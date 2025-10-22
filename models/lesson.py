@@ -83,6 +83,9 @@ class ContentBlock(BaseModel):
 
     class Config:
         use_enum_values = True
+        json_encoders = {
+            UUID: lambda v: str(v)
+        }
 
 
 class Lesson(BaseModel):
