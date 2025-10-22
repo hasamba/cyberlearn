@@ -49,7 +49,7 @@ class QuestionType(str, Enum):
 
 class Question(BaseModel):
     """Individual assessment question"""
-    question_id: UUID = Field(default_factory=uuid4)
+    question_id: str  # Simple string ID like "q1", "q2", etc.
     type: QuestionType
     question: str
     options: Optional[List[str]] = None  # For multiple choice
