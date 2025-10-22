@@ -264,7 +264,88 @@
     }
   ],
   "pre_assessment": null,
-  "post_assessment": [],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Which CIA pillar is violated when an attacker steals passwords from a database?",
+      "options": [
+        "Confidentiality",
+        "Integrity",
+        "Availability",
+        "All three"
+      ],
+      "correct_answer": 0,
+      "explanation": "Unauthorized access to sensitive information (passwords) is a confidentiality breach. The passwords were kept secret but that secrecy was violated.",
+      "difficulty": 1,
+      "memory_aid": "Remember: Confidentiality = Concealed. Stolen passwords are no longer concealed.",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "A company implements daily backups and redundant servers. Which CIA pillar are they primarily protecting?",
+      "options": [
+        "Confidentiality",
+        "Integrity",
+        "Availability",
+        "Authorization"
+      ],
+      "correct_answer": 2,
+      "explanation": "Backups and redundancy ensure systems remain accessible even during failures. This is availability protection.",
+      "difficulty": 2,
+      "memory_aid": "Backups = spare tire = Availability",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which technology primarily protects data integrity?",
+      "options": [
+        "Encryption",
+        "Firewalls",
+        "Hashing",
+        "VPNs"
+      ],
+      "correct_answer": 2,
+      "explanation": "Hashing creates a digital fingerprint of data. Any change to the data produces a different hash, allowing detection of tampering—this protects integrity.",
+      "difficulty": 2,
+      "memory_aid": "Hash = fingerprint = detects tampering = Integrity",
+      "points": 15
+    },
+    {
+      "question_id": "q4",
+      "type": "scenario",
+      "question": "Scenario: A hospital's patient database is online and secure, but so slow that doctors can't access records during emergencies. Which statement is TRUE?",
+      "options": [
+        "Confidentiality is maintained, but availability is compromised",
+        "Integrity is maintained, but confidentiality is compromised",
+        "All three CIA pillars are violated",
+        "Only availability is maintained"
+      ],
+      "correct_answer": 0,
+      "explanation": "Data is still secure (confidentiality OK) and accurate (integrity OK), but the system is too slow to use effectively (availability compromised). Security isn't just about protecting data—it's also about ensuring accessibility.",
+      "difficulty": 3,
+      "memory_aid": "A slow but secure system still fails availability. Remember: security must be usable.",
+      "points": 20
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "Which is the BEST real-world example of protecting confidentiality?",
+      "options": [
+        "Using RAID arrays to prevent disk failure",
+        "Implementing two-factor authentication",
+        "Creating nightly database backups",
+        "Using checksums to verify file integrity"
+      ],
+      "correct_answer": 1,
+      "explanation": "Two-factor authentication strengthens identity verification, ensuring only authorized users access sensitive data. This protects confidentiality. The other options protect availability (RAID, backups) and integrity (checksums).",
+      "difficulty": 2,
+      "memory_aid": "Authentication = proving identity = controls access = Confidentiality",
+      "points": 15
+    }
+  ],
   "mastery_threshold": 80,
   "jim_kwik_principles": [
     "active_learning",
