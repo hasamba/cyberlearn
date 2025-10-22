@@ -312,7 +312,17 @@ class Database:
         if not row:
             return None
 
-        return Lesson.parse_raw(json.dumps(dict(row)))
+        # Parse JSON fields from database
+        row_dict = dict(row)
+        row_dict['prerequisites'] = json.loads(row_dict['prerequisites'])
+        row_dict['learning_objectives'] = json.loads(row_dict['learning_objectives'])
+        row_dict['content_blocks'] = json.loads(row_dict['content_blocks'])
+        row_dict['post_assessment'] = json.loads(row_dict['post_assessment'])
+        row_dict['jim_kwik_principles'] = json.loads(row_dict['jim_kwik_principles'])
+        if row_dict['pre_assessment']:
+            row_dict['pre_assessment'] = json.loads(row_dict['pre_assessment'])
+
+        return Lesson(**row_dict)
 
     def get_lessons_by_domain(self, domain: str) -> List[LessonMetadata]:
         """Get all lesson metadata for a domain"""
