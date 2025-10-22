@@ -280,13 +280,13 @@ class Database:
                     lesson.order_index,
                     json.dumps([str(p) for p in lesson.prerequisites]),
                     json.dumps(lesson.learning_objectives),
-                    json.dumps([block.dict() for block in lesson.content_blocks]),
+                    json.dumps([json.loads(block.model_dump_json()) for block in lesson.content_blocks]),
                     (
-                        json.dumps([q.dict() for q in lesson.pre_assessment])
+                        json.dumps([json.loads(q.model_dump_json()) for q in lesson.pre_assessment])
                         if lesson.pre_assessment
                         else None
                     ),
-                    json.dumps([q.dict() for q in lesson.post_assessment]),
+                    json.dumps([json.loads(q.model_dump_json()) for q in lesson.post_assessment]),
                     lesson.mastery_threshold,
                     json.dumps(lesson.jim_kwik_principles),
                     lesson.base_xp_reward,
