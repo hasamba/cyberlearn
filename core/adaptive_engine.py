@@ -230,35 +230,57 @@ class AdaptiveEngine:
         Used for initial skill profiling.
         """
 
-        domains = [
-            "fundamentals",
-            "dfir",
-            "malware",
-            "active_directory",
-            "pentest",
-            "redteam",
-            "blueteam",
-        ]
-
-        # Distribute questions across domains and difficulties
-        questions_per_domain = num_questions // len(domains)
+        # Real diagnostic questions for each domain
+        diagnostic_questions = {
+            "fundamentals": [
+                {"question": "What does the CIA triad stand for in cybersecurity?", "difficulty": 1},
+                {"question": "Which principle ensures data is accessible when needed?", "difficulty": 1},
+                {"question": "What is the primary purpose of encryption?", "difficulty": 2},
+            ],
+            "dfir": [
+                {"question": "What does DFIR stand for?", "difficulty": 1},
+                {"question": "Why is chain of custody important in digital forensics?", "difficulty": 2},
+                {"question": "What is the first step in incident response?", "difficulty": 2},
+            ],
+            "malware": [
+                {"question": "What is the difference between a virus and a worm?", "difficulty": 2},
+                {"question": "What does static malware analysis involve?", "difficulty": 2},
+                {"question": "What is a rootkit?", "difficulty": 3},
+            ],
+            "active_directory": [
+                {"question": "What is Active Directory used for?", "difficulty": 1},
+                {"question": "What is the purpose of Group Policy?", "difficulty": 2},
+                {"question": "What is Kerberos authentication?", "difficulty": 3},
+            ],
+            "pentest": [
+                {"question": "What is the purpose of penetration testing?", "difficulty": 1},
+                {"question": "What are the main phases of a penetration test?", "difficulty": 2},
+                {"question": "What is privilege escalation?", "difficulty": 2},
+            ],
+            "redteam": [
+                {"question": "How does red team differ from penetration testing?", "difficulty": 2},
+                {"question": "What is social engineering?", "difficulty": 1},
+                {"question": "What is lateral movement in a network?", "difficulty": 3},
+            ],
+            "blueteam": [
+                {"question": "What is the role of a blue team?", "difficulty": 1},
+                {"question": "What is a SIEM system?", "difficulty": 2},
+                {"question": "What are Indicators of Compromise (IOCs)?", "difficulty": 2},
+            ],
+        }
 
         diagnostic = {}
-        for domain in domains:
+        for domain, questions in diagnostic_questions.items():
             domain_questions = []
-
-            # Mix of difficulties
-            difficulties = [1, 1, 2, 2, 3]  # More beginner/intermediate
-            for diff in difficulties[:questions_per_domain]:
+            for q in questions:
                 domain_questions.append(
                     {
                         "domain": domain,
-                        "difficulty": diff,
-                        "question": f"[{domain.upper()}] Diagnostic question difficulty {diff}",
+                        "difficulty": q["difficulty"],
+                        "question": q["question"],
                         "type": "multiple_choice",
                     }
                 )
-
             diagnostic[domain] = domain_questions
 
         return diagnostic
