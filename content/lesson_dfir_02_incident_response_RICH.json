@@ -1,0 +1,121 @@
+{
+  "lesson_id": "df000000-0000-0000-0000-000000000002",
+  "domain": "dfir",
+  "title": "Incident Response Process",
+  "difficulty": 2,
+  "order_index": 3,
+  "prerequisites": [],
+  "concepts": [
+    "IR lifecycle",
+    "Preparation",
+    "Detection",
+    "Containment",
+    "Eradication",
+    "Recovery"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "df000000-0000-0000-0000-000000000201",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Incident Response is what separates organizations that survive breaches from those that don't. Every organization will face security incidents - it's not if, but when. The quality of your incident response determines whether it's a minor event or catastrophic breach.\n\nHere's the harsh reality: The average time to detect a breach is 207 days. The average time to contain it after detection is 73 days. That's nearly 9 months attackers can operate undetected. Proper incident response reduces both numbers dramatically.\n\nMany people think incident response is just 'fix the problem when it happens.' Wrong. Real incident response is a structured, rehearsed process that starts long before incidents occur. Preparation is 50% of incident response. The time to write your incident response plan is not during an active ransomware attack.\n\nThink of incident response like emergency medicine. When someone has a heart attack, the ER team doesn't improvise - they follow established protocols, have roles assigned, tools ready, and procedures rehearsed. That's what you're building for cyber incidents.\n\nThe critical mindset: Stay calm under pressure. Incidents are high-stress, high-stakes situations. Executives yelling, systems down, attackers active, media watching. Your job is methodical, evidence-based investigation and response. Panic spreads incidents, process contains them."
+      },
+      "simplified_explanation": "Incident Response = what you do when security breach happens. Follow process: Prepare (before), Detect (find breach), Contain (stop spread), Eradicate (remove attacker), Recover (restore systems), Learn (prevent recurrence). Like firefighters - prepare, respond with process, learn from each fire.",
+      "memory_aids": [
+        "PICERL = Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned",
+        "First 48 hours critical for evidence preservation",
+        "Document everything - it's evidence"
+      ],
+      "teach_like_im_10": "When bad guys break into computer systems, you need a plan. Before it happens, prepare (have tools ready, know who does what). When it happens, find it (detect the break-in), stop it from spreading (containment), kick them out (eradication), fix everything (recovery), and learn from it so it doesn't happen again."
+    },
+    {
+      "block_id": "df000000-0000-0000-0000-000000000202",
+      "type": "explanation",
+      "content": {
+        "text": "## The Incident Response Lifecycle\n\nBased on NIST SP 800-61 framework, incident response has six phases:\n\n### Phase 1: Preparation\n\n**Goal**: Be ready to respond effectively before incidents occur.\n\n**This happens BEFORE an incident.** Most important phase - preparation determines response success.\n\n**Key Activities**:\n\n**1. Incident Response Plan**:\n- Written procedures for handling incidents\n- Contact information for team members\n- Escalation procedures\n- Communication protocols\n- Regulatory reporting requirements\n\n**2. Incident Response Team (IRT / CSIRT)**:\n- **Incident Commander**: Leads response, makes decisions\n- **Security Analysts**: Investigate, analyze\n- **System Administrators**: System access, remediation\n- **Legal**: Legal implications, law enforcement liaison\n- **Communications**: Internal/external communications\n- **Management**: Business decisions, resource allocation\n\n**3. Tools and Resources**:\n- Forensic workstations (write-blockers, imaging tools)\n- Network packet capture tools\n- Log analysis platforms (SIEM)\n- Endpoint detection and response (EDR)\n- Forensic software (EnCase, FTK, Autopsy)\n- Clean OS images and software\n- Secure communication channels (encrypted)\n\n**4. Documentation Templates**:\n- Incident report template\n- Timeline template\n- Evidence chain of custody forms\n- Communication templates\n\n**5. Training and Exercises**:\n- Tabletop exercises (talk through scenarios)\n- Simulation exercises (technical practice)\n- Red team/purple team exercises\n- Quarterly drills\n\n**6. Preventive Measures**:\n- Security controls (firewalls, AV, EDR)\n- Monitoring and detection (SIEM, IDS/IPS)\n- Patch management\n- User awareness training\n- Regular backups (offline!)\n\n### Phase 2: Detection and Analysis (Identification)\n\n**Goal**: Identify that an incident has occurred and understand its scope.\n\n**Detection Sources**:\n- SIEM alerts\n- IDS/IPS alerts\n- Antivirus/EDR alerts\n- User reports\n- Threat intelligence feeds\n- Anomaly detection\n- Third-party notification (FBI, security researcher)\n\n**Initial Analysis Questions**:\n1. Is this a real incident or false positive?\n2. What type of incident? (malware, breach, DDoS, insider threat)\n3. What is the scope? (How many systems affected?)\n4. What is the severity? (Critical, High, Medium, Low)\n5. What data may be compromised?\n6. Is attacker still active?\n\n**Indicators of Compromise (IOCs)**:\n- Unusual outbound network traffic\n- Anomalous user behavior\n- Known malicious IP/domain connections\n- Unexpected system changes\n- Failed login attempts followed by success\n- New accounts created\n- Privilege escalation events\n- Data exfiltration patterns\n\n**Triage and Prioritization**:\n```\nCritical: Active data breach, ransomware, systems down\nHigh: Compromised privileged account, lateral movement\nMedium: Malware detected but contained\nLow: Failed attack attempt, reconnaissance detected\n```\n\n**Analysis Activities**:\n- Collect and analyze logs\n- Review system artifacts\n- Network traffic analysis\n- Memory analysis\n- Malware analysis\n- Correlate events across systems\n- Build attack timeline\n\n### Phase 3: Containment\n\n**Goal**: Stop the incident from spreading while preserving evidence.\n\n**Three Types of Containment**:\n\n**1. Short-term Containment**:\n- Immediate actions to stop spread\n- Example: Isolate infected system from network\n- Goal: Prevent immediate damage\n\n**2. Long-term Containment**:\n- Temporary fixes allowing business operations\n- Example: Segment network, apply temporary patches\n- Goal: Maintain business operations while preparing for eradication\n\n**3. Evidence Preservation**:\n- Throughout containment, preserve evidence\n- Take forensic images before changes\n- Document all actions\n- Maintain chain of custody\n\n**Containment Actions**:\n\n**Network Level**:\n- Isolate affected network segments\n- Block malicious IPs/domains at firewall\n- Disable compromised accounts\n- Implement additional firewall rules\n- Disconnect infected systems from network\n\n**System Level**:\n- Disable compromised accounts\n- Kill malicious processes\n- Block malicious files\n- Reset passwords (especially privileged accounts)\n- Enable additional logging\n\n**Containment Decisions**:\n- **Disconnect vs Monitor**: Disconnecting stops attack but loses visibility. Monitoring allows intelligence gathering but risks spread.\n- **Shutdown vs Isolate**: Shutdown loses volatile data (memory). Isolation preserves evidence.\n- **When to Disconnect**:\n  - Ransomware actively encrypting\n  - Data exfiltration in progress\n  - Lateral movement detected\n  - Cannot effectively monitor\n\n### Phase 4: Eradication\n\n**Goal**: Remove the threat from the environment completely.\n\n**Eradication Activities**:\n\n**Remove Malware**:\n- Delete malicious files\n- Remove persistence mechanisms (scheduled tasks, registry keys, services)\n- Clean infected systems\n- Consider rebuilding vs cleaning (rebuilding more thorough)\n\n**Close Attack Vectors**:\n- Patch exploited vulnerabilities\n- Remove unauthorized access\n- Delete backdoors\n- Fix misconfigurations\n\n**Credential Reset**:\n- Reset all compromised credentials\n- Reset privileged account passwords\n- Revoke and reissue certificates if compromised\n- Reset service account passwords\n\n**Verification**:\n- Scan for residual malware\n- Verify all persistence mechanisms removed\n- Check for additional compromised systems\n- Search for IOCs across environment\n\n**Rebuild vs Clean Debate**:\n```\nClean:\n- Faster\n- Less disruptive\n- Risk: May miss rootkits or persistence\n\nRebuild:\n- Complete assurance\n- More thorough\n- More disruptive\n- Recommended for critical incidents\n```\n\n### Phase 5: Recovery\n\n**Goal**: Restore systems to normal operation and verify they're clean.\n\n**Recovery Activities**:\n\n**System Restoration**:\n- Rebuild compromised systems\n- Restore from clean backups\n- Verify backups not infected\n- Reinstall applications\n- Restore data\n\n**Validation**:\n- Test systems before returning to production\n- Verify functionality\n- Scan for malware\n- Monitor for anomalous behavior\n- Check for indicators of compromise\n\n**Gradual Return to Production**:\n- Don't restore everything at once\n- Monitor heavily during initial hours\n- Watch for signs of reinfection\n- Be prepared to re-isolate if needed\n\n**Enhanced Monitoring**:\n- Increase logging verbosity\n- Add specific IOC detections\n- Monitor for attacker return\n- Continued surveillance for 30-90 days\n\n**Backup Verification**:\n- Verify backups taken post-recovery\n- Test restoration process\n- Ensure offline backups exist\n\n### Phase 6: Lessons Learned (Post-Incident Activity)\n\n**Goal**: Learn from the incident to improve security and response.\n\n**Post-Incident Review Meeting**:\n- Hold within 2 weeks of incident closure\n- Include all response team members\n- No blame culture - focus on improvement\n\n**Questions to Answer**:\n1. How did the incident occur?\n2. How was it detected?\n3. What was the timeline?\n4. What worked well in response?\n5. What could be improved?\n6. What security gaps were exposed?\n7. What preventive measures are needed?\n8. Were procedures followed?\n9. What additional training is needed?\n\n**Outputs**:\n- Final incident report\n- Root cause analysis\n- Recommendations\n- Updated procedures\n- Security improvements\n- Metrics and statistics\n\n**Security Improvements**:\n- Patch vulnerabilities exploited\n- Implement new detection rules\n- Update firewall rules\n- Enhance monitoring\n- Update incident response plan\n- Conduct additional training\n- Improve security controls\n\n**Metrics to Track**:\n- Time to detect (TTD)\n- Time to contain (TTC)\n- Number of systems affected\n- Data compromised\n- Cost of incident\n- Effectiveness of controls\n\n## Incident Classification\n\n**By Impact**:\n- **Critical**: Complete system compromise, data breach, ransomware\n- **High**: Privileged account compromise, partial breach\n- **Medium**: Malware contained, unsuccessful attacks\n- **Low**: Reconnaissance, failed attempts\n\n**By Type**:\n- Data breach / exfiltration\n- Ransomware / destructive attack\n- Malware infection\n- Unauthorized access\n- Denial of Service\n- Insider threat\n- Physical breach\n- Social engineering\n\n## Communication During Incidents\n\n**Internal Communication**:\n- Regular updates to management\n- Status reports to incident response team\n- Coordination between teams\n- Use secure channels (encrypted)\n\n**External Communication**:\n- Law enforcement (FBI, Secret Service)\n- Regulatory bodies (FTC, SEC, HHS for HIPAA)\n- Customers (if their data compromised)\n- Media (through designated spokesperson)\n- Cyber insurance\n\n**Communication Rules**:\n- Designate single spokesperson\n- Don't speculate\n- Stick to facts\n- Coordinate with legal\n- Document all communications\n- Consider notification requirements (GDPR, state laws)\n\n## Legal and Regulatory Considerations\n\n**Evidence Preservation**:\n- Maintain chain of custody\n- Document all evidence handling\n- Use forensically sound methods\n- Consider legal hold requirements\n\n**Breach Notification Laws**:\n- GDPR: 72 hours for notification\n- State laws vary (California, New York, etc.)\n- HIPAA: 60 days for breach notification\n- Know your requirements\n\n**Law Enforcement Engagement**:\n- When to involve: Major breaches, nation-state attacks, ransomware\n- FBI Cyber Division, Secret Service, local law enforcement\n- They can assist with investigation and attribution\n- May request evidence preservation"
+      },
+      "ascii_art": "INCIDENT RESPONSE LIFECYCLE\n\n1. PREPARATION\n   (Before incident)\n   |\n2. DETECTION & ANALYSIS\n   (Identify incident)\n   |\n3. CONTAINMENT\n   (Stop the spread)\n   |\n4. ERADICATION\n   (Remove threat)\n   |\n5. RECOVERY\n   (Restore systems)\n   |\n6. LESSONS LEARNED\n   (Improve for next time)\n   |\n   Back to 1. PREPARATION",
+      "examples": [
+        {
+          "scenario": "Ransomware Incident Response",
+          "explanation": "Alert: Multiple systems showing encrypted files. DETECT: Confirmed ransomware via ransom note and EDR alerts. CONTAIN: Immediately isolated affected systems, blocked outbound connections to C2. ERADICATE: Identified entry point (phishing), removed malware, patched vulnerability. RECOVER: Restored from offline backups taken 24 hours prior, verified clean. LEARN: Implemented email filtering, user training, and offline backup verification process."
+        },
+        {
+          "scenario": "Compromised Account Response",
+          "explanation": "Alert: Account accessing systems from unusual location. DETECT: VPN login from foreign IP, account typically local only. CONTAIN: Disabled account immediately, ended all sessions, reviewed accessed systems. ERADICATE: Reset credentials, reviewed for backdoors, checked for lateral movement. RECOVER: Re-enabled account with new credentials and MFA. LEARN: Implemented mandatory MFA for all VPN access."
+        }
+      ]
+    },
+    {
+      "block_id": "df000000-0000-0000-0000-000000000203",
+      "type": "real_world",
+      "content": {
+        "text": "**Maersk NotPetya Recovery (2017)**:\n\nIncident:\n- NotPetya wiper malware hit Maersk shipping company\n- Encrypted/wiped 4,000 servers and 45,000 PCs\n- Complete shutdown of IT infrastructure\n- Could not track shipments, process orders, communicate\n\nResponse:\n- Incident detected immediately (all systems going down)\n- Contained by shutting down remaining systems\n- Eradicated by rebuilding entire infrastructure from scratch\n- Recovered in 10 days (heroic effort)\n- Miracle: Found one domain controller in Ghana (powered off during attack) - only surviving copy of AD\n\nCost: $300 million\nLessons: Offline backups critical, DR plan, network segmentation\n\n**Equifax Breach Response Failure (2017)**:\n\nWhat went wrong:\n- Breach occurred March 2017\n- Not detected until July 2017 (4 months!)\n- Vulnerability had patch available (unpatched)\n- Poor containment (continued for months)\n- Delayed public disclosure\n- Affected 147 million people\n\nResponse failures:\n- No detection for 76 days\n- Inadequate monitoring\n- Failed to patch known vulnerability\n- Poor communication\n- Insufficient preparation\n\nCost: $1.4 billion, CIO and CISO resigned, congressional hearings\nLessons: Patch management critical, detection must be fast, communication important\n\n**Target Breach Response (2013)**:\n\nWhat happened:\n- Malware detected by FireEye\n- Alert generated, sent to security team in India\n- Alert was reviewed but not escalated\n- Breach continued for weeks\n- Finally detected by external source (DOJ notification)\n\nResponse failures:\n- Detection tools worked, but process failed\n- Alert not escalated properly\n- No clear escalation procedures\n- Delayed response allowed massive data theft\n\nCost: 40 million credit cards stolen, $292 million, CIO resigned\nLessons: Tools alone insufficient, need process and people"
+      },
+      "industry_examples": [
+        "Colonial Pipeline responded to ransomware by shutting pipeline proactively, preventing worse damage but causing gas shortages - sometimes containment has business impact",
+        "SolarWinds supply chain attack: Sophisticated IR required, global coordination, months to fully eradicate, showed importance of supply chain security",
+        "Capital One breach (2019): Cloud misconfiguration, good IR limited damage to 100M records (could have been worse), showed cloud IR differences"
+      ]
+    },
+    {
+      "block_id": "df000000-0000-0000-0000-000000000204",
+      "type": "explanation",
+      "content": {
+        "text": "**Pitfall 1: No Preparation**\nWaiting until incident happens to plan response. Chaos, panic, poor decisions. Solution: Write IR plan, conduct tabletop exercises, prepare tools/team.\n\n**Pitfall 2: Destroying Evidence**\nTaking actions that destroy evidence (reimaging immediately, not taking forensic images). Solution: Evidence preservation first, remediation second.\n\n**Pitfall 3: Incomplete Eradication**\nRemoving visible malware but missing persistence mechanisms. Attacker returns days later using backdoor. Solution: Thorough hunt for all attacker access, consider full rebuild.\n\n**Pitfall 4: Not Documenting**\nFailing to document actions during incident. Can't recreate timeline, can't testify in court. Solution: Document everything in real-time.\n\n**Pitfall 5: Working Alone**\nIncident commander trying to do everything. Burnout, mistakes, slow response. Solution: Activate full incident response team, delegate.\n\n**Pitfall 6: Poor Communication**\nManagement surprised by news coverage, legal not informed, affected users not notified. Solution: Communication plan, designated spokesperson, regular updates.\n\n**Pitfall 7: Premature Declaration of Victory**\nDeclaring incident resolved, attacker still has access. Incident recurs. Solution: Thorough validation, extended monitoring period.\n\n**Pitfall 8: Skipping Lessons Learned**\nResolving incident, moving on, same thing happens again. Solution: Always conduct post-incident review, implement improvements."
+      }
+    },
+    {
+      "block_id": "df000000-0000-0000-0000-000000000205",
+      "type": "explanation",
+      "content": {
+        "text": "**Immediate Actions**:\n1. Check if your organization has an incident response plan (read it!)\n2. Identify your incident response team members\n3. Verify you have access to forensic tools\n4. Confirm offline backups exist\n5. Review incident escalation procedures\n\n**This Week - Preparation**:\n1. Create personal IR checklist\n2. Document key contacts (team, legal, management)\n3. Practice taking forensic image (in lab)\n4. Review NIST SP 800-61 (IR guide)\n5. Participate in or create tabletop exercise scenario\n\n**This Month - Build IR Skills**:\n1. Complete TryHackMe Incident Response path\n2. Practice full IR simulation in lab\n3. Learn forensic tools (FTK, Autopsy, Volatility)\n4. Study real incident response case studies\n5. Practice log analysis for IR\n6. Create IR playbooks for common scenarios\n\n**Incident Response Plan Essentials**:\n- ✅ Clear roles and responsibilities\n- ✅ Contact information for team\n- ✅ Escalation procedures\n- ✅ Communication templates\n- ✅ Technical procedures for common incidents\n- ✅ Legal and regulatory requirements\n- ✅ Evidence preservation procedures\n- ✅ Vendor contact information\n- ✅ Business continuity procedures\n\n**IR Tool Kit**:\n- Forensic workstation with write blockers\n- Forensic imaging tools (FTK Imager, dd)\n- Memory analysis (Volatility, Rekall)\n- Disk analysis (Autopsy, EnCase, FTK)\n- Network analysis (Wireshark, NetworkMiner)\n- Log analysis tools (Splunk, ELK)\n- Malware analysis (sandbox, disassembler)\n- Secure communication (Signal, encrypted email)\n\n**Incident Response Playbooks to Create**:\n- Ransomware response\n- Data breach response\n- Malware infection response\n- Compromised account response\n- DDoS response\n- Insider threat response\n- Web application compromise\n- Cloud security incident\n\n**Metrics to Track**:\n```\nMean Time to Detect (MTTD): How long to find incidents\nMean Time to Respond (MTTR): How long to start response\nMean Time to Contain (MTTC): How long to contain\nMean Time to Recover (MTTRecover): How long to restore\nNumber of incidents by type\nCost per incident\n```\n\n**Training and Exercises**:\n- Quarterly tabletop exercises\n- Annual full-scale simulation\n- Red team/purple team exercises\n- Attend IR training (SANS FOR508, GCIH certification)\n- Practice IR in lab environments\n\n**Career Path**:\n- SOC Analyst → Incident Responder → Senior IR → IR Team Lead → CISO\n- Certifications: GCIH, GCFA, GREM, CISSP\n- Skills: Log analysis, forensics, malware analysis, communication\n\n**Quick Reference - First Hour**:\n```\nMinute 1-5: Verify incident is real\nMinute 5-10: Assess scope and severity\nMinute 10-15: Activate incident response team\nMinute 15-20: Begin containment actions\nMinute 20-30: Preserve evidence, take forensic images\nMinute 30-60: Continue containment, notify management\n         Document everything\n```\n\n**Communications Checklist**:\n- Notify management\n- Engage legal team\n- Contact law enforcement (if appropriate)\n- Notify affected parties (if required)\n- Prepare public statement (if needed)\n- Coordinate with PR team\n- Report to regulators (if required)\n\n**Post-Incident Report Contents**:\n1. Executive summary\n2. Incident timeline\n3. Root cause analysis\n4. Systems affected\n5. Data compromised (if any)\n6. Response actions taken\n7. Effectiveness evaluation\n8. Recommendations\n9. Lessons learned\n10. Appendices (evidence, logs)\n\n**Remember**:\n- Preparation is half the battle\n- Document everything - it's evidence\n- Evidence preservation before remediation\n- Communication is critical\n- Thorough eradication prevents recurrence\n- Always conduct lessons learned\n- Practice makes perfect - exercise regularly\n- Stay calm under pressure\n\nMaster incident response and you'll handle the worst security events with confidence and competence. The difference between good and great IR is preparation."
+      }
+    }
+  ],
+  "estimated_time": 30,
+  "learning_objectives": [
+    "Understand core concepts",
+    "Apply knowledge in real-world scenarios",
+    "Identify common security issues",
+    "Implement best practices"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main concept covered in this lesson?",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which best practice should you implement?",
+      "options": [
+        "Best Practice A",
+        "Best Practice B",
+        "Best Practice C",
+        "Best Practice D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ]
+}

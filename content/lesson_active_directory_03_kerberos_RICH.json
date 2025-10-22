@@ -1,0 +1,121 @@
+{
+  "lesson_id": "ad000000-0000-0000-0000-000000000003",
+  "domain": "active_directory",
+  "title": "Kerberos Authentication",
+  "difficulty": 3,
+  "order_index": 3,
+  "prerequisites": [],
+  "concepts": [
+    "Tickets",
+    "TGT",
+    "TGS",
+    "KDC",
+    "Service tickets",
+    "Authentication protocol"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000301",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Kerberos is the authentication protocol that powers Active Directory and makes Windows domains work. Named after the three-headed dog guarding the gates of Hades, Kerberos has three main components working together to authenticate users securely.\n\nHere's why this matters: Every time you log into a Windows domain, Kerberos is working behind the scenes. Every time you access a file share, Kerberos authenticates you. Understanding Kerberos means understanding how Windows authentication actually works at a deep level.\n\nFor security professionals, Kerberos knowledge is critical because it's both a security strength and potential attack vector. Attacks like Kerberoasting, Pass-the-Ticket, Golden Ticket, and Silver Ticket all exploit Kerberos mechanics. Defenders must understand the protocol to detect these attacks. Red teamers must understand it to execute them.\n\nThe beautiful part: Kerberos is elegant. It solves the problem of authenticating without sending passwords over the network. It uses tickets - cryptographic tokens that prove identity - instead of repeatedly entering passwords. Once you understand the ticket flow, everything clicks into place."
+      },
+      "simplified_explanation": "Kerberos = ticket-based authentication system. Instead of sending your password every time you access something, you get tickets that prove who you are. Like a concert wristband - show it once to get in, then the wristband proves you're allowed to be there.",
+      "memory_aids": [
+        "TGT = Ticket to Get Tickets (the master ticket)",
+        "TGS = Ticket Granting Service (gives you specific service tickets)",
+        "KDC = Key Distribution Center (the ticket booth)"
+      ],
+      "teach_like_im_10": "Imagine going to a theme park. You show ID and buy a wristband (TGT) at the entrance. Now you can ride any ride by showing your wristband to get a ride ticket (TGS). You never show your ID again - just your wristband and ride tickets. That's Kerberos!"
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000302",
+      "type": "explanation",
+      "content": {
+        "text": "## Kerberos Components\n\n**Key Distribution Center (KDC)**:\n- Runs on domain controller\n- Two main services: Authentication Service (AS) and Ticket Granting Service (TGS)\n- Issues tickets to authenticated users\n- Stores all password hashes in Active Directory database\n\n**Authentication Service (AS)**:\n- First stop for authentication\n- Issues TGT (Ticket Granting Ticket) after verifying credentials\n- User proves identity with password hash\n\n**Ticket Granting Service (TGS)**:\n- Issues service tickets for specific resources\n- User presents TGT to get service-specific tickets\n- Doesn't require password again\n\n## The Kerberos Authentication Flow\n\n**Step 1: AS-REQ (Authentication Service Request)**\nUser logs in → Client sends request to AS:\n- Username\n- Timestamp encrypted with user's password hash\n\n**Step 2: AS-REP (Authentication Service Response)**\nAS verifies user → Sends back:\n- TGT (Ticket Granting Ticket) - encrypted with KDC secret key\n- Session key - encrypted with user's password hash\n- TGT contains: username, timestamp, IP, session key\n\n**Step 3: TGS-REQ (Ticket Granting Service Request)**\nUser wants to access file server → Client sends to TGS:\n- TGT (proves identity)\n- Service Principal Name (SPN) of desired service\n- Authenticator (timestamp encrypted with session key)\n\n**Step 4: TGS-REP (Ticket Granting Service Response)**\nTGS validates TGT → Sends back:\n- Service ticket for requested service\n- Encrypted with service account's password hash\n- Contains: username, session key for service\n\n**Step 5: AP-REQ (Application Request)**\nClient contacts file server → Presents:\n- Service ticket\n- New authenticator\n\n**Step 6: AP-REP (Application Response)**\nFile server validates ticket → Grants access\n\n## Kerberos Security Features\n\n**No passwords over network**:\n- Password never transmitted\n- Only encrypted tickets exchanged\n- Reduces interception risk\n\n**Mutual authentication**:\n- Client authenticates to server\n- Server proves it's the legitimate service\n- Prevents fake services\n\n**Ticket lifetime**:\n- TGT expires (default: 10 hours)\n- Service tickets expire (default: 10 hours)\n- Reduces window for ticket theft\n\n**Replay prevention**:\n- Timestamps in tickets\n- Tickets only valid once\n- Prevents reuse of captured tickets\n\n## Kerberos Attacks\n\n**Kerberoasting**:\n- Request service tickets for SPNs\n- Service tickets encrypted with service account password hash\n- Crack hash offline to recover service account password\n- Defense: Strong service account passwords, detect mass TGS requests\n\n**Pass-the-Ticket**:\n- Steal tickets from memory (mimikatz)\n- Inject stolen ticket to impersonate user\n- No password needed, just ticket\n- Defense: Protected Users group, monitor unusual ticket usage\n\n**Golden Ticket**:\n- Steal KRBTGT account hash (KDC secret key)\n- Forge TGTs for any user, any privileges\n- Complete domain compromise\n- Defense: Rotate KRBTGT password, monitor for anomalous TGT usage\n\n**Silver Ticket**:\n- Steal service account hash\n- Forge service tickets for that specific service\n- More limited than Golden Ticket but stealthier\n- Defense: Service account password rotation, monitor service ticket usage\n\n**AS-REP Roasting**:\n- Attack accounts with 'Do not require Kerberos preauthentication'\n- Request AS-REP without authentication\n- Crack hash offline\n- Defense: Remove 'Do not require preauthentication' setting"
+      },
+      "ascii_art": "KERBEROS FLOW\n\n1. AS-REQ\nClient ----[User+Password Hash]----> KDC-AS\n\n2. AS-REP\nClient <---[TGT + Session Key]------ KDC-AS\n\n3. TGS-REQ\nClient ----[TGT + SPN]-------------> KDC-TGS\n\n4. TGS-REP\nClient <---[Service Ticket]--------- KDC-TGS\n\n5. AP-REQ\nClient ----[Service Ticket]--------> File Server\n\n6. AP-REP\nClient <---[Access Granted]--------- File Server",
+      "examples": [
+        {
+          "scenario": "Normal Kerberos Authentication",
+          "explanation": "User john@corp.com logs in at 9am. Client gets TGT from DC. At 9:15, John accesses \\\\fileserver\\share. Client presents TGT to TGS, requests ticket for cifs/fileserver. Receives service ticket. Presents service ticket to fileserver. Granted access. John's password never sent over network."
+        },
+        {
+          "scenario": "Kerberoasting Attack",
+          "explanation": "Attacker has compromised low-privilege domain user account. Enumerates all SPNs in domain. Requests TGS tickets for all service accounts. Receives service tickets encrypted with service account password hashes. Extracts tickets, runs hashcat offline. Cracks weak service account password. Now has privileged access."
+        }
+      ]
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000303",
+      "type": "real_world",
+      "content": {
+        "text": "**Kerberoasting in the Wild**:\n\nRed Team Engagement:\n- Compromised domain user workstation\n- Ran GetUserSPNs.ps1 to enumerate SPNs\n- Found service account: svc_backup with SPN registered\n- Requested TGS for svc_backup\n- Extracted ticket to hash format\n- Offline cracking with hashcat\n- Password cracked in 4 hours: 'Summer2019!'\n- svc_backup had Domain Admin privileges (misconfiguration)\n- Complete domain compromise from Kerberoasting\n\n**Golden Ticket Attack**:\n\nAPT Group Attack:\n- Compromised DC, dumped KRBTGT hash\n- Created Golden Ticket with mimikatz\n- Ticket grants Domain Admin access for 10 years\n- Even after password resets, Golden Ticket still valid\n- Persistent access to entire domain\n- Detection: Monitor for TGTs with unusual lifetimes, KRBTGT hash changes\n\n**Defense Success Story**:\n\nCompany implemented Kerberos monitoring:\n- SIEM alert on mass TGS requests (Kerberoasting indicator)\n- Alert fired: user requested 47 service tickets in 2 minutes\n- SOC investigated immediately\n- Found compromised account conducting Kerberoasting\n- Disabled account, reset service account passwords\n- Prevented privilege escalation"
+      },
+      "industry_examples": [
+        "NotPetya ransomware used Pass-the-Ticket to spread rapidly across networks after initial compromise",
+        "Financial services company detected Golden Ticket attack via impossible ticket lifetimes in logs",
+        "Healthcare breach involved Kerberoasting to compromise privileged service accounts"
+      ]
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000304",
+      "type": "explanation",
+      "content": {
+        "text": "**Pitfall 1: Weak Service Account Passwords**\nService accounts with weak passwords vulnerable to Kerberoasting. Once ticket requested, offline cracking succeeds. Solution: 25+ character random passwords for service accounts.\n\n**Pitfall 2: Not Rotating KRBTGT**\nKRBTGT password never rotated. If compromised, Golden Tickets valid forever. Solution: Rotate KRBTGT password twice (special procedure required).\n\n**Pitfall 3: Excessive Service Account Privileges**\nService accounts with Domain Admin rights. Kerberoasting leads to complete compromise. Solution: Least privilege for service accounts.\n\n**Pitfall 4: Not Monitoring Kerberos Logs**\nKerberos attacks happening without detection. Solution: Monitor Event IDs 4768, 4769, 4770 for anomalies.\n\n**Pitfall 5: Accounts with No Preauth Required**\nAS-REP Roasting trivial against these accounts. Solution: Audit and remove 'Do not require Kerberos preauthentication' setting."
+      }
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000305",
+      "type": "explanation",
+      "content": {
+        "text": "**Immediate Actions**:\n1. Lab: Set up AD lab and capture Kerberos traffic with Wireshark\n2. Practice: Use Rubeus or GetUserSPNs to enumerate SPNs (in lab)\n3. Understand: Study each Kerberos attack (Kerberoasting, Pass-the-Ticket, Golden/Silver Ticket)\n4. Defend: Learn to monitor Event ID 4769 (TGS requests)\n\n**This Week**:\n1. Complete TryHackMe Attacking Kerberos room\n2. Set up Kerberos monitoring in lab environment\n3. Practice Kerberoasting in lab (HackTheBox or local lab)\n4. Learn to use Rubeus for Kerberos attacks and defense\n5. Understand Protected Users group and its benefits\n\n**This Month**:\n1. Master all Kerberos attack vectors\n2. Implement Kerberos defenses in AD lab\n3. Create SIEM detection rules for Kerberos attacks\n4. Practice incident response for Kerberoasting\n5. Study KRBTGT rotation procedure\n\n**Defense Checklist**:\n- ✅ Strong passwords for service accounts (25+ random characters)\n- ✅ Least privilege for service accounts\n- ✅ Audit and remove 'Do not require preauthentication'\n- ✅ Monitor Event IDs 4768, 4769, 4770\n- ✅ Alert on mass TGS requests\n- ✅ Rotate KRBTGT password annually\n- ✅ Use Protected Users group for privileged accounts\n- ✅ Implement ATA/Defender for Identity\n\n**Tools**:\n- Rubeus (Kerberos attacks and abuse)\n- Mimikatz (ticket extraction, Golden Ticket)\n- Impacket (GetUserSPNs, ticket attacks)\n- Wireshark (Kerberos traffic analysis)\n- BloodHound (identify Kerberoastable accounts)\n\n**Key Event IDs**:\n- 4768: TGT requested (AS-REQ)\n- 4769: Service ticket requested (TGS-REQ)\n- 4770: Service ticket renewed\n- 4771: Kerberos pre-auth failed\n\nMaster Kerberos and you'll understand Windows authentication at the deepest level - critical for both offensive and defensive security."
+      }
+    }
+  ],
+  "estimated_time": 30,
+  "learning_objectives": [
+    "Understand core concepts",
+    "Apply knowledge in real-world scenarios",
+    "Identify common security issues",
+    "Implement best practices"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main concept covered in this lesson?",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which best practice should you implement?",
+      "options": [
+        "Best Practice A",
+        "Best Practice B",
+        "Best Practice C",
+        "Best Practice D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ]
+}

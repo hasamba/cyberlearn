@@ -25,6 +25,8 @@ class AdaptiveEngine:
             "dfir": ["fundamentals"],
             "malware": ["fundamentals"],
             "active_directory": ["fundamentals"],
+            "system": ["fundamentals"],
+            "cloud": ["fundamentals", "system"],
             "pentest": ["fundamentals", "active_directory"],
             "redteam": ["pentest", "malware"],
             "blueteam": ["dfir", "malware"],
@@ -101,6 +103,8 @@ class AdaptiveEngine:
             "dfir",
             "malware",
             "active_directory",
+            "system",
+            "cloud",
             "pentest",
             "redteam",
             "blueteam",
@@ -368,6 +372,46 @@ class AdaptiveEngine:
                 {
                     "question": "What are Indicators of Compromise (IOCs)?",
                     "options": ["System performance metrics", "Evidence of security breach", "User passwords", "Network bandwidth"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+            ],
+            "system": [
+                {
+                    "question": "What is the purpose of privilege escalation in system security?",
+                    "options": ["To gain higher-level permissions on a system", "To reduce user access rights", "To encrypt system files", "To monitor network traffic"],
+                    "correct": 0,
+                    "difficulty": 2
+                },
+                {
+                    "question": "Which Linux file controls sudo permissions?",
+                    "options": ["/etc/passwd", "/etc/sudoers", "/etc/shadow", "/etc/hosts"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What does UAC (User Account Control) do in Windows?",
+                    "options": ["Prevents all administrative actions", "Prompts for permission before privileged operations", "Encrypts user files", "Monitors network connections"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+            ],
+            "cloud": [
+                {
+                    "question": "What is the shared responsibility model in cloud security?",
+                    "options": ["Cloud provider responsible for everything", "Customer responsible for everything", "Responsibilities split between provider and customer", "Third-party manages all security"],
+                    "correct": 2,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What does IAM stand for in cloud security?",
+                    "options": ["Internet Access Management", "Identity and Access Management", "Infrastructure Administration Module", "Integrated Alert Monitoring"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is a common security risk of misconfigured S3 buckets?",
+                    "options": ["Too much encryption", "Public exposure of sensitive data", "Excessive monitoring", "Too many backups"],
                     "correct": 1,
                     "difficulty": 2
                 },

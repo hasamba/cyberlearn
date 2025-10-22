@@ -1,0 +1,121 @@
+{
+  "lesson_id": "6221c4ec-677e-4bf0-bd49-5825f6162218",
+  "domain": "blue_team",
+  "title": "Log Analysis Basics",
+  "difficulty": 1,
+  "order_index": 2,
+  "prerequisites": [],
+  "concepts": [
+    "Event logs",
+    "Log sources",
+    "Log correlation",
+    "Anomaly detection",
+    "SIEM basics"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "0ebc4a90-1f7e-420a-860d-846dc609e5a1",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Logs are the single most valuable source of security intelligence. Every action on a computer system leaves traces. Attackers can delete files, but they struggle to delete all logs, especially when logs are centralized. Master log analysis and you gain visibility into everything happening in your environment.\n\nHere's the profound truth: Logs don't lie. Users lie, attackers lie, but logs tell the objective truth about what happened, when, and by whom. A skilled log analyst can reconstruct entire attack campaigns from log data alone.\n\nMany people find logs overwhelming - gigabytes of data, millions of events, cryptic messages. Here's the secret: You don't need to read every log line. You need to know what to look for, which logs matter, and how to correlate events across different systems. It's pattern recognition, not brute force reading.\n\nThink of log analysis like being a detective examining evidence. Each log entry is a clue. Individual clues might seem meaningless, but when you connect them - login from IP A, followed by file access, followed by outbound connection to suspicious domain - you've reconstructed the attack narrative.\n\nThe beautiful part: Log analysis skills are universal. Windows Event Logs, Linux syslog, web server logs, firewall logs - the principles are the same. Learn to analyze one, you can analyze all."
+      },
+      "simplified_explanation": "Logs = records of everything that happens on systems. Login attempts, file access, network connections - all logged. Your job is reading these logs to find suspicious activity. Like security camera footage, but for computers.",
+      "memory_aids": [
+        "4624 = Successful login",
+        "4625 = Failed login",
+        "4672 = Admin rights assigned",
+        "Logs are evidence - preserve them!"
+      ],
+      "teach_like_im_10": "Imagine every action on a computer leaves a footprint, like walking in mud. Logs are those footprints. Your job is looking at the footprints to figure out who went where and what they did. If someone breaks in, their footprints give them away!"
+    },
+    {
+      "block_id": "5e26f0f1-0385-4bf1-8949-1f82842042cf",
+      "type": "explanation",
+      "content": {
+        "text": "## Log Sources\n\n**Windows Event Logs**:\n- **Security Log**: Authentication, privilege use, policy changes, object access\n- **System Log**: System-level events, service start/stop, driver issues\n- **Application Log**: Application-specific events and errors\n- **PowerShell Log**: PowerShell commands and scripts executed\n- **Sysmon Log**: Enhanced system monitoring (requires Sysmon installation)\n\n**Linux/Unix Logs**:\n- **/var/log/auth.log**: Authentication events (su, sudo, SSH logins)\n- **/var/log/syslog**: General system messages\n- **/var/log/apache2/access.log**: Web server access logs\n- **/var/log/apache2/error.log**: Web server errors\n- **/var/log/secure**: Security-related events (RHEL/CentOS)\n\n**Network Device Logs**:\n- **Firewall logs**: Allowed/blocked connections, rule hits\n- **Proxy logs**: Web traffic, URL requests, user activity\n- **VPN logs**: Remote access attempts, connections, disconnections\n- **IDS/IPS logs**: Detected attacks, alerts, blocked attacks\n\n**Application Logs**:\n- **Web application logs**: User actions, errors, suspicious requests\n- **Database logs**: Queries, connections, admin actions\n- **Email server logs**: Message flow, delivery, spam filtering\n\n## Critical Windows Event IDs\n\n**Authentication Events**:\n- **4624**: Successful logon\n- **4625**: Failed logon attempt\n- **4634**: Logoff\n- **4648**: Logon using explicit credentials (RunAs)\n- **4672**: Admin privileges assigned to logon\n\n**Account Management**:\n- **4720**: User account created\n- **4722**: User account enabled\n- **4723**: Password change attempt\n- **4724**: Password reset\n- **4732**: Member added to security-enabled group\n- **4740**: User account locked out\n\n**Privilege Use**:\n- **4672**: Special privileges assigned (admin logon)\n- **4673**: Sensitive privilege use\n- **4674**: Operation attempted on privileged object\n\n**Policy Changes**:\n- **4719**: System audit policy changed\n- **4739**: Domain policy changed\n- **4740**: User account locked out\n\n**Object Access**:\n- **4663**: File/object accessed\n- **4656**: Handle to object requested\n- **5140**: Network share accessed\n\n**Process Execution** (Sysmon):\n- **Sysmon Event 1**: Process creation\n- **Sysmon Event 3**: Network connection\n- **Sysmon Event 7**: Image/DLL loaded\n\n## Reading Windows Event Logs\n\n**Event Log Structure**:\n```\nEvent ID: 4624 (Successful logon)\nTimestamp: 2024-01-15 09:23:45\nUser: CORP\\john.smith\nWorkstation: WKST-123\nSource IP: 192.168.1.50\nLogon Type: 10 (Remote Interactive - RDP)\n```\n\n**Logon Types (Critical to Understand)**:\n- Type 2: Interactive (console logon)\n- Type 3: Network (accessing file share)\n- Type 4: Batch (scheduled task)\n- Type 5: Service (service started)\n- Type 7: Unlock (screen unlock)\n- Type 10: Remote Interactive (RDP)\n- Type 11: Cached credentials (offline logon)\n\n**Analyzing Failed Logon (4625)**:\n```\nMultiple 4625 events from same IP = Brute force attack\nFailure Reason 0xC0000064 = User doesn't exist (username enumeration)\nFailure Reason 0xC000006A = Correct user, wrong password\nFailure Reason 0xC0000234 = Account locked out\n```\n\n## Log Analysis Techniques\n\n**Baseline Normal Activity**:\nBefore detecting anomalies, understand normal:\n- When do users typically login?\n- What's normal authentication pattern?\n- What's normal network traffic volume?\n- Which accounts access which servers?\n\n**Pattern Recognition**:\n\n**Brute Force Detection**:\n```\nLook for: Multiple 4625 (failed logons) followed by 4624 (success)\nIndicates: Attacker trying passwords until success\nExample: \n  09:00:01 - 4625 Failed (password1)\n  09:00:02 - 4625 Failed (password123)\n  09:00:03 - 4625 Failed (admin123)\n  09:00:04 - 4624 Success (Summer2023!)\n```\n\n**Pass-the-Hash Detection**:\n```\nLook for: 4624 Logon Type 3 with NTLM, no corresponding 4768 Kerberos\nIndicates: Authentication with hash, not password (suspicious)\n```\n\n**Lateral Movement Detection**:\n```\nLook for: 4624 Type 3 from one workstation to multiple others rapidly\nUser typically on WKST-A suddenly logging into WKST-B, C, D, E\nIndicates: Attacker moving through network\n```\n\n**Privilege Escalation Detection**:\n```\nLook for: 4672 (admin privileges) on account that normally doesn't have them\nIndicates: Account compromised and elevated, or privilege escalation\n```\n\n**Data Exfiltration Detection**:\n```\nLook for: \n- Large outbound data transfers (firewall logs)\n- Access to many files rapidly (4663 events)\n- Connections to unusual external IPs\n- File compression activities followed by transfer\n```\n\n## Log Correlation\n\nSingle log sources are limited. Correlation provides full picture.\n\n**Example: Detecting Compromised Account**:\n```\nFirewall log: External IP scanning port 3389 (RDP)\n  → Reconnaissance\n\nSecurity log: Multiple 4625 from that IP\n  → Brute force attempt\n\nSecurity log: 4624 from that IP (success!)\n  → Compromised credentials\n\nSecurity log: 4672 (admin privileges assigned)\n  → Attacker has admin access\n\nSysmon: New process created: mimikatz.exe\n  → Credential dumping\n\nFirewall: Outbound connection to suspicious IP\n  → C2 communication\n```\n\nWithout correlation: Six separate events\nWith correlation: Complete attack narrative\n\n## SIEM Basics\n\nSIEM (Security Information and Event Management) centralizes logs and enables correlation.\n\n**SIEM Functions**:\n1. **Collection**: Gather logs from all sources\n2. **Normalization**: Convert different formats to consistent structure\n3. **Correlation**: Connect related events\n4. **Alerting**: Notify on suspicious patterns\n5. **Storage**: Retain logs for investigation and compliance\n6. **Search**: Query logs efficiently\n7. **Visualization**: Dashboards and reports\n\n**Common SIEMs**:\n- Splunk (most popular commercial)\n- QRadar (IBM)\n- ArcSight (Micro Focus)\n- Sentinel (Microsoft Azure)\n- ELK Stack (Elasticsearch, Logstash, Kibana - open source)\n\n**SIEM Query Example (Splunk)**:\n```\nindex=windows EventCode=4625 \n| stats count by src_ip \n| where count > 10\n| sort - count\n\nTranslation: Show IPs with >10 failed login attempts, sorted by count\nUse case: Identify brute force sources\n```\n\n## Log Analysis Workflow\n\n**Step 1: Define What You're Looking For**\n- Specific threat (brute force, lateral movement)?\n- Time range?\n- Systems involved?\n\n**Step 2: Identify Relevant Log Sources**\n- Authentication events → Security logs\n- Network activity → Firewall logs\n- Process execution → Sysmon\n\n**Step 3: Query and Filter**\n- Use SIEM or log analysis tools\n- Filter by Event ID, user, IP, time range\n- Eliminate known good activity\n\n**Step 4: Correlate Events**\n- Connect events across systems\n- Build timeline of activity\n- Identify patterns\n\n**Step 5: Investigate Anomalies**\n- Unusual times (3am logins)\n- Unusual sources (foreign IPs)\n- Unusual volumes (1000 file accesses in 1 minute)\n- Unusual accounts (service account interactive logon)\n\n**Step 6: Document Findings**\n- Timeline of events\n- Systems affected\n- Evidence collected\n- Indicators of compromise\n\n## Log Retention and Management\n\n**Retention Requirements**:\n- Compliance (PCI-DSS: 1 year, HIPAA: 6 years)\n- Incident investigation (at least 90 days recommended)\n- Threat hunting (longer is better)\n\n**Log Storage Considerations**:\n- Centralized storage (logs off compromised systems)\n- Secure storage (logs are evidence)\n- Efficient storage (compression, archival)\n- Searchable storage (indexed for fast queries)\n\n**Log Forwarding**:\n```\nAgent-based: Software on each system forwards logs\n  → Syslog, Windows Event Forwarding, SIEM agents\n\nAgentless: Pull logs via API or network protocols\n  → WMI, SSH, SNMP\n\nReal-time vs Batch:\n  → Real-time for security monitoring\n  → Batch for compliance/archival\n```"
+      },
+      "ascii_art": "LOG CORRELATION EXAMPLE\n\n[FIREWALL]   [DC]   [WORKSTATION]\n    |         |           |\nPort scan  Failed      Process\n detected   logons      created\n    |         |           |\n    +----Correlate--------+\n              |\n         [SIEM ALERT]\n    Brute Force + Compromise",
+      "examples": [
+        {
+          "scenario": "Detecting Lateral Movement",
+          "explanation": "Event 4624 Logon Type 3 from user 'jsmith' to WKST-001 at 14:23. Same user, WKST-002 at 14:24, WKST-003 at 14:25, WKST-004 at 14:26. Normal user doesn't access 4 workstations in 4 minutes. Investigation reveals compromised credentials being used for lateral movement."
+        },
+        {
+          "scenario": "Finding Privilege Escalation",
+          "explanation": "User 'bob' account (standard user) shows Event 4672 (admin privileges assigned) at 03:47am. Bob never works at 3am. Bob's account is standard user, shouldn't have admin rights. Correlation shows 4625 failed logins 100x before 4624 success. Bob's account was brute forced and privileges escalated."
+        }
+      ]
+    },
+    {
+      "block_id": "1495e990-6daf-43f5-add2-e7e6fa6958b1",
+      "type": "real_world",
+      "content": {
+        "text": "**Real Breach Detection via Log Analysis**:\n\nScenario: Financial services company, 5000 employees\n\nSOC analyst reviewing morning SIEM alerts:\n- Alert: 500+ Event 4625 from single external IP to VPN portal\n- Brute force attack detected, but all blocked by account lockout\n- Analyst notes the IP and continues monitoring\n\nTwo hours later:\n- Alert: Successful VPN login (4624) from different external IP\n- Username: service_account_backup (should never VPN in)\n- Analyst immediately investigates\n\nCorrelation reveals:\n- Service account last password change: 3 years ago (weak password)\n- Attacker switched IPs after first attempt blocked\n- Successful login with compromised service account\n- Account had excessive privileges (domain admin)\n\nImmediate actions:\n- Disabled service account\n- Checked for lateral movement (found none - caught early)\n- Reset password\n- Reviewed account privileges (reduced to minimum)\n\nOutcome: Breach detected and stopped within 15 minutes of initial access\nCost: $5000 (investigation time)\nPotential cost if undetected: Millions (full domain compromise)\n\n**Log Analysis Catches Insider Threat**:\n\nSIEM alert: User accessing 500+ HR files in 30 minutes\nNormal pattern: HR staff access 20-30 files per day\nInvestigation:\n- User is IT support, no business reason to access HR files\n- Correlation shows bulk file downloads to USB drive\n- User gave 2-week notice last week (leaving company)\n- Attempting to steal employee PII before departure\n\nAction: Immediate termination, legal action, USB drive recovered\nData breach prevented by log monitoring"
+      },
+      "industry_examples": [
+        "Target breach (2013): Attackers present in network for weeks - logs showed suspicious activity but weren't reviewed until too late",
+        "JPMorgan breach (2014): Log analysis revealed initial compromise, but correlation gaps delayed full scope discovery",
+        "DFIR team used log analysis to reconstruct entire APT campaign timeline from 6 months of retained logs"
+      ]
+    },
+    {
+      "block_id": "fee4c75e-df47-4a09-8f34-1bfe05eaecf4",
+      "type": "explanation",
+      "content": {
+        "text": "**Pitfall 1: Not Centralizing Logs**\nLogs stored only on local systems. Attacker compromises system, deletes logs. Solution: Forward logs to central SIEM in real-time.\n\n**Pitfall 2: Insufficient Log Retention**\nOnly keeping 7 days of logs. Breach discovery takes average 200+ days. Evidence already deleted. Solution: Retain logs 90+ days minimum, 1+ year for compliance.\n\n**Pitfall 3: Alert Fatigue**\nToo many alerts, most false positives. Analysts ignore alerts. Real breach alert gets dismissed. Solution: Tune alerts, reduce false positives, prioritize by risk.\n\n**Pitfall 4: Not Understanding Baseline**\nAlerting on activity that's actually normal. Wasting time on false positives. Solution: Establish baseline of normal activity first.\n\n**Pitfall 5: Looking at Single Log Source**\nOnly checking firewall logs or only security logs. Missing the full picture. Solution: Correlate multiple log sources for complete narrative.\n\n**Pitfall 6: Not Documenting Investigation**\nFind something suspicious, don't document, forget details later. Solution: Document everything - queries run, findings, timeline, evidence.\n\n**Pitfall 7: Logs Not Protected**\nAttacker modifies or deletes logs. Evidence destroyed. Solution: Secure log storage, append-only logs, centralized collection.\n\n**Pitfall 8: No Log Analysis During Off-Hours**\nMonitoring 9-5 only. Attackers work nights and weekends. Solution: 24/7 SOC or automated alerting."
+      }
+    },
+    {
+      "block_id": "dc5c3771-3770-4ab7-83f5-fa226feb0ac6",
+      "type": "explanation",
+      "content": {
+        "text": "**Immediate Actions**:\n1. Open Event Viewer on Windows, browse Security log\n2. Find Event ID 4624 (successful login), understand the fields\n3. Search for Event ID 4625 (failed logins) - any suspicious patterns?\n4. On Linux: tail -f /var/log/auth.log (watch authentication in real-time)\n5. Memorize critical Event IDs: 4624, 4625, 4672, 4720\n\n**This Week - Build Log Analysis Skills**:\n1. Practice with Windows Event Logs: Filter by Event ID, user, time\n2. Learn PowerShell for log analysis: Get-EventLog, Get-WinEvent\n3. Practice on TryHackMe or CyberDefenders log analysis challenges\n4. Create timeline from logs manually\n5. Understand logon types and what each means\n\n**This Month - Master Log Analysis**:\n1. Set up ELK Stack or Splunk Free in lab environment\n2. Forward logs from multiple sources to SIEM\n3. Create detection rules for common attacks\n4. Practice log correlation across multiple systems\n5. Complete SANS SEC450 or similar log analysis training\n6. Participate in Blue Team CTF focused on log analysis\n\n**Critical Event IDs to Memorize**:\n```\n4624 - Successful logon (know logon types!)\n4625 - Failed logon (know failure codes!)\n4672 - Admin privileges assigned\n4720 - Account created\n4732 - User added to group\n4740 - Account locked out\n4768 - Kerberos TGT requested\n4769 - Kerberos service ticket requested\n5140 - Network share accessed\nSysmon 1 - Process created\nSysmon 3 - Network connection\n```\n\n**Log Analysis Tools**:\n- Event Viewer (Windows built-in)\n- PowerShell (Get-EventLog, Get-WinEvent)\n- Splunk (commercial SIEM)\n- ELK Stack (open source SIEM)\n- grep/awk/sed (Linux log analysis)\n- DeepBlueCLI (PowerShell threat hunting)\n- Chainsaw (Rust-based log analysis)\n\n**Queries to Master**:\n```powershell\n# Failed logins in last 24 hours\nGet-EventLog -LogName Security -InstanceId 4625 -After (Get-Date).AddDays(-1)\n\n# Admin logons\nGet-WinEvent -FilterHashtable @{LogName='Security';ID=4672}\n\n# New accounts created\nGet-WinEvent -FilterHashtable @{LogName='Security';ID=4720}\n```\n\n**Building Detection Rules**:\n1. Identify attack technique (e.g., brute force)\n2. Determine log indicators (Event 4625 multiple times)\n3. Define threshold (>10 failures in 5 minutes)\n4. Create SIEM correlation rule\n5. Test with benign and malicious data\n6. Tune to reduce false positives\n\n**Log Analysis Career Path**:\n- SOC Analyst Tier 1: Alert triage, basic log review\n- SOC Analyst Tier 2: Complex log analysis, correlation\n- Threat Hunter: Proactive log hunting\n- DFIR Analyst: Forensic log analysis\n- Detection Engineer: Build detection rules\n\n**Practice Platforms**:\n- TryHackMe (Investigating Windows rooms)\n- CyberDefenders (blue team challenges)\n- LetsDefend (SOC analyst training)\n- Boss of the SOC (Splunk competition)\n\n**Remember**:\n- Logs don't lie - trust the evidence\n- Correlation is key - single log source insufficient\n- Centralize logs before attackers delete them\n- Retain logs long enough for investigation\n- Document everything during investigation\n- Baseline normal before detecting abnormal\n- Time matters - timestamps are critical\n- Context matters - why is this unusual?\n\nMaster log analysis and you'll have visibility into everything happening in your environment. Logs are your eyes in the network - learn to read them fluently."
+      }
+    }
+  ],
+  "estimated_time": 30,
+  "learning_objectives": [
+    "Understand core concepts",
+    "Apply knowledge in real-world scenarios",
+    "Identify common security issues",
+    "Implement best practices"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main concept covered in this lesson?",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which best practice should you implement?",
+      "options": [
+        "Best Practice A",
+        "Best Practice B",
+        "Best Practice C",
+        "Best Practice D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ]
+}

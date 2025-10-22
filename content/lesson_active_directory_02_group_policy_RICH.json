@@ -1,0 +1,120 @@
+{
+  "lesson_id": "ad000000-0000-0000-0000-000000000002",
+  "domain": "active_directory",
+  "title": "Group Policy Essentials",
+  "difficulty": 2,
+  "order_index": 2,
+  "prerequisites": [],
+  "concepts": [
+    "GPO",
+    "Policy inheritance",
+    "Security settings",
+    "User policies",
+    "Computer policies"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000201",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Group Policy is the centralized configuration management system that makes Active Directory powerful. With GPOs (Group Policy Objects), you can configure thousands of computers and users from a single location. It's automation and enforcement at scale.\n\nHere's why GPO matters: Every security hardening guide, compliance requirement, and IT policy can be enforced via Group Policy. Password policies, firewall rules, software restrictions, audit settings - all centrally managed. Without GPOs, you'd need to manually configure every single computer. With GPOs, configure once and deploy everywhere.\n\nFor security professionals, Group Policy is both a powerful defense tool and potential attack vector. Properly configured GPOs harden domains against attacks. Misconfigured GPOs create vulnerabilities. Compromised GPOs allow attackers to push malware to every computer. Understanding GPO is understanding how to secure or attack entire domains.\n\nThe elegant part: GPOs follow a clear hierarchy and inheritance model. Once you understand the rules - site, domain, OU, and processing order - everything makes sense. You can predict exactly how policies apply and troubleshoot when they don't."
+      },
+      "simplified_explanation": "GPO = rules that apply to many computers/users at once from central location. Like a school principal making rules that apply to all students - one rule, enforced everywhere automatically. Password policy, security settings, software installs - all controlled via GPO.",
+      "memory_aids": [
+        "LSDOU = Local, Site, Domain, OU (policy processing order)",
+        "Computer policies process at boot, User policies at login",
+        "Last applied wins (unless enforced)"
+      ],
+      "teach_like_im_10": "Imagine a school with 1000 students. Instead of telling each student the rules individually, the principal writes rules once and they automatically apply to everyone. That's Group Policy - write rules once, they apply to all computers/users in that group."
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000202",
+      "type": "explanation",
+      "content": {
+        "text": "## What is Group Policy?\n\nGroup Policy allows administrators to centrally manage computers and users in Active Directory by defining settings once and applying them automatically.\n\n**Key Concepts**:\n- **GPO** (Group Policy Object): Collection of policy settings\n- **Scope**: Who/what the GPO applies to\n- **Inheritance**: Policies flow down the OU structure\n- **Processing Order**: LSDOU (Local, Site, Domain, OU)\n\n## GPO Structure\n\n**Computer Configuration**:\n- Policies that apply to computers\n- Processed at computer boot\n- Examples: Windows Firewall, security settings, software installation\n\n**User Configuration**:\n- Policies that apply to users\n- Processed at user login\n- Examples: Desktop settings, mapped drives, password policy for users\n\n## GPO Processing Order: LSDOU\n\n**L - Local** (Local Group Policy on computer)\n**S - Site** (Policies linked to AD site)\n**D - Domain** (Policies linked to domain)\n**O - OU** (Policies linked to Organizational Unit)\n\n**Last applied wins** - OU policies override Domain policies\n\n**Example**:\n```\nLocal: Password min length = 8\nDomain: Password min length = 12\nOU: Password min length = 14\n\nResult: 14 (OU applied last)\n```\n\n**Block Inheritance**: OU can block policies from above\n**Enforced**: GPO that cannot be blocked (formerly 'No Override')\n\n## Common Group Policy Settings\n\n**Security Policies**:\n- Password Policy (complexity, length, age)\n- Account Lockout Policy\n- User Rights Assignment (who can login, shutdown, backup)\n- Security Options (UAC settings, network security)\n- Audit Policy (what to log)\n\n**Software Restriction Policies**:\n- Block executables from certain paths\n- Allow only signed software\n- Prevent malware execution\n- Example: Block .exe from user temp folders\n\n**Windows Firewall**:\n- Enable/disable firewall\n- Configure firewall rules\n- Block/allow specific ports\n- Apply different profiles (Domain, Private, Public)\n\n**AppLocker**:\n- Advanced application control\n- Allow/deny applications based on:\n  - Publisher (code signing)\n  - Path\n  - File hash\n- More powerful than Software Restriction Policies\n\n**Scripts**:\n- Startup/Shutdown scripts (computer)\n- Logon/Logoff scripts (user)\n- Execute PowerShell or batch scripts\n- Use cases: Drive mapping, environment setup\n\n**Administrative Templates**:\n- Registry-based settings\n- Thousands of settings available\n- Control Windows features and behavior\n- Examples: Disable USB, configure IE, disable Command Prompt\n\n## GPO Security Hardening\n\n**Password Policy GPO**:\n```\nComputer Config → Policies → Windows Settings → Security Settings → Account Policies → Password Policy\n\n- Enforce password history: 24\n- Maximum password age: 90 days\n- Minimum password age: 1 day\n- Minimum password length: 14\n- Password must meet complexity: Enabled\n- Store passwords using reversible encryption: Disabled\n```\n\n**Account Lockout Policy**:\n```\n- Account lockout duration: 30 minutes\n- Account lockout threshold: 5 invalid attempts\n- Reset account lockout counter after: 30 minutes\n```\n\n**Audit Policy**:\n```\nEnable auditing for:\n- Logon events (Success, Failure)\n- Account logon events\n- Object access (for sensitive files)\n- Policy change\n- Privilege use\n- System events\n```\n\n**Disable Guest Account**:\n```\nComputer Config → Policies → Windows Settings → Security Settings → Local Policies → Security Options\n→ Accounts: Guest account status: Disabled\n```\n\n**Rename Administrator Account**:\n```\nAccounts: Rename administrator account: \"admin_[random]\"\nAccounts: Rename guest account: \"guest_[random]\"\n```\n\n**User Rights Assignment**:\n```\nRemove unnecessary privileges:\n- Access this computer from network: Limit to necessary groups\n- Allow log on locally: Limit to authorized users\n- Deny log on locally: Add service accounts\n```\n\n## GPO for Defense\n\n**Block Known Attack Paths**:\n- Disable LLMNR (Link-Local Multicast Name Resolution)\n- Disable NetBIOS\n- Enable SMB signing\n- Disable WPAD\n- Configure LAPS (Local Admin Password Solution)\n\n**PowerShell Hardening**:\n- Enable PowerShell logging\n- Enable ScriptBlock logging\n- Enable Module logging\n- Constrained language mode for users\n\n**Credential Guard**:\n- Enable Windows Defender Credential Guard\n- Protects against Pass-the-Hash and credential dumping\n\n**Attack Surface Reduction**:\n- Disable unnecessary services\n- Remove unnecessary features\n- Disable legacy protocols (SMBv1)\n\n## GPO as Attack Vector\n\n**GPO Abuse by Attackers**:\nIf attacker gains rights to create/modify GPOs:\n- Push malware via startup scripts\n- Add their account to local administrators\n- Disable security tools\n- Create scheduled tasks\n- Modify firewall rules\n\n**Permissions Matter**:\n```\nDangerous permissions on GPO:\n- Edit settings: Can modify GPO\n- Edit settings, delete, modify security: Full control\n- Link GPOs: Can apply GPO to OUs\n```\n\n**GPO Backdoor Example**:\nAttacker with GPO edit rights:\n1. Modify GPO to add their account to local Administrators\n2. GPO processes on next reboot/gpupdate\n3. Attacker now has admin rights on all computers in scope\n4. Persistence established via GPO\n\n## Troubleshooting GPOs\n\n**gpresult /r**: View applied GPOs for current user/computer\n**gpresult /h report.html**: Detailed HTML report\n**rsop.msc**: Resultant Set of Policy GUI\n**gpupdate /force**: Force immediate policy refresh\n**Group Policy Management Console (GPMC)**: Main GPO management tool\n\n**Common Issues**:\n- GPO not applying: Check linking, filtering, permissions\n- Conflicting settings: Check processing order, enforcement\n- Slow logon: Too many GPOs, complex processing\n- Permissions errors: Authenticated Users must have Read permission"
+      },
+      "ascii_art": "GPO PROCESSING ORDER (LSDOU)\n\n[Local GPO]\n    |\n    v\n[Site GPO]\n    |\n    v\n[Domain GPO]\n    |\n    v\n[Parent OU GPO]\n    |\n    v\n[Child OU GPO] <-- Last applied (wins)\n\nNOTE: Enforced GPOs cannot be overridden",
+      "examples": [
+        {
+          "scenario": "Password Policy via GPO",
+          "explanation": "Company needs 14-character passwords. Create GPO: 'Password Policy' → Link to domain root → Configure minimum password length: 14 → All domain users now require 14-character passwords. Single policy, enforced everywhere automatically."
+        },
+        {
+          "scenario": "Blocking USB Drives",
+          "explanation": "Prevent data exfiltration via USB. Create GPO → Computer Config → Administrative Templates → System → Removable Storage Access → All Removable Storage: Deny All Access → Link to Workstations OU → USB drives now blocked on all workstations."
+        }
+      ]
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000203",
+      "type": "real_world",
+      "content": {
+        "text": "**GPO-Based Ransomware Defense**:\n\nCompany implemented security GPOs:\n- Software Restriction Policies blocking .exe from %TEMP%, %APPDATA%\n- PowerShell Constrained Language Mode for users\n- Disabled macros in Office by default\n- Enabled Controlled Folder Access\n\nAttack attempted:\n- User received phishing email with malicious macro\n- User opened document, tried to enable macros\n- GPO blocked macro execution\n- Ransomware never executed\n- Total damage: Zero\n\nWithout GPO: Full ransomware encryption, $500K+ recovery cost\n\n**GPO Abuse in the Wild**:\n\nAPT Group Attack:\n- Compromised account with GPO edit rights (misconfigured permissions)\n- Modified existing GPO to add scheduled task\n- Scheduled task downloaded and executed malware\n- GPO updated on 500+ computers in 24 hours\n- Malware deployed to entire domain via legitimate GPO mechanism\n- Detection: Monitor GPO modifications, audit GPO permissions\n\n**LAPS Deployment Success**:\n\nProblem: All workstations had same local admin password\nSolution: Deploy LAPS via GPO\n- LAPS GPO randomizes local admin passwords\n- Passwords stored in AD, unique per computer\n- Passwords rotate automatically\n- Pass-the-Hash attacks neutralized\n- Lateral movement blocked"
+      },
+      "industry_examples": [
+        "Financial services firm uses GPOs to enforce CIS benchmarks across 10,000 endpoints automatically",
+        "Healthcare organization uses GPOs for HIPAA compliance - encrypted drives, screensaver locks, audit logging",
+        "Government agency detected attacker modifying GPO to disable antivirus - SIEM alert on GPO change"
+      ]
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000204",
+      "type": "explanation",
+      "content": {
+        "text": "**Pitfall 1: Too Many GPOs**\nHundreds of GPOs cause slow logons. Solution: Consolidate related settings into fewer GPOs.\n\n**Pitfall 2: Overly Permissive GPO Edit Rights**\nToo many users can modify GPOs. Attacker with GPO rights = domain compromise. Solution: Strict control over GPO permissions.\n\n**Pitfall 3: Not Testing GPOs**\nDeploy GPO to entire domain, breaks production. Solution: Test in pilot OU first.\n\n**Pitfall 4: Conflicting GPOs**\nMultiple GPOs setting same setting differently. Confusion about what's applied. Solution: Document GPO purpose, check conflicts with GPMC.\n\n**Pitfall 5: Not Monitoring GPO Changes**\nAttacker modifies GPO undetected. Solution: Audit and alert on GPO modifications (Event ID 5136).\n\n**Pitfall 6: Using User Config for Computer Settings**\nComputer settings in User Configuration don't work. Solution: Computer settings in Computer Config, User settings in User Config."
+      }
+    },
+    {
+      "block_id": "ad000000-0000-0000-0000-000000000205",
+      "type": "explanation",
+      "content": {
+        "text": "**Immediate Actions**:\n1. Lab: Set up AD lab and practice creating GPOs\n2. Create password policy GPO\n3. Test GPO application with gpresult /r\n4. Understand LSDOU processing order\n5. Review GPO permissions in your environment\n\n**This Week**:\n1. Complete TryHackMe Group Policy room\n2. Practice creating security hardening GPOs\n3. Deploy LAPS in lab environment\n4. Learn to troubleshoot GPO issues\n5. Understand GPO inheritance and enforcement\n\n**Security Hardening GPOs to Deploy**:\n- ✅ Strong password policy (14+ chars, complexity)\n- ✅ Account lockout policy (5 attempts)\n- ✅ Audit policy (comprehensive logging)\n- ✅ Disable Guest account\n- ✅ Rename Administrator account\n- ✅ PowerShell logging enabled\n- ✅ Windows Firewall enabled\n- ✅ LAPS deployed\n- ✅ Disable LLMNR and NetBIOS\n- ✅ Enable SMB signing\n- ✅ Software restriction policies\n- ✅ Credential Guard enabled\n\n**Defense Monitoring**:\n- Alert on GPO modifications (Event ID 5136, 5137)\n- Audit GPO permissions regularly\n- Monitor for unauthorized GPO links\n- Review GPO security filtering\n\n**Attack Detection**:\n- Monitor for GPO changes during off-hours\n- Alert on startup/shutdown script modifications\n- Watch for malicious scheduled tasks via GPO\n- Detect suspicious GPO links to high-value OUs\n\n**Tools**:\n- Group Policy Management Console (GPMC)\n- gpresult /h (detailed GPO report)\n- gpupdate /force (force policy refresh)\n- rsop.msc (Resultant Set of Policy)\n- PolicyAnalyzer (compare GPO versions)\n\n**Key Event IDs**:\n- 5136: Directory service object modified (GPO change)\n- 5137: Directory service object created (new GPO)\n- 4719: System audit policy changed\n- 4739: Domain policy changed\n\n**Quick Reference**:\n```\nCreate GPO: GPMC → Right-click domain/OU → Create GPO\nLink GPO: Right-click OU → Link existing GPO\nEdit GPO: Right-click GPO → Edit\nTest GPO: gpresult /r (current user/computer)\nForce update: gpupdate /force\nView applied: gpresult /h report.html\n```\n\nMaster Group Policy and you control entire domains from a central point - the ultimate force multiplier for security and administration."
+      }
+    }
+  ],
+  "estimated_time": 30,
+  "learning_objectives": [
+    "Understand core concepts",
+    "Apply knowledge in real-world scenarios",
+    "Identify common security issues",
+    "Implement best practices"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main concept covered in this lesson?",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which best practice should you implement?",
+      "options": [
+        "Best Practice A",
+        "Best Practice B",
+        "Best Practice C",
+        "Best Practice D"
+      ],
+      "correct_answer": 0,
+      "explanation": "Review the lesson content for details.",
+      "difficulty": 2,
+      "points": 10
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ]
+}

@@ -27,6 +27,8 @@ class SkillLevels(BaseModel):
     dfir: int = Field(default=0, ge=0, le=100)
     malware: int = Field(default=0, ge=0, le=100)
     active_directory: int = Field(default=0, ge=0, le=100)
+    system: int = Field(default=0, ge=0, le=100)
+    cloud: int = Field(default=0, ge=0, le=100)
     pentest: int = Field(default=0, ge=0, le=100)
     redteam: int = Field(default=0, ge=0, le=100)
     blueteam: int = Field(default=0, ge=0, le=100)
@@ -38,6 +40,8 @@ class SkillLevels(BaseModel):
             self.dfir,
             self.malware,
             self.active_directory,
+            self.system,
+            self.cloud,
             self.pentest,
             self.redteam,
             self.blueteam
@@ -51,6 +55,8 @@ class SkillLevels(BaseModel):
             self.dfir: "dfir",
             self.malware: "malware",
             self.active_directory: "active_directory",
+            self.system: "system",
+            self.cloud: "cloud",
             self.pentest: "pentest",
             self.redteam: "redteam",
             self.blueteam: "blueteam"

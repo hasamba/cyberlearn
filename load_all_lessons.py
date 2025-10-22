@@ -34,9 +34,10 @@ def load_all_lessons():
             with open(lesson_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
-            # Convert UUIDs
+            # Convert lesson_id to UUID, but keep prerequisites as strings
             data['lesson_id'] = UUID(data['lesson_id'])
-            data['prerequisites'] = [UUID(p) for p in data['prerequisites']]
+            # Prerequisites should remain as strings (as per model definition)
+            data['prerequisites'] = [str(p) for p in data['prerequisites']]
 
             # Create lesson
             lesson = Lesson(**data)
