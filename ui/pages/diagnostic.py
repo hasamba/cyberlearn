@@ -100,45 +100,47 @@ def render_diagnostic_quiz(user: UserProfile, db: Database):
 
         submit = st.form_submit_button("Complete Assessment", use_container_width=True)
 
-        if submit:
-            # Score diagnostic
-            skills = adaptive.score_diagnostic(user_responses)
+    # Process results OUTSIDE the form
+    if submit:
+        # Score diagnostic
+        skills = adaptive.score_diagnostic(user_responses)
 
-            # Update user
-            user.skill_levels = skills
-            user.diagnostic_completed = True
-            db.update_user(user)
+        # Update user
+        user.skill_levels = skills
+        user.diagnostic_completed = True
+        db.update_user(user)
 
-            # Show results
-            st.success("✅ Diagnostic Complete!")
-            st.balloons()
+        # Show results
+        st.success("✅ Diagnostic Complete!")
+        st.balloons()
 
-            st.markdown("### 📊 Your Skill Profile")
+        st.markdown("### 📊 Your Skill Profile")
 
-            domains = [
-                ("fundamentals", "🔐 Fundamentals"),
-                ("dfir", "🔍 DFIR"),
-                ("malware", "🦠 Malware"),
-                ("active_directory", "🗂️ Active Directory"),
-                ("pentest", "🎯 Pentest"),
-                ("redteam", "🔴 Red Team"),
-                ("blueteam", "🛡️ Blue Team"),
-            ]
+        domains = [
+            ("fundamentals", "🔐 Fundamentals"),
+            ("dfir", "🔍 DFIR"),
+            ("malware", "🦠 Malware"),
+            ("active_directory", "🗂️ Active Directory"),
+            ("pentest", "🎯 Pentest"),
+            ("redteam", "🔴 Red Team"),
+            ("blueteam", "🛡️ Blue Team"),
+        ]
 
-            for domain_key, domain_name in domains:
-                skill = getattr(user.skill_levels, domain_key)
-                col1, col2 = st.columns([3, 1])
+        for domain_key, domain_name in domains:
+            skill = getattr(user.skill_levels, domain_key)
+            col1, col2 = st.columns([3, 1])
 
-                with col1:
-                    st.markdown(f"**{domain_name}**")
-                    st.progress(skill / 100)
+            with col1:
+                st.markdown(f"**{domain_name}**")
+                st.progress(skill / 100)
 
-                with col2:
-                    st.markdown(f"{skill}/100")
+            with col2:
+                st.markdown(f"{skill}/100")
 
-            st.markdown("---")
+        st.markdown("---")
 
-            if st.button("🏠 Go to Dashboard", use_container_width=True):
-                st.session_state.diagnostic_started = False
-                st.session_state.current_page = "dashboard"
-                st.rerun()
+        # Button is now OUTSIDE the form
+        if st.button("🏠 Go to Dashboard", use_container_width=True):
+            st.session_state.diagnostic_started = False
+            st.session_state.current_page = "dashboard"
+            st.rerun()

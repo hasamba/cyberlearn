@@ -209,20 +209,28 @@ def render_welcome_page():
 
     with tab2:
         with st.form("register_form"):
-            new_username = st.text_input("Choose Username")
+            new_username = st.text_input("Choose Username (min 3 characters)")
             email = st.text_input("Email (optional)")
             submit = st.form_submit_button("Create Account", use_container_width=True)
 
-            if submit and new_username:
-                # Create new user
-                user = UserProfile(username=new_username, email=email or None)
-                if st.session_state.db.create_user(user):
-                    st.session_state.current_user = user
-                    st.session_state.current_page = "diagnostic"
-                    st.success(f"Account created! Welcome, {new_username}!")
-                    st.rerun()
+            if submit:
+                if not new_username:
+                    st.error("Please enter a username.")
+                elif len(new_username) < 3:
+                    st.error("Username must be at least 3 characters long.")
                 else:
-                    st.error("Username already exists. Please choose another.")
+                    try:
+                        # Create new user
+                        user = UserProfile(username=new_username, email=email or None)
+                        if st.session_state.db.create_user(user):
+                            st.session_state.current_user = user
+                            st.session_state.current_page = "diagnostic"
+                            st.success(f"Account created! Welcome, {new_username}!")
+                            st.rerun()
+                        else:
+                            st.error("Username already exists. Please choose another.")
+                    except Exception as e:
+                        st.error(f"Error creating account: {str(e)}")
 
 
 def main():
