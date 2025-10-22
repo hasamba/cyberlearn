@@ -1,0 +1,257 @@
+{
+  "lesson_id": "13184c2a-55cc-45b4-9347-5c501f68ccbf",
+  "domain": "red_team",
+  "title": "Red Team Fundamentals",
+  "subtitle": "Introduction to Offensive Security Operations",
+  "difficulty": 1,
+  "estimated_time": 25,
+  "order_index": 1,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand what red teaming is and how it differs from penetration testing",
+    "Explain the importance of rules of engagement",
+    "Describe the ethical and legal boundaries of offensive security",
+    "Identify the phases of a red team operation",
+    "Understand the attacker mindset and methodology"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "887466f9-3080-4bc2-bbbb-2884a160e52d",
+      "type": "mindset_coach",
+      "title": "Welcome to Red Teaming",
+      "content": {
+        "text": "Red teaming is about thinking like an attacker to defend better. You're not learning this to become a criminal - you're learning to understand how attackers think so you can protect organizations. This knowledge is powerful and comes with serious responsibility. Use it ethically, always with authorization, and remember: the best red teamers help organizations get more secure."
+      },
+      "mindset_message": "Red teamers are the 'ethical hackers' - security professionals who use attacker techniques to find weaknesses before real criminals do. You're training to be one of the good guys.",
+      "simplified_explanation": "Think of red teaming like being a professional lockpick hired by a bank to test their vault security. You have permission, you document your findings, and your goal is to make the bank MORE secure, not to rob it.",
+      "memory_aids": [
+        "Red Team = Offensive security (attackers)",
+        "Blue Team = Defensive security (defenders)",
+        "You're learning to attack so you can defend better"
+      ],
+      "real_world_connection": "Companies like banks, hospitals, and government agencies hire red teams to simulate real attacks. This reveals security gaps before actual criminals find them. Red team findings lead directly to better defenses.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "2dc0f08f-24c7-4595-803a-9850741bd4c5",
+      "type": "explanation",
+      "title": "What is Red Teaming?",
+      "content": {
+        "text": "**Red Teaming** is simulating real-world adversary tactics, techniques, and procedures (TTPs) to test an organization's detection and response capabilities.\n\n## Red Team vs Penetration Testing\n\nMany people confuse these - here's the difference:\n\n### Penetration Testing (Pentest)\n- **Goal**: Find as many vulnerabilities as possible\n- **Scope**: Specific systems or applications\n- **Approach**: Methodical, comprehensive scanning\n- **Detection**: Doesn't matter if you get caught\n- **Timeline**: Usually 1-2 weeks\n- **Report**: List of vulnerabilities with severity ratings\n\n### Red Team Operations\n- **Goal**: Test detection and response capabilities\n- **Scope**: Entire organization (physical + digital)\n- **Approach**: Stealthy, mimics real attackers\n- **Detection**: Getting caught = failure (attackers want to stay hidden)\n- **Timeline**: Weeks to months\n- **Report**: Assessment of defensive capabilities\n\n**Key Difference**: Pentesting finds vulnerabilities. Red teaming tests if your security team can DETECT and RESPOND to sophisticated attacks.\n\n## Real-World Analogy\n\n**Penetration Test** = Fire inspector checking if smoke alarms work by testing each one\n\n**Red Team** = Starting a small controlled fire to see if:\n- Smoke alarms actually trigger\n- People evacuate properly\n- Fire department responds quickly\n- Emergency procedures work under stress\n\nRed teams test the ENTIRE security program, not just individual components."
+      },
+      "simplified_explanation": "Imagine your school wants to test its security:\n\n**Pentest**: Security expert walks around during the day checking every door lock, window, camera. Makes a list of broken locks.\n\n**Red Team**: Security expert dresses like a janitor, enters through an unlocked side door at 2 AM, walks past cameras (are they monitored?), reaches the principal's office (does anyone notice?), leaves a note proving they were there. Tests if security guards, cameras, and alarm systems actually CATCH intruders in action.\n\nRed team = Full realistic simulation",
+      "memory_aids": [
+        "Pentest = Find vulnerabilities",
+        "Red Team = Test detection and response",
+        "Pentest = Breadth (find everything)",
+        "Red Team = Depth (can you stop a real attacker?)",
+        "Think: Red Team = Full military exercise, Pentest = Equipment inspection"
+      ],
+      "real_world_connection": "In 2018, a bank hired a red team to test physical security. The red team walked into headquarters dressed as IT contractors, plugged a device into the network, and set up remote access - all without being questioned. Security cameras recorded them, but nobody was monitoring. The red team proved that technical defenses were useless because the human/process layer failed. This led to major security improvements.",
+      "reflection_prompt": "If you were defending a network, which would be more valuable: A list of 50 vulnerabilities, or proof that attackers can operate undetected for weeks? Why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c8a7e99c-765d-463d-b4ea-67ba4c37b66a",
+      "type": "explanation",
+      "title": "Rules of Engagement (ROE): The Legal Foundation",
+      "content": {
+        "text": "**Rules of Engagement (ROE)** are the legal contract defining what red teamers are authorized to do. Without ROE, hacking is illegal - even with good intentions.\n\n## What ROE Must Include\n\n### 1. Scope\n**What's IN scope** (you CAN attack):\n- Specific IP ranges (e.g., 192.168.1.0/24)\n- Specific domains (e.g., company.com, app.company.com)\n- Specific physical locations (e.g., Building A, not Building B)\n- Specific techniques allowed (e.g., phishing, password spraying)\n\n**What's OUT of scope** (you CANNOT touch):\n- Production databases with customer data\n- Life-safety systems (medical devices, industrial controls)\n- Partner/vendor systems\n- Personal devices\n\n### 2. Timeline\n- Start date/time\n- End date/time\n- Allowed hours (24/7 or business hours only?)\n\n### 3. Communication Plan\n- Emergency contact (if something breaks)\n- Daily check-ins (optional)\n- How to signal if you need to stop\n\n### 4. Authorized Techniques\n**Allowed**:\n- Social engineering\n- Password attacks\n- Network exploitation\n- Physical intrusion\n\n**Prohibited**:\n- DoS/DDoS attacks (disrupting services)\n- Data destruction\n- Data exfiltration beyond proof-of-concept\n\n### 5. Get-Out-of-Jail-Free Letter\nSigned document from company leadership authorizing the engagement. Carry this at ALL times during physical intrusions.\n\n**Real Story**: Red teamer was arrested during a physical security test at a bank. He was in handcuffs until the bank's CISO arrived with the authorization letter. Police verified it and released him. Without that letter, he'd have been charged with trespassing.\n\n## Why ROE Matters\n\n**Without ROE**:\n- You're committing crimes (Computer Fraud and Abuse Act, Computer Misuse Act)\n- Company can deny they authorized you\n- You have no legal protection\n- Criminal charges, lawsuits, career destruction\n\n**With ROE**:\n- Legal authorization to attack (within defined boundaries)\n- Company can't claim unauthorized access\n- Protection if law enforcement gets involved\n- Professional relationship\n\n## The Golden Rule\n\n**NEVER START AN ENGAGEMENT WITHOUT SIGNED, WRITTEN ROE**\n\nVerbal authorization isn't enough. \"The CEO said it was okay\" won't hold up in court. Get it in writing, signed by someone with authority, before touching anything."
+      },
+      "simplified_explanation": "Rules of Engagement are like a permission slip for a field trip:\n\n- **Where you can go**: Museum (IN scope), not the mall next door (OUT of scope)\n- **When**: 9 AM to 3 PM (timeline)\n- **What you can do**: Take photos, ask questions (allowed techniques)\n- **What you can't do**: Break exhibits, wander off alone (prohibited actions)\n- **Emergency contact**: Teacher's phone number\n\nWithout the signed permission slip, you're just skipping school. With it, you're on an authorized educational trip.",
+      "memory_aids": [
+        "ROE = Rules of Engagement = Your legal protection",
+        "No ROE = No engagement (it's hacking, not authorized testing)",
+        "Think: ROE = Permission slip from the company",
+        "Verbal authorization ≠ Real authorization (get it in writing!)"
+      ],
+      "real_world_connection": "In 2020, two security researchers tested a courthouse's security without proper ROE. They were arrested for trespassing. The county that hired them claimed it was 'unauthorized.' Because the ROE wasn't properly documented with the right authorities, the researchers faced criminal charges. Eventually charges were dropped, but their reputation and business suffered. Always get explicit, written ROE.",
+      "reflection_prompt": "Why do you think verbal authorization isn't enough for red team operations?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "74ad9304-3c5c-44a1-8853-a3960440ed86",
+      "type": "explanation",
+      "title": "The Cyber Kill Chain: Red Team Attack Phases",
+      "content": {
+        "text": "Red teams follow a structured attack methodology based on how real threat actors operate. The most common model is the **Cyber Kill Chain** (developed by Lockheed Martin).\n\n## The 7 Phases of the Cyber Kill Chain\n\n### Phase 1: Reconnaissance\n**Goal**: Gather information about the target\n\n**Activities**:\n- OSINT (Open Source Intelligence): Google, LinkedIn, social media\n- Network scanning: Identify live hosts, open ports\n- Email harvesting: Find valid email addresses\n- Technology fingerprinting: What software versions?\n\n**Example**: Attacker discovers on LinkedIn that target company uses Cisco VPNs and Microsoft Exchange. They search for known vulnerabilities in those specific versions.\n\n### Phase 2: Weaponization\n**Goal**: Create the attack tool/payload\n\n**Activities**:\n- Develop exploits for discovered vulnerabilities\n- Create malicious documents (weaponized PDFs, Office docs)\n- Build phishing emails\n- Customize malware to evade detection\n\n**Example**: Create a malicious Excel spreadsheet with macros that download and execute a backdoor.\n\n### Phase 3: Delivery\n**Goal**: Transmit the weapon to the target\n\n**Methods**:\n- Phishing emails with malicious attachments\n- Malicious links (watering hole attacks)\n- USB drops in parking lot\n- Exploit public-facing applications (web server vulnerabilities)\n\n**Example**: Send phishing email to HR department with fake resume in weaponized PDF.\n\n### Phase 4: Exploitation\n**Goal**: Trigger the vulnerability\n\n**Activities**:\n- User opens malicious document → macros execute\n- User clicks malicious link → browser exploit triggers\n- Exploit code runs and gains initial access\n\n**Example**: HR opens the resume PDF, which exploits Adobe Reader vulnerability and executes attacker's code.\n\n### Phase 5: Installation\n**Goal**: Establish persistence (stay in the network even after reboots)\n\n**Activities**:\n- Install backdoor/remote access tool (RAT)\n- Create scheduled tasks or service\n- Modify registry keys\n- Add startup scripts\n\n**Example**: Malware installs persistence via Windows Registry Run key and connects to attacker's command-and-control server.\n\n### Phase 6: Command and Control (C2)\n**Goal**: Establish communication channel with compromised system\n\n**Activities**:\n- Victim system 'beacons' to attacker's server\n- Attacker sends commands remotely\n- Malware sends stolen data back\n- Often uses encrypted channels (HTTPS) to blend with normal traffic\n\n**Example**: Backdoor connects to attacker's server every 30 minutes, awaiting commands while looking like normal web traffic.\n\n### Phase 7: Actions on Objectives\n**Goal**: Achieve the attack's ultimate purpose\n\n**Activities**:\n- Data exfiltration (steal sensitive files)\n- Lateral movement (spread to other systems)\n- Privilege escalation (gain admin rights)\n- Deploy ransomware\n- Sabotage systems\n- Establish long-term access\n\n**Example**: Attacker moves from HR workstation to file server, steals customer database, and exfiltrates 10GB of data via encrypted channel.\n\n## Defensive Perspective\n\n**Breaking the Kill Chain**: Defenders only need to stop ONE phase to prevent the attack. The earlier you stop it, the better.\n\n- Stop at **Reconnaissance**: Limit information disclosure (security through obscurity isn't enough, but it helps)\n- Stop at **Delivery**: Email filtering, web proxies, USB device controls\n- Stop at **Exploitation**: Patching, EDR (Endpoint Detection and Response)\n- Stop at **Installation**: Anti-malware, application whitelisting\n- Stop at **C2**: Network monitoring, firewall rules, DNS filtering\n- Stop at **Actions**: Data Loss Prevention (DLP), network segmentation\n\nRed teams test which phases the blue team can detect and stop."
+      },
+      "simplified_explanation": "The Cyber Kill Chain is like planning a heist in a movie:\n\n1. **Reconnaissance**: Casing the joint (watch guard schedules, find cameras)\n2. **Weaponization**: Get your tools ready (lock picks, fake uniforms)\n3. **Delivery**: Get to the target (drive to the bank)\n4. **Exploitation**: Use the vulnerability (pick the lock)\n5. **Installation**: Set up for the job (disable alarms)\n6. **C2**: Stay coordinated (walkie-talkies with team outside)\n7. **Actions**: Do the crime (open the vault, take the money)\n\nDefenders (security guards) can stop you at ANY step. That's why attackers are careful at EVERY phase.",
+      "memory_aids": [
+        "7 Phases: Recon → Weaponization → Delivery → Exploitation → Installation → C2 → Actions",
+        "Think: RWDEICA (not a great acronym, so focus on the flow)",
+        "Remember: Break the chain at ANY point = attack fails",
+        "Early detection better than late detection"
+      ],
+      "real_world_connection": "The 2013 Target breach followed this exact kill chain: Attackers researched Target's vendors (recon), created malware (weaponization), sent phishing to HVAC vendor (delivery), compromised vendor's network (exploitation), installed backdoor (installation), accessed Target's network via vendor connection (C2), then stole 40 million credit cards (actions). If Target had detected and stopped at ANY phase, the breach could have been prevented.",
+      "reflection_prompt": "Which phase do you think is easiest for defenders to stop? Which is hardest? Why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "55de5f98-b769-4ef6-86d7-aaea9b6e51f4",
+      "type": "explanation",
+      "title": "Ethics and Legal Considerations",
+      "content": {
+        "text": "Red teaming is one of the few professions where you're PAID to break into systems. This power requires strict ethical boundaries.\n\n## The Hacker's Code of Ethics\n\n### 1. Authorization is EVERYTHING\n- Only attack systems you're authorized to attack\n- Never exceed your scope\n- If you find something out of scope, report it - don't exploit it\n\n### 2. Do No Harm\n- Don't destroy data (beyond proof-of-concept)\n- Don't disrupt business operations\n- Don't access personal/sensitive data unnecessarily\n- If you accidentally break something, report immediately\n\n### 3. Confidentiality\n- Don't disclose findings to unauthorized people\n- Don't brag about breaches on social media\n- Client data stays with the client\n- NDAs are sacred\n\n### 4. Professional Boundaries\n- Don't use client access for personal gain\n- Don't reuse techniques from one client against another without permission\n- Don't steal tools, credentials, or data\n\n### 5. Disclosure\n- Report all findings to the client\n- Don't hide embarrassing discoveries\n- Provide remediation guidance, not just criticism\n- Give clients time to fix issues before public disclosure\n\n## Legal Frameworks\n\n### United States: Computer Fraud and Abuse Act (CFAA)\n- Unauthorized access to computers = Federal crime\n- Penalties: Fines up to $250,000, prison up to 10 years\n- **Defense**: Signed authorization from system owner\n\n### United Kingdom: Computer Misuse Act 1990\n- Similar to CFAA\n- Unauthorized access = Up to 2 years in prison\n- Unauthorized access with intent to commit further crimes = Up to 5 years\n\n### European Union: General Data Protection Regulation (GDPR)\n- Accessing personal data without authorization = Massive fines\n- Even with ROE, must minimize access to personal data\n\n## The Gray Areas\n\n### Scenario 1: You discover child abuse material during a red team engagement\n**Answer**: IMMEDIATELY stop, preserve evidence, contact law enforcement, notify client. Legal obligations override ROE.\n\n### Scenario 2: You find evidence of insider fraud\n**Answer**: Report to client contact per ROE. Don't investigate further without explicit authorization.\n\n### Scenario 3: You compromise a system out of scope\n**Answer**: Immediately exit, document what happened, report to client, don't exploit further.\n\n## Real-World Consequences\n\n**Case 1**: Security researcher tested airport Wi-Fi without authorization (thought it was legal research). Arrested, charged with CFAA violations, faced federal charges. Eventually case dismissed, but spent $100,000+ on legal fees and had passport seized for months.\n\n**Case 2**: Pentester exceeded scope by accessing HR database with employee salaries (was told to test web app only). Client pressed charges, pentester lost certifications, company lost insurance, pentester served 6 months in jail.\n\n**Case 3**: Red teamer properly authorized, but forgot to carry ROE letter during physical intrusion. Security called police. Red teamer spent 8 hours in custody until client confirmed authorization. Legal, but traumatic.\n\n## The Professional Mindset\n\nYou're not a hacker. You're a **security consultant** using offensive techniques to improve defense.\n\n- **Hackers** break in for personal gain or ego\n- **Red teamers** simulate hackers to help organizations improve\n\nAlways remember: Your goal is to make the world MORE secure, not less."
+      },
+      "simplified_explanation": "Think of red teaming like being a stunt driver in a movie:\n\n- You're authorized to drive dangerously (with ROE = contract)\n- You only do stunts that are planned and safe (within scope)\n- You have safety equipment and insurance (legal protection)\n- Your goal is entertainment (security improvement), not causing accidents (real damage)\n- If you drive recklessly outside the movie set, you're just a dangerous criminal driver\n\nSame skills, completely different context and intent.",
+      "memory_aids": [
+        "Authorization = Everything (no ROE = crime)",
+        "Do No Harm = Don't break what you don't have to",
+        "CFAA = Federal law making unauthorized access criminal",
+        "Think: With great power comes great responsibility (yes, Spider-Man applies here)"
+      ],
+      "real_world_connection": "Every year, security researchers face legal threats for unauthorized testing. In 2021, a researcher found vulnerabilities in voting machines and was threatened with prosecution - even though he was trying to improve election security. Only work with explicit authorization, or you risk your freedom and career.",
+      "reflection_prompt": "Why do you think the law doesn't distinguish between 'good hackers' and 'bad hackers' without authorization? What problems would that create?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f00137a7-953b-45f9-b26a-9c8114219e80",
+      "type": "memory_aid",
+      "title": "Key Takeaways",
+      "content": {
+        "summary": [
+          "Red Team = Simulating real attackers to test detection and response",
+          "Pentest = Finding vulnerabilities; Red Team = Testing if defenders can stop attacks",
+          "Rules of Engagement (ROE) = Legal authorization defining scope and methods",
+          "Never start engagement without signed, written ROE",
+          "Cyber Kill Chain = 7-phase attack methodology (Recon → Actions)",
+          "Break the kill chain at any phase = stop the attack",
+          "Ethics: Authorization is everything, do no harm, maintain confidentiality",
+          "Legal: CFAA (US) and Computer Misuse Act (UK) make unauthorized access criminal",
+          "You're a security consultant, not a hacker"
+        ]
+      },
+      "simplified_explanation": "Red teaming is ethical hacking with authorization to test if defenders can actually stop sophisticated attacks. Always get permission in writing, follow the rules, and remember your goal is to improve security, not cause harm.",
+      "memory_aids": [
+        "Red Team = Ethical attackers testing defenses",
+        "ROE = Permission slip (must have it!)",
+        "Cyber Kill Chain = Attack phases (stop any phase = win)",
+        "Authorization = Legal protection",
+        "No authorization = Crime"
+      ],
+      "real_world_connection": "Professional red teams help organizations understand their true security posture. Every major company uses red teams to test defenses before attackers do. You're learning a valuable, legal, ethical profession.",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main difference between penetration testing and red teaming?",
+      "options": [
+        "Pentesting is illegal, red teaming is legal",
+        "Pentesting finds vulnerabilities; red teaming tests detection and response",
+        "Pentesting is more advanced than red teaming",
+        "There is no difference"
+      ],
+      "correct_answer": 1,
+      "explanation": "Penetration testing focuses on finding as many vulnerabilities as possible. Red teaming simulates real attackers to test if the security team can DETECT and RESPOND to sophisticated attacks. Red teaming tests the entire security program, not just technical vulnerabilities.",
+      "difficulty": 1,
+      "memory_aid": "Pentest = Find bugs; Red Team = Test defenders",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why are Rules of Engagement (ROE) critical?",
+      "options": [
+        "They're optional guidelines for better organization",
+        "They provide legal authorization and define scope",
+        "They're only needed for physical security tests",
+        "They protect the client, not the red team"
+      ],
+      "correct_answer": 1,
+      "explanation": "ROE are the legal contract authorizing the red team engagement. Without signed ROE, hacking is illegal - even with good intentions. ROE define what's in scope, what techniques are allowed, and provide legal protection for the red team.",
+      "difficulty": 1,
+      "memory_aid": "ROE = Legal permission slip (no ROE = crime)",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What are the phases of the Cyber Kill Chain in order?",
+      "options": [
+        "Delivery, Exploitation, Reconnaissance, C2, Actions",
+        "Reconnaissance, Weaponization, Delivery, Exploitation, Installation, C2, Actions",
+        "Scanning, Attacking, Persistence, Exfiltration",
+        "Planning, Execution, Escape"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Cyber Kill Chain has 7 phases in order: Reconnaissance (gather info) → Weaponization (create attack) → Delivery (send to target) → Exploitation (trigger vulnerability) → Installation (persistence) → Command & Control (communication) → Actions on Objectives (achieve goal).",
+      "difficulty": 1,
+      "memory_aid": "RWDEICA: Recon → Weapon → Deliver → Exploit → Install → C2 → Actions",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "From a defensive perspective, what's important about the Kill Chain?",
+      "options": [
+        "You must stop all 7 phases to prevent an attack",
+        "Breaking the chain at ANY phase stops the attack",
+        "Only the first phase matters",
+        "The Kill Chain only applies to red teams, not defenders"
+      ],
+      "correct_answer": 1,
+      "explanation": "Defenders only need to stop ONE phase to prevent the attack. Breaking the kill chain at any point disrupts the attack. The earlier you detect and stop an attack, the less damage can occur. This is why layered defenses are important - multiple chances to break the chain.",
+      "difficulty": 1,
+      "memory_aid": "Break the chain ANYWHERE = stop the attack",
+      "points": 10
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What should you do if you accidentally discover something out of scope during a red team engagement?",
+      "options": [
+        "Exploit it anyway since you found it legitimately",
+        "Stop, document it, report to client, don't exploit further",
+        "Ignore it completely",
+        "Post about it on Twitter"
+      ],
+      "correct_answer": 1,
+      "explanation": "If you discover something out of scope, immediately stop, document what happened, report it to your client contact, and do NOT exploit it further. Exceeding your ROE can result in legal liability, even if you found the issue legitimately. Professional ethics require staying within scope.",
+      "difficulty": 1,
+      "memory_aid": "Out of scope = Stop, document, report, don't exploit",
+      "points": 10
+    },
+    {
+      "question_id": "q6",
+      "type": "multiple_choice",
+      "question": "What law makes unauthorized computer access a federal crime in the United States?",
+      "options": [
+        "Digital Millennium Copyright Act (DMCA)",
+        "Computer Fraud and Abuse Act (CFAA)",
+        "General Data Protection Regulation (GDPR)",
+        "Sarbanes-Oxley Act (SOX)"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Computer Fraud and Abuse Act (CFAA) is the primary US federal law prohibiting unauthorized access to computers. Penalties can include up to $250,000 in fines and 10 years in prison. Signed ROE from the system owner provides legal authorization as a defense.",
+      "difficulty": 1,
+      "memory_aid": "CFAA = Computer Fraud and Abuse Act = Federal hacking law",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "active_learning"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2025-01-22T12:00:00",
+  "updated_at": "2025-01-22T12:00:00",
+  "author": "CyberLearn Red Team Curriculum",
+  "version": "2.0"
+}

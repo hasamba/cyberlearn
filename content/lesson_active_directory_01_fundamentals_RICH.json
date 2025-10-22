@@ -1,0 +1,247 @@
+{
+  "lesson_id": "ad000000-0000-0000-0000-000000000001",
+  "domain": "active_directory",
+  "title": "Active Directory Fundamentals",
+  "subtitle": "Understanding Microsoft's Enterprise Identity System",
+  "difficulty": 1,
+  "estimated_time": 25,
+  "order_index": 1,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand what Active Directory is and why organizations use it",
+    "Explain the role of Domain Controllers and how they work",
+    "Describe the hierarchical structure of Domains, OUs, and Objects",
+    "Identify common AD objects: users, groups, computers, and policies"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "4ba5a90e-fe9a-461f-b7f3-58d887a742e8",
+      "type": "mindset_coach",
+      "title": "Welcome to Active Directory!",
+      "content": {
+        "text": "Active Directory is one of the most important technologies in enterprise cybersecurity. Almost every large organization uses it, which means it's a prime target for attackers. Understanding AD is essential for both offensive (Red Team) and defensive (Blue Team) security professionals. You're about to learn a technology that powers millions of businesses worldwide!"
+      },
+      "simplified_explanation": "Think of Active Directory like a massive digital phonebook for a company - but instead of just names and numbers, it controls who can access what, manages all the computers, and enforces security rules across an entire organization.",
+      "memory_aids": [
+        "AD = Active Directory = The 'control center' for Windows networks",
+        "If Windows is the OS, Active Directory is the 'network operating system'"
+      ],
+      "real_world_connection": "When you log into your work computer, Active Directory is verifying your identity and determining what you can access. When your password expires, AD enforces that. When IT restricts USB drives, AD controls that.",
+      "reflection_prompt": "Have you ever logged into a work or school computer? Active Directory was probably working behind the scenes!",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "47a2df9c-7a90-444b-972a-825f252a0fa9",
+      "type": "explanation",
+      "title": "What is Active Directory?",
+      "content": {
+        "text": "Active Directory (AD) is Microsoft's directory service for Windows networks. It's a centralized database that stores information about network resources and enables administrators to manage users, computers, and security policies from one place.\n\nKey Functions:\n\n1. **Authentication**: Verifies WHO you are (username/password)\n2. **Authorization**: Determines WHAT you can access (permissions)\n3. **Centralized Management**: Admins control everything from one console\n4. **Policy Enforcement**: Security settings applied automatically across all computers\n5. **Single Sign-On (SSO)**: Log in once, access multiple resources\n\nWithout AD, administrators would need to create separate accounts on every single computer and server - imagine managing 10,000 computers individually!"
+      },
+      "simplified_explanation": "Imagine a school with 1,000 students. Without AD, each teacher would need to keep their own list of students and manually check who's allowed in their classroom. With AD, there's ONE master list that everyone uses, and it automatically knows which students belong in which classes. AD does this for computers, users, and resources in a company.",
+      "memory_aids": [
+        "AD = Authentication + Authorization + Administration",
+        "Think: 'One login to rule them all' (like the One Ring, but for IT)"
+      ],
+      "real_world_connection": "Companies like banks, hospitals, and government agencies use AD to manage tens of thousands of employees. When you get hired, IT creates ONE AD account that gives you access to email, file shares, applications, and printers - all controlled by Active Directory.",
+      "reflection_prompt": "Why would managing 10,000 computers individually be impossible without AD?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "fe92a137-b4e4-4b16-bbce-affb49a02c9d",
+      "type": "explanation",
+      "title": "Domain Controllers - The Brain of AD",
+      "content": {
+        "text": "A Domain Controller (DC) is a Windows Server that hosts Active Directory. It's the 'master brain' that:\n\n- Stores the AD database (containing all users, computers, groups, policies)\n- Authenticates login requests ('Is this password correct?')\n- Applies Group Policies to computers\n- Replicates data with other DCs for redundancy\n\n**Key Concepts:**\n\n**Domain**: A logical group of network objects (users, computers) that share the same AD database. Example: 'company.com'\n\n**Forest**: A collection of one or more domains. The top-level security boundary.\n\n**Replication**: Multiple DCs sync their databases automatically. If one DC fails, others continue working.\n\n**Why Multiple DCs?**\n- Redundancy: If one fails, others take over\n- Load balancing: Distribute authentication requests\n- Geographic distribution: DCs in different offices for faster local authentication"
+      },
+      "simplified_explanation": "Think of a Domain Controller like the principal's office in a school. It has the master records of all students (users), knows which classrooms exist (computers), and enforces school rules (policies). If you have multiple school buildings, each has its own principal's office (DC), but they all share the same information so students can move between buildings.",
+      "memory_aids": [
+        "DC = Domain Controller = The server that IS Active Directory",
+        "Domain = The 'company.com' - one AD database shared by everyone",
+        "Forest = Collection of domains (like 'company.com' and 'subsidiary.com')"
+      ],
+      "real_world_connection": "When you type your password at work, your computer sends that to a Domain Controller. The DC checks if it's correct and sends back a 'ticket' that proves you're authenticated. This happens in milliseconds, thousands of times per day across an organization.",
+      "reflection_prompt": "Why is it important to have multiple Domain Controllers instead of just one?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "1bc1bda4-db15-4c10-8b0b-912c9a54cbbb",
+      "type": "explanation",
+      "title": "AD Structure: Domains, OUs, and Objects",
+      "content": {
+        "text": "Active Directory is organized hierarchically like a file system:\n\n**Forest (Top Level)**\n└── Domain (e.g., company.com)\n    ├── Organizational Unit (OU): IT Department\n    │   ├── User: john.doe\n    │   ├── User: jane.smith\n    │   └── Computer: IT-LAPTOP-01\n    ├── OU: Sales Department\n    │   ├── User: bob.sales\n    │   └── Computer: SALES-PC-05\n    └── OU: Domain Controllers\n        └── Computer: DC01\n\n**Organizational Units (OUs)**:\n- Containers that group objects (like folders)\n- Used to organize users/computers by department, location, or function\n- Allow delegated administration (Sales manager can manage Sales OU)\n- Group Policies applied to OUs affect everything inside\n\n**AD Objects**:\n- **User**: Represents a person (has username, password, email)\n- **Computer**: Represents a workstation or server\n- **Group**: Collection of users (e.g., 'Domain Admins', 'Sales Team')\n- **Group Policy Object (GPO)**: Collection of settings applied to users/computers"
+      },
+      "simplified_explanation": "Think of AD like organizing a school:\n- Forest = The entire school district\n- Domain = One specific school\n- OUs = Departments (Math Department, Science Department)\n- Objects = Individual students (users), classrooms (computers), and student clubs (groups)",
+      "memory_aids": [
+        "OU = Organizational Unit = Folders for organizing AD objects",
+        "Objects = The 'things' in AD: Users, Computers, Groups",
+        "Think: Forest > Domain > OU > Objects (big to small)"
+      ],
+      "real_world_connection": "When IT needs to deploy software only to the Sales department, they apply a Group Policy to the Sales OU. Everyone and every computer in that OU automatically gets the software - no manual installation needed on 100 computers!",
+      "reflection_prompt": "How would you organize a company with offices in New York, London, and Tokyo using OUs?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "96e32e5b-7617-45a9-a601-eb6ba37e093e",
+      "type": "diagram",
+      "title": "AD Hierarchy Visualization",
+      "content": {
+        "diagram_type": "hierarchy",
+        "description": "Visual representation of Active Directory structure",
+        "ascii_art": "[FOREST: megacorp.com]\n              |\n+-----------------+-----------------+\n|                                   |\n[DOMAIN: megacorp.com]   [DOMAIN: subsidiary.com]\n    |\n    +-- [OU: Corporate]\n    |     |\n    |     +-- [OU: IT Department]\n    |     |     |\n    |     |     +-- User: admin_john\n    |     |     +-- Computer: IT-WKS-001\n    |     |\n    |     +-- [OU: Sales]\n    |           |\n    |           +-- User: sales_mary\n    |           +-- Computer: SALES-PC-01\n    |\n    +-- [OU: Domain Controllers]\n          |\n          +-- Computer: DC01\n          +-- Computer: DC02"
+      },
+      "simplified_explanation": "This diagram shows how AD is structured like a family tree - everything connects back to the Forest at the top.",
+      "memory_aids": [
+        "Top to bottom: Forest > Domain > OUs > Objects",
+        "Left to right: Different departments/locations"
+      ],
+      "real_world_connection": "When you log in, AD traverses this tree to find your user object, determine which groups you're in, and apply the correct policies.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "27d8379d-ed2f-4fa0-8d3d-8893780ade87",
+      "type": "explanation",
+      "title": "Why AD Matters for Security",
+      "content": {
+        "text": "Active Directory is the #1 target for attackers in enterprise environments. Here's why:\n\n**For Attackers (Red Team):**\n- Compromise AD = Compromise the ENTIRE network\n- Domain Admin account = 'God mode' - access to everything\n- AD contains password hashes that can be cracked\n- Misconfigurations are common (weak passwords, excessive permissions)\n- Attack techniques: Kerberoasting, Pass-the-Hash, Golden Ticket\n\n**For Defenders (Blue Team):**\n- Monitor AD for suspicious authentication patterns\n- Enforce strong password policies via AD\n- Use Group Policies to harden all computers\n- Audit privileged account usage (Domain Admins)\n- Detect lateral movement through AD logs\n\n**Common AD Attacks You'll Learn:**\n1. **Kerberoasting**: Cracking service account passwords\n2. **Pass-the-Hash**: Authenticating with stolen password hashes\n3. **Golden Ticket**: Forging authentication tickets for persistence\n4. **DCSync**: Extracting all AD passwords by impersonating a DC\n\nUnderstanding AD is foundational for both attacking and defending enterprise networks!"
+      },
+      "simplified_explanation": "If AD is the principal's office with all the master records, imagine what would happen if a bad actor got into that office. They could change grades, create fake students, or even impersonate the principal! That's why attackers target AD - it controls everything.",
+      "memory_aids": [
+        "AD = The 'keys to the kingdom' in enterprise security",
+        "Domain Admin = Most powerful account (protect it!)",
+        "Compromise DC = Compromise everything"
+      ],
+      "real_world_connection": "Major breaches like SolarWinds, NotPetya, and countless ransomware attacks involved compromising Active Directory. Once attackers get Domain Admin, they can deploy ransomware to every computer in minutes.",
+      "reflection_prompt": "If you were an attacker, why would compromising a Domain Admin account be your ultimate goal?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "87c09930-4035-4727-9b7a-82f2358dc397",
+      "type": "memory_aid",
+      "title": "Key Takeaways",
+      "content": {
+        "summary": [
+          "Active Directory = Centralized identity and access management for Windows networks",
+          "Domain Controller = Server that hosts AD and authenticates users",
+          "Domain = Logical boundary sharing one AD database (e.g., company.com)",
+          "Organizational Units (OUs) = Folders that organize users and computers",
+          "Objects = The 'things' in AD: Users, Computers, Groups, Policies",
+          "AD is critical for security - compromise AD = compromise everything"
+        ]
+      },
+      "simplified_explanation": "Remember: AD is the control center for everything in a Windows network. Protect it, or attackers will own your entire organization.",
+      "memory_aids": [
+        "AD Acronyms: DC (Domain Controller), OU (Organizational Unit), GPO (Group Policy Object)",
+        "Attack mindset: 'Get Domain Admin = Win the entire network'",
+        "Defense mindset: 'Protect AD = Protect everything'"
+      ],
+      "real_world_connection": "Every cybersecurity job involving Windows networks requires AD knowledge - it's foundational.",
+      "reflection_prompt": "What's one thing you learned about AD that surprised you?",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is Active Directory primarily used for?",
+      "options": [
+        "Web hosting and content management",
+        "Centralized identity and access management",
+        "Antivirus and malware protection",
+        "Database management and SQL queries"
+      ],
+      "correct_answer": 1,
+      "explanation": "Active Directory is Microsoft's directory service for centralized identity management, authentication, and authorization in Windows networks. It's not used for web hosting, antivirus, or database management.",
+      "difficulty": 1,
+      "memory_aid": "Remember: AD = Authentication + Authorization + Administration",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is a Domain Controller?",
+      "options": [
+        "A firewall that protects the domain",
+        "A Windows Server that hosts Active Directory",
+        "A router that manages domain traffic",
+        "An antivirus program for servers"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Domain Controller (DC) is a Windows Server that hosts the Active Directory database, authenticates users, and applies policies. It's not a firewall, router, or antivirus.",
+      "difficulty": 1,
+      "memory_aid": "DC = Domain Controller = The server that IS Active Directory",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What are Organizational Units (OUs) used for?",
+      "options": [
+        "Encrypting sensitive data",
+        "Organizing and grouping AD objects like users and computers",
+        "Scanning for viruses",
+        "Managing network bandwidth"
+      ],
+      "correct_answer": 1,
+      "explanation": "OUs are containers within Active Directory used to organize objects (users, computers, groups) logically, often by department or location. They allow applying Group Policies to specific groups of objects.",
+      "difficulty": 1,
+      "memory_aid": "OU = Organizational Unit = Folders for organizing AD objects",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Why do organizations have multiple Domain Controllers?",
+      "options": [
+        "To slow down authentication",
+        "For redundancy, load balancing, and geographic distribution",
+        "To increase licensing costs",
+        "DCs must be replaced monthly"
+      ],
+      "correct_answer": 1,
+      "explanation": "Multiple DCs provide redundancy (if one fails, others continue), load balancing (distribute authentication requests), and geographic distribution (local authentication at remote offices).",
+      "difficulty": 1,
+      "memory_aid": "Multiple DCs = High availability and better performance",
+      "points": 10
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "From a security perspective, why is Active Directory a prime target for attackers?",
+      "options": [
+        "It's easy to hack and has no defenses",
+        "Compromising AD gives access to the entire network",
+        "AD is only used by small companies",
+        "Attacking AD is legal"
+      ],
+      "correct_answer": 1,
+      "explanation": "Active Directory is the 'keys to the kingdom' - compromising AD (especially Domain Admin accounts) gives attackers control over every computer, user, and resource in the organization. This makes it the ultimate target.",
+      "difficulty": 1,
+      "memory_aid": "Compromise AD = Compromise everything (that's why attackers love it)",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2025-01-22T10:00:00",
+  "updated_at": "2025-01-22T10:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0"
+}

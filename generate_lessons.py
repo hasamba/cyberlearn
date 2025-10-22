@@ -263,6 +263,136 @@ LESSON_CURRICULUM = {
                 }
             ]
         }
+    ],
+    "red_team": [
+        {
+            "title": "Red Team Fundamentals",
+            "subtitle": "Introduction to offensive security operations",
+            "difficulty": 1,
+            "order": 1,
+            "concepts": ["Red teaming vs pentesting", "Rules of engagement", "Ethical hacking", "Attack lifecycle"],
+            "quiz": [
+                {
+                    "q": "What is red teaming?",
+                    "opts": ["Defensive security", "Simulating real-world adversaries", "Network administration", "Antivirus testing"],
+                    "correct": 1,
+                    "explanation": "Red teaming simulates real-world adversaries to test an organization's detection and response capabilities."
+                },
+                {
+                    "q": "Why are rules of engagement important?",
+                    "opts": ["They speed up attacks", "They define legal and ethical boundaries", "They're optional", "They only apply to blue team"],
+                    "correct": 1,
+                    "explanation": "Rules of engagement define what's authorized, ensuring red team operations remain legal and ethical."
+                }
+            ]
+        },
+        {
+            "title": "OSINT and Reconnaissance",
+            "subtitle": "Gathering intelligence from public sources",
+            "difficulty": 1,
+            "order": 2,
+            "concepts": ["Open Source Intelligence", "Passive reconnaissance", "Social media analysis", "Domain enumeration"],
+            "quiz": [
+                {
+                    "q": "What is OSINT?",
+                    "opts": ["A hacking tool", "Open Source Intelligence from public sources", "Operating system", "Encryption method"],
+                    "correct": 1,
+                    "explanation": "OSINT is intelligence gathering from publicly available sources like websites, social media, public records."
+                },
+                {
+                    "q": "Which is passive reconnaissance?",
+                    "opts": ["Port scanning", "Viewing company website", "Phishing emails", "Exploiting vulnerabilities"],
+                    "correct": 1,
+                    "explanation": "Passive recon doesn't directly interact with target systems - viewing public websites leaves no traces."
+                }
+            ]
+        },
+        {
+            "title": "Social Engineering Basics",
+            "subtitle": "Human-based attack vectors",
+            "difficulty": 2,
+            "order": 3,
+            "concepts": ["Phishing", "Pretexting", "Psychological manipulation", "Defense strategies"],
+            "quiz": [
+                {
+                    "q": "What is social engineering?",
+                    "opts": ["Network hacking", "Manipulating people to divulge information", "Software development", "Firewall configuration"],
+                    "correct": 1,
+                    "explanation": "Social engineering exploits human psychology rather than technical vulnerabilities."
+                },
+                {
+                    "q": "What is pretexting?",
+                    "opts": ["Writing code before testing", "Creating a fabricated scenario to gain information", "Network scanning", "Password cracking"],
+                    "correct": 1,
+                    "explanation": "Pretexting involves creating a believable scenario (pretext) to trick targets into sharing information."
+                }
+            ]
+        }
+    ],
+    "blue_team": [
+        {
+            "title": "Blue Team Fundamentals",
+            "subtitle": "Introduction to defensive security operations",
+            "difficulty": 1,
+            "order": 1,
+            "concepts": ["Defensive security", "Security monitoring", "Threat detection", "Incident response"],
+            "quiz": [
+                {
+                    "q": "What is blue teaming?",
+                    "opts": ["Offensive hacking", "Defensive security and monitoring", "Network design", "Software development"],
+                    "correct": 1,
+                    "explanation": "Blue teaming focuses on defense: detecting, preventing, and responding to security threats."
+                },
+                {
+                    "q": "What is a Security Operations Center (SOC)?",
+                    "opts": ["Data center", "Team monitoring security events 24/7", "Network switch", "Backup facility"],
+                    "correct": 1,
+                    "explanation": "A SOC is a centralized team that monitors, detects, analyzes, and responds to security incidents."
+                }
+            ]
+        },
+        {
+            "title": "Log Analysis Basics",
+            "subtitle": "Understanding security logs and events",
+            "difficulty": 1,
+            "order": 2,
+            "concepts": ["Event logs", "Log sources", "Log correlation", "Anomaly detection"],
+            "quiz": [
+                {
+                    "q": "Why are logs important for security?",
+                    "opts": ["They slow down systems", "They provide evidence of security events", "They're only for debugging", "They replace backups"],
+                    "correct": 1,
+                    "explanation": "Logs record system activities, providing critical evidence for detecting and investigating security incidents."
+                },
+                {
+                    "q": "What is log correlation?",
+                    "opts": ["Deleting old logs", "Combining logs from multiple sources to detect patterns", "Encrypting logs", "Compressing logs"],
+                    "correct": 1,
+                    "explanation": "Log correlation combines data from different sources to identify complex attack patterns."
+                }
+            ]
+        },
+        {
+            "title": "Security Monitoring and Alerting",
+            "subtitle": "Detecting threats in real-time",
+            "difficulty": 2,
+            "order": 3,
+            "concepts": ["SIEM basics", "Alert creation", "False positives", "Alert triage"],
+            "quiz": [
+                {
+                    "q": "What is a SIEM?",
+                    "opts": ["Firewall", "Security Information and Event Management system", "Antivirus", "VPN"],
+                    "correct": 1,
+                    "explanation": "SIEM systems collect, analyze, and correlate security logs to detect threats in real-time."
+                },
+                {
+                    "q": "What is a false positive?",
+                    "opts": ["Missed attack", "Alert for benign activity", "Successful detection", "Log error"],
+                    "correct": 1,
+                    "explanation": "False positives are alerts triggered by normal activity, not actual threats - they waste analyst time."
+                }
+            ]
+        }
     ]
 }
 
