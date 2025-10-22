@@ -416,9 +416,14 @@ class AdaptiveEngine:
             total = len(answers)
             percentage = (correct / total) * 100
 
-            # Map to skill level (diagnostic is intentionally harder)
-            # Scale up to account for diagnostic difficulty
-            skill_estimate = min(100, int(percentage * 1.2))
+            # Map to skill level (more conservative scoring)
+            # Scale down to encourage learning from basics
+            if percentage >= 80:
+                skill_estimate = min(50, int(percentage * 0.5))  # Even experts start at 50
+            elif percentage >= 60:
+                skill_estimate = int(percentage * 0.4)  # 60% = 24 skill
+            else:
+                skill_estimate = int(percentage * 0.3)  # 33% = 10 skill
 
             # Set skill level
             setattr(skills, domain, skill_estimate)

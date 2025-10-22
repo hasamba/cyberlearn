@@ -1,0 +1,132 @@
+# Push Advanced Lessons to GitHub
+
+## New Files Created (Ready to Push)
+
+### Lesson Generators:
+- generate_advanced_lessons.py (22 advanced lessons generator)
+- generate_lessons.py (18 basic lessons - already exists)
+- load_all_lessons.py (batch loader)
+- check_database.py (database verification tool)
+
+### Documentation:
+- ADVANCED_LESSONS.md (comprehensive advanced curriculum guide)
+- ADD_LESSONS.md (basic lesson instructions)
+
+### Content (will be generated on VM):
+After running generators, you'll have:
+- content/lesson_*.json (40 total lesson files)
+
+## Git Commands to Run
+
+### On Your Host Machine (Windows):
+
+```powershell
+# Navigate to project directory
+cd "c:\Users\yaniv\10Root Dropbox\Yaniv Radunsky\Documents\50-59 Projects\57 ClaudeCode\57.14_Learning_app"
+
+# Check current status
+git status
+
+# Add new files
+git add generate_advanced_lessons.py
+git add ADVANCED_LESSONS.md
+git add GITHUB_PUSH_ADVANCED.txt
+
+# Commit with descriptive message
+git commit -m "Add advanced curriculum: 22 expert-level lessons
+
+- Add generate_advanced_lessons.py with 22 difficulty-4 lessons
+- Active Directory: 5 lessons (Kerberoasting, Golden Ticket, DCSync, PtH/PtT, AD CS)
+- Red Team: 5 lessons (APT29, APT28, Lazarus, C2 Infrastructure, LOLBins)
+- Blue Team: 6 lessons (Threat Hunting, EDR, Memory Forensics, Deception, SIEM, SOAR)
+- DFIR: 3 advanced lessons (Windows forensics, Network analysis, Timeline)
+- Malware: 3 lessons (Reverse engineering, Anti-analysis, Ransomware)
+- Full APT attack path simulations with MITRE ATT&CK mapping
+- Threat hunting playbooks with detection logic
+- Complete documentation in ADVANCED_LESSONS.md
+- Total curriculum: 40 lessons (18 basic + 22 advanced)
+
+🤖 Generated with Claude Code https://claude.com/claude-code
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# Push to GitHub
+git push origin main
+
+# If you haven't set up remote yet:
+# git remote add origin https://github.com/hasamba/cyberlearn.git
+# git push -u origin main
+```
+
+## Alternative: Push Everything Including Generated Content
+
+If you want to include the generated lesson JSON files:
+
+```powershell
+# First, generate all lessons on your host machine (optional)
+python generate_lessons.py
+python generate_advanced_lessons.py
+
+# Then add everything
+git add .
+git commit -m "Add complete lesson library with generated content"
+git push origin main
+```
+
+## Recommended Approach
+
+**Option 1 (Recommended)**: Push generators only, generate lessons on VM
+- Smaller repo size
+- Lessons generated fresh on deployment
+- Easier to modify curriculum
+
+**Option 2**: Push generators + all generated lessons
+- Immediate content availability
+- No need to run generators after clone
+- Larger repo size (~40 JSON files)
+
+## After Pushing
+
+Update your README.md to mention:
+- 40 total lessons (18 basic + 22 advanced)
+- APT attack simulations (APT29, APT28, Lazarus)
+- Advanced AD exploitation techniques
+- Threat hunting and detection engineering
+- Professional-grade curriculum
+
+## Verification
+
+After pushing, check GitHub:
+1. Visit: https://github.com/hasamba/cyberlearn
+2. Verify new files appear
+3. Check commit message shows up correctly
+4. Verify ADVANCED_LESSONS.md renders properly
+
+## What Your VM Needs to Do
+
+After pulling on VM:
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Generate all lessons
+python generate_lessons.py
+python generate_advanced_lessons.py
+
+# Load into database
+python load_all_lessons.py
+
+# Verify
+python check_database.py
+
+# Launch app
+streamlit run app.py
+```
+
+---
+
+Total new lines of code: ~800 lines
+Total lessons: 40 (beginner → expert)
+Domains covered: All 7 (Fundamentals, DFIR, Malware, AD, Pentest, Red Team, Blue Team)
+Difficulty range: 1-4 (Apprentice → Grandmaster)

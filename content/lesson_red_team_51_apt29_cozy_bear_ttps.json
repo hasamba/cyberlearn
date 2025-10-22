@@ -1,0 +1,221 @@
+{
+  "lesson_id": "39ae611f-8ea2-4643-8d89-d92a2091be65",
+  "domain": "red_team",
+  "title": "APT29 (Cozy Bear) TTPs",
+  "subtitle": "Simulating Russian state-sponsored threat actor",
+  "difficulty": 4,
+  "estimated_time": 30,
+  "order_index": 1,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand Initial access",
+    "Understand Persistence",
+    "Understand Stealth",
+    "Understand Data exfiltration"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "7bd20f1c-a862-465b-9be6-39b00cccdf6c",
+      "type": "explanation",
+      "title": "Advanced Topic Ahead",
+      "content": {
+        "text": "You're about to learn APT29 (Cozy Bear) TTPs, an advanced technique used by real-world threat actors and security professionals. This knowledge is powerful and must be used ethically."
+      },
+      "simplified_explanation": "Think of this like learning advanced martial arts - powerful, but requires responsibility.",
+      "memory_aids": [
+        "\ud83c\udfaf Advanced level - requires prerequisite knowledge",
+        "\u2696\ufe0f Use ethically - authorized testing only"
+      ],
+      "real_world_connection": "This technique is actively used in real-world attacks and defenses.",
+      "reflection_prompt": "How would you use this knowledge to improve security?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "ec7fe38e-9e53-4472-a271-a409acbcc03f",
+      "type": "explanation",
+      "title": "APT29 (Cozy Bear) TTPs",
+      "content": {
+        "text": "This lesson covers: Initial access, Persistence, Stealth, Data exfiltration. These are advanced techniques requiring solid fundamentals."
+      },
+      "simplified_explanation": "Core concept: Initial access enables attackers (or defenders) to simulating russian state-sponsored threat actor.",
+      "memory_aids": [
+        "\ud83d\udca1 Key: Initial access",
+        "\ud83d\udca1 Key: Persistence",
+        "\ud83d\udca1 Key: Stealth"
+      ],
+      "real_world_connection": "Real threat actors use APT29 (Cozy Bear) TTPs daily in active campaigns.",
+      "reflection_prompt": "What security controls could prevent or detect this technique?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "261cdb51-612e-421e-8e0c-b62c8f958be3",
+      "type": "simulation",
+      "title": "APT Attack Path",
+      "content": {
+        "scenario": "Simulate APT29 attack chain against corporate environment",
+        "phases": [
+          {
+            "name": "Initial Compromise",
+            "techniques": [
+              "Spear phishing with malicious Office document",
+              "Macro-based dropper",
+              "WellMess or WellMail malware deployment"
+            ],
+            "mitre_tactics": [
+              "Initial Access: T1566.001"
+            ]
+          },
+          {
+            "name": "Establish Foothold",
+            "techniques": [
+              "PowerShell Empire or Cobalt Strike",
+              "Registry persistence",
+              "Scheduled tasks"
+            ],
+            "mitre_tactics": [
+              "Persistence: T1053.005",
+              "Execution: T1059.001"
+            ]
+          },
+          {
+            "name": "Credential Access",
+            "techniques": [
+              "mimikatz for LSASS dumping",
+              "Pass-the-hash",
+              "Kerberoasting"
+            ],
+            "mitre_tactics": [
+              "Credential Access: T1003.001",
+              "T1558.003"
+            ]
+          },
+          {
+            "name": "Lateral Movement",
+            "techniques": [
+              "PsExec or WMI",
+              "Remote Desktop Protocol",
+              "Stolen credentials"
+            ],
+            "mitre_tactics": [
+              "Lateral Movement: T1021.001",
+              "T1021.002"
+            ]
+          },
+          {
+            "name": "Data Collection & Exfiltration",
+            "techniques": [
+              "Archive sensitive files",
+              "OneDrive/cloud storage for staging",
+              "HTTPS exfiltration to legitimate services"
+            ],
+            "mitre_tactics": [
+              "Collection: T1560",
+              "Exfiltration: T1567.002"
+            ]
+          }
+        ],
+        "detection": [
+          "Email gateway detecting malicious macros",
+          "EDR detecting LSASS access",
+          "Network monitoring for unusual cloud uploads",
+          "Behavioral analytics for anomalous PowerShell usage"
+        ]
+      },
+      "simplified_explanation": "Understand how advanced threat actors conduct multi-stage operations.",
+      "memory_aids": [
+        "\ud83c\udfaf APT = Advanced Persistent Threat",
+        "\ud83d\udcca Multi-stage attack chain",
+        "\ud83d\udd0d Detection at each stage"
+      ],
+      "real_world_connection": "This attack pattern is documented in real APT29 (Cozy Bear) TTPs operations.",
+      "reflection_prompt": "Where are the best opportunities to disrupt this attack chain?",
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "b5dd37f7-c84f-43a3-9395-18fa10b65fb4",
+      "type": "explanation",
+      "title": "MITRE ATT&CK Mapping",
+      "content": {
+        "text": "This attack uses the following MITRE ATT&CK techniques: Initial Access: T1566.001, Persistence: T1053.005, Execution: T1059.001, Credential Access: T1003.001, T1558.003, Lateral Movement: T1021.001, T1021.002, Collection: T1560, Exfiltration: T1567.002"
+      },
+      "simplified_explanation": "MITRE ATT&CK provides a common language for describing adversary behavior.",
+      "memory_aids": [
+        "\ud83c\udfaf MITRE ATT&CK = Adversary tactics and techniques",
+        "\ud83d\udcda Industry standard framework"
+      ],
+      "real_world_connection": "Security teams use ATT&CK to map detections and prioritize defenses.",
+      "reflection_prompt": "Which of these techniques does your organization currently detect?",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is APT29 known for?",
+      "options": [
+        "Ransomware",
+        "State-sponsored espionage",
+        "Cryptomining",
+        "DDoS attacks"
+      ],
+      "correct_answer": 1,
+      "explanation": "APT29 (Cozy Bear) is a Russian state-sponsored APT focused on intelligence gathering and long-term espionage.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Initial access",
+      "points": 15
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which initial access vector is commonly used by APT29?",
+      "options": [
+        "SQL injection",
+        "Spear phishing",
+        "Physical access",
+        "Brute force"
+      ],
+      "correct_answer": 1,
+      "explanation": "APT29 frequently uses highly targeted spear phishing campaigns with malicious attachments or links.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Initial access",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What makes APT29 particularly stealthy?",
+      "options": [
+        "No malware used",
+        "Living-off-the-land techniques and legitimate tools",
+        "Very fast attacks",
+        "DDoS as distraction"
+      ],
+      "correct_answer": 1,
+      "explanation": "APT29 uses legitimate tools (PowerShell, WMI, legitimate admin tools) to blend in with normal activity.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Initial access",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning"
+  ],
+  "base_xp_reward": 600,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-22T13:09:10.083148",
+  "updated_at": "2025-10-22T13:09:10.083157",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "1.0"
+}

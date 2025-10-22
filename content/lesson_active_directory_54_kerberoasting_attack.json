@@ -1,0 +1,148 @@
+{
+  "lesson_id": "f3397e09-f940-4911-9bd4-26a69485352d",
+  "domain": "active_directory",
+  "title": "Kerberoasting Attack",
+  "subtitle": "Exploiting service account credentials",
+  "difficulty": 4,
+  "estimated_time": 30,
+  "order_index": 4,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand SPN enumeration",
+    "Understand TGS extraction",
+    "Understand Offline cracking",
+    "Understand Mitigation strategies"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "0305aba5-ff5a-4132-83fc-a26d56d2f60b",
+      "type": "explanation",
+      "title": "Advanced Topic Ahead",
+      "content": {
+        "text": "You're about to learn Kerberoasting Attack, an advanced technique used by real-world threat actors and security professionals. This knowledge is powerful and must be used ethically."
+      },
+      "simplified_explanation": "Think of this like learning advanced martial arts - powerful, but requires responsibility.",
+      "memory_aids": [
+        "\ud83c\udfaf Advanced level - requires prerequisite knowledge",
+        "\u2696\ufe0f Use ethically - authorized testing only"
+      ],
+      "real_world_connection": "This technique is actively used in real-world attacks and defenses.",
+      "reflection_prompt": "How would you use this knowledge to improve security?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "15b4573b-a5c6-4934-babc-02632e681b63",
+      "type": "explanation",
+      "title": "Kerberoasting Attack",
+      "content": {
+        "text": "This lesson covers: SPN enumeration, TGS extraction, Offline cracking, Mitigation strategies. These are advanced techniques requiring solid fundamentals."
+      },
+      "simplified_explanation": "Core concept: SPN enumeration enables attackers (or defenders) to exploiting service account credentials.",
+      "memory_aids": [
+        "\ud83d\udca1 Key: SPN enumeration",
+        "\ud83d\udca1 Key: TGS extraction",
+        "\ud83d\udca1 Key: Offline cracking"
+      ],
+      "real_world_connection": "Real threat actors use Kerberoasting Attack daily in active campaigns.",
+      "reflection_prompt": "What security controls could prevent or detect this technique?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "25b2024e-ead5-467b-868f-1bc1de21550f",
+      "type": "simulation",
+      "title": "Attack Simulation",
+      "content": {
+        "scenario": "You've gained initial access to a Windows domain. Now you need to escalate privileges.",
+        "steps": [
+          "Enumerate SPNs using setspn -T domain -Q */*",
+          "Request TGS tickets for service accounts",
+          "Extract tickets using Rubeus or Invoke-Kerberoast",
+          "Crack tickets offline with Hashcat",
+          "Use compromised service account credentials"
+        ],
+        "detection": [
+          "Monitor for unusual TGS requests (Event ID 4769)",
+          "Alert on encryption type downgrades (RC4 vs AES)",
+          "Track service account authentication patterns"
+        ]
+      },
+      "simplified_explanation": "Follow this attack path step-by-step to understand the adversary perspective.",
+      "memory_aids": [
+        "\ud83d\udd34 Red Team: Offensive simulation",
+        "\ud83d\udd35 Blue Team: Detection opportunities"
+      ],
+      "real_world_connection": "This exact attack path has been observed in real breaches.",
+      "reflection_prompt": "How would you detect each step of this attack?",
+      "is_interactive": true,
+      "xp_reward": 50
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What does Kerberoasting target?",
+      "options": [
+        "User passwords",
+        "Service account TGS tickets",
+        "Domain controller files",
+        "DNS records"
+      ],
+      "correct_answer": 1,
+      "explanation": "Kerberoasting extracts TGS tickets for service accounts, which can be cracked offline to reveal passwords.",
+      "difficulty": 4,
+      "memory_aid": "Remember: SPN enumeration",
+      "points": 15
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "How can you mitigate Kerberoasting?",
+      "options": [
+        "Disable Kerberos",
+        "Use long complex passwords for service accounts",
+        "Remove all SPNs",
+        "Disable TGS"
+      ],
+      "correct_answer": 1,
+      "explanation": "Long, complex passwords (25+ characters) for service accounts make offline cracking impractical.",
+      "difficulty": 4,
+      "memory_aid": "Remember: SPN enumeration",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What tool is commonly used for Kerberoasting?",
+      "options": [
+        "mimikatz",
+        "Rubeus/Invoke-Kerberoast",
+        "nmap",
+        "Wireshark"
+      ],
+      "correct_answer": 1,
+      "explanation": "Rubeus and Invoke-Kerberoast are PowerShell tools specifically designed for Kerberoasting attacks.",
+      "difficulty": 4,
+      "memory_aid": "Remember: SPN enumeration",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning"
+  ],
+  "base_xp_reward": 600,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-22T13:09:10.073918",
+  "updated_at": "2025-10-22T13:09:10.073951",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "1.0"
+}

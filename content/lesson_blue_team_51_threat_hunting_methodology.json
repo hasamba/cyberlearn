@@ -1,0 +1,162 @@
+{
+  "lesson_id": "b4f95215-14ad-468e-89ed-f81920405ebc",
+  "domain": "blue_team",
+  "title": "Threat Hunting Methodology",
+  "subtitle": "Proactive adversary detection",
+  "difficulty": 4,
+  "estimated_time": 30,
+  "order_index": 1,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand Hypothesis-driven hunting",
+    "Understand IOC development",
+    "Understand Behavioral analysis",
+    "Understand Threat intelligence"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "cd309a4f-891a-49f5-a0f5-860a02dabde9",
+      "type": "explanation",
+      "title": "Advanced Topic Ahead",
+      "content": {
+        "text": "You're about to learn Threat Hunting Methodology, an advanced technique used by real-world threat actors and security professionals. This knowledge is powerful and must be used ethically."
+      },
+      "simplified_explanation": "Think of this like learning advanced martial arts - powerful, but requires responsibility.",
+      "memory_aids": [
+        "\ud83c\udfaf Advanced level - requires prerequisite knowledge",
+        "\u2696\ufe0f Use ethically - authorized testing only"
+      ],
+      "real_world_connection": "This technique is actively used in real-world attacks and defenses.",
+      "reflection_prompt": "How would you use this knowledge to improve security?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "df8c091b-e99b-4cd6-94b8-64e66a8a9a10",
+      "type": "explanation",
+      "title": "Threat Hunting Methodology",
+      "content": {
+        "text": "This lesson covers: Hypothesis-driven hunting, IOC development, Behavioral analysis, Threat intelligence. These are advanced techniques requiring solid fundamentals."
+      },
+      "simplified_explanation": "Core concept: Hypothesis-driven hunting enables attackers (or defenders) to proactive adversary detection.",
+      "memory_aids": [
+        "\ud83d\udca1 Key: Hypothesis-driven hunting",
+        "\ud83d\udca1 Key: IOC development",
+        "\ud83d\udca1 Key: Behavioral analysis"
+      ],
+      "real_world_connection": "Real threat actors use Threat Hunting Methodology daily in active campaigns.",
+      "reflection_prompt": "What security controls could prevent or detect this technique?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "42550ff1-e8d6-4d49-bc18-02019be3db8a",
+      "type": "simulation",
+      "title": "Threat Hunting Playbook",
+      "content": {
+        "hypothesis": "Adversaries may be extracting service account TGS tickets for offline cracking",
+        "data_sources": [
+          "Windows Event Logs (Security, System)",
+          "EDR telemetry",
+          "Network traffic captures",
+          "Authentication logs"
+        ],
+        "hunt_steps": [
+          "Identify baseline: normal TGS request patterns",
+          "Search for Event ID 4769 with RC4 encryption (downgrade)",
+          "Correlate multiple TGS requests from single account",
+          "Check for requests to high-value service accounts",
+          "Investigate anomalous requesting accounts"
+        ],
+        "detection_logic": [
+          "IF: >10 TGS requests in 5 minutes FROM: single account",
+          "IF: TGS request WITH: RC4 encryption (weak) FOR: service account",
+          "IF: TGS requests FOR: admin service accounts FROM: low-privilege user"
+        ],
+        "response_actions": [
+          "Isolate suspicious account",
+          "Rotate service account passwords",
+          "Review authentication logs for compromise",
+          "Create detection rule for future prevention"
+        ]
+      },
+      "simplified_explanation": "Use this structured approach to hunt for threats in your environment.",
+      "memory_aids": [
+        "\ud83d\udd0d Start with hypothesis",
+        "\ud83d\udcca Query data sources",
+        "\u2705 Validate findings",
+        "\ud83d\udea8 Create detection rules"
+      ],
+      "real_world_connection": "SOC analysts use these exact hunting techniques daily.",
+      "reflection_prompt": "What additional data sources would improve this hunt?",
+      "is_interactive": true,
+      "xp_reward": 50
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is threat hunting?",
+      "options": [
+        "Reactive incident response",
+        "Proactive search for hidden threats",
+        "Installing antivirus",
+        "Patching systems"
+      ],
+      "correct_answer": 1,
+      "explanation": "Threat hunting is proactively searching for threats that evaded automated detection systems.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Hypothesis-driven hunting",
+      "points": 15
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What's the first step in threat hunting?",
+      "options": [
+        "Block all traffic",
+        "Form a hypothesis based on threat intel",
+        "Reimage all systems",
+        "Update signatures"
+      ],
+      "correct_answer": 1,
+      "explanation": "Effective threat hunting starts with a hypothesis (e.g., 'Are we vulnerable to Kerberoasting?').",
+      "difficulty": 4,
+      "memory_aid": "Remember: Hypothesis-driven hunting",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What differentiates hunting from monitoring?",
+      "options": [
+        "Hunting is automated",
+        "Hunting is hypothesis-driven and iterative",
+        "Hunting is slower",
+        "Hunting requires no tools"
+      ],
+      "correct_answer": 1,
+      "explanation": "Hunting is an active, hypothesis-driven process, while monitoring is passive alert-based detection.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Hypothesis-driven hunting",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning"
+  ],
+  "base_xp_reward": 600,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-22T13:09:10.092009",
+  "updated_at": "2025-10-22T13:09:10.092019",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "1.0"
+}

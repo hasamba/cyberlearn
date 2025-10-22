@@ -99,7 +99,7 @@ class Lesson(BaseModel):
 
     # Curriculum structure
     order_index: int = Field(ge=0)  # Sequence in domain
-    prerequisites: List[UUID] = Field(default_factory=list)
+    prerequisites: List[str] = Field(default_factory=list)  # Changed from List[UUID] to List[str] for lesson title references
     learning_objectives: List[str] = Field(min_items=1)
 
     # Content

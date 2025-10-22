@@ -1,0 +1,131 @@
+{
+  "lesson_id": "72853c95-f1e0-418c-9dfb-55e543e4ec74",
+  "domain": "active_directory",
+  "title": "DCSync Attack",
+  "subtitle": "Replicating Active Directory credentials",
+  "difficulty": 4,
+  "estimated_time": 30,
+  "order_index": 7,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand Directory replication",
+    "Understand Credential dumping",
+    "Understand Domain compromise",
+    "Understand Detection"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a0338859-5d3d-4e26-abe5-4380d2629d06",
+      "type": "explanation",
+      "title": "Advanced Topic Ahead",
+      "content": {
+        "text": "You're about to learn DCSync Attack, an advanced technique used by real-world threat actors and security professionals. This knowledge is powerful and must be used ethically."
+      },
+      "simplified_explanation": "Think of this like learning advanced martial arts - powerful, but requires responsibility.",
+      "memory_aids": [
+        "\ud83c\udfaf Advanced level - requires prerequisite knowledge",
+        "\u2696\ufe0f Use ethically - authorized testing only"
+      ],
+      "real_world_connection": "This technique is actively used in real-world attacks and defenses.",
+      "reflection_prompt": "How would you use this knowledge to improve security?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b108ba92-164b-4599-a5fd-99576efb1dc3",
+      "type": "explanation",
+      "title": "DCSync Attack",
+      "content": {
+        "text": "This lesson covers: Directory replication, Credential dumping, Domain compromise, Detection. These are advanced techniques requiring solid fundamentals."
+      },
+      "simplified_explanation": "Core concept: Directory replication enables attackers (or defenders) to replicating active directory credentials.",
+      "memory_aids": [
+        "\ud83d\udca1 Key: Directory replication",
+        "\ud83d\udca1 Key: Credential dumping",
+        "\ud83d\udca1 Key: Domain compromise"
+      ],
+      "real_world_connection": "Real threat actors use DCSync Attack daily in active campaigns.",
+      "reflection_prompt": "What security controls could prevent or detect this technique?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "814d4990-5265-4465-8aad-4f2e73438b88",
+      "type": "simulation",
+      "title": "Attack Simulation",
+      "content": {
+        "scenario": "You've compromised an account with replication rights. Extract all domain credentials.",
+        "steps": [
+          "Verify replication permissions",
+          "Use mimikatz: lsadump::dcsync /domain:example.com /all",
+          "Extract KRBTGT, admin, and user hashes",
+          "Store credentials for future use"
+        ],
+        "detection": [
+          "Monitor replication requests from non-DC systems",
+          "Alert on Event ID 4662 with replication GUIDs",
+          "Track accounts with replication rights"
+        ]
+      },
+      "simplified_explanation": "Follow this attack path step-by-step to understand the adversary perspective.",
+      "memory_aids": [
+        "\ud83d\udd34 Red Team: Offensive simulation",
+        "\ud83d\udd35 Blue Team: Detection opportunities"
+      ],
+      "real_world_connection": "This exact attack path has been observed in real breaches.",
+      "reflection_prompt": "How would you detect each step of this attack?",
+      "is_interactive": true,
+      "xp_reward": 50
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What does DCSync abuse?",
+      "options": [
+        "DNS protocols",
+        "Domain replication rights",
+        "File sharing",
+        "Remote desktop"
+      ],
+      "correct_answer": 1,
+      "explanation": "DCSync abuses directory replication (DS-Replication-Get-Changes) to extract credentials from domain controllers.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Directory replication",
+      "points": 15
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What permissions are needed for DCSync?",
+      "options": [
+        "Read-only domain user",
+        "DS-Replication-Get-Changes rights",
+        "Physical DC access",
+        "DNS admin"
+      ],
+      "correct_answer": 1,
+      "explanation": "DCSync requires replication rights: DS-Replication-Get-Changes and DS-Replication-Get-Changes-All.",
+      "difficulty": 4,
+      "memory_aid": "Remember: Directory replication",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning"
+  ],
+  "base_xp_reward": 600,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-22T13:09:10.079033",
+  "updated_at": "2025-10-22T13:09:10.079042",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "1.0"
+}
