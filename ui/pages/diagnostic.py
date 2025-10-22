@@ -81,17 +81,20 @@ def render_diagnostic_quiz(user: UserProfile, db: Database):
             st.markdown(question["question"])
             st.caption(f"Domain: {domain.replace('_', ' ').title()} | Difficulty: {question['difficulty']}")
 
-            # For demo, use True/False (in real implementation, would have actual questions)
-            answer = st.radio(
+            # Use actual answer options
+            answer_idx = st.radio(
                 "Select your answer:",
-                ["I know this", "I don't know this"],
+                range(len(question["options"])),
+                format_func=lambda x: question["options"][x],
                 key=f"diag_q_{i}",
             )
 
             if domain not in user_responses:
                 user_responses[domain] = []
 
-            user_responses[domain].append(answer == "I know this")
+            # Check if answer is correct
+            is_correct = (answer_idx == question["correct"])
+            user_responses[domain].append(is_correct)
 
             st.markdown("---")
 

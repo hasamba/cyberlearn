@@ -230,42 +230,147 @@ class AdaptiveEngine:
         Used for initial skill profiling.
         """
 
-        # Real diagnostic questions for each domain
+        # Real diagnostic questions for each domain with answer options
         diagnostic_questions = {
             "fundamentals": [
-                {"question": "What does the CIA triad stand for in cybersecurity?", "difficulty": 1},
-                {"question": "Which principle ensures data is accessible when needed?", "difficulty": 1},
-                {"question": "What is the primary purpose of encryption?", "difficulty": 2},
+                {
+                    "question": "What does the CIA triad stand for in cybersecurity?",
+                    "options": ["Confidentiality, Integrity, Availability", "Central Intelligence Agency", "Computer, Internet, Application", "Cybersecurity Information Analysis"],
+                    "correct": 0,
+                    "difficulty": 1
+                },
+                {
+                    "question": "Which principle ensures data is accessible when needed?",
+                    "options": ["Confidentiality", "Integrity", "Availability", "Authentication"],
+                    "correct": 2,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is the primary purpose of encryption?",
+                    "options": ["Speed up data transfer", "Protect confidentiality", "Detect malware", "Backup data"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
             ],
             "dfir": [
-                {"question": "What does DFIR stand for?", "difficulty": 1},
-                {"question": "Why is chain of custody important in digital forensics?", "difficulty": 2},
-                {"question": "What is the first step in incident response?", "difficulty": 2},
+                {
+                    "question": "What does DFIR stand for?",
+                    "options": ["Digital Forensics and Incident Response", "Data Flow Information Report", "Digital File Integrity Review", "Defense and Firewall Investigation"],
+                    "correct": 0,
+                    "difficulty": 1
+                },
+                {
+                    "question": "Why is chain of custody important in digital forensics?",
+                    "options": ["Faster analysis", "Legal admissibility of evidence", "Better documentation", "Easier sharing"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is the first step in incident response?",
+                    "options": ["Eradication", "Recovery", "Identification/Detection", "Lessons learned"],
+                    "correct": 2,
+                    "difficulty": 2
+                },
             ],
             "malware": [
-                {"question": "What is the difference between a virus and a worm?", "difficulty": 2},
-                {"question": "What does static malware analysis involve?", "difficulty": 2},
-                {"question": "What is a rootkit?", "difficulty": 3},
+                {
+                    "question": "What is the difference between a virus and a worm?",
+                    "options": ["No difference", "Virus needs host file, worm self-replicates", "Worm is less dangerous", "Virus spreads faster"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What does static malware analysis involve?",
+                    "options": ["Running the malware", "Examining code without execution", "Infecting test systems", "Monitoring network traffic"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is a rootkit?",
+                    "options": ["A password cracker", "Malware that hides at system level", "A network scanner", "An encryption tool"],
+                    "correct": 1,
+                    "difficulty": 3
+                },
             ],
             "active_directory": [
-                {"question": "What is Active Directory used for?", "difficulty": 1},
-                {"question": "What is the purpose of Group Policy?", "difficulty": 2},
-                {"question": "What is Kerberos authentication?", "difficulty": 3},
+                {
+                    "question": "What is Active Directory used for?",
+                    "options": ["Website hosting", "Directory services and identity management", "Antivirus scanning", "Network monitoring"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is the purpose of Group Policy?",
+                    "options": ["Create user groups", "Centrally manage Windows settings", "Share files", "Monitor logins"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is Kerberos authentication?",
+                    "options": ["Password hashing", "Ticket-based authentication protocol", "Biometric system", "Two-factor authentication"],
+                    "correct": 1,
+                    "difficulty": 3
+                },
             ],
             "pentest": [
-                {"question": "What is the purpose of penetration testing?", "difficulty": 1},
-                {"question": "What are the main phases of a penetration test?", "difficulty": 2},
-                {"question": "What is privilege escalation?", "difficulty": 2},
+                {
+                    "question": "What is the purpose of penetration testing?",
+                    "options": ["Break systems permanently", "Find and report vulnerabilities", "Install backdoors", "Delete data"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What are the main phases of a penetration test?",
+                    "options": ["Only exploitation", "Reconnaissance, Scanning, Exploitation, Post-exploitation", "Just scanning", "Only reporting"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is privilege escalation?",
+                    "options": ["Adding more users", "Gaining higher access rights", "Faster logins", "Better passwords"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
             ],
             "redteam": [
-                {"question": "How does red team differ from penetration testing?", "difficulty": 2},
-                {"question": "What is social engineering?", "difficulty": 1},
-                {"question": "What is lateral movement in a network?", "difficulty": 3},
+                {
+                    "question": "How does red team differ from penetration testing?",
+                    "options": ["No difference", "Red team simulates real adversaries over longer periods", "Red team is faster", "Red team only tests networks"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is social engineering?",
+                    "options": ["Network scanning", "Manipulating people to divulge information", "Password cracking", "Virus creation"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is lateral movement in a network?",
+                    "options": ["Moving files between folders", "Moving between systems after initial compromise", "Upgrading network speed", "Installing updates"],
+                    "correct": 1,
+                    "difficulty": 3
+                },
             ],
             "blueteam": [
-                {"question": "What is the role of a blue team?", "difficulty": 1},
-                {"question": "What is a SIEM system?", "difficulty": 2},
-                {"question": "What are Indicators of Compromise (IOCs)?", "difficulty": 2},
+                {
+                    "question": "What is the role of a blue team?",
+                    "options": ["Attack systems", "Defend and monitor systems", "Develop software", "Manage databases"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is a SIEM system?",
+                    "options": ["Social media platform", "Security Information and Event Management", "Server Infrastructure", "Software Installation Manager"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What are Indicators of Compromise (IOCs)?",
+                    "options": ["System performance metrics", "Evidence of security breach", "User passwords", "Network bandwidth"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
             ],
         }
 
@@ -278,6 +383,8 @@ class AdaptiveEngine:
                         "domain": domain,
                         "difficulty": q["difficulty"],
                         "question": q["question"],
+                        "options": q["options"],
+                        "correct": q["correct"],
                         "type": "multiple_choice",
                     }
                 )
