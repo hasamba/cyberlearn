@@ -136,10 +136,15 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     # Progress bar for lesson
     total_blocks = len(lesson.content_blocks)
     current_idx = st.session_state.current_block_index
-    progress_pct = (current_idx / total_blocks) * 100 if total_blocks > 0 else 0
 
-    st.progress(progress_pct / 100)
-    st.caption(f"Section {current_idx + 1} of {total_blocks}")
+    # Calculate progress (clamp between 0 and 1)
+    if total_blocks > 0:
+        progress_value = min(current_idx / total_blocks, 1.0)
+    else:
+        progress_value = 0.0
+
+    st.progress(progress_value)
+    st.caption(f"Section {min(current_idx + 1, total_blocks)} of {total_blocks}")
 
     st.markdown("---")
 
