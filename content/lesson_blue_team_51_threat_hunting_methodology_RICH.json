@@ -23,7 +23,7 @@
   ],
   "content_blocks": [
     {
-      "block_id": "intro-mindset",
+      "block_id": "f0880d53-bfc6-4cf2-b760-cc5fe196c678",
       "type": "mindset_coach",
       "title": "The Proactive Defender",
       "content": {
@@ -31,7 +31,7 @@
       }
     },
     {
-      "block_id": "what-is-hunting",
+      "block_id": "0eec8554-07f6-4415-af8f-d73084523459",
       "type": "explanation",
       "title": "What is Threat Hunting?",
       "content": {
@@ -39,7 +39,7 @@
       }
     },
     {
-      "block_id": "hypothesis-dev",
+      "block_id": "d779e277-98ca-43c0-ba70-6a58c8238139",
       "type": "explanation",
       "title": "Developing Hunting Hypotheses",
       "content": {
@@ -47,7 +47,7 @@
       }
     },
     {
-      "block_id": "hunting-playbooks",
+      "block_id": "dfcc0c1a-3a38-4fcd-a1fa-ad05150eb80d",
       "type": "explanation",
       "title": "Practical Hunting Playbooks",
       "content": {
@@ -55,7 +55,7 @@
       }
     },
     {
-      "block_id": "memory-aids-hunting",
+      "block_id": "a0ae2192-7e22-451a-b071-d5b158bb5a89",
       "type": "memory_aid",
       "title": "Threat Hunting Memory Aids",
       "content": {
@@ -63,7 +63,7 @@
       }
     },
     {
-      "block_id": "takeaways-hunting",
+      "block_id": "9a28ebd1-2352-4e39-b043-776c6dd268b2",
       "type": "explanation",
       "title": "Building Your Hunting Program",
       "content": {
@@ -73,7 +73,9 @@
     {
       "type": "video",
       "title": "Video Tutorial: Threat Hunting Methodology",
-      "content": "Watch this comprehensive video tutorial to reinforce your learning with visual demonstrations and practical examples.\n\n**Video**: [Threat Hunting Explained by SANS Cyber Defense](https://www.youtube.com/watch?v=HAslu96jy3A)\n\n**What you'll see:**\nProactive threat hunting techniques, hypothesis development, hunt playbooks, and MITRE ATT&CK-based hunting.\n\n**Duration**: ~35 minutes\n\n**Recommended viewing**: After completing the lesson to solidify understanding.\n\n**Additional Resources:**\n- [SANS Threat Hunting Framework](https://www.sans.org/white-papers/)\n- [ThreatHunter-Playbook](https://threathunterplaybook.com/)\n- [Sqrrl Threat Hunting Reference Model](https://www.threathunting.net/sqrrl-archive)"
+      "content": {
+        "resources": "Watch this comprehensive video tutorial to reinforce your learning with visual demonstrations and practical examples.\n\n**Video**: [Threat Hunting Explained by SANS Cyber Defense](https://www.youtube.com/watch?v=HAslu96jy3A)\n\n**What you'll see:**\nProactive threat hunting techniques, hypothesis development, hunt playbooks, and MITRE ATT&CK-based hunting.\n\n**Duration**: ~35 minutes\n\n**Recommended viewing**: After completing the lesson to solidify understanding.\n\n**Additional Resources:**\n- [SANS Threat Hunting Framework](https://www.sans.org/white-papers/)\n- [ThreatHunter-Playbook](https://threathunterplaybook.com/)\n- [Sqrrl Threat Hunting Reference Model](https://www.threathunting.net/sqrrl-archive)"
+      }
     }
   ],
   "post_assessment": [
@@ -88,7 +90,8 @@
         "Threat hunting replaces the need for SIEM and EDR"
       ],
       "correct_answer": 1,
-      "explanation": "Threat hunting is proactive (assumes compromise, searches for threats) and hypothesis-driven (tests specific theories about adversary behavior). Traditional monitoring is reactive (waits for alerts based on signatures/rules). Both are complementary, not replacements."
+      "explanation": "Threat hunting is proactive (assumes compromise, searches for threats) and hypothesis-driven (tests specific theories about adversary behavior). Traditional monitoring is reactive (waits for alerts based on signatures/rules). Both are complementary, not replacements.",
+      "difficulty": 3
     },
     {
       "question_id": "q2",
@@ -101,7 +104,8 @@
         "CIS Controls"
       ],
       "correct_answer": 1,
-      "explanation": "MITRE ATT&CK is the industry-standard framework for threat hunting hypotheses. It catalogs adversary tactics, techniques, and procedures (TTPs), providing specific, observable behaviors to hunt for. Hunters use ATT&CK to guide hypothesis development and coverage."
+      "explanation": "MITRE ATT&CK is the industry-standard framework for threat hunting hypotheses. It catalogs adversary tactics, techniques, and procedures (TTPs), providing specific, observable behaviors to hunt for. Hunters use ATT&CK to guide hypothesis development and coverage.",
+      "difficulty": 3
     },
     {
       "question_id": "q3",
@@ -114,7 +118,8 @@
         "5140 (Network Share Access)"
       ],
       "correct_answer": 2,
-      "explanation": "Event ID 4769 logs Kerberos service ticket requests. Kerberoasting involves requesting service tickets with RC4 encryption (TicketEncryptionType=0x17) for accounts with SPNs. High volume of these requests from a single account is suspicious and indicates potential Kerberoasting."
+      "explanation": "Event ID 4769 logs Kerberos service ticket requests. Kerberoasting involves requesting service tickets with RC4 encryption (TicketEncryptionType=0x17) for accounts with SPNs. High volume of these requests from a single account is suspicious and indicates potential Kerberoasting.",
+      "difficulty": 3
     },
     {
       "question_id": "q4",
@@ -127,14 +132,20 @@
         "Failed connections, retry attempts, DNS queries"
       ],
       "correct_answer": 1,
-      "explanation": "C2 beaconing exhibits the '3 C's': Consistent intervals (regular timing like every 60 seconds), Cyclical patterns (repeating behavior), and Continuous connections (ongoing over time). These patterns distinguish beaconing from normal user traffic."
+      "explanation": "C2 beaconing exhibits the '3 C's': Consistent intervals (regular timing like every 60 seconds), Cyclical patterns (repeating behavior), and Continuous connections (ongoing over time). These patterns distinguish beaconing from normal user traffic.",
+      "difficulty": 3
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
     "teach_like_im_10",
     "memory_hooks",
-    "real_world_application",
-    "encouragement"
+    "minimum_effective_dose",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

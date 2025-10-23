@@ -1,0 +1,147 @@
+{
+  "lesson_id": "d2b3c4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e",
+  "domain": "cloud",
+  "title": "Azure Security Best Practices and Identity Management",
+  "difficulty": 1,
+  "order_index": 2,
+  "prerequisites": [
+    "c1a2b3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+  ],
+  "concepts": [
+    "Azure Active Directory (Azure AD / Entra ID)",
+    "Azure Role-Based Access Control (RBAC)",
+    "Conditional Access Policies",
+    "Azure Key Vault",
+    "Azure Security Center",
+    "Azure Storage Account Security",
+    "Azure Network Security Groups (NSGs)",
+    "Azure Defender",
+    "Managed Identities",
+    "Azure Policy and Blueprints"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand Azure Active Directory and Entra ID for identity management",
+    "Implement Azure RBAC with principle of least privilege",
+    "Configure Conditional Access policies for zero-trust security",
+    "Secure Azure Storage Accounts with SAS tokens and private endpoints",
+    "Use Azure Key Vault for secrets and certificate management",
+    "Deploy Azure Security Center for threat detection and compliance",
+    "Configure Network Security Groups for network isolation",
+    "Implement Managed Identities to eliminate hardcoded credentials"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "title": "Azure Security Fundamentals",
+      "content": {
+        "text": "Microsoft Azure is the second-largest cloud provider (21% market share) after AWS (32%). Many enterprises use both AWS and Azure in multi-cloud strategies. Mastering Azure security is ESSENTIAL for comprehensive cloud security expertise.\n\n**Azure vs AWS: Key Differences**\n\n```\n┌─────────────────────────────────────────────────────┐\n│  Concept        │  AWS              │  Azure        │\n├─────────────────────────────────────────────────────┤\n│  Identity       │  IAM              │  Azure AD     │\n│  Access Control │  IAM Policies     │  RBAC         │\n│  Secrets Mgmt   │  Secrets Manager  │  Key Vault    │\n│  Security Hub   │  Security Hub     │  Defender     │\n│  Storage        │  S3               │  Blob Storage │\n│  Network ACL    │  Security Groups  │  NSGs         │\n│  Audit Logs     │  CloudTrail       │  Activity Log │\n└─────────────────────────────────────────────────────┘\n```\n\n**Azure Active Directory (Now Microsoft Entra ID)**\n\nAzure AD is Microsoft's cloud identity service. In 2023, Microsoft rebranded it to \"Microsoft Entra ID\", but most documentation still uses \"Azure AD\".\n\n**Azure AD Core Concepts:**\n\n1. **Users**: Individual identities (employees, contractors)\n2. **Groups**: Collections of users\n3. **Service Principals**: Application identities\n4. **Managed Identities**: Azure resource identities (no credentials needed)\n5. **Roles**: Permission sets (Owner, Contributor, Reader, custom)\n6. **Conditional Access**: Context-aware access policies\n\n**Azure RBAC: Role-Based Access Control**\n\nAzure uses RBAC instead of policy documents. Permissions are assigned via built-in or custom roles.\n\n**Built-in Roles:**\n- **Owner**: Full access including managing permissions\n- **Contributor**: Full access except managing permissions\n- **Reader**: Read-only access\n- **User Access Administrator**: Manage user access only\n\n**RBAC Assignment Structure:**\n```\nWho (Security Principal) + What (Role Definition) + Where (Scope) = Assignment\n```\n\nExample:\n- **Who**: user@company.com\n- **What**: Storage Blob Data Contributor\n- **Where**: /subscriptions/xxx/resourceGroups/production/providers/Microsoft.Storage/storageAccounts/proddata\n\n**Conditional Access: Zero Trust Security**\n\nConditional Access policies enforce access requirements based on conditions:\n\n**Conditions:**\n- User/Group\n- Cloud app\n- Device state (compliant, hybrid joined)\n- Location (IP address, country)\n- Risk level (Azure AD Identity Protection)\n\n**Controls:**\n- Require MFA\n- Require compliant device\n- Block access\n- Require password change\n\nExample policy: \"Require MFA for all admin roles when accessing from outside corporate network\"\n\n**Azure Key Vault: Secrets Management**\n\nKey Vault stores:\n- **Secrets**: API keys, connection strings, passwords\n- **Keys**: Cryptographic keys (RSA, EC)\n- **Certificates**: SSL/TLS certificates\n\nApplications retrieve secrets at runtime instead of hardcoding them.\n\n**Azure Storage Account Security**\n\nStorage Accounts contain Blob, File, Queue, and Table storage. Common misconfiguration: public blob containers.\n\n**Security Layers:**\n1. **Firewall**: Allow specific IP ranges or VNets only\n2. **SAS Tokens**: Time-limited access tokens with specific permissions\n3. **Private Endpoints**: Access storage via private IP (no internet)\n4. **Encryption**: At rest (default) and in transit (HTTPS required)\n5. **RBAC**: Identity-based access control\n\n**Network Security Groups (NSGs)**\n\nNSGs are stateful firewalls attached to subnets or network interfaces.\n\nRule structure:\n- Priority (100-4096, lower = higher priority)\n- Source (IP, service tag, ASG)\n- Destination\n- Port\n- Protocol\n- Action (Allow/Deny)\n\n**Azure Security Center / Microsoft Defender for Cloud**\n\nCentralized security management:\n- Secure Score (0-100% based on security recommendations)\n- Vulnerability assessment\n- Just-in-Time VM access\n- Adaptive application controls\n- File integrity monitoring\n- Threat protection\n\n**Managed Identities: The Right Way**\n\nManaged Identities eliminate hardcoded credentials for Azure resources.\n\n**System-assigned**: Tied to resource lifecycle (deleted when resource deleted)\n**User-assigned**: Independent lifecycle (reusable across resources)\n\nAzure automatically manages credential rotation."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "title": "Azure Security Configuration",
+      "content": {
+        "text": "**Exercise 1: Create Storage Account with Security Controls**\n\n```bash\n# Azure CLI commands\n\n# 1. Create resource group\naz group create \\\n  --name rg-secure-storage \\\n  --location eastus\n\n# 2. Create storage account with security defaults\naz storage account create \\\n  --name stprodsecuredata001 \\\n  --resource-group rg-secure-storage \\\n  --location eastus \\\n  --sku Standard_GRS \\\n  --kind StorageV2 \\\n  --https-only true \\\n  --min-tls-version TLS1_2 \\\n  --allow-blob-public-access false\n\n# 3. Enable firewall (deny by default)\naz storage account update \\\n  --name stprodsecuredata001 \\\n  --resource-group rg-secure-storage \\\n  --default-action Deny\n\n# 4. Allow specific IP range\naz storage account network-rule add \\\n  --account-name stprodsecuredata001 \\\n  --resource-group rg-secure-storage \\\n  --ip-address 203.0.113.0/24\n\n# 5. Enable Advanced Threat Protection\naz security atp storage update \\\n  --resource-group rg-secure-storage \\\n  --storage-account stprodsecuredata001 \\\n  --is-enabled true\n```\n\n**Exercise 2: Create Managed Identity and Grant Access**\n\n```bash\n# 1. Create VM with system-assigned managed identity\naz vm create \\\n  --name vm-app-server \\\n  --resource-group rg-secure-storage \\\n  --image Ubuntu2204 \\\n  --assign-identity [system] \\\n  --admin-username azureuser \\\n  --generate-ssh-keys\n\n# 2. Get the identity's principal ID\nPRINCIPAL_ID=$(az vm show \\\n  --name vm-app-server \\\n  --resource-group rg-secure-storage \\\n  --query identity.principalId \\\n  --output tsv)\n\n# 3. Grant Storage Blob Data Contributor role\naz role assignment create \\\n  --assignee $PRINCIPAL_ID \\\n  --role \"Storage Blob Data Contributor\" \\\n  --scope /subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-secure-storage/providers/Microsoft.Storage/storageAccounts/stprodsecuredata001\n\n# 4. From within the VM, access storage without credentials:\n# Install Azure CLI on the VM, then:\naz login --identity\naz storage blob list \\\n  --account-name stprodsecuredata001 \\\n  --container-name data \\\n  --auth-mode login\n```\n\n**Exercise 3: Create Conditional Access Policy**\n\n```powershell\n# PowerShell using Microsoft Graph API\n\nConnect-MgGraph -Scopes \"Policy.ReadWrite.ConditionalAccess\"\n\n# Require MFA for admin roles from untrusted locations\n$conditions = @{\n  Users = @{\n    IncludeRoles = @(\n      \"62e90394-69f5-4237-9190-012177145e10\"  # Global Administrator\n      \"194ae4cb-b126-40b2-bd5b-6091b380977d\"  # Security Administrator\n    )\n  }\n  Locations = @{\n    IncludeLocations = @(\"All\")\n    ExcludeLocations = @(\"AllTrusted\")\n  }\n}\n\n$grantControls = @{\n  Operator = \"OR\"\n  BuiltInControls = @(\"mfa\")\n}\n\n$params = @{\n  DisplayName = \"Require MFA for admins from untrusted locations\"\n  State = \"enabled\"\n  Conditions = $conditions\n  GrantControls = $grantControls\n}\n\nNew-MgIdentityConditionalAccessPolicy -BodyParameter $params\n```\n\n**Exercise 4: Create and Use Key Vault**\n\n```bash\n# 1. Create Key Vault\naz keyvault create \\\n  --name kv-prod-secrets-001 \\\n  --resource-group rg-secure-storage \\\n  --location eastus \\\n  --enable-rbac-authorization true\n\n# 2. Store a secret\naz keyvault secret set \\\n  --vault-name kv-prod-secrets-001 \\\n  --name DatabaseConnectionString \\\n  --value \"Server=prod-sql;Database=myapp;User=appuser;Password=ComplexP@ssw0rd!\"\n\n# 3. Grant VM's managed identity access\nKV_ID=$(az keyvault show --name kv-prod-secrets-001 --query id -o tsv)\n\naz role assignment create \\\n  --assignee $PRINCIPAL_ID \\\n  --role \"Key Vault Secrets User\" \\\n  --scope $KV_ID\n\n# 4. Retrieve secret from application code (Python)\n# pip install azure-identity azure-keyvault-secrets\n\nfrom azure.identity import DefaultAzureCredential\nfrom azure.keyvault.secrets import SecretClient\n\ncredential = DefaultAzureCredential()\nclient = SecretClient(vault_url=\"https://kv-prod-secrets-001.vault.azure.net/\", credential=credential)\n\nsecret = client.get_secret(\"DatabaseConnectionString\")\nprint(f\"Connection string: {secret.value}\")\n```\n\n**Exercise 5: Configure Network Security Group**\n\n```bash\n# 1. Create NSG\naz network nsg create \\\n  --name nsg-web-servers \\\n  --resource-group rg-secure-storage\n\n# 2. Allow HTTPS from internet\naz network nsg rule create \\\n  --nsg-name nsg-web-servers \\\n  --resource-group rg-secure-storage \\\n  --name AllowHTTPS \\\n  --priority 100 \\\n  --source-address-prefixes Internet \\\n  --destination-port-ranges 443 \\\n  --protocol Tcp \\\n  --access Allow\n\n# 3. Allow SSH from jump box only\naz network nsg rule create \\\n  --nsg-name nsg-web-servers \\\n  --resource-group rg-secure-storage \\\n  --name AllowSSHFromJumpBox \\\n  --priority 110 \\\n  --source-address-prefixes 10.0.1.0/24 \\\n  --destination-port-ranges 22 \\\n  --protocol Tcp \\\n  --access Allow\n\n# 4. Deny all other inbound traffic (implicit, but explicit is better)\naz network nsg rule create \\\n  --nsg-name nsg-web-servers \\\n  --resource-group rg-secure-storage \\\n  --name DenyAllInbound \\\n  --priority 4096 \\\n  --source-address-prefixes '*' \\\n  --destination-port-ranges '*' \\\n  --access Deny\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "title": "Microsoft Security Breaches and Lessons",
+      "content": {
+        "text": "**SolarWinds Supply Chain Attack (2020)**\n\nRussian APT group Nobelium (SVR) compromised SolarWinds Orion software, affecting 18,000 customers including Microsoft.\n\n**Microsoft's Exposure:**\n- Attackers accessed Microsoft source code repositories\n- Viewed Azure and Exchange source code (no modification)\n- Accessed internal Microsoft systems\n\n**How it happened:**\n1. Compromised SolarWinds build system\n2. Injected backdoor into Orion updates\n3. 18,000+ organizations installed trojanized updates\n4. Attackers used legitimate credentials to access cloud environments\n\n**Azure Security Lessons:**\n- Enable Conditional Access (require MFA, trusted devices)\n- Monitor for unusual OAuth app consents\n- Use Azure AD Identity Protection (risky sign-in detection)\n- Implement Just-in-Time access for admin roles\n- Enable Azure Defender threat detection\n\n**Lapsus$ Breach of Microsoft (2022)**\n\nLapsus$ hacking group breached Microsoft, Okta, Samsung, and NVIDIA.\n\n**Attack Vector:**\n- Social engineering to obtain employee credentials\n- No MFA on compromised account\n- Accessed Azure DevOps repositories\n- Downloaded source code for Bing, Cortana, and internal tools\n\n**Prevention:**\n- Enforce MFA for ALL accounts (no exceptions)\n- Use Conditional Access to block unusual locations\n- Enable Privileged Identity Management (PIM) for admin access\n- Monitor for impossible travel (login from US, then Russia 1 hour later)\n- Use hardware security keys (FIDO2) for admin accounts"
+      }
+    },
+    {
+      "type": "reflection",
+      "title": "Azure vs AWS Security Comparison",
+      "content": {
+        "text": "**Reflection Questions:**\n\n1. How does Azure RBAC differ from AWS IAM policies?\n2. What is the Azure equivalent of AWS instance profiles? (Managed Identities)\n3. Why is Conditional Access a zero-trust security feature?\n4. How would you prevent hardcoded database credentials in Azure applications?\n5. What Azure services provide threat detection similar to AWS GuardDuty?\n\n**Career Application:**\n- Multi-cloud security expertise (AWS + Azure) increases your market value by 40%\n- Many enterprises use both clouds (AWS for innovation, Azure for Microsoft workloads)\n- Understanding both platforms helps you architect secure hybrid cloud solutions"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "title": "Azure Security Quick Reference",
+      "content": {
+        "text": "**Azure RBAC: \"OWN-CRA\"**\n- **O**wner (full access + permissions management)\n- **W**rite = Contributor (full access, no permissions management)\n- **N**othing = Reader (read-only)\n- **C**ustom roles (define your own)\n- **R**esource scope (subscription, resource group, resource)\n- **A**ssignment = Who + What + Where\n\n**Conditional Access: \"ULRD-MBC\"**\n- **U**ser/Group (who)\n- **L**ocation (where from)\n- **R**isk level (how risky)\n- **D**evice state (managed/compliant)\n- **M**FA (control: require multi-factor)\n- **B**lock (control: deny access)\n- **C**ompliant device (control: require)\n\n**Key Vault Secrets Retrieval:**\n```python\nfrom azure.identity import DefaultAzureCredential\nfrom azure.keyvault.secrets import SecretClient\ncredential = DefaultAzureCredential()\nclient = SecretClient(vault_url=\"https://VAULT.vault.azure.net/\", credential=credential)\nsecret = client.get_secret(\"SECRET_NAME\")\n```\n\n**Managed Identity vs Service Principal:**\n- **Managed Identity**: Azure manages credentials automatically (PREFERRED)\n- **Service Principal**: You manage credentials manually (avoid if possible)"
+      }
+    },
+    {
+      "type": "video",
+      "title": "Azure Security Resources",
+      "content": {
+        "resources": "**Official Microsoft Learning:**\n- \"Azure Security Fundamentals\" (Microsoft Learn)\n- \"Implement Azure Security\" (Microsoft Learn path)\n- \"AZ-500: Azure Security Technologies\" (certification course)\n\n**YouTube Resources:**\n- \"John Savill's Technical Training\" (Azure security deep dives)\n- \"Azure Academy\" (practical tutorials)\n- \"Microsoft Security\" (official channel)\n\n**Hands-On Labs:**\n- Microsoft Learn sandbox (free Azure access)\n- Azure free tier ($200 credit for 30 days)\n- \"Azure Security Workshop\" (github.com/Azure/Azure-Security-Center)"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Your application running on an Azure VM needs to access a Storage Account. What is the MOST secure authentication method?",
+      "options": [
+        "Hardcode the storage account key in application code",
+        "Store the key in Azure Key Vault and retrieve it at runtime",
+        "Use a system-assigned Managed Identity and grant it RBAC permissions",
+        "Generate a SAS token and store it in an environment variable"
+      ],
+      "correct_answer": 2,
+      "explanation": "**Correct: Use a system-assigned Managed Identity and grant it RBAC permissions.**\n\nManaged Identities eliminate credentials entirely. Azure automatically manages authentication:\n\n1. VM has managed identity enabled\n2. Azure grants identity access to storage via RBAC\n3. Application uses DefaultAzureCredential() which automatically discovers the identity\n4. No secrets to store, rotate, or leak\n\n**Why others are wrong:**\n- Hardcoded keys: Will leak in version control, logs, or backups\n- Key Vault: Better, but still requires managing access to Key Vault (Managed Identity is simpler)\n- SAS tokens: Expire and must be rotated; environment variables can leak in logs\n\nManaged Identities are the Azure gold standard for service-to-service authentication.",
+      "question_id": "3657e861-2a25-4527-8375-0f8a6d214fb3",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question": "You need to enforce MFA for all users accessing Azure Portal from outside the corporate network. Which Azure service provides this capability?",
+      "options": [
+        "Azure RBAC",
+        "Azure Policy",
+        "Conditional Access",
+        "Azure Firewall"
+      ],
+      "correct_answer": 2,
+      "explanation": "**Correct: Conditional Access.**\n\nConditional Access policies enforce access controls based on conditions:\n- **Condition**: Location = Not corporate network\n- **Action**: Require MFA\n\nThis is a zero-trust security control that adapts security requirements to risk level.\n\n**Why others are wrong:**\n- RBAC: Controls WHAT you can do, not HOW you authenticate\n- Azure Policy: Enforces resource compliance (e.g., \"all VMs must have encryption\"), not authentication\n- Azure Firewall: Network-level filtering, not identity-based access control",
+      "question_id": "087e432b-968b-487b-a6b6-66f9fec447ed",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question": "An attacker obtains a SAS token for your Storage Account with read/write permissions that expires in 7 days. How can you immediately revoke access?",
+      "options": [
+        "Delete the SAS token from Azure Portal",
+        "Rotate the storage account key used to generate the SAS token",
+        "Change the storage account firewall rules to block the attacker's IP",
+        "Disable public access on the storage account"
+      ],
+      "correct_answer": 1,
+      "explanation": "**Correct: Rotate the storage account key used to generate the SAS token.**\n\nSAS tokens are signed with storage account keys. When you rotate the key, all SAS tokens generated with that key become invalid immediately.\n\nStorage accounts have two keys (key1, key2) for zero-downtime rotation:\n1. Rotate key1 (invalidates SAS tokens created with key1)\n2. Update applications to use key2\n3. Later rotate key2 for future rotation cycle\n\n**Why others are wrong:**\n- Delete SAS token: SAS tokens can't be deleted individually (they're just signed strings, not stored objects)\n- Firewall rules: Attacker may use different IPs, or you may not know their IP\n- Disable public access: Breaks legitimate access; doesn't specifically target the compromised token\n\n**Prevention:** Use short-lived SAS tokens (hours, not days) and prefer Managed Identities + RBAC over SAS tokens.",
+      "question_id": "a9ff02dd-fecd-434d-9abe-1a24d90ca86f",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question": "Your Azure subscription has the following RBAC assignments: (1) User Alice has 'Owner' role at subscription scope. (2) User Alice has 'Reader' role at resource group scope. What permissions does Alice have in that resource group?",
+      "options": [
+        "Reader (most restrictive wins)",
+        "Owner (most permissive wins)",
+        "No access (conflicting roles cancel out)",
+        "Owner on some resources, Reader on others"
+      ],
+      "correct_answer": 1,
+      "explanation": "**Correct: Owner (most permissive wins).**\n\nAzure RBAC is **additive** (union of permissions), not restrictive like AWS IAM (where deny wins).\n\nAlice's effective permissions:\n- Owner at subscription scope = Owner on ALL resource groups (including this one)\n- Reader at resource group scope = adds nothing (Owner already includes Reader)\n\nResult: Alice has Owner permissions.\n\n**Azure RBAC Evaluation:**\n1. Collect all role assignments for the user at all scopes (subscription, resource group, resource)\n2. Union all permissions (most permissive wins)\n3. Apply deny assignments (rare, used for Azure Blueprints)\n\n**Key difference from AWS:**\n- AWS: Explicit deny always wins\n- Azure: No deny in RBAC (except special deny assignments), most permissive wins\n\nTo restrict Alice, you must REMOVE the Owner role, not add a Reader role.",
+      "question_id": "bff9a2b5-f715-467d-8d6b-75447db5cc87",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "teach_like_im_10",
+    "minimum_effective_dose",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ]
+}

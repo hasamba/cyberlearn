@@ -18,11 +18,11 @@ def load_all_lessons():
     lesson_files = list(content_dir.glob("lesson_*.json"))
 
     if not lesson_files:
-        print("❌ No lesson files found in content/ directory")
-        print("   Files should be named: lesson_*.json")
+        print("[ERROR] No lesson files found in content/ directory")
+        print("        Files should be named: lesson_*.json")
         return
 
-    print(f"📚 Found {len(lesson_files)} lesson files")
+    print(f"[FOUND] {len(lesson_files)} lesson files")
     print("=" * 60)
 
     loaded = 0
@@ -43,23 +43,23 @@ def load_all_lessons():
             lesson = Lesson(**data)
 
             if db.create_lesson(lesson):
-                print(f"✅ Loaded: {lesson.title}")
+                print(f"[OK] Loaded: {lesson.title}")
                 loaded += 1
             else:
-                print(f"⏭️  Skipped (already exists): {lesson.title}")
+                print(f"[SKIP] Already exists: {lesson.title}")
                 skipped += 1
 
         except Exception as e:
-            print(f"❌ Error loading {lesson_file.name}: {e}")
+            print(f"[ERROR] Loading {lesson_file.name}: {e}")
             errors += 1
 
     db.close()
 
     print("=" * 60)
-    print(f"✅ Loaded: {loaded}")
-    print(f"⏭️  Skipped: {skipped}")
-    print(f"❌ Errors: {errors}")
-    print(f"📊 Total lessons in database: {loaded + skipped}")
+    print(f"[LOADED] {loaded} lessons")
+    print(f"[SKIPPED] {skipped} lessons")
+    print(f"[ERRORS] {errors} lessons")
+    print(f"[TOTAL] {loaded + skipped} lessons in database")
 
 
 if __name__ == "__main__":
