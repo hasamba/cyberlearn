@@ -308,14 +308,31 @@ If you encounter issues not covered here:
 
 ### Start Application (After Initial Setup)
 
-**Linux/Mac:**
+**Option 1 - Using Start Script (Recommended):**
+
+Linux/Mac:
+```bash
+cd cyberlearn
+chmod +x start.sh  # Only needed first time
+./start.sh
+```
+
+Windows:
+```batch
+cd cyberlearn
+start.bat
+```
+
+**Option 2 - Manual Start:**
+
+Linux/Mac:
 ```bash
 cd cyberlearn
 source venv/bin/activate
 streamlit run app.py
 ```
 
-**Windows:**
+Windows:
 ```batch
 cd cyberlearn
 venv\Scripts\activate.bat
