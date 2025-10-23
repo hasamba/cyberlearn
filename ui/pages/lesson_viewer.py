@@ -206,6 +206,15 @@ def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database)
     elif content_type == ContentType.REFLECTION:
         render_reflection_block(block, user, lesson, db)
 
+    elif content_type == ContentType.VIDEO:
+        render_video_block(block)
+
+    elif content_type == ContentType.CODE_EXERCISE:
+        render_code_exercise_block(block)
+
+    elif content_type == ContentType.REAL_WORLD:
+        render_real_world_block(block)
+
     elif content_type == ContentType.QUIZ:
         # Inline quiz (different from final assessment)
         st.info("Interactive checkpoint quiz")
@@ -323,6 +332,61 @@ def render_reflection_block(block, user: UserProfile, lesson: Lesson, db: Databa
             st.balloons()
         else:
             st.warning("Please enter your reflection to continue.")
+
+
+def render_video_block(block):
+    """Render video content block"""
+    st.markdown("### 🎥 Video Tutorial")
+
+    # Check for different possible keys in content
+    text_content = block.content.get("text") or block.content.get("resources") or block.content.get("description", "")
+
+    if text_content:
+        st.markdown(text_content)
+
+    # Check for video URL
+    if "url" in block.content:
+        st.video(block.content["url"])
+    elif "video_url" in block.content:
+        st.video(block.content["video_url"])
+
+
+def render_code_exercise_block(block):
+    """Render code exercise block"""
+    st.markdown("### 💻 Code Exercise")
+
+    text_content = block.content.get("text", "")
+    if text_content:
+        st.markdown(text_content)
+
+    # Display code examples if present
+    if "code" in block.content:
+        st.code(block.content["code"], language=block.content.get("language", "python"))
+
+    if "examples" in block.content:
+        for example in block.content["examples"]:
+            if isinstance(example, dict):
+                st.code(example.get("code", ""), language=example.get("language", "python"))
+            else:
+                st.code(example, language="python")
+
+
+def render_real_world_block(block):
+    """Render real-world application block"""
+    st.markdown("### 🌍 Real-World Application")
+
+    text_content = block.content.get("text") or block.content.get("description", "")
+    if text_content:
+        st.markdown(text_content)
+
+    # Display case studies if present
+    if "cases" in block.content:
+        for case in block.content["cases"]:
+            if isinstance(case, dict):
+                st.markdown(f"**{case.get('title', 'Case Study')}**")
+                st.markdown(case.get("description", ""))
+            else:
+                st.markdown(case)
 
 
 def render_quiz(lesson: Lesson, user: UserProfile, db: Database):
