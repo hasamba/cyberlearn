@@ -45,7 +45,16 @@ def setup_database():
 
         # Convert string UUIDs to UUID objects
         data["lesson_id"] = UUID(data["lesson_id"])
-        data["prerequisites"] = [UUID(p) for p in data["prerequisites"]]
+
+        # Safely parse prerequisites, filtering out invalid UUIDs
+        prereqs = []
+        for p in data.get("prerequisites", []):
+            if p and isinstance(p, str):
+                try:
+                    prereqs.append(UUID(p))
+                except (ValueError, AttributeError):
+                    continue
+        data["prerequisites"] = prereqs
 
         # Create lesson object
         lesson = Lesson(**data)
