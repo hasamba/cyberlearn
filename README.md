@@ -21,41 +21,39 @@ CyberLearn is a **complete adaptive learning platform** that delivers profession
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## 🚀 Quick Start (2 Minutes)
 
 ### Prerequisites
-- Python 3.10 or higher
-- pip (Python package manager)
+- Python 3.8 or higher
+- Git
 
-### Installation & Launch
+### Automated Installation
 
+**Linux/Mac:**
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+git clone https://github.com/hasamba/cyberlearn.git
+cd cyberlearn
+chmod +x setup.sh
+./setup.sh
+```
 
-# 2. Initialize database & load sample lesson
-python -c "
-import json
-from uuid import UUID
-from utils.database import Database
-from models.lesson import Lesson
+**Windows:**
+```batch
+git clone https://github.com/hasamba/cyberlearn.git
+cd cyberlearn
+setup.bat
+```
 
-db = Database()
-with open('content/sample_lesson_cia_triad.json', 'r') as f:
-    data = json.load(f)
-data['lesson_id'] = UUID(data['lesson_id'])
-data['prerequisites'] = [UUID(p) for p in data['prerequisites']]
-lesson = Lesson(**data)
-db.create_lesson(lesson)
-print('✅ Sample lesson loaded!')
-db.close()
-"
-
-# 3. Launch application
+**Start the Application:**
+```bash
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate.bat # Windows
 streamlit run app.py
 ```
 
 **🎉 That's it!** Open your browser to `http://localhost:8501` and start learning!
+
+📖 **For detailed instructions, troubleshooting, and manual installation, see [INSTALL.md](INSTALL.md)**
 
 ---
 
@@ -63,9 +61,11 @@ streamlit run app.py
 
 | Document | Description |
 |----------|-------------|
-| **[ARCHITECTURE.md](ARCHITECTURE.md)** | Complete system design, technology stack, data models, and algorithms |
-| **[USER_FLOWS.md](USER_FLOWS.md)** | User journey maps, learning pathways, and UX principles |
-| **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** | Step-by-step deployment, scaling, and extension guide |
+| **[INSTALL.md](INSTALL.md)** | Complete installation guide with troubleshooting |
+| **[CLAUDE.md](CLAUDE.md)** | Project instructions and current status |
+| **[HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md)** | Step-by-step guide for creating lessons |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | System design, technology stack, and algorithms |
+| **[USER_FLOWS.md](USER_FLOWS.md)** | User journey maps and learning pathways |
 
 ---
 
