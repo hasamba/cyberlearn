@@ -338,6 +338,17 @@ class Database:
 
         lessons = []
         for row in cursor.fetchall():
+            # Parse prerequisites safely, filtering out invalid UUIDs
+            prereqs_raw = json.loads(row["prerequisites"])
+            prereqs = []
+            for p in prereqs_raw:
+                if p and isinstance(p, str):
+                    try:
+                        prereqs.append(UUID(p))
+                    except (ValueError, AttributeError):
+                        # Skip invalid UUIDs
+                        continue
+
             lessons.append(
                 LessonMetadata(
                     lesson_id=UUID(row["lesson_id"]),
@@ -347,7 +358,7 @@ class Database:
                     estimated_time=row["estimated_time"],
                     order_index=row["order_index"],
                     is_core_concept=bool(row["is_core_concept"]),
-                    prerequisites=[UUID(p) for p in json.loads(row["prerequisites"])],
+                    prerequisites=prereqs,
                 )
             )
 
