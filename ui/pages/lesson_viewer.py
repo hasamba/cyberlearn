@@ -243,7 +243,10 @@ def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database)
 
 def render_mindset_block(block):
     """Render mindset coaching message"""
-    st.info(block.content.get("message", ""))
+    # Check for different possible keys in content
+    text_content = block.content.get("text") or block.content.get("message", "")
+    if text_content:
+        st.info(text_content)
     if block.mindset_message:
         st.success(f"💪 {block.mindset_message}")
 
@@ -273,6 +276,11 @@ def render_diagram_block(block):
 def render_memory_aid_block(block):
     """Render memory technique"""
     st.markdown("### 🧠 Memory Technique")
+
+    # Check for text content first
+    text_content = block.content.get("text", "")
+    if text_content:
+        st.markdown(text_content)
 
     if "technique" in block.content:
         st.markdown(f"**Technique:** {block.content['technique']}")
