@@ -1,6 +1,11 @@
 """
 CyberLearn - Adaptive Cybersecurity Learning Platform
 Main Streamlit application entry point
+
+Usage:
+  streamlit run app.py           # Normal mode
+  streamlit run app.py -- -v     # Verbose/Debug mode
+  streamlit run app.py -- --debug # Debug mode
 """
 
 import streamlit as st
@@ -10,9 +15,17 @@ import sys
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+from config import config, debug_print
 from ui.pages import dashboard, lesson_viewer, diagnostic, profile
 from utils.database import Database
 from models.user import UserProfile
+
+# Show debug info if enabled
+if config.debug:
+    debug_print("Application starting in DEBUG mode")
+    debug_print(f"Python version: {sys.version}")
+    debug_print(f"Streamlit version: {st.__version__}")
+    debug_print(f"Working directory: {Path.cwd()}")
 
 # Page configuration
 st.set_page_config(
@@ -77,9 +90,13 @@ def initialize_session_state():
     """Initialize session state variables"""
     if "db" not in st.session_state:
         st.session_state.db = Database()
+        if config.debug:
+            debug_print("Database connection initialized")
 
     if "current_user" not in st.session_state:
         st.session_state.current_user = None
+        if config.debug:
+            debug_print("Session state initialized (no user)")
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -145,8 +162,25 @@ def render_sidebar():
                 st.session_state.current_page = "welcome"
                 st.rerun()
 
+            # Debug info section
+            if config.debug:
+                st.markdown("---")
+                st.markdown("### 🐛 Debug Info")
+                st.caption(f"User ID: {user.user_id}")
+                st.caption(f"Page: {st.session_state.current_page}")
+                st.caption(f"DB: {config.db_path.exists()}")
+                if st.session_state.current_lesson:
+                    st.caption(f"Lesson: {st.session_state.current_lesson.title}")
+
         else:
             st.info("Please login or create an account to start learning!")
+
+            # Debug info for no user
+            if config.debug:
+                st.markdown("---")
+                st.markdown("### 🐛 Debug Info")
+                st.caption("No user logged in")
+                st.caption(f"DB exists: {config.db_path.exists()}")
 
 
 def render_welcome_page():
