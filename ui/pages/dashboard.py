@@ -129,11 +129,20 @@ def render_recommended_lessons(user: UserProfile, db: Database):
         else:
             st.info("Loading lesson content...")
     else:
-        st.info("Complete the diagnostic assessment to get personalized recommendations!")
+        # Check if diagnostic is completed
+        if not user.diagnostic_completed:
+            st.info("Complete the diagnostic assessment to get personalized recommendations!")
+            if st.button("📊 Take Diagnostic", use_container_width=True):
+                st.session_state.current_page = "diagnostic"
+                st.rerun()
+        else:
+            # Diagnostic completed but no lessons found
+            st.success("🎉 Great progress! You've completed all available lessons in your current skill range.")
+            st.info("💡 **What's next?**\n- Review previous lessons to strengthen mastery\n- Check out the Learning page to explore other domains\n- Keep your streak alive by reviewing material!")
 
-        if st.button("📊 Take Diagnostic", use_container_width=True):
-            st.session_state.current_page = "diagnostic"
-            st.rerun()
+            if st.button("📚 Explore All Lessons", use_container_width=True):
+                st.session_state.current_page = "learning"
+                st.rerun()
 
 
 def render_skill_progress(user: UserProfile):
