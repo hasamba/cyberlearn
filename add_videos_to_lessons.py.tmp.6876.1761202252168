@@ -1,0 +1,334 @@
+"""
+Script to add YouTube video tutorials to all rich lessons
+Adds video content block before post_assessment section
+"""
+
+import json
+import os
+from pathlib import Path
+
+# Video mapping for each lesson
+VIDEO_MAP = {
+    "lesson_active_directory_01_fundamentals_RICH.json": {
+        "title": "Video Tutorial: Active Directory Fundamentals",
+        "video_title": "Active Directory Explained by NetworkChuck",
+        "url": "https://www.youtube.com/watch?v=MAg4aVkLMQs",
+        "duration": "~20 minutes",
+        "description": "Complete overview of Active Directory architecture, domains, forests, organizational units, and core concepts.",
+        "resources": [
+            "[Microsoft: Active Directory Documentation](https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview)",
+            "[Active Directory Security Best Practices](https://adsecurity.org/)",
+            "[MITRE ATT&CK: Active Directory](https://attack.mitre.org/matrices/enterprise/windows/)"
+        ]
+    },
+    "lesson_active_directory_02_group_policy_RICH.json": {
+        "title": "Video Tutorial: Group Policy Management",
+        "video_title": "Group Policy Explained by Professor Messer",
+        "url": "https://www.youtube.com/watch?v=rEhTzP-ScBo",
+        "duration": "~15 minutes",
+        "description": "Understanding Group Policy Objects (GPOs), policy settings, inheritance, and practical GPO management.",
+        "resources": [
+            "[Microsoft: Group Policy Overview](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/hh831791(v=ws.11))",
+            "[Group Policy Best Practices](https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/best-practices-for-securing-active-directory)",
+            "[GPOZaurr - Group Policy Analysis Tool](https://github.com/EvotecIT/GPOZaurr)"
+        ]
+    },
+    "lesson_active_directory_03_kerberos_RICH.json": {
+        "title": "Video Tutorial: Kerberos Authentication Protocol",
+        "video_title": "Kerberos Explained by Computerphile",
+        "url": "https://www.youtube.com/watch?v=5N242XcKAsM",
+        "duration": "~18 minutes",
+        "description": "Deep dive into Kerberos authentication: TGT, TGS, tickets, KDC, and the complete authentication flow.",
+        "resources": [
+            "[Microsoft: How Kerberos Works](https://docs.microsoft.com/en-us/windows-server/security/kerberos/kerberos-authentication-overview)",
+            "[MIT Kerberos Documentation](https://web.mit.edu/kerberos/)",
+            "[ired.team: Kerberos Attacks](https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse)"
+        ]
+    },
+    "lesson_blue_team_01_fundamentals_RICH.json": {
+        "title": "Video Tutorial: Blue Team Fundamentals",
+        "video_title": "Blue Team Fundamentals by John Strand",
+        "url": "https://www.youtube.com/watch?v=qGvYF0YZ9qM",
+        "duration": "~25 minutes",
+        "description": "Core defensive security concepts, detection strategies, incident response basics, and blue team methodologies.",
+        "resources": [
+            "[NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)",
+            "[MITRE ATT&CK for Defenders](https://attack.mitre.org/resources/getting-started/)",
+            "[Blue Team Labs Online](https://blueteamlabs.online/)"
+        ]
+    },
+    "lesson_blue_team_02_log_analysis_RICH.json": {
+        "title": "Video Tutorial: Windows Event Log Analysis",
+        "video_title": "Windows Event Log Analysis by SANS",
+        "url": "https://www.youtube.com/watch?v=H3t_kHQG1Js",
+        "duration": "~30 minutes",
+        "description": "Analyzing Windows Event logs for security incidents, understanding key Event IDs, and building detection logic.",
+        "resources": [
+            "[SANS Windows Event Log Cheat Sheet](https://www.sans.org/posters/windows-forensic-analysis/)",
+            "[Ultimate Windows Security Event ID List](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/)",
+            "[Sysmon Configuration Guide](https://github.com/SwiftOnSecurity/sysmon-config)"
+        ]
+    },
+    "lesson_blue_team_51_threat_hunting_methodology_RICH.json": {
+        "title": "Video Tutorial: Threat Hunting Methodology",
+        "video_title": "Threat Hunting Explained by SANS Cyber Defense",
+        "url": "https://www.youtube.com/watch?v=HAslu96jy3A",
+        "duration": "~35 minutes",
+        "description": "Proactive threat hunting techniques, hypothesis development, hunt playbooks, and MITRE ATT&CK-based hunting.",
+        "resources": [
+            "[SANS Threat Hunting Framework](https://www.sans.org/white-papers/)",
+            "[ThreatHunter-Playbook](https://threathunterplaybook.com/)",
+            "[Sqrrl Threat Hunting Reference Model](https://www.threathunting.net/sqrrl-archive)"
+        ]
+    },
+    "lesson_dfir_01_introduction_to_digital_forensics_RICH.json": {
+        "title": "Video Tutorial: Digital Forensics Introduction",
+        "video_title": "Digital Forensics 101 by 13Cubed",
+        "url": "https://www.youtube.com/watch?v=FS4qnM3UgGk",
+        "duration": "~20 minutes",
+        "description": "Introduction to digital forensics, evidence collection, analysis methodology, and forensic tools.",
+        "resources": [
+            "[SANS DFIR Resources](https://www.sans.org/digital-forensics-incident-response/)",
+            "[13Cubed YouTube Channel](https://www.youtube.com/c/13Cubed)",
+            "[NIST Computer Forensics Tool Testing](https://www.nist.gov/itl/ssd/software-quality-group/computer-forensics-tool-testing-program-cftt)"
+        ]
+    },
+    "lesson_dfir_02_chain_of_custody_RICH.json": {
+        "title": "Video Tutorial: Chain of Custody in Digital Forensics",
+        "video_title": "Chain of Custody Best Practices by SANS DFIR",
+        "url": "https://www.youtube.com/watch?v=UqZLQb9MNaA",
+        "duration": "~15 minutes",
+        "description": "Maintaining chain of custody for digital evidence, documentation requirements, and legal admissibility.",
+        "resources": [
+            "[NIST Digital Evidence Guide](https://www.nist.gov/system/files/documents/2016/09/26/GuidetoIntegratingForensicTechniquesIntoIncidentResponse.pdf)",
+            "[Chain of Custody Form Templates](https://www.sans.org/security-resources/policies)",
+            "[DOJ Digital Evidence Guidelines](https://www.justice.gov/criminal-ccips/digital-evidence)"
+        ]
+    },
+    "lesson_dfir_02_incident_response_RICH.json": {
+        "title": "Video Tutorial: Incident Response Process",
+        "video_title": "Incident Response Lifecycle by SANS",
+        "url": "https://www.youtube.com/watch?v=7VqfJJurH0Q",
+        "duration": "~25 minutes",
+        "description": "Complete incident response lifecycle: preparation, detection, containment, eradication, recovery, and lessons learned.",
+        "resources": [
+            "[NIST SP 800-61: Incident Response Guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r2.pdf)",
+            "[SANS Incident Handler's Handbook](https://www.sans.org/white-papers/33901/)",
+            "[CISA Incident Response Resources](https://www.cisa.gov/incident-response)"
+        ]
+    },
+    "lesson_fundamentals_02_authentication_vs_authorization_RICH.json": {
+        "title": "Video Tutorial: Authentication vs Authorization",
+        "video_title": "Authentication vs Authorization Explained by IBM Technology",
+        "url": "https://www.youtube.com/watch?v=I0poT4UxFxE",
+        "duration": "~8 minutes",
+        "description": "Understanding the difference between authentication and authorization, with practical examples.",
+        "resources": [
+            "[OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)",
+            "[OAuth 2.0 Framework](https://oauth.net/2/)",
+            "[NIST Digital Identity Guidelines](https://pages.nist.gov/800-63-3/)"
+        ]
+    },
+    "lesson_fundamentals_03_encryption_RICH.json": {
+        "title": "Video Tutorial: Encryption Fundamentals",
+        "video_title": "Encryption Explained by Computerphile",
+        "url": "https://www.youtube.com/watch?v=jhXCTbFnK8o",
+        "duration": "~15 minutes",
+        "description": "Symmetric vs asymmetric encryption, hashing, digital signatures, and modern cryptographic practices.",
+        "resources": [
+            "[NIST Cryptographic Standards](https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines)",
+            "[Crypto101 Free Cryptography Book](https://www.crypto101.io/)",
+            "[OWASP Cryptographic Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html)"
+        ]
+    },
+    "lesson_fundamentals_04_network_security_RICH.json": {
+        "title": "Video Tutorial: Network Security Fundamentals",
+        "video_title": "Network Security Basics by Professor Messer",
+        "url": "https://www.youtube.com/watch?v=5vScHV18oNw",
+        "duration": "~20 minutes",
+        "description": "Network security concepts, firewalls, IDS/IPS, VPNs, network segmentation, and defense in depth.",
+        "resources": [
+            "[SANS Network Security Resources](https://www.sans.org/network-security/)",
+            "[NIST Network Security Guide](https://csrc.nist.gov/publications/detail/sp/800-41/rev-1/final)",
+            "[Network+ Study Guide](https://www.comptia.org/certifications/network)"
+        ]
+    },
+    "lesson_fundamentals_04_threat_landscape_overview_RICH.json": {
+        "title": "Video Tutorial: Modern Threat Landscape",
+        "video_title": "Cyber Threat Landscape Overview",
+        "url": "https://www.youtube.com/watch?v=bPH5uvX074c",
+        "duration": "~25 minutes",
+        "description": "Current threat actors, attack vectors, APT groups, ransomware trends, and threat intelligence.",
+        "resources": [
+            "[MITRE ATT&CK Framework](https://attack.mitre.org/)",
+            "[Verizon Data Breach Report](https://www.verizon.com/business/resources/reports/dbir/)",
+            "[CrowdStrike Global Threat Report](https://www.crowdstrike.com/global-threat-report/)"
+        ]
+    },
+    "lesson_malware_01_types_RICH.json": {
+        "title": "Video Tutorial: Malware Types Overview",
+        "video_title": "Malware Types Explained by John Hammond",
+        "url": "https://www.youtube.com/watch?v=n8mbzU0X2nQ",
+        "duration": "~18 minutes",
+        "description": "Comprehensive overview of malware types: viruses, worms, trojans, ransomware, RATs, and more.",
+        "resources": [
+            "[Malware Bazaar](https://bazaar.abuse.ch/)",
+            "[ANY.RUN Malware Trends](https://any.run/malware-trends/)",
+            "[MITRE ATT&CK: Malware](https://attack.mitre.org/software/)"
+        ]
+    },
+    "lesson_malware_02_static_malware_analysis_RICH.json": {
+        "title": "Video Tutorial: Static Malware Analysis",
+        "video_title": "Static Malware Analysis Techniques by OALabs",
+        "url": "https://www.youtube.com/watch?v=VroT3SSeGiY",
+        "duration": "~30 minutes",
+        "description": "Static analysis techniques: PE structure analysis, strings extraction, packing detection, and disassembly.",
+        "resources": [
+            "[Practical Malware Analysis Book](https://practicalmalwareanalysis.com/)",
+            "[FLOSS - Obfuscated String Solver](https://github.com/mandiant/flare-floss)",
+            "[PEStudio Tool](https://www.winitor.com/)"
+        ]
+    },
+    "lesson_malware_03_dynamic_malware_analysis_RICH.json": {
+        "title": "Video Tutorial: Dynamic Malware Analysis",
+        "video_title": "Dynamic Malware Analysis by OALabs",
+        "url": "https://www.youtube.com/watch?v=q-97K7ZKWfI",
+        "duration": "~35 minutes",
+        "description": "Dynamic analysis in sandboxes: Cuckoo, ANY.RUN, process monitoring, network traffic capture, memory forensics.",
+        "resources": [
+            "[Cuckoo Sandbox](https://cuckoosandbox.org/)",
+            "[ANY.RUN Interactive Sandbox](https://any.run/)",
+            "[Volatility Memory Forensics](https://www.volatilityfoundation.org/)"
+        ]
+    },
+    "lesson_pentest_01_methodology_RICH.json": {
+        "title": "Video Tutorial: Penetration Testing Methodology",
+        "video_title": "Pentesting Methodology by The Cyber Mentor",
+        "url": "https://www.youtube.com/watch?v=fNzpcB7ODxQ",
+        "duration": "~22 minutes",
+        "description": "Complete penetration testing methodology: reconnaissance, scanning, exploitation, post-exploitation, reporting.",
+        "resources": [
+            "[OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)",
+            "[PTES Technical Guidelines](http://www.pentest-standard.org/index.php/Main_Page)",
+            "[OSCP Certification Info](https://www.offensive-security.com/pwk-oscp/)"
+        ]
+    },
+    "lesson_pentest_02_reconnaissance_techniques_RICH.json": {
+        "title": "Video Tutorial: Reconnaissance in Pentesting",
+        "video_title": "Reconnaissance Techniques by IppSec",
+        "url": "https://www.youtube.com/watch?v=q9_qmHlGCNo",
+        "duration": "~25 minutes",
+        "description": "Passive and active reconnaissance, OSINT, subdomain enumeration, port scanning, and service enumeration.",
+        "resources": [
+            "[OSINT Framework](https://osintframework.com/)",
+            "[Nmap Official Guide](https://nmap.org/book/toc.html)",
+            "[Amass Subdomain Enumeration](https://github.com/OWASP/Amass)"
+        ]
+    },
+    "lesson_pentest_03_exploitation_fundamentals_RICH.json": {
+        "title": "Video Tutorial: Exploitation with Metasploit",
+        "video_title": "Metasploit Fundamentals by NetworkChuck",
+        "url": "https://www.youtube.com/watch?v=8lR27r8Y_ik",
+        "duration": "~28 minutes",
+        "description": "Metasploit Framework, exploit development basics, payloads, handlers, and post-exploitation modules.",
+        "resources": [
+            "[Metasploit Unleashed](https://www.offensive-security.com/metasploit-unleashed/)",
+            "[Exploit Database](https://www.exploit-db.com/)",
+            "[Rapid7 Metasploit Docs](https://docs.rapid7.com/metasploit/)"
+        ]
+    },
+    "lesson_red_team_01_fundamentals_RICH.json": {
+        "title": "Video Tutorial: Red Team Fundamentals",
+        "video_title": "Red Team vs Penetration Testing by HackerSploit",
+        "url": "https://www.youtube.com/watch?v=_j6FKYBK7uU",
+        "duration": "~20 minutes",
+        "description": "Red team operations, adversary emulation, persistence, evasion, and long-term engagement strategies.",
+        "resources": [
+            "[Red Team Development Guide](https://redteam.guide/)",
+            "[MITRE ATT&CK for Red Teams](https://attack.mitre.org/resources/adversary-emulation-plans/)",
+            "[Cobalt Strike Documentation](https://www.cobaltstrike.com/support)"
+        ]
+    },
+    "lesson_red_team_02_osint_recon_RICH.json": {
+        "title": "Video Tutorial: OSINT for Red Teams",
+        "video_title": "OSINT Techniques Explained by The Cyber Mentor",
+        "url": "https://www.youtube.com/watch?v=qwA6MmbeGNo",
+        "duration": "~30 minutes",
+        "description": "Open source intelligence gathering, social engineering prep, target profiling, and information correlation.",
+        "resources": [
+            "[OSINT Framework](https://osintframework.com/)",
+            "[Maltego Tool](https://www.maltego.com/)",
+            "[theHarvester Tool](https://github.com/laramies/theHarvester)"
+        ]
+    },
+    "lesson_system_01_windows_internals_RICH.json": {
+        "title": "Video Tutorial: Windows Internals Overview",
+        "video_title": "Windows Internals by Pavel Yosifovich",
+        "url": "https://www.youtube.com/watch?v=LLQbTF7h9jg",
+        "duration": "~45 minutes",
+        "description": "Windows architecture, processes, threads, memory management, registry, and system internals for security.",
+        "resources": [
+            "[Windows Internals Book](https://docs.microsoft.com/en-us/sysinternals/resources/windows-internals)",
+            "[Sysinternals Tools](https://docs.microsoft.com/en-us/sysinternals/)",
+            "[Windows Internals Course](https://scorpiosoftware.net/training/)"
+        ]
+    }
+}
+
+def add_video_to_lesson(lesson_path, video_info):
+    """Add video content block to a lesson JSON file"""
+
+    with open(lesson_path, 'r', encoding='utf-8') as f:
+        lesson = json.load(f)
+
+    # Check if video already exists
+    has_video = any(block.get('type') == 'video' for block in lesson.get('content_blocks', []))
+    if has_video:
+        print(f"[OK] {lesson_path.name} already has video - skipping")
+        return False
+
+    # Create video content block
+    video_block = {
+        "type": "video",
+        "title": video_info["title"],
+        "content": f"Watch this comprehensive video tutorial to reinforce your learning with visual demonstrations and practical examples.\n\n**Video**: [{video_info['video_title']}]({video_info['url']})\n\n**What you'll see:**\n{video_info['description']}\n\n**Duration**: {video_info['duration']}\n\n**Recommended viewing**: After completing the lesson to solidify understanding.\n\n**Additional Resources:**\n" + "\n".join(f"- {res}" for res in video_info['resources'])
+    }
+
+    # Insert video block before post_assessment
+    # Find the index of the last content block before post_assessment
+    content_blocks = lesson.get('content_blocks', [])
+    content_blocks.append(video_block)
+    lesson['content_blocks'] = content_blocks
+
+    # Write back to file with proper formatting
+    with open(lesson_path, 'w', encoding='utf-8') as f:
+        json.dump(lesson, f, indent=2, ensure_ascii=False)
+
+    print(f"✅ Added video to {lesson_path.name}")
+    return True
+
+def main():
+    content_dir = Path(__file__).parent / "content"
+
+    added_count = 0
+    skipped_count = 0
+
+    for lesson_file, video_info in VIDEO_MAP.items():
+        lesson_path = content_dir / lesson_file
+
+        if not lesson_path.exists():
+            print(f"⚠️  Lesson not found: {lesson_file}")
+            continue
+
+        if add_video_to_lesson(lesson_path, video_info):
+            added_count += 1
+        else:
+            skipped_count += 1
+
+    print(f"\n📊 Summary:")
+    print(f"   Videos added: {added_count}")
+    print(f"   Already had videos: {skipped_count}")
+    print(f"   Total lessons processed: {added_count + skipped_count}")
+
+if __name__ == "__main__":
+    main()
