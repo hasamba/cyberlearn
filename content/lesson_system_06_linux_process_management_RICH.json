@@ -92,6 +92,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Linux Process Management & Monitoring for Security Overview",
+        "url": "https://www.youtube.com/embed/6OHVjVtjQVw",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# Linux Process Lifecycle\n\n## Process Creation: The Fork-Exec Model\n\nLinux creates processes using a two-step approach:\n\n### Step 1: fork() - Clone the Parent\n```c\npid_t child_pid = fork();\n\nWhat happens:\n1. Kernel creates exact copy of parent process\n2. Child gets new PID\n3. Child inherits:\n   - Memory space (copy-on-write)\n   - File descriptors\n   - Environment variables\n   - Current working directory\n   - UID/GID (user/group identity)\n```\n\n### Step 2: exec() - Replace with New Program\n```c\nexecve(\"/bin/bash\", args, env);\n\nWhat happens:\n1. Replaces current process image with new program\n2. Keeps same PID\n3. Resets memory but keeps:\n   - PID\n   - PPID (parent PID)\n   - Open file descriptors (unless FD_CLOEXEC)\n   - UID/GID\n```\n\n## Process Hierarchy Visualization\n\n```\n         systemd (PID 1)\n              |\n      ┌───────┴───────────────┐\n      │                       │\n   sshd (PID 500)      NetworkManager (PID 600)\n      │\n   sshd (PID 1234) ← Your SSH session\n      │\n   bash (PID 1235)\n      │\n   ┌──┴──┐\n   │     │\n  ps    vim\n (1300) (1301)\n```\n\n**Key Concepts:**\n- **PPID (Parent PID)**: Every process has a parent (except PID 1)\n- **Orphan Process**: If parent dies, child is re-parented to PID 1\n- **Zombie Process**: Child finished but parent hasn't called wait() yet\n- **Process Group**: Collection of processes (job control in shells)\n- **Session**: Collection of process groups (terminal session)"

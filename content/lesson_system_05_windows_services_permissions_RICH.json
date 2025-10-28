@@ -93,6 +93,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Windows Services & Permissions Deep Dive Overview",
+        "url": "https://www.youtube.com/embed/REexhR84Vj8",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# Windows Services Architecture\n\n## What Are Windows Services?\n\nWindows Services are long-running background processes that:\n- Start automatically at boot (or manually when needed)\n- Run without user interaction\n- Can execute with elevated privileges\n- Provide core OS functionality (networking, security, updates)\n\n## Service Control Manager (SCM)\n\nThe **Service Control Manager** (`services.exe`) is the master controller:\n\n```\nSCM Architecture:\n┌──────────────────────────────────────────┐\n│  Service Control Manager (services.exe)  │\n│  - Maintains service database            │\n│  - Starts/stops services                 │\n│  - Monitors service status               │\n└────────────┬─────────────────────────────┘\n             │\n     ┌───────┴───────┐\n     ▼               ▼\n┌─────────┐    ┌──────────┐    ┌─────────┐\n│ Service │    │ Service  │    │ Service │\n│ Host    │    │ Process  │    │ Host    │\n│ (svchost│    │ (standalone)  │ (svchost│\n│  #1)    │    │          │    │  #2)    │\n└─────────┘    └──────────┘    └─────────┘\n```\n\n**Key SCM Responsibilities:**\n1. **Service Registration**: Stores service configs in Registry (`HKLM\\SYSTEM\\CurrentControlSet\\Services`)\n2. **Lifecycle Management**: Starting, stopping, pausing services\n3. **Dependency Resolution**: Ensures prerequisite services start first\n4. **Failure Recovery**: Automatic restart on crashes\n5. **Security Enforcement**: Checks permissions before service operations"

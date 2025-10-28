@@ -204,6 +204,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Shell Scripting for Security Automation Overview",
+        "url": "https://www.youtube.com/embed/6OHVjVtjQVw",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "code_exercise",
       "content": {
         "text": "# Bash Scripting Fundamentals\n\n## Your First Security Script\n\n```bash\n#!/bin/bash\n# security_check.sh - Basic system security check\n\n# Shebang: Tells system to use Bash\n# Comments: Lines starting with #\n\necho \"=== Security Check ===\"\necho \"Date: $(date)\"\necho \"Hostname: $(hostname)\"\necho \"Current User: $(whoami)\"\n\n# Check if running as root\nif [ \"$(id -u)\" -ne 0 ]; then\n    echo \"WARNING: Not running as root. Some checks may fail.\"\nfi\n\n# Check for updates\necho \"\"\necho \"[+] Checking for security updates...\"\napt update > /dev/null 2>&1\nUPDATES=$(apt list --upgradable 2>/dev/null | grep -c \"security\")\necho \"Available security updates: $UPDATES\"\n\n# Check SSH configuration\necho \"\"\necho \"[+] Checking SSH security...\"\nif grep -q \"^PermitRootLogin yes\" /etc/ssh/sshd_config; then\n    echo \"WARNING: Root login via SSH is enabled!\"\nelse\n    echo \"OK: Root login via SSH is disabled\"\nfi\n\necho \"\"\necho \"=== Check Complete ===\"\n```\n\n**Make it executable and run**:\n```bash\nchmod +x security_check.sh\n./security_check.sh\n```\n\n## Variables and Command Substitution\n\n```bash\n#!/bin/bash\n\n# Variable assignment (no spaces around =)\nHOSTNAME=\"server01\"\nIP=\"192.168.1.100\"\n\n# Command substitution - capture command output\nCURRENT_DATE=$(date +%Y-%m-%d)\nUSER_COUNT=$(who | wc -l)\nDISK_USAGE=$(df -h / | tail -1 | awk '{print $5}')\n\n# Using variables (use quotes to handle spaces)\necho \"Server: $HOSTNAME\"\necho \"IP: $IP\"\necho \"Date: $CURRENT_DATE\"\necho \"Active users: $USER_COUNT\"\necho \"Disk usage: $DISK_USAGE\"\n\n# Environment variables\necho \"Home: $HOME\"\necho \"User: $USER\"\necho \"Path: $PATH\"\n\n# Special variables\necho \"Script name: $0\"\necho \"First argument: $1\"\necho \"All arguments: $@\"\necho \"Number of arguments: $#\"\necho \"Last command exit status: $?\"\necho \"Current PID: $$\"\n```"

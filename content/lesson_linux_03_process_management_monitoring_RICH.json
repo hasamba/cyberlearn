@@ -204,6 +204,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Linux Process Management and Monitoring Overview",
+        "url": "https://www.youtube.com/embed/6OHVjVtjQVw",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# Process Identifiers and Attributes\n\nEvery process has multiple identifiers and attributes:\n\n## Core Identifiers\n\n```bash\nps -eo pid,ppid,uid,gid,user,comm\n\n  PID  PPID   UID   GID USER     COMMAND\n    1     0     0     0 root     systemd\n 1234     1  1000  1000 alice    bash\n 1235  1234  1000  1000 alice    firefox\n```\n\n**Definitions**:\n- **PID (Process ID)**: Unique identifier for the process\n- **PPID (Parent PID)**: PID of the process that created this one\n- **UID (User ID)**: Numeric user ID running the process\n- **GID (Group ID)**: Primary group ID\n- **EUID/EGID**: Effective user/group (can differ with SUID/SGID)\n\n## Process Hierarchy\n\nLinux processes form a **tree** - every process (except PID 1) has a parent:\n\n```\nsystemd (PID 1)\n  ├─ sshd (PID 1089)\n  │   └─ sshd: alice (PID 4521)    ← SSH session\n  │       └─ bash (PID 4522)        ← Shell\n  │           ├─ vim (PID 4567)     ← Editor\n  │           └─ python (PID 4589)  ← Script\n  └─ apache2 (PID 1234)\n      ├─ apache2 (PID 1235)         ← Worker processes\n      └─ apache2 (PID 1236)\n```\n\n**View hierarchy**:\n```bash\npstree -p        # Show tree with PIDs\npstree -u        # Show user transitions\npstree -a        # Show command arguments\n```\n\n**Security Insight**: Unexpected parent-child relationships indicate compromise:\n- **Suspicious**: `bash` child of `apache2` (web shell!)\n- **Suspicious**: `nc` (netcat) child of `cron` (backdoor!)"

@@ -203,6 +203,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Linux Networking and Firewall Configuration Overview",
+        "url": "https://www.youtube.com/embed/qiQR5rTSshw",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# Network Interfaces: Your Connection to the World\n\nA **network interface** is how your Linux system connects to networks - physical (Ethernet) or virtual (loopback, tunnels).\n\n## Common Interface Names\n\n**Legacy naming** (older systems):\n- **eth0, eth1**: Ethernet interfaces\n- **wlan0**: Wireless interface\n- **lo**: Loopback (127.0.0.1)\n\n**Predictable naming** (modern systemd systems):\n- **ens33, enp0s3**: Ethernet interfaces (by PCI slot)\n- **wlp2s0**: Wireless\n- **lo**: Loopback (unchanged)\n\n## Viewing Network Interfaces\n\n```bash\n# Modern method (ip command)\nip addr show\nip a    # Shorthand\n\n# Legacy method (deprecated but still works)\nifconfig\n\n# Example output:\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    inet 192.168.1.50/24 brd 192.168.1.255 scope global eth0\n    inet6 fe80::a00:27ff:fe4e:66c8/64 scope link\n```\n\n**Key Information**:\n- **UP**: Interface is active\n- **inet 192.168.1.50/24**: IPv4 address with /24 subnet (255.255.255.0)\n- **mtu 1500**: Maximum Transmission Unit (packet size)\n- **inet6**: IPv6 address\n\n## Configuring Interfaces\n\n```bash\n# Bring interface up/down\nsudo ip link set eth0 up\nsudo ip link set eth0 down\n\n# Assign IP address (temporary - lost on reboot)\nsudo ip addr add 192.168.1.100/24 dev eth0\n\n# Delete IP address\nsudo ip addr del 192.168.1.100/24 dev eth0\n\n# View specific interface\nip addr show eth0\n```\n\n**Permanent Configuration** (Ubuntu/Debian - /etc/network/interfaces):\n```bash\nauto eth0\niface eth0 inet static\n    address 192.168.1.100\n    netmask 255.255.255.0\n    gateway 192.168.1.1\n    dns-nameservers 8.8.8.8 1.1.1.1\n```\n\n**Permanent Configuration** (Modern systems - Netplan on Ubuntu 18.04+):\n```yaml\n# /etc/netplan/01-netcfg.yaml\nnetwork:\n  version: 2\n  ethernets:\n    eth0:\n      addresses:\n        - 192.168.1.100/24\n      gateway4: 192.168.1.1\n      nameservers:\n        addresses: [8.8.8.8, 1.1.1.1]\n```\n\nApply with: `sudo netplan apply`"

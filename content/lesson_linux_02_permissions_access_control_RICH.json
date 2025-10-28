@@ -203,6 +203,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Linux Permissions and Access Control Overview",
+        "url": "https://www.youtube.com/embed/6OHVjVtjQVw",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# The Linux Permission Model: Three Layers\n\nLinux uses a simple but powerful model with **three permission types** and **three permission categories**:\n\n```\n-rwxr-xr--  1 alice developers 4096 Jan 15 10:30 script.sh\n│└┬┘└┬┘└┬┘\n│ │  │  └─── Others permissions (r--)\n│ │  └────── Group permissions (r-x)\n│ └───────── User/Owner permissions (rwx)\n└─────────── File type (- = regular file, d = directory, l = link)\n```\n\n**Permission Types:**\n- **r (read)**: View file contents or list directory contents\n- **w (write)**: Modify file or create/delete files in directory\n- **x (execute)**: Run file as program or enter directory\n\n**Categories:**\n- **User (u)**: The file owner\n- **Group (g)**: Members of the file's group\n- **Others (o)**: Everyone else on the system\n\n**Key Insight**: Permissions are checked in order - if you're the owner, only user permissions apply (group/other are ignored)."

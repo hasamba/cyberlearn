@@ -90,6 +90,14 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "title": "Video: Google Cloud Platform (GCP) Security Fundamentals Overview",
+        "url": "https://www.youtube.com/embed/3hLmDS179YE",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# GCP Security Architecture\n\n## Shared Responsibility Model\n\n```\nGCP Shared Responsibility:\n\n┌─────────────────────────────────────────┐\n│ Customer Responsibility                 │\n│ - Application code security             │\n│ - Data classification and encryption    │\n│ - IAM policies and access control       │\n│ - Network configuration (firewall)      │\n│ - OS patches (if using GCE)            │\n└─────────────────────────────────────────┘\n           ↕ (Shared)\n┌─────────────────────────────────────────┐\n│ Google Responsibility                   │\n│ - Physical security of data centers     │\n│ - Hardware infrastructure               │\n│ - Network infrastructure                │\n│ - Hypervisor security                   │\n│ - Default encryption at rest            │\n└─────────────────────────────────────────┘\n```\n\n## GCP Resource Hierarchy\n\n```\nOrganization\n  |\n  ├── Folder (Dev)\n  │     ├── Project A\n  │     └── Project B\n  |\n  └── Folder (Prod)\n        ├── Project C\n        └── Project D\n\nIAM policies inherit down the hierarchy!\n```\n\n**Key Concepts:**\n- **Organization**: Root node (linked to Google Workspace domain)\n- **Folders**: Group projects (by team, environment, compliance)\n- **Projects**: Billing and resource container\n- **Resources**: VMs, storage, databases\n\n**Security Implication:** IAM policies set at organization level cascade to all projects. This is powerful but dangerous if misconfigured!"
