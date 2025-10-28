@@ -4,7 +4,9 @@
   "title": "Disk Forensics and File System Analysis",
   "difficulty": 2,
   "order_index": 4,
-  "prerequisites": ["7333ad37-a513-4598-a23b-9729e3114bae"],
+  "prerequisites": [
+    "7333ad37-a513-4598-a23b-9729e3114bae"
+  ],
   "concepts": [
     "File Systems",
     "NTFS",
@@ -149,7 +151,9 @@
         "A backup of important system files"
       ],
       "correct_answer": "A database containing metadata for every file and directory including timestamps, size, and location",
-      "explanation": "The MFT is NTFS's central catalog - a database with one entry per file/directory. Each MFT entry contains: filename, four timestamps (Modified, Accessed, Changed, Born), file size, attributes, security descriptor, and data runs (cluster locations). The MFT is the first place forensic analysts look for file information, including deleted files if MFT entries haven't been overwritten yet."
+      "explanation": "The MFT is NTFS's central catalog - a database with one entry per file/directory. Each MFT entry contains: filename, four timestamps (Modified, Accessed, Changed, Born), file size, attributes, security descriptor, and data runs (cluster locations). The MFT is the first place forensic analysts look for file information, including deleted files if MFT entries haven't been overwritten yet.",
+      "question_id": "fa35e176-c562-4a57-af54-5cd53578d854",
+      "difficulty": 2
     },
     {
       "question": "Why can deleted files often be recovered in NTFS?",
@@ -161,7 +165,9 @@
         "File deletion only removes the filename, not the content"
       ],
       "correct_answer": "When files are deleted, the MFT entry is marked as deleted and clusters are marked available, but the actual data remains on disk until overwritten",
-      "explanation": "File deletion in NTFS doesn't erase data - it marks the MFT entry as deleted (available for reuse) and marks the clusters as free in $Bitmap. The actual file data remains on disk until those clusters are allocated to new files and overwritten. This creates a 'forensic window' where deleted files can be recovered. The window closes when disk activity overwrites those clusters."
+      "explanation": "File deletion in NTFS doesn't erase data - it marks the MFT entry as deleted (available for reuse) and marks the clusters as free in $Bitmap. The actual file data remains on disk until those clusters are allocated to new files and overwritten. This creates a 'forensic window' where deleted files can be recovered. The window closes when disk activity overwrites those clusters.",
+      "question_id": "92fa72c9-3adc-4514-b992-b4c9c262be7d",
+      "difficulty": 2
     },
     {
       "question": "What are Alternate Data Streams (ADS) and why are they significant for security?",
@@ -173,13 +179,21 @@
         "Compressed versions of large files"
       ],
       "correct_answer": "An NTFS feature allowing multiple data streams within one file, commonly abused by malware to hide data",
-      "explanation": "ADS is an NTFS feature allowing multiple data streams per file (e.g., file.txt:hidden or file.txt:malware.exe). Security significance: Malware hides executables or data in ADS - not visible in Windows Explorer, not counted in file size displayed by 'dir', may evade antivirus. Detection requires specific tools (dir /r, streams.exe, Get-Item -Stream *). Legitimate uses exist (Zone.Identifier for downloaded files) but it's commonly abused."
+      "explanation": "ADS is an NTFS feature allowing multiple data streams per file (e.g., file.txt:hidden or file.txt:malware.exe). Security significance: Malware hides executables or data in ADS - not visible in Windows Explorer, not counted in file size displayed by 'dir', may evade antivirus. Detection requires specific tools (dir /r, streams.exe, Get-Item -Stream *). Legitimate uses exist (Zone.Identifier for downloaded files) but it's commonly abused.",
+      "question_id": "62ebbd3d-cc0a-4464-b53b-20d3099c41c1",
+      "difficulty": 2
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "chunking",
-    "visual_learning",
-    "real_world"
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

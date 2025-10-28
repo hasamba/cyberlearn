@@ -4,7 +4,9 @@
   "title": "Windows Event Log Analysis for Incident Response",
   "difficulty": 2,
   "order_index": 3,
-  "prerequisites": ["7333ad37-a513-4598-a23b-9729e3114bae"],
+  "prerequisites": [
+    "7333ad37-a513-4598-a23b-9729e3114bae"
+  ],
   "concepts": [
     "Windows Event Logs",
     "Event IDs",
@@ -149,7 +151,9 @@
         "Service account logon"
       ],
       "correct_answer": "Network logon (accessing file share, remote registry, etc.)",
-      "explanation": "Event ID 4624 with Logon Type 3 = Network logon. This occurs when accessing network resources like shared folders, remote registry, or administrative shares (\\\\\\\\server\\\\c$). Often seen in lateral movement attacks. Type 2 = Interactive (console), Type 10 = RDP, Type 5 = Service. Understanding Logon Types is critical for incident response - helps identify HOW attacker accessed systems."
+      "explanation": "Event ID 4624 with Logon Type 3 = Network logon. This occurs when accessing network resources like shared folders, remote registry, or administrative shares (\\\\\\\\server\\\\c$). Often seen in lateral movement attacks. Type 2 = Interactive (console), Type 10 = RDP, Type 5 = Service. Understanding Logon Types is critical for incident response - helps identify HOW attacker accessed systems.",
+      "question_id": "e58e0cb3-43ce-44dd-90b9-e04bef8f1f1d",
+      "difficulty": 2
     },
     {
       "question": "Which Event ID indicates the Security event log was cleared?",
@@ -161,7 +165,9 @@
         "Event ID 7045"
       ],
       "correct_answer": "Event ID 1102",
-      "explanation": "Event ID 1102 = Audit log was cleared. Records who cleared the Security log and when. This is extremely suspicious in production (attackers often clear logs to hide tracks). Legitimate log clearing should only occur during maintenance windows with change management. Always investigate Event 1102. Event 4624 = logon, 4688 = process created, 7045 = service installed."
+      "explanation": "Event ID 1102 = Audit log was cleared. Records who cleared the Security log and when. This is extremely suspicious in production (attackers often clear logs to hide tracks). Legitimate log clearing should only occur during maintenance windows with change management. Always investigate Event 1102. Event 4624 = logon, 4688 = process created, 7045 = service installed.",
+      "question_id": "21460650-f366-4660-93fa-ce9fcc50e163",
+      "difficulty": 2
     },
     {
       "question": "What advantage does Sysmon provide over default Windows event logging?",
@@ -173,13 +179,21 @@
         "Sysmon runs faster than Windows Event Logs"
       ],
       "correct_answer": "Sysmon provides detailed telemetry including process hashes, command lines, network connections, and parent processes",
-      "explanation": "Sysmon enhances visibility with: (1) Process creation with full command line, file hashes (MD5/SHA256), parent process; (2) Network connections with source process; (3) Process memory access (credential dumping detection); (4) File creation/modification; (5) Registry changes. This detail enables detection of sophisticated attacks. Sysmon is passive monitoring (doesn't block). Both Sysmon and Windows logs are free. Speed is not the differentiator - comprehensive visibility is."
+      "explanation": "Sysmon enhances visibility with: (1) Process creation with full command line, file hashes (MD5/SHA256), parent process; (2) Network connections with source process; (3) Process memory access (credential dumping detection); (4) File creation/modification; (5) Registry changes. This detail enables detection of sophisticated attacks. Sysmon is passive monitoring (doesn't block). Both Sysmon and Windows logs are free. Speed is not the differentiator - comprehensive visibility is.",
+      "question_id": "29feec1c-ded1-4e63-8be9-0f136e2bd930",
+      "difficulty": 2
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "chunking",
-    "spaced_repetition",
-    "real_world"
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

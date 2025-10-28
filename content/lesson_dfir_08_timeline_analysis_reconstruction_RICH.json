@@ -4,7 +4,11 @@
   "title": "Timeline Analysis and Incident Reconstruction",
   "difficulty": 3,
   "order_index": 8,
-  "prerequisites": ["dfir_01", "dfir_03", "dfir_04"],
+  "prerequisites": [
+    "dfir_01",
+    "dfir_03",
+    "dfir_04"
+  ],
   "concepts": [
     "Super Timeline Creation",
     "MACB Timestamps (Modified, Accessed, Changed, Born)",
@@ -100,7 +104,10 @@
         "This is normal behavior for copied files"
       ],
       "correct_answer": 1,
-      "explanation": "The $FILE_NAME timestamp (2025-10-27) is harder to modify than $STANDARD_INFORMATION. When they don't match, it indicates timestomping. The attacker modified $SI to make the file look old (2020) but couldn't easily modify $FN, which reveals the real creation time (2025-10-27)."
+      "explanation": "The $FILE_NAME timestamp (2025-10-27) is harder to modify than $STANDARD_INFORMATION. When they don't match, it indicates timestomping. The attacker modified $SI to make the file look old (2020) but couldn't easily modify $FN, which reveals the real creation time (2025-10-27).",
+      "question_id": "51f3dd69-8dea-4183-a733-7aa2a0128024",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "During timeline analysis, you want to find when a user account was first used for lateral movement. Which artifact combination is MOST useful?",
@@ -111,7 +118,10 @@
         "$MFT timestamps + Registry Run keys"
       ],
       "correct_answer": 1,
-      "explanation": "Lateral movement involves logging into remote systems (Event ID 4624, Logon Type 3 = Network) and often uses SMB (port 445) for file access or PsExec. Correlating Windows Event Logs with network logs provides timestamps and source/destination systems. Other options detect local activity but not lateral movement."
+      "explanation": "Lateral movement involves logging into remote systems (Event ID 4624, Logon Type 3 = Network) and often uses SMB (port 445) for file access or PsExec. Correlating Windows Event Logs with network logs provides timestamps and source/destination systems. Other options detect local activity but not lateral movement.",
+      "question_id": "2e18a0a3-678d-4a1d-a187-c4700d2fdd4c",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You're using Plaso and want to create a timeline of ONLY Windows Event Logs and Prefetch files (to focus on execution). Which command is correct?",
@@ -122,7 +132,10 @@
         "log2timeline.py --artifacts \"events,execution\" evidence.dd"
       ],
       "correct_answer": 1,
-      "explanation": "The --parsers flag in log2timeline.py specifies which artifact types to parse. \"winevt\" = Windows Event Logs, \"prefetch\" = Prefetch files. This targeted approach is faster than parsing everything (\"all\"). Option C uses psort (for filtering output, not parsing). Option D uses incorrect flag syntax."
+      "explanation": "The --parsers flag in log2timeline.py specifies which artifact types to parse. \"winevt\" = Windows Event Logs, \"prefetch\" = Prefetch files. This targeted approach is faster than parsing everything (\"all\"). Option C uses psort (for filtering output, not parsing). Option D uses incorrect flag syntax.",
+      "question_id": "51761705-654f-4253-98e0-44175a9db6ac",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You see Event ID 1102 (Security log cleared) at 3:15 AM. What should this tell you?",
@@ -133,7 +146,10 @@
         "The investigation is compromised and cannot proceed"
       ],
       "correct_answer": 1,
-      "explanation": "Event ID 1102 (log clearing) at 3:15 AM (off-hours) is highly suspicious—attackers often clear logs to hide their tracks. The key insight: investigate events BEFORE the clearing to see what they tried to hide. Also check other log sources (System, Application, Sysmon, network logs) which may still have evidence. The investigation can absolutely proceed."
+      "explanation": "Event ID 1102 (log clearing) at 3:15 AM (off-hours) is highly suspicious—attackers often clear logs to hide their tracks. The key insight: investigate events BEFORE the clearing to see what they tried to hide. Also check other log sources (System, Application, Sysmon, network logs) which may still have evidence. The investigation can absolutely proceed.",
+      "question_id": "aeeb63e1-a644-4c59-8012-da924a695259",
+      "type": "multiple_choice",
+      "difficulty": 3
     },
     {
       "question": "You're correlating timelines from 3 systems (workstation, DC, file server). You see: Workstation Event ID 4688 at 15:30:00 EST, DC Event ID 4624 at 20:30:00 UTC, File Server log at 15:30:00 EST. Which events are simultaneous?",
@@ -144,13 +160,22 @@
         "DC and File Server events are simultaneous"
       ],
       "correct_answer": 2,
-      "explanation": "Timezone conversion: EST = UTC-5. So 15:30 EST = 20:30 UTC. The workstation (15:30 EST) and DC (20:30 UTC) events happened at the exact same moment, just displayed in different timezones. The File Server event (15:30 EST) happened at a different time than the DC event. Always convert to a single timezone (usually UTC) when correlating multi-system timelines."
+      "explanation": "Timezone conversion: EST = UTC-5. So 15:30 EST = 20:30 UTC. The workstation (15:30 EST) and DC (20:30 UTC) events happened at the exact same moment, just displayed in different timezones. The File Server event (15:30 EST) happened at a different time than the DC event. Always convert to a single timezone (usually UTC) when correlating multi-system timelines.",
+      "question_id": "0b3b2da5-9eb3-482e-ba72-b6279da175de",
+      "type": "multiple_choice",
+      "difficulty": 3
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "state_management",
-    "memory_techniques",
-    "real_world_application"
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

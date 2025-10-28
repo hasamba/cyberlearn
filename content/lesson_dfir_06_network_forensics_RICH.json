@@ -4,7 +4,10 @@
   "title": "Network Forensics: Packet Analysis and Threat Detection",
   "difficulty": 2,
   "order_index": 6,
-  "prerequisites": ["dfir_01", "dfir_03"],
+  "prerequisites": [
+    "dfir_01",
+    "dfir_03"
+  ],
   "concepts": [
     "Packet Capture Analysis",
     "Wireshark Deep Packet Inspection",
@@ -112,7 +115,10 @@
         "A legitimate Windows Update process"
       ],
       "correct_answer": 2,
-      "explanation": "This shows classic C2 beaconing: regular time intervals (~60s) with slight jitter (58-62s), outdated User-Agent (MSIE 8.0 is ancient), and external IP. The consistent interval rules out human behavior. The old User-Agent rules out legitimate Windows processes. This is malware calling home."
+      "explanation": "This shows classic C2 beaconing: regular time intervals (~60s) with slight jitter (58-62s), outdated User-Agent (MSIE 8.0 is ancient), and external IP. The consistent interval rules out human behavior. The old User-Agent rules out legitimate Windows processes. This is malware calling home.",
+      "question_id": "6bb1664e-ff88-4d8c-b7df-724eac99b08a",
+      "type": "multiple_choice",
+      "difficulty": 2
     },
     {
       "question": "During incident response, you find DNS queries to domains like '4d616c776172652d436f6d6d616e64.exfil.example.com'. When you hex-decode the subdomain, it reveals 'Malware-Command'. What attack technique is this?",
@@ -123,7 +129,10 @@
         "Typosquatting"
       ],
       "correct_answer": 1,
-      "explanation": "This is DNS tunneling. The hex-encoded subdomain contains data being exfiltrated via DNS queries. DNS tunneling is used to bypass firewalls (DNS is rarely blocked) and avoid detection by encoding data in domain names rather than using HTTP/HTTPS."
+      "explanation": "This is DNS tunneling. The hex-encoded subdomain contains data being exfiltrated via DNS queries. DNS tunneling is used to bypass firewalls (DNS is rarely blocked) and avoid detection by encoding data in domain names rather than using HTTP/HTTPS.",
+      "question_id": "4bb473f5-2e04-4525-8324-8f08cb968b80",
+      "type": "multiple_choice",
+      "difficulty": 2
     },
     {
       "question": "Your Wireshark capture shows SMB traffic from workstation 10.0.0.100 to 10.0.0.105 with the file path '\\\\10.0.0.105\\ADMIN$\\temp\\evil.exe', followed 3 seconds later by a service creation named 'RemoteExec'. What's happening?",
@@ -134,7 +143,10 @@
         "User copying files via network share"
       ],
       "correct_answer": 2,
-      "explanation": "This is classic PsExec lateral movement: (1) file copied to ADMIN$ share, (2) service created to execute it. The ADMIN$ share is used for remote administration and is a common lateral movement path. The 3-second delay matches PsExec's operation. While an admin *could* do this legitimately, in incident response context, workstation→workstation SMB with ADMIN$ access is highly suspicious."
+      "explanation": "This is classic PsExec lateral movement: (1) file copied to ADMIN$ share, (2) service created to execute it. The ADMIN$ share is used for remote administration and is a common lateral movement path. The 3-second delay matches PsExec's operation. While an admin *could* do this legitimately, in incident response context, workstation→workstation SMB with ADMIN$ access is highly suspicious.",
+      "question_id": "216bdbe7-e2e6-4fad-b391-a5ac3cdb6ba9",
+      "type": "multiple_choice",
+      "difficulty": 2
     },
     {
       "question": "You need to detect potential data exfiltration in a 10GB PCAP file. Which tshark command is most effective?",
@@ -145,7 +157,10 @@
         "tshark -r capture.pcap -Y 'ip.dst != 10.0.0.0/8'"
       ],
       "correct_answer": 1,
-      "explanation": "Option B specifically filters for large HTTP POST requests (>1MB), which are strong indicators of data exfiltration, and extracts the destination IP and upload size for analysis. Option A shows protocol hierarchy (too broad). Option C shows all HTTPS (too much noise). Option D shows external traffic (too broad). Focus on large uploads for exfiltration detection."
+      "explanation": "Option B specifically filters for large HTTP POST requests (>1MB), which are strong indicators of data exfiltration, and extracts the destination IP and upload size for analysis. Option A shows protocol hierarchy (too broad). Option C shows all HTTPS (too much noise). Option D shows external traffic (too broad). Focus on large uploads for exfiltration detection.",
+      "question_id": "d1b03427-5da5-476b-8318-d15e97c987de",
+      "type": "multiple_choice",
+      "difficulty": 2
     },
     {
       "question": "While investigating a breach, you notice NTLM authentication traffic (ntlmssp) between multiple workstations, even though your domain uses Kerberos. What attack technique does this suggest?",
@@ -156,13 +171,22 @@
         "DCSync attack"
       ],
       "correct_answer": 2,
-      "explanation": "Pass-the-Hash (PtH) uses NTLM authentication because the attacker has the NTLM hash but not the plaintext password or Kerberos ticket. In a Kerberos domain, seeing NTLM instead of Kerberos is suspicious. Golden Ticket would still use Kerberos (with forged ticket). Kerberoasting targets Kerberos service tickets. DCSync uses Directory Replication Service (DRS) protocol."
+      "explanation": "Pass-the-Hash (PtH) uses NTLM authentication because the attacker has the NTLM hash but not the plaintext password or Kerberos ticket. In a Kerberos domain, seeing NTLM instead of Kerberos is suspicious. Golden Ticket would still use Kerberos (with forged ticket). Kerberoasting targets Kerberos service tickets. DCSync uses Directory Replication Service (DRS) protocol.",
+      "question_id": "03540580-36f8-4426-868c-dc95ea95c313",
+      "type": "multiple_choice",
+      "difficulty": 2
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "state_management",
-    "memory_techniques",
-    "real_world_application"
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }

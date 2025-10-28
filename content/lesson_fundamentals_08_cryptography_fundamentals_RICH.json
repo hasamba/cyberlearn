@@ -149,7 +149,9 @@
         "AES, RSA, SHA"
       ],
       "correct_answer": "Symmetric Encryption, Asymmetric Encryption, Hashing",
-      "explanation": "The three fundamental cryptographic function categories are: (1) SYMMETRIC ENCRYPTION - same key encrypts and decrypts (AES), fast, for bulk data; (2) ASYMMETRIC ENCRYPTION - public/private key pairs (RSA), slow, for key exchange and signatures; (3) HASHING - one-way functions (SHA-256), for integrity and password storage. AES/RSA/SHA are specific algorithms within these categories. Encryption/decryption are operations, not categories."
+      "explanation": "The three fundamental cryptographic function categories are: (1) SYMMETRIC ENCRYPTION - same key encrypts and decrypts (AES), fast, for bulk data; (2) ASYMMETRIC ENCRYPTION - public/private key pairs (RSA), slow, for key exchange and signatures; (3) HASHING - one-way functions (SHA-256), for integrity and password storage. AES/RSA/SHA are specific algorithms within these categories. Encryption/decryption are operations, not categories.",
+      "question_id": "8eb42919-f7c7-4657-beab-17b12d21e051",
+      "difficulty": 1
     },
     {
       "question": "Why is bcrypt recommended for password storage instead of SHA-256?",
@@ -161,7 +163,9 @@
         "bcrypt can be reversed to recover the password"
       ],
       "correct_answer": "bcrypt is intentionally slow and computationally expensive, making brute force attacks impractical, and includes automatic salting",
-      "explanation": "bcrypt is designed specifically for password hashing with: (1) SLOW BY DESIGN - takes ~100ms vs SHA-256's microseconds, making brute force attacks 100,000x slower; (2) CONFIGURABLE WORK FACTOR - can increase iterations as hardware improves; (3) AUTOMATIC SALTING - includes unique salt per password, preventing rainbow tables. SHA-256 is fast (great for integrity, terrible for passwords). bcrypt CANNOT be reversed (still one-way). Hash length is irrelevant to security here."
+      "explanation": "bcrypt is designed specifically for password hashing with: (1) SLOW BY DESIGN - takes ~100ms vs SHA-256's microseconds, making brute force attacks 100,000x slower; (2) CONFIGURABLE WORK FACTOR - can increase iterations as hardware improves; (3) AUTOMATIC SALTING - includes unique salt per password, preventing rainbow tables. SHA-256 is fast (great for integrity, terrible for passwords). bcrypt CANNOT be reversed (still one-way). Hash length is irrelevant to security here.",
+      "question_id": "b4d97418-ed78-4268-ab10-d136b0e91533",
+      "difficulty": 1
     },
     {
       "question": "How does hybrid encryption work in TLS/SSL?",
@@ -173,13 +177,21 @@
         "Both RSA and AES encrypt every packet for redundancy"
       ],
       "correct_answer": "RSA encrypts the AES session key (key exchange), then AES encrypts all data (bulk encryption)",
-      "explanation": "TLS uses hybrid encryption combining both: (1) RSA (or Diffie-Hellman) performs KEY EXCHANGE - client generates random AES key, encrypts it with server's public RSA key, sends to server; (2) Both parties now have shared AES symmetric key; (3) AES encrypts ALL data (fast, efficient bulk encryption). This gets security benefits of asymmetric crypto (no pre-shared secret) with speed of symmetric crypto. Not redundancy - each has specific role."
+      "explanation": "TLS uses hybrid encryption combining both: (1) RSA (or Diffie-Hellman) performs KEY EXCHANGE - client generates random AES key, encrypts it with server's public RSA key, sends to server; (2) Both parties now have shared AES symmetric key; (3) AES encrypts ALL data (fast, efficient bulk encryption). This gets security benefits of asymmetric crypto (no pre-shared secret) with speed of symmetric crypto. Not redundancy - each has specific role.",
+      "question_id": "7460ae30-4b1b-460b-9159-9d4544cee949",
+      "difficulty": 1
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "chunking",
-    "visual_learning",
-    "real_world"
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ]
 }
