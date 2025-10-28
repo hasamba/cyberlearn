@@ -5,7 +5,9 @@
   "subtitle": "Mastering file permissions, ownership, and access control mechanisms",
   "difficulty": 1,
   "order_index": 2,
-  "prerequisites": ["3b2aa25c-082d-4ff7-962c-fcde78b16bf4"],
+  "prerequisites": [
+    "3b2aa25c-082d-4ff7-962c-fcde78b16bf4"
+  ],
   "concepts": [
     "File permissions (rwx)",
     "Ownership (user, group, others)",
@@ -39,7 +41,11 @@
         "Owner: rw-, Group: rw-, Others: rw-"
       ],
       "correct": 0,
-      "explanation": "644 = rw-r--r--. Owner (6=4+2) has read+write, Group (4) has read, Others (4) has read."
+      "explanation": "644 = rw-r--r--. Owner (6=4+2) has read+write, Group (4) has read, Others (4) has read.",
+      "question_id": "ae3c4ab7-8afa-4a38-a40c-110387222a4b",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "Which special permission allows a program to run with the file owner's privileges?",
@@ -50,7 +56,11 @@
         "ACL (Access Control List)"
       ],
       "correct": 2,
-      "explanation": "SUID allows executables to run with the permissions of the file owner, commonly used for programs like passwd that need elevated privileges."
+      "explanation": "SUID allows executables to run with the permissions of the file owner, commonly used for programs like passwd that need elevated privileges.",
+      "question_id": "605ea002-5173-40ba-bd94-d10db1a8abb2",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What is the primary security risk of SUID binaries?",
@@ -61,7 +71,11 @@
         "They slow down system performance"
       ],
       "correct": 1,
-      "explanation": "SUID binaries run with elevated privileges. If they contain vulnerabilities, attackers can exploit them to gain root access."
+      "explanation": "SUID binaries run with elevated privileges. If they contain vulnerabilities, attackers can exploit them to gain root access.",
+      "question_id": "edda418e-01a0-448e-9a47-043c24c6387e",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What does the sticky bit on a directory do?",
@@ -72,7 +86,11 @@
         "Encrypts all files in the directory"
       ],
       "correct": 1,
-      "explanation": "The sticky bit (commonly on /tmp) ensures only the file owner can delete or rename their files, even if others have write permission on the directory."
+      "explanation": "The sticky bit (commonly on /tmp) ensures only the file owner can delete or rename their files, even if others have write permission on the directory.",
+      "question_id": "02abd579-61b6-4c43-b212-dd0a2c053a55",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "Which command grants user 'alice' read permission on file.txt using ACLs?",
@@ -83,7 +101,11 @@
         "acl alice read file.txt"
       ],
       "correct": 0,
-      "explanation": "setfacl -m u:alice:r file.txt modifies the ACL to grant user alice read permission without changing the traditional ownership."
+      "explanation": "setfacl -m u:alice:r file.txt modifies the ACL to grant user alice read permission without changing the traditional ownership.",
+      "question_id": "a4940649-86eb-4578-a66b-61af0b9e9993",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What does umask 022 result in for newly created files?",
@@ -94,7 +116,11 @@
         "022 (no permissions)"
       ],
       "correct": 0,
-      "explanation": "For files, default 666 minus umask 022 = 644 (rw-r--r--). For directories, 777 - 022 = 755."
+      "explanation": "For files, default 666 minus umask 022 = 644 (rw-r--r--). For directories, 777 - 022 = 755.",
+      "question_id": "81c8b68e-76fc-4d57-a40a-ab2423385437",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "Which file contains sudo configuration and should be edited carefully?",
@@ -105,7 +131,11 @@
         "/etc/group"
       ],
       "correct": 2,
-      "explanation": "/etc/sudoers controls sudo access. Always edit with 'visudo' to prevent syntax errors that could lock you out."
+      "explanation": "/etc/sudoers controls sudo access. Always edit with 'visudo' to prevent syntax errors that could lock you out.",
+      "question_id": "921ea3a6-5b3b-4712-ab76-20f6d2fbeb2f",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What does the immutable attribute (+i) do to a file?",
@@ -116,7 +146,11 @@
         "Makes it executable by all users"
       ],
       "correct": 1,
-      "explanation": "The immutable attribute (chattr +i) prevents any modifications, deletions, or renames - even root cannot change the file until the attribute is removed."
+      "explanation": "The immutable attribute (chattr +i) prevents any modifications, deletions, or renames - even root cannot change the file until the attribute is removed.",
+      "question_id": "31ada0bf-0210-4727-9797-63bc70e44ddd",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "How do you find all SUID files on a system?",
@@ -127,7 +161,11 @@
         "chmod --find-suid /"
       ],
       "correct": 0,
-      "explanation": "find / -perm -4000 searches for files with the SUID bit (4000) set. The 2>/dev/null suppresses permission denied errors."
+      "explanation": "find / -perm -4000 searches for files with the SUID bit (4000) set. The 2>/dev/null suppresses permission denied errors.",
+      "question_id": "1f978056-a800-4a87-bb45-22e43d090e2e",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What principle should guide permission assignments in secure systems?",
@@ -138,14 +176,24 @@
         "Open by default"
       ],
       "correct": 1,
-      "explanation": "Principle of least privilege means granting only the minimum permissions necessary for users/processes to perform their tasks."
+      "explanation": "Principle of least privilege means granting only the minimum permissions necessary for users/processes to perform their tasks.",
+      "question_id": "66d656a2-8f69-45aa-807d-fd2f9fadf5ab",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     }
   ],
   "jim_kwik_principles": [
-    "active_recall",
-    "spaced_repetition",
-    "state_management",
-    "teach_to_learn"
+    "active_learning",
+    "meta_learning",
+    "teach_like_im_10",
+    "minimum_effective_dose",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {

@@ -1,11 +1,13 @@
 {
-  "lesson_id": "d0a6f1b2-7e5h-6h4d-0c8f-1a0h9f8e7d6g",
+  "lesson_id": "2d827c68-ade9-484a-9abd-d0cb467576c5",
   "domain": "linux",
   "title": "Linux Package Management and System Updates",
   "subtitle": "Master package managers, repositories, and secure system maintenance",
   "difficulty": 1,
   "order_index": 5,
-  "prerequisites": ["3b2aa25c-082d-4ff7-962c-fcde78b16bf4"],
+  "prerequisites": [
+    "3b2aa25c-082d-4ff7-962c-fcde78b16bf4"
+  ],
   "concepts": [
     "APT package manager (Debian/Ubuntu)",
     "YUM and DNF (RHEL/CentOS/Fedora)",
@@ -39,7 +41,11 @@
         "apt refresh"
       ],
       "correct": 1,
-      "explanation": "'apt update' downloads package information from repositories. 'apt upgrade' actually installs updates after running 'apt update'."
+      "explanation": "'apt update' downloads package information from repositories. 'apt upgrade' actually installs updates after running 'apt update'.",
+      "question_id": "0da7a8f1-fa11-44c0-999f-6590e7f7e7da",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What is the difference between 'apt upgrade' and 'apt full-upgrade'?",
@@ -50,7 +56,11 @@
         "full-upgrade only updates the kernel"
       ],
       "correct": 1,
-      "explanation": "'apt upgrade' never removes packages. 'apt full-upgrade' (formerly dist-upgrade) can remove packages to resolve dependencies and conflicts."
+      "explanation": "'apt upgrade' never removes packages. 'apt full-upgrade' (formerly dist-upgrade) can remove packages to resolve dependencies and conflicts.",
+      "question_id": "ecbf9de7-b0b1-4c61-b4ae-d7c467633bdd",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "How do you install a specific version of a package with apt?",
@@ -61,7 +71,11 @@
         "apt version package"
       ],
       "correct": 0,
-      "explanation": "Use 'apt install package=version' syntax, e.g., 'apt install nginx=1.18.0-0ubuntu1'."
+      "explanation": "Use 'apt install package=version' syntax, e.g., 'apt install nginx=1.18.0-0ubuntu1'.",
+      "question_id": "83d51d98-1ced-4124-88e0-f835ddb38fc2",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "Which file contains the list of package repositories on Debian/Ubuntu?",
@@ -72,7 +86,11 @@
         "/etc/repositories.list"
       ],
       "correct": 1,
-      "explanation": "/etc/apt/sources.list and files in /etc/apt/sources.list.d/ contain repository configurations."
+      "explanation": "/etc/apt/sources.list and files in /etc/apt/sources.list.d/ contain repository configurations.",
+      "question_id": "3f17da62-4892-4f78-bdad-a9fd08d73f16",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What command shows security updates available on Ubuntu?",
@@ -83,7 +101,11 @@
         "apt list --upgradable | grep -i security"
       ],
       "correct": 3,
-      "explanation": "Use 'apt list --upgradable' and filter for security updates, or check /var/lib/apt/lists/ for security repository entries."
+      "explanation": "Use 'apt list --upgradable' and filter for security updates, or check /var/lib/apt/lists/ for security repository entries.",
+      "question_id": "d7b4373e-375c-41ba-94be-3c4ee8e727ea",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "How do you prevent a package from being automatically updated (apt hold)?",
@@ -94,7 +116,11 @@
         "apt freeze package"
       ],
       "correct": 2,
-      "explanation": "'apt-mark hold package' prevents a package from being automatically upgraded. Use 'apt-mark unhold' to remove the hold."
+      "explanation": "'apt-mark hold package' prevents a package from being automatically upgraded. Use 'apt-mark unhold' to remove the hold.",
+      "question_id": "8736cf45-780d-4209-8299-8449e9b04fbf",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What is the YUM/DNF equivalent of 'apt update'?",
@@ -105,7 +131,11 @@
         "yum makecache"
       ],
       "correct": 2,
-      "explanation": "'yum check-update' or 'dnf check-update' checks for available updates without installing them. 'yum makecache' updates the local cache."
+      "explanation": "'yum check-update' or 'dnf check-update' checks for available updates without installing them. 'yum makecache' updates the local cache.",
+      "question_id": "c229ea67-c6c7-4871-b995-23165c141268",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "How do you verify the GPG signature of a package?",
@@ -116,7 +146,11 @@
         "apt-key verify"
       ],
       "correct": 0,
-      "explanation": "APT automatically verifies GPG signatures if the repository's public key is in the trusted keyring (/etc/apt/trusted.gpg.d/)."
+      "explanation": "APT automatically verifies GPG signatures if the repository's public key is in the trusted keyring (/etc/apt/trusted.gpg.d/).",
+      "question_id": "1f11ac69-7f1b-452f-99f6-6f49548ba76b",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "What is the safest approach to kernel updates on production servers?",
@@ -127,7 +161,11 @@
         "Only update during business hours"
       ],
       "correct": 1,
-      "explanation": "Test kernel updates in staging environments first, schedule maintenance windows, ensure you can rollback to previous kernel if needed."
+      "explanation": "Test kernel updates in staging environments first, schedule maintenance windows, ensure you can rollback to previous kernel if needed.",
+      "question_id": "c932e203-e097-4977-b350-277c5a519a86",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     },
     {
       "question": "Which tool provides automatic security updates on Ubuntu?",
@@ -138,14 +176,24 @@
         "security-updates"
       ],
       "correct": 1,
-      "explanation": "unattended-upgrades automatically installs security updates. Configure in /etc/apt/apt.conf.d/50unattended-upgrades."
+      "explanation": "unattended-upgrades automatically installs security updates. Configure in /etc/apt/apt.conf.d/50unattended-upgrades.",
+      "question_id": "6f666c52-22a5-4085-a4d3-0014797591ce",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "correct_answer": 0
     }
   ],
   "jim_kwik_principles": [
-    "active_recall",
-    "spaced_repetition",
-    "chunking",
-    "practical_application"
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {

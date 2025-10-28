@@ -1,11 +1,13 @@
 {
-  "lesson_id": "c9f5e0a1-6d4g-5g3c-9b7e-0f9g8e7d6c5f",
+  "lesson_id": "a4751145-2bc2-4c65-8650-9d13ab58a2cc",
   "domain": "linux",
   "title": "Linux Networking and Firewall Configuration",
   "subtitle": "Master network interfaces, routing, and firewall management for security",
   "difficulty": 2,
   "order_index": 4,
-  "prerequisites": ["3b2aa25c-082d-4ff7-962c-fcde78b16bf4"],
+  "prerequisites": [
+    "3b2aa25c-082d-4ff7-962c-fcde78b16bf4"
+  ],
   "concepts": [
     "Network interfaces and configuration",
     "IP addressing and routing",
@@ -39,7 +41,11 @@
         "PREROUTING"
       ],
       "correct": 1,
-      "explanation": "INPUT chain handles packets destined for the local system. FORWARD is for routed packets, OUTPUT for locally-generated packets."
+      "explanation": "INPUT chain handles packets destined for the local system. FORWARD is for routed packets, OUTPUT for locally-generated packets.",
+      "question_id": "62b61a49-bef8-411c-9458-1c79afec1061",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What does the iptables rule 'iptables -A INPUT -p tcp --dport 22 -j ACCEPT' do?",
@@ -50,7 +56,11 @@
         "Logs SSH connection attempts"
       ],
       "correct": 1,
-      "explanation": "-A INPUT appends to INPUT chain, -p tcp specifies TCP protocol, --dport 22 matches destination port 22 (SSH), -j ACCEPT allows the traffic."
+      "explanation": "-A INPUT appends to INPUT chain, -p tcp specifies TCP protocol, --dport 22 matches destination port 22 (SSH), -j ACCEPT allows the traffic.",
+      "question_id": "1fea4f83-3dd6-4c87-8eb9-0f5a2254ada0",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What is the default policy best practice for iptables INPUT chain?",
@@ -61,7 +71,11 @@
         "LOG (log all traffic)"
       ],
       "correct": 1,
-      "explanation": "Default DROP with explicit ACCEPT rules follows principle of least privilege - deny everything except what's specifically needed."
+      "explanation": "Default DROP with explicit ACCEPT rules follows principle of least privilege - deny everything except what's specifically needed.",
+      "question_id": "257166c9-c3b7-4a85-a9ab-97dc66bb2648",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "Which command shows current routing table?",
@@ -72,7 +86,11 @@
         "iptables -L"
       ],
       "correct": 1,
-      "explanation": "'route -n' or 'ip route show' displays the routing table. -n shows numeric addresses without DNS resolution."
+      "explanation": "'route -n' or 'ip route show' displays the routing table. -n shows numeric addresses without DNS resolution.",
+      "question_id": "aacca0b5-61ef-4e5a-9f2b-5dc69aa7d9a8",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What does NAT (Network Address Translation) primarily accomplish?",
@@ -83,7 +101,11 @@
         "Increases network speed"
       ],
       "correct": 2,
-      "explanation": "NAT translates private IP addresses to a public IP, allowing multiple internal devices to access the internet through one public address."
+      "explanation": "NAT translates private IP addresses to a public IP, allowing multiple internal devices to access the internet through one public address.",
+      "question_id": "5549fcaa-89e1-45b1-8d61-66603ea5f225",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "Which tool is best for analyzing live packet captures on Linux?",
@@ -94,7 +116,11 @@
         "route"
       ],
       "correct": 1,
-      "explanation": "tcpdump captures and analyzes network packets in real-time. Wireshark (GUI) is another option, but tcpdump is the command-line standard."
+      "explanation": "tcpdump captures and analyzes network packets in real-time. Wireshark (GUI) is another option, but tcpdump is the command-line standard.",
+      "question_id": "f8c3003e-9c82-4749-9181-e6a6b38a4ae4",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you make iptables rules persistent across reboots on Ubuntu?",
@@ -105,7 +131,11 @@
         "Use the --persist flag"
       ],
       "correct": 1,
-      "explanation": "iptables rules are not persistent by default. Use 'iptables-save > /etc/iptables/rules.v4' and configure iptables-persistent package to restore on boot."
+      "explanation": "iptables rules are not persistent by default. Use 'iptables-save > /etc/iptables/rules.v4' and configure iptables-persistent package to restore on boot.",
+      "question_id": "33529acf-70f9-4df3-9fd8-8607bc1f0806",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What is the advantage of nftables over iptables?",
@@ -116,7 +146,11 @@
         "Automatically blocks all attacks"
       ],
       "correct": 0,
-      "explanation": "nftables provides simpler, more consistent syntax, better performance, and unified framework for IPv4/IPv6. It's the modern replacement for iptables."
+      "explanation": "nftables provides simpler, more consistent syntax, better performance, and unified framework for IPv4/IPv6. It's the modern replacement for iptables.",
+      "question_id": "50c8ec6f-ad18-4736-8f63-1e8aa8da1598",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "Which file contains DNS resolver configuration on Linux?",
@@ -127,7 +161,11 @@
         "/etc/dns.conf"
       ],
       "correct": 1,
-      "explanation": "/etc/resolv.conf contains DNS nameserver addresses. /etc/hosts is for static hostname-to-IP mappings."
+      "explanation": "/etc/resolv.conf contains DNS nameserver addresses. /etc/hosts is for static hostname-to-IP mappings.",
+      "question_id": "1f3f82c1-daee-4272-9072-1892db340d44",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you block all traffic from IP 192.168.1.100 with iptables?",
@@ -138,14 +176,24 @@
         "iptables -R INPUT 192.168.1.100"
       ],
       "correct": 0,
-      "explanation": "-A INPUT appends rule to INPUT chain, -s specifies source IP, -j DROP drops packets silently."
+      "explanation": "-A INPUT appends rule to INPUT chain, -s specifies source IP, -j DROP drops packets silently.",
+      "question_id": "566410f6-42c4-4b60-9064-5e73a90f50c8",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     }
   ],
   "jim_kwik_principles": [
-    "active_recall",
-    "spaced_repetition",
-    "chunking",
-    "visualization"
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {

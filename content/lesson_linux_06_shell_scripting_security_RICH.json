@@ -1,11 +1,14 @@
 {
-  "lesson_id": "e1b7g2c3-8f6i-7i5e-1d9g-2b1i0g9f8e7h",
+  "lesson_id": "d63f380f-b638-4695-a8ad-e4b7844dc4a6",
   "domain": "linux",
   "title": "Shell Scripting for Security Automation",
   "subtitle": "Automate security tasks with Bash scripting",
   "difficulty": 2,
   "order_index": 6,
-  "prerequisites": ["3b2aa25c-082d-4ff7-962c-fcde78b16bf4", "b8e4d9f0-5c3f-4f2b-8a6d-9e8f7d6c5b4e"],
+  "prerequisites": [
+    "3b2aa25c-082d-4ff7-962c-fcde78b16bf4",
+    "b8e4d9f0-5c3f-4f2b-8a6d-9e8f7d6c5b4e"
+  ],
   "concepts": [
     "Bash scripting fundamentals",
     "Variables and command substitution",
@@ -39,7 +42,11 @@
         "//bin/bash"
       ],
       "correct": 0,
-      "explanation": "#!/bin/bash (shebang) tells the system to execute the script with Bash. Must be the first line."
+      "explanation": "#!/bin/bash (shebang) tells the system to execute the script with Bash. Must be the first line.",
+      "question_id": "0917a24f-6c97-4111-b298-688b1bb3a36a",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you capture command output into a variable?",
@@ -50,7 +57,11 @@
         "var:=$(command)"
       ],
       "correct": 1,
-      "explanation": "Use var=$(command) or backticks var=`command`. No spaces around =."
+      "explanation": "Use var=$(command) or backticks var=`command`. No spaces around =.",
+      "question_id": "323004b6-05c9-43e9-a67c-ce1603f21aad",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What does $? represent in Bash?",
@@ -61,7 +72,11 @@
         "Current user"
       ],
       "correct": 2,
-      "explanation": "$? contains the exit status (return code) of the last executed command. 0 = success, non-zero = error."
+      "explanation": "$? contains the exit status (return code) of the last executed command. 0 = success, non-zero = error.",
+      "question_id": "86378d56-3b26-4813-beb1-241c95f29beb",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you make a script executable?",
@@ -72,7 +87,11 @@
         "run script.sh"
       ],
       "correct": 0,
-      "explanation": "chmod +x script.sh adds execute permission. Then run with ./script.sh"
+      "explanation": "chmod +x script.sh adds execute permission. Then run with ./script.sh",
+      "question_id": "7f7443fb-d683-4714-9de4-f0a9f3345259",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What is the safest way to handle passwords in scripts?",
@@ -83,7 +102,11 @@
         "Store in a text file"
       ],
       "correct": 2,
-      "explanation": "Never hardcode passwords. Use environment variables, read from secure files with restricted permissions, or integrate with password managers."
+      "explanation": "Never hardcode passwords. Use environment variables, read from secure files with restricted permissions, or integrate with password managers.",
+      "question_id": "fb727d38-1a35-43da-8b6f-2ffd3ef3c91c",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "Which cron expression runs a script every day at 2 AM?",
@@ -94,7 +117,11 @@
         "0 0 2 * *"
       ],
       "correct": 0,
-      "explanation": "Cron format: minute hour day month weekday. 0 2 * * * = minute 0, hour 2, every day."
+      "explanation": "Cron format: minute hour day month weekday. 0 2 * * * = minute 0, hour 2, every day.",
+      "question_id": "7cfaeb81-84b5-4400-b942-a5a128273774",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you redirect both stdout and stderr to a file?",
@@ -105,7 +132,11 @@
         "command 2> file"
       ],
       "correct": 0,
-      "explanation": "> redirects stdout, 2>&1 redirects stderr to wherever stdout goes. So both go to file."
+      "explanation": "> redirects stdout, 2>&1 redirects stderr to wherever stdout goes. So both go to file.",
+      "question_id": "fd7c0957-3d61-47e6-84ab-fb265e3e90b8",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What does set -e do in a Bash script?",
@@ -116,7 +147,11 @@
         "Exports all variables"
       ],
       "correct": 1,
-      "explanation": "set -e makes the script exit immediately if any command returns non-zero exit status (fails)."
+      "explanation": "set -e makes the script exit immediately if any command returns non-zero exit status (fails).",
+      "question_id": "434e8d08-3b7f-48b8-a07c-febfdf2fdc51",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "How do you loop through lines in a file?",
@@ -127,7 +162,11 @@
         "loop file"
       ],
       "correct": 1,
-      "explanation": "while read line; do ... done < file is safe for reading files line-by-line, handles spaces correctly."
+      "explanation": "while read line; do ... done < file is safe for reading files line-by-line, handles spaces correctly.",
+      "question_id": "d8b94714-a687-4e74-8d21-56039514f9d3",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     },
     {
       "question": "What is the difference between [ ] and [[ ]] in Bash?",
@@ -138,14 +177,24 @@
         "[[ ]] is deprecated"
       ],
       "correct": 1,
-      "explanation": "[[ ]] is a Bash keyword (not POSIX), supports pattern matching, regex, and doesn't require quoting variables."
+      "explanation": "[[ ]] is a Bash keyword (not POSIX), supports pattern matching, regex, and doesn't require quoting variables.",
+      "question_id": "ad816819-34ef-46b3-bae7-bc69facb12c2",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "correct_answer": 0
     }
   ],
   "jim_kwik_principles": [
-    "active_recall",
-    "practical_application",
-    "deliberate_practice",
-    "teach_to_learn"
+    "active_learning",
+    "teach_like_im_10",
+    "minimum_effective_dose",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {
