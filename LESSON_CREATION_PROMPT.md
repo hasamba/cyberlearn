@@ -178,6 +178,61 @@ Each content block MUST follow this structure:
 }
 ```
 
+### CRITICAL JSON FORMATTING RULES
+
+**Inside the "text" field, you MUST properly escape:**
+
+1. **Newlines**: Use `\n` (NOT actual line breaks)
+2. **Quotes**: Use `\"` for double quotes inside the text
+3. **Backslashes**: Use `\\` for literal backslashes
+4. **NO Backticks**: Do NOT use `` ` `` or `` ``` `` for code blocks!
+
+**For Code Blocks - Use Newlines:**
+
+❌ **WRONG (causes JSON parse errors):**
+```json
+{
+  "text": "# Example\n\n`bash\ncommand here\n`"
+}
+```
+
+✅ **CORRECT:**
+```json
+{
+  "text": "# Example\n\n```bash\ncommand here\n```"
+}
+```
+
+**Or even better - use simple formatting:**
+```json
+{
+  "text": "# Example\n\nCommand:\n  command here\n\nOutput:\n  result here"
+}
+```
+
+**For ASCII Diagrams:**
+
+❌ **WRONG:**
+```json
+{
+  "text": "`\n┌────┐\n│ Box │\n└────┘\n`"
+}
+```
+
+✅ **CORRECT:**
+```json
+{
+  "text": "```\n┌────┐\n│ Box │\n└────┘\n```"
+}
+```
+
+**Or:**
+```json
+{
+  "text": "Diagram:\n\n┌────┐\n│ Box │\n└────┘"
+}
+```
+
 ### LESSON CONTENT STANDARDS
 
 **Length:** 4,000-6,000 words total (across all content blocks)
@@ -223,6 +278,16 @@ Each content block MUST follow this structure:
   "type": "code_exercise",
   "content": {
     "text": "# Practical Exercise: Topic\n\n## Example 1: Description\n\n```bash\n# Command with comments\ncommand --option value\n\n# Output:\nExpected output here\n```\n\n## Example 2: Another scenario\n\n```python\n# Python example\ndef function():\n    # Code here\n    pass\n```\n\n**Practice Exercise:**\n1. Try this command\n2. Observe the output\n3. Modify parameters"
+  }
+}
+```
+
+**IMPORTANT:** In actual JSON output, this becomes a single line with `\n`:
+```json
+{
+  "type": "code_exercise",
+  "content": {
+    "text": "# Practical Exercise: Topic\n\n## Example 1: Description\n\n```bash\n# Command with comments\ncommand --option value\n```\n\n**Practice Exercise:**\n1. Try this command"
   }
 }
 ```
@@ -488,6 +553,42 @@ Before outputting, verify:
 - [ ] Included: explanation (3-5x), code_exercise (2-3x), real_world (1-2x), memory_aid (1x), mindset_coach (1x), reflection (1x)
 - [ ] NO emojis in content (except mindset_coach if appropriate)
 - [ ] All JSON is valid (proper escaping, no trailing commas)
+- [ ] NO single backticks `` ` `` in text (use ```code``` or simple formatting)
+- [ ] Newlines use `\n` not actual line breaks in JSON
+- [ ] Quotes escaped as `\"` inside text strings
+- [ ] Backslashes escaped as `\\` inside text strings
+
+### COMMON JSON ERRORS TO AVOID
+
+**Error 1: Single Backticks**
+❌ WRONG: `"text": "Use ` for inline code"`
+✅ CORRECT: `"text": "Use backticks for inline code"` or `"text": "Use \`code\` for inline"`
+
+**Error 2: Unescaped Quotes**
+❌ WRONG: `"text": "The "main" function"`
+✅ CORRECT: `"text": "The \"main\" function"`
+
+**Error 3: Unescaped Backslashes**
+❌ WRONG: `"text": "Path is C:\Users\file"`
+✅ CORRECT: `"text": "Path is C:\\Users\\file"`
+
+**Error 4: Actual Line Breaks**
+❌ WRONG:
+```json
+{
+  "text": "Line 1
+  Line 2"
+}
+```
+✅ CORRECT: `{"text": "Line 1\nLine 2"}`
+
+**Error 5: Trailing Commas**
+❌ WRONG: `{"field": "value",}`
+✅ CORRECT: `{"field": "value"}`
+
+**Error 6: Comments in JSON**
+❌ WRONG: `{"field": "value" // comment}`
+✅ CORRECT: `{"field": "value"}`
 
 ### OUTPUT FORMAT
 
@@ -496,6 +597,13 @@ Before outputting, verify:
 Start directly with `{` and end with `}`
 
 The output should be ready to save as `lesson_DOMAIN_##_TOPIC_RICH.json`
+
+**Validate before output:**
+1. All strings properly escaped
+2. No trailing commas
+3. No backticks for code fences (use triple backticks as part of the string)
+4. All newlines are `\n`
+5. Valid JSON structure
 
 ---
 
