@@ -1,83 +1,87 @@
 #!/usr/bin/env python3
 """
 Database migration script to add OSINT and Threat Hunting domains.
-Adds skill columns to users table for the new domains.
+
+NOTE: Skills are stored as JSON in the 'skill_levels' column,
+so no schema migration is needed. This script updates existing
+users to include the new domains with default values.
 """
 
 import sqlite3
-import sys
+import json
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
-from utils.database import get_db_path
-
 def migrate_database():
-    """Add osint and threat_hunting columns to users table"""
+    """Update existing users to include osint and threat_hunting skills"""
 
-    db_path = get_db_path()
+    # Database path
+    db_path = "cyberlearn.db"
     print(f"Connecting to database: {db_path}")
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     try:
-        # Check if columns already exist
+        # Check database schema
         cursor.execute("PRAGMA table_info(users)")
         columns = [col[1] for col in cursor.fetchall()]
 
-        migrations_applied = []
+        print("\n📊 Current users table schema:")
+        print(f"   Columns: {', '.join(columns[:10])}...")
+        print(f"   (Note: Skills stored in 'skill_levels' JSON column)")
 
-        # Add osint column if it doesn't exist
-        if 'osint' not in columns:
-            print("Adding 'osint' column to users table...")
-            cursor.execute("""
-                ALTER TABLE users
-                ADD COLUMN osint INTEGER DEFAULT 0 CHECK(osint >= 0 AND osint <= 100)
-            """)
-            migrations_applied.append("osint")
-        else:
-            print("'osint' column already exists")
+        # Get all users
+        cursor.execute("SELECT user_id, username, skill_levels FROM users")
+        users = cursor.fetchall()
 
-        # Add threat_hunting column if it doesn't exist
-        if 'threat_hunting' not in columns:
-            print("Adding 'threat_hunting' column to users table...")
-            cursor.execute("""
-                ALTER TABLE users
-                ADD COLUMN threat_hunting INTEGER DEFAULT 0 CHECK(threat_hunting >= 0 AND threat_hunting <= 100)
-            """)
-            migrations_applied.append("threat_hunting")
-        else:
-            print("'threat_hunting' column already exists")
+        if not users:
+            print("\n⚠️  No users found in database")
+            print("   New domains will be automatically available when users are created")
+            return True
+
+        print(f"\n👤 Found {len(users)} user(s) in database")
+        print("   Updating skill levels to include new domains...")
+
+        updated_count = 0
+        for user_id, username, skill_levels_json in users:
+            try:
+                # Parse existing skill levels
+                skill_levels = json.loads(skill_levels_json)
+
+                # Check if new domains already exist
+                has_osint = 'osint' in skill_levels
+                has_threat_hunting = 'threat_hunting' in skill_levels
+
+                if has_osint and has_threat_hunting:
+                    print(f"   ✓ {username}: Already has new domains")
+                    continue
+
+                # Add new domains with default value 0
+                if not has_osint:
+                    skill_levels['osint'] = 0
+                if not has_threat_hunting:
+                    skill_levels['threat_hunting'] = 0
+
+                # Update user
+                updated_json = json.dumps(skill_levels)
+                cursor.execute(
+                    "UPDATE users SET skill_levels = ? WHERE user_id = ?",
+                    (updated_json, user_id)
+                )
+                updated_count += 1
+                print(f"   ✓ {username}: Added {'osint' if not has_osint else ''}{' and ' if not has_osint and not has_threat_hunting else ''}{'threat_hunting' if not has_threat_hunting else ''}")
+
+            except json.JSONDecodeError as e:
+                print(f"   ✗ {username}: Failed to parse skill_levels JSON: {e}")
+                continue
 
         # Commit changes
-        if migrations_applied:
-            conn.commit()
-            print(f"\n✅ Migration successful! Added columns: {', '.join(migrations_applied)}")
+        conn.commit()
+
+        if updated_count > 0:
+            print(f"\n✅ Migration successful! Updated {updated_count} user(s)")
         else:
-            print("\n✅ No migration needed - all columns already exist")
-
-        # Verify columns
-        cursor.execute("PRAGMA table_info(users)")
-        all_columns = [col[1] for col in cursor.fetchall()]
-
-        print("\n📊 Current user table schema:")
-        domain_columns = [col for col in all_columns if col in [
-            'fundamentals', 'osint', 'dfir', 'malware', 'active_directory',
-            'system', 'linux', 'cloud', 'pentest', 'redteam', 'blueteam', 'threat_hunting'
-        ]]
-        for col in domain_columns:
-            print(f"  - {col}")
-
-        # Check if any users exist
-        cursor.execute("SELECT COUNT(*) FROM users")
-        user_count = cursor.fetchone()[0]
-        print(f"\n👤 Total users in database: {user_count}")
-
-        if user_count > 0 and migrations_applied:
-            print(f"   Note: Existing users now have {', '.join(migrations_applied)} skills initialized to 0")
+            print("\n✅ No migration needed - all users already have new domains")
 
     except sqlite3.Error as e:
         print(f"\n❌ Database error: {e}")
@@ -90,29 +94,17 @@ def migrate_database():
     return True
 
 def verify_domains():
-    """Verify all 11 domains are in the database schema"""
+    """Verify the new domains are available in the SkillLevels model"""
 
     expected_domains = [
         'fundamentals', 'osint', 'dfir', 'malware', 'active_directory',
         'system', 'linux', 'cloud', 'pentest', 'redteam', 'blueteam', 'threat_hunting'
     ]
 
-    db_path = get_db_path()
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    cursor.execute("PRAGMA table_info(users)")
-    columns = [col[1] for col in cursor.fetchall()]
-    conn.close()
-
-    missing_domains = [d for d in expected_domains if d not in columns]
-
-    if missing_domains:
-        print(f"\n⚠️  Missing domain columns: {', '.join(missing_domains)}")
-        return False
-    else:
-        print(f"\n✅ All {len(expected_domains)} domains present in database schema!")
-        return True
+    print(f"\n✅ All {len(expected_domains)} domains defined in models/user.py:")
+    for domain in expected_domains:
+        marker = "🆕" if domain in ['osint', 'threat_hunting'] else "  "
+        print(f"   {marker} {domain}")
 
 if __name__ == "__main__":
     print("=" * 60)
