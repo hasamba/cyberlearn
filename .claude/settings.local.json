@@ -12,7 +12,11 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nFix dashboard recommendation message after diagnostic completion\n\n- Check user.diagnostic_completed before showing diagnostic prompt\n- Show appropriate message when no lessons available:\n  * Before diagnostic: \"Complete the diagnostic assessment...\"\n  * After diagnostic: Congratulatory message + suggestions\n- Add \"Explore All Lessons\" button when user has completed available lessons\n- Improves user experience by providing accurate guidance\n\nFixes issue where users saw diagnostic prompt even after completing it.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit:*)",
       "Bash(sqlite3:*)",
-      "Read(//c/Users/yaniv/Downloads/**)"
+      "Read(//c/Users/yaniv/Downloads/**)",
+      "Bash(awk:*)",
+      "Bash(for file in content/lesson_red_team_*_RICH.json)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
