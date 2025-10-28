@@ -8,6 +8,48 @@ Use this prompt with any LLM to generate complete, production-ready lesson JSON 
 
 You are a cybersecurity education content creator for the CyberLearn platform. Your task is to create a complete, rich lesson in JSON format that can be directly added to the platform.
 
+---
+
+## ⚠️ CRITICAL WARNING: JSON FORMATTING ⚠️
+
+**BEFORE YOU START - READ THIS:**
+
+The #1 cause of lesson failures is **SINGLE BACKTICKS in JSON strings**.
+
+**❌ NEVER DO THIS:**
+```json
+{
+  "text": "`\nCode example\n`"
+}
+```
+
+**❌ THIS WILL FAIL:**
+```json
+{
+  "text": "Use `command` to run"
+}
+```
+
+**✅ DO THIS INSTEAD:**
+```json
+{
+  "text": "```\nCode example\n```"
+}
+```
+
+**✅ OR THIS:**
+```json
+{
+  "text": "Use command to run"
+}
+```
+
+**Why?** Single backticks `` ` `` cause "Expecting ',' delimiter" JSON parse errors. The file will be rejected.
+
+**Remember:** You're generating JSON, not Markdown. Backticks have no special meaning in JSON and will break parsing.
+
+---
+
 ### LESSON REQUIREMENTS
 
 **User Input:** I will provide:
@@ -180,12 +222,20 @@ Each content block MUST follow this structure:
 
 ### CRITICAL JSON FORMATTING RULES
 
+**⚠️ MOST IMPORTANT: NO SINGLE BACKTICKS IN JSON STRINGS! ⚠️**
+
+Single backticks `` ` `` will cause "Expecting ',' delimiter" errors and break JSON parsing.
+
 **Inside the "text" field, you MUST properly escape:**
 
 1. **Newlines**: Use `\n` (NOT actual line breaks)
 2. **Quotes**: Use `\"` for double quotes inside the text
 3. **Backslashes**: Use `\\` for literal backslashes
-4. **NO Backticks**: Do NOT use `` ` `` or `` ``` `` for code blocks!
+4. **Backticks**:
+   - ❌ NEVER use single `` ` ``
+   - ❌ NEVER wrap code/diagrams in `` `code` ``
+   - ✅ Use triple backticks as part of the string: `"text": "```bash\ncode\n```"`
+   - ✅ Or use simple indentation: `"text": "Code:\n  command here"`
 
 **For Code Blocks - Use Newlines:**
 
@@ -552,17 +602,29 @@ Before outputting, verify:
 - [ ] Total word count: 4,000-6,000 words
 - [ ] Included: explanation (3-5x), code_exercise (2-3x), real_world (1-2x), memory_aid (1x), mindset_coach (1x), reflection (1x)
 - [ ] NO emojis in content (except mindset_coach if appropriate)
+- [ ] ⚠️ CRITICAL: NO single backticks `` ` `` ANYWHERE in text strings (will cause JSON parse error!)
 - [ ] All JSON is valid (proper escaping, no trailing commas)
-- [ ] NO single backticks `` ` `` in text (use ```code``` or simple formatting)
 - [ ] Newlines use `\n` not actual line breaks in JSON
 - [ ] Quotes escaped as `\"` inside text strings
 - [ ] Backslashes escaped as `\\` inside text strings
+- [ ] Code blocks use triple backticks: `"```bash\ncode\n```"` NOT single backticks
+- [ ] Inline code mentions: Remove backticks or write out "backtick" as a word
 
 ### COMMON JSON ERRORS TO AVOID
 
-**Error 1: Single Backticks**
-❌ WRONG: `"text": "Use ` for inline code"`
-✅ CORRECT: `"text": "Use backticks for inline code"` or `"text": "Use \`code\` for inline"`
+**⚠️ Error 1: Single Backticks (MOST COMMON - CAUSES "Expecting ',' delimiter")**
+
+This is THE #1 error that breaks lessons!
+
+❌ WRONG: `"text": "Use ` for inline code"` ← Will break JSON!
+❌ WRONG: `"text": "`bash\ncommand\n`"` ← Will break JSON!
+❌ WRONG: `"text": "Run \`ls\` command"` ← Even escaped backticks can cause issues!
+
+✅ CORRECT: `"text": "Use backticks for inline code"`
+✅ CORRECT: `"text": "```bash\ncommand\n```"`
+✅ CORRECT: `"text": "Run ls command"` (just remove backticks)
+
+**Why this breaks:** Backticks are not valid JSON escape sequences. They cause the parser to expect different delimiters.
 
 **Error 2: Unescaped Quotes**
 ❌ WRONG: `"text": "The "main" function"`
