@@ -1,0 +1,218 @@
+{
+  "lesson_id": "ce11f768-9f34-4d72-b377-6913889d4b8c",
+  "domain": "red_team",
+  "title": "PowerShell Offensive Tradecraft Accelerator",
+  "subtitle": "Fileless automation, evasion chains, and resilient tradecraft",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 12,
+  "prerequisites": [
+    "PowerShell Foundations for Cyber Practitioners",
+    "Payload Development & Execution Frameworks"
+  ],
+  "concepts": [
+    "Living-off-the-land automation patterns",
+    "AMSI bypass chaining",
+    "Constrained Language Mode detection and evasion",
+    "Just Enough Administration abuse paths",
+    "PowerShell transcription and logging controls",
+    "Fileless payload delivery with reflective loading",
+    "Command-and-control integration hooks",
+    "Obfuscation and sandbox checks",
+    "Privileged workflow kill switches",
+    "White cell coordination and safety interlocks"
+  ],
+  "learning_objectives": [
+    "Design modular offensive PowerShell toolchains that survive AMSI, CLM, and script block logging",
+    "Blend living-off-the-land binaries with PowerShell automation to minimise telemetry",
+    "Integrate kill switches, guardrails, and white cell beacons into offensive scripts",
+    "Embed PowerShell tasks inside C2 frameworks with resilient staging and fallback",
+    "Evaluate detection surface area by replaying logs, telemetry, and defender analytics",
+    "Document runbooks that articulate risk, containment, and remediation options"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "4357a0d7-3ff1-48b3-8091-4a8ad65024f6",
+      "type": "mindset_coach",
+      "title": "Engineer Like An Adversary",
+      "content": {
+        "text": "Approach this module as both a software engineer and a threat operator. Every function needs testing, guardrails, and an exit plan. You win by staying disciplined while forcing defenders to learn faster."
+      },
+      "simplified_explanation": "Treat each script as a product with safety nets, not a throwaway one-liner.",
+      "memory_aids": [
+        "Engineer > script kiddie"
+      ],
+      "real_world_connection": "Elite red teams iterate PowerShell modules with unit tests and peer review just like product teams, ensuring engagements stay controlled and ethical.",
+      "reflection_prompt": "Which habit from your software teammates could harden your offensive scripting workflow?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "556d2c8f-0112-41f3-b14f-388fd0a46ca2",
+      "type": "explanation",
+      "title": "CLOAK Blueprint",
+      "content": {
+        "text": "### CLOAK\n- **C**ompartmentalise modules: loader, payload, guardrails\n- **L**ive-off-the-land first, custom binaries last\n- **O**bserve telemetry with script block logging replicas\n- **A**utomate AMSI and CLM checks before executing payloads\n- **K**ill switches everywhere: timers, beacons, white cell overrides"
+      },
+      "simplified_explanation": "Follow CLOAK to keep automation modular, stealthy, and reversible.",
+      "memory_aids": [
+        "CLOAK"
+      ],
+      "real_world_connection": "Teams use CLOAK-style patterns to minimise detection while keeping leadership briefed on kill-switch coverage.",
+      "reflection_prompt": "Which CLOAK step is weakest in your current PowerShell toolkit?",
+      "is_interactive": false,
+      "xp_reward": 12
+    },
+    {
+      "block_id": "ca4de5a5-1e31-4b5e-ba15-837cb81402a8",
+      "type": "video",
+      "title": "PowerShell Tradecraft Deep Dive",
+      "content": {
+        "resources": "Watch this conference session and capture three evasion techniques you can reproduce in lab.\n\n**Video**: [DEF CON PowerShell Security & Tradecraft](https://www.youtube.com/watch?v=J4sWDQ1Z_H4)\n\nPause after each demo and rebuild it with your own obfuscation and guardrails."
+      },
+      "simplified_explanation": "Absorb the tactics visually, then reconstruct them hands-on to anchor memory.",
+      "memory_aids": [
+        "Watch \u2192 Rebuild \u2192 Harden"
+      ],
+      "real_world_connection": "Conference walkthroughs surface real operator workflows and the defensive analytics they triggered.",
+      "reflection_prompt": "Which technique from the talk will you refactor into your own modular function first?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "986c6e69-485a-4e05-8730-6acc9f190da1",
+      "type": "memory_aid",
+      "title": "AMSI Bypass Decision Tree",
+      "content": {
+        "text": "- Stage 0: Detect CLM, transcript, and script block logging status\n- Stage 1: Attempt in-memory patch (e.g., `AmsiUtils::AmsiScanBuffer` override)\n- Stage 2: Fall back to proxy execution (InstallUtil, MSBuild, RunDLL32)\n- Stage 3: Abandon PowerShell if telemetry risk outweighs benefit"
+      },
+      "simplified_explanation": "Follow the stages to balance stealth with mission progress.",
+      "memory_aids": [
+        "Sense \u2192 Patch \u2192 Proxy \u2192 Pivot"
+      ],
+      "real_world_connection": "Operators maintain runbooks with conditional AMSI bypass logic so they can justify every escalation to the white cell.",
+      "reflection_prompt": "At which stage do you usually linger too long before pivoting?",
+      "is_interactive": false,
+      "xp_reward": 8
+    },
+    {
+      "block_id": "5fb7a6b1-7c50-4c67-a4d0-809475bf9d8f",
+      "type": "real_world",
+      "title": "Case Study: Fortune 100 Purple Op",
+      "content": {
+        "text": "An internal red team automated lateral movement with constrained JEA endpoints, staging modules through signed configuration files. When defenders flipped on script block logging mid-engagement, the team\u2019s guardrails tripped, gracefully disabling payloads and notifying the white cell."
+      },
+      "simplified_explanation": "Well-instrumented scripts adapt when defenders change the environment.",
+      "memory_aids": [
+        "Guardrails save the day"
+      ],
+      "real_world_connection": "Based on practitioner talks from SANS Purple Team Summit and post-engagement retrospectives.",
+      "reflection_prompt": "How would your tooling respond if defenders toggled new logging today?",
+      "is_interactive": false,
+      "xp_reward": 12
+    },
+    {
+      "block_id": "d60e7578-c6b8-456c-afcb-a09a0f95db83",
+      "type": "simulation",
+      "title": "Lab: Build a Resilient Dropper",
+      "content": {
+        "text": "1. Instrument a lab domain controller with full PowerShell logging and Sysmon collection.\n2. Write a staged PowerShell dropper that checks CLM, AMSI, and transcription status before proceeding.\n3. Add kill switches tied to time, DNS beacons, and white cell override commands.\n4. Execute via a living-off-the-land binary, capture telemetry, and iterate obfuscation until alerts drop below thresholds.\n5. Document the decision tree and communication plan for white cell coordination."
+      },
+      "simplified_explanation": "Build, test, and tune in a controlled lab before any live engagement.",
+      "memory_aids": [
+        "Sense \u2192 Decide \u2192 Execute"
+      ],
+      "real_world_connection": "This mirrors purple team events where operators and defenders iterate together with live telemetry.",
+      "reflection_prompt": "What telemetry signal informed your final obfuscation tweak?",
+      "is_interactive": true,
+      "xp_reward": 28
+    },
+    {
+      "block_id": "89cf5267-49d7-49e3-9750-ad20e5448cbc",
+      "type": "reflection",
+      "title": "Teach Back & Mentor",
+      "content": {
+        "text": "### Teach Back\n- Demo your kill-switch instrumentation to a peer defender.\n- Capture their feedback on detection blind spots.\n- Schedule a spaced follow-up to review script updates and telemetry."
+      },
+      "simplified_explanation": "Teaching forces clarity and uncovers blind spots before production use.",
+      "memory_aids": [
+        "Teach \u2192 Refine \u2192 Repeat"
+      ],
+      "real_world_connection": "High-performing red teams embed defenders in their readiness reviews to maintain trust.",
+      "reflection_prompt": "Who will you invite to your dry run, and what metric will prove improvement?",
+      "is_interactive": false,
+      "xp_reward": 6
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "3b067136-b75b-41d3-af5a-78bd8dc0266b",
+      "type": "multiple_choice",
+      "question": "During staging you discover Constrained Language Mode is enforced and script block logging is enabled. What is the first action in the AMSI bypass decision tree outlined in this lesson?",
+      "options": [
+        "Immediately patch `AmsiScanBuffer` in memory",
+        "Attempt to disable CLM via registry edits",
+        "Assess telemetry state and capture it in your runbook before escalating",
+        "Switch to a custom unmanaged implant immediately"
+      ],
+      "correct_answer": 2,
+      "explanation": "The decision tree starts with sensing and documenting current controls to justify later escalation and maintain white cell trust.",
+      "difficulty": 3,
+      "memory_aid": "Sense \u2192 Patch \u2192 Proxy \u2192 Pivot",
+      "points": 12
+    },
+    {
+      "question_id": "293d224a-b952-4ded-a0ea-5f45525d1f53",
+      "type": "multiple_choice",
+      "question": "Which principle from the CLOAK blueprint keeps your PowerShell automation safest during long engagements?",
+      "options": [
+        "Using custom binaries for every task",
+        "Documenting nothing to stay stealthy",
+        "Automating AMSI and CLM checks before payload execution",
+        "Avoiding kill switches to reduce code paths"
+      ],
+      "correct_answer": 2,
+      "explanation": "CLOAK emphasises automated guardrails and telemetry checks before executing offensive payloads, reducing surprise detections.",
+      "difficulty": 3,
+      "memory_aid": "CLOAK",
+      "points": 12
+    },
+    {
+      "question_id": "634c1793-a2cc-4bf6-829f-415cf2373e02",
+      "type": "multiple_choice",
+      "question": "Why do elite operators schedule teach-back sessions with defenders after building new PowerShell tooling?",
+      "options": [
+        "It forces incident response teams to reveal detection gaps and strengthens trust",
+        "It slows operations and hides failures",
+        "It ensures defenders never see payloads",
+        "It eliminates the need for engagement scopes"
+      ],
+      "correct_answer": 0,
+      "explanation": "Teach-backs align red and blue teams, revealing blind spots while reinforcing ethical guardrails and communication channels.",
+      "difficulty": 3,
+      "memory_aid": "Teach \u2192 Refine \u2192 Repeat",
+      "points": 12
+    }
+  ],
+  "mastery_threshold": 85,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 160,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T17:05:00",
+  "updated_at": "2025-10-28T17:05:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

@@ -1,0 +1,218 @@
+{
+  "lesson_id": "41b3aa87-c6d0-41e6-92b9-dda92e89fb27",
+  "domain": "red_team",
+  "title": "Initial Access Automation with PhishKit Frameworks",
+  "subtitle": "Scaling campaigns responsibly using GoPhish, Phishery, and custom tooling",
+  "difficulty": 3,
+  "estimated_time": 60,
+  "order_index": 7,
+  "prerequisites": [
+    "Red Team Initial Access Tradecraft",
+    "Red Team Payload Development & Execution Frameworks"
+  ],
+  "concepts": [
+    "Framework selection criteria",
+    "Infrastructure-as-code for phishing platforms",
+    "Template engineering and localisation",
+    "Payload coordination with automation",
+    "Token-aware safeties and kill switches",
+    "Campaign metrics and telemetry",
+    "Integration with collaboration tools",
+    "Legal and ethical guardrails",
+    "Blue-team collaboration for detection uplift",
+    "Post-campaign teardown and sanitisation"
+  ],
+  "learning_objectives": [
+    "Evaluate phishing automation frameworks based on engagement requirements",
+    "Deploy GoPhish or Phishery using repeatable infrastructure scripts",
+    "Instrument campaigns with safeties, throttling, and tamper logging",
+    "Coordinate payload retrieval and reporting through automation hooks",
+    "Capture metrics for both red-team insight and blue-team detection tuning",
+    "Decommission infrastructure cleanly while preserving evidence"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "7df76daa-7d24-4ea0-ab43-dda0d04e6183",
+      "type": "mindset_coach",
+      "title": "Automation Amplifies Accountability",
+      "content": {
+        "text": "Automation magnifies whatever process you encode. Approach frameworks with discipline: design for ethics, transparency, and learning—then scale."
+      },
+      "simplified_explanation": "Build guardrails before you push the automation button.",
+      "memory_aids": [
+        "Automate ethics, not shortcuts"
+      ],
+      "real_world_connection": "Organisations that automate responsibly maintain trust with legal and blue teams.",
+      "reflection_prompt": "Which safeguard will you automate first to maintain trust?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "ace54213-4b70-43f9-a026-5dd217af2185",
+      "type": "explanation",
+      "title": "Framework Comparison",
+      "content": {
+        "text": "## GoPhish vs Phishery vs Custom\n- **GoPhish** – Full portal with tracking, templates, and metrics.\n- **Phishery** – Lightweight credential harvesting via template injection.\n- **Custom** – Bespoke automation with CI/CD integration.\n\nEvaluate on control, stealth, reporting, and maintenance."
+      },
+      "simplified_explanation": "Match the tool to the control you need and the safeties you can sustain.",
+      "memory_aids": [
+        "Control, stealth, reporting, maintenance"
+      ],
+      "real_world_connection": "Red teams often mix frameworks based on target environment maturity.",
+      "reflection_prompt": "Which dimension (control, stealth, reporting, maintenance) matters most in your next engagement?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "42f2f269-a185-4a88-86ba-d9d2ba285ce8",
+      "type": "video",
+      "title": "GoPhish Automation Walkthrough",
+      "content": {
+        "resources": "See GoPhish deployed with infrastructure-as-code and safety instrumentation.\n\n**Video**: [GoPhish Automation Tutorial](https://www.youtube.com/watch?v=QDyxuX1U3as)\n\nNote the Terraform/Ansible snippets and campaign dashboards demonstrated."
+      },
+      "simplified_explanation": "Watch how automation scripts bootstrap infrastructure and dashboards.",
+      "memory_aids": [
+        "Document every script showcased"
+      ],
+      "real_world_connection": "Clip reflects internal training shared within large consulting practices.",
+      "reflection_prompt": "What infrastructure automation will you add to your repository?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d7595278-8401-44bb-b56f-eacf27379fe4",
+      "type": "memory_aid",
+      "title": "SAFE-AUTO Checklist",
+      "content": {
+        "text": "### S.A.F.E.-A.U.T.O.\n- **S**cope approvals logged.\n- **A**uth tokens protected and rotated.\n- **F**ail-safes (kill switches, throttles) documented.\n- **E**vidence logging enabled.\n- **A**utomation scripts versioned.\n- **U**ptime monitored.\n- **T**eardown plan defined.\n- **O**versight (white cell) subscribed to alerts."
+      },
+      "simplified_explanation": "SAFE-AUTO keeps automation aligned with governance.",
+      "memory_aids": [
+        "SAFE-AUTO every campaign"
+      ],
+      "real_world_connection": "Red-team programmes adopt similar checklists during change control.",
+      "reflection_prompt": "Which SAFE-AUTO element is missing from your current pipeline?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "9b164659-bb33-4717-b9e6-72a0c9dde6e2",
+      "type": "real_world",
+      "title": "Field Example: Global Bank PhishOps",
+      "content": {
+        "text": "A global bank's red team containerised GoPhish, integrated it with Slack approvals, and enforced automatic throttling per region. Blue teams received near-real-time telemetry, allowing them to test detection rules. The programme became a quarterly purple-team exercise."
+      },
+      "simplified_explanation": "Automation plus transparency strengthened red/blue collaboration.",
+      "memory_aids": [
+        "Automation + telemetry = trust"
+      ],
+      "real_world_connection": "Adapted from a financial sector keynote on red-team automation.",
+      "reflection_prompt": "What telemetry would you share with defenders to build similar trust?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "ea456b46-0679-42d0-957d-3eb665886fcb",
+      "type": "simulation",
+      "title": "Design an Automated Campaign",
+      "content": {
+        "text": "1. Define target personas, safeties, and metrics for a hypothetical campaign.\n2. Choose a framework and outline supporting infrastructure scripts.\n3. Document authentication secrets management, throttling, and monitoring.\n4. Draft the teardown checklist and evidence retention plan.\n5. Store the plan in version control and tag reviewers."
+      },
+      "simplified_explanation": "Plan the entire automation lifecycle before coding anything.",
+      "memory_aids": [
+        "Plan → Automate → Review"
+      ],
+      "real_world_connection": "Red teams complete similar design docs before automation work begins.",
+      "reflection_prompt": "Who must approve your automation design before deployment?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "93642379-207e-4d44-8a7b-13863bd265d1",
+      "type": "reflection",
+      "title": "Teach Back the Pipeline",
+      "content": {
+        "text": "### Reflect & Teach\n- Present your automation plan to a peer, emphasising SAFE-AUTO safeguards.\n- List two metrics you will capture (click rate, detection time, credential reuse alerts).\n- Identify one improvement you will implement before the next campaign."
+      },
+      "simplified_explanation": "Teaching clarifies both technical and ethical guardrails.",
+      "memory_aids": [
+        "Explain → Measure → Improve"
+      ],
+      "real_world_connection": "Automation retrospectives revolve around these prompts.",
+      "reflection_prompt": "Who will you brief and how will you capture their feedback?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why should automation scripts include kill switches and throttling?",
+      "options": [
+        "To increase email volume",
+        "To maintain control, respect scope, and stop activity instantly if issues arise",
+        "To disable detections",
+        "Because frameworks require it for licensing"
+      ],
+      "correct_answer": 1,
+      "explanation": "Kill switches and throttling protect clients and red teams by ensuring activity stays within agreed boundaries.",
+      "difficulty": 3,
+      "memory_aid": "Safeties protect the mission",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is a benefit of containerising a phishing framework like GoPhish?",
+      "options": [
+        "It removes the need for infrastructure monitoring",
+        "It enables repeatable deployment, isolation, and teardown",
+        "It prevents defenders from detecting campaigns",
+        "It eliminates the need for change control"
+      ],
+      "correct_answer": 1,
+      "explanation": "Containerisation allows teams to deploy and destroy infrastructure consistently while maintaining hygiene.",
+      "difficulty": 3,
+      "memory_aid": "Containers = consistency",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How can telemetry sharing improve red/blue collaboration during automated campaigns?",
+      "options": [
+        "By hiding campaign metrics until the end",
+        "By giving defenders real-time signals to tune detections and validate controls",
+        "By overwhelming the SOC with data",
+        "By forcing defenders to disable monitoring"
+      ],
+      "correct_answer": 1,
+      "explanation": "Sharing telemetry enables defenders to learn alongside the red team, strengthening the overall exercise.",
+      "difficulty": 3,
+      "memory_aid": "Share signal to share success",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:36:00",
+  "updated_at": "2025-10-28T15:36:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

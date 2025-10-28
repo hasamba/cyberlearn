@@ -1,0 +1,218 @@
+{
+  "lesson_id": "ace54213-4b70-43f9-a026-5dd217af2185",
+  "domain": "cloud",
+  "title": "Azure AD Conditional Access Bypass Scenarios",
+  "subtitle": "Offensive and defensive perspectives on policy gaps",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 11,
+  "prerequisites": [
+    "Azure Security Fundamentals",
+    "Identity Threat Detection in Azure"
+  ],
+  "concepts": [
+    "Conditional Access policy architecture",
+    "Legacy authentication loopholes",
+    "Token replay and MFA fatigue attacks",
+    "Trusted device and location pitfalls",
+    "Service principal abuse",
+    "Emergency access accounts",
+    "Logging and monitoring strategies",
+    "Detection with Azure AD Identity Protection",
+    "Response playbooks and automation",
+    "Purple-team validation of controls"
+  ],
+  "learning_objectives": [
+    "Identify common misconfigurations that allow Conditional Access bypass",
+    "Simulate attack paths such as token replay and legacy auth abuse with proper safeties",
+    "Instrument detections using Azure AD logs, Identity Protection, and Defender for Cloud Apps",
+    "Design remediation strategies including policy hardening and least privilege",
+    "Establish monitoring and response workflows for bypass attempts",
+    "Integrate purple-team cycles to validate control effectiveness"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "42f2f269-a185-4a88-86ba-d9d2ba285ce8",
+      "type": "mindset_coach",
+      "title": "Trust but Verify Identity Controls",
+      "content": {
+        "text": "Conditional Access is only as strong as its edge cases. Cultivate a mindset that celebrates controls while relentlessly testing for blind spots."
+      },
+      "simplified_explanation": "Assume gaps exist—go find and fix them.",
+      "memory_aids": [
+        "Celebrate controls, challenge assumptions"
+      ],
+      "real_world_connection": "Identity red teams earn trust by helping defenders harden Conditional Access.",
+      "reflection_prompt": "Which Conditional Access scenario worries you the most today?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d7595278-8401-44bb-b56f-eacf27379fe4",
+      "type": "explanation",
+      "title": "Bypass Patterns",
+      "content": {
+        "text": "## L.O.S.T.\n- **L**egacy protocols (POP/IMAP) bypass modern policies.\n- **O**ut-of-band tokens re-used via token replay.\n- **S**ervice principals granted broad consent.\n- **T**rusted locations/devices mis-scoped."
+      },
+      "simplified_explanation": "Use LOST to remember the top bypass categories.",
+      "memory_aids": [
+        "Legacy, Out-of-band, Service principal, Trust scope"
+      ],
+      "real_world_connection": "Microsoft DART highlighted these trends in recent incident reports.",
+      "reflection_prompt": "Which LOST category is most applicable to your tenant?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9b164659-bb33-4717-b9e6-72a0c9dde6e2",
+      "type": "video",
+      "title": "Conditional Access Best Practices & Pitfalls",
+      "content": {
+        "resources": "Review Microsoft identity engineers discussing real-world policy gaps.\n\n**Video**: [Azure AD Conditional Access Deep Dive](https://www.youtube.com/watch?v=bnZrrcSUk9I)\n\nNote mitigation tactics for legacy auth, emergency accounts, and device filters."
+      },
+      "simplified_explanation": "Visualise how policy design impacts bypass risk.",
+      "memory_aids": [
+        "Log mitigation ideas in your notebook"
+      ],
+      "real_world_connection": "Session delivered at a Microsoft security community event.",
+      "reflection_prompt": "What policy change will you recommend after watching?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "ea456b46-0679-42d0-957d-3eb665886fcb",
+      "type": "memory_aid",
+      "title": "LOCK Framework",
+      "content": {
+        "text": "### L.O.C.K.\n- **L**ock down legacy auth.\n- **O**bserve token behaviour (sign-ins, anomalies).\n- **C**ontrol service principals with conditional policies.\n- **K**eep emergency access accounts monitored."
+      },
+      "simplified_explanation": "LOCK ensures coverage across key bypass surfaces.",
+      "memory_aids": [
+        "LOCK your identity perimeter"
+      ],
+      "real_world_connection": "Identity architects reference LOCK when reviewing design docs.",
+      "reflection_prompt": "Which LOCK action will you implement this quarter?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "93642379-207e-4d44-8a7b-13863bd265d1",
+      "type": "real_world",
+      "title": "Field Example: MFA Fatigue Campaign",
+      "content": {
+        "text": "An enterprise experienced MFA fatigue attacks that exploited poorly scoped trusted locations. Attackers re-used tokens from unmanaged devices. Remediation included enforcing device compliance, reducing MFA prompt frequency, and deploying Defender for Cloud Apps session controls."
+      },
+      "simplified_explanation": "Bypass attempts highlighted weak trust assumptions and outdated policies.",
+      "memory_aids": [
+        "Reduce trust surface to reduce fatigue"
+      ],
+      "real_world_connection": "Case study referenced in Microsoft’s security blog series.",
+      "reflection_prompt": "How would you detect similar fatigue-induced bypass attempts?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "57639b84-7b7b-4ae4-85ff-1e18db322b57",
+      "type": "simulation",
+      "title": "Purple-Team Exercise Design",
+      "content": {
+        "text": "1. Define a bypass hypothesis (e.g., legacy auth + stolen credentials).\n2. Outline attacker steps with safety controls and logging.\n3. Map detections (Azure AD logs, Defender for Cloud Apps, Identity Protection).\n4. Document remediation actions and policy changes.\n5. Share the purple-team plan with stakeholders for approval."
+      },
+      "simplified_explanation": "Plan the drill that validates your controls and detection coverage.",
+      "memory_aids": [
+        "Hypothesise → Map → Detect → Remediate"
+      ],
+      "real_world_connection": "Organisations run this exercise quarterly to protect identity perimeter.",
+      "reflection_prompt": "Who needs to sign off before running the drill?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "93642379-207e-4d44-8a7b-13863bd265d2",
+      "type": "reflection",
+      "title": "Teach Back the Identity Plan",
+      "content": {
+        "text": "### Reflect & Teach\n- Explain LOST and LOCK to a colleague and describe your planned drill.\n- List two detection queries you will build in Azure Monitor or Sentinel.\n- Identify one policy change you will advocate for in the next governance meeting."
+      },
+      "simplified_explanation": "Teaching cements your understanding and sets expectations for action.",
+      "memory_aids": [
+        "Explain → Detect → Advocate"
+      ],
+      "real_world_connection": "Identity governance boards expect concise action plans like this.",
+      "reflection_prompt": "When will you brief leadership on these recommendations?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why is disabling legacy authentication critical for Conditional Access?",
+      "options": [
+        "Legacy protocols provide stronger encryption",
+        "Legacy protocols bypass modern Conditional Access policies and MFA controls",
+        "Legacy authentication reduces log volume",
+        "Conditional Access requires legacy auth to function"
+      ],
+      "correct_answer": 1,
+      "explanation": "Legacy protocols such as POP or IMAP do not support modern enforcement, allowing bypass of MFA and policy decisions.",
+      "difficulty": 3,
+      "memory_aid": "Legacy auth = open door",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "How can service principals bypass Conditional Access?",
+      "options": [
+        "They always require MFA",
+        "They can be granted broad consent without conditional policies",
+        "They cannot access resources",
+        "They are limited to guest tenants only"
+      ],
+      "correct_answer": 1,
+      "explanation": "Service principals can operate without interactive logins, so policies must explicitly cover them to prevent bypass.",
+      "difficulty": 3,
+      "memory_aid": "Service principals need policies too",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What role do purple-team drills play in defending Conditional Access?",
+      "options": [
+        "They eliminate the need for monitoring",
+        "They validate detection coverage and reveal policy gaps",
+        "They replace regular audits",
+        "They are only useful for red teams"
+      ],
+      "correct_answer": 1,
+      "explanation": "Purple-team drills provide collaborative validation that controls detect and prevent bypass attempts.",
+      "difficulty": 3,
+      "memory_aid": "Purple drills prove protection",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:40:00",
+  "updated_at": "2025-10-28T15:40:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

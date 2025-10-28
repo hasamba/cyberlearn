@@ -22,21 +22,24 @@ class AdaptiveEngine:
     def __init__(self):
         self.domain_prerequisites = {
             "fundamentals": [],
+            "osint": ["fundamentals"],
             "dfir": ["fundamentals"],
             "malware": ["fundamentals"],
             "active_directory": ["fundamentals"],
             "system": ["fundamentals"],
             "linux": ["fundamentals"],
             "cloud": ["fundamentals", "system"],
-            "pentest": ["fundamentals", "active_directory"],
-            "redteam": ["pentest", "malware"],
+            "pentest": ["fundamentals", "active_directory", "osint"],
+            "redteam": ["pentest", "malware", "osint"],
             "blueteam": ["dfir", "malware"],
+            "threat_hunting": ["dfir", "malware", "blueteam"],
         }
 
     def _ordered_domains(self) -> List[str]:
         """Domain ordering used for recommendations and fallbacks"""
         return [
             "fundamentals",
+            "osint",
             "dfir",
             "malware",
             "active_directory",
@@ -46,6 +49,7 @@ class AdaptiveEngine:
             "pentest",
             "redteam",
             "blueteam",
+            "threat_hunting",
         ]
 
     def _prerequisites_met(self, domain: str, user: UserProfile) -> bool:
@@ -471,6 +475,46 @@ class AdaptiveEngine:
                 {
                     "question": "What is a common security risk of misconfigured S3 buckets?",
                     "options": ["Too much encryption", "Public exposure of sensitive data", "Excessive monitoring", "Too many backups"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+            ],
+            "osint": [
+                {
+                    "question": "What does OSINT stand for?",
+                    "options": ["Open Source Intelligence", "Operating System Intelligence", "Online Security Investigation", "Organizational Security Network"],
+                    "correct": 0,
+                    "difficulty": 1
+                },
+                {
+                    "question": "Which tool is commonly used for OSINT reconnaissance?",
+                    "options": ["Metasploit", "Shodan", "Wireshark", "Nessus"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "What is Google Dorking used for in OSINT?",
+                    "options": ["Encrypting searches", "Advanced search operators to find specific information", "Blocking search results", "Deleting cached pages"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+            ],
+            "threat_hunting": [
+                {
+                    "question": "What is threat hunting?",
+                    "options": ["Waiting for alerts", "Proactively searching for threats before detection", "Installing antivirus", "Blocking all traffic"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What is a hypothesis in threat hunting?",
+                    "options": ["A confirmed breach", "An educated guess about potential threats to investigate", "A false positive", "A security policy"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+                {
+                    "question": "Which tool is commonly used for endpoint threat hunting?",
+                    "options": ["Nmap", "OSQuery/Velociraptor", "Burp Suite", "Hashcat"],
                     "correct": 1,
                     "difficulty": 2
                 },

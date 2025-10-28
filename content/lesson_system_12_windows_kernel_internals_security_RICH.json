@@ -1,0 +1,218 @@
+{
+  "lesson_id": "2c0ad90f-d36e-4e61-a5c7-1cc8cf29f7d5",
+  "domain": "system",
+  "title": "Windows Kernel Internals for Security Engineers",
+  "subtitle": "Drivers, callbacks, and instrumentation",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 12,
+  "prerequisites": [
+    "Windows Internals Deep Dive",
+    "Windows Privilege Escalation for Red Teams"
+  ],
+  "concepts": [
+    "Kernel architecture",
+    "Driver model",
+    "Callback registration",
+    "Instrumentation (ETW, WMI)",
+    "Security controls (HVCI, CFG)",
+    "Rootkit techniques",
+    "Detection strategies",
+    "Forensics",
+    "Debugging tools",
+    "Reporting"
+  ],
+  "learning_objectives": [
+    "Explain kernel components and security features",
+    "Analyse driver behaviour and callbacks",
+    "Leverage instrumentation for detection",
+    "Assess security features against threats",
+    "Document findings for SOC and engineering",
+    "Plan research to improve defences"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "2beddd72-9e6f-4af7-829e-0fcbd08557b4",
+      "type": "mindset_coach",
+      "title": "Prime Your Approach",
+      "content": {
+        "text": "Stay curious and meticulous\u2014document everything and respect engagement boundaries."
+      },
+      "simplified_explanation": "Balance curiosity with discipline in every step.",
+      "memory_aids": [
+        "Curiosity + discipline"
+      ],
+      "real_world_connection": "Top teams rely on these habits to produce actionable outcomes.",
+      "reflection_prompt": "Which kernel area do you need deeper understanding of?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "0b547f0d-c282-4de3-b665-fc183c7d583c",
+      "type": "explanation",
+      "title": "Guiding Framework",
+      "content": {
+        "text": "### KERNEL\n- **K**now architecture\n- **E**xplore drivers\n- **R**eview callbacks\n- **N**ote instrumentation\n- **E**valuate security controls\n- **L**everage insights"
+      },
+      "simplified_explanation": "Use this mnemonic to stay aligned when tasks get complex.",
+      "memory_aids": [
+        "KERNEL"
+      ],
+      "real_world_connection": "Frameworks help security teams repeat success at scale.",
+      "reflection_prompt": "Which framework step will need the most coordination?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "14db9743-9f57-43b7-a9a8-c11e05ad2494",
+      "type": "video",
+      "title": "Windows Kernel Security Internals",
+      "content": {
+        "resources": "Watch the expert walkthrough for deeper context.\n\n**Video**: [Windows Kernel Security Internals](https://www.youtube.com/watch?v=ufyMcA8t6W4)\n\nKernel researchers explain driver models and security instrumentation."
+      },
+      "simplified_explanation": "Visual demonstrations strengthen memory\u2014take notes.",
+      "memory_aids": [
+        "Pause, summarise, apply"
+      ],
+      "real_world_connection": "These sessions capture lessons from frontline experts.",
+      "reflection_prompt": "Which takeaway from the video will you implement?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "96a602ec-1800-4b9c-a084-846f3649738c",
+      "type": "memory_aid",
+      "title": "KERNEL",
+      "content": {
+        "text": "### KERNEL\n- **K**now architecture\n- **E**xplore drivers\n- **R**eview callbacks\n- **N**ote instrumentation\n- **E**valuate security controls\n- **L**everage insights"
+      },
+      "simplified_explanation": "Keep the mnemonic handy as a quick-reference guide.",
+      "memory_aids": [
+        "KERNEL"
+      ],
+      "real_world_connection": "Mnemonics help brief stakeholders under pressure.",
+      "reflection_prompt": "How will you spread this mnemonic within your team?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "f3ccb8c8-1cf1-42d1-9c3c-bbbd7b50bd45",
+      "type": "real_world",
+      "title": "Field Example",
+      "content": {
+        "text": "Security engineers improved driver allowlisting by understanding callback registration and instrumentation, closing rootkit gaps."
+      },
+      "simplified_explanation": "Real outcomes demonstrate the framework\u2019s value.",
+      "memory_aids": [
+        "Outcome focused"
+      ],
+      "real_world_connection": "Case studies sourced from public reports and community talks.",
+      "reflection_prompt": "What metric will show improvement in your environment?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e21caccf-9b8b-4cb1-b64d-19e3b7c0a07a",
+      "type": "simulation",
+      "title": "Guided Simulation",
+      "content": {
+        "text": "1. Set up a kernel debugging lab.\n2. Inspect driver callback registrations.\n3. Map instrumentation to detection capabilities.\n4. Summarise security insights for your SOC."
+      },
+      "simplified_explanation": "Rehearse the workflow to surface gaps before production.",
+      "memory_aids": [
+        "Practice prevents surprises"
+      ],
+      "real_world_connection": "Lab drills are standard practice before live engagements.",
+      "reflection_prompt": "What support do you need to run this simulation?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c222d90b-1b6b-406a-b5ea-2fe076db1434",
+      "type": "reflection",
+      "title": "Teach Back",
+      "content": {
+        "text": "### Teach Back\n- Summarise the framework for a colleague.\n- List two actions you will deliver next sprint.\n- Set a reminder to review outcomes in 30 days."
+      },
+      "simplified_explanation": "Teaching cements ownership and accountability.",
+      "memory_aids": [
+        "Explain \u2192 Act \u2192 Review"
+      ],
+      "real_world_connection": "Teams rely on teach-backs to maintain momentum after sprints.",
+      "reflection_prompt": "Who will you brief on your progress and when?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What keeps this capability effective over time?",
+      "options": [
+        "Ignore feedback",
+        "Measure results, gather feedback, and iterate",
+        "Outsource responsibility",
+        "Disable monitoring"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continuous measurement, collaboration, and retros keep the programme resilient.",
+      "difficulty": 3,
+      "memory_aid": "KERNEL",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why is collaboration crucial?",
+      "options": [
+        "It slows progress",
+        "It ensures shared context, approvals, and ownership",
+        "It is optional",
+        "Only auditors benefit"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continuous measurement, collaboration, and retros keep the programme resilient.",
+      "difficulty": 3,
+      "memory_aid": "KERNEL",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How do retrospectives support improvement?",
+      "options": [
+        "They are ceremonial",
+        "They capture lessons to refine tooling and process",
+        "They replace testing",
+        "They eliminate documentation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continuous measurement, collaboration, and retros keep the programme resilient.",
+      "difficulty": 3,
+      "memory_aid": "KERNEL",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T17:00:00",
+  "updated_at": "2025-10-28T17:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

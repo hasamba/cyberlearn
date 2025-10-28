@@ -1,0 +1,184 @@
+{
+  "lesson_id": "7beba484-df8e-4440-9276-c42980a729c5",
+  "domain": "fundamentals",
+  "title": "Offensive Tooling Essentials",
+  "subtitle": "Selecting and chaining tools across the offensive lifecycle",
+  "difficulty": 2,
+  "estimated_time": 60,
+  "order_index": 17,
+  "prerequisites": [
+    "Kali Environment Optimisation",
+    "Linux Command-Line Mastery for Offensive Ops"
+  ],
+  "concepts": [
+    "Swiss-army utilities such as netcat, socat, and nmap",
+    "Credential helpers including hydra and crackmapexec",
+    "Packet capture and replay with tcpdump and Wireshark",
+    "Proxychains and tunnelling helpers",
+    "Scripting quick wins with bash and python",
+    "Tool trustworthiness and verification practices",
+    "Building a minimum effective toolkit",
+    "State management when shifting tool contexts"
+  ],
+  "learning_objectives": [
+    "Build a curated toolkit covering recon, exploitation, and post-exploitation",
+    "Verify tool integrity and manage update cadences",
+    "Chain tools together to accelerate enumeration workflows",
+    "Document fallback options for common lab blockers",
+    "Prime FASTER cues when shifting between tool categories"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "bc2382f4-cdbb-4a34-bb9d-8974533660d9",
+      "type": "mindset_coach",
+      "title": "FASTER Focus",
+      "content": {
+        "text": "FASTER your toolchain design practice. Forget the urge to hoard every binary, activate by checking your current energy level, visualise a whiteboard sketch of your tool stack, teach forward with a quick checklist entry, enter by running the wrapper script that launches your standard recon flow, and review when your weekly toolkit audit reminder pings."
+      },
+      "simplified_explanation": "Reset your mindset before cycling through tools.",
+      "memory_aids": [
+        "Forget → Active → State → Teach → Enter → Review"
+      ],
+      "real_world_connection": "Field teams begin every engagement by aligning on state, tooling, and fallback plans.",
+      "reflection_prompt": "Which mindset cue keeps you from overloading your environment with unnecessary tools?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "736c6fde-5cdf-4e0b-915c-0db362138921",
+      "type": "explanation",
+      "title": "Key Moves",
+      "content": {
+        "text": "## Execution Checklist\n- **Document your primary and fallback tool for each engagement phase**\n- **Automate launch scripts for multi-tool workflows**\n- **Store hashes of trusted binaries to detect tampering**\n\nUse this pre-flight briefing before modifying your toolkit."
+      },
+      "simplified_explanation": "Glance at this when planning tool updates or swaps.",
+      "memory_aids": [
+        "Primary → Automation → Integrity"
+      ],
+      "real_world_connection": "Consultancies codify these practices to keep customer environments predictable.",
+      "reflection_prompt": "Where do you still rely on memory instead of documentation?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "2c80c214-6d56-4af8-b8b5-6532f9cc5642",
+      "type": "video",
+      "title": "Tool Stack Playbook for Offensive Operators",
+      "content": {
+        "resources": "Watch the walkthrough to anchor the workflow.\n\n**Video**: [Tool Stack Playbook for Offensive Operators](https://videos.cyberlearn.local/fundamentals/offensive_tooling_essentials.mp4) — 14 minutes\n\nPause at 08:40 and predict the next chaining decision before resuming."
+      },
+      "simplified_explanation": "See how experienced operators sequence tools under time pressure.",
+      "memory_aids": [
+        "Pause → Predict → Play"
+      ],
+      "real_world_connection": "Video playbooks let teams rehearse toolchain choices before live customer work.",
+      "reflection_prompt": "Which tool pairing surprised you during the walkthrough?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "22880c36-b0a7-4c7e-9779-9dbd41847221",
+      "type": "simulation",
+      "title": "Scenario Lab",
+      "content": {
+        "text": "### Lab Goal: Assemble and rehearse a dependable offensive toolkit\n1. Create a table mapping each offensive phase to primary and backup tools.\n2. Write a wrapper script that triggers nmap, eyewitness, and a notes template.\n3. Capture traffic with tcpdump and import into Wireshark for rapid analysis.\n4. Review the session using a spaced recap and teach-back reflection.\n\nCapture artefacts as you go so the reporting section writes itself."
+      },
+      "simplified_explanation": "Execute the plan, collect proof, and evaluate your stack.",
+      "memory_aids": [
+        "Plan → Execute → Capture"
+      ],
+      "real_world_connection": "Operators review these artefacts during after-action debriefs to justify tool choices.",
+      "reflection_prompt": "Where did your toolchain feel brittle, and what backup will you add?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "1ff68510-695d-44d6-a86e-5d1a8e7f5545",
+      "type": "reflection",
+      "title": "Teach-Back Debrief",
+      "content": {
+        "text": "Teach it back: record a two-minute voice note explaining how you curated your offensive toolkit.\nAnswer the prompts:\n- What signal told you the chain was working?\n- How will you elevate your state faster when swapping tools under pressure?\n- Who will you debrief using the toolbox tour analogy?"
+      },
+      "simplified_explanation": "Teaching the reasoning cements your tool selection under stress.",
+      "memory_aids": [
+        "Signal → State → Story"
+      ],
+      "real_world_connection": "High-performing teams share tool tour recordings so new members ramp quickly.",
+      "reflection_prompt": "Who needs to review this debrief to validate your tool choices?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Which FASTER step helps curb the tendency to keep every tool installed?",
+      "options": [
+        "Active",
+        "Teach",
+        "Forget",
+        "Review"
+      ],
+      "correct_answer": 2,
+      "explanation": "Starting with Forget clears the mental clutter so you focus on the minimum effective toolkit.",
+      "difficulty": 3,
+      "memory_aid": "Reset before you rush.",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is the primary outcome of this lesson's lab?",
+      "options": [
+        "Install every available tool without curation",
+        "Assemble and rehearse a dependable offensive toolkit",
+        "Rely only on GUI wrappers for automation",
+        "Documenting unrelated vulnerabilities"
+      ],
+      "correct_answer": 1,
+      "explanation": "Each step supports building and validating a curated tool stack you trust.",
+      "difficulty": 3,
+      "memory_aid": "Know the win condition before you start.",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which approach best supports maintaining reliable transfer tunnels?",
+      "options": [
+        "Proxychains combined with socat relays",
+        "Manual copy and paste through RDP sessions",
+        "A random VPN service unrelated to the lab",
+        "Rebooting targets whenever a port is closed"
+      ],
+      "correct_answer": 0,
+      "explanation": "Proxychains plus socat provide flexible, scriptable tunnels suited for multi-hop engagements.",
+      "difficulty": 3,
+      "memory_aid": "Map each phase to a go-to tool and a backup.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T19:40:00",
+  "updated_at": "2025-10-28T19:40:00",
+  "author": "CyberLearn Offensive Curriculum Team",
+  "version": "1.0"
+}
+

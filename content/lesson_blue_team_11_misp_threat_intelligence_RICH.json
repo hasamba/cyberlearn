@@ -1,0 +1,125 @@
+{
+  "lesson_id": "9a8b7c6d-5e4f-3d2c-1b0a-9f8e7d6c5b4a",
+  "domain": "blue_team",
+  "title": "MISP: Threat Intelligence Sharing and Collaboration",
+  "difficulty": 2,
+  "order_index": 11,
+  "prerequisites": ["blue_team_01"],
+  "concepts": [
+    "Threat intelligence platforms",
+    "MISP architecture",
+    "Events and attributes",
+    "Taxonomies and tagging",
+    "Intelligence sharing",
+    "STIX/TAXII integration",
+    "IOC management",
+    "Feed synchronization"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand MISP architecture and threat intelligence concepts",
+    "Create and manage threat intelligence events",
+    "Use taxonomies and galaxies for classification",
+    "Share intelligence with trusted communities",
+    "Integrate MISP with security tools (SIEM, IDS, EDR)"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of MISP taxonomies?",
+      "options": ["Encrypt threat data", "Classify and tag events consistently", "Generate malware signatures", "Block malicious IPs"],
+      "correct_answer": 1,
+      "explanation": "MISP taxonomies provide standardized vocabularies for classifying and tagging threat intelligence events, ensuring consistent communication across organizations."
+    },
+    {
+      "question": "Which protocol does MISP use for automated threat intelligence exchange?",
+      "options": ["HTTPS only", "STIX/TAXII", "FTP", "SMTP"],
+      "correct_answer": 1,
+      "explanation": "MISP supports STIX (Structured Threat Information Expression) and TAXII (Trusted Automated Exchange of Intelligence Information) for standardized, automated threat intelligence sharing."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to the collaborative world of threat intelligence! 🌐\n\nImagine if every time a company got hacked, they kept it secret and never shared what they learned. Every organization would keep getting hit by the same attacks, over and over. That's where MISP changes everything.\n\n**MISP (Malware Information Sharing Platform)** is like a global neighborhood watch for cybersecurity. When one organization spots a threat, they share it with the community, and everyone benefits from that knowledge.\n\n**Mindset shift**: Threat intelligence isn't about hoarding information—it's about **collective defense**. The more you share (responsibly), the stronger the entire community becomes.\n\nYou're about to learn how organizations worldwide are working together to stay ahead of attackers. Let's turn isolated incidents into shared intelligence! 💡🛡️"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## What is MISP?\n\n**MISP (Malware Information Sharing Platform & Threat Sharing)** is an open-source threat intelligence platform designed for collecting, storing, sharing, and correlating Indicators of Compromise (IOCs) and threat intelligence.\n\n### The Problem MISP Solves\n\n**Before MISP**:\n- Organizations faced the same threats independently\n- IOCs were shared via email, PDFs, or proprietary formats\n- No standardization (one org says \"IP address\", another says \"IPv4-addr\")\n- Manual, time-consuming intelligence sharing\n- No way to correlate related threats across organizations\n\n**With MISP**:\n- Structured, standardized threat data\n- Automated sharing with trusted communities\n- Built-in correlation engine\n- Integration with 100+ security tools\n- Taxonomies for consistent classification\n- Real-time threat feeds\n\n### Core Concepts\n\n**1. Events**\nAn event represents a threat or incident:\n- **Example**: \"Cobalt Strike Phishing Campaign - March 2024\"\n- Contains attributes (IOCs), analysis, tags\n\n**2. Attributes**\nSpecific indicators within an event:\n- IP addresses: `192.0.2.100`\n- Domain names: `malicious-domain.com`\n- File hashes: `a3b2c1d4e5f6...` (MD5, SHA1, SHA256)\n- Email subjects: \"Invoice #12345 - Urgent\"\n- URLs, YARA rules, Sigma rules, etc.\n\n**3. Objects**\nGrouped attributes that belong together:\n- **File object**: filename + hash + size + mime-type\n- **Network connection**: source IP + dest IP + dest port + protocol\n- **Email object**: sender + subject + attachment + headers\n\n**4. Taxonomies**\nStandardized classification schemes:\n- **TLP (Traffic Light Protocol)**: WHITE, GREEN, AMBER, RED\n- **PAP (Permissible Actions Protocol)**: What can you do with this intel?\n- **Admiralty Scale**: Reliability of source and information\n- **Kill Chain**: Which phase of attack (recon, delivery, exploitation, etc.)\n\n**5. Galaxies**\nKnowledge bases for threat actors, malware families, TTPs:\n- **Threat actors**: APT29, Lazarus Group, FIN7\n- **Malware**: Cobalt Strike, Emotet, Ryuk\n- **Techniques**: MITRE ATT&CK mapping\n\n### Real-World Adoption\n\n**Organizations Using MISP**:\n- **Financial sector**: FS-ISAC (Financial Services ISAC)\n- **Healthcare**: H-ISAC\n- **Government**: NATO, Europol, various CERTs\n- **Private**: Thousands of companies via CIRCL.LU and other communities\n\n**Stats**:\n- 7,000+ MISP instances worldwide\n- 50+ million attributes shared\n- 500+ communities"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "title": "Video: MISP Threat Intelligence Platform Overview",
+        "url": "https://www.youtube.com/embed/aM7czPsQyaI",
+        "description": "Watch this comprehensive introduction to MISP and threat intelligence sharing."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## MISP Architecture\n\n```\n┌────────────────────────────────────────────────────────┐\n│                   MISP WEB UI                          │\n│         (Event Creation, Search, Tagging)              │\n└──────────────────┬─────────────────────────────────────┘\n                   │\n┌──────────────────┴─────────────────────────────────────┐\n│              MISP CORE (PHP/CakePHP)                   │\n│  • Event Management    • Correlation Engine            │\n│  • User Authentication • Sharing Groups                │\n│  • API Endpoints       • Background Jobs               │\n└──────────────────┬─────────────────────────────────────┘\n                   │\n       ┌───────────┼───────────┐\n       │           │           │\n┌──────┴─────┐ ┌──┴────┐ ┌────┴──────┐\n│  MySQL/    │ │ Redis │ │  Workers  │\n│  MariaDB   │ │ Cache │ │ (Jobs)    │\n│            │ │       │ │           │\n│ • Events   │ │ Fast  │ │ • Feeds   │\n│ • Attrs    │ │ Access│ │ • Exports │\n│ • Users    │ │       │ │ • Enrichmt│\n└────────────┘ └───────┘ └───────────┘\n       │\n       │ External Integrations\n       ▼\n┌──────────────────────────────────┐\n│ • STIX/TAXII Servers             │\n│ • SIEM (Splunk, ELK)             │\n│ • IDS/IPS (Snort, Suricata)      │\n│ • Threat Intel Feeds             │\n│ • EDR (CrowdStrike, SentinelOne) │\n└──────────────────────────────────┘\n```\n\n### Installation (Ubuntu)\n\n```bash\n# Quick install using official script\nsudo apt update\nsudo apt install git -y\n\ncd /tmp\ngit clone https://github.com/MISP/MISP.git\ncd MISP\nsudo bash INSTALL/INSTALL.sh -A\n\n# This installs:\n# - Apache2 web server\n# - MySQL database\n# - PHP 7.4+\n# - Redis\n# - Python dependencies\n# - MISP core application\n\n# Access MISP at: https://your-server-ip\n# Default credentials: admin@admin.test / admin\n```\n\n**Production Considerations**:\n- Use HTTPS with valid certificates\n- Configure firewall (only expose port 443)\n- Regular database backups\n- Enable 2FA for all users\n- Configure proper sharing groups"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "title": "Hands-On: Create Your First MISP Event",
+        "description": "Document a phishing campaign in MISP",
+        "code": "# Scenario: Your SOC detected a phishing campaign\n# Attacker sent emails with malicious Excel attachment\n# C2 server at 198.51.100.42\n# Payload hash: 5d41402abc4b2a76b9719d911017c592\n\n# ============================================\n# METHOD 1: Using Web UI (Most Common)\n# ============================================\n\n# 1. Login to MISP web interface\n# 2. Click \"Add Event\"\n# 3. Fill in event details:\n\nDistribution: Your organisation only\nThreat Level: High\nAnalysis: Ongoing\nEvent Info: Cobalt Strike Phishing Campaign - Q1 2024\nDate: 2024-03-15\n\n# 4. Add attributes (IOCs):\n\n# Email Sender:\nCategory: Payload delivery\nType: email-src\nValue: attacker@evil-domain.com\nIDS: Yes\n\n# Malicious Domain:\nCategory: Network activity  \nType: domain\nValue: evil-domain.com\nIDS: Yes\n\n# C2 Server IP:\nCategory: Network activity\nType: ip-dst\nValue: 198.51.100.42\nIDS: Yes\n\n# File Hash:\nCategory: Payload delivery\nType: sha256\nValue: 5d41402abc4b2a76b9719d911017c592\nIDS: Yes\nComment: Malicious Excel file with macro\n\n# 5. Tag the event:\nTags:\n- tlp:amber (Limited sharing)\n- misp-galaxy:threat-actor=\"APT29\"\n- misp-galaxy:tool=\"Cobalt Strike\"\n- workflow:state=\"incomplete\"\n\n# 6. Publish event (makes it available to your communities)\nClick \"Publish Event\"\n\n# ============================================\n# METHOD 2: Using MISP API (Automation)\n# ============================================\n\n# Install PyMISP\npip install pymisp\n\n# Python script to create event\nfrom pymisp import PyMISP, MISPEvent, MISPAttribute\n\nmisp_url = 'https://your-misp-instance.com'\nmisp_key = 'YOUR_API_KEY_HERE'  # Get from: Event Actions > Automation\nmisp_verifycert = True\n\nmisp = PyMISP(misp_url, misp_key, misp_verifycert)\n\n# Create event\nevent = MISPEvent()\nevent.info = 'Cobalt Strike Phishing Campaign - Q1 2024'\nevent.distribution = 0  # Your organization only\nevent.threat_level_id = 2  # Medium\nevent.analysis = 1  # Ongoing\n\n# Add attributes\nevent.add_attribute('email-src', 'attacker@evil-domain.com', comment='Phishing sender')\nevent.add_attribute('domain', 'evil-domain.com', to_ids=True)\nevent.add_attribute('ip-dst', '198.51.100.42', to_ids=True, comment='C2 server')\nevent.add_attribute('sha256', '5d41402abc4b2a76b9719d911017c592', comment='Malicious Excel')\n\n# Add tags\nevent.add_tag('tlp:amber')\nevent.add_tag('misp-galaxy:threat-actor=\"APT29\"')\n\n# Push to MISP\nresponse = misp.add_event(event)\nprint(f\"Event created with ID: {response['Event']['id']}\")\n\n# Result: Event created and ready to share!",
+        "language": "python",
+        "difficulty": "intermediate"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Working with MISP: Key Operations\n\n### 1. Searching for Intelligence\n\n**Web UI Search**:\n- **Quick filter**: Top-right search bar (searches attributes)\n- **Advanced search**: List Events → Filter options\n  - By date range\n  - By tags (e.g., tlp:white, ransomware)\n  - By organization\n  - By attribute value (IP, domain, hash)\n\n**API Search Examples**:\n\n```python\nfrom pymisp import PyMISP\n\nmisp = PyMISP(misp_url, misp_key, misp_verifycert)\n\n# Search for specific IP\nresults = misp.search(controller='attributes', value='192.0.2.100')\n\n# Search by domain\nresults = misp.search(controller='attributes', type='domain', value='%evil.com')\n\n# Search by tag (all ransomware events)\nresults = misp.search(controller='events', tags='ransomware', published=True)\n\n# Search by date range\nresults = misp.search(\n    controller='events',\n    date_from='2024-01-01',\n    date_to='2024-03-31',\n    published=True\n)\n\n# Complex search: All Cobalt Strike IOCs from last 7 days\nresults = misp.search(\n    controller='attributes',\n    tags='misp-galaxy:tool=\"Cobalt Strike\"',\n    published=True,\n    to_ids=True,\n    date_from='7d'\n)\n```\n\n### 2. Correlation Engine\n\nMISP automatically correlates attributes across events:\n\n**Example**:\n- **Event A** (your organization): Phishing with IP 198.51.100.42\n- **Event B** (partner org): Malware C2 using IP 198.51.100.42\n- **MISP**: Automatically links these events as related\n\n**Viewing Correlations**:\n- Click any attribute → \"View correlations\"\n- See all events containing that IOC\n- Discover campaigns you didn't know were related\n\n### 3. Sharing and Distribution\n\n**Distribution Levels**:\n\n```\nLevel 0: Your organisation only\nLevel 1: This community only\nLevel 2: Connected communities  \nLevel 3: All communities\nLevel 4: Sharing group (custom)\n```\n\n**Best Practices**:\n- Start restrictive (Level 0 or 1)\n- Use TLP tags alongside distribution\n- Review before publishing\n- Sanitize sensitive data (remove internal IPs, usernames)\n\n**Sharing Groups** (for targeted sharing):\n```\nCreate sharing group: \"Financial Sector ISAC\"\nAdd organizations: Bank A, Bank B, Insurance Co C\nShare event only with this group\n```\n\n### 4. Threat Feeds\n\nMISP can consume external feeds:\n\n**Popular Feeds**:\n- **CIRCL OSINT Feeds** (free)\n- **URLhaus** (malicious URLs)\n- **Abuse.ch** (malware samples)\n- **Botvrij.eu** (C2 servers)\n\n**Enabling Feeds** (Web UI):\n```\nSync Actions → List Feeds\nSearch for \"CIRCL\" → Enable\nClick \"Fetch and store all feed data\"\n```\n\n**Result**: Thousands of IOCs automatically imported and correlated with your events"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Case Study: Financial Services ISAC\n\n**Organization**: Regional financial services consortium (12 banks)\n\n**Challenge**: Each bank was being targeted by the same threat actors, but they didn't realize it because they didn't share intelligence.\n\n**Solution**: Deployed shared MISP instance\n\n### Implementation\n\n**Week 1: Setup**\n- Hosted MISP instance on neutral cloud provider\n- Created accounts for each bank's SOC\n- Established sharing rules and TLP guidelines\n\n**Week 2: Initial Population**\n- Each bank uploaded IOCs from last 6 months:\n  - Phishing emails (sender addresses, subjects)\n  - Malicious domains\n  - File hashes\n  - C2 IP addresses\n- Total: 4,200 attributes across 180 events\n\n**Week 3: Discovery Phase**\n\nMISP correlation engine revealed shocking patterns:\n\n**Finding 1: Same C2 Infrastructure**\n- Bank A saw phishing campaign using C2 at 203.0.113.45\n- Bank E saw different malware, but SAME C2 IP\n- **Correlation**: Both campaigns by same threat actor group\n\n**Finding 2: Phishing Template Reuse**\n- 7 banks had received emails with subject: \"Urgent: Update Your Banking Credentials\"\n- Different sender domains, but identical HTML template\n- MISP detected all as related through content hash\n\n**Finding 3: Credential Stuffing Pattern**\n- Multiple banks saw login attempts from same IP range\n- Timestamps suggested automated tool\n- MISP correlation showed 11 banks affected\n\n### Results\n\n**Defensive Actions Taken**:\n\n```\n# All banks blocked these IOCs within 24 hours:\n- 47 malicious IPs\n- 89 phishing domains  \n- 234 file hashes\n- 12 email sender addresses\n```\n\n**Automated Integration**:\n\nEach bank integrated MISP with their security tools:\n\n```python\n# Daily MISP to firewall sync\nfrom pymisp import PyMISP\n\nmisp = PyMISP(misp_url, misp_key, misp_verifycert)\n\n# Get all malicious IPs from last 30 days\niocs = misp.search(\n    controller='attributes',\n    type='ip-dst',\n    to_ids=True,\n    published=True,\n    date_from='30d'\n)\n\n# Export to firewall blocklist\nwith open('/etc/firewall/misp_blocklist.txt', 'w') as f:\n    for ioc in iocs['Attribute']:\n        f.write(f\"{ioc['value']}\\n\")\n\n# Reload firewall rules\nimport subprocess\nsubprocess.run(['sudo', 'firewall-cmd', '--reload'])\n```\n\n**Impact Metrics** (First 6 Months):\n\n- **Phishing detection rate**: +340% (blocking known campaigns immediately)\n- **Mean time to detect**: 18 hours → 2 hours (shared IOCs)\n- **False positive rate**: -65% (context from other orgs)\n- **Prevented incidents**: 23 confirmed (attacks blocked using shared intel)\n- **Cost savings**: Estimated $2.4M (prevented breaches)\n\n**Quote from CISO**:\n\n> \"Before MISP, we were fighting in the dark. Now when one bank spots a threat, all 12 banks are protected within minutes. It's like having 12 SOCs working as one.\"\n\n### Key Success Factors\n\n1. **Trust**: Clear legal agreements on data sharing\n2. **Standardization**: Everyone used TLP and PAP consistently\n3. **Automation**: API integrations reduced manual work\n4. **Culture**: Shifted from \"hoard intelligence\" to \"share intelligence\"\n5. **Governance**: Monthly meetings to review sharing effectiveness"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "title": "Advanced: MISP to SIEM Integration",
+        "description": "Automatically import MISP IOCs into Splunk for detection",
+        "code": "#!/usr/bin/env python3\n# misp_to_splunk.py\n# Syncs MISP IOCs to Splunk lookup table for detection\n\nfrom pymisp import PyMISP\nimport csv\nimport requests\nimport json\nfrom datetime import datetime\n\n# MISP Configuration\nMISP_URL = 'https://your-misp.com'\nMISP_KEY = 'YOUR_MISP_API_KEY'\n\n# Splunk Configuration\nSPLUNK_URL = 'https://splunk.company.com:8089'\nSPLUNK_TOKEN = 'YOUR_SPLUNK_HEC_TOKEN'\n\ndef get_misp_iocs():\n    \"\"\"Fetch IOCs from MISP published in last 7 days\"\"\"\n    misp = PyMISP(MISP_URL, MISP_KEY, True)\n    \n    # Search for threat intel suitable for IDS\n    results = misp.search(\n        controller='attributes',\n        to_ids=True,  # Only IOCs marked for detection\n        published=True,\n        date_from='7d',\n        type=['ip-dst', 'domain', 'hostname', 'sha256', 'md5']\n    )\n    \n    iocs = []\n    for attr in results['Attribute']:\n        iocs.append({\n            'type': attr['type'],\n            'value': attr['value'],\n            'comment': attr.get('comment', ''),\n            'event_id': attr['event_id'],\n            'timestamp': attr['timestamp']\n        })\n    \n    return iocs\n\ndef write_splunk_lookup(iocs):\n    \"\"\"Write IOCs to Splunk lookup table\"\"\"\n    lookup_path = '/opt/splunk/etc/apps/search/lookups/misp_iocs.csv'\n    \n    with open(lookup_path, 'w', newline='') as f:\n        writer = csv.DictWriter(f, fieldnames=['ioc_type', 'ioc_value', 'description', 'added_date'])\n        writer.writeheader()\n        \n        for ioc in iocs:\n            writer.writerow({\n                'ioc_type': ioc['type'],\n                'ioc_value': ioc['value'],\n                'description': ioc['comment'],\n                'added_date': datetime.fromtimestamp(int(ioc['timestamp'])).strftime('%Y-%m-%d')\n            })\n    \n    print(f\"[+] Written {len(iocs)} IOCs to Splunk lookup table\")\n\ndef create_splunk_alert(iocs):\n    \"\"\"Create Splunk alert to detect IOCs\"\"\"\n    \n    # Splunk SPL query to detect IOCs\n    spl_query = '''\n    index=firewall OR index=proxy OR index=dns\n    [ | inputlookup misp_iocs.csv \n      | eval search_field=case(\n          ioc_type=\"ip-dst\", \"dest_ip=\" . ioc_value,\n          ioc_type=\"domain\", \"query=\" . ioc_value,\n          ioc_type=\"md5\", \"file_hash=\" . ioc_value\n      )\n      | return $search_field\n    ]\n    | lookup misp_iocs.csv ioc_value AS dest_ip OUTPUT ioc_type, description\n    | stats count by src_ip, dest_ip, description\n    | where count > 0\n    '''\n    \n    alert_config = {\n        'name': 'MISP IOC Detection',\n        'search': spl_query,\n        'cron_schedule': '*/15 * * * *',  # Every 15 minutes\n        'actions': 'email',\n        'action.email.to': 'soc@company.com',\n        'action.email.subject': 'ALERT: MISP IOC Detected in Network Traffic'\n    }\n    \n    # Create alert via Splunk REST API\n    headers = {\n        'Authorization': f'Bearer {SPLUNK_TOKEN}',\n        'Content-Type': 'application/json'\n    }\n    \n    response = requests.post(\n        f'{SPLUNK_URL}/servicesNS/admin/search/saved/searches',\n        headers=headers,\n        data=json.dumps(alert_config),\n        verify=False\n    )\n    \n    if response.status_code == 201:\n        print(\"[+] Splunk alert created successfully\")\n    else:\n        print(f\"[-] Failed to create alert: {response.text}\")\n\nif __name__ == '__main__':\n    print(\"[*] Fetching IOCs from MISP...\")\n    iocs = get_misp_iocs()\n    print(f\"[+] Retrieved {len(iocs)} IOCs\")\n    \n    print(\"[*] Writing to Splunk lookup table...\")\n    write_splunk_lookup(iocs)\n    \n    print(\"[*] Creating Splunk detection alert...\")\n    create_splunk_alert(iocs)\n    \n    print(\"[✓] MISP to Splunk sync complete!\")\n\n# Run this script daily via cron:\n# 0 2 * * * /usr/bin/python3 /opt/scripts/misp_to_splunk.py",
+        "language": "python",
+        "difficulty": "advanced"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## MISP Framework: SHARE\n\n**S**tructure - Use events, attributes, objects correctly\n**H**ierarchy - Classify with taxonomies and galaxies\n**A**utomate - API integrations, not manual work\n**R**esponsible - Use TLP and PAP for appropriate sharing\n**E**nrich - Add context, comments, correlations\n\n### Quick Reference: When to Use MISP\n\n✅ **Use MISP For**:\n- Tracking IOCs from incidents\n- Sharing threat intel with partners\n- Correlating attacks across teams\n- Enriching alerts with context\n- Building organizational threat database\n\n❌ **Don't Use MISP For**:\n- Real-time blocking (too slow, use firewall)\n- Log storage (use SIEM instead)\n- Vulnerability management (use dedicated tool)\n- Compliance documentation\n\n### Essential API Patterns\n\n```python\n# Pattern 1: Add IOC from incident\nevent.add_attribute(type, value, comment='Context here', to_ids=True)\n\n# Pattern 2: Search for IOC\nmisp.search(controller='attributes', value='IOC_HERE')\n\n# Pattern 3: Get recent threats\nmisp.search(controller='events', published=True, date_from='7d')\n\n# Pattern 4: Export for tool integration  \nmisp.search(controller='attributes', to_ids=True, return_format='csv')\n```"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "question": "Your organization wants to start sharing threat intelligence with industry partners, but management is concerned about accidentally sharing sensitive internal information. How would you use MISP's features to address this concern while still benefiting from threat intel sharing?",
+        "guidance": "Consider: (1) Distribution levels and sharing groups for granular control, (2) TLP tags to mark sensitivity, (3) Attribute-level comments vs event-level data, (4) Review workflow before publishing, (5) Sanitizing IOCs (removing internal IPs, employee names, etc.), (6) Using PAP to control what partners can do with the data."
+      }
+    }
+  ]
+}

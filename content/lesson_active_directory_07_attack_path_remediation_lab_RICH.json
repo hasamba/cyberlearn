@@ -1,0 +1,218 @@
+{
+  "lesson_id": "7af9a271-1ffb-4870-a40f-3276ba23c389",
+  "domain": "active_directory",
+  "title": "Attack Path Remediation Lab",
+  "subtitle": "Blue-team workflows for closing BloodHound findings",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 7,
+  "prerequisites": [
+    "Active Directory Enumeration & Attack Path Discovery",
+    "Active Directory Hardening & Continuous Monitoring"
+  ],
+  "concepts": [
+    "BloodHound blue-team dashboards",
+    "Short path vs choke point analysis",
+    "Group membership hygiene",
+    "Delegation hardening techniques",
+    "Tiered administration enforcement",
+    "Privileged identity reviews",
+    "Automation with Azure AD and PowerShell",
+    "Change management and documentation",
+    "Impact measurement and reporting",
+    "Continuous validation and regression testing"
+  ],
+  "learning_objectives": [
+    "Prioritise BloodHound findings using choke points and high-value assets",
+    "Execute remediation steps for common attack path patterns",
+    "Automate group membership and delegation clean-up with scripts",
+    "Communicate remediation progress and residual risk to stakeholders",
+    "Integrate remediation workflows into change management processes",
+    "Validate that remediation actions persist using continuous scanning"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f425bd87-2621-451e-8651-84b26b4c8173",
+      "type": "mindset_coach",
+      "title": "Think Like a Cartographer",
+      "content": {
+        "text": "You have a map of privilege paths—your job is to redraw the terrain. Approach remediation as an iterative cartography project: eliminate shortcuts, reinforce bridges, and document every change."
+      },
+      "simplified_explanation": "You are redrawing the map to make attackers work harder.",
+      "memory_aids": [
+        "Map → Modify → Monitor"
+      ],
+      "real_world_connection": "Blue teams that succeed view BloodHound data as a living atlas of privilege.",
+      "reflection_prompt": "Which attack path pattern causes the most concern in your environment?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "41b3aa87-c6d0-41e6-92b9-dda92e89fb27",
+      "type": "explanation",
+      "title": "Remediation Workflow",
+      "content": {
+        "text": "## P.A.T.H.\n- **P**rioritise by blast radius and chokepoints.\n- **A**ct by adjusting groups, delegation, and service accounts.\n- **T**rack in change management systems with rollback plans.\n- **H**arden long term through automation and monitoring."
+      },
+      "simplified_explanation": "Follow PATH to turn findings into lasting fixes.",
+      "memory_aids": [
+        "Prioritise → Act → Track → Harden"
+      ],
+      "real_world_connection": "Security engineers use PATH to brief leadership on remediation status.",
+      "reflection_prompt": "How will you measure the impact of each PATH iteration?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "7df76daa-7d24-4ea0-ab43-dda0d04e6183",
+      "type": "video",
+      "title": "BloodHound for Blue Teams",
+      "content": {
+        "resources": "See how defenders leverage BloodHound to identify and remediate toxic combinations.\n\n**Video**: [BloodHound for Blue Teams](https://www.youtube.com/watch?v=F2vC0_aws-M)\n\nCapture the remediation scripts and dashboards highlighted in the demo."
+      },
+      "simplified_explanation": "Observe how experienced defenders tackle privilege cleanup.",
+      "memory_aids": [
+        "Note each script and add it to your toolkit"
+      ],
+      "real_world_connection": "Clip mirrors workshops delivered at community conferences.",
+      "reflection_prompt": "Which automation idea will you pilot immediately?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "ace54213-4b70-43f9-a026-5dd217af2185",
+      "type": "memory_aid",
+      "title": "TRIM Checklist",
+      "content": {
+        "text": "### T.R.I.M.\n- **T**ag high-risk edges.\n- **R**emove unnecessary rights.\n- **I**dentify replacement controls.\n- **M**onitor for regression."
+      },
+      "simplified_explanation": "TRIM keeps remediation focused on high-risk edges.",
+      "memory_aids": [
+        "TRIM attack paths regularly"
+      ],
+      "real_world_connection": "Teams incorporate TRIM into sprint checklists to avoid backlog sprawl.",
+      "reflection_prompt": "Which TRIM step needs stakeholder buy-in to succeed?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "42f2f269-a185-4a88-86ba-d9d2ba285ce8",
+      "type": "real_world",
+      "title": "Field Example: Retail Privilege Cleanup",
+      "content": {
+        "text": "A retail enterprise used BloodHound choke point analysis to identify five privileged groups whose removal broke 70% of attack paths. Automations via PowerShell and Azure Automation enforced least privilege, and Defender for Identity alerts confirmed reduced attack surface."
+      },
+      "simplified_explanation": "Targeted cleanup yielded massive risk reduction.",
+      "memory_aids": [
+        "Choke points = high leverage"
+      ],
+      "real_world_connection": "Story adapted from a customer success case study.",
+      "reflection_prompt": "What chokepoint in your environment could offer similar leverage?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d7595278-8401-44bb-b56f-eacf27379fe4",
+      "type": "simulation",
+      "title": "Remediation Sprint Planning",
+      "content": {
+        "text": "1. Select a high-risk attack path from a sample BloodHound export.\n2. Document affected groups, computers, and delegation settings.\n3. Draft remediation steps with rollback and communication plans.\n4. Assign owners and due dates, then define verification queries.\n5. Capture the sprint plan in your operations notebook."
+      },
+      "simplified_explanation": "Practise turning findings into a sprint backlog that sticks.",
+      "memory_aids": [
+        "Plan → Assign → Verify"
+      ],
+      "real_world_connection": "Blue teams run workshops like this to kick off remediation programmes.",
+      "reflection_prompt": "Which stakeholder needs to approve your plan before execution?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "9b164659-bb33-4717-b9e6-72a0c9dde6e2",
+      "type": "reflection",
+      "title": "Teach Back the Cleanup",
+      "content": {
+        "text": "### Reflect & Teach\n- Summarise your remediation plan for a leadership audience.\n- Record two metrics you will track to demonstrate progress (paths removed, privileged accounts reduced).\n- Identify one automation or detection you will add to prevent regression."
+      },
+      "simplified_explanation": "Teaching the plan ensures stakeholders understand impact and safeguards.",
+      "memory_aids": [
+        "Explain → Measure → Automate"
+      ],
+      "real_world_connection": "Monthly metrics reviews rely on concise storytelling like this.",
+      "reflection_prompt": "Who will you brief on these improvements and when?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why focus on choke points when prioritising attack path remediation?",
+      "options": [
+        "They are easy to remove without change control",
+        "They represent edges whose removal breaks many attack paths at once",
+        "They reduce the need for documentation",
+        "They automatically disable BloodHound scans"
+      ],
+      "correct_answer": 1,
+      "explanation": "Choke points provide high leverage; fixing them collapses multiple privilege chains simultaneously.",
+      "difficulty": 2,
+      "memory_aid": "Choke points = high leverage",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which step ensures remediation work remains auditable?",
+      "options": [
+        "Skipping change requests for faster progress",
+        "Tracking changes with owners, rollback plans, and verification queries",
+        "Deleting BloodHound exports after work is complete",
+        "Only notifying the red team"
+      ],
+      "correct_answer": 1,
+      "explanation": "Documenting owners, rollback, and verification enables auditability and consistent execution.",
+      "difficulty": 2,
+      "memory_aid": "Track to trust",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How can automation aid attack path remediation?",
+      "options": [
+        "Automation replaces the need for human oversight",
+        "Scripts can enforce least privilege, validate changes, and detect regressions",
+        "Automation should only run once at the end of the project",
+        "Automation keeps findings hidden from leadership"
+      ],
+      "correct_answer": 1,
+      "explanation": "Automation helps enforce desired state, validate results, and surface regressions for follow-up.",
+      "difficulty": 2,
+      "memory_aid": "Automate to sustain",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:32:00",
+  "updated_at": "2025-10-28T15:32:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

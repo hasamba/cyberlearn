@@ -1,0 +1,219 @@
+{
+  "lesson_id": "b41fcbad-0d3d-4a3c-83d1-65c963f4bf58",
+  "domain": "fundamentals",
+  "title": "PowerShell Foundations for Cyber Practitioners",
+  "subtitle": "Cmdlets, objects, and automation habits for Windows environments",
+  "difficulty": 1,
+  "estimated_time": 45,
+  "order_index": 12,
+  "prerequisites": [
+    "Cybersecurity Orientation & Learning Gameplan",
+    "Active Directory Fundamentals"
+  ],
+  "concepts": [
+    "PowerShell vs traditional shells",
+    "Cmdlets and parameter binding",
+    "Object pipeline fundamentals",
+    "Providers and PSDrives",
+    "Remoting safety basics",
+    "Execution policy management",
+    "Modules and the PowerShell Gallery",
+    "Scripting hygiene and logging",
+    "Error handling with Try/Catch",
+    "Help system and community resources"
+  ],
+  "learning_objectives": [
+    "Describe how PowerShell differs from CMD/Bash and why it returns .NET objects",
+    "Use `Get-Help`, `Get-Command`, and `Get-Member` to explore cmdlets safely",
+    "Build pipelines that filter, sort, and export structured data",
+    "Configure execution policy responsibly and explain script signing options",
+    "Establish PowerShell remoting with least privilege and session transcripts",
+    "Document scripts with comments, transcripts, and version control"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f0b5f3ed-2c7c-4b3a-b08d-2ab5f1f0610f",
+      "type": "mindset_coach",
+      "title": "Think in Objects",
+      "content": {
+        "text": "PowerShell rewards curiosity. Treat every command as an opportunity to shape objects instead of parsing text. Ask: *What object am I working with and how can I view it safely?*"
+      },
+      "simplified_explanation": "PowerShell works with objects—explore before you execute.",
+      "memory_aids": [
+        "Objects over text",
+        "Explore, then act"
+      ],
+      "real_world_connection": "SOC analysts lean on PowerShell to inventory hosts, collect logs, and respond to incidents. Mastering the basics prevents costly mistakes later.",
+      "reflection_prompt": "Which Windows task would be easier if you could query structured objects instead of scraping text?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "0ff1eaeb-ffae-467d-bae6-94fd839fe4cb",
+      "type": "explanation",
+      "title": "POWERS Habit",
+      "content": {
+        "text": "### POWERS\n- **P**ipeline objects, not strings\n- **O**bserve with `Get-Help` and `Get-Member`\n- **W**ork via providers (FileSystem, Registry)\n- **E**xecution policy awareness\n- **R**emoting with just-enough rights\n- **S**cripts documented and versioned"
+      },
+      "simplified_explanation": "Follow POWERS every session to stay safe and productive.",
+      "memory_aids": [
+        "POWERS"
+      ],
+      "real_world_connection": "Teams that adopt POWERS reduce incidents caused by unsafe scripts or over-privileged remoting.",
+      "reflection_prompt": "Which POWERS habit do you already follow, and which will you practise this week?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "1bf23a04-7dbe-4bc1-b9f0-5f75af4fd4b2",
+      "type": "video",
+      "title": "PowerShell for Beginners in 90 Minutes",
+      "content": {
+        "resources": "Watch the friendly introduction and mimic each demo in your lab.\n\n**Video**: [PowerShell for Beginners](https://www.youtube.com/watch?v=UVjKz0jvA7k)\n\nThe session highlights cmdlets, the object pipeline, and remoting safety tips from Microsoft MVPs."
+      },
+      "simplified_explanation": "Visual demos cement syntax—pause frequently to practise commands yourself.",
+      "memory_aids": [
+        "Pause, type, review"
+      ],
+      "real_world_connection": "This workshop mirrors many enterprise onboarding bootcamps for junior analysts.",
+      "reflection_prompt": "Which demo from the video will you recreate immediately?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "4a3c17fb-9aef-496c-a3cf-8858f16c2062",
+      "type": "memory_aid",
+      "title": "Discovery Cmdlets Cheat Sheet",
+      "content": {
+        "text": "- Explore: `Get-Command`, `Get-Help`, `Get-Member`\n- Filesystem: `Get-ChildItem`, `Test-Path`, `Copy-Item`\n- Processes & Services: `Get-Process`, `Get-Service`, `Stop-Process`\n- Filter & Format: `Where-Object`, `Select-Object`, `Format-Table`, `Export-Csv`"
+      },
+      "simplified_explanation": "Start with discovery commands before altering anything.",
+      "memory_aids": [
+        "Discover → Filter → Act"
+      ],
+      "real_world_connection": "Incident responders use these cmdlets to triage systems quickly and safely.",
+      "reflection_prompt": "Which discovery cmdlet will you add to your daily workflow?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "e223b66c-4973-4aeb-a154-6a3eddacdd90",
+      "type": "real_world",
+      "title": "Field Example: SOC Onboarding",
+      "content": {
+        "text": "A financial SOC halved analyst onboarding time by giving new hires a PowerShell foundations lab and the POWERS checklist. Analysts now pull host inventories and export logs with reusable scripts instead of manual clicks."
+      },
+      "simplified_explanation": "A small investment in PowerShell basics yields big operational gains.",
+      "memory_aids": [
+        "Automate the tedious"
+      ],
+      "real_world_connection": "Organisations track productivity improvements when analysts master essential cmdlets.",
+      "reflection_prompt": "Which repetitive Windows task will you automate first?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "3086072d-0f5f-4813-907f-1a5028ee9b00",
+      "type": "simulation",
+      "title": "Guided Lab: Build Your First Toolkit",
+      "content": {
+        "text": "1. Launch PowerShell and explore with `Get-Help`, `Get-Command`, and `Get-Member`.\n2. Write a script that lists services, filters for those stopped, and exports to CSV.\n3. Set execution policy to `RemoteSigned` temporarily, note why, then revert.\n4. Open a lab remoting session using a least-privileged account and run your script.\n5. Enable transcription, review the log, and commit the script with comments to version control."
+      },
+      "simplified_explanation": "Practise discovery, scripting, safety, and documentation end-to-end in a lab.",
+      "memory_aids": [
+        "Discover → Script → Secure"
+      ],
+      "real_world_connection": "This mirrors the workflow analysts follow when triaging endpoints remotely.",
+      "reflection_prompt": "What hurdles did you encounter during the lab, and how will you overcome them next time?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "79452cfc-17ed-4e4b-a4d6-ff4aa2f9b0ca",
+      "type": "reflection",
+      "title": "Teach Back",
+      "content": {
+        "text": "### Teach Back\n- Explain the POWERS mnemonic to a teammate.\n- Share your service inventory script, highlighting safety measures.\n- Schedule a follow-up in 2 weeks to discuss what you automated next."
+      },
+      "simplified_explanation": "Teaching someone else locks in your knowledge and builds team muscle.",
+      "memory_aids": [
+        "Explain → Share → Review"
+      ],
+      "real_world_connection": "Teams that run informal teach-backs see faster adoption of new tooling.",
+      "reflection_prompt": "Who will you teach and how will you capture their feedback?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the primary reason PowerShell pipelines are powerful for security work?",
+      "options": [
+        "They always output plain text",
+        "They pass rich .NET objects that can be filtered, sorted, and exported cleanly",
+        "They automatically run as SYSTEM",
+        "They disable event logging"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cmdlets produce objects instead of text, so you can manipulate structured data without fragile parsing.",
+      "difficulty": 1,
+      "memory_aid": "Objects over text",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "How should you change execution policy when testing scripts?",
+      "options": [
+        "Set it to Unrestricted permanently",
+        "Temporarily adjust it (e.g., RemoteSigned), document the reason, and revert afterward",
+        "Disable it completely via the Registry",
+        "Execution policy does not affect script safety"
+      ],
+      "correct_answer": 1,
+      "explanation": "Execution policy helps control script trust. Adjust it only as needed, document the change, and revert to a safer setting once finished.",
+      "difficulty": 1,
+      "memory_aid": "Secure scripts",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What is the safest way to learn a new cmdlet?",
+      "options": [
+        "Run it in production immediately",
+        "Use `Get-Help`, `Get-Member`, and `-WhatIf` in a lab before making changes",
+        "Disable event logging for privacy",
+        "Download random scripts from the internet"
+      ],
+      "correct_answer": 1,
+      "explanation": "Always explore cmdlets in a lab with help and `-WhatIf` so you understand the impact before touching production systems.",
+      "difficulty": 1,
+      "memory_aid": "Explore before execute",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T16:52:00",
+  "updated_at": "2025-10-28T16:52:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

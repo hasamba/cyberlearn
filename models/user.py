@@ -24,6 +24,7 @@ class LearningPreferences(BaseModel):
 class SkillLevels(BaseModel):
     """Skill proficiency across cybersecurity domains (0-100 scale)"""
     fundamentals: int = Field(default=0, ge=0, le=100)
+    osint: int = Field(default=0, ge=0, le=100)
     dfir: int = Field(default=0, ge=0, le=100)
     malware: int = Field(default=0, ge=0, le=100)
     active_directory: int = Field(default=0, ge=0, le=100)
@@ -33,11 +34,13 @@ class SkillLevels(BaseModel):
     pentest: int = Field(default=0, ge=0, le=100)
     redteam: int = Field(default=0, ge=0, le=100)
     blueteam: int = Field(default=0, ge=0, le=100)
+    threat_hunting: int = Field(default=0, ge=0, le=100)
 
     def get_overall_level(self) -> int:
         """Calculate overall skill level across all domains"""
         skills = [
             self.fundamentals,
+            self.osint,
             self.dfir,
             self.malware,
             self.active_directory,
@@ -46,7 +49,8 @@ class SkillLevels(BaseModel):
             self.cloud,
             self.pentest,
             self.redteam,
-            self.blueteam
+            self.blueteam,
+            self.threat_hunting
         ]
         return sum(skills) // len(skills)
 
@@ -54,6 +58,7 @@ class SkillLevels(BaseModel):
         """Identify domain needing most attention"""
         domain_map = {
             self.fundamentals: "fundamentals",
+            self.osint: "osint",
             self.dfir: "dfir",
             self.malware: "malware",
             self.active_directory: "active_directory",
@@ -62,7 +67,8 @@ class SkillLevels(BaseModel):
             self.cloud: "cloud",
             self.pentest: "pentest",
             self.redteam: "redteam",
-            self.blueteam: "blueteam"
+            self.blueteam: "blueteam",
+            self.threat_hunting: "threat_hunting"
         }
         return domain_map[min(domain_map.keys())]
 
