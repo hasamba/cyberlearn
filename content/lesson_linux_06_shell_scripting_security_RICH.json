@@ -1,0 +1,212 @@
+{
+  "lesson_id": "e1b7g2c3-8f6i-7i5e-1d9g-2b1i0g9f8e7h",
+  "domain": "linux",
+  "title": "Shell Scripting for Security Automation",
+  "subtitle": "Automate security tasks with Bash scripting",
+  "difficulty": 2,
+  "order_index": 6,
+  "prerequisites": ["3b2aa25c-082d-4ff7-962c-fcde78b16bf4", "b8e4d9f0-5c3f-4f2b-8a6d-9e8f7d6c5b4e"],
+  "concepts": [
+    "Bash scripting fundamentals",
+    "Variables and command substitution",
+    "Loops and conditionals",
+    "Functions and error handling",
+    "Log parsing with grep, awk, sed",
+    "Security automation scripts",
+    "Scheduled tasks with cron",
+    "Script hardening and best practices",
+    "Input validation and sanitization",
+    "Secure credential handling"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Write effective Bash scripts for security automation",
+    "Parse and analyze log files programmatically",
+    "Implement error handling and input validation",
+    "Schedule automated security checks with cron",
+    "Build security audit and compliance scripts",
+    "Automate incident response workflows",
+    "Handle credentials securely in scripts",
+    "Debug and troubleshoot shell scripts"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the correct shebang for a Bash script?",
+      "options": [
+        "#!/bin/bash",
+        "#/bin/bash",
+        "!/bin/bash",
+        "//bin/bash"
+      ],
+      "correct": 0,
+      "explanation": "#!/bin/bash (shebang) tells the system to execute the script with Bash. Must be the first line."
+    },
+    {
+      "question": "How do you capture command output into a variable?",
+      "options": [
+        "var = $(command)",
+        "var=$(command) or var=`command`",
+        "var=<command>",
+        "var:=$(command)"
+      ],
+      "correct": 1,
+      "explanation": "Use var=$(command) or backticks var=`command`. No spaces around =."
+    },
+    {
+      "question": "What does $? represent in Bash?",
+      "options": [
+        "Current process ID",
+        "Number of arguments",
+        "Exit status of last command",
+        "Current user"
+      ],
+      "correct": 2,
+      "explanation": "$? contains the exit status (return code) of the last executed command. 0 = success, non-zero = error."
+    },
+    {
+      "question": "How do you make a script executable?",
+      "options": [
+        "chmod +x script.sh",
+        "exec script.sh",
+        "./script.sh",
+        "run script.sh"
+      ],
+      "correct": 0,
+      "explanation": "chmod +x script.sh adds execute permission. Then run with ./script.sh"
+    },
+    {
+      "question": "What is the safest way to handle passwords in scripts?",
+      "options": [
+        "Hardcode them in the script",
+        "Pass as command-line arguments",
+        "Use environment variables or external password managers",
+        "Store in a text file"
+      ],
+      "correct": 2,
+      "explanation": "Never hardcode passwords. Use environment variables, read from secure files with restricted permissions, or integrate with password managers."
+    },
+    {
+      "question": "Which cron expression runs a script every day at 2 AM?",
+      "options": [
+        "0 2 * * *",
+        "2 0 * * *",
+        "* 2 * * *",
+        "0 0 2 * *"
+      ],
+      "correct": 0,
+      "explanation": "Cron format: minute hour day month weekday. 0 2 * * * = minute 0, hour 2, every day."
+    },
+    {
+      "question": "How do you redirect both stdout and stderr to a file?",
+      "options": [
+        "command > file 2>&1",
+        "command >> file",
+        "command > file",
+        "command 2> file"
+      ],
+      "correct": 0,
+      "explanation": "> redirects stdout, 2>&1 redirects stderr to wherever stdout goes. So both go to file."
+    },
+    {
+      "question": "What does set -e do in a Bash script?",
+      "options": [
+        "Enables verbose mode",
+        "Exits script immediately if any command fails",
+        "Enables debugging",
+        "Exports all variables"
+      ],
+      "correct": 1,
+      "explanation": "set -e makes the script exit immediately if any command returns non-zero exit status (fails)."
+    },
+    {
+      "question": "How do you loop through lines in a file?",
+      "options": [
+        "for line in $(cat file)",
+        "while read line; do ... done < file",
+        "foreach line in file",
+        "loop file"
+      ],
+      "correct": 1,
+      "explanation": "while read line; do ... done < file is safe for reading files line-by-line, handles spaces correctly."
+    },
+    {
+      "question": "What is the difference between [ ] and [[ ]] in Bash?",
+      "options": [
+        "They are identical",
+        "[[ ]] is Bash-specific, supports regex, safer for comparisons",
+        "[ ] is newer",
+        "[[ ]] is deprecated"
+      ],
+      "correct": 1,
+      "explanation": "[[ ]] is a Bash keyword (not POSIX), supports pattern matching, regex, and doesn't require quoting variables."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_recall",
+    "practical_application",
+    "deliberate_practice",
+    "teach_to_learn"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Why Shell Scripting for Security?\n\n**Shell scripting** is the **Swiss Army knife** of Linux security. Every security professional needs it for:\n\n- **Automation**: Security checks, log analysis, vulnerability scanning\n- **Incident Response**: Rapid evidence collection, containment actions\n- **Compliance**: Automated CIS benchmark checks, audit trails\n- **Monitoring**: Custom alerting, anomaly detection\n- **Red Team**: Custom tools, payload delivery\n- **Blue Team**: Automated defenses, threat hunting\n\n**Real-World Example**: During the **2013 Target breach**, attackers used custom malware on POS systems. Blue team analysts wrote Bash scripts to:\n- Search all systems for malware indicators\n- Collect memory dumps from infected hosts\n- Automate IOC checking across thousands of endpoints\n\n**Scripts can do in minutes what would take humans days manually.**\n\n**Jim Kwik Mindset**: Scripting seems intimidating until you realize it's just **automating tasks you already do manually**. Every command you type can become a script. You're not learning from scratch - you're automating what you know."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Bash Scripting Fundamentals\n\n## Your First Security Script\n\n```bash\n#!/bin/bash\n# security_check.sh - Basic system security check\n\n# Shebang: Tells system to use Bash\n# Comments: Lines starting with #\n\necho \"=== Security Check ===\"\necho \"Date: $(date)\"\necho \"Hostname: $(hostname)\"\necho \"Current User: $(whoami)\"\n\n# Check if running as root\nif [ \"$(id -u)\" -ne 0 ]; then\n    echo \"WARNING: Not running as root. Some checks may fail.\"\nfi\n\n# Check for updates\necho \"\"\necho \"[+] Checking for security updates...\"\napt update > /dev/null 2>&1\nUPDATES=$(apt list --upgradable 2>/dev/null | grep -c \"security\")\necho \"Available security updates: $UPDATES\"\n\n# Check SSH configuration\necho \"\"\necho \"[+] Checking SSH security...\"\nif grep -q \"^PermitRootLogin yes\" /etc/ssh/sshd_config; then\n    echo \"WARNING: Root login via SSH is enabled!\"\nelse\n    echo \"OK: Root login via SSH is disabled\"\nfi\n\necho \"\"\necho \"=== Check Complete ===\"\n```\n\n**Make it executable and run**:\n```bash\nchmod +x security_check.sh\n./security_check.sh\n```\n\n## Variables and Command Substitution\n\n```bash\n#!/bin/bash\n\n# Variable assignment (no spaces around =)\nHOSTNAME=\"server01\"\nIP=\"192.168.1.100\"\n\n# Command substitution - capture command output\nCURRENT_DATE=$(date +%Y-%m-%d)\nUSER_COUNT=$(who | wc -l)\nDISK_USAGE=$(df -h / | tail -1 | awk '{print $5}')\n\n# Using variables (use quotes to handle spaces)\necho \"Server: $HOSTNAME\"\necho \"IP: $IP\"\necho \"Date: $CURRENT_DATE\"\necho \"Active users: $USER_COUNT\"\necho \"Disk usage: $DISK_USAGE\"\n\n# Environment variables\necho \"Home: $HOME\"\necho \"User: $USER\"\necho \"Path: $PATH\"\n\n# Special variables\necho \"Script name: $0\"\necho \"First argument: $1\"\necho \"All arguments: $@\"\necho \"Number of arguments: $#\"\necho \"Last command exit status: $?\"\necho \"Current PID: $$\"\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Conditionals and Logic\n\n## If Statements\n\n```bash\n#!/bin/bash\n\n# Basic if\nif [ -f \"/etc/passwd\" ]; then\n    echo \"passwd file exists\"\nfi\n\n# If-else\nif [ \"$USER\" = \"root\" ]; then\n    echo \"Running as root\"\nelse\n    echo \"Running as regular user\"\nfi\n\n# If-elif-else\nLOAD=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')\nif (( $(echo \"$LOAD > 2.0\" | bc -l) )); then\n    echo \"CRITICAL: High load ($LOAD)\"\nelif (( $(echo \"$LOAD > 1.0\" | bc -l) )); then\n    echo \"WARNING: Moderate load ($LOAD)\"\nelse\n    echo \"OK: Normal load ($LOAD)\"\nfi\n```\n\n## Test Operators\n\n### File Tests\n```bash\nif [ -f file.txt ]; then echo \"Regular file exists\"; fi\nif [ -d /etc ]; then echo \"Directory exists\"; fi\nif [ -e path ]; then echo \"Path exists (file or dir)\"; fi\nif [ -r file ]; then echo \"File is readable\"; fi\nif [ -w file ]; then echo \"File is writable\"; fi\nif [ -x script.sh ]; then echo \"File is executable\"; fi\nif [ -s file ]; then echo \"File is not empty\"; fi\n```\n\n### String Tests\n```bash\nif [ -z \"$VAR\" ]; then echo \"String is empty\"; fi\nif [ -n \"$VAR\" ]; then echo \"String is not empty\"; fi\nif [ \"$A\" = \"$B\" ]; then echo \"Strings equal\"; fi\nif [ \"$A\" != \"$B\" ]; then echo \"Strings not equal\"; fi\n```\n\n### Numeric Tests\n```bash\nif [ $A -eq $B ]; then echo \"Equal\"; fi\nif [ $A -ne $B ]; then echo \"Not equal\"; fi\nif [ $A -lt $B ]; then echo \"Less than\"; fi\nif [ $A -le $B ]; then echo \"Less than or equal\"; fi\nif [ $A -gt $B ]; then echo \"Greater than\"; fi\nif [ $A -ge $B ]; then echo \"Greater than or equal\"; fi\n```\n\n### Logical Operators\n```bash\n# AND\nif [ $A -gt 0 ] && [ $A -lt 10 ]; then\n    echo \"A is between 0 and 10\"\nfi\n\n# OR\nif [ \"$USER\" = \"root\" ] || [ \"$USER\" = \"admin\" ]; then\n    echo \"Privileged user\"\nfi\n\n# NOT\nif [ ! -f file.txt ]; then\n    echo \"File does not exist\"\nfi\n```\n\n## Modern [[ ]] Syntax (Recommended)\n\n```bash\n# Supports regex matching\nif [[ $filename =~ \\.log$ ]]; then\n    echo \"Log file detected\"\nfi\n\n# Pattern matching\nif [[ $IP == 192.168.*.* ]]; then\n    echo \"Private IP\"\nfi\n\n# No need to quote variables (safer)\nif [[ $VAR == \"value\" ]]; then\n    echo \"Match\"\nfi\n\n# Combine conditions\nif [[ $A -gt 0 && $B -lt 100 ]]; then\n    echo \"Conditions met\"\nfi\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Loops: Automation Power\n\n## For Loops\n\n```bash\n#!/bin/bash\n\n# Loop through list\nfor server in web01 web02 web03 db01; do\n    echo \"Checking $server...\"\n    ping -c 1 $server > /dev/null 2>&1\n    if [ $? -eq 0 ]; then\n        echo \"  [OK] $server is up\"\n    else\n        echo \"  [FAIL] $server is down\"\n    fi\ndone\n\n# Loop through files\nfor file in /var/log/*.log; do\n    echo \"Analyzing $file\"\n    grep -i \"error\" \"$file\" | wc -l\ndone\n\n# Loop through command output\nfor user in $(cat /etc/passwd | cut -d: -f1); do\n    echo \"User: $user\"\ndone\n\n# C-style for loop\nfor ((i=1; i<=5; i++)); do\n    echo \"Iteration $i\"\ndone\n\n# Loop through IP range\nfor ip in 192.168.1.{1..254}; do\n    ping -c 1 -W 1 $ip > /dev/null 2>&1 && echo \"$ip is up\"\ndone\n```\n\n## While Loops\n\n```bash\n# Loop while condition is true\nCOUNTER=0\nwhile [ $COUNTER -lt 5 ]; do\n    echo \"Counter: $COUNTER\"\n    COUNTER=$((COUNTER + 1))\ndone\n\n# Read file line by line (best practice)\nwhile read -r line; do\n    echo \"Processing: $line\"\ndone < /etc/passwd\n\n# Infinite loop (monitoring)\nwhile true; do\n    CPU=$(top -bn1 | grep \"Cpu(s)\" | awk '{print $2}')\n    echo \"$(date): CPU usage: $CPU\"\n    sleep 60  # Check every minute\ndone\n\n# Read user input\nwhile read -p \"Enter command (quit to exit): \" cmd; do\n    if [ \"$cmd\" = \"quit\" ]; then\n        break\n    fi\n    eval $cmd\ndone\n```\n\n## Real-World Example: Failed Login Monitor\n\n```bash\n#!/bin/bash\n# monitor_failed_logins.sh\n\nLOGFILE=\"/var/log/auth.log\"\nTHRESHOLD=5\nALERT_FILE=\"/tmp/failed_login_alerts.txt\"\n\necho \"[+] Monitoring failed SSH logins...\"\necho \"Date: $(date)\" > \"$ALERT_FILE\"\n\n# Find failed login attempts\ngrep \"Failed password\" \"$LOGFILE\" | \\\n    awk '{print $(NF-3)}' | \\\n    sort | uniq -c | \\\n    while read count ip; do\n        if [ $count -ge $THRESHOLD ]; then\n            echo \"ALERT: $ip has $count failed login attempts\" | tee -a \"$ALERT_FILE\"\n            \n            # Auto-block with iptables (optional)\n            # iptables -A INPUT -s $ip -j DROP\n            # echo \"Blocked $ip\"\n        fi\n    done\n\necho \"[+] Check complete. Report saved to $ALERT_FILE\"\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Functions and Error Handling\n\n## Functions\n\n```bash\n#!/bin/bash\n\n# Define function\ncheck_root() {\n    if [ \"$(id -u)\" -ne 0 ]; then\n        echo \"ERROR: This script must be run as root\"\n        exit 1\n    fi\n}\n\n# Function with parameters\nping_host() {\n    local host=$1\n    local count=${2:-3}  # Default to 3 if not provided\n    \n    echo \"Pinging $host ($count times)...\"\n    if ping -c $count $host > /dev/null 2>&1; then\n        echo \"  [OK] $host is reachable\"\n        return 0\n    else\n        echo \"  [FAIL] $host is unreachable\"\n        return 1\n    fi\n}\n\n# Function with return value\nget_disk_usage() {\n    local path=${1:-.}  # Default to current directory\n    df -h \"$path\" | tail -1 | awk '{print $5}' | sed 's/%//'\n}\n\n# Using functions\ncheck_root\nping_host \"8.8.8.8\" 2\nping_host \"192.168.1.1\"\n\nUSAGE=$(get_disk_usage \"/\")\necho \"Root partition usage: $USAGE%\"\n\nif [ $USAGE -gt 80 ]; then\n    echo \"WARNING: Disk usage above 80%\"\nfi\n```\n\n## Error Handling\n\n```bash\n#!/bin/bash\n\n# Exit immediately on error\nset -e\n\n# Exit on undefined variable\nset -u\n\n# Pipe failure detection\nset -o pipefail\n\n# Combined (best practice)\nset -euo pipefail\n\n# Custom error handler\nerror_exit() {\n    echo \"ERROR: $1\" >&2\n    exit 1\n}\n\n# Usage\nif [ ! -f \"/etc/important.conf\" ]; then\n    error_exit \"Configuration file not found\"\nfi\n\n# Check command success\nif ! systemctl is-active --quiet nginx; then\n    error_exit \"Nginx is not running\"\nfi\n\n# Trap errors\ntrap 'echo \"Error on line $LINENO\"' ERR\n\n# Cleanup on exit\ncleanup() {\n    echo \"Cleaning up...\"\n    rm -f /tmp/tempfile\n}\ntrap cleanup EXIT\n\n# Create temp file\ntouch /tmp/tempfile\n# ... do work ...\n# cleanup() will run automatically on exit\n```\n\n## Logging Function\n\n```bash\n#!/bin/bash\n\nLOGFILE=\"/var/log/script.log\"\n\nlog() {\n    local level=$1\n    shift\n    local message=\"$@\"\n    echo \"[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $message\" | tee -a \"$LOGFILE\"\n}\n\nlog \"INFO\" \"Script started\"\nlog \"WARNING\" \"Disk usage is high\"\nlog \"ERROR\" \"Failed to connect to database\"\nlog \"DEBUG\" \"Variable value: $VAR\"\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Log Parsing with grep, awk, sed\n\n## grep - Pattern Matching\n\n```bash\n# Find failed SSH logins\ngrep \"Failed password\" /var/log/auth.log\n\n# Case-insensitive search\ngrep -i \"error\" /var/log/syslog\n\n# Count occurrences\ngrep -c \"Failed password\" /var/log/auth.log\n\n# Show context (2 lines before and after)\ngrep -C 2 \"error\" /var/log/app.log\n\n# Recursive search in directory\ngrep -r \"malware\" /var/log/\n\n# Multiple patterns\ngrep -E \"error|warning|critical\" /var/log/syslog\n\n# Invert match (lines NOT containing pattern)\ngrep -v \"INFO\" /var/log/app.log\n\n# Show only filenames with matches\ngrep -l \"error\" /var/log/*.log\n```\n\n## awk - Text Processing\n\n```bash\n# Print specific columns\nawk '{print $1, $3}' /var/log/access.log\n\n# Print lines where column 9 (HTTP status) is 404\nawk '$9 == 404' /var/log/apache2/access.log\n\n# Sum column values\nawk '{sum += $10} END {print \"Total bytes:\", sum}' access.log\n\n# Print HTTP requests and their counts\nawk '{print $7}' access.log | sort | uniq -c | sort -rn\n\n# Custom field separator\nawk -F: '{print $1}' /etc/passwd  # Print usernames\n\n# Conditional processing\nawk '$3 >= 1000 {print $1}' /etc/passwd  # Users with UID >= 1000\n\n# Pattern matching\nawk '/Failed password/ {print $11}' /var/log/auth.log  # Extract IPs\n\n# Advanced: Extract and count failed login IPs\nawk '/Failed password/ {print $(NF-3)}' /var/log/auth.log | \\\n    sort | uniq -c | sort -rn\n```\n\n## sed - Stream Editing\n\n```bash\n# Replace text (first occurrence per line)\nsed 's/old/new/' file.txt\n\n# Replace all occurrences\nsed 's/old/new/g' file.txt\n\n# Replace and save to new file\nsed 's/old/new/g' input.txt > output.txt\n\n# In-place editing\nsed -i 's/old/new/g' file.txt\n\n# Delete lines matching pattern\nsed '/pattern/d' file.txt\n\n# Print only lines matching pattern\nsed -n '/error/p' /var/log/syslog\n\n# Delete blank lines\nsed '/^$/d' file.txt\n\n# Comment out lines (add # at start)\nsed 's/^/#/' config.conf\n\n# Extract IP addresses\nsed -n 's/.*\\([0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\\.[0-9]\\{1,3\\}\\).*/\\1/p' file.txt\n```\n\n## Real-World Log Analysis Script\n\n```bash\n#!/bin/bash\n# analyze_access_log.sh - Apache/Nginx access log analyzer\n\nLOG=\"/var/log/nginx/access.log\"\n\necho \"=== Access Log Analysis ===\"\necho \"Date: $(date)\"\necho \"\"\n\necho \"[+] Top 10 IP addresses:\"\nawk '{print $1}' \"$LOG\" | sort | uniq -c | sort -rn | head -10\n\necho \"\"\necho \"[+] Top 10 requested URLs:\"\nawk '{print $7}' \"$LOG\" | sort | uniq -c | sort -rn | head -10\n\necho \"\"\necho \"[+] HTTP Status Code Distribution:\"\nawk '{print $9}' \"$LOG\" | sort | uniq -c | sort -rn\n\necho \"\"\necho \"[+] Top 10 User Agents:\"\nawk -F'\"' '{print $6}' \"$LOG\" | sort | uniq -c | sort -rn | head -10\n\necho \"\"\necho \"[+] Requests by hour:\"\nawk '{print $4}' \"$LOG\" | cut -d: -f2 | sort | uniq -c\n\necho \"\"\necho \"[+] 404 Errors:\"\nawk '$9 == 404 {print $7}' \"$LOG\" | sort | uniq -c | sort -rn | head -10\n\necho \"\"\necho \"[+] Potential SQL Injection Attempts:\"\ngrep -i \"union.*select\\|' or\\|1=1\" \"$LOG\" | wc -l\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Cron: Scheduled Automation\n\n## Cron Format\n\n```\n* * * * * command\n│ │ │ │ │\n│ │ │ │ └─── Day of week (0-7, 0 and 7 are Sunday)\n│ │ │ └───── Month (1-12)\n│ │ └─────── Day of month (1-31)\n│ └───────── Hour (0-23)\n└─────────── Minute (0-59)\n```\n\n## Cron Examples\n\n```bash\n# Every minute\n* * * * * /path/to/script.sh\n\n# Every hour at minute 0\n0 * * * * /path/to/script.sh\n\n# Every day at 2:30 AM\n30 2 * * * /path/to/backup.sh\n\n# Every Sunday at midnight\n0 0 * * 0 /path/to/weekly-report.sh\n\n# Every weekday at 9 AM\n0 9 * * 1-5 /path/to/workday-check.sh\n\n# Every 15 minutes\n*/15 * * * * /path/to/monitor.sh\n\n# First day of every month at 3 AM\n0 3 1 * * /path/to/monthly-audit.sh\n\n# Every 6 hours\n0 */6 * * * /path/to/periodic-check.sh\n```\n\n## Managing Cron Jobs\n\n```bash\n# Edit crontab for current user\ncrontab -e\n\n# List cron jobs\ncrontab -l\n\n# Remove all cron jobs\ncrontab -r\n\n# Edit crontab for another user (as root)\nsudo crontab -u username -e\n\n# System-wide cron directories\n/etc/cron.daily/      # Daily scripts\n/etc/cron.weekly/     # Weekly scripts\n/etc/cron.monthly/    # Monthly scripts\n/etc/cron.d/          # Additional cron jobs\n```\n\n## Cron Best Practices\n\n```bash\n# Use absolute paths\n0 2 * * * /usr/local/bin/backup.sh\n\n# Redirect output to log file\n0 2 * * * /path/to/script.sh >> /var/log/script.log 2>&1\n\n# Set environment variables in crontab\nPATH=/usr/local/bin:/usr/bin:/bin\nSHELL=/bin/bash\n0 2 * * * script.sh\n\n# Email output (set MAILTO)\nMAILTO=admin@example.com\n0 2 * * * /path/to/script.sh\n\n# Prevent concurrent executions (use flock)\n*/5 * * * * flock -n /tmp/script.lock /path/to/script.sh\n```\n\n## Security Automation Cron Examples\n\n```bash\n# Daily security update check (6 AM)\n0 6 * * * /usr/local/bin/check-updates.sh\n\n# Hourly failed login monitoring\n0 * * * * /usr/local/bin/monitor-failed-logins.sh\n\n# Weekly CIS benchmark audit (Sunday 1 AM)\n0 1 * * 0 /usr/local/bin/cis-audit.sh\n\n# Daily log rotation and analysis (midnight)\n0 0 * * * /usr/local/bin/analyze-logs.sh\n\n# Every 15 minutes: Check for suspicious processes\n*/15 * * * * /usr/local/bin/check-suspicious-processes.sh\n\n# Monthly vulnerability scan (1st at 3 AM)\n0 3 1 * * /usr/local/bin/run-vuln-scan.sh\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Real-World Security Automation Script\n\n## Complete Security Audit Script\n\n```bash\n#!/bin/bash\n#########################################################\n# security_audit.sh - Comprehensive Security Audit\n# Description: Automated security checks for Linux servers\n# Author: Security Team\n# Usage: sudo ./security_audit.sh\n#########################################################\n\nset -euo pipefail\n\n# Configuration\nLOGFILE=\"/var/log/security_audit_$(date +%Y%m%d_%H%M%S).log\"\nALERT_EMAIL=\"security@example.com\"\nHOSTNAME=$(hostname)\n\n# Colors for output\nRED='\\033[0;31m'\nGREEN='\\033[0;32m'\nYELLOW='\\033[1;33m'\nNC='\\033[0m' # No Color\n\n# Logging function\nlog() {\n    echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $1\" | tee -a \"$LOGFILE\"\n}\n\ncheck_result() {\n    if [ $1 -eq 0 ]; then\n        echo -e \"${GREEN}[PASS]${NC} $2\" | tee -a \"$LOGFILE\"\n    else\n        echo -e \"${RED}[FAIL]${NC} $2\" | tee -a \"$LOGFILE\"\n    fi\n}\n\nwarn() {\n    echo -e \"${YELLOW}[WARN]${NC} $1\" | tee -a \"$LOGFILE\"\n}\n\n# Check if running as root\nif [ \"$(id -u)\" -ne 0 ]; then\n    echo \"ERROR: This script must be run as root\" >&2\n    exit 1\nfi\n\nlog \"=== Security Audit Started on $HOSTNAME ===\"\n\n# 1. System Updates\nlog \"\"\nlog \"[+] Checking for system updates...\"\napt update > /dev/null 2>&1\nUPDATES=$(apt list --upgradable 2>/dev/null | wc -l)\nif [ $UPDATES -gt 1 ]; then\n    warn \"$((UPDATES-1)) package updates available\"\n    apt list --upgradable 2>/dev/null | tee -a \"$LOGFILE\"\nelse\n    log \"System is up to date\"\nfi\n\n# 2. SSH Configuration\nlog \"\"\nlog \"[+] Checking SSH security...\"\nSSH_CONFIG=\"/etc/ssh/sshd_config\"\n\ngrep -q \"^PermitRootLogin no\" \"$SSH_CONFIG\"\ncheck_result $? \"Root login via SSH disabled\"\n\ngrep -q \"^PasswordAuthentication no\" \"$SSH_CONFIG\"\ncheck_result $? \"Password authentication disabled\"\n\ngrep -q \"^PubkeyAuthentication yes\" \"$SSH_CONFIG\"\ncheck_result $? \"Public key authentication enabled\"\n\n# 3. Firewall Status\nlog \"\"\nlog \"[+] Checking firewall...\"\nif systemctl is-active --quiet ufw; then\n    check_result 0 \"UFW firewall is active\"\n    ufw status | tee -a \"$LOGFILE\"\nelse\n    check_result 1 \"UFW firewall is NOT active\"\nfi\n\n# 4. Failed Login Attempts\nlog \"\"\nlog \"[+] Checking failed login attempts...\"\nFAILED_LOGINS=$(grep \"Failed password\" /var/log/auth.log 2>/dev/null | wc -l)\nlog \"Failed login attempts in auth.log: $FAILED_LOGINS\"\n\nif [ $FAILED_LOGINS -gt 10 ]; then\n    warn \"High number of failed login attempts detected\"\n    grep \"Failed password\" /var/log/auth.log | awk '{print $(NF-3)}' | \\\n        sort | uniq -c | sort -rn | head -5 | tee -a \"$LOGFILE\"\nfi\n\n# 5. World-Writable Files\nlog \"\"\nlog \"[+] Checking for world-writable files in /etc...\"\nWWRITABLE=$(find /etc -type f -perm -002 2>/dev/null)\nif [ -z \"$WWRITABLE\" ]; then\n    check_result 0 \"No world-writable files in /etc\"\nelse\n    check_result 1 \"World-writable files found in /etc\"\n    echo \"$WWRITABLE\" | tee -a \"$LOGFILE\"\nfi\n\n# 6. SUID/SGID Files\nlog \"\"\nlog \"[+] Checking SUID/SGID binaries...\"\nSUID_COUNT=$(find / -type f \\( -perm -4000 -o -perm -2000 \\) 2>/dev/null | wc -l)\nlog \"SUID/SGID binaries found: $SUID_COUNT\"\nfind / -type f \\( -perm -4000 -o -perm -2000 \\) 2>/dev/null | head -10 | tee -a \"$LOGFILE\"\n\n# 7. Open Ports\nlog \"\"\nlog \"[+] Checking listening ports...\"\nss -tuln | tee -a \"$LOGFILE\"\n\n# 8. Active Users\nlog \"\"\nlog \"[+] Checking active users...\"\nwho | tee -a \"$LOGFILE\"\nlast -n 10 | tee -a \"$LOGFILE\"\n\n# 9. Disk Usage\nlog \"\"\nlog \"[+] Checking disk usage...\"\ndf -h | tee -a \"$LOGFILE\"\nDISK_USAGE=$(df -h / | tail -1 | awk '{print $5}' | sed 's/%//')\nif [ $DISK_USAGE -gt 80 ]; then\n    warn \"Root partition usage is ${DISK_USAGE}% (threshold: 80%)\"\nfi\n\n# 10. Running Processes\nlog \"\"\nlog \"[+] Top CPU-consuming processes...\"\nps aux --sort=-%cpu | head -6 | tee -a \"$LOGFILE\"\n\n# Summary\nlog \"\"\nlog \"=== Security Audit Complete ===\"\nlog \"Report saved to: $LOGFILE\"\n\n# Email report (if mail is configured)\nif command -v mail &> /dev/null; then\n    cat \"$LOGFILE\" | mail -s \"Security Audit: $HOSTNAME\" \"$ALERT_EMAIL\"\n    log \"Report emailed to $ALERT_EMAIL\"\nfi\n\nexit 0\n```\n\n## Deploying the Script\n\n```bash\n# Make executable\nchmod +x security_audit.sh\n\n# Run manually\nsudo ./security_audit.sh\n\n# Schedule daily at 2 AM\nsudo crontab -e\n# Add: 0 2 * * * /usr/local/bin/security_audit.sh\n\n# Or place in /etc/cron.daily/\nsudo cp security_audit.sh /etc/cron.daily/\n```"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Mastery Mindset: From Manual to Automated\n\n**Common Thought**: \"I can just run these commands manually. Why bother scripting?\"\n\n**Reality**: \n- **Manual**: Run 20 commands → 10 minutes → Repeat daily → 60 hours/year\n- **Automated**: Write script once → 30 minutes → Runs automatically → 0 hours/year\n\n**Time investment**: 30 minutes\n**Time saved**: 60 hours/year\n**ROI**: 12,000%\n\n## The Compound Effect of Automation\n\n**Month 1**: \n- Write 1 script (security audit) → Save 30 min/day\n\n**Month 3**: \n- 5 scripts (audit, log analysis, backup verify, update check, monitoring)\n- Save 2 hours/day\n\n**Month 6**: \n- 10+ scripts\n- Save 4+ hours/day\n- Can focus on strategic work instead of repetitive tasks\n\n**Month 12**:\n- Automated security infrastructure\n- Detect issues in minutes, not days\n- Prevented multiple incidents through early detection\n\n## Learning Strategy (Jim Kwik Method)\n\n### Week 1: Script What You Already Do\n```bash\n# Take a task you do manually:\n\"Check if system needs updates\"\n\n# Turn it into a script:\napt update\napt list --upgradable\n\n# Done! Your first script.\n```\n\n### Week 2: Add Intelligence\n```bash\n# Count updates\nUPDATES=$(apt list --upgradable | wc -l)\n\n# Make decision\nif [ $UPDATES -gt 1 ]; then\n    echo \"Updates available: $UPDATES\"\nfi\n```\n\n### Week 3: Add Automation\n```bash\n# Add to cron\n0 6 * * * /path/to/update-check.sh\n\n# Now it runs daily without you thinking about it\n```\n\n### Week 4: Compound Your Scripts\n```bash\n# Combine multiple checks\n- Update check\n- Failed login monitor\n- Disk usage alert\n- Process monitoring\n\n# One master audit script\n# Runs daily\n# Emails you only if issues found\n```\n\n## The \"I'm Not a Programmer\" Myth\n\n**Truth**: Shell scripting isn't programming - it's **automating commands you already know**.\n\nIf you can type:\n```bash\ngrep \"error\" /var/log/syslog\n```\n\nYou can script:\n```bash\n#!/bin/bash\ngrep \"error\" /var/log/syslog\n```\n\nThat's it. You're a scripter now.\n\n## Practice Challenge\n\n**This Week**: Identify 3 tasks you do manually and script them.\n\n**Example**:\n1. Daily: Check disk space → `disk_check.sh`\n2. Weekly: Review logs → `log_review.sh`\n3. Monthly: User audit → `user_audit.sh`\n\n**Next Week**: Schedule them with cron. Never think about them again.\n\n**Remember**: Every expert scripter started by automating simple tasks. The difference? They started. You're starting right now!"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Reflection and Next Steps\n\n## Key Takeaways\n\n1. **Shebang (#!/bin/bash)** specifies script interpreter\n2. **Variables** store data: `VAR=$(command)` captures output\n3. **Conditionals** make decisions: `if [ condition ]; then ... fi`\n4. **Loops** automate repetition: `for`, `while`\n5. **Functions** organize code and enable reuse\n6. **grep/awk/sed** are text processing powerhouses\n7. **Cron** schedules automated tasks\n8. **Error handling** (set -e, trap) prevents silent failures\n9. **Logging** creates audit trails\n10. **Security** requires input validation, credential protection\n\n## Practice Exercises\n\n1. **Basic Script**:\n   ```bash\n   # Write a script that:\n   # - Checks disk usage\n   # - Alerts if > 80%\n   # - Emails the result\n   ```\n\n2. **Log Analysis**:\n   ```bash\n   # Parse Apache/Nginx access logs\n   # - Find top 10 IPs\n   # - Count 404 errors\n   # - Identify potential attacks\n   ```\n\n3. **Security Audit**:\n   ```bash\n   # Create script that checks:\n   # - SSH configuration\n   # - Firewall status\n   # - Failed logins\n   # - SUID binaries\n   # - Open ports\n   ```\n\n4. **Automation**:\n   ```bash\n   # Schedule with cron:\n   # - Daily security audit (2 AM)\n   # - Hourly log monitoring\n   # - Weekly report generation\n   ```\n\n5. **Incident Response**:\n   ```bash\n   # Write rapid evidence collection script:\n   # - Active connections (ss -tulanp)\n   # - Running processes (ps auxf)\n   # - Recent logins (last)\n   # - Open files (lsof)\n   # - All output to timestamped directory\n   ```\n\n## What's Next?\n\nYou've mastered **security automation** with Bash. Next lessons:\n- **Log Analysis**: Advanced log parsing and correlation\n- **Incident Response**: Automated evidence collection\n- **Compliance**: Scripting CIS benchmark checks\n\n## Challenge Project\n\n**Build a complete security monitoring system**:\n\n1. **Script**: `security_monitor.sh`\n   - Checks SSH config, firewall, failed logins, disk usage, updates\n   - Logs all findings\n   - Emails alerts for critical issues\n\n2. **Schedule**: Run every 6 hours\n\n3. **Dashboard**: Create simple HTML report\n\n4. **Alerting**: Send email only when issues detected\n\nIf you can build this system and explain how each component works, you've mastered this lesson!\n\n**Final Thought**: **Automation is the security professional's force multiplier.** One script can monitor 100 servers 24/7. One human cannot. Master scripting, and you scale your defensive capabilities exponentially. You now have that power."
+      }
+    }
+  ]
+}

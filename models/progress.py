@@ -70,6 +70,10 @@ class LessonProgress(BaseModel):
 
     def complete_lesson(self, score: int, time_seconds: int) -> Dict:
         """Mark lesson as completed, calculate next review"""
+        # Increment attempts if this is a retake (completed_at already set)
+        if self.completed_at is not None:
+            self.attempts += 1
+
         self.status = LessonStatus.COMPLETED
         self.completed_at = datetime.now()
         self.quiz_scores.append(score)

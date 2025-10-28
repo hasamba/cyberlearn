@@ -128,12 +128,9 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Scroll to top on navigation
-    if st.session_state.get("scroll_to_top", False):
-        st.session_state.scroll_to_top = False
-        # Use Streamlit's anchor to scroll to top
-        st.markdown('<div id="top"></div>', unsafe_allow_html=True)
-        st.markdown('<script>document.getElementById("top").scrollIntoView();</script>', unsafe_allow_html=True)
+    # Workaround for scroll: Use components.html to inject JS
+    # Streamlit reruns reset scroll position, so we inject JS after render
+    import streamlit.components.v1 as components
 
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
@@ -144,6 +141,13 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
 
     if "quiz_answers" not in st.session_state:
         st.session_state.quiz_answers = {}
+
+    # Inject scroll-to-top after navigation
+    components.html("""
+        <script>
+            window.parent.document.querySelector('section.main').scrollTo(0, 0);
+        </script>
+    """, height=0)
 
     # Header
     st.markdown(f"# {lesson.title}")
@@ -184,20 +188,17 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
             if current_idx > 0:
                 if st.button("⬅️ Previous", use_container_width=True):
                     st.session_state.current_block_index -= 1
-                    st.session_state.scroll_to_top = True
                     st.rerun()
 
         with col_next:
             if current_idx < total_blocks - 1:
                 if st.button("Next ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
-                    st.session_state.scroll_to_top = True
                     st.rerun()
             else:
                 # Last block - show quiz
                 if st.button("📝 Take Quiz ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
-                    st.session_state.scroll_to_top = True
                     st.rerun()
     else:
         # Quiz time
@@ -491,7 +492,8 @@ def complete_lesson(
     # Get or create progress
     progress = db.get_lesson_progress(user.user_id, lesson.lesson_id)
 
-    # Check if this is the first completion
+    # Check if this is the first completion - BEFORE calling complete_lesson()
+    # which changes the status
     is_first_completion = False
     if not progress:
         progress = LessonProgress(
@@ -500,11 +502,14 @@ def complete_lesson(
         )
         progress.start_lesson()
         is_first_completion = True
-    elif progress.status == LessonStatus.NOT_STARTED or progress.status == LessonStatus.IN_PROGRESS:
+    elif progress.status in [LessonStatus.NOT_STARTED, LessonStatus.IN_PROGRESS]:
         # First time completing (was in progress or not started)
         is_first_completion = True
+    elif progress.completed_at is None:
+        # Lesson exists but was never completed before
+        is_first_completion = True
 
-    # Complete
+    # Complete - this changes status to COMPLETED/MASTERED
     completion_info = progress.complete_lesson(score, time_spent)
 
     # Initialize gamification engine
