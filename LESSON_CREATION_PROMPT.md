@@ -46,19 +46,28 @@ You are a cybersecurity education content creator for the CyberLearn platform. Y
       "question": "Multiple choice question text?",
       "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
       "correct_answer": 0_TO_3,
-      "explanation": "Detailed explanation of why this is correct"
+      "explanation": "Detailed explanation of why this is correct",
+      "question_id": "GENERATE_NEW_UUID_HERE",
+      "type": "multiple_choice",
+      "difficulty": SAME_AS_LESSON_DIFFICULTY
     },
     {
       "question": "Second question?",
       "options": ["A", "B", "C", "D"],
       "correct_answer": 0_TO_3,
-      "explanation": "Explanation"
+      "explanation": "Explanation",
+      "question_id": "GENERATE_NEW_UUID_HERE",
+      "type": "multiple_choice",
+      "difficulty": SAME_AS_LESSON_DIFFICULTY
     },
     {
       "question": "Third question?",
       "options": ["A", "B", "C", "D"],
       "correct_answer": 0_TO_3,
-      "explanation": "Explanation"
+      "explanation": "Explanation",
+      "question_id": "GENERATE_NEW_UUID_HERE",
+      "type": "multiple_choice",
+      "difficulty": SAME_AS_LESSON_DIFFICULTY
     }
   ],
   "jim_kwik_principles": [
@@ -296,21 +305,79 @@ Example valid UUIDs:
 "estimated_time": 50
 ```
 
+### POST-ASSESSMENT QUESTIONS
+
+**CRITICAL:** Each question MUST have these 7 fields:
+
+```json
+{
+  "question": "Question text ending with ?",
+  "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+  "correct_answer": 0,  // Index: 0, 1, 2, or 3
+  "explanation": "Why this answer is correct",
+  "question_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",  // NEW UUID
+  "type": "multiple_choice",  // Always this value
+  "difficulty": 2  // SAME as lesson difficulty (1, 2, or 3)
+}
+```
+
+**Requirements:**
+- **Exactly 3 questions** (no more, no less)
+- **4 options** per question
+- **correct_answer**: Integer 0-3 (index of correct option)
+- **question_id**: NEW unique UUID v4 for each question
+- **type**: Always `"multiple_choice"`
+- **difficulty**: MUST match the lesson's difficulty level
+
+**Example for difficulty 2 lesson:**
+```json
+"post_assessment": [
+  {
+    "question": "What is ASLR?",
+    "options": ["Anti-virus", "Address Space Layout Randomization", "Access Control", "Authentication"],
+    "correct_answer": 1,
+    "explanation": "ASLR randomizes memory addresses to make exploits harder.",
+    "question_id": "f1e2d3c4-b5a6-4978-8c1d-0e2f3a4b5c6d",
+    "type": "multiple_choice",
+    "difficulty": 2
+  }
+]
+```
+
+---
+
 ### JIM KWIK PRINCIPLES
 
-**Valid values (choose 2-4):**
-- "Active recall"
-- "Spaced repetition"
-- "Visualization"
-- "Chunking"
-- "State management"
-- "Active learning"
-- "Teach to learn"
-- "Practice retrieval"
+**CRITICAL:** Use EXACT lowercase snake_case values (choose 2-4):
 
-**DO NOT use:**
+**Valid values (copy these EXACTLY):**
+- `"active_learning"`
+- `"minimum_effective_dose"`
+- `"teach_like_im_10"`
+- `"memory_hooks"`
+- `"meta_learning"`
+- `"connect_to_what_i_know"`
+- `"reframe_limiting_beliefs"`
+- `"gamify_it"`
+- `"learning_sprint"`
+- `"multiple_memory_pathways"`
+
+**WRONG (will cause errors):**
+- "Active learning" ❌ (wrong casing)
+- "Active recall" ❌ (not in list)
+- "Spaced repetition" ❌ (not in list)
+- "Visualization" ❌ (not in list)
+- "Chunking" ❌ (not in list)
 - Free-text descriptions ❌
-- Custom principles not in the list ❌
+
+**Correct example:**
+```json
+"jim_kwik_principles": [
+  "active_learning",
+  "memory_hooks",
+  "teach_like_im_10"
+]
+```
 
 ### DIFFICULTY LEVEL SELECTION (Automatic)
 
@@ -407,7 +474,12 @@ Before outputting, verify:
 - [ ] Concepts: 8-12 items
 - [ ] Learning objectives: 5-6 items
 - [ ] Post assessment: Exactly 3 questions
-- [ ] Jim Kwik principles: 2-4 valid values from list
+- [ ] Each post_assessment question has ALL 7 fields (question, options, correct_answer, explanation, question_id, type, difficulty)
+- [ ] question_id: NEW unique UUID for EACH question
+- [ ] type: "multiple_choice" for all questions
+- [ ] difficulty: Matches lesson difficulty (1, 2, or 3)
+- [ ] Jim Kwik principles: 2-4 values
+- [ ] Jim Kwik principles: EXACT lowercase snake_case (active_learning, NOT "Active learning")
 - [ ] Estimated time: 30-60 (integer)
 - [ ] Content blocks: Minimum 8-10 blocks
 - [ ] Used ONLY valid content block types
