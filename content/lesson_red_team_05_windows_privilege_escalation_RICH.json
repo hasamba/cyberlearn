@@ -1,0 +1,218 @@
+{
+  "lesson_id": "b0a1ad50-48a7-4d14-bb28-1d03b341bd09",
+  "domain": "red_team",
+  "title": "Windows Privilege Escalation for Red Teams",
+  "subtitle": "From local admin footholds to enterprise dominance",
+  "difficulty": 3,
+  "estimated_time": 60,
+  "order_index": 5,
+  "prerequisites": [
+    "Red Team Payload Development & Execution Frameworks",
+    "Active Directory Enumeration & Attack Path Discovery"
+  ],
+  "concepts": [
+    "Privilege escalation methodology",
+    "Service misconfigurations and DLL hijacking",
+    "Unquoted service paths",
+    "Token impersonation and abuse",
+    "Credential extraction and protection bypass",
+    "Kerberoasting and AS-REP roasting",
+    "Service account hardening gaps",
+    "ADCS exploitation",
+    "Persistence via scheduled tasks and WMI",
+    "Detection avoidance and cleanup"
+  ],
+  "learning_objectives": [
+    "Follow a structured checklist for Windows privilege escalation",
+    "Exploit service misconfigurations and binary planting opportunities safely",
+    "Leverage credential material to advance toward domain dominance",
+    "Abuse ADCS and delegation weaknesses responsibly within engagement scope",
+    "Maintain stealth while escalating and prepare forensic-quality reporting",
+    "Produce actionable remediation guidance for blue teams"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "8552fab9-a278-49e7-8962-ea973cbf6646",
+      "type": "mindset_coach",
+      "title": "Escalate With Discipline",
+      "content": {
+        "text": "Privilege escalation is where engagements can spiral if you rush. Treat the process like defusing a device: confirm context, execute the checklist, capture telemetry, and disengage cleanly."
+      },
+      "simplified_explanation": "Move carefully; every action must be justified and reversible.",
+      "memory_aids": [
+        "Confirm → Execute → Capture → Clean"
+      ],
+      "real_world_connection": "Experienced operators pause before every escalation step to validate impact and safeties.",
+      "reflection_prompt": "What signals tell you an escalation attempt should be aborted?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "38e21994-9bab-4e54-ab93-2b1d939a4e4e",
+      "type": "explanation",
+      "title": "Escalation Flow",
+      "content": {
+        "text": "## Structured Approach\n- **Inventory** – Enumerate local privileges, services, scheduled tasks, tokens, and credentials.\n- **Evaluate** – Score opportunities by impact, detectability, and clean-up complexity.\n- **Execute** – Implement the chosen technique with safeguards and logging.\n- **Exit** – Remove artifacts, rotate credentials, and document findings."
+      },
+      "simplified_explanation": "Inventory, evaluate, execute, exit—repeat until goals are met.",
+      "memory_aids": [
+        "Inventory → Evaluate → Execute → Exit"
+      ],
+      "real_world_connection": "This flow underpins popular escalation checklists such as OSCP and RastaMouse guides.",
+      "reflection_prompt": "Which stage do you typically rush, and how will you slow it down?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d69bfbd0-0632-4c45-bc93-f48f9f7b8dfc",
+      "type": "video",
+      "title": "Windows Privilege Escalation Tactics",
+      "content": {
+        "resources": "Explore common escalation paths including service misconfigurations, token abuse, and credential harvesting.\n\n**Video**: [Windows Privilege Escalation Tactics](https://www.youtube.com/watch?v=PKZy4IUz0Ck)\n\nPay attention to the detection tips sprinkled throughout the demonstration."
+      },
+      "simplified_explanation": "Match each technique with the conditions that make it viable.",
+      "memory_aids": [
+        "Pause after each tactic and note pre-conditions"
+      ],
+      "real_world_connection": "The walkthrough reflects a real red team lab environment.",
+      "reflection_prompt": "Which technique will you test in your lab next, and what safeties will you add?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d5930a62-801a-4994-b503-457568e4ab6e",
+      "type": "memory_aid",
+      "title": "RISE Mnemonic",
+      "content": {
+        "text": "### R.I.S.E.\n- **R**eview local privilege and service configuration\n- **I**nspect credentials, tickets, and tokens\n- **S**elect the safest escalation path\n- **E**rase artifacts and document thoroughly"
+      },
+      "simplified_explanation": "Use RISE to stay methodical under pressure.",
+      "memory_aids": [
+        "RISE before reporting"
+      ],
+      "real_world_connection": "Operators use mnemonics to avoid missing critical steps on long nights.",
+      "reflection_prompt": "Which RISE step will you automate to save time?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "d5930a62-801a-4994-b503-457568e4ab6f",
+      "type": "real_world",
+      "title": "Field Example: Retail Escalation",
+      "content": {
+        "text": "A retail engagement landed on a point-of-sale server with limited rights. The team identified an unquoted service path, planted a signed binary, gained SYSTEM, dumped LSASS safely, and derived privileges across child domains. Their report highlighted service hardening, credential guard, and monitoring recommendations."
+      },
+      "simplified_explanation": "Small misconfigurations often lead to domain dominance when escalated responsibly.",
+      "memory_aids": [
+        "Quote paths to close gaps"
+      ],
+      "real_world_connection": "Adapted from an engagement where remediation was implemented within weeks.",
+      "reflection_prompt": "How would you communicate the risk and remediation to business stakeholders?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d69bfbd0-0632-4c45-bc93-f48f9f7b8dff",
+      "type": "simulation",
+      "title": "Escalation Decision Tree",
+      "content": {
+        "text": "1. In your lab, enumerate a Windows host for service misconfigurations, credential material, and privileged tokens.\n2. Select the escalation path with the best impact-to-risk ratio and justify your choice.\n3. Document cleanup steps, credential hygiene, and detection artefacts.\n4. Summarise your tree in the CyberLearn journal."
+      },
+      "simplified_explanation": "Practice weighing trade-offs before acting in live environments.",
+      "memory_aids": [
+        "Decision tree prevents tunnel vision"
+      ],
+      "real_world_connection": "Top operators use decision logs to explain why they chose certain techniques.",
+      "reflection_prompt": "What secondary path would you choose if your first attempt failed?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d69bfbd0-0632-4c45-bc93-f48f9f7b8dfe",
+      "type": "reflection",
+      "title": "Teach Back the Escalation",
+      "content": {
+        "text": "### Reflect & Teach\n- Explain the escalation path you executed and why it was chosen.\n- Record two defensive countermeasures you will recommend.\n- Note one detection analytic you will share with blue teams."
+      },
+      "simplified_explanation": "Teaching ensures you internalise both offense and defense.",
+      "memory_aids": [
+        "Explain → Counter → Detect"
+      ],
+      "real_world_connection": "After-action reviews often revolve around these three prompts.",
+      "reflection_prompt": "Who will you walk through your findings with, and when?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What makes unquoted service paths dangerous?",
+      "options": [
+        "They slow down boot time",
+        "Attackers can plant binaries in writable directories to hijack execution",
+        "They disable services during patching",
+        "They require Domain Admin to exploit"
+      ],
+      "correct_answer": 1,
+      "explanation": "When paths lack quotes, Windows may execute the first matching binary in the path, enabling privilege escalation.",
+      "difficulty": 3,
+      "memory_aid": "Quote the path, close the gap",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why is credential hygiene essential after escalation?",
+      "options": [
+        "Because red teamers like deleting accounts",
+        "To avoid contaminating evidence and to support defender lessons",
+        "Because reports look better",
+        "To speed up lateral movement"
+      ],
+      "correct_answer": 1,
+      "explanation": "Proper cleanup maintains engagement integrity and ensures defenders can trace events accurately.",
+      "difficulty": 3,
+      "memory_aid": "Escalate, document, sanitize",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which technique abuses Kerberos for privilege escalation?",
+      "options": [
+        "ARP poisoning",
+        "Kerberoasting",
+        "DNS cache poisoning",
+        "SQL injection"
+      ],
+      "correct_answer": 1,
+      "explanation": "Kerberoasting extracts service tickets for offline cracking, often leading to privilege escalation.",
+      "difficulty": 3,
+      "memory_aid": "Roast to elevate",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

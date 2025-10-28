@@ -1,0 +1,218 @@
+{
+  "lesson_id": "d71f784e-828f-41d1-bd00-a9a8337527a9",
+  "domain": "red_team",
+  "title": "Red Team Initial Access Tradecraft",
+  "subtitle": "Crafting entry points that survive modern defenses",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 3,
+  "prerequisites": [
+    "Red Team Fundamentals",
+    "Red Team OSINT Reconnaissance"
+  ],
+  "concepts": [
+    "Attack surface mapping",
+    "Persona and pretext design",
+    "Malicious document delivery",
+    "Payload staging and hosting",
+    "Beacon and callback design",
+    "Email and web security bypasses",
+    "Initial persistence strategies",
+    "Rules of engagement and safety controls",
+    "Dwell time and telemetry balance",
+    "Reporting and defender knowledge transfer"
+  ],
+  "learning_objectives": [
+    "Design initial access campaigns aligned with engagement scope and safety rules",
+    "Select payload carriers that bypass secure email and web gateways",
+    "Instrument callbacks with resilient communication channels and kill switches",
+    "Balance stealth, speed, and learning objectives when establishing dwell time",
+    "Document artifacts so defenders can build detections and mitigations",
+    "Coordinate with white cell teams to maintain ethical and legal compliance"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "e09d130f-995a-47bc-90a7-8984c0db2e32",
+      "type": "mindset_coach",
+      "title": "Operate With Intentionality",
+      "content": {
+        "text": "Initial access is where trust is earned. Treat each campaign like a scientific experiment: define the hypothesis, record every variable, and build in safeties. The objective is not to \"get in\" at any cost—it is to learn, document, and teach."
+      },
+      "simplified_explanation": "Plan carefully so you learn more than you break.",
+      "memory_aids": [
+        "Hypothesis → Safeties → Learning"
+      ],
+      "real_world_connection": "Respected operators keep immaculate logs and can explain every decision to stakeholders and regulators.",
+      "reflection_prompt": "What is the key learning outcome you want from your next initial access run?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a5ccf222-9d3b-4374-9945-c5ff9e05f2a5",
+      "type": "explanation",
+      "title": "Campaign Blueprint",
+      "content": {
+        "text": "## Build, Deliver, Sustain\n- **Build** – Craft persona, pretext, and payload with appropriate safeties and logging.\n- **Deliver** – Select channels (phish, web, supply chain) and rehearse them.\n- **Sustain** – Establish callbacks, persistence, and containment triggers."
+      },
+      "simplified_explanation": "Plan for the life-cycle: setup, execution, and post-access control.",
+      "memory_aids": [
+        "Build → Deliver → Sustain"
+      ],
+      "real_world_connection": "Engagement plans often mirror this slide to brief white cell teams.",
+      "reflection_prompt": "Which phase tends to absorb the most time in your experience?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "68c74ef7-da87-41bb-8c6d-cafae387ee06",
+      "type": "video",
+      "title": "Initial Access Phishing Campaign Breakdown",
+      "content": {
+        "resources": "Follow a seasoned operator as they dissect pretext creation, payload assembly, and blue team detections.\n\n**Video**: [Initial Access Phishing Campaign Breakdown](https://www.youtube.com/watch?v=ZJ6Pp5oVJz0)\n\nTake notes on safeguard triggers, hosting infrastructure, and post-delivery hygiene."
+      },
+      "simplified_explanation": "Let the visuals reinforce how planning and execution connect.",
+      "memory_aids": [
+        "Pause after each phase and restate the intent"
+      ],
+      "real_world_connection": "The clip mirrors many real-world health-sector engagements.",
+      "reflection_prompt": "What safety mechanism from the video will you adopt immediately?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9a92c03e-c3d4-4df5-b0ee-184cda5e83a8",
+      "type": "memory_aid",
+      "title": "SAFE Hooks",
+      "content": {
+        "text": "### S.A.F.E.\n- **S**cope confirmation and white cell contacts\n- **A**rtifact logging (hashes, lure copy, server configs)\n- **F**ail-safe kill switches for callbacks\n- **E**thical review before launch"
+      },
+      "simplified_explanation": "Run SAFE every time before you push send.",
+      "memory_aids": [
+        "SAFE before send"
+      ],
+      "real_world_connection": "Accredited teams use checklists like SAFE to pass compliance audits.",
+      "reflection_prompt": "Which SAFE step have you skipped in the past? What did it cost?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "52c89880-48dc-447d-b31c-0aa63ff32eb8",
+      "type": "real_world",
+      "title": "Field Example: Healthcare Spearphish",
+      "content": {
+        "text": "A healthcare red team crafted spearphish referencing a recent industry breach. The lure achieved a 38% click rate, but pre-deployed canary accounts triggered an alert within minutes. The lesson: blend email, web, and supply chain vectors to diversify learning while respecting detection investments."
+      },
+      "simplified_explanation": "Even successful lures must account for modern detections.",
+      "memory_aids": [
+        "Variety reveals gaps"
+      ],
+      "real_world_connection": "Case study sourced from a regulated medical provider exercise.",
+      "reflection_prompt": "How would you expand this campaign to include an alternate initial access avenue?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "8d57d078-6199-47d3-9471-e4451f9e2fb6",
+      "type": "simulation",
+      "title": "Craft an Initial Access Plan",
+      "content": {
+        "text": "1. Choose a target persona and write a three-sentence pretext aligned with recent OSINT.\n2. Select a payload carrier (macro doc, HTA, link) and justify why it fits the controls you expect.\n3. Define success criteria, kill switches, and clean-up steps.\n4. Capture the plan in your engagement notebook and tag white cell reviewers."
+      },
+      "simplified_explanation": "Rehearse the plan in writing so approvals move quickly.",
+      "memory_aids": [
+        "Persona → Payload → Protection"
+      ],
+      "real_world_connection": "Operators often draft this exact plan before requesting go-live sign-off.",
+      "reflection_prompt": "What is the riskiest assumption in your plan, and how will you validate it?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "2bf3f611-c2c1-4046-b6c1-7c922d5e36f2",
+      "type": "reflection",
+      "title": "Teach Back the Campaign",
+      "content": {
+        "text": "### Reflect & Teach\n- Draft a short audio or written debrief explaining your pretext, payload, and safety controls to a teammate.\n- Record two insights you gained about balancing stealth and learning.\n- Identify one detection recommendation you will hand to defenders."
+      },
+      "simplified_explanation": "Teaching clarifies the why behind every engagement decision.",
+      "memory_aids": [
+        "Explain → Insight → Recommend"
+      ],
+      "real_world_connection": "After every campaign, elite teams hold a hotwash identical to this activity.",
+      "reflection_prompt": "Who will you share your debrief with this week?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the main reason to diversify initial access techniques during an engagement?",
+      "options": [
+        "To increase the volume of alerts",
+        "To adapt to layered defenses and increase learning value",
+        "To impress executives",
+        "To avoid writing reports"
+      ],
+      "correct_answer": 1,
+      "explanation": "Multiple techniques reveal strengths and weaknesses across technology, process, and people.",
+      "difficulty": 2,
+      "memory_aid": "Variety reveals gaps",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why should callbacks include safeties and kill switches?",
+      "options": [
+        "To avoid writing documentation",
+        "To maintain control and terminate immediately if scope is breached",
+        "To increase beacon frequency",
+        "To disable blue team monitoring"
+      ],
+      "correct_answer": 1,
+      "explanation": "Safeties protect both client and red team by ensuring activity stays within agreed parameters.",
+      "difficulty": 2,
+      "memory_aid": "Safety first, stealth second",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What should accompany initial access artifacts in the final report?",
+      "options": [
+        "Only screenshots",
+        "Context, impact, and remediation guidance",
+        "A list of memes",
+        "Nothing—artifacts speak for themselves"
+      ],
+      "correct_answer": 1,
+      "explanation": "Detailed context empowers defenders to prioritise fixes and replicate detection logic.",
+      "difficulty": 2,
+      "memory_aid": "Artifact + Insight",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

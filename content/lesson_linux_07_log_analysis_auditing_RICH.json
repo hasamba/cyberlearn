@@ -10,22 +10,21 @@
   "base_xp_reward": 150,
   "prerequisites": [],
   "concepts": [
-    "syslog",
-    "rsyslog",
-    "journalctl",
-    "auditd",
+    "syslog architecture",
+    "journalctl mastery",
+    "auditd configuration",
     "log rotation",
     "security event correlation",
     "audit rules",
-    "log analysis"
+    "forensic log analysis"
   ],
   "learning_objectives": [
-    "Understand Linux logging architecture",
-    "Master journalctl for systemd log analysis",
-    "Configure and use auditd for security monitoring",
-    "Create custom audit rules",
-    "Correlate security events across multiple logs",
-    "Investigate security incidents using logs"
+    "Understand Linux logging architecture (syslog, rsyslog, systemd journal)",
+    "Master journalctl for querying and analyzing systemd logs",
+    "Configure and use auditd for security auditing",
+    "Create custom audit rules for monitoring critical events",
+    "Correlate security events across multiple log sources",
+    "Investigate security incidents using log analysis"
   ],
   "jim_kwik_principles": [
     "active_learning",
@@ -41,9 +40,124 @@
   ],
   "content_blocks": [
     {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Log analysis is like being a detective with security camera footage. Every login, file access, and command execution leaves a trace. The key is knowing where to look and what patterns to recognize. By the end of this lesson, you will be able to investigate a security incident using logs in under 5 minutes!"
+      }
+    },
+    {
       "type": "explanation",
       "content": {
-        "text": "Linux logging is your security camera system. Every authentication attempt, file access, and system error is recorded. Master log analysis to detect breaches, investigate incidents, and maintain security."
+        "text": "Linux logging has three main components: Traditional syslog (logs to files in /var/log), Systemd journal (binary logs), and Auditd (security-focused kernel auditing). Understanding when to use each tool is essential for effective security monitoring and incident response."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Journalctl is your Swiss Army knife for log analysis. Key commands: journalctl -b (current boot logs), journalctl -xe (recent errors with explanations), journalctl -u servicename (specific service logs), journalctl --since today (time filtering). The -f flag follows logs in real-time like tail -f."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Essential journalctl commands:\n\n# Show recent errors\njournalctl -xe\n\n# SSH logs from last hour\njournalctl -u sshd --since '1 hour ago'\n\n# Follow logs in real-time\njournalctl -f\n\n# Show only error priority\njournalctl -p err\n\n# Logs from previous boot\njournalctl -b -1"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Traditional syslog stores logs in /var/log as text files. Key files: /var/log/auth.log (authentication events), /var/log/syslog (general system messages), /var/log/kern.log (kernel messages). Use grep, awk, and tail to analyze these files. Remember that btmp and wtmp are binary files - use lastb and last commands to read them."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Essential syslog commands:\n\n# Failed SSH attempts\ngrep 'Failed password' /var/log/auth.log\n\n# Successful logins\ngrep 'Accepted password' /var/log/auth.log\n\n# Sudo usage\ngrep sudo /var/log/auth.log\n\n# Count failed logins by IP\ngrep 'Failed password' /var/log/auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn\n\n# View failed login attempts\nlastb\n\n# View successful logins\nlast"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Auditd is the Linux Audit Framework for security monitoring. It tracks WHO did WHAT, WHEN, and HOW at the kernel level. Create audit rules with auditctl to watch files, track syscalls, and monitor user actions. Rules persist across reboots when added to /etc/audit/rules.d/"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Essential auditd commands:\n\n# Watch a file for changes\nsudo auditctl -w /etc/passwd -p wa -k passwd_changes\n\n# Watch executable for execution\nsudo auditctl -w /bin/su -p x -k privilege_escalation\n\n# Search audit logs by key\nsudo ausearch -k passwd_changes -i\n\n# Search recent AVC denials\nsudo ausearch -m AVC -ts recent\n\n# Generate audit report\nsudo aureport -au\n\n# Make rules persistent\necho '-w /etc/passwd -p wa -k passwd_changes' | sudo tee -a /etc/audit/rules.d/custom.rules\nsudo augenrules --load"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Real incident: At 3 AM, IDS alerts on unusual outbound connections from web server. Using logs, you discover: (1) journalctl shows successful SSH login from unknown IP at 2:47 AM, (2) ausearch reveals attacker executed cryptominer from /tmp, (3) auth.log shows attacker modified .bashrc for persistence. Log correlation across syslog, journal, and auditd provided complete attack timeline. Without logs, this breach would have gone undetected for weeks."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Remember LOG-STAR for incident investigation: Location (where are logs?), Outcome (success/fail?), Granularity (filter by time/priority), Source (who/what?), Time (when?), Action (what happened?), Response (system reaction?). For commands, remember TUBE: Time (--since), Unit (-u service), Boot (-b), End+Explain (-xe)."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "questions": [
+          {
+            "question_id": "q1",
+            "type": "multiple_choice",
+            "question": "You need to investigate a service crash at 2:15 PM. Which command is most efficient?",
+            "options": [
+              "journalctl -b",
+              "journalctl -u servicename --since 14:10 --until 14:20 -p err",
+              "tail -f /var/log/syslog",
+              "grep error /var/log/syslog"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B targets the specific service, time window, and error priority. This filters out noise and shows only relevant errors. Option A shows all boot logs (too broad), C follows live logs (not historical), D searches all errors without filtering.",
+            "difficulty": 2,
+            "memory_aid": "TUBE framework: Time + Unit + priority filter",
+            "points": 10
+          },
+          {
+            "question_id": "q2",
+            "type": "multiple_choice",
+            "question": "Which command shows failed login attempts stored in binary format?",
+            "options": [
+              "grep Failed /var/log/auth.log",
+              "lastb",
+              "journalctl -u sshd",
+              "ausearch -m USER_LOGIN"
+            ],
+            "correct_answer": 1,
+            "explanation": "lastb reads /var/log/btmp which stores failed logins in binary format. Option A reads text auth.log (also valid but different source). Option C shows SSH logs from journal. Option D searches auditd logs.",
+            "difficulty": 1,
+            "memory_aid": "lastb = last bad (failed logins)",
+            "points": 5
+          },
+          {
+            "question_id": "q3",
+            "type": "multiple_choice",
+            "question": "You want auditd to monitor all changes to /etc/shadow. Which command?",
+            "options": [
+              "auditctl -w /etc/shadow -p r -k shadow_read",
+              "auditctl -w /etc/shadow -p wa -k shadow_changes",
+              "auditctl -w /etc/shadow -p x -k shadow_exec",
+              "auditctl -w /etc/shadow -k shadow_monitor"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B watches for write (w) and attribute changes (a). Option A only monitors reads. Option C monitors execution (shadow is not executable). Option D is missing permission flags. The -k flag adds a searchable key for ausearch.",
+            "difficulty": 2,
+            "memory_aid": "-w = watch path, -p = permissions (wa = write+attribute), -k = key for search",
+            "points": 10
+          }
+        ]
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Reflection: Explain how you would investigate a suspected brute force attack using journalctl, grep, and ausearch. What logs would you check first? How would you correlate timestamps across different log sources? What patterns would indicate a successful breach versus just scanning?"
       }
     }
   ],
@@ -51,18 +165,34 @@
     {
       "question_id": "pa1",
       "type": "multiple_choice",
-      "question": "What is the primary tool for querying systemd journal logs?",
+      "question": "You see 50 failed SSH attempts from one IP, then one success. What should you investigate FIRST?",
       "options": [
-        "grep",
-        "journalctl",
-        "ausearch",
-        "tail"
+        "Block the IP in firewall immediately",
+        "Check what commands the user executed after successful login using ausearch",
+        "Reset all user passwords",
+        "Review SSH configuration"
       ],
       "correct_answer": 1,
-      "explanation": "journalctl is the command-line interface to the systemd journal, providing powerful filtering and querying capabilities.",
-      "difficulty": 1,
-      "memory_aid": "journalctl queries the systemd journal",
+      "explanation": "Option B: Successful login after brute force suggests compromise. First priority is understanding what the attacker DID using ausearch -k command_execution or checking auth.log for user actions. This determines scope before containment. Blocking (A) and password resets (C) come after understanding impact.",
+      "difficulty": 2,
+      "memory_aid": "Investigate first, contain second - need to know what was compromised",
       "points": 10
+    },
+    {
+      "question_id": "pa2",
+      "type": "multiple_choice",
+      "question": "Which file contains authentication events like SSH logins and sudo usage?",
+      "options": [
+        "/var/log/syslog",
+        "/var/log/auth.log",
+        "/var/log/kern.log",
+        "/var/log/messages"
+      ],
+      "correct_answer": 1,
+      "explanation": "/var/log/auth.log (Debian/Ubuntu) or /var/log/secure (RHEL) contains all authentication and authorization events including SSH, sudo, su, and user account changes. syslog is general system messages, kern.log is kernel messages.",
+      "difficulty": 1,
+      "memory_aid": "auth.log = authentication logs",
+      "points": 5
     }
   ],
   "tags": [
@@ -70,10 +200,11 @@
     "logging",
     "auditd",
     "journalctl",
-    "incident_response"
+    "incident_response",
+    "forensics"
   ],
   "version": "1.0",
   "author": "CyberLearn Platform",
   "created_at": "2025-01-28T10:00:00Z",
-  "updated_at": "2025-01-28T10:00:00Z"
+  "updated_at": "2025-01-28T18:00:00Z"
 }

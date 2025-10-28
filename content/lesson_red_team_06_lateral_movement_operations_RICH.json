@@ -1,0 +1,218 @@
+{
+  "lesson_id": "6c7d3667-e81e-4876-a7b5-33fb0bb23451",
+  "domain": "red_team",
+  "title": "Lateral Movement Operations & Command and Control",
+  "subtitle": "Expanding footholds while managing detection risk",
+  "difficulty": 3,
+  "estimated_time": 60,
+  "order_index": 6,
+  "prerequisites": [
+    "Windows Privilege Escalation for Red Teams",
+    "Active Directory Hardening & Continuous Monitoring"
+  ],
+  "concepts": [
+    "Credential reuse and pass-the-hash",
+    "Remote service execution",
+    "WMI and PowerShell remoting",
+    "WinRM and SMB lateral movement",
+    "Kerberos constrained delegation abuse",
+    "Golden ticket and silver ticket operations",
+    "C2 infrastructure scaling",
+    "Detection engineering considerations",
+    "Containment triggers and safeties",
+    "Data staging and exfil preparation"
+  ],
+  "learning_objectives": [
+    "Select lateral movement techniques aligned with engagement objectives and OPSEC",
+    "Automate host-to-host operations through C2 frameworks and custom tooling",
+    "Manage credentials securely during multi-hop campaigns",
+    "Detect and react to blue team containment signals without derailing the mission",
+    "Stage data and evidence for realistic adversary simulation and reporting",
+    "Provide defenders with replayable timelines and indicators of compromise"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "586cde49-61d1-4dff-8add-328ec86e09f8",
+      "type": "mindset_coach",
+      "title": "Scale Without Losing Control",
+      "content": {
+        "text": "Lateral movement is where engagements expand rapidly. Approach it like air traffic control: every credential, host, and beacon needs a flight plan, safe altitude, and emergency procedure."
+      },
+      "simplified_explanation": "Keep a clear, controlled view of every move you make.",
+      "memory_aids": [
+        "Plan → Track → Adjust"
+      ],
+      "real_world_connection": "Elite operators manage lateral movement via shared dashboards and white cell approvals.",
+      "reflection_prompt": "What tracking mechanisms will you use to avoid losing sight of compromised hosts?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "0dddd3aa-c974-4fb0-8186-a1bd016c31f0",
+      "type": "explanation",
+      "title": "Movement Matrix",
+      "content": {
+        "text": "## Technique Families\n- **Credential reuse** – Pass-the-hash, pass-the-ticket, credential replay.\n- **Remote execution** – WMI, WinRM, PsExec, scheduled tasks.\n- **Delegation abuse** – Kerberos constrained/unconstrained delegation, S4U.\nPair each family with prerequisites, detection risk, and clean-up steps."
+      },
+      "simplified_explanation": "Map techniques to prerequisites so you deploy them intentionally.",
+      "memory_aids": [
+        "Credentials → Execution → Delegation"
+      ],
+      "real_world_connection": "Movement matrices live on the ops floor to ensure coverage and variation.",
+      "reflection_prompt": "Which technique family do you rely on too heavily and why?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "7d8fb154-c8ca-4fb2-910d-a53faa0f44f1",
+      "type": "video",
+      "title": "Lateral Movement and C2 Infrastructure",
+      "content": {
+        "resources": "Review pass-the-hash, remote execution, and infrastructure hygiene in an end-to-end demo.\n\n**Video**: [Lateral Movement and C2 Infrastructure](https://www.youtube.com/watch?v=jQ9kx6hjVn4)\n\nObserve how containment triggers and emergency stop procedures are woven into the workflow."
+      },
+      "simplified_explanation": "See how movement and C2 design reinforce each other.",
+      "memory_aids": [
+        "Annotate the diagram with your own infrastructure"
+      ],
+      "real_world_connection": "Many real operations use identical infrastructure diagrams.",
+      "reflection_prompt": "What change will you make to your C2 design after watching?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e51b5c9a-065c-4cb6-80c1-e356b2a42f3f",
+      "type": "memory_aid",
+      "title": "MOVE Framework",
+      "content": {
+        "text": "### M.O.V.E.\n- **M**ap credentials and sessions\n- **O**perate with containment triggers\n- **V**alidate access with canary actions\n- **E**xfil only after approval"
+      },
+      "simplified_explanation": "MOVE keeps operations intentional and auditable.",
+      "memory_aids": [
+        "Always MOVE with intent"
+      ],
+      "real_world_connection": "MOVE aligns with many red-team governance requirements.",
+      "reflection_prompt": "Which MOVE element will you incorporate into your runbook today?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "a0671908-a5c5-4f94-a925-63c8f6640ac5",
+      "type": "real_world",
+      "title": "Field Example: Global Manufacturing Purple Team",
+      "content": {
+        "text": "During a purple-team engagement, operators combined pass-the-hash with SMB lateral movement to simulate ransomware propagation. Blue teams, armed with Sysmon and Defender telemetry, contained the campaign within twenty minutes and traced the intrusion path for remediation."
+      },
+      "simplified_explanation": "Well-instrumented environments can catch rapid lateral movement when trained.",
+      "memory_aids": [
+        "Telemetry + Training = Triumph"
+      ],
+      "real_world_connection": "Adapted from a publicised manufacturing sector exercise.",
+      "reflection_prompt": "How will you help defenders achieve similar visibility?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "21d711b9-1e4d-4fb6-bf97-c681a96b7720",
+      "type": "simulation",
+      "title": "Plan a Lateral Movement Chain",
+      "content": {
+        "text": "1. Inventory credentials and permissions you currently control.\n2. Choose two lateral movement techniques and outline commands, safeties, and expected telemetry.\n3. Define detection signals you anticipate and your response if defenders react.\n4. Capture the chain in your operation log and set containment triggers."
+      },
+      "simplified_explanation": "Design the chain before you touch a keyboard to avoid improvising under pressure.",
+      "memory_aids": [
+        "Design → Execute → Adapt"
+      ],
+      "real_world_connection": "Operations teams rehearse movement chains during tabletop exercises.",
+      "reflection_prompt": "Which part of your plan would benefit from automation?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "7f65413b-db61-4551-9397-9978d11f4147",
+      "type": "reflection",
+      "title": "Teach Back the Timeline",
+      "content": {
+        "text": "### Reflect & Teach\n- Summarise the lateral movement timeline you designed, highlighting decision points.\n- List two containment triggers that protect the client and the engagement.\n- Identify one defender insight you will deliver post-engagement."
+      },
+      "simplified_explanation": "Teaching forces you to articulate intent, safeguards, and lessons.",
+      "memory_aids": [
+        "Timeline → Triggers → Insights"
+      ],
+      "real_world_connection": "Timeline briefings are standard in hotwashes and regulatory reviews.",
+      "reflection_prompt": "Who on the blue team would benefit most from this briefing?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why coordinate lateral movement with C2 infrastructure planning?",
+      "options": [
+        "Because C2 is only for initial access",
+        "To ensure command channels support scale, redundancy, and safety",
+        "To impress the client",
+        "Because lateral movement disables C2"
+      ],
+      "correct_answer": 1,
+      "explanation": "Strong C2 design maintains control, enables rapid stop, and supports evidence capture during broad operations.",
+      "difficulty": 3,
+      "memory_aid": "Move with comms",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What distinguishes pass-the-hash from credential replay?",
+      "options": [
+        "Nothing, they are identical",
+        "Pass-the-hash reuses NTLM hashes without cracking, while credential replay reuses captured credentials in their native protocol",
+        "Pass-the-hash works only on Linux",
+        "Credential replay requires Domain Admin"
+      ],
+      "correct_answer": 1,
+      "explanation": "Understanding the distinction informs detection strategies and defensive guidance.",
+      "difficulty": 3,
+      "memory_aid": "Hash vs protocol reuse",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Why practise containment triggers during lateral movement?",
+      "options": [
+        "To avoid writing reports",
+        "To respond immediately if scope or safety signals fire",
+        "To reduce stealth",
+        "To notify marketing"
+      ],
+      "correct_answer": 1,
+      "explanation": "Predefined triggers keep engagements safe and protect client systems when unexpected events occur.",
+      "difficulty": 3,
+      "memory_aid": "Trigger = pivot stop",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 160,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}
