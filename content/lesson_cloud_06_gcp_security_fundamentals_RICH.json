@@ -1,0 +1,141 @@
+{
+  "lesson_id": "18e97c15-6900-4919-99f0-0531c5809325",
+  "domain": "cloud",
+  "title": "Google Cloud Platform (GCP) Security Fundamentals",
+  "difficulty": 2,
+  "order_index": 6,
+  "prerequisites": [],
+  "concepts": [
+    "GCP Security Architecture",
+    "Google Cloud Identity and Access Management (IAM)",
+    "GCP Project Organization and Hierarchy",
+    "Cloud Resource Manager",
+    "VPC Service Controls",
+    "Cloud Armor and DDoS Protection",
+    "Cloud Security Command Center (SCC)",
+    "Binary Authorization",
+    "Cloud KMS and Secret Manager",
+    "GCP Audit Logging and Monitoring"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Understand GCP security architecture and shared responsibility model",
+    "Master Google Cloud IAM roles, permissions, and service accounts",
+    "Learn to implement VPC Service Controls for data exfiltration prevention",
+    "Configure Cloud Armor for DDoS protection and WAF capabilities",
+    "Apply Cloud Security Command Center for threat detection",
+    "Implement encryption with Cloud KMS and manage secrets securely"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of VPC Service Controls in GCP?",
+      "options": [
+        "To encrypt data at rest",
+        "To prevent data exfiltration from GCP services",
+        "To manage user authentication",
+        "To monitor network traffic"
+      ],
+      "correct_answer": 1,
+      "explanation": "VPC Service Controls create security perimeters around GCP resources to prevent data exfiltration and unauthorized access to sensitive data.",
+      "question_id": "a040140c-5ef8-4574-8ad0-17f701a266af",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question": "Which GCP service provides centralized security and risk management?",
+      "options": [
+        "Cloud Armor",
+        "Cloud Security Command Center",
+        "IAM",
+        "Cloud KMS"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cloud Security Command Center (SCC) provides centralized visibility into security and data risk across GCP resources.",
+      "question_id": "b150251d-6ef9-4685-9be1-28f812b377bg",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question": "What type of IAM binding should you use for temporary access?",
+      "options": [
+        "Basic roles",
+        "Predefined roles",
+        "Custom roles",
+        "Conditional roles"
+      ],
+      "correct_answer": 3,
+      "explanation": "Conditional roles allow you to grant temporary access based on conditions like time, IP address, or resource attributes.",
+      "question_id": "c260362e-7ffa-4796-acf2-39g923c488ch",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "memory_hooks",
+    "teach_like_im_10",
+    "minimum_effective_dose",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Welcome to GCP Security!\n\nGoogle Cloud Platform (GCP) is the third-largest cloud provider with unique security features that differentiate it from AWS and Azure. Understanding GCP security is essential for:\n\n**Why GCP Security Matters:**\n- Fortune 500 companies increasingly adopt GCP for analytics and ML workloads\n- Google's security model is built on their experience protecting Gmail, YouTube, and Search\n- Unique security features like VPC Service Controls and Binary Authorization\n- Strong integration with Google Workspace for identity management\n\n**Real-World Impact:**\n- Spotify uses GCP for data analytics (petabytes of data)\n- Twitter migrated to GCP for cost optimization and security\n- PayPal uses GCP for payment processing infrastructure\n- Misconfigured GCP projects can expose data to the internet\n\n**What You'll Master:**\n- GCP IAM (roles, service accounts, workload identity)\n- VPC Service Controls for data exfiltration prevention\n- Cloud Armor for DDoS protection\n- Cloud Security Command Center for threat detection\n- Cloud KMS and Secret Manager\n- Security best practices and compliance\n\nLet's dive into securing Google Cloud!"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# GCP Security Architecture\n\n## Shared Responsibility Model\n\n```\nGCP Shared Responsibility:\n\n┌─────────────────────────────────────────┐\n│ Customer Responsibility                 │\n│ - Application code security             │\n│ - Data classification and encryption    │\n│ - IAM policies and access control       │\n│ - Network configuration (firewall)      │\n│ - OS patches (if using GCE)            │\n└─────────────────────────────────────────┘\n           ↕ (Shared)\n┌─────────────────────────────────────────┐\n│ Google Responsibility                   │\n│ - Physical security of data centers     │\n│ - Hardware infrastructure               │\n│ - Network infrastructure                │\n│ - Hypervisor security                   │\n│ - Default encryption at rest            │\n└─────────────────────────────────────────┘\n```\n\n## GCP Resource Hierarchy\n\n```\nOrganization\n  |\n  ├── Folder (Dev)\n  │     ├── Project A\n  │     └── Project B\n  |\n  └── Folder (Prod)\n        ├── Project C\n        └── Project D\n\nIAM policies inherit down the hierarchy!\n```\n\n**Key Concepts:**\n- **Organization**: Root node (linked to Google Workspace domain)\n- **Folders**: Group projects (by team, environment, compliance)\n- **Projects**: Billing and resource container\n- **Resources**: VMs, storage, databases\n\n**Security Implication:** IAM policies set at organization level cascade to all projects. This is powerful but dangerous if misconfigured!"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# GCP IAM Hands-On\n\n## Understanding IAM Roles\n\nGCP IAM has 3 role types:\n\n### 1. Basic Roles (Avoid in Production!)\n\n```bash\n# Basic roles are too broad\n# Owner = Full access (DANGEROUS)\n# Editor = Modify resources\n# Viewer = Read-only\n\n# Grant viewer access (basic role)\ngcloud projects add-iam-policy-binding PROJECT_ID \\\n  --member='user:alice@example.com' \\\n  --role='roles/viewer'\n```\n\n### 2. Predefined Roles (Recommended)\n\n```bash\n# Specific to services, follow least privilege\n\n# Grant Compute Instance Admin\ngcloud projects add-iam-policy-binding PROJECT_ID \\\n  --member='user:bob@example.com' \\\n  --role='roles/compute.instanceAdmin.v1'\n\n# Grant Storage Object Viewer\ngcloud projects add-iam-policy-binding PROJECT_ID \\\n  --member='serviceAccount:app@project.iam.gserviceaccount.com' \\\n  --role='roles/storage.objectViewer'\n```\n\n### 3. Custom Roles\n\n```bash\n# Create custom role with specific permissions\ngcloud iam roles create customComputeRole \\\n  --project=PROJECT_ID \\\n  --title=\"Custom Compute Role\" \\\n  --description=\"Limited compute permissions\" \\\n  --permissions=compute.instances.list,compute.instances.get,compute.instances.stop\n\n# Assign custom role\ngcloud projects add-iam-policy-binding PROJECT_ID \\\n  --member='user:charlie@example.com' \\\n  --role='projects/PROJECT_ID/roles/customComputeRole'\n```\n\n## Service Accounts (Application Identity)\n\n```bash\n# Create service account\ngcloud iam service-accounts create my-app-sa \\\n  --display-name=\"My Application Service Account\"\n\n# Grant service account permissions\ngcloud projects add-iam-policy-binding PROJECT_ID \\\n  --member='serviceAccount:my-app-sa@PROJECT_ID.iam.gserviceaccount.com' \\\n  --role='roles/storage.objectAdmin'\n\n# Create and download key (AVOID IF POSSIBLE)\ngcloud iam service-accounts keys create key.json \\\n  --iam-account=my-app-sa@PROJECT_ID.iam.gserviceaccount.com\n\n# Better: Use Workload Identity (no keys!)\n```\n\n**Practice Exercise:**\n1. List all IAM policies in your project\n2. Create a custom role with minimal permissions\n3. Create a service account for an application\n4. Audit service account keys (find old ones!)"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# VPC Service Controls - Data Exfiltration Prevention\n\n## What Are VPC Service Controls?\n\nVPC Service Controls create a security perimeter around GCP services to prevent:\n- Data exfiltration via unauthorized API calls\n- Access from untrusted networks\n- Copying data to external projects\n\n## How It Works\n\n```\nWithout VPC Service Controls:\n┌──────────────┐\n│ Your Project │\n│ (Private)    │───> Cloud Storage ───> Internet\n└──────────────┘         ↓\n                    Anyone with link\n                    can download!\n\nWith VPC Service Controls:\n┌──────────────────────────────────┐ Service Perimeter\n│ Your Project                     │\n│ ├── Cloud Storage (Protected)    │\n│ ├── BigQuery (Protected)         │\n│ └── Only accessible from inside  │\n└──────────────────────────────────┘\n         ↓\n    Blocked from external access\n```\n\n## Creating a Service Perimeter\n\n```bash\n# Create access policy\ngcloud access-context-manager policies create \\\n  --title=\"Production Policy\"\n\n# Create service perimeter\ngcloud access-context-manager perimeters create production_perimeter \\\n  --title=\"Production Perimeter\" \\\n  --resources=projects/PROJECT_NUMBER \\\n  --restricted-services=storage.googleapis.com,bigquery.googleapis.com \\\n  --access-levels=POLICY_NAME\n```\n\n**Use Cases:**\n- Protect sensitive data (PII, financial)\n- Compliance requirements (HIPAA, PCI-DSS)\n- Prevent insider threats\n- Multi-tenant isolation"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Cloud Armor - DDoS Protection\n\n## Setting Up Cloud Armor\n\n### Step 1: Create Security Policy\n\n```bash\n# Create security policy\ngcloud compute security-policies create my-security-policy \\\n  --description=\"Block malicious traffic\"\n```\n\n### Step 2: Add Rules\n\n```bash\n# Block specific IP ranges\ngcloud compute security-policies rules create 1000 \\\n  --security-policy=my-security-policy \\\n  --expression=\"origin.ip == '203.0.113.0/24'\" \\\n  --action=deny-403\n\n# Rate limiting\ngcloud compute security-policies rules create 2000 \\\n  --security-policy=my-security-policy \\\n  --expression=\"true\" \\\n  --action=rate-based-ban \\\n  --rate-limit-threshold-count=100 \\\n  --rate-limit-threshold-interval-sec=60\n\n# Allow only specific countries\ngcloud compute security-policies rules create 3000 \\\n  --security-policy=my-security-policy \\\n  --expression=\"origin.region_code == 'US' || origin.region_code == 'CA'\" \\\n  --action=allow\n\n# Default rule (deny all)\ngcloud compute security-policies rules create 2147483647 \\\n  --security-policy=my-security-policy \\\n  --action=deny-403\n```\n\n### Step 3: Attach to Backend Service\n\n```bash\n# Attach policy to load balancer backend\ngcloud compute backend-services update my-backend \\\n  --security-policy=my-security-policy \\\n  --global\n```\n\n## Advanced: SQL Injection Prevention\n\n```bash\n# Block SQL injection patterns\ngcloud compute security-policies rules create 4000 \\\n  --security-policy=my-security-policy \\\n  --expression=\"evaluatePreconfiguredExpr('sqli-stable')\" \\\n  --action=deny-403\n\n# Block XSS patterns\ngcloud compute security-policies rules create 4001 \\\n  --security-policy=my-security-policy \\\n  --expression=\"evaluatePreconfiguredExpr('xss-stable')\" \\\n  --action=deny-403\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Real-World GCP Security Incidents\n\n## Case Study 1: Tesla's Kubernetes Misconfiguration (2018)\n\n**What Happened:**\n- Tesla's Kubernetes console on GCP was not password protected\n- Cryptocurrency miners discovered the exposed cluster\n- Attackers deployed mining software on Tesla's compute resources\n\n**Attack Chain:**\n```\n1. Shodan scan found exposed Kubernetes dashboard\n2. No authentication required to access\n3. Attackers deployed cryptomining pods\n4. Tesla received massive GCP bill\n```\n\n**Root Cause:**\n- Kubernetes dashboard exposed to internet\n- No IAM authentication configured\n- No VPC Service Controls\n\n**Lessons:**\n- Always enable authentication on management interfaces\n- Use VPC Service Controls to limit access\n- Implement Cloud Armor to block suspicious traffic\n- Monitor for unusual resource consumption\n\n---\n\n## Case Study 2: Misconfigured Cloud Storage Bucket\n\n**Scenario:** Healthcare company exposed patient data\n\n**Misconfiguration:**\n```bash\n# WRONG - Bucket publicly accessible\ngsutil iam ch allUsers:objectViewer gs://patient-data\n\n# Result: Anyone can list and download all files\ngsutil ls gs://patient-data\ngsutil cp gs://patient-data/* .\n```\n\n**Correct Configuration:**\n```bash\n# Remove public access\ngsutil iam ch -d allUsers:objectViewer gs://patient-data\n\n# Grant access only to specific service account\ngsutil iam ch serviceAccount:app@project.iam.gserviceaccount.com:objectViewer gs://patient-data\n\n# Enable uniform bucket-level access\ngsutil uniformbucketlevelaccess set on gs://patient-data\n```\n\n**Prevention:**\n- Enable Organization Policy to block public buckets\n- Use Cloud Asset Inventory to find public resources\n- Implement VPC Service Controls\n- Regular security audits with Cloud Security Command Center"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Aids for GCP Security\n\n## Mnemonic: \"VICE ASKS\"\n\n```\nV - VPC Service Controls (data exfiltration prevention)\nI - IAM (identity and access management)\nC - Cloud Armor (DDoS protection)\nE - Encryption (KMS, default at rest)\n\nA - Audit Logging (Cloud Logging)\nS - Security Command Center (threat detection)\nK - Key Management (Cloud KMS, Secret Manager)\nS - Service Accounts (application identity)\n```\n\n## IAM Role Types: \"BPC\"\n\n```\nB - Basic roles (Owner, Editor, Viewer) - AVOID!\nP - Predefined roles (service-specific) - PREFER\nC - Custom roles (minimal permissions) - BEST for unique needs\n```\n\n## Service Perimeter: Think \"Fortress\"\n\n```\nVPC Service Controls = Medieval fortress walls\n- Only authorized people enter (Access Levels)\n- Resources stay inside (Restricted Services)\n- No unauthorized data leaves (Egress/Ingress rules)\n```\n\n## Cloud Armor Rules Priority\n\n```\nLower number = Higher priority\n\n1000 - Block bad IPs\n2000 - Rate limiting\n3000 - Allow good traffic\n2147483647 - Default deny (always last)\n```"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You've Mastered GCP Security Fundamentals!\n\n**Outstanding progress!** You now understand Google Cloud Platform security - a critical skill as GCP adoption grows.\n\n## What You've Accomplished:\n\n- GCP IAM (roles, service accounts, workload identity)\n- VPC Service Controls (data exfiltration prevention)\n- Cloud Armor (DDoS protection and WAF)\n- Cloud Security Command Center (threat detection)\n- Security best practices and real-world incident analysis\n\n## Real-World Application:\n\n**For Cloud Security Engineers:**\n- Secure GCP projects following least privilege\n- Implement VPC Service Controls for sensitive data\n- Configure Cloud Armor for production workloads\n- Monitor with Cloud Security Command Center\n\n**For Pentesters:**\n- Understand common GCP misconfigurations\n- Identify exposed Kubernetes dashboards\n- Find publicly accessible Cloud Storage buckets\n- Test IAM policies for over-permissive access\n\n**For Compliance:**\n- GCP provides HIPAA, PCI-DSS, SOC 2 compliance\n- VPC Service Controls help meet data residency requirements\n- Audit logging supports compliance reporting\n\n## Next Steps:\n\n1. **Practice**: Create a GCP free tier account and experiment\n2. **Explore**: Try Cloud Security Command Center\n3. **Compare**: How does GCP differ from AWS/Azure?\n4. **Certifications**: Consider Google Cloud Security certification\n\n**Remember:** GCP security is different from AWS/Azure - unique features like VPC Service Controls and Binary Authorization provide powerful security capabilities. Master these to stand out!\n\nKeep building your multi-cloud security expertise!"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Knowledge Integration & Reflection\n\n## 1. Core Concept Review\n\n**Question:** How do VPC Service Controls differ from traditional firewall rules?\n\n**Your Answer:**\n___________________________________________\n___________________________________________\n\n---\n\n## 2. Practical Scenario\n\n**Scenario:** You discover a Cloud Storage bucket with allUsers:objectViewer permission in production.\n\n**Questions:**\n- What are the immediate risks?\n- How would you remediate this?\n- What preventive measures should be in place?\n\n**Your Response:**\n___________________________________________\n___________________________________________\n\n---\n\n## 3. IAM Design Challenge\n\n**Challenge:** Design IAM structure for a company with:\n- Dev team (needs full access to dev projects)\n- Ops team (needs read-only access to production)\n- Data scientists (need BigQuery access only)\n\n**Your IAM Design:**\n1. ___________________________________\n2. ___________________________________\n3. ___________________________________\n\n---\n\n## 4. Multi-Cloud Comparison\n\n**How does GCP security compare to AWS/Azure?**\n\n**Unique GCP features:**\n___________________________________________\n\n**When to choose GCP:**\n___________________________________________\n\n---\n\n## 5. Incident Response\n\n**You receive an alert: Unusual data egress from Cloud Storage.**\n\n**Your investigation steps:**\n1. ___________________________________\n2. ___________________________________\n3. ___________________________________\n4. ___________________________________"
+      }
+    }
+  ]
+}

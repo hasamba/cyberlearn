@@ -1,0 +1,147 @@
+{
+  "lesson_id": "a89f77d1-58f2-4f6f-8f4a-3e7b42a4a6b1",
+  "domain": "active_directory",
+  "title": "BloodHound: Mapping and Exploiting Active Directory Relationships",
+  "difficulty": 3,
+  "order_index": 9,
+  "prerequisites": [],
+  "concepts": [
+    "Graph theory in Active Directory enumeration",
+    "BloodHound data collection and ingestion",
+    "SharpHound data gathering",
+    "Edge types and relationships in AD graphs",
+    "Privilege escalation paths in AD",
+    "Shortest path analysis in BloodHound",
+    "Custom queries and Cypher language",
+    "Defensive use of BloodHound",
+    "Operational security when using enumeration tools",
+    "Detection and mitigation strategies"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand how BloodHound leverages graph theory to map AD relationships",
+    "Identify key AD objects and edges relevant to privilege escalation",
+    "Apply SharpHound to collect data from AD environments safely",
+    "Analyze privilege escalation paths using BloodHound queries",
+    "Implement defensive measures to detect and mitigate BloodHound activity",
+    "Use Cypher queries for custom analysis and detection strategies"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of BloodHound in an Active Directory environment?",
+      "options": [
+        "To exploit vulnerabilities in Windows binaries",
+        "To map and analyze relationships within Active Directory objects",
+        "To perform brute-force attacks on user credentials",
+        "To create phishing campaigns for AD users"
+      ],
+      "correct_answer": 1,
+      "explanation": "BloodHound uses graph theory to analyze and visualize relationships between AD objects to identify privilege escalation paths.",
+      "question_id": "2a3e17f2-6b2d-43d4-9d2e-1f26a5a48e1b",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question": "Which tool is commonly used to collect data for BloodHound analysis?",
+      "options": [
+        "SharpHound",
+        "Responder",
+        "PowerView",
+        "CrackMapExec"
+      ],
+      "correct_answer": 0,
+      "explanation": "SharpHound is the official data collector for BloodHound, used to gather data about users, groups, and permissions in AD.",
+      "question_id": "7de9c1c3-04a1-4bdf-94e3-4d65d81e2b92",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question": "What is a defensive strategy against BloodHound enumeration?",
+      "options": [
+        "Disable DNS logging",
+        "Reduce Group Policy Object (GPO) usage",
+        "Restrict unnecessary AD permissions and monitor LDAP queries",
+        "Enable anonymous LDAP binding"
+      ],
+      "correct_answer": 2,
+      "explanation": "Limiting excessive AD permissions and monitoring suspicious LDAP queries can significantly reduce BloodHound’s effectiveness.",
+      "question_id": "8a45dcb3-93a9-47c2-9a6b-3db6fd958b0e",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Introduction to BloodHound\n\nBloodHound is an Active Directory (AD) analysis tool that uses graph theory to uncover hidden relationships and privilege escalation paths within complex AD environments. By visualizing AD as a network graph, BloodHound provides defenders and attackers with a way to understand how users, groups, and permissions are interconnected.\n\n**Key Takeaways:**\n- BloodHound maps AD trust relationships.\n- It identifies potential privilege escalation paths.\n- It aids both offensive and defensive security operations.\n\nBloodHound consists of two main components:\n1. **SharpHound** – The data collector that gathers AD information.\n2. **BloodHound GUI** – The analytical interface used to visualize and query the collected data.\n\nBloodHound is invaluable for both penetration testers seeking to exploit AD weaknesses and blue teams aiming to close privilege gaps before adversaries exploit them."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Understanding Active Directory Relationships\n\nActive Directory (AD) is inherently relational. Users belong to groups, groups have permissions on objects, and certain accounts have elevated privileges. BloodHound leverages these relationships through **graph theory**, where nodes represent objects and edges represent relationships.\n\n**Common Object Types:**\n- Users\n- Groups\n- Computers\n- Organizational Units (OUs)\n\n**Common Relationship (Edge) Types:**\n- `MemberOf`: Indicates group membership.\n- `HasSession`: Indicates where a user is logged in.\n- `AdminTo`: Represents administrative privileges.\n- `CanRDP`: Represents RDP access rights.\n\nUnderstanding these relationships allows analysts to trace complex attack paths that might otherwise be invisible in raw AD data."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Data Collection Using SharpHound\n\nThe SharpHound data collector gathers AD relationship data in JSON format for import into BloodHound.\n\n**Example 1: Collecting Data via PowerShell**\n\n`bash\n# Execute SharpHound collector\nInvoke-BloodHound -CollectionMethod All -OutputDirectory C:\\BloodHound\\Data -ZipFileName data.zip\n`\n\n**Example 2: Using the .exe Collector**\n\n`bash\nSharpHound.exe -c All -d example.local -zipfilename data.zip\n`\n\n**Practice Exercise:**\n1. Run SharpHound in a test domain.\n2. Analyze the output data files.\n3. Import the .zip into the BloodHound GUI.\n\nAlways ensure this is done in a controlled environment with proper authorization."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Visualizing Privilege Escalation Paths\n\nOnce SharpHound data is imported, BloodHound visualizes it as a graph. Analysts can use **shortest path analysis** to find the quickest route from a low-privilege account to a domain admin.\n\n**Example Query:**\n- Find the shortest path to domain admin:\n  - `MATCH p=shortestPath((u:User {name:\"lowprivuser@example.local\"})-[:MemberOf*1..]->(g:Group {name:\"Domain Admins\"})) RETURN p`\n\n**Key Visualization Features:**\n- Node colors indicate object type.\n- Edge types show relationship paths.\n- Filters highlight specific privilege types.\n\nThis graph-based visualization transforms complex permission data into actionable insights for both offense and defense."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Querying BloodHound with Cypher\n\nCypher is the query language used to extract insights from the BloodHound Neo4j database.\n\n**Example 1: List all domain admins**\n`bash\nMATCH (u:User)-[:MemberOf*1..]->(g:Group {name:\"Domain Admins\"}) RETURN u\n`\n\n**Example 2: Find users with RDP privileges**\n`bash\nMATCH (u:User)-[:CanRDP]->(c:Computer) RETURN u.name, c.name\n`\n\n**Practice Exercise:**\n1. Write a Cypher query to find users who can execute DCSync.\n2. Modify it to include local admin relationships.\n3. Interpret the query results to identify risky accounts."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Real-World Case Study: APT Privilege Escalation via BloodHound\n\n## Case Study: APT29 in an Enterprise AD Environment\n\n**Target:** Corporate domain with nested group memberships.\n\n**Attack Chain:**\n`\n1. Initial access via phishing credentials.\n2. SharpHound run for AD enumeration.\n3. Graph analysis to identify 'CanRDP' → 'AdminTo' → 'Domain Admins' chain.\n4. Privilege escalation using discovered paths.\n`\n\n**Why It Worked:**\n- Overlapping group memberships.\n- Unrestricted delegation configurations.\n- Lack of monitoring for SharpHound-like activity.\n\n**Defense:**\n- Audit group memberships regularly.\n- Restrict administrative delegation.\n- Deploy honeypot users to detect reconnaissance attempts."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Defensive Applications of BloodHound\n\nDefenders can use BloodHound to proactively identify and close attack paths. The same visibility that aids attackers can empower administrators to harden AD.\n\n**Defensive Queries:**\n- Find accounts with unconstrained delegation.\n- Detect users who are local admins on multiple systems.\n\n**Example Defensive Query:**\n`bash\nMATCH (u:User)-[:AdminTo]->(c:Computer) RETURN u.name, count(c)\n`\n\n**Key Defensive Steps:**\n1. Remove unnecessary group memberships.\n2. Enforce tiered administration.\n3. Monitor for SharpHound binaries and LDAP enumeration patterns."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Mnemonic: BLOODHOUND\n\n`\nB - Build AD graphs\nL - Locate privilege paths\nO - Observe relationships\nO - Optimize permissions\nD - Detect anomalies\nH - Harden configurations\nO - Oversee group memberships\nU - Use Cypher for analysis\nN - Neutralize escalation paths\nD - Defend with intelligence\n`\n\nUse this acronym to remember BloodHound’s dual nature—both an offensive and defensive tool for AD security."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You've Mastered BloodHound Enumeration and Defense!\n\nExcellent work mastering one of the most powerful AD analysis tools in the cybersecurity arsenal.\n\n## What You've Achieved:\n✅ Understood BloodHound’s graph-theoretical foundation.\n✅ Executed SharpHound for data collection.\n✅ Queried and visualized AD privilege paths.\n✅ Applied defensive methodologies to mitigate exposure.\n\n## Real-World Application:\n\n**For Red Teamers:** Craft stealthier enumeration tactics and identify high-value targets efficiently.\n\n**For Blue Teamers:** Detect and remediate exposure before threat actors do.\n\n**Next Steps:**\n1. Deploy BloodHound in a controlled lab.\n2. Correlate findings with Windows event logs.\n3. Study advanced AD persistence techniques.\n\n**Remember:** Mastery of BloodHound gives you vision into the unseen structure of enterprise privilege. With great visibility comes great responsibility."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Knowledge Integration & Reflection\n\n## 1. Core Concept Review\n\n**Question:** How does graph theory empower BloodHound to reveal hidden privilege paths in AD?\n\n**Your Answer:**\n___________________________________________\n\n---\n\n## 2. Practical Scenario\n\n**Scenario:** You discover a non-admin user with RDP rights to a domain controller. How would you investigate and mitigate this using BloodHound?\n\n**Your Analysis:**\n___________________________________________\n\n---\n\n## 3. Application Challenge\n\n**Challenge:** Create a Cypher query to identify users who can perform DCSync operations. What remediation actions would you take?\n\n**Your Solution:**\n1. ___________________________________\n2. ___________________________********\n3. ***********************************\n\n---\n\n## 4. Connection to Other Topics\n\n**How does this relate to:**\n- Active Directory privilege management?\n- Lateral movement detection?\n- Zero Trust architecture?\n\n**Your Connections:**\n*******************************************"
+      }
+    }
+  ]
+}
