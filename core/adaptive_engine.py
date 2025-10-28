@@ -33,6 +33,47 @@ class AdaptiveEngine:
             "blueteam": ["dfir", "malware"],
         }
 
+    def _ordered_domains(self) -> List[str]:
+        """Domain ordering used for recommendations and fallbacks"""
+        return [
+            "fundamentals",
+            "dfir",
+            "malware",
+            "active_directory",
+            "system",
+            "linux",
+            "cloud",
+            "pentest",
+            "redteam",
+            "blueteam",
+        ]
+
+    def _prerequisites_met(self, domain: str, user: UserProfile) -> bool:
+        """Check if a user meets prerequisite skill thresholds for a domain"""
+        prereqs = self.domain_prerequisites.get(domain, [])
+        return all(getattr(user.skill_levels, prereq, 0) >= 30 for prereq in prereqs)
+
+    def _get_candidates_for_domain(
+        self,
+        lessons: List[LessonMetadata],
+        domain: str,
+        difficulties: List[int],
+        user_progress: List[LessonProgress],
+    ) -> List[LessonMetadata]:
+        """Return candidate lessons for a domain with graceful difficulty fallback"""
+        candidates = self._filter_lessons(lessons, domain, difficulties, user_progress)
+        if candidates:
+            return candidates
+
+        # No candidates within target difficulty – widen the search to any available difficulty
+        domain_difficulties = sorted(
+            {lesson.difficulty for lesson in lessons if lesson.domain == domain}
+        )
+        if not domain_difficulties or set(domain_difficulties) == set(difficulties):
+            return []
+
+        return self._filter_lessons(lessons, domain, domain_difficulties, user_progress)
+
     def get_recommended_lesson(
         self,
         user: UserProfile,
@@ -60,14 +101,26 @@ class AdaptiveEngine:
         if not domain:
             domain = self._select_optimal_domain(user)
 
-        # Get appropriate difficulty for user's skill level
-        skill_level = getattr(user.skill_levels, domain)
-        target_difficulties = self._get_target_difficulties(skill_level)
+        ordered_domains = self._ordered_domains()
+        search_domains = [domain] + [d for d in ordered_domains if d != domain]
 
-        # Filter available lessons
-        candidates = self._filter_lessons(
-            available_lessons, domain, target_difficulties, user_progress
-        )
+        candidates: List[LessonMetadata] = []
+        for candidate_domain in search_domains:
+            if not self._prerequisites_met(candidate_domain, user):
+                continue
+
+            skill_level = getattr(user.skill_levels, candidate_domain, 0)
+            target_difficulties = self._get_target_difficulties(skill_level)
+
+            candidates = self._get_candidates_for_domain(
+                available_lessons,
+                candidate_domain,
+                target_difficulties,
+                user_progress,
+            )
+
+            if candidates:
+                break
 
         if not candidates:
             return None
@@ -99,29 +152,14 @@ class AdaptiveEngine:
             return "fundamentals"
 
         # Find weakest domain that has prerequisites met
-        domains = [
-            "fundamentals",
-            "dfir",
-            "malware",
-            "active_directory",
-            "system",
-            "cloud",
-            "pentest",
-            "redteam",
-            "blueteam",
-        ]
+        domains = self._ordered_domains()
 
         domain_scores = []
         for domain in domains:
             skill = getattr(user.skill_levels, domain)
 
             # Check prerequisites
-            prereqs = self.domain_prerequisites.get(domain, [])
-            prereqs_met = all(
-                getattr(user.skill_levels, prereq) >= 30 for prereq in prereqs
-            )
-
-            if not prereqs_met:
+            if not self._prerequisites_met(domain, user):
                 continue
 
             # Score: lower skill = higher priority

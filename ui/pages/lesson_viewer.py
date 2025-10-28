@@ -20,6 +20,11 @@ def render(user: UserProfile, db: Database):
 
     st.markdown('<h1 class="main-header">📚 My Learning</h1>', unsafe_allow_html=True)
 
+    completion_summary = st.session_state.pop("completion_summary", None)
+    if completion_summary:
+        _render_completion_feedback(completion_summary)
+        st.markdown("---")
+
     # Domain tabs
     domains = [
         ("fundamentals", "🔐 Fundamentals"),
@@ -39,6 +44,8 @@ def render(user: UserProfile, db: Database):
     for idx, (domain_key, domain_name) in enumerate(domains):
         with tabs[idx]:
             render_domain_lessons(user, db, domain_key)
+
+    _maybe_scroll_to_top()
 
 
 def render_domain_lessons(user: UserProfile, db: Database, domain: str):
@@ -126,6 +133,137 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
         st.markdown("---")
 
 
+def _format_duration(seconds: int) -> str:
+    """Convert seconds into a human-friendly duration string"""
+    seconds = max(int(seconds), 0)
+    minutes, secs = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+
+    parts = []
+    if hours:
+        parts.append(f"{hours}h")
+    if minutes:
+        parts.append(f"{minutes}m")
+    if secs or not parts:
+        parts.append(f"{secs}s")
+
+    return " ".join(parts)
+
+
+def _render_completion_feedback(summary):
+    """Display completion feedback stored in session state"""
+    lesson_title = summary.get("lesson_title", "Lesson")
+    status_value = summary.get("status", "completed").replace("_", " ").title()
+    score = summary.get("score")
+    mastered = summary.get("mastered", False)
+    is_first_completion = summary.get("is_first_completion", False)
+    encouragement = summary.get("encouragement")
+    time_spent = summary.get("time_spent")
+    next_review = summary.get("next_review")
+
+    status_emoji = "🏆" if mastered else "✅"
+    st.success(f"{status_emoji} {lesson_title} marked as {status_value}! Score: {score}%")
+
+    if summary.get("trigger_balloons"):
+        st.balloons()
+
+    if time_spent is not None:
+        st.caption(f"Time spent: {_format_duration(time_spent)}")
+
+    if next_review:
+        st.caption(f"Next review scheduled for: {next_review}")
+
+    if is_first_completion:
+        xp_info = summary.get("xp_info") or {}
+        total_xp = xp_info.get("total_xp")
+        base_xp = xp_info.get("base_xp")
+
+        if total_xp is not None and base_xp is not None:
+            st.markdown(f"**XP Earned:** {total_xp} (Base XP: {base_xp})")
+
+        multipliers = xp_info.get("multipliers") or []
+        if multipliers:
+            st.caption("XP Multipliers:")
+            for item in multipliers:
+                st.caption(f"- {item['label']}: {item['value']}x")
+
+        level_info = summary.get("level_info") or {}
+        if level_info.get("level_up"):
+            st.success(
+                f"🆙 Level Up! Now Level {level_info.get('new_level')} - {level_info.get('level_name')}"
+            )
+
+        badges = summary.get("new_badges") or []
+        if badges:
+            with st.expander("🏅 New badges unlocked"):
+                for badge in badges:
+                    st.markdown(f"- **{badge['name']}** — {badge['description']}")
+    else:
+        st.info("🔁 Retake recorded. XP rewards apply on first completion only.")
+        retake_details = summary.get("retake_details") or {}
+        attempts = retake_details.get("attempts")
+        best_score = retake_details.get("best_score")
+        previous_best = retake_details.get("previous_best")
+        improved = retake_details.get("improved")
+
+        if attempts or best_score is not None:
+            st.caption(
+                "Attempts: "
+                + (str(attempts) if attempts is not None else "N/A")
+                + (
+                    f" · Best Score: {best_score}%"
+                    if best_score is not None
+                    else ""
+                )
+            )
+
+        if previous_best is not None:
+            if improved:
+                st.success(f"📈 New personal best! Previous best: {previous_best}%")
+            else:
+                st.caption(f"Previous best: {previous_best}%")
+
+    if encouragement:
+        st.info(encouragement)
+
+
+def _maybe_scroll_to_top():
+    """Scroll Streamlit view to the top on the next render cycle"""
+    if not st.session_state.pop("scroll_to_top", False):
+        return
+
+    import streamlit.components.v1 as components
+
+    components.html(
+        """
+        <script>
+        (function() {
+            function scrollAll(win) {
+                try { win.scrollTo(0, 0); } catch (e) {}
+                if (!win || !win.document) { return; }
+                ['section.main', '.block-container'].forEach(function(sel) {
+                    var el = win.document.querySelector(sel);
+                    if (el) { el.scrollTop = 0; }
+                });
+                try {
+                    win.document.documentElement.scrollTop = 0;
+                    win.document.body.scrollTop = 0;
+                } catch (e) {}
+            }
+            var targets = [window];
+            if (window.parent && window.parent !== window) {
+                targets.push(window.parent);
+            }
+            targets.forEach(scrollAll);
+            setTimeout(function(){ targets.forEach(scrollAll); }, 150);
+            setTimeout(function(){ targets.forEach(scrollAll); }, 400);
+        })();
+        </script>
+        """,
+        height=0,
+    )
+
+
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
@@ -204,24 +342,7 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
         st.session_state.scroll_to_top = True
         st.rerun()
 
-    # Scroll to top after navigation events to keep context consistent
-    if st.session_state.pop("scroll_to_top", False):
-        import streamlit.components.v1 as components
-
-        components.html(
-            """
-            <script>
-                const doc = window.parent.document;
-                const targets = doc.querySelectorAll('section.main, .block-container');
-                if (targets.length) {
-                    targets.forEach((el) => el.scrollTo({ top: 0, behavior: 'smooth' }));
-                }
-                doc.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-                doc.body.scrollTop = 0;
-            </script>
-        """,
-            height=0,
-        )
+    _maybe_scroll_to_top()
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
@@ -528,104 +649,139 @@ def complete_lesson(
         # Lesson exists but was never completed before
         is_first_completion = True
 
-    # Complete - this changes status to COMPLETED/MASTERED
-    completion_info = progress.complete_lesson(score, time_spent)
+    existing_scores = list(progress.quiz_scores)
+    previous_best = max(existing_scores) if existing_scores else None
+
+    # Complete - this changes status to COMPLETED/MASTERED
+    completion_info = progress.complete_lesson(score, time_spent)
+
+    # Initialize gamification engine
+    gamification = GamificationEngine()
+    xp_info = None
+    level_info = None
+    new_badges = []
+    encouragement = None
+
+    next_review_iso = (
+        completion_info.get("next_review").isoformat()
+        if completion_info.get("next_review")
+        else None
+    )
+
+    # Only award XP and update skills on FIRST completion
+    if is_first_completion:
+        # Calculate XP with bonuses
+        xp_info = gamification.calculate_xp(
+            base_xp=lesson.base_xp_reward,
+            score=score,
+            time_spent=time_spent,
+            estimated_time=lesson.estimated_time,
+            streak=user.streak_days,
+            difficulty=lesson.difficulty,
+            first_attempt=(progress.attempts == 1),
+        )
+
+        # Award XP
+        level_info = user.add_xp(xp_info["total_xp"])
+
+        # Update skill level
+        domain = lesson.domain
+        current_skill = getattr(user.skill_levels, domain)
+        adaptive = __import__("core.adaptive_engine", fromlist=["AdaptiveEngine"]).AdaptiveEngine()
+        new_skill = adaptive.calculate_skill_update(current_skill, lesson.difficulty, score)
+        setattr(user.skill_levels, domain, new_skill)
+
+        # Update stats (only on first completion)
+        user.total_lessons_completed += 1
+        user.total_time_spent += time_spent
+
+        # Check for badges (only on first completion)
+        user_progress_list = db.get_user_progress(user.user_id)
+        new_badges = gamification.check_badge_unlocks(user, user_progress_list, progress)
+
+        for badge in new_badges:
+            user.add_badge(badge.badge_id)
+
+        encouragement = gamification.generate_encouragement(
+            "perfect_score" if score == 100 else "level_up" if level_info["level_up"] else "streak_maintained",
+            user,
+        )
+    else:
+        # Retake - only update time spent
+        user.total_time_spent += time_spent
+        encouragement = gamification.generate_encouragement(
+            "streak_maintained" if score >= 80 else "low_score",
+            user,
+        )
+
+    # Save to database
+    if progress_exists_in_db:
+        db.update_progress(progress)
+    else:
+        db.create_progress(progress)
+
+    db.update_user(user)
+
+    badge_payload = [
+        {"id": badge.badge_id, "name": badge.name, "description": badge.description}
+        for badge in new_badges
+    ]
+
+    xp_payload = None
+    if xp_info:
+        xp_payload = {
+            "base_xp": xp_info["base_xp"],
+            "bonus_xp": xp_info["bonus_xp"],
+            "total_xp": xp_info["total_xp"],
+            "total_multiplier": xp_info["total_multiplier"],
+            "multipliers": [
+                {"label": name, "value": mult} for name, mult in xp_info["multipliers"]
+            ],
+        }
+
+    status_value = (
+        progress.status.value
+        if isinstance(progress.status, LessonStatus)
+        else str(progress.status)
+    )
+
+    retake_details = None
+    if not is_first_completion:
+        retake_details = {
+            "attempts": progress.attempts,
+            "best_score": progress.best_score,
+            "previous_best": previous_best,
+            "improved": (
+                progress.best_score > (previous_best or 0)
+                if previous_best is not None
+                else progress.best_score > 0
+            ),
+        }
+
+    completion_summary = {
+        "lesson_id": str(lesson.lesson_id),
+        "lesson_title": lesson.title,
+        "domain": lesson.domain,
+        "score": score,
+        "status": status_value,
+        "mastered": progress.status == LessonStatus.MASTERED,
+        "is_first_completion": is_first_completion,
+        "xp_info": xp_payload,
+        "level_info": level_info,
+        "new_badges": badge_payload,
+        "encouragement": encouragement,
+        "retake_details": retake_details,
+        "time_spent": time_spent,
+        "completed_at": progress.completed_at.isoformat() if progress.completed_at else None,
+        "next_review": next_review_iso,
+        "trigger_balloons": is_first_completion,
+    }
+
+    st.session_state.completion_summary = completion_summary
+
+    # Cleanup
+    cleanup_lesson_state()
 
-    # Initialize gamification engine
-    gamification = GamificationEngine()
-    xp_info = None
-    level_info = None
-    new_badges = []
-
-    # Only award XP and update skills on FIRST completion
-    if is_first_completion:
-        # Calculate XP with bonuses
-        xp_info = gamification.calculate_xp(
-            base_xp=lesson.base_xp_reward,
-            score=score,
-            time_spent=time_spent,
-            estimated_time=lesson.estimated_time,
-            streak=user.streak_days,
-            difficulty=lesson.difficulty,
-            first_attempt=(progress.attempts == 1),
-        )
-
-        # Award XP
-        level_info = user.add_xp(xp_info["total_xp"])
-
-        # Update skill level
-        domain = lesson.domain
-        current_skill = getattr(user.skill_levels, domain)
-        adaptive = __import__("core.adaptive_engine", fromlist=["AdaptiveEngine"]).AdaptiveEngine()
-        new_skill = adaptive.calculate_skill_update(current_skill, lesson.difficulty, score)
-        setattr(user.skill_levels, domain, new_skill)
-
-        # Update stats (only on first completion)
-        user.total_lessons_completed += 1
-        user.total_time_spent += time_spent
-
-        # Check for badges (only on first completion)
-        user_progress_list = db.get_user_progress(user.user_id)
-        new_badges = gamification.check_badge_unlocks(user, user_progress_list, progress)
-
-        for badge in new_badges:
-            user.add_badge(badge.badge_id)
-    else:
-        # Retake - only update time spent
-        user.total_time_spent += time_spent
-
-    # Save to database
-    if progress_exists_in_db:
-        # Progress record exists - update it
-        db.update_progress(progress)
-    else:
-        # New progress record - create it
-        db.create_progress(progress)
-
-    db.update_user(user)
-
-    # Show completion message
-    if is_first_completion:
-        st.success(f"🎉 Lesson Completed! Score: {score}%")
-        st.balloons()
-
-        st.markdown(f"### 🏆 Rewards")
-        st.markdown(f"**XP Earned:** {xp_info['total_xp']} XP")
-        st.markdown(f"**Base XP:** {xp_info['base_xp']}")
-
-        for multiplier_name, mult_value in xp_info["multipliers"]:
-            st.markdown(f"- {multiplier_name}: {mult_value}x")
-
-        if level_info["level_up"]:
-            st.success(
-                f"🎊 LEVEL UP! You're now Level {level_info['new_level']} - {level_info['level_name']}!"
-            )
-
-        if new_badges:
-            st.markdown("### 🏅 New Badges Unlocked!")
-            for badge in new_badges:
-                st.markdown(f"**{badge.name}** - {badge.description}")
-
-        # Encouragement
-        encouragement = gamification.generate_encouragement(
-            "perfect_score" if score == 100 else "level_up" if level_info["level_up"] else "streak_maintained",
-            user,
-        )
-        st.info(encouragement)
-    else:
-        # Retake completion
-        st.success(f"✅ Lesson Retake Completed! Score: {score}%")
-        st.info("💡 **Note:** XP and skill level rewards are only awarded on first completion. Great job reviewing the material!")
-
-        # Show progress improvement if score improved
-        if progress.attempts > 1:
-            st.markdown(f"**Attempts:** {progress.attempts}")
-            st.markdown(f"**Best Score:** {progress.best_score}%")
-            if score > progress.best_score:
-                st.success(f"🎯 New personal best! Previous best: {progress.best_score}%")
-
-    # Cleanup
-    cleanup_lesson_state()
 
 
 def cleanup_lesson_state():
