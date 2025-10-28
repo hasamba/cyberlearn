@@ -108,6 +108,12 @@ def render_recommended_lessons(user: UserProfile, db: Database):
     if recommended_id:
         lesson = db.get_lesson(recommended_id)
 
+        # Double-check the lesson isn't already completed (defensive check)
+        lesson_progress = db.get_lesson_progress(user.user_id, recommended_id)
+        if lesson_progress and lesson_progress.status in [LessonStatus.COMPLETED, LessonStatus.MASTERED]:
+            st.info("🎓 Great job! You've completed all available lessons in your recommended domains. Explore other domains or review past lessons to maintain your skills.")
+            return
+
         if lesson:
             st.markdown(
                 f"""

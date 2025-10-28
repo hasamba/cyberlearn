@@ -155,6 +155,11 @@ class UserProfile(BaseModel):
         now = datetime.now()
         days_since_last = (now - self.last_login).days
 
+        # Initialize streak for new users
+        if self.streak_days == 0:
+            self.streak_days = 1
+            self.longest_streak = 1
+
         if days_since_last == 1:
             # Consecutive day
             self.streak_days += 1

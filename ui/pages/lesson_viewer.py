@@ -128,10 +128,6 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Workaround for scroll: Use components.html to inject JS
-    # Streamlit reruns reset scroll position, so we inject JS after render
-    import streamlit.components.v1 as components
-
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
         st.session_state.lesson_start_time = time.time()
@@ -141,13 +137,6 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
 
     if "quiz_answers" not in st.session_state:
         st.session_state.quiz_answers = {}
-
-    # Inject scroll-to-top after navigation
-    components.html("""
-        <script>
-            window.parent.document.querySelector('section.main').scrollTo(0, 0);
-        </script>
-    """, height=0)
 
     # Header
     st.markdown(f"# {lesson.title}")
@@ -209,6 +198,17 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
         cleanup_lesson_state()
         st.session_state.current_page = "learning"
         st.rerun()
+
+    # Inject scroll-to-top at the END after all content is rendered
+    # This prevents auto-focus on buttons from scrolling page down
+    import streamlit.components.v1 as components
+    components.html("""
+        <script>
+            setTimeout(function() {
+                window.parent.document.querySelector('section.main').scrollTo(0, 0);
+            }, 100);
+        </script>
+    """, height=0)
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
@@ -465,6 +465,8 @@ def render_quiz(lesson: Lesson, user: UserProfile, db: Database):
             # Complete lesson
             complete_lesson(user, lesson, score, time_spent, db)
 
+            # Redirect back to lessons page to avoid empty page
+            st.session_state.current_page = "learning"
             st.rerun()
 
 
