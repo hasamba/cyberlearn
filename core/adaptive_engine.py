@@ -26,6 +26,7 @@ class AdaptiveEngine:
             "malware": ["fundamentals"],
             "active_directory": ["fundamentals"],
             "system": ["fundamentals"],
+            "linux": ["fundamentals"],
             "cloud": ["fundamentals", "system"],
             "pentest": ["fundamentals", "active_directory"],
             "redteam": ["pentest", "malware"],
@@ -392,6 +393,26 @@ class AdaptiveEngine:
                 {
                     "question": "What does UAC (User Account Control) do in Windows?",
                     "options": ["Prevents all administrative actions", "Prompts for permission before privileged operations", "Encrypts user files", "Monitors network connections"],
+                    "correct": 1,
+                    "difficulty": 2
+                },
+            ],
+            "linux": [
+                {
+                    "question": "What command shows currently running processes in Linux?",
+                    "options": ["ls", "ps", "cd", "pwd"],
+                    "correct": 1,
+                    "difficulty": 1
+                },
+                {
+                    "question": "What does chmod 755 mean in Linux permissions?",
+                    "options": ["Owner: rwx, Group: r-x, Others: r-x", "Everyone has full access", "No one can access", "Only root can access"],
+                    "correct": 0,
+                    "difficulty": 2
+                },
+                {
+                    "question": "Which firewall is commonly used in modern Linux distributions?",
+                    "options": ["Windows Firewall", "iptables/nftables", "Norton Firewall", "McAfee Firewall"],
                     "correct": 1,
                     "difficulty": 2
                 },
