@@ -34,7 +34,7 @@ def fix_duplicate_completions():
 
         # Get unique completed lessons
         cursor.execute(
-            "SELECT * FROM lesson_progress WHERE user_id = ? AND status IN ('completed', 'mastered')",
+            "SELECT * FROM progress WHERE user_id = ? AND status IN ('completed', 'mastered')",
             (user_id,)
         )
         progress_records = cursor.fetchall()
