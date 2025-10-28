@@ -260,6 +260,8 @@ def render_welcome_page():
                         # Create new user
                         user = UserProfile(username=new_username, email=email or None)
                         if st.session_state.db.create_user(user):
+                            user.update_streak()
+                            st.session_state.db.update_user(user)
                             st.session_state.current_user = user
                             st.session_state.current_page = "diagnostic"
                             st.success(f"Account created! Welcome, {new_username}!")

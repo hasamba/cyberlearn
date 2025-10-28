@@ -120,6 +120,7 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 ):
                     st.session_state.current_lesson = lesson
                     st.session_state.current_page = "lesson"
+                    st.session_state.scroll_to_top = True
                     st.rerun()
 
         st.markdown("---")
@@ -177,17 +178,20 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
             if current_idx > 0:
                 if st.button("⬅️ Previous", use_container_width=True):
                     st.session_state.current_block_index -= 1
+                    st.session_state.scroll_to_top = True
                     st.rerun()
 
         with col_next:
             if current_idx < total_blocks - 1:
                 if st.button("Next ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
+                    st.session_state.scroll_to_top = True
                     st.rerun()
             else:
                 # Last block - show quiz
                 if st.button("📝 Take Quiz ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
+                    st.session_state.scroll_to_top = True
                     st.rerun()
     else:
         # Quiz time
@@ -197,18 +201,27 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     if st.button("🔙 Back to Lessons"):
         cleanup_lesson_state()
         st.session_state.current_page = "learning"
+        st.session_state.scroll_to_top = True
         st.rerun()
 
-    # Inject scroll-to-top at the END after all content is rendered
-    # This prevents auto-focus on buttons from scrolling page down
-    import streamlit.components.v1 as components
-    components.html("""
-        <script>
-            setTimeout(function() {
-                window.parent.document.querySelector('section.main').scrollTo(0, 0);
-            }, 100);
-        </script>
-    """, height=0)
+    # Scroll to top after navigation events to keep context consistent
+    if st.session_state.pop("scroll_to_top", False):
+        import streamlit.components.v1 as components
+
+        components.html(
+            """
+            <script>
+                const doc = window.parent.document;
+                const targets = doc.querySelectorAll('section.main, .block-container');
+                if (targets.length) {
+                    targets.forEach((el) => el.scrollTo({ top: 0, behavior: 'smooth' }));
+                }
+                doc.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+                doc.body.scrollTop = 0;
+            </script>
+        """,
+            height=0,
+        )
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
@@ -467,6 +480,7 @@ def render_quiz(lesson: Lesson, user: UserProfile, db: Database):
 
             # Redirect back to lessons page to avoid empty page
             st.session_state.current_page = "learning"
+            st.session_state.scroll_to_top = True
             st.rerun()
 
 

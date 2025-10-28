@@ -517,17 +517,34 @@ class Database:
         """Convert DB row to LessonProgress"""
         data = dict(row)
 
-        # Parse JSON fields that are stored as strings
-        if 'quiz_scores' in data and isinstance(data['quiz_scores'], str):
-            data['quiz_scores'] = json.loads(data['quiz_scores'])
+        def parse_datetime(value):
+            return datetime.fromisoformat(value) if value else None
 
-        if 'retention_checks' in data and isinstance(data['retention_checks'], str):
-            data['retention_checks'] = json.loads(data['retention_checks'])
+        data["progress_id"] = UUID(data["progress_id"])
+        data["user_id"] = UUID(data["user_id"])
+        data["lesson_id"] = UUID(data["lesson_id"])
 
-        if 'interactive_blocks_completed' in data and isinstance(data['interactive_blocks_completed'], str):
-            data['interactive_blocks_completed'] = json.loads(data['interactive_blocks_completed'])
+        data["started_at"] = parse_datetime(data.get("started_at"))
+        data["completed_at"] = parse_datetime(data.get("completed_at"))
+        data["next_review_date"] = parse_datetime(data.get("next_review_date"))
 
-        return LessonProgress.parse_raw(json.dumps(data))
+        quiz_scores = data.get("quiz_scores")
+        data["quiz_scores"] = json.loads(quiz_scores) if quiz_scores else []
+
+        retention_raw = data.get("retention_checks")
+        data["retention_checks"] = (
+            json.loads(retention_raw) if retention_raw else []
+        )
+
+        interactive_raw = data.get("interactive_blocks_completed")
+        interactive_ids = json.loads(interactive_raw) if interactive_raw else []
+        data["interactive_blocks_completed"] = [
+            UUID(val) for val in interactive_ids if val
+        ]
+
+        data["reflection_submitted"] = bool(data.get("reflection_submitted"))
+
+        return LessonProgress.model_validate(data)
 
     def close(self):
         """Close database connection"""
