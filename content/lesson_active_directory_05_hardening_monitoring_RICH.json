@@ -1,0 +1,218 @@
+{
+  "lesson_id": "f8d4cc0e-59c2-42e0-a328-df5bb67cb0e6",
+  "domain": "active_directory",
+  "title": "Active Directory Hardening & Continuous Monitoring",
+  "subtitle": "Closing privilege gaps and detecting adversary reconnaissance",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 5,
+  "prerequisites": [
+    "Active Directory Fundamentals",
+    "Active Directory Enumeration & Attack Path Discovery"
+  ],
+  "concepts": [
+    "Tiered administration models",
+    "Privileged Access Workstations",
+    "Group Policy baselines",
+    "Local Administrator Password Solution",
+    "AdminSDHolder hygiene",
+    "Defender for Identity analytics",
+    "Honeytokens and deception accounts",
+    "Event log subscriptions and forwarding",
+    "Zero Trust enforcement in AD",
+    "Incident response runbooks for directory alerts"
+  ],
+  "learning_objectives": [
+    "Design tiered administration structures that reduce lateral movement risk",
+    "Implement Group Policy and LAPS controls that minimise credential theft",
+    "Deploy honeytokens and deception objects to detect enumeration",
+    "Integrate Defender for Identity or Sentinel analytics into daily monitoring",
+    "Create response playbooks for common AD security alerts and anomalies",
+    "Prioritise hardening tasks based on attack path intelligence"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "6b47dd6b-0f3b-4cc5-8d49-b1603f91e2b7",
+      "type": "mindset_coach",
+      "title": "From Recon to Resilience",
+      "content": {
+        "text": "Every escalation path you map during enumeration becomes a hardening opportunity. Approach this lesson like a joint red/blue planning session: your goal is to remove easy wins from the attacker while giving defenders faster, clearer signal."
+      },
+      "simplified_explanation": "Think like both attacker and defender while you build safeguards.",
+      "memory_aids": [
+        "Break paths, boost signal"
+      ],
+      "real_world_connection": "Purple teams that share this mindset shrink mean-time-to-detect and harden faster.",
+      "reflection_prompt": "Which attack path did you uncover previously that still needs mitigation?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f91ad261-f206-4cdb-941d-f273444777be",
+      "type": "explanation",
+      "title": "Hardening Priorities",
+      "content": {
+        "text": "## Three Pillars\n- **Restrict privilege** – Tiered admin, PAWs, and LAPS reduce credential reuse.\n- **Instrument visibility** – Defender for Identity, event subscriptions, and Sysmon feed analytics.\n- **Automate response** – Runbooks and playbooks ensure alerts become action, not noise."
+      },
+      "simplified_explanation": "Limit privilege, watch relentlessly, respond deliberately.",
+      "memory_aids": [
+        "Restrict → Instrument → Automate"
+      ],
+      "real_world_connection": "Organisations that master these pillars drastically reduce dwell time.",
+      "reflection_prompt": "Which pillar is weakest in your current environment?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "1b2dfd59-2ec1-42b6-ba25-ecab1e2fc141",
+      "type": "video",
+      "title": "Active Directory Hardening Strategies",
+      "content": {
+        "resources": "Watch a Microsoft MVP walk through tiered administration, PAWs, and monitoring architectures.\n\n**Video**: [Active Directory Hardening Strategies](https://www.youtube.com/watch?v=c1Vh1iPgCo8)\n\nUse the chapter markers to revisit Group Policy templates, Defender for Identity dashboards, and automation ideas."
+      },
+      "simplified_explanation": "Visualise the target architecture before you roll out incremental changes.",
+      "memory_aids": [
+        "Sketch the topology while you watch"
+      ],
+      "real_world_connection": "Many enterprise reference architectures stem from this approach.",
+      "reflection_prompt": "Which control do you want to pilot in your lab this week?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "623021e7-f3a4-4bae-b9c0-fac84b9ead49",
+      "type": "memory_aid",
+      "title": "HARDEN Checklist",
+      "content": {
+        "text": "### H.A.R.D.E.N\n- **H**arden admin paths (tiering, PAWs)\n- **A**uto-rotate secrets (LAPS, vaults)\n- **R**aise detection signal (DFI, SIEM)\n- **D**eploy decoys (honeytokens)\n- **E**stablish response playbooks\n- **N**urture continuous review"
+      },
+      "simplified_explanation": "Use HARDEN to keep your remediation backlog focused.",
+      "memory_aids": [
+        "HARDEN to shorten kill chains"
+      ],
+      "real_world_connection": "Security leaders use mnemonics like this to brief executives on program health.",
+      "reflection_prompt": "Which HARDEN step can ship value within 30 days?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "db175534-244c-44b8-a10f-91c4b1814e79",
+      "type": "real_world",
+      "title": "Field Example: Manufacturing Transformation",
+      "content": {
+        "text": "After a red-team engagement, a global manufacturer deployed tiered admin, PAWs, LAPS, and Defender for Identity. Within weeks the SOC detected a live DCSync attempt from an adversary, contained it in under fifteen minutes, and traced the root cause to an unattended legacy service account. Attack path reduction plus improved monitoring delivered a measurable ROI."
+      },
+      "simplified_explanation": "Hardening plus telemetry gave the defenders the edge when it mattered.",
+      "memory_aids": [
+        "Shrink paths, speed detection"
+      ],
+      "real_world_connection": "This after-action summary came from a regulated manufacturing sector programme.",
+      "reflection_prompt": "How would you quantify the value of similar improvements for your stakeholders?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "5b815b5a-0e92-49a4-ba78-b7a3575db5dc",
+      "type": "simulation",
+      "title": "Build a Hardening Roadmap",
+      "content": {
+        "text": "1. List five quick wins you can deliver within 30 days (e.g., LAPS rollout, privileged group review, honeytoken deployment).\n2. Identify two longer-term initiatives that require executive sponsorship (tiered admin, PAWs, SIEM enrichment).\n3. Map each initiative to the stakeholders, metrics, and dependencies.\nDraft the roadmap slide you would use to brief leadership and upload it to your notes."
+      },
+      "simplified_explanation": "Practice turning technical controls into a narrative leaders can fund.",
+      "memory_aids": [
+        "Quick wins build capital for big bets"
+      ],
+      "real_world_connection": "Successful CISOs maintain living roadmaps that read like this exercise.",
+      "reflection_prompt": "What dependency could stall your roadmap? How will you mitigate it?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c28eb5cc-c232-4bd6-9334-f085a2be6bae",
+      "type": "reflection",
+      "title": "Teach the Hardening Story",
+      "content": {
+        "text": "### Reflect & Teach\n- Summarise the most impactful control you learned and explain it to an imaginary stakeholder.\n- Note two monitoring alerts you will prototype in your lab.\n- Decide when you will review attack path graphs again to validate progress."
+      },
+      "simplified_explanation": "Teaching locks in the reasoning behind each safeguard.",
+      "memory_aids": [
+        "Explain → Instrument → Validate"
+      ],
+      "real_world_connection": "Purple-team hotwashes always end with cross-team storytelling like this.",
+      "reflection_prompt": "Who is the real person you will brief about these controls?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the primary goal of tiered administration?",
+      "options": [
+        "To reduce helpdesk workload",
+        "To isolate high value credentials and limit lateral movement",
+        "To allow developers Domain Admin rights",
+        "To disable legacy authentication protocols"
+      ],
+      "correct_answer": 1,
+      "explanation": "Tiering separates administrative planes so compromise of a lower tier cannot easily impact Domain Controllers.",
+      "difficulty": 2,
+      "memory_aid": "Tier walls stop pivots",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "How do honeytokens help detect enumeration?",
+      "options": [
+        "They block LDAP queries",
+        "They are decoy objects whose access triggers alerts",
+        "They replace the need for Defender for Identity",
+        "They encrypt the directory"
+      ],
+      "correct_answer": 1,
+      "explanation": "When attackers interact with decoy accounts or groups, defenders receive early warning.",
+      "difficulty": 2,
+      "memory_aid": "Touch the decoy, trip the alarm",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Why is continuous monitoring necessary even after hardening?",
+      "options": [
+        "Because controls never break",
+        "Because new misconfigurations and attacks emerge over time",
+        "Because it satisfies auditors",
+        "Because monitoring replaces backups"
+      ],
+      "correct_answer": 1,
+      "explanation": "Active monitoring catches deviations, regressions, and novel attack paths that bypass initial controls.",
+      "difficulty": 2,
+      "memory_aid": "Harden + Watch",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

@@ -1,0 +1,219 @@
+{
+  "lesson_id": "a990cff9-803f-4254-8a6a-a51fe93de40d",
+  "domain": "active_directory",
+  "title": "Active Directory Enumeration & Attack Path Discovery",
+  "subtitle": "From baseline inventory to privilege escalation graphing",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 4,
+  "prerequisites": [
+    "Active Directory Fundamentals",
+    "Active Directory Group Policy Essentials",
+    "Active Directory Kerberos Deep Dive"
+  ],
+  "concepts": [
+    "LDAP schema awareness",
+    "Native AD discovery tooling",
+    "PowerView reconnaissance workflows",
+    "SharpHound collection flags",
+    "AdminSDHolder and protected objects",
+    "Service Principal Name analysis",
+    "Delegation and constrained delegation mapping",
+    "Graph theory for attack paths",
+    "Operational security during enumeration",
+    "Detection of suspicious directory queries"
+  ],
+  "learning_objectives": [
+    "Execute baseline enumeration of users, groups, and computers without disrupting production",
+    "Correlate group memberships and delegation settings to identify privilege escalation paths",
+    "Use PowerView and SharpHound modules with minimal footprint and auditable safeties",
+    "Interpret BloodHound-style graphs to prioritize escalation targets and mitigations",
+    "Document enumeration findings for blue team remediation and hardening workstreams",
+    "Apply OPSEC safeguards that respect rules of engagement while collecting directory intelligence"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f0a44d80-d962-4c59-ab84-e668d8e91b34",
+      "type": "mindset_coach",
+      "title": "Recon With Purpose",
+      "content": {
+        "text": "Enumeration is not a noisy treasure hunt. Treat it like digital archaeology: brush lightly, capture context, and respect the artifacts you uncover. Your mindset should balance curiosity, discipline, and empathy for the defenders who will inherit your findings."
+      },
+      "simplified_explanation": "Approach AD recon like a careful explorer, not a bull in a china shop.",
+      "memory_aids": [
+        "Curious, Careful, Contextual"
+      ],
+      "real_world_connection": "Experienced operators run quiet, well-documented discovery because they know the same data powers defensive remediation.",
+      "reflection_prompt": "What safeguards will you enable before running your first command?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "0c73a3ec-3492-4948-8549-7f94a6cf41f9",
+      "type": "explanation",
+      "title": "Core Enumeration Workflows",
+      "content": {
+        "text": "## Three Chunks of Enumeration\n- **Baseline discovery** – Native tools, LDAP queries, and documentation review to understand the forest.\n- **Privilege mapping** – PowerView and SharpHound sweeps that spotlight toxic combinations, SPNs, and delegation edges.\n- **Graph analysis** – Translating JSON exports into visuals and Cypher queries that prioritize escalation routes."
+      },
+      "simplified_explanation": "Learn the flow: inventory, map privilege, then visualize paths.",
+      "memory_aids": [
+        "Discover → Map → Visualize"
+      ],
+      "real_world_connection": "Purple teams align red and blue playbooks around these three phases to stay synchronized.",
+      "reflection_prompt": "Which stage do you currently feel least confident about?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "3fbff11b-36ee-4eda-b567-7db0d80bd2e4",
+      "type": "video",
+      "title": "PowerView & SharpHound Operator Walkthrough",
+      "content": {
+        "resources": "Watch the end-to-end capture of covert enumeration techniques.\n\n**Video**: [PowerView & SharpHound Operator Walkthrough](https://www.youtube.com/watch?v=G7_kb6lC4ZI)\n\nThe demo covers scope validation, OPSEC switches, staged data exports, and clean-up habits."
+      },
+      "simplified_explanation": "Visualize the commands so you can replay them confidently in the lab.",
+      "memory_aids": [
+        "Pause and paraphrase each command aloud"
+      ],
+      "real_world_connection": "Watching seasoned operators is the closest thing to sitting in the engagement war room.",
+      "reflection_prompt": "Which command or flag was new to you, and how will you test it safely?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "7df0fbca-54a3-4c2b-8a57-8c428c22774a",
+      "type": "memory_aid",
+      "title": "Enumeration Mnemonic",
+      "content": {
+        "text": "### L.E.A.P.\n- **L**ist scope and safeties.\n- **E**numerate with native tools first.\n- **A**utomate with SharpHound when justified.\n- **P**resent findings as graphs plus mitigations."
+      },
+      "simplified_explanation": "Keep LEAP handy so you do not skip the fundamentals under pressure.",
+      "memory_aids": [
+        "LEAP into insight"
+      ],
+      "real_world_connection": "Teams that follow LEAP produce reports defenders can act on immediately.",
+      "reflection_prompt": "Which LEAP step do you tend to rush? How will you slow it down?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "9804aeb7-21fb-43d4-8198-bcc0ffea7709",
+      "type": "real_world",
+      "title": "Field Example: Legacy Group Chain",
+      "content": {
+        "text": "During an EU financial engagement, a red team discovered that a legacy \"Server Operators\" group still retained nested membership granting Domain Admin. The finding emerged after combining LDAP queries with SharpHound exports. The blue team used the same dataset to remove obsolete delegations, cutting twenty-two unnecessary privileged accounts."
+      },
+      "simplified_explanation": "Enumeration revealed a risk and empowered defenders to close it.",
+      "memory_aids": [
+        "Find it → Fix it"
+      ],
+      "real_world_connection": "This case study came from a jointly facilitated purple-team exercise.",
+      "reflection_prompt": "How would you package a similar finding for executive stakeholders?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "6320d53c-104f-4333-982b-870f80f4d10d",
+      "type": "simulation",
+      "title": "Plan an Enumeration Run",
+      "content": {
+        "text": "1. List the pre-flight checks you will complete before running SharpHound (scope confirmation, safeties, detection contacts).\n2. Draft the exact PowerView and SharpHound commands you will execute for a low and a medium noise collection.\n3. Describe how you will package, encrypt, and hand off data to the blue team.\nRecord your plan in the CyberLearn project notebook and set a review reminder."
+      },
+      "simplified_explanation": "Mentally rehearse the workflow before touching a lab keyboard.",
+      "memory_aids": [
+        "Plan → Execute → Hand off"
+      ],
+      "real_world_connection": "Operators use dry runs to prevent live engagements from derailing.",
+      "reflection_prompt": "What part of the plan felt most fragile? How can you reinforce it?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e3598276-c7e5-401e-9691-186121e5b657",
+      "type": "reflection",
+      "title": "Teach Back the Findings",
+      "content": {
+        "text": "### Reflect & Teach\n- Draft a short debrief describing how you would explain your enumeration approach to senior defenders.\n- List two mitigation actions you would recommend based on common findings.\n- Identify one detection analytic you would propose to catch future misuse."
+      },
+      "simplified_explanation": "Teaching the workflow cements the reasoning behind each step.",
+      "memory_aids": [
+        "Explain → Mitigate → Monitor"
+      ],
+      "real_world_connection": "Purple-team hotwashes often follow this exact agenda.",
+      "reflection_prompt": "Who will you share your debrief with this week?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the advantage of combining LDAP queries with SharpHound data?",
+      "options": [
+        "LDAP is faster so SharpHound becomes unnecessary",
+        "LDAP provides live state verification that complements graph exports",
+        "SharpHound outputs are only accurate when LDAP is disabled",
+        "The combination hides enumeration activity from defenders"
+      ],
+      "correct_answer": 1,
+      "explanation": "LDAP queries validate assumptions and help prioritise SharpHound findings with real-time context.",
+      "difficulty": 2,
+      "memory_aid": "Graph + Live = Insight",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which OPSEC consideration is most critical when running PowerView in production?",
+      "options": [
+        "Always run as Domain Admin to avoid errors",
+        "Throttle queries, randomise timing, and clean artifacts",
+        "Broadcast your commands to the security team",
+        "Disable antivirus first to speed execution"
+      ],
+      "correct_answer": 1,
+      "explanation": "Controlled query rates, staggered timing, and disciplined cleanup reduce detection risk while respecting engagement rules.",
+      "difficulty": 2,
+      "memory_aid": "Slow and stealth",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Why should enumeration findings be documented for blue teams?",
+      "options": [
+        "To prove the red team is smarter",
+        "So defenders can validate and remediate risky configurations",
+        "Because reports replace executive briefs",
+        "To avoid having to run SharpHound again"
+      ],
+      "correct_answer": 1,
+      "explanation": "Transparent documentation closes the learning loop and enables defenders to harden the environment efficiently.",
+      "difficulty": 2,
+      "memory_aid": "Find it → Fix it",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}
