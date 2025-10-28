@@ -492,6 +492,9 @@ def complete_lesson(
     # Get or create progress
     progress = db.get_lesson_progress(user.user_id, lesson.lesson_id)
 
+    # Track if progress exists in database (for save logic later)
+    progress_exists_in_db = progress is not None
+
     # Check if this is the first completion - BEFORE calling complete_lesson()
     # which changes the status
     is_first_completion = False
@@ -556,9 +559,11 @@ def complete_lesson(
         user.total_time_spent += time_spent
 
     # Save to database
-    if progress.progress_id:
+    if progress_exists_in_db:
+        # Progress record exists - update it
         db.update_progress(progress)
     else:
+        # New progress record - create it
         db.create_progress(progress)
 
     db.update_user(user)
