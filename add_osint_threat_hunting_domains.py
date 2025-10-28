@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from database import get_db_path
+from utils.database import get_db_path
 
 def migrate_database():
     """Add osint and threat_hunting columns to users table"""
