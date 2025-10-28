@@ -103,7 +103,7 @@
       ],
       "correct_answer": 1,
       "explanation": "Option B is correct. This scenario is extremely common and represents a significant security risk. When organizations migrate from on-premise to cloud infrastructure, they often forget to properly decommission old servers. The old server at 192.0.2.50 likely still contains the production codebase, database connections, or even production data. Attackers specifically look for these forgotten assets because they often have: (1) Outdated, unpatched software, (2) Weaker security controls (no longer monitored), (3) Same vulnerabilities as the current production system, (4) Potential for data leakage or lateral movement. This is NOT a backup system (Option C) because a proper backup wouldn't be publicly accessible with no change in DNS for months. It's NOT likely DNS poisoning (Option D) because passive DNS shows this is a legitimate migration, not an attack. Option A makes no sense—AWS infrastructure is correctly using a new IP. This pattern is a classic indicator of incomplete migration and forgotten infrastructure. Red teamers actively search passive DNS for exactly this scenario because it's a low-hanging fruit with high impact.",
-      "difficulty": "hard"
+      "difficulty": 3
     },
     {
       "question": "You're conducting a DNS zone transfer attempt against target.com and it succeeds, revealing 150 subdomains including internal.target.com and employee-vpn.target.com. You have a signed penetration testing agreement that authorizes 'network reconnaissance and vulnerability assessment' but does not explicitly mention DNS enumeration or zone transfers. What should you do?",
@@ -115,7 +115,7 @@
       ],
       "correct_answer": 1,
       "explanation": "Option B is correct and represents professional penetration testing practices. Here's why this is the right approach: (1) Successful zone transfers are UNUSUAL in modern infrastructure—this indicates a serious misconfiguration that the client needs to know about immediately. (2) Your authorization says 'network reconnaissance' which could reasonably include DNS queries, BUT discovering internal subdomains like 'internal.target.com' and 'employee-vpn.target.com' suggests you've found infrastructure that may be out of scope. (3) Professional pentesters clarify scope when they discover unexpected access or information—this protects both you and the client. (4) The client needs to make an informed decision: should you test internal infrastructure? Are these subdomains in scope? Option A is WRONG because 'technically allowed' doesn't equal 'within scope.' Just because the DNS server allowed the transfer doesn't mean your contract covers testing internal infrastructure. You could be crossing into unauthorized access. Option C is too conservative—you should document what you found (it's a critical vulnerability), but you should pause before proceeding. Option D is an arbitrary distinction with no legal or contractual basis. The key principle: When in doubt during authorized testing, STOP and clarify with the client. Document what you found, explain the security implications, and get explicit authorization before proceeding. This scenario is based on real pentesting situations where unclear scope led to legal issues. Better to over-communicate than to face claims of unauthorized access.",
-      "difficulty": "hard"
+      "difficulty": 3
     }
   ],
   "jim_kwik_principles": [
