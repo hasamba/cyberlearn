@@ -515,7 +515,19 @@ class Database:
 
     def _row_to_progress(self, row: sqlite3.Row) -> LessonProgress:
         """Convert DB row to LessonProgress"""
-        return LessonProgress.parse_raw(json.dumps(dict(row)))
+        data = dict(row)
+
+        # Parse JSON fields that are stored as strings
+        if 'quiz_scores' in data and isinstance(data['quiz_scores'], str):
+            data['quiz_scores'] = json.loads(data['quiz_scores'])
+
+        if 'retention_checks' in data and isinstance(data['retention_checks'], str):
+            data['retention_checks'] = json.loads(data['retention_checks'])
+
+        if 'interactive_blocks_completed' in data and isinstance(data['interactive_blocks_completed'], str):
+            data['interactive_blocks_completed'] = json.loads(data['interactive_blocks_completed'])
+
+        return LessonProgress.parse_raw(json.dumps(data))
 
     def close(self):
         """Close database connection"""
