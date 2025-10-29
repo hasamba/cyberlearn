@@ -16,56 +16,202 @@ CyberLearn is a **complete adaptive learning platform** that delivers profession
 - **🎮 Gamification**: Earn XP, unlock badges, maintain streaks, and level up from Apprentice to Grandmaster
 - **⚡ Accelerated Learning**: Every lesson implements all 10 Jim Kwik learning principles for faster, deeper mastery
 - **📊 Spaced Repetition**: Smart review scheduling ensures long-term retention using cognitive science
-- **🎯 7 Core Domains**: Fundamentals, DFIR, Malware Analysis, Active Directory, Penetration Testing, Red Team, Blue Team
+- **🎯 12 Core Domains**: Fundamentals, OSINT, DFIR, Malware, Active Directory, System, Linux, Cloud, Pentest, Red Team, Blue Team, Threat Hunting
 - **⏱️ 30-Minute Sessions**: Focused daily learning designed to fit busy schedules
 
+**Current Status**: 180+ professional lessons (600,000+ words) covering all 12 domains
+
 ---
 
-## 🚀 Quick Start (2 Minutes)
+## 🚀 Quick Start (5 Minutes)
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.10 or higher
 - Git
 
-### Automated Installation
+### Installation & Setup
 
-**Linux/Mac:**
+**On Your VM, run these commands**:
+
 ```bash
+# 1. Clone the repository
 git clone https://github.com/hasamba/cyberlearn.git
 cd cyberlearn
-chmod +x setup.sh
-./setup.sh
-```
 
-**Windows:**
-```batch
-git clone https://github.com/hasamba/cyberlearn.git
-cd cyberlearn
-setup.bat
-```
-
-**Start the Application:**
-```bash
+# 2. Create virtual environment
+python -m venv venv
 source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate.bat # Windows
+# Or: venv\Scripts\activate  # Windows
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Load all lessons into database
+python load_all_lessons.py
+
+# 5. Start the application
 streamlit run app.py
+
+# Access at: http://localhost:8501
 ```
 
-**🎉 That's it!** Open your browser to `http://localhost:8501` and start learning!
-
-📖 **For detailed instructions, troubleshooting, and manual installation, see [INSTALL.md](INSTALL.md)**
+**🎉 That's it!** Create an account and start learning!
 
 ---
 
-## 📚 Documentation
+## 📚 Complete Documentation
 
 | Document | Description |
 |----------|-------------|
-| **[INSTALL.md](INSTALL.md)** | Complete installation guide with troubleshooting |
-| **[CLAUDE.md](CLAUDE.md)** | Project instructions and current status |
-| **[HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md)** | Step-by-step guide for creating lessons |
-| **[ARCHITECTURE.md](ARCHITECTURE.md)** | System design, technology stack, and algorithms |
-| **[USER_FLOWS.md](USER_FLOWS.md)** | User journey maps and learning pathways |
+| **[CLAUDE.md](CLAUDE.md)** | **Complete project guide** - Structure, domains, lesson standards, troubleshooting |
+| **[HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md)** | **Step-by-step guide** for creating lessons (manual & AI-assisted) |
+| **[NEXT_LESSONS_PLAN.md](NEXT_LESSONS_PLAN.md)** | **Content roadmap** - What lessons to create next, priorities |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | System design, technology stack, algorithms |
+
+---
+
+## 🔄 Keeping Your Platform Updated
+
+### Pull Latest Lessons
+
+```bash
+# On your VM, run:
+cd cyberlearn
+python git_pull.py  # Updates timestamp & pulls from GitHub
+
+# If new lessons were added:
+python comprehensive_fix.py  # Fix any validation errors
+python load_all_lessons.py   # Load new lessons into database
+
+# Restart app:
+streamlit run app.py
+```
+
+### Check for Updates in Dashboard
+
+The dashboard automatically shows:
+- ✅ **Last Update**: When you last ran `git pull`
+- ⚠️ **Update Available**: If new commits exist on GitHub
+- 📊 **Lesson Count**: Total lessons loaded
+
+---
+
+## 📝 Creating New Lessons
+
+### Method 1: AI-Assisted (Recommended - Fastest)
+
+**Using ChatGPT** (GPT-4 or o1):
+
+```bash
+# 1. Use the batch prompt template
+cat BATCH_LESSONS_PROMPT_PENTEST.md  # Or create your own
+
+# 2. Copy entire prompt and paste into ChatGPT
+# 3. ChatGPT generates complete JSON lesson files
+# 4. Save each JSON file to content/ directory
+
+# 5. Fix validation errors
+python comprehensive_fix.py
+
+# 6. Load lessons into database
+python load_all_lessons.py
+
+# 7. Verify loaded
+python list_lessons.py
+```
+
+**Time Estimate**: 10-15 minutes per lesson (vs 4-6 hours manual)
+
+### Method 2: Template-Based (Manual)
+
+```bash
+# 1. Create lesson template
+python create_lesson_template.py
+
+# 2. Fill in content manually following rich lesson standards
+# Edit the generated JSON file in content/
+
+# 3. Fix and load
+python comprehensive_fix.py
+python load_all_lessons.py
+```
+
+### Method 3: Interactive Creator
+
+```bash
+# Interactive CLI lesson creator
+python create_rich_lesson.py --interactive
+```
+
+### Lesson Requirements
+
+**All lessons MUST have**:
+- Valid UUID (use `uuid.uuid4()`)
+- Domain from: fundamentals, osint, dfir, malware, active_directory, system, linux, cloud, pentest, red_team, blue_team, threat_hunting
+- Difficulty: 1 (beginner), 2 (intermediate), 3 (advanced)
+- `estimated_time`: 30-60 minutes
+- `prerequisites`: List of lesson_id UUIDs (empty if none)
+- **Valid content block types only**: explanation, video, diagram, quiz, simulation, reflection, memory_aid, real_world, code_exercise, mindset_coach
+
+**Rich Lesson Standards** (4,000-5,500 words):
+- Deep technical content (not surface-level)
+- Real-world examples (companies, attacks, case studies)
+- Code snippets (commands, scripts, configurations)
+- Memory aids (mnemonics, acronyms)
+- Common pitfalls and warnings
+- Actionable takeaways
+- ASCII art diagrams where helpful
+
+**See [HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md) for complete guide with examples.**
+
+---
+
+## 🛠️ Common Scripts & Tools
+
+### Loading & Fixing Lessons
+
+```bash
+# Load all lessons from content/ into database
+python load_all_lessons.py
+
+# Fix validation errors automatically
+python comprehensive_fix.py
+
+# List all loaded lessons by domain
+python list_lessons.py
+
+# Force reload specific domain
+python force_load_domain.py <domain_name>
+```
+
+### Database Operations
+
+```bash
+# Check database contents
+python check_database.py
+
+# Sync database with content files
+python sync_database.py
+
+# Remove orphaned lessons
+python remove_orphaned_lessons.py
+
+# Fix duplicate domains
+python fix_duplicate_domains.py
+```
+
+### Content Creation Tools
+
+```bash
+# Create lesson template
+python create_lesson_template.py
+
+# AI-assisted content filling
+python fill_lesson_with_ai.py
+
+# Interactive lesson creator
+python create_rich_lesson.py --interactive
+```
 
 ---
 
@@ -84,7 +230,7 @@ streamlit run app.py
 │  │  - Skill profiling │  │  - XP calculation          │   │
 │  │  - Lesson routing  │  │  - Badge system            │   │
 │  │  - Difficulty adj  │  │  - Streak tracking         │   │
-│  │  - Spaced review   │  │  - Level progression       │   │
+│  │  │  - Spaced review   │  │  - Level progression       │   │
 │  └────────────────────┘  └────────────────────────────┘   │
 └─────────────────────┬───────────────────────────────────────┘
                       │
@@ -98,10 +244,32 @@ streamlit run app.py
 ```
 
 **Tech Stack:**
-- **Backend**: Python 3.10+, Pydantic (validation), SQLite (persistence)
+- **Backend**: Python 3.10+, FastAPI, SQLAlchemy, Pydantic V2
 - **Frontend**: Streamlit (interactive UI), Plotly (visualizations)
+- **Database**: SQLite (development), PostgreSQL (production-ready)
 - **Content**: JSON-based modular lessons
-- **Deployment**: Docker, Streamlit Cloud, or traditional VM
+- **Deployment**: Docker, VM, or Streamlit Cloud
+
+---
+
+## 📊 Domain Structure (12 Domains)
+
+| Domain | Lessons | Prerequisites | Description |
+|--------|---------|---------------|-------------|
+| **fundamentals** | 13 | None | Security basics, CIA Triad, Authentication |
+| **osint** | 10 | fundamentals | Open-source intelligence gathering |
+| **dfir** | 17 | fundamentals | Digital forensics & incident response |
+| **malware** | 16 | fundamentals | Malware analysis & reverse engineering |
+| **active_directory** | 16 | fundamentals | AD security, attacks, defense |
+| **system** | 15 | fundamentals | Windows/Linux internals |
+| **linux** | 16 | fundamentals | Linux security & administration |
+| **cloud** | 15 | fundamentals + system | AWS, Azure, GCP security |
+| **pentest** | 35 | fundamentals + AD | Penetration testing methodology |
+| **red_team** | 18 | pentest + malware | Red team operations |
+| **blue_team** | 15 | dfir + malware | Blue team defense |
+| **threat_hunting** | 10 | dfir + malware | Proactive threat hunting |
+
+**Total**: 180+ professional lessons
 
 ---
 
@@ -128,7 +296,7 @@ Every lesson implements all 10 accelerated learning principles:
 
 ### 🎓 For Learners
 
-- **Diagnostic Assessment**: Initial skill profiling across all domains
+- **Diagnostic Assessment**: Initial skill profiling across all 12 domains
 - **Personalized Path**: Adaptive recommendations based on performance
 - **Interactive Lessons**: Mix of text, visuals, simulations, and quizzes
 - **Progress Tracking**: Real-time skill levels, completion rates, mastery metrics
@@ -140,9 +308,10 @@ Every lesson implements all 10 accelerated learning principles:
 
 - **JSON-Based Authoring**: Easy lesson creation with structured templates
 - **Multi-Format Support**: Text, video, diagrams, code, quizzes, simulations
+- **AI-Assisted Generation**: Use ChatGPT/Claude to generate lessons quickly
+- **Validation Tools**: `comprehensive_fix.py` auto-corrects common errors
 - **Version Control**: Git-friendly content management
 - **Rapid Deployment**: Add lessons without code changes
-- **Quality Checklist**: Ensure all Jim Kwik principles in every lesson
 
 ### 🏢 For Organizations
 
@@ -154,101 +323,116 @@ Every lesson implements all 10 accelerated learning principles:
 
 ---
 
-## 📊 Sample Lesson: CIA Triad
+## 🛠️ Troubleshooting
 
-A complete lesson is included demonstrating all features:
+### Validation Errors
 
-**Content Blocks:**
-1. Mindset coaching introduction
-2. Core concept explanation (with ELI10 version)
-3. Visual diagram (ASCII art)
-4. Three pillar deep dives (Confidentiality, Integrity, Availability)
-5. Interactive scenario analysis (5 real-world cases)
-6. Advanced memory technique (visualization exercise)
-7. Meta-learning reflection prompts
-8. 5-question mastery quiz
+**Error**: `Field required` or `Input should be 'explanation', 'video'...`
 
-**Learning Outcomes:**
-- Define CIA Triad components
-- Apply principles to security scenarios
-- Remember concepts using memory techniques
-- Achieve 80%+ quiz score for mastery
+```bash
+# Run comprehensive fix script
+python comprehensive_fix.py
 
-**Rewards:**
-- 100 base XP (+ multipliers up to 3x)
-- "Fundamentals Beginner" badge
-- +5 skill points in Fundamentals domain
+# This auto-fixes:
+# - Invalid UUIDs
+# - Missing fields
+# - Wrong content block types
+# - Invalid jim_kwik_principles
+# - Format issues
+```
+
+### Lessons Not Appearing
+
+```bash
+# Check what's loaded
+python list_lessons.py
+
+# Force reload all lessons
+python load_all_lessons.py
+
+# Check for errors in output
+```
+
+### Database Issues
+
+```bash
+# Check database state
+python check_database.py
+
+# Reset database (WARNING: Deletes all user progress)
+rm cyberlearn.db
+python load_all_lessons.py
+```
+
+### Unicode Errors (Windows)
+
+Fixed in latest version. If you see encoding errors:
+
+```bash
+# Pull latest updates
+git pull origin main
+```
+
+**More help**: See [CLAUDE.md](CLAUDE.md) - "Validation Error Troubleshooting" section
 
 ---
 
 ## 🗺️ Learning Pathways
 
 ### Path 1: Complete Beginner → Security Analyst
-**Duration**: 6 months | **Lessons**: 60+ | **Domains**: All
+**Duration**: 6-8 months | **Lessons**: 80+ | **Domains**: All
 
 ```
-Weeks 1-4:  Fundamentals (10 lessons) ────┐
-                                           │
-Weeks 5-8:  DFIR Basics (8 lessons) ──────┼─→ Entry-Level
-                                           │   Security Analyst
-Weeks 9-12: Malware Intro (8 lessons) ────┘
-
-Weeks 13-20: Advanced topics across domains → Mid-Level Analyst
-
-Weeks 21-26: Specialization + capstone → Senior Analyst
+Months 1-2:  Fundamentals + OSINT (23 lessons)
+Months 3-4:  DFIR + Malware Basics (33 lessons)
+Months 5-6:  Active Directory + System (31 lessons)
+Months 7-8:  Specialization (Blue Team, Threat Hunting)
 ```
 
 ### Path 2: IT Pro → Penetration Tester
-**Duration**: 3 months | **Lessons**: 35+ | **Focus**: Pentest, Red Team
+**Duration**: 3-4 months | **Lessons**: 50+ | **Focus**: Pentest, Red Team
 
 ```
-Weeks 1-2:  Security Fundamentals Review (5 lessons)
-Weeks 3-6:  Penetration Testing Methodology (10 lessons)
-Weeks 7-10: Red Team Tactics (10 lessons)
-Weeks 11-12: Capstone Projects + Certifications
+Month 1:  Security Fundamentals + OSINT (23 lessons)
+Month 2-3: Penetration Testing (35 lessons)
+Month 4:  Red Team Operations (18 lessons)
 ```
 
-### Path 3: Developer → Secure Coder
-**Duration**: 2 months | **Lessons**: 25+ | **Focus**: Secure Development
+### Path 3: Analyst → Threat Hunter
+**Duration**: 2-3 months | **Lessons**: 40+ | **Focus**: DFIR, Blue Team, Threat Hunting
 
 ```
-Weeks 1-2:  Security Basics (5 lessons)
-Weeks 3-4:  Secure Coding Practices (8 lessons)
-Weeks 5-6:  Vulnerability Analysis (6 lessons)
-Weeks 7-8:  Defense Patterns (6 lessons)
+Month 1:  DFIR Deep Dive (17 lessons)
+Month 2:  Blue Team Defense (15 lessons)
+Month 3:  Threat Hunting Mastery (10 lessons)
 ```
 
 ---
 
-## 🎯 Roadmap
+## 🎯 Content Roadmap
 
-### ✅ Phase 1: Foundation (Complete)
-- Core adaptive engine
-- Gamification system
-- Streamlit UI
-- Sample lesson (CIA Triad)
-- Database persistence
-- User profiles & progress tracking
+### ✅ Complete (180+ lessons)
+- Fundamentals (13)
+- OSINT (10)
+- DFIR (17)
+- Malware (16)
+- Active Directory (16)
+- System (15)
+- Linux (16)
+- Cloud (15)
+- Pentest (35)
+- Red Team (18)
+- Blue Team (15)
+- Threat Hunting (10 in progress)
 
-### 🚧 Phase 2: Content Expansion (In Progress)
-- [ ] 100+ lessons across 7 domains
-- [ ] Video content integration
-- [ ] Hands-on lab environments (Docker)
-- [ ] Weekend sprint mode
+### 🚧 Future Additions
+- Advanced cloud security (Kubernetes, serverless)
+- Container security (Docker, Kubernetes)
+- Mobile security (iOS, Android)
+- IoT security
+- AI/ML security
 
-### 📋 Phase 3: Advanced Features
-- [ ] AI tutor chatbot (GPT integration)
-- [ ] Team dashboards for organizations
-- [ ] Mobile app (React Native)
-- [ ] CTF challenge integration
-- [ ] Certification exam alignment
-
-### 🎨 Phase 4: Enterprise
-- [ ] SSO authentication (SAML, OAuth)
-- [ ] LMS integration (SCORM)
-- [ ] Custom branding/white-label
-- [ ] Advanced analytics & reporting
-- [ ] Multi-language support
+**See [NEXT_LESSONS_PLAN.md](NEXT_LESSONS_PLAN.md) for detailed roadmap**
 
 ---
 
@@ -257,9 +441,9 @@ Weeks 7-8:  Defense Patterns (6 lessons)
 Contributions welcome! Here's how you can help:
 
 ### 🎓 Content Creators
-- Write new lessons following the template in `content/lesson_template.json`
+- Write new lessons following standards in [HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md)
 - Ensure all Jim Kwik principles are represented
-- Submit via pull request with lesson JSON
+- Submit via pull request with lesson JSON files
 
 ### 💻 Developers
 - Fix bugs or add features
@@ -272,59 +456,7 @@ Contributions welcome! Here's how you can help:
 - Provide feedback on effectiveness
 - Suggest improvements to pedagogy
 
-**Contribution Guide**: See `IMPLEMENTATION_PLAN.md` Phase 2 for lesson creation process.
-
----
-
-## 📈 Success Metrics
-
-Real user outcomes (target vs. achieved):
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Average quiz score | >80% | 🆕 Just launched |
-| Lesson completion rate | >70% | 🆕 Tracking starting |
-| 30-day retention | >60% | 🆕 Data collecting |
-| Skill growth per month | +15 pts | 🆕 Measuring soon |
-| User satisfaction | >4.2/5 | 🆕 Surveys pending |
-
-*Help us achieve these goals by providing feedback!*
-
----
-
-## 🛠️ Troubleshooting
-
-### Application won't start
-```bash
-# Check Python version
-python --version  # Must be 3.10+
-
-# Reinstall dependencies
-pip install --force-reinstall -r requirements.txt
-```
-
-### Lessons not appearing
-```bash
-# Verify lesson loaded
-python -c "
-from utils.database import Database
-db = Database()
-import sqlite3
-cursor = db.conn.cursor()
-cursor.execute('SELECT lesson_id, title FROM lessons')
-print(cursor.fetchall())
-db.close()
-"
-```
-
-### Database errors
-```bash
-# Reset (WARNING: deletes all data)
-rm cyberlearn.db
-python -c "from utils.database import Database; Database()"
-```
-
-**More help**: See `IMPLEMENTATION_PLAN.md` Troubleshooting section.
+**Before contributing**: Read [CLAUDE.md](CLAUDE.md) for project structure and standards
 
 ---
 
@@ -353,9 +485,9 @@ MIT License - feel free to use, modify, and distribute.
 
 ## 📞 Support & Contact
 
-- **Documentation**: Read `ARCHITECTURE.md`, `USER_FLOWS.md`, `IMPLEMENTATION_PLAN.md`
-- **Issues**: GitHub Issues for bugs and feature requests
-- **Discussions**: Community best practices and tips
+- **GitHub Issues**: Bug reports and feature requests
+- **Documentation**: Complete guides in repository
+- **Community**: Share lessons and best practices
 
 ---
 
@@ -370,52 +502,6 @@ MIT License - feel free to use, modify, and distribute.
 - **Effectiveness**: Leverage cognitive science for better outcomes
 - **Engagement**: Make learning enjoyable, not just informative
 - **Empowerment**: Build confidence alongside competence
-
----
-
-## 🚀 What to Do on Your VMs
-
-Based on your instructions to **not run commands but tell you what to run on your VMs**, here's your deployment checklist:
-
-### On Your VMs, run these commands:
-
-```bash
-# 1. Navigate to project directory
-cd /path/to/project/57.14_Learning_app
-
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Linux/Mac
-# Or: venv\Scripts\activate  # On Windows
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Initialize database and load sample lesson
-python -c "
-import json
-from uuid import UUID
-from utils.database import Database
-from models.lesson import Lesson
-
-db = Database()
-with open('content/sample_lesson_cia_triad.json', 'r') as f:
-    data = json.load(f)
-data['lesson_id'] = UUID(data['lesson_id'])
-data['prerequisites'] = [UUID(p) for p in data['prerequisites']]
-lesson = Lesson(**data)
-db.create_lesson(lesson)
-print('✅ Setup complete!')
-db.close()
-"
-
-# 5. Launch the application
-streamlit run app.py
-
-# Access at: http://localhost:8501
-```
-
-For production deployment (nginx, systemd, SSL), see **IMPLEMENTATION_PLAN.md Phase 5**.
 
 ---
 
