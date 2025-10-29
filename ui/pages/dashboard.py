@@ -89,6 +89,10 @@ def render(user: UserProfile, db: Database):
     with col_right:
         render_next_milestone(user)
         render_recent_badges(user)
+        st.markdown("---")
+        render_lesson_stats(user, db)
+        st.markdown("---")
+        render_git_status(db)
 
 
 def render_recommended_lessons(user: UserProfile, db: Database):
@@ -287,3 +291,94 @@ def render_learning_stats(user: UserProfile):
     with col2:
         st.metric("Current Streak", f"{user.streak_days} days")
         st.metric("Longest Streak", f"{user.longest_streak} days")
+
+
+def render_lesson_stats(user: UserProfile, db: Database):
+    """Show lesson statistics by domain"""
+    st.markdown("### 📊 Lesson Progress by Domain")
+
+    # Get lesson stats
+    stats = db.get_lesson_stats_by_domain(user.user_id)
+
+    if stats:
+        # Create a compact table view
+        for domain in sorted(stats.keys()):
+            domain_stats = stats[domain]
+            total = domain_stats['total']
+            completed = domain_stats['completed']
+            in_progress = domain_stats['in_progress']
+
+            # Calculate completion percentage
+            completion_pct = (completed / total * 100) if total > 0 else 0
+
+            # Create a single row for each domain
+            col1, col2, col3 = st.columns([2, 1, 1])
+
+            with col1:
+                # Domain name (no full title, just abbreviated)
+                domain_short = domain.replace('_', ' ').title()[:15]
+                st.markdown(f"**{domain_short}**")
+
+            with col2:
+                # Completed / Total
+                st.markdown(f"{completed}/{total}")
+
+            with col3:
+                # Progress bar (small)
+                st.progress(completion_pct / 100)
+
+    else:
+        st.info("No lessons loaded yet.")
+
+
+def render_git_status(db: Database):
+    """Show git repository status and last update"""
+    from utils.git_status import GitStatus
+
+    st.markdown("### 🔄 Platform Status")
+
+    git = GitStatus()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Last pull time
+        last_pull = git.get_last_pull_time()
+        if last_pull:
+            from datetime import datetime
+            time_ago = datetime.now() - last_pull
+            days_ago = time_ago.days
+
+            if days_ago == 0:
+                pull_str = "Today"
+            elif days_ago == 1:
+                pull_str = "Yesterday"
+            else:
+                pull_str = f"{days_ago} days ago"
+
+            st.metric("Last Update", pull_str)
+        else:
+            st.metric("Last Update", "Unknown")
+
+    with col2:
+        # Total lessons
+        total = db.get_total_lesson_count()
+        st.metric("Total Lessons", total)
+
+    # Check for updates
+    update_status = git.check_for_updates()
+
+    if update_status['error']:
+        st.caption(f"ℹ️ {update_status['error']}")
+    elif update_status['has_updates']:
+        st.warning(
+            f"⚠️ **Update Available!** {update_status['behind_by']} new commit(s) on GitHub. "
+            f"Run `git pull` to update."
+        )
+    else:
+        st.success("✅ Up to date with GitHub")
+
+    # Show commit info in expander
+    with st.expander("📝 Current Version"):
+        commit_info = git.get_last_commit_info()
+        st.code(f"Commit: {commit_info['hash']}\nDate: {commit_info['date']}\nMessage: {commit_info['message']}")

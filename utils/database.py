@@ -546,6 +546,83 @@ class Database:
 
         return LessonProgress.model_validate(data)
 
+    def get_lesson_stats_by_domain(self, user_id: Optional[UUID] = None) -> Dict[str, Dict]:
+        """
+        Get lesson statistics by domain.
+        Returns dict with domain as key and stats as value:
+        {
+            'domain_name': {
+                'total': int,  # Total lessons in domain
+                'completed': int,  # Completed by user (if user_id provided)
+                'in_progress': int,  # In progress by user (if user_id provided)
+                'not_started': int  # Not started by user (if user_id provided)
+            }
+        }
+        """
+        cursor = self.conn.cursor()
+
+        # Get total lessons per domain
+        cursor.execute("""
+            SELECT domain, COUNT(*) as total
+            FROM lessons
+            GROUP BY domain
+            ORDER BY domain
+        """)
+
+        stats = {}
+        for row in cursor.fetchall():
+            domain = row['domain']
+            stats[domain] = {
+                'total': row['total'],
+                'completed': 0,
+                'in_progress': 0,
+                'not_started': 0
+            }
+
+        # If user_id provided, get completion stats
+        if user_id:
+            # Completed lessons
+            cursor.execute("""
+                SELECT l.domain, COUNT(*) as count
+                FROM lessons l
+                JOIN progress p ON l.lesson_id = p.lesson_id
+                WHERE p.user_id = ? AND p.status IN ('completed', 'mastered')
+                GROUP BY l.domain
+            """, (str(user_id),))
+
+            for row in cursor.fetchall():
+                if row['domain'] in stats:
+                    stats[row['domain']]['completed'] = row['count']
+
+            # In progress lessons
+            cursor.execute("""
+                SELECT l.domain, COUNT(*) as count
+                FROM lessons l
+                JOIN progress p ON l.lesson_id = p.lesson_id
+                WHERE p.user_id = ? AND p.status = 'in_progress'
+                GROUP BY l.domain
+            """, (str(user_id),))
+
+            for row in cursor.fetchall():
+                if row['domain'] in stats:
+                    stats[row['domain']]['in_progress'] = row['count']
+
+            # Calculate not_started
+            for domain in stats:
+                stats[domain]['not_started'] = (
+                    stats[domain]['total']
+                    - stats[domain]['completed']
+                    - stats[domain]['in_progress']
+                )
+
+        return stats
+
+    def get_total_lesson_count(self) -> int:
+        """Get total number of lessons in database"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM lessons")
+        return cursor.fetchone()['count']
+
     def close(self):
         """Close database connection"""
         if self.conn:
