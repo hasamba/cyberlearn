@@ -155,6 +155,10 @@ def render_sidebar():
                 st.session_state.current_page = "achievements"
                 st.rerun()
 
+            if st.button("🏷️ Manage Tags", use_container_width=True):
+                st.session_state.current_page = "tags"
+                st.rerun()
+
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
@@ -306,6 +310,9 @@ def main():
             achievements.render(
                 st.session_state.current_user, st.session_state.db
             )
+        elif page == "tags":
+            from ui.pages import tag_management
+            tag_management.render_tag_management(st.session_state.db)
         elif page == "lesson":
             if st.session_state.current_lesson:
                 lesson_viewer.render_lesson(

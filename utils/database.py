@@ -13,6 +13,7 @@ from pathlib import Path
 from models.user import UserProfile, SkillLevels, LearningPreferences
 from models.lesson import Lesson, LessonMetadata
 from models.progress import LessonProgress, DomainProgress
+from models.tag import Tag, LessonTag, TagCreate, TagUpdate, TagFilter
 
 
 class Database:
@@ -622,6 +623,287 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute("SELECT COUNT(*) as count FROM lessons")
         return cursor.fetchone()['count']
+
+    # TAG OPERATIONS
+
+    def create_tag(self, tag: Tag) -> bool:
+        """Create a new tag"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO tags (tag_id, name, color, icon, description, created_at, is_system)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    tag.tag_id,
+                    tag.name,
+                    tag.color,
+                    tag.icon,
+                    tag.description,
+                    tag.created_at.isoformat(),
+                    int(tag.is_system)
+                )
+            )
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def get_tag(self, tag_id: str) -> Optional[Tag]:
+        """Get tag by ID"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM tags WHERE tag_id = ?", (tag_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return Tag(
+            tag_id=row['tag_id'],
+            name=row['name'],
+            color=row['color'],
+            icon=row['icon'],
+            description=row['description'],
+            created_at=datetime.fromisoformat(row['created_at']),
+            is_system=bool(row['is_system'])
+        )
+
+    def get_tag_by_name(self, name: str) -> Optional[Tag]:
+        """Get tag by name"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM tags WHERE name = ?", (name,))
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return Tag(
+            tag_id=row['tag_id'],
+            name=row['name'],
+            color=row['color'],
+            icon=row['icon'],
+            description=row['description'],
+            created_at=datetime.fromisoformat(row['created_at']),
+            is_system=bool(row['is_system'])
+        )
+
+    def get_all_tags(self) -> List[Tag]:
+        """Get all tags"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM tags ORDER BY name")
+
+        tags = []
+        for row in cursor.fetchall():
+            tags.append(Tag(
+                tag_id=row['tag_id'],
+                name=row['name'],
+                color=row['color'],
+                icon=row['icon'],
+                description=row['description'],
+                created_at=datetime.fromisoformat(row['created_at']),
+                is_system=bool(row['is_system'])
+            ))
+
+        return tags
+
+    def update_tag(self, tag_id: str, update: TagUpdate) -> bool:
+        """Update tag fields"""
+        cursor = self.conn.cursor()
+
+        # Build dynamic UPDATE query based on provided fields
+        fields = []
+        values = []
+
+        if update.name is not None:
+            fields.append("name = ?")
+            values.append(update.name)
+        if update.color is not None:
+            fields.append("color = ?")
+            values.append(update.color)
+        if update.icon is not None:
+            fields.append("icon = ?")
+            values.append(update.icon)
+        if update.description is not None:
+            fields.append("description = ?")
+            values.append(update.description)
+
+        if not fields:
+            return False
+
+        values.append(tag_id)
+        query = f"UPDATE tags SET {', '.join(fields)} WHERE tag_id = ?"
+
+        cursor.execute(query, values)
+        self.conn.commit()
+        return cursor.rowcount > 0
+
+    def delete_tag(self, tag_id: str) -> bool:
+        """
+        Delete tag (only if not system tag).
+        Cascade deletes lesson_tags associations.
+        """
+        cursor = self.conn.cursor()
+
+        # Check if system tag
+        cursor.execute("SELECT is_system FROM tags WHERE tag_id = ?", (tag_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return False
+
+        if row['is_system']:
+            raise ValueError("Cannot delete system tags")
+
+        # Delete tag (cascade handles lesson_tags)
+        cursor.execute("DELETE FROM tags WHERE tag_id = ?", (tag_id,))
+        self.conn.commit()
+        return cursor.rowcount > 0
+
+    def add_tag_to_lesson(self, lesson_id: str, tag_id: str) -> bool:
+        """Add tag to lesson (many-to-many)"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO lesson_tags (lesson_id, tag_id, added_at)
+                VALUES (?, ?, ?)
+                """,
+                (lesson_id, tag_id, datetime.utcnow().isoformat())
+            )
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            # Already tagged
+            return False
+
+    def remove_tag_from_lesson(self, lesson_id: str, tag_id: str) -> bool:
+        """Remove tag from lesson"""
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "DELETE FROM lesson_tags WHERE lesson_id = ? AND tag_id = ?",
+            (lesson_id, tag_id)
+        )
+        self.conn.commit()
+        return cursor.rowcount > 0
+
+    def get_lesson_tags(self, lesson_id: str) -> List[Tag]:
+        """Get all tags for a lesson"""
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT t.* FROM tags t
+            JOIN lesson_tags lt ON t.tag_id = lt.tag_id
+            WHERE lt.lesson_id = ?
+            ORDER BY t.name
+            """,
+            (lesson_id,)
+        )
+
+        tags = []
+        for row in cursor.fetchall():
+            tags.append(Tag(
+                tag_id=row['tag_id'],
+                name=row['name'],
+                color=row['color'],
+                icon=row['icon'],
+                description=row['description'],
+                created_at=datetime.fromisoformat(row['created_at']),
+                is_system=bool(row['is_system'])
+            ))
+
+        return tags
+
+    def get_lessons_by_tags(self, tag_filter: TagFilter) -> List[LessonMetadata]:
+        """
+        Get lessons filtered by tags.
+
+        If match_all=True: lesson must have ALL specified tags
+        If match_all=False: lesson must have ANY of the specified tags
+        """
+        if not tag_filter.tag_ids:
+            return self.get_all_lessons_metadata()
+
+        cursor = self.conn.cursor()
+
+        if tag_filter.match_all:
+            # Lesson must have ALL tags
+            placeholders = ','.join(['?' for _ in tag_filter.tag_ids])
+            query = f"""
+                SELECT DISTINCT l.lesson_id, l.domain, l.title, l.difficulty,
+                       l.estimated_time, l.order_index, l.is_core_concept, l.prerequisites
+                FROM lessons l
+                JOIN lesson_tags lt ON l.lesson_id = lt.lesson_id
+                WHERE lt.tag_id IN ({placeholders})
+                GROUP BY l.lesson_id
+                HAVING COUNT(DISTINCT lt.tag_id) = ?
+                ORDER BY l.domain, l.order_index
+            """
+            cursor.execute(query, tag_filter.tag_ids + [len(tag_filter.tag_ids)])
+        else:
+            # Lesson must have ANY tag
+            placeholders = ','.join(['?' for _ in tag_filter.tag_ids])
+            query = f"""
+                SELECT DISTINCT l.lesson_id, l.domain, l.title, l.difficulty,
+                       l.estimated_time, l.order_index, l.is_core_concept, l.prerequisites
+                FROM lessons l
+                JOIN lesson_tags lt ON l.lesson_id = lt.lesson_id
+                WHERE lt.tag_id IN ({placeholders})
+                ORDER BY l.domain, l.order_index
+            """
+            cursor.execute(query, tag_filter.tag_ids)
+
+        lessons = []
+        for row in cursor.fetchall():
+            # Parse prerequisites safely
+            prereqs_raw = json.loads(row["prerequisites"])
+            prereqs = []
+            for p in prereqs_raw:
+                if p and isinstance(p, str):
+                    try:
+                        prereqs.append(UUID(p))
+                    except (ValueError, AttributeError):
+                        continue
+
+            # Get tags for this lesson
+            lesson_tags = self.get_lesson_tags(row["lesson_id"])
+            tag_ids = [tag.tag_id for tag in lesson_tags]
+
+            lessons.append(
+                LessonMetadata(
+                    lesson_id=UUID(row["lesson_id"]),
+                    domain=row["domain"],
+                    title=row["title"],
+                    difficulty=row["difficulty"],
+                    estimated_time=row["estimated_time"],
+                    order_index=row["order_index"],
+                    is_core_concept=bool(row["is_core_concept"]),
+                    prerequisites=prereqs,
+                    tags=tag_ids
+                )
+            )
+
+        return lessons
+
+    def get_tag_stats(self) -> Dict[str, int]:
+        """Get statistics about tag usage"""
+        cursor = self.conn.cursor()
+
+        stats = {}
+
+        # Lesson count per tag
+        cursor.execute("""
+            SELECT t.name, COUNT(lt.lesson_id) as lesson_count
+            FROM tags t
+            LEFT JOIN lesson_tags lt ON t.tag_id = lt.tag_id
+            GROUP BY t.tag_id, t.name
+            ORDER BY lesson_count DESC
+        """)
+
+        for row in cursor.fetchall():
+            stats[row['name']] = row['lesson_count']
+
+        return stats
 
     def close(self):
         """Close database connection"""
