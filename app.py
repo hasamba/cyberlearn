@@ -185,20 +185,34 @@ def render_sidebar():
             # Login/Create Account in sidebar
             st.markdown("### 🔐 Login")
 
-            # Initialize saved username in session state if not exists
-            if 'last_username' not in st.session_state:
-                st.session_state.last_username = ''
+            # Get last username from database (most recently logged in user)
+            if 'last_username_loaded' not in st.session_state:
+                # Get most recently logged in user's username
+                cursor = st.session_state.db.conn.cursor()
+                cursor.execute("""
+                    SELECT last_username
+                    FROM users
+                    WHERE last_username IS NOT NULL
+                    ORDER BY last_login DESC
+                    LIMIT 1
+                """)
+                row = cursor.fetchone()
+                default_username = row[0] if row else ''
+                st.session_state.last_username = default_username
+                st.session_state.last_username_loaded = True
 
             # Login form
             with st.form("login_form_sidebar"):
-                username = st.text_input("Username", value=st.session_state.last_username, key="login_username_input")
+                username = st.text_input("Username", value=st.session_state.get('last_username', ''), key="login_username_input")
                 submit = st.form_submit_button("Login", use_container_width=True)
 
                 if submit and username:
                     user = st.session_state.db.get_user_by_username(username)
                     if user:
                         st.session_state.current_user = user
-                        st.session_state.last_username = username  # Save username
+                        st.session_state.last_username = username
+                        # Save username to user's database record
+                        user.last_username = username
                         user.update_streak()
                         st.session_state.db.update_user(user)
                         st.session_state.current_page = "dashboard"
@@ -225,11 +239,14 @@ def render_sidebar():
                         try:
                             # Create new user
                             user = UserProfile(username=new_username, email=email or None)
+                            # Set default tag preference to Beginner
+                            user.preferred_tag_filters = ["Beginner"]
+                            user.last_username = new_username
                             if st.session_state.db.create_user(user):
                                 user.update_streak()
                                 st.session_state.db.update_user(user)
                                 st.session_state.current_user = user
-                                st.session_state.last_username = new_username  # Save username
+                                st.session_state.last_username = new_username
                                 st.session_state.current_page = "diagnostic"
                                 st.success(f"Welcome, {new_username}!")
                                 st.rerun()

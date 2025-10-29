@@ -31,15 +31,19 @@ def render(user: UserProfile, db: Database):
     if all_tags:
         st.markdown("#### 🏷️ Filter by Tags")
 
-        # Initialize saved tag selections for this user
+        # Load tag preferences from database (not session state)
         tag_pref_key = f"tag_filter_{user.user_id}"
         if tag_pref_key not in st.session_state:
-            # Default to Beginner tag for new users
-            beginner_tag = db.get_tag_by_name("Beginner")
-            if beginner_tag:
-                st.session_state[tag_pref_key] = ["Beginner"]
+            # Load from user's database record
+            if user.preferred_tag_filters:
+                st.session_state[tag_pref_key] = user.preferred_tag_filters
             else:
-                st.session_state[tag_pref_key] = []
+                # Default to Beginner tag for new users
+                beginner_tag = db.get_tag_by_name("Beginner")
+                if beginner_tag:
+                    st.session_state[tag_pref_key] = ["Beginner"]
+                else:
+                    st.session_state[tag_pref_key] = []
 
         col1, col2 = st.columns([4, 1])
 
@@ -54,9 +58,11 @@ def render(user: UserProfile, db: Database):
                 key=f"tag_multiselect_{user.user_id}"
             )
 
-            # Save user's selection for next time
+            # Save user's selection to database when changed
             if selected_tag_names != st.session_state[tag_pref_key]:
                 st.session_state[tag_pref_key] = selected_tag_names
+                user.preferred_tag_filters = selected_tag_names
+                db.update_user(user)
 
         with col2:
             # Match all vs any - add empty label to align with multiselect
