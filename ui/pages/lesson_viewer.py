@@ -231,25 +231,20 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                         font-weight: 500;
                     ">{tag.icon} {tag.name}</span>"""
 
-                # Add manage button styled as tag badge (inline)
-                tags_html += f"""<span style="
-                    display: inline-block;
-                    padding: 3px 10px;
-                    margin: 2px 3px;
-                    background-color: {'#dbeafe' if is_editing else '#f0f0f0'};
-                    border: 1px {'solid #3b82f6' if is_editing else 'dashed #999'};
-                    border-radius: 10px;
-                    color: {'#1e40af' if is_editing else '#666'};
-                    font-size: 0.75em;
-                    font-weight: 500;
-                ">🏷️ Manage</span>"""
-
                 st.markdown(tags_html, unsafe_allow_html=True)
 
-                # Actual clickable button (minimal text)
-                if st.button("⚙️", key=manage_tags_key, help="Click to manage tags"):
-                    st.session_state[editor_key] = not is_editing
-                    st.rerun()
+                # Clickable "Manage Tags" button styled as a tag badge
+                # Use columns to make button compact and inline-looking
+                col_tags, col_spacer = st.columns([1, 5])
+                with col_tags:
+                    if st.button(
+                        f"🏷️ Manage",
+                        key=manage_tags_key,
+                        help="Click to manage lesson tags",
+                        use_container_width=True
+                    ):
+                        st.session_state[editor_key] = not is_editing
+                        st.rerun()
 
                 # Compact tag editor
                 if is_editing:
