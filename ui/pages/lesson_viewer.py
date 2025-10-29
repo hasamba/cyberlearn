@@ -199,7 +199,11 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 if lesson.is_core_concept:
                     st.caption("🔥 Core Concept (Essential)")
 
-                # Show tag badges
+                # Show tag badges inline with manage button
+                manage_tags_key = f"manage_tags_{lesson.lesson_id}"
+                editor_key = f"show_tag_editor_{lesson.lesson_id}"
+                is_editing = st.session_state.get(editor_key, False)
+
                 tags_html = ""
                 for tag in lesson_tags:
                     tags_html += f"""<span style="
@@ -214,51 +218,61 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                         font-weight: 500;
                     ">{tag.icon} {tag.name}</span>"""
 
-                if tags_html:
-                    st.markdown(tags_html, unsafe_allow_html=True)
+                # Add manage button styled as tag badge (inline)
+                tags_html += f"""<span style="
+                    display: inline-block;
+                    padding: 3px 10px;
+                    margin: 2px 3px;
+                    background-color: {'#dbeafe' if is_editing else '#f0f0f0'};
+                    border: 1px {'solid #3b82f6' if is_editing else 'dashed #999'};
+                    border-radius: 10px;
+                    color: {'#1e40af' if is_editing else '#666'};
+                    font-size: 0.75em;
+                    font-weight: 500;
+                ">🏷️ Manage</span>"""
 
-                # Manage tags button
-                manage_tags_key = f"manage_tags_{lesson.lesson_id}"
-                if st.button("🏷️ Manage Tags", key=manage_tags_key, type="secondary"):
-                    # Toggle the editor state
-                    editor_key = f"show_tag_editor_{lesson.lesson_id}"
-                    st.session_state[editor_key] = not st.session_state.get(editor_key, False)
+                st.markdown(tags_html, unsafe_allow_html=True)
+
+                # Actual clickable button (minimal)
+                if st.button("", key=manage_tags_key, help="Click to manage tags", label_visibility="collapsed"):
+                    st.session_state[editor_key] = not is_editing
                     st.rerun()
 
-                # Tag management editor (only show if button was clicked)
-                editor_key = f"show_tag_editor_{lesson.lesson_id}"
-                if st.session_state.get(editor_key, False):
-                    st.markdown("---")
-                    st.markdown("**✏️ Edit Lesson Tags**")
+                # Compact tag editor
+                if is_editing:
+                    st.markdown('<div style="background-color: #f8f9fa; padding: 8px; border-radius: 5px; margin: 5px 0;">', unsafe_allow_html=True)
 
                     all_tags = db.get_all_tags()
                     current_tag_ids = {tag.tag_id for tag in lesson_tags}
 
-                    # Show current tags with remove buttons
+                    # Current tags - compact
                     if lesson_tags:
-                        st.markdown("**Current Tags:**")
+                        st.markdown('<p style="margin: 0 0 5px 0; font-size: 0.8em; font-weight: 600;">Current:</p>', unsafe_allow_html=True)
                         for tag in lesson_tags:
-                            col_t1, col_t2 = st.columns([3, 1])
+                            col_t1, col_t2 = st.columns([5, 1])
                             with col_t1:
-                                st.markdown(f"{tag.icon} {tag.name}")
+                                st.markdown(f'<p style="margin: 2px 0; font-size: 0.8em;">{tag.icon} {tag.name}</p>', unsafe_allow_html=True)
                             with col_t2:
-                                if st.button("Remove", key=f"remove_{lesson.lesson_id}_{tag.tag_id}"):
+                                if st.button("✕", key=f"rm_{lesson.lesson_id}_{tag.tag_id}", help="Remove"):
                                     db.remove_tag_from_lesson(str(lesson.lesson_id), tag.tag_id)
-                                    st.success(f"Removed {tag.name}")
                                     st.rerun()
 
-                    # Add new tags
-                    st.markdown("**Add Tags:**")
+                    # Add tags - compact grid
+                    st.markdown('<p style="margin: 8px 0 5px 0; font-size: 0.8em; font-weight: 600;">Add:</p>', unsafe_allow_html=True)
                     available_tags = [t for t in all_tags if t.tag_id not in current_tag_ids]
 
                     if available_tags:
-                        for tag in available_tags:
-                            if st.button(f"{tag.icon} {tag.name}", key=f"add_{lesson.lesson_id}_{tag.tag_id}"):
-                                db.add_tag_to_lesson(str(lesson.lesson_id), tag.tag_id)
-                                st.success(f"Added {tag.name}")
-                                st.rerun()
+                        cols = st.columns(3)
+                        for idx, tag in enumerate(available_tags):
+                            with cols[idx % 3]:
+                                if st.button(f"{tag.icon}", key=f"add_{lesson.lesson_id}_{tag.tag_id}",
+                                           help=tag.name, use_container_width=True):
+                                    db.add_tag_to_lesson(str(lesson.lesson_id), tag.tag_id)
+                                    st.rerun()
                     else:
-                        st.info("All tags already applied to this lesson")
+                        st.markdown('<p style="font-size: 0.75em; color: #999; margin: 2px 0;">All applied</p>', unsafe_allow_html=True)
+
+                    st.markdown('</div>', unsafe_allow_html=True)
 
             with col2:
                 if st.button(
