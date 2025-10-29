@@ -32,8 +32,8 @@ class SkillLevels(BaseModel):
     linux: int = Field(default=0, ge=0, le=100)
     cloud: int = Field(default=0, ge=0, le=100)
     pentest: int = Field(default=0, ge=0, le=100)
-    redteam: int = Field(default=0, ge=0, le=100)
-    blueteam: int = Field(default=0, ge=0, le=100)
+    red_team: int = Field(default=0, ge=0, le=100)
+    blue_team: int = Field(default=0, ge=0, le=100)
     threat_hunting: int = Field(default=0, ge=0, le=100)
 
     def get_overall_level(self) -> int:
@@ -48,8 +48,8 @@ class SkillLevels(BaseModel):
             self.linux,
             self.cloud,
             self.pentest,
-            self.redteam,
-            self.blueteam,
+            self.red_team,
+            self.blue_team,
             self.threat_hunting
         ]
         return sum(skills) // len(skills)
@@ -66,8 +66,8 @@ class SkillLevels(BaseModel):
             self.linux: "linux",
             self.cloud: "cloud",
             self.pentest: "pentest",
-            self.redteam: "redteam",
-            self.blueteam: "blueteam",
+            self.red_team: "red_team",
+            self.blue_team: "blue_team",
             self.threat_hunting: "threat_hunting"
         }
         return domain_map[min(domain_map.keys())]
