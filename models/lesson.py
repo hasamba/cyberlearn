@@ -102,6 +102,9 @@ class Lesson(BaseModel):
     prerequisites: List[str] = Field(default_factory=list)  # Changed from List[UUID] to List[str] for lesson title references
     learning_objectives: List[str] = Field(min_items=1)
 
+    # Tags for organization and filtering (many-to-many)
+    tags: List[str] = Field(default_factory=list)  # List of tag_ids
+
     # Content
     content_blocks: List[ContentBlock] = Field(min_items=1)
 
@@ -179,6 +182,7 @@ class LessonMetadata(BaseModel):
     order_index: int
     is_core_concept: bool
     prerequisites: List[UUID]
+    tags: List[str] = Field(default_factory=list)  # Tag IDs
 
     class Config:
         json_encoders = {UUID: lambda v: str(v)}

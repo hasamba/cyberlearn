@@ -25,27 +25,42 @@ def render(user: UserProfile, db: Database):
         _render_completion_feedback(completion_summary)
         st.markdown("---")
 
-    # Domain tabs
-    domains = [
-        ("fundamentals", "🔐 Fundamentals"),
-        ("osint", "🔎 OSINT"),
-        ("dfir", "🔍 DFIR"),
-        ("malware", "🦠 Malware"),
-        ("active_directory", "🗂️ Active Directory"),
-        ("system", "💻 System"),
-        ("linux", "🐧 Linux"),
-        ("cloud", "☁️ Cloud"),
-        ("pentest", "🎯 Pentest"),
-        ("red_team", "🔴 Red Team"),
-        ("blue_team", "🛡️ Blue Team"),
-        ("threat_hunting", "🎯 Threat Hunting"),
-    ]
+    # View mode selector
+    view_mode = st.radio(
+        "View Mode",
+        ["📂 By Domain", "🏷️ By Tags"],
+        horizontal=True,
+        help="Switch between domain-based and tag-based lesson browsing"
+    )
 
-    tabs = st.tabs([name for _, name in domains])
+    st.markdown("---")
 
-    for idx, (domain_key, domain_name) in enumerate(domains):
-        with tabs[idx]:
-            render_domain_lessons(user, db, domain_key)
+    if view_mode == "🏷️ By Tags":
+        # Tag-based browser
+        from ui.components.lesson_browser import render_lesson_browser
+        render_lesson_browser(user, db)
+    else:
+        # Original domain-based view
+        domains = [
+            ("fundamentals", "🔐 Fundamentals"),
+            ("osint", "🔎 OSINT"),
+            ("dfir", "🔍 DFIR"),
+            ("malware", "🦠 Malware"),
+            ("active_directory", "🗂️ Active Directory"),
+            ("system", "💻 System"),
+            ("linux", "🐧 Linux"),
+            ("cloud", "☁️ Cloud"),
+            ("pentest", "🎯 Pentest"),
+            ("red_team", "🔴 Red Team"),
+            ("blue_team", "🛡️ Blue Team"),
+            ("threat_hunting", "🎯 Threat Hunting"),
+        ]
+
+        tabs = st.tabs([name for _, name in domains])
+
+        for idx, (domain_key, domain_name) in enumerate(domains):
+            with tabs[idx]:
+                render_domain_lessons(user, db, domain_key)
 
     _maybe_scroll_to_top()
 
