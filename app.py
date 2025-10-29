@@ -185,12 +185,13 @@ def render_sidebar():
             # Login/Create Account in sidebar
             st.markdown("### 🔐 Login")
 
-            # Get saved username from session state
-            saved_username = st.session_state.get('last_username', '')
+            # Initialize saved username in session state if not exists
+            if 'last_username' not in st.session_state:
+                st.session_state.last_username = ''
 
             # Login form
             with st.form("login_form_sidebar"):
-                username = st.text_input("Username", value=saved_username)
+                username = st.text_input("Username", value=st.session_state.last_username, key="login_username_input")
                 submit = st.form_submit_button("Login", use_container_width=True)
 
                 if submit and username:
