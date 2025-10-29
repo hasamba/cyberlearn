@@ -315,12 +315,12 @@ def render_lesson_stats(user: UserProfile, db: Database):
             col1, col2, col3 = st.columns([2, 1, 1])
 
             with col1:
-                # Domain name (abbreviated for compact display)
+                # Domain name (with proper formatting)
                 domain_abbrev = {
-                    'active_directory': 'Active Dir',
+                    'active_directory': 'Active Directory',
                     'red_team': 'Red Team',
                     'blue_team': 'Blue Team',
-                    'threat_hunting': 'Threat Hunt'
+                    'threat_hunting': 'Threat Hunting'
                 }
                 domain_short = domain_abbrev.get(domain, domain.replace('_', ' ').title())
                 st.markdown(f"**{domain_short}**")
