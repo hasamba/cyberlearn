@@ -219,11 +219,17 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 editor_key = f"show_tag_editor_{lesson.lesson_id}"
                 is_editing = st.session_state.get(editor_key, False)
 
-                # Create inline layout for tags + manage button
-                cols_inline = st.columns([10, 1])
+                # Create inline layout with manage button first, then tags
+                cols_inline = st.columns([1, 10])
 
                 with cols_inline[0]:
-                    # Build tags HTML
+                    # Manage button first
+                    if st.button("🏷️", key=manage_tags_key, help="Manage tags"):
+                        st.session_state[editor_key] = not is_editing
+                        st.rerun()
+
+                with cols_inline[1]:
+                    # Build tags HTML after button
                     tags_html = ''
                     for tag in lesson_tags:
                         tags_html += f"""<span style="
@@ -240,12 +246,6 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 
                     if tags_html:
                         st.markdown(tags_html, unsafe_allow_html=True)
-
-                with cols_inline[1]:
-                    # Compact button on same line
-                    if st.button("🏷️", key=manage_tags_key, help="Manage tags"):
-                        st.session_state[editor_key] = not is_editing
-                        st.rerun()
 
                 # Compact tag editor
                 if is_editing:
