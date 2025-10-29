@@ -233,8 +233,8 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 
                 st.markdown(tags_html, unsafe_allow_html=True)
 
-                # Actual clickable button (minimal)
-                if st.button("", key=manage_tags_key, help="Click to manage tags", label_visibility="collapsed"):
+                # Actual clickable button (minimal text)
+                if st.button("⚙️", key=manage_tags_key, help="Click to manage tags"):
                     st.session_state[editor_key] = not is_editing
                     st.rerun()
 
