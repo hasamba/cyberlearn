@@ -4,7 +4,9 @@
   "title": "Sigma: Universal Detection Rule Format",
   "difficulty": 2,
   "order_index": 13,
-  "prerequisites": ["blue_team_01"],
+  "prerequisites": [
+    "blue_team_01"
+  ],
   "concepts": [
     "Detection engineering",
     "Sigma rule format",
@@ -26,15 +28,31 @@
   "post_assessment": [
     {
       "question": "What problem does Sigma solve in detection engineering?",
-      "options": ["Encrypts SIEM logs", "Provides SIEM-agnostic detection rule format", "Replaces firewalls", "Generates malware signatures"],
+      "options": [
+        "Encrypts SIEM logs",
+        "Provides SIEM-agnostic detection rule format",
+        "Replaces firewalls",
+        "Generates malware signatures"
+      ],
       "correct_answer": 1,
-      "explanation": "Sigma solves the problem of SIEM vendor lock-in by providing a universal, YAML-based detection rule format that can be converted to any SIEM query language (Splunk SPL, Elastic KQL, QRadar AQL, etc.)."
+      "explanation": "Sigma solves the problem of SIEM vendor lock-in by providing a universal, YAML-based detection rule format that can be converted to any SIEM query language (Splunk SPL, Elastic KQL, QRadar AQL, etc.).",
+      "question_id": "1bcffd1c-a46f-4a71-98e5-50e6da5837da",
+      "type": "multiple_choice",
+      "difficulty": 2
     },
     {
       "question": "Which Sigma field is used to reduce false positives by excluding known benign activity?",
-      "options": ["detection.selection", "detection.condition", "detection.filter", "logsource"],
+      "options": [
+        "detection.selection",
+        "detection.condition",
+        "detection.filter",
+        "logsource"
+      ],
       "correct_answer": 2,
-      "explanation": "The 'filter' field in the detection section is used to exclude known false positives by specifying conditions that should NOT trigger the rule, such as benign processes or trusted user accounts."
+      "explanation": "The 'filter' field in the detection section is used to exclude known false positives by specifying conditions that should NOT trigger the rule, such as benign processes or trusted user accounts.",
+      "question_id": "6af12637-a9f3-4eec-a001-4ed9fd605a2c",
+      "type": "multiple_choice",
+      "difficulty": 2
     }
   ],
   "jim_kwik_principles": [

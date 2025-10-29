@@ -14,7 +14,20 @@ python reload_osint_simple.py
 ```
 This will load the 5 OSINT lessons that are fixed and ready.
 
-### 3. Verify Current State
+### 3. Consolidate Red Team Domains (5 + 7 = 12 lessons)
+```bash
+# Step 1: Review analysis
+python consolidate_redteam_domains.py
+
+# Step 2: Execute consolidation (creates backup)
+python consolidate_redteam_execute.py
+
+# Step 3: Verify result
+python list_lessons.py
+```
+**See**: [`RED_TEAM_CONSOLIDATION.md`](RED_TEAM_CONSOLIDATION.md) for complete guide
+
+### 4. Verify Current State
 ```bash
 python list_lessons.py
 ```
@@ -66,19 +79,22 @@ This will show all lessons by domain and counts.
 
 ## Current Lesson Priorities
 
-### Priority 1: OSINT Domain (5 more lessons needed)
-- **Status**: 5 lessons ready to load, need 5 more (6-10)
-- **Next lessons**: Email OSINT, Image/Geolocation, Maltego, Dark Web, Automation
-- **See**: [`NEXT_LESSONS_PLAN.md`](NEXT_LESSONS_PLAN.md) for detailed outlines
+### Priority 1: OSINT Domain (5 more lessons needed) ⭐ BATCH READY
+- **Status**: 5 lessons ready to load, **batch prompt ready for lessons 6-10**
+- **Batch File**: [BATCH_OSINT_06_10.md](BATCH_OSINT_06_10.md) - Single ChatGPT prompt for all 5 lessons
+- **Time**: 1-2 hours (vs 20-25 hours manual)
+- **Lessons**: Email Intelligence, Geolocation, Maltego, Dark Web, Automation
 
 ### Priority 2: Threat Hunting Domain (10 lessons needed)
 - **Status**: Domain infrastructure exists, NO lessons created yet
 - **Next lessons**: All 10 lessons (Fundamentals → Purple Team)
 - **See**: [`NEXT_LESSONS_PLAN.md`](NEXT_LESSONS_PLAN.md) for detailed outlines
 
-### Priority 3: Red Team Consolidation
-- **Status**: Two domains (red_team: 5, redteam: 7) need merging
-- **Action**: Audit, consolidate, add 1-5 more to reach 12 total
+### Priority 3: Red Team Consolidation (**READY TO EXECUTE**)
+- **Status**: Two domains (red_team: 5, redteam: 7) - tools ready
+- **Action**: Run consolidation scripts (30 minutes)
+- **Result**: Single red_team domain with 12 lessons (no new content needed)
+- **See**: [`RED_TEAM_CONSOLIDATION.md`](RED_TEAM_CONSOLIDATION.md)
 
 ---
 
@@ -87,7 +103,11 @@ This will show all lessons by domain and counts.
 | File | Purpose |
 |------|---------|
 | [`CHATGPT_LESSON_PROMPT.md`](CHATGPT_LESSON_PROMPT.md) | Full prompt template for ChatGPT lesson creation |
-| [`NEXT_LESSONS_PLAN.md`](NEXT_LESSONS_PLAN.md) | Detailed plan for next 18-20 lessons |
+| [`PENTEST_BATCH_INDEX.md`](PENTEST_BATCH_INDEX.md) | ⭐ **Master guide: Generate 21 pentest lessons in 5 batches** |
+| [`BATCH_OSINT_06_10.md`](BATCH_OSINT_06_10.md) | ⭐ **Generate 5 OSINT lessons (6-10) in one prompt** |
+| [`NEXT_LESSONS_PLAN.md`](NEXT_LESSONS_PLAN.md) | Detailed plan for all lesson priorities |
+| [`RED_TEAM_CONSOLIDATION.md`](RED_TEAM_CONSOLIDATION.md) | Complete guide to consolidating red team domains |
+| [`PWK_COVERAGE_ANALYSIS.md`](PWK_COVERAGE_ANALYSIS.md) | PWK syllabus coverage analysis (21 pentest lessons) |
 | [`CLAUDE.md`](CLAUDE.md) | Full project documentation and guidelines |
 | [`OSINT_LESSONS_READY.md`](OSINT_LESSONS_READY.md) | OSINT lessons deployment guide |
 
