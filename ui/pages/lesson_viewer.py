@@ -225,33 +225,43 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 editor_key = f"show_tag_editor_{lesson.lesson_id}"
                 is_editing = st.session_state.get(editor_key, False)
 
-                # Create inline layout with manage button first, then tags
-                cols_inline = st.columns([1, 10])
+                # Build all tags in single HTML block (inline)
+                manage_bg = '#dbeafe' if is_editing else '#f0f0f0'
+                manage_border = 'solid #3b82f6' if is_editing else 'dashed #999'
+                manage_color = '#1e40af' if is_editing else '#666'
 
-                with cols_inline[0]:
-                    # Manage button first
-                    if st.button("🏷️", key=manage_tags_key, help="Manage tags"):
-                        st.session_state[editor_key] = not is_editing
-                        st.rerun()
+                tags_html = f"""<span style="
+                    display: inline-block;
+                    padding: 3px 10px;
+                    margin: 2px 3px;
+                    background-color: {manage_bg};
+                    border: 1px {manage_border};
+                    border-radius: 10px;
+                    color: {manage_color};
+                    font-size: 0.75em;
+                    font-weight: 500;
+                    cursor: pointer;
+                ">🏷️</span>"""
 
-                with cols_inline[1]:
-                    # Build tags HTML after button
-                    tags_html = ''
-                    for tag in lesson_tags:
-                        tags_html += f"""<span style="
-                            display: inline-block;
-                            padding: 3px 10px;
-                            margin: 2px 3px;
-                            background-color: {tag.color}20;
-                            border: 1px solid {tag.color};
-                            border-radius: 10px;
-                            color: {tag.color};
-                            font-size: 0.75em;
-                            font-weight: 500;
-                        ">{tag.icon} {tag.name}</span>"""
+                for tag in lesson_tags:
+                    tags_html += f"""<span style="
+                        display: inline-block;
+                        padding: 3px 10px;
+                        margin: 2px 3px;
+                        background-color: {tag.color}20;
+                        border: 1px solid {tag.color};
+                        border-radius: 10px;
+                        color: {tag.color};
+                        font-size: 0.75em;
+                        font-weight: 500;
+                    ">{tag.icon} {tag.name}</span>"""
 
-                    if tags_html:
-                        st.markdown(tags_html, unsafe_allow_html=True)
+                st.markdown(tags_html, unsafe_allow_html=True)
+
+                # Small button to actually trigger the action
+                if st.button("⚙️ Edit Tags", key=manage_tags_key):
+                    st.session_state[editor_key] = not is_editing
+                    st.rerun()
 
                 # Compact tag editor
                 if is_editing:
