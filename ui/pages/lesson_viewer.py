@@ -31,17 +31,30 @@ def render(user: UserProfile, db: Database):
     if all_tags:
         st.markdown("#### 🏷️ Filter by Tags")
 
+        # Initialize saved tag selections for this user
+        tag_pref_key = f"tag_filter_{user.user_id}"
+        if tag_pref_key not in st.session_state:
+            # Default to Beginner tag for new users
+            beginner_tag = db.get_tag_by_name("Beginner")
+            if beginner_tag:
+                st.session_state[tag_pref_key] = ["Beginner"]
+            else:
+                st.session_state[tag_pref_key] = []
+
         col1, col2 = st.columns([4, 1])
 
         with col1:
-            # Multi-select for tags
+            # Multi-select for tags with saved default
             selected_tag_names = st.multiselect(
                 "Select tags to filter lessons",
                 options=[tag.name for tag in all_tags],
-                default=[],
+                default=st.session_state[tag_pref_key],
                 help="Filter lessons by tags. Leave empty to show all lessons.",
                 label_visibility="visible"
             )
+
+            # Save user's selection
+            st.session_state[tag_pref_key] = selected_tag_names
 
         with col2:
             # Match all vs any - add empty label to align with multiselect
