@@ -177,7 +177,55 @@ def render_sidebar():
                     st.caption(f"Lesson: {st.session_state.current_lesson.title}")
 
         else:
-            st.info("Please login or create an account to start learning!")
+            # Login/Create Account in sidebar
+            st.markdown("### 🔐 Login")
+
+            # Login form
+            with st.form("login_form_sidebar"):
+                username = st.text_input("Username")
+                submit = st.form_submit_button("Login", use_container_width=True)
+
+                if submit and username:
+                    user = st.session_state.db.get_user_by_username(username)
+                    if user:
+                        st.session_state.current_user = user
+                        user.update_streak()
+                        st.session_state.db.update_user(user)
+                        st.session_state.current_page = "dashboard"
+                        st.success(f"Welcome back, {username}!")
+                        st.rerun()
+                    else:
+                        st.error("User not found.")
+
+            st.markdown("---")
+            st.markdown("### ✨ Create Account")
+
+            # Register form
+            with st.form("register_form_sidebar"):
+                new_username = st.text_input("Username (min 3 chars)")
+                email = st.text_input("Email (optional)")
+                submit = st.form_submit_button("Create Account", use_container_width=True)
+
+                if submit:
+                    if not new_username:
+                        st.error("Please enter a username.")
+                    elif len(new_username) < 3:
+                        st.error("Username must be at least 3 characters long.")
+                    else:
+                        try:
+                            # Create new user
+                            user = UserProfile(username=new_username, email=email or None)
+                            if st.session_state.db.create_user(user):
+                                user.update_streak()
+                                st.session_state.db.update_user(user)
+                                st.session_state.current_user = user
+                                st.session_state.current_page = "diagnostic"
+                                st.success(f"Welcome, {new_username}!")
+                                st.rerun()
+                            else:
+                                st.error("Username already exists.")
+                        except Exception as e:
+                            st.error(f"Error: {str(e)}")
 
             # Debug info for no user
             if config.debug:
@@ -194,6 +242,10 @@ def render_welcome_page():
         "### Accelerated Cybersecurity Mastery with Adaptive Learning"
     )
 
+    st.info("👈 **Please login or create an account in the sidebar to start learning!**")
+
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -205,7 +257,8 @@ def render_welcome_page():
         - **Jim Kwik Principles** - Accelerated learning techniques
         - **Hands-on Labs** - Interactive simulations and exercises
         - **Spaced Repetition** - Optimize retention with smart reviews
-        - **7 Core Domains** - From fundamentals to advanced operations
+        - **Tag-Based Organization** - Filter by career paths, courses, and tools
+        - **12 Learning Domains** - From fundamentals to advanced operations
         """
         )
 
@@ -230,52 +283,22 @@ def render_welcome_page():
 
     st.markdown("---")
 
-    # Login/Register
-    tab1, tab2 = st.tabs(["Login", "Create Account"])
-
-    with tab1:
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            submit = st.form_submit_button("Login", use_container_width=True)
-
-            if submit and username:
-                user = st.session_state.db.get_user_by_username(username)
-                if user:
-                    st.session_state.current_user = user
-                    user.update_streak()
-                    st.session_state.db.update_user(user)
-                    st.session_state.current_page = "dashboard"
-                    st.success(f"Welcome back, {username}!")
-                    st.rerun()
-                else:
-                    st.error("User not found. Please create an account.")
-
-    with tab2:
-        with st.form("register_form"):
-            new_username = st.text_input("Choose Username (min 3 characters)")
-            email = st.text_input("Email (optional)")
-            submit = st.form_submit_button("Create Account", use_container_width=True)
-
-            if submit:
-                if not new_username:
-                    st.error("Please enter a username.")
-                elif len(new_username) < 3:
-                    st.error("Username must be at least 3 characters long.")
-                else:
-                    try:
-                        # Create new user
-                        user = UserProfile(username=new_username, email=email or None)
-                        if st.session_state.db.create_user(user):
-                            user.update_streak()
-                            st.session_state.db.update_user(user)
-                            st.session_state.current_user = user
-                            st.session_state.current_page = "diagnostic"
-                            st.success(f"Account created! Welcome, {new_username}!")
-                            st.rerun()
-                        else:
-                            st.error("Username already exists. Please choose another.")
-                    except Exception as e:
-                        st.error(f"Error creating account: {str(e)}")
+    # Career paths section
+    st.markdown("#### 🎯 Career Path Tags")
+    st.markdown(
+        """
+    Filter lessons by your target cybersecurity role:
+    - 🛡️ SOC Analyst (Tier 1 & 2)
+    - 🚨 Incident Responder
+    - 🎯 Threat Hunter
+    - 🔬 Forensic Analyst
+    - 🦠 Malware Analyst
+    - 🔓 Penetration Tester
+    - ⚔️ Red Team Operator
+    - 🔧 Security Engineer
+    - ☁️ Cloud Security Specialist
+    """
+    )
 
 
 def main():
