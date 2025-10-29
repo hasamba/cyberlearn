@@ -99,6 +99,10 @@ class UserProfile(BaseModel):
     total_time_spent: int = Field(default=0, ge=0)  # seconds
     diagnostic_completed: bool = Field(default=False)
 
+    # UI Preferences (persistent across sessions)
+    last_username: Optional[str] = None  # For login form convenience
+    preferred_tag_filters: List[str] = Field(default_factory=list)  # List of tag names
+
     def calculate_level(self) -> int:
         """Calculate user level based on total XP"""
         if self.total_xp < 1000:

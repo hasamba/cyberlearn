@@ -211,7 +211,8 @@ class Database:
                 email = ?, last_login = ?, skill_levels = ?, total_xp = ?,
                 level = ?, streak_days = ?, longest_streak = ?, badges = ?,
                 learning_preferences = ?, total_lessons_completed = ?,
-                total_time_spent = ?, diagnostic_completed = ?
+                total_time_spent = ?, diagnostic_completed = ?,
+                last_username = ?, preferred_tag_filters = ?
             WHERE user_id = ?
         """,
             (
@@ -227,6 +228,8 @@ class Database:
                 user.total_lessons_completed,
                 user.total_time_spent,
                 int(user.diagnostic_completed),
+                user.last_username,
+                json.dumps(user.preferred_tag_filters),
                 str(user.user_id),
             ),
         )
@@ -253,6 +256,8 @@ class Database:
             total_lessons_completed=row["total_lessons_completed"],
             total_time_spent=row["total_time_spent"],
             diagnostic_completed=bool(row["diagnostic_completed"]),
+            last_username=row.get("last_username"),
+            preferred_tag_filters=json.loads(row.get("preferred_tag_filters", "[]")),
         )
 
     # LESSON OPERATIONS
