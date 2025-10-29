@@ -67,40 +67,13 @@ def render_tag_management(db: Database):
                                     del st.session_state[f'editing_tag']
                                     st.rerun()
                     else:
-                        # Tag card with buttons inside
-                        button_html = ""
-                        if not tag.is_system:
-                            button_html = f"""
-                            <div style="margin-top: 10px; display: flex; gap: 5px;">
-                                <button style="
-                                    flex: 1;
-                                    padding: 5px;
-                                    background-color: {tag.color};
-                                    color: white;
-                                    border: none;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                    font-size: 0.85em;
-                                " onclick="return false;">✏️ Edit</button>
-                                <button style="
-                                    flex: 1;
-                                    padding: 5px;
-                                    background-color: #dc2626;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                    font-size: 0.85em;
-                                " onclick="return false;">🗑️ Delete</button>
-                            </div>
-                            """
-
+                        # Tag card
                         st.markdown(f"""
                         <div style="
                             border: 2px solid {tag.color};
                             border-radius: 10px;
                             padding: 15px;
-                            margin-bottom: 15px;
+                            margin-bottom: 10px;
                             background-color: {tag.color}15;
                         ">
                             <h3 style="color: {tag.color}; margin: 0;">
@@ -110,20 +83,19 @@ def render_tag_management(db: Database):
                             <p style="margin: 5px 0; font-size: 0.8em; color: #666;">
                                 {'🔒 System Tag' if tag.is_system else '✏️ Custom Tag'}
                             </p>
-                            {button_html}
                         </div>
                         """, unsafe_allow_html=True)
 
-                        # Actual functional buttons (hidden visually but work)
+                        # Functional buttons for custom tags
                         if not tag.is_system:
                             col_a, col_b = st.columns(2)
                             with col_a:
-                                if st.button(f"Edit", key=f"edit_{tag.tag_id}", use_container_width=True):
+                                if st.button(f"✏️ Edit", key=f"edit_{tag.tag_id}", use_container_width=True):
                                     st.session_state[f'editing_tag'] = tag.tag_id
                                     st.rerun()
 
                             with col_b:
-                                if st.button(f"Delete", key=f"del_{tag.tag_id}", use_container_width=True):
+                                if st.button(f"🗑️ Delete", key=f"del_{tag.tag_id}", use_container_width=True, type="secondary"):
                                     if st.session_state.get(f'confirm_delete_{tag.tag_id}'):
                                         try:
                                             db.delete_tag(tag.tag_id)
