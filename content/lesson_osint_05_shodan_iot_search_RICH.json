@@ -1,5 +1,5 @@
 {
-  "lesson_id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+  "lesson_id": "5ed4583c-ce75-4c37-beb8-3ac0ec21aa6b",
   "domain": "osint",
   "title": "Shodan & IoT Search",
   "difficulty": 2,
@@ -101,7 +101,7 @@
       "correct_answer": 0,
       "explanation": "Option A is correct and represents best practices for critical infrastructure vulnerability disclosure. Here's why: (1) Critical infrastructure (water, power, healthcare, transportation) falls under CISA's jurisdiction in the US. Reporting to CISA (via US-CERT) ensures coordinated response and protects you legally under responsible disclosure frameworks. (2) Water treatment facilities are classified as critical national infrastructure—compromise could endanger public health. (3) CISA has established relationships with facility operators and can coordinate notification diplomatically. (4) Documenting the finding through official channels protects you from legal retaliation. Option B is WRONG because attempting to connect to an ICS device without authorization is illegal (CFAA violation) and potentially dangerous—you could cause physical damage or disruption. ICS devices are fragile and not designed for security testing. Option C is WRONG and potentially illegal—public disclosure before the facility has a chance to respond is irresponsible and could enable attackers to exploit the vulnerability. This is the opposite of responsible disclosure. Option D is WRONG because you have a moral and often legal obligation to report critical infrastructure vulnerabilities. Many jurisdictions have 'Good Samaritan' laws protecting security researchers who report vulnerabilities responsibly. The proper disclosure timeline: (1) Report to CISA immediately (24 hours), (2) CISA coordinates with facility, (3) Facility remediates, (4) Only after remediation, consider public disclosure if appropriate. This scenario is based on real incidents—exposed ICS devices have been found controlling power grids, water treatment, and manufacturing. Responsible disclosure has prevented real-world disasters.",
       "difficulty": 3,
-      "question_id": "fe2bba0f-217d-4c22-ba47-6f57b29edd4f",
+      "question_id": "101b8ae9-71eb-4430-987b-d128e8b4fb56",
       "type": "multiple_choice"
     },
     {
@@ -115,7 +115,7 @@
       "correct_answer": 1,
       "explanation": "Option B is correct. This scenario describes a likely breach, not just a vulnerability. Here's the critical thinking: (1) Database exposed for 6 months with no auth = window of vulnerability. (2) Pastebin post 3 months ago = public knowledge of exposure. (3) Assumption: If one person found it and posted publicly, others found it too. (4) Under GDPR/CCPA/breach notification laws, you must ASSUME breach until proven otherwise when sensitive data is exposed. Option B is correct because your first step is incident response: (a) Preserve evidence (don't alter the database yet), (b) Review logs to determine if unauthorized access occurred, (c) Identify what data was accessed, (d) Determine breach notification obligations. Only after investigation do you remediate. Option A (blocking the port) is necessary but not sufficient—damage may already be done, and you'd be destroying evidence of access. Option C (enabling auth + notification) jumps ahead—you need to investigate FIRST to know what to notify (what data was accessed? how many customers affected?). Option D (taking offline) might be necessary for containment, but investigating logs comes first—once you take it offline, you lose the ability to monitor ongoing attacker activity. The correct sequence: (1) Assume breach, activate IR team [Option B], (2) Preserve evidence and analyze logs, (3) Contain (block access or take offline) [Options A or D], (4) Eradicate (enable auth, fix config), (5) Notify (customers, regulators) [Option C], (6) Recover and improve. This scenario is realistic—many Shodan findings turn out to be active breaches. The MongoDB exposure problem was so widespread that in 2017, ransom attacks targeted tens of thousands of exposed MongoDB instances, wiping data and demanding Bitcoin payment. Companies that assumed 'exposure = vulnerability' instead of 'exposure = breach' often discovered too late that data had been exfiltrated months earlier.",
       "difficulty": 3,
-      "question_id": "eb4ec5da-6536-4d6c-8de6-fe17a3963335",
+      "question_id": "9e9cb959-9af2-4f82-a2de-80f5bd7846cd",
       "type": "multiple_choice"
     }
   ],
