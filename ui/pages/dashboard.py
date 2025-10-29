@@ -185,8 +185,8 @@ def render_skill_progress(user: UserProfile):
         user.skill_levels.linux,
         user.skill_levels.cloud,
         user.skill_levels.pentest,
-        user.skill_levels.redteam,
-        user.skill_levels.blueteam,
+        user.skill_levels.red_team,
+        user.skill_levels.blue_team,
         user.skill_levels.threat_hunting,
     ]
 

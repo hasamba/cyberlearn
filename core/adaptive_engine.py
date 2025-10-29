@@ -30,9 +30,9 @@ class AdaptiveEngine:
             "linux": ["fundamentals"],
             "cloud": ["fundamentals", "system"],
             "pentest": ["fundamentals", "active_directory", "osint"],
-            "redteam": ["pentest", "malware", "osint"],
-            "blueteam": ["dfir", "malware"],
-            "threat_hunting": ["dfir", "malware", "blueteam"],
+            "red_team": ["pentest", "malware", "osint"],
+            "blue_team": ["dfir", "malware"],
+            "threat_hunting": ["dfir", "malware", "blue_team"],
         }
 
     def _ordered_domains(self) -> List[str]:
@@ -47,8 +47,8 @@ class AdaptiveEngine:
             "linux",
             "cloud",
             "pentest",
-            "redteam",
-            "blueteam",
+            "red_team",
+            "blue_team",
             "threat_hunting",
         ]
 
@@ -379,7 +379,7 @@ class AdaptiveEngine:
                     "difficulty": 2
                 },
             ],
-            "redteam": [
+            "red_team": [
                 {
                     "question": "How does red team differ from penetration testing?",
                     "options": ["No difference", "Red team simulates real adversaries over longer periods", "Red team is faster", "Red team only tests networks"],
@@ -399,7 +399,7 @@ class AdaptiveEngine:
                     "difficulty": 3
                 },
             ],
-            "blueteam": [
+            "blue_team": [
                 {
                     "question": "What is the role of a blue team?",
                     "options": ["Attack systems", "Defend and monitor systems", "Develop software", "Manage databases"],

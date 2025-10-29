@@ -51,8 +51,8 @@ class GamificationEngine:
             "malware",
             "active_directory",
             "pentest",
-            "redteam",
-            "blueteam",
+            "red_team",
+            "blue_team",
         ]
         for domain in domains:
             badges[f"{domain}_complete"] = Badge(
@@ -240,8 +240,8 @@ class GamificationEngine:
             "malware",
             "active_directory",
             "pentest",
-            "redteam",
-            "blueteam",
+            "red_team",
+            "blue_team",
         ]
 
         for domain in domains:
