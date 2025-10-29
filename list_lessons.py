@@ -43,7 +43,8 @@ def list_lessons():
         print("-" * 80)
 
         for order_idx, title, difficulty, est_time in lessons:
-            diff_icon = "●" * difficulty + "○" * (3 - difficulty)
+            # Use ASCII characters for Windows compatibility
+            diff_icon = "*" * difficulty + "-" * (3 - difficulty)
             print(f"  {order_idx:2d}. {title[:60]:<60} [{diff_icon}] {est_time}min")
 
     print("\n" + "="*80)
@@ -53,7 +54,8 @@ def list_lessons():
     # Show domains summary
     print("\nDomains Summary:")
     for domain, count in domains:
-        bar = "█" * (count // 2)
+        # Use ASCII characters for Windows compatibility
+        bar = "#" * (count // 2)
         print(f"  {domain:20s} {count:3d} {bar}")
 
     conn.close()

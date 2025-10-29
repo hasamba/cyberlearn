@@ -30,24 +30,32 @@ python fix_domain_naming.py
 python fix_user_model.py
 ```
 
-### Step 3: Fix Validation Errors
+### Step 3: Fix Validation Errors (Old Lessons)
 ```bash
 python fix_post_assessments.py
 ```
 
-### Step 4: Load Lessons
+### Step 4: Fix Validation Errors (New Pentest Lessons)
+```bash
+python fix_pentest_lessons.py
+```
+
+### Step 5: Load Lessons
 ```bash
 python load_all_lessons.py
 ```
 
-### Step 5: Verify
+### Step 6: Verify
 ```bash
 python list_lessons.py | grep -i osint
+python list_lessons.py | grep -i pentest
 ```
 
-**Expected**: Should show 10 OSINT lessons
+**Expected**:
+- OSINT: 10 lessons
+- Pentest: 30 lessons
 
-### Step 6: Test App
+### Step 7: Test App
 ```bash
 streamlit run app.py
 ```
