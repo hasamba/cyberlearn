@@ -199,68 +199,66 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 if lesson.is_core_concept:
                     st.caption("🔥 Core Concept (Essential)")
 
-                # Show tag badges with inline tag management
-                if lesson_tags or True:  # Always show to allow adding tags
-                    tags_html = ""
-                    for tag in lesson_tags:
-                        tags_html += f"""<span style="
-                            display: inline-block;
-                            padding: 3px 10px;
-                            margin: 2px 3px;
-                            background-color: {tag.color}20;
-                            border: 1px solid {tag.color};
-                            border-radius: 10px;
-                            color: {tag.color};
-                            font-size: 0.75em;
-                            font-weight: 500;
-                        ">{tag.icon} {tag.name}</span>"""
-
-                    # Add tag management button
+                # Show tag badges
+                tags_html = ""
+                for tag in lesson_tags:
                     tags_html += f"""<span style="
                         display: inline-block;
                         padding: 3px 10px;
                         margin: 2px 3px;
-                        background-color: #f0f0f0;
-                        border: 1px dashed #999;
+                        background-color: {tag.color}20;
+                        border: 1px solid {tag.color};
                         border-radius: 10px;
-                        color: #666;
+                        color: {tag.color};
                         font-size: 0.75em;
                         font-weight: 500;
-                        cursor: pointer;
-                    ">🏷️ Manage Tags</span>"""
+                    ">{tag.icon} {tag.name}</span>"""
 
+                if tags_html:
                     st.markdown(tags_html, unsafe_allow_html=True)
 
-                    # Tag management expander
-                    with st.expander("✏️ Edit Lesson Tags", expanded=False):
-                        all_tags = db.get_all_tags()
-                        current_tag_ids = {tag.tag_id for tag in lesson_tags}
+                # Manage tags button
+                manage_tags_key = f"manage_tags_{lesson.lesson_id}"
+                if st.button("🏷️ Manage Tags", key=manage_tags_key, type="secondary"):
+                    # Toggle the editor state
+                    editor_key = f"show_tag_editor_{lesson.lesson_id}"
+                    st.session_state[editor_key] = not st.session_state.get(editor_key, False)
+                    st.rerun()
 
-                        # Show current tags with remove buttons
-                        if lesson_tags:
-                            st.markdown("**Current Tags:**")
-                            for tag in lesson_tags:
-                                col_t1, col_t2 = st.columns([3, 1])
-                                with col_t1:
-                                    st.markdown(f"{tag.icon} {tag.name}")
-                                with col_t2:
-                                    if st.button("Remove", key=f"remove_{lesson.lesson_id}_{tag.tag_id}"):
-                                        db.remove_tag_from_lesson(str(lesson.lesson_id), tag.tag_id)
-                                        st.success(f"Removed {tag.name}")
-                                        st.rerun()
+                # Tag management editor (only show if button was clicked)
+                editor_key = f"show_tag_editor_{lesson.lesson_id}"
+                if st.session_state.get(editor_key, False):
+                    st.markdown("---")
+                    st.markdown("**✏️ Edit Lesson Tags**")
 
-                        # Add new tags
-                        st.markdown("**Add Tags:**")
-                        available_tags = [t for t in all_tags if t.tag_id not in current_tag_ids]
+                    all_tags = db.get_all_tags()
+                    current_tag_ids = {tag.tag_id for tag in lesson_tags}
 
-                        if available_tags:
-                            for tag in available_tags:
-                                if st.button(f"{tag.icon} {tag.name}", key=f"add_{lesson.lesson_id}_{tag.tag_id}"):
-                                    db.add_tag_to_lesson(str(lesson.lesson_id), tag.tag_id)
-                                    st.success(f"Added {tag.name}")
+                    # Show current tags with remove buttons
+                    if lesson_tags:
+                        st.markdown("**Current Tags:**")
+                        for tag in lesson_tags:
+                            col_t1, col_t2 = st.columns([3, 1])
+                            with col_t1:
+                                st.markdown(f"{tag.icon} {tag.name}")
+                            with col_t2:
+                                if st.button("Remove", key=f"remove_{lesson.lesson_id}_{tag.tag_id}"):
+                                    db.remove_tag_from_lesson(str(lesson.lesson_id), tag.tag_id)
+                                    st.success(f"Removed {tag.name}")
                                     st.rerun()
-                        else:
-                            st.info("All tags already applied to this lesson")
+
+                    # Add new tags
+                    st.markdown("**Add Tags:**")
+                    available_tags = [t for t in all_tags if t.tag_id not in current_tag_ids]
+
+                    if available_tags:
+                        for tag in available_tags:
+                            if st.button(f"{tag.icon} {tag.name}", key=f"add_{lesson.lesson_id}_{tag.tag_id}"):
+                                db.add_tag_to_lesson(str(lesson.lesson_id), tag.tag_id)
+                                st.success(f"Added {tag.name}")
+                                st.rerun()
+                    else:
+                        st.info("All tags already applied to this lesson")
 
             with col2:
                 if st.button(
