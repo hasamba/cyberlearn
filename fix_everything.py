@@ -5,9 +5,11 @@ Master fix script - runs all fixes in correct order.
 This script:
 1. Fixes database domain naming (blueteam → blue_team)
 2. Fixes user model (redteam/blueteam → red_team/blue_team)
-3. Validates OSINT lessons
-4. Loads all lessons into database
-5. Verifies final state
+3. Fixes post_assessment fields (Blue Team, DFIR, Malware lessons)
+4. Fixes pentest lessons (jim_kwik_principles, estimated_time, post_assessment)
+5. Validates all lessons (optional)
+6. Loads all lessons into database
+7. Verifies final state
 
 Usage:
   python fix_everything.py
@@ -48,9 +50,11 @@ def main():
     print("\nThis script will:")
     print("  1. Fix database domain naming (blueteam → blue_team)")
     print("  2. Fix user model (redteam/blueteam → red_team/blue_team)")
-    print("  3. Validate OSINT lessons with comprehensive_fix.py")
-    print("  4. Load all lessons (including OSINT) into database")
-    print("  5. Display final lesson count and domain summary")
+    print("  3. Fix post_assessment fields (Blue Team, DFIR, Malware)")
+    print("  4. Fix pentest lessons (jim_kwik_principles, estimated_time)")
+    print("  5. Validate all lessons (optional)")
+    print("  6. Load all lessons into database")
+    print("  7. Display final lesson count and domain summary")
     print("\nEstimated time: 5-10 minutes")
     print("="*70)
 
@@ -74,22 +78,30 @@ def main():
         print("\n[!] User model fix failed. Stopping here.")
         sys.exit(1)
 
-    # Step 3: Validate lessons (optional but recommended)
+    # Step 3: Fix post-assessment fields (Blue Team, DFIR, Malware lessons)
+    if not run_script('fix_post_assessments.py', 'Fix Post-Assessment Fields'):
+        print("\n[WARNING] Post-assessment fix had issues, but continuing...")
+
+    # Step 4: Fix pentest lessons (jim_kwik_principles, estimated_time, post_assessment)
+    if not run_script('fix_pentest_lessons.py', 'Fix Pentest Lessons'):
+        print("\n[WARNING] Pentest lesson fix had issues, but continuing...")
+
+    # Step 5: Validate lessons (optional but recommended)
     print("\n" + "="*70)
-    print("STEP: Validate OSINT Lessons")
+    print("STEP: Validate All Lessons")
     print("="*70)
     response = input("Run comprehensive_fix.py to validate lessons? [Y/n]: ").strip().lower()
     if response != 'n':
         if not run_script('comprehensive_fix.py', 'Validate All Lessons'):
             print("\n[WARNING] Validation had issues, but continuing...")
 
-    # Step 4: Load all lessons
+    # Step 6: Load all lessons
     if not run_script('load_all_lessons.py', 'Load All Lessons into Database'):
         all_success = False
         print("\n[!] Lesson loading failed. Check errors above.")
         sys.exit(1)
 
-    # Step 5: Final verification
+    # Step 7: Final verification
     print("\n" + "="*70)
     print("FINAL VERIFICATION")
     print("="*70)
