@@ -25,42 +25,86 @@ def render(user: UserProfile, db: Database):
         _render_completion_feedback(completion_summary)
         st.markdown("---")
 
-    # View mode selector
-    view_mode = st.radio(
-        "View Mode",
-        ["📂 By Domain", "🏷️ By Tags"],
-        horizontal=True,
-        help="Switch between domain-based and tag-based lesson browsing"
-    )
+    # Tag filter section
+    all_tags = db.get_all_tags()
 
-    st.markdown("---")
+    if all_tags:
+        st.markdown("#### 🏷️ Filter by Tags")
 
-    if view_mode == "🏷️ By Tags":
-        # Tag-based browser
-        from ui.components.lesson_browser import render_lesson_browser
-        render_lesson_browser(user, db)
-    else:
-        # Original domain-based view
-        domains = [
-            ("fundamentals", "🔐 Fundamentals"),
-            ("osint", "🔎 OSINT"),
-            ("dfir", "🔍 DFIR"),
-            ("malware", "🦠 Malware"),
-            ("active_directory", "🗂️ Active Directory"),
-            ("system", "💻 System"),
-            ("linux", "🐧 Linux"),
-            ("cloud", "☁️ Cloud"),
-            ("pentest", "🎯 Pentest"),
-            ("red_team", "🔴 Red Team"),
-            ("blue_team", "🛡️ Blue Team"),
-            ("threat_hunting", "🎯 Threat Hunting"),
-        ]
+        col1, col2 = st.columns([3, 1])
 
-        tabs = st.tabs([name for _, name in domains])
+        with col1:
+            # Multi-select for tags
+            selected_tag_names = st.multiselect(
+                "Select tags to filter lessons",
+                options=[tag.name for tag in all_tags],
+                default=[],
+                help="Filter lessons by tags. Leave empty to show all lessons."
+            )
 
-        for idx, (domain_key, domain_name) in enumerate(domains):
-            with tabs[idx]:
-                render_domain_lessons(user, db, domain_key)
+        with col2:
+            # Match all vs any
+            match_all = st.checkbox(
+                "Match ALL",
+                value=False,
+                help="If checked, lessons must have ALL selected tags"
+            )
+
+        # Store selected tags in session state for domain tabs
+        if selected_tag_names:
+            selected_tag_ids = []
+            for tag_name in selected_tag_names:
+                tag = db.get_tag_by_name(tag_name)
+                if tag:
+                    selected_tag_ids.append(tag.tag_id)
+            st.session_state['selected_tag_filter'] = {
+                'tag_ids': selected_tag_ids,
+                'match_all': match_all
+            }
+
+            # Show active filters
+            filter_html = ""
+            for tag_name in selected_tag_names:
+                tag = db.get_tag_by_name(tag_name)
+                if tag:
+                    filter_html += f"""<span style="
+                        display: inline-block;
+                        padding: 4px 12px;
+                        margin: 2px 4px;
+                        background-color: {tag.color}20;
+                        border: 1px solid {tag.color};
+                        border-radius: 12px;
+                        color: {tag.color};
+                        font-size: 0.85em;
+                        font-weight: 500;
+                    ">{tag.icon} {tag.name}</span>"""
+            st.markdown(f"**Active Filters:** {filter_html}", unsafe_allow_html=True)
+        else:
+            st.session_state['selected_tag_filter'] = None
+
+        st.markdown("---")
+
+    # Domain tabs
+    domains = [
+        ("fundamentals", "🔐 Fundamentals"),
+        ("osint", "🔎 OSINT"),
+        ("dfir", "🔍 DFIR"),
+        ("malware", "🦠 Malware"),
+        ("active_directory", "🗂️ Active Directory"),
+        ("system", "💻 System"),
+        ("linux", "🐧 Linux"),
+        ("cloud", "☁️ Cloud"),
+        ("pentest", "🎯 Pentest"),
+        ("red_team", "🔴 Red Team"),
+        ("blue_team", "🛡️ Blue Team"),
+        ("threat_hunting", "🎯 Threat Hunting"),
+    ]
+
+    tabs = st.tabs([name for _, name in domains])
+
+    for idx, (domain_key, domain_name) in enumerate(domains):
+        with tabs[idx]:
+            render_domain_lessons(user, db, domain_key)
 
     _maybe_scroll_to_top()
 
@@ -71,10 +115,24 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
     lessons = db.get_lessons_by_domain(domain)
     user_progress = db.get_user_progress(user.user_id)
 
+    # Apply tag filter if active
+    tag_filter = st.session_state.get('selected_tag_filter')
+    if tag_filter:
+        from models.tag import TagFilter
+        filter_obj = TagFilter(tag_ids=tag_filter['tag_ids'], match_all=tag_filter['match_all'])
+        all_filtered_lessons = db.get_lessons_by_tags(filter_obj)
+
+        # Filter to only this domain
+        filtered_lesson_ids = {l.lesson_id for l in all_filtered_lessons if l.domain == domain}
+        lessons = [l for l in lessons if l.lesson_id in filtered_lesson_ids]
+
     progress_map = {p.lesson_id: p for p in user_progress}
 
     if not lessons:
-        st.info(f"Lessons for {domain} are coming soon!")
+        if tag_filter:
+            st.info(f"No lessons in {domain} match the selected tags.")
+        else:
+            st.info(f"Lessons for {domain} are coming soon!")
         return
 
     skill = getattr(user.skill_levels, domain)
@@ -89,6 +147,9 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
             continue
 
         progress = progress_map.get(lesson_meta.lesson_id)
+
+        # Get lesson tags
+        lesson_tags = db.get_lesson_tags(str(lesson.lesson_id))
 
         # Lesson card
         with st.container():
@@ -135,6 +196,23 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 
                 if lesson.is_core_concept:
                     st.caption("🔥 Core Concept (Essential)")
+
+                # Show tag badges
+                if lesson_tags:
+                    tags_html = ""
+                    for tag in lesson_tags:
+                        tags_html += f"""<span style="
+                            display: inline-block;
+                            padding: 3px 10px;
+                            margin: 2px 3px;
+                            background-color: {tag.color}20;
+                            border: 1px solid {tag.color};
+                            border-radius: 10px;
+                            color: {tag.color};
+                            font-size: 0.75em;
+                            font-weight: 500;
+                        ">{tag.icon} {tag.name}</span>"""
+                    st.markdown(tags_html, unsafe_allow_html=True)
 
             with col2:
                 if st.button(

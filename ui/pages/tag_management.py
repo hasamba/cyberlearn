@@ -33,76 +33,108 @@ def render_tag_management(db: Database):
 
             for idx, tag in enumerate(tags):
                 with cols[idx % 3]:
-                    # Tag card
-                    st.markdown(f"""
-                    <div style="
-                        border: 2px solid {tag.color};
-                        border-radius: 10px;
-                        padding: 15px;
-                        margin-bottom: 15px;
-                        background-color: {tag.color}15;
-                    ">
-                        <h3 style="color: {tag.color}; margin: 0;">
-                            {tag.icon} {tag.name}
-                        </h3>
-                        <p style="margin: 5px 0; font-size: 0.9em;">{tag.description or 'No description'}</p>
-                        <p style="margin: 5px 0; font-size: 0.8em; color: #666;">
-                            {'🔒 System Tag' if tag.is_system else '✏️ Custom Tag'}
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Check if editing this tag
+                    is_editing = st.session_state.get(f'editing_tag') == tag.tag_id
 
-                    # Edit/Delete buttons (only for non-system tags)
-                    if not tag.is_system:
-                        col_a, col_b = st.columns(2)
-
-                        with col_a:
-                            if st.button(f"Edit", key=f"edit_{tag.tag_id}"):
-                                st.session_state[f'editing_tag'] = tag.tag_id
-
-                        with col_b:
-                            if st.button(f"Delete", key=f"del_{tag.tag_id}", type="secondary"):
-                                if st.session_state.get(f'confirm_delete_{tag.tag_id}'):
-                                    try:
-                                        db.delete_tag(tag.tag_id)
-                                        st.success(f"Deleted tag: {tag.name}")
-                                        st.rerun()
-                                    except ValueError as e:
-                                        st.error(str(e))
-                                else:
-                                    st.session_state[f'confirm_delete_{tag.tag_id}'] = True
-                                    st.warning("Click again to confirm deletion")
-
+                    if is_editing:
                         # Edit form
-                        if st.session_state.get(f'editing_tag') == tag.tag_id:
-                            with st.expander(f"Edit {tag.name}", expanded=True):
-                                with st.form(f"edit_form_{tag.tag_id}"):
-                                    new_name = st.text_input("Name", value=tag.name)
-                                    new_color = st.color_picker("Color", value=tag.color)
-                                    new_icon = st.text_input("Icon (emoji)", value=tag.icon or "")
-                                    new_desc = st.text_area("Description", value=tag.description or "")
+                        with st.form(f"edit_form_{tag.tag_id}"):
+                            st.markdown(f"**Edit Tag: {tag.icon} {tag.name}**")
+                            new_name = st.text_input("Name", value=tag.name)
+                            new_color = st.color_picker("Color", value=tag.color)
+                            new_icon = st.text_input("Icon (emoji)", value=tag.icon or "")
+                            new_desc = st.text_area("Description", value=tag.description or "")
 
-                                    col1, col2 = st.columns(2)
-                                    with col1:
-                                        if st.form_submit_button("Save Changes"):
-                                            update = TagUpdate(
-                                                name=new_name if new_name != tag.name else None,
-                                                color=new_color if new_color != tag.color else None,
-                                                icon=new_icon if new_icon != tag.icon else None,
-                                                description=new_desc if new_desc != tag.description else None
-                                            )
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if st.form_submit_button("Save", use_container_width=True):
+                                    update = TagUpdate(
+                                        name=new_name if new_name != tag.name else None,
+                                        color=new_color if new_color != tag.color else None,
+                                        icon=new_icon if new_icon != tag.icon else None,
+                                        description=new_desc if new_desc != tag.description else None
+                                    )
 
-                                            if db.update_tag(tag.tag_id, update):
-                                                st.success("Tag updated!")
-                                                del st.session_state[f'editing_tag']
-                                                st.rerun()
-                                            else:
-                                                st.error("Failed to update tag")
+                                    if db.update_tag(tag.tag_id, update):
+                                        st.success("Tag updated!")
+                                        del st.session_state[f'editing_tag']
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update tag")
 
-                                    with col2:
-                                        if st.form_submit_button("Cancel"):
-                                            del st.session_state[f'editing_tag']
+                            with col2:
+                                if st.form_submit_button("Cancel", use_container_width=True):
+                                    del st.session_state[f'editing_tag']
+                                    st.rerun()
+                    else:
+                        # Tag card with buttons inside
+                        button_html = ""
+                        if not tag.is_system:
+                            button_html = f"""
+                            <div style="margin-top: 10px; display: flex; gap: 5px;">
+                                <button style="
+                                    flex: 1;
+                                    padding: 5px;
+                                    background-color: {tag.color};
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 0.85em;
+                                " onclick="return false;">✏️ Edit</button>
+                                <button style="
+                                    flex: 1;
+                                    padding: 5px;
+                                    background-color: #dc2626;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 0.85em;
+                                " onclick="return false;">🗑️ Delete</button>
+                            </div>
+                            """
+
+                        st.markdown(f"""
+                        <div style="
+                            border: 2px solid {tag.color};
+                            border-radius: 10px;
+                            padding: 15px;
+                            margin-bottom: 15px;
+                            background-color: {tag.color}15;
+                        ">
+                            <h3 style="color: {tag.color}; margin: 0;">
+                                {tag.icon} {tag.name}
+                            </h3>
+                            <p style="margin: 5px 0; font-size: 0.9em;">{tag.description or 'No description'}</p>
+                            <p style="margin: 5px 0; font-size: 0.8em; color: #666;">
+                                {'🔒 System Tag' if tag.is_system else '✏️ Custom Tag'}
+                            </p>
+                            {button_html}
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                        # Actual functional buttons (hidden visually but work)
+                        if not tag.is_system:
+                            col_a, col_b = st.columns(2)
+                            with col_a:
+                                if st.button(f"Edit", key=f"edit_{tag.tag_id}", use_container_width=True):
+                                    st.session_state[f'editing_tag'] = tag.tag_id
+                                    st.rerun()
+
+                            with col_b:
+                                if st.button(f"Delete", key=f"del_{tag.tag_id}", use_container_width=True):
+                                    if st.session_state.get(f'confirm_delete_{tag.tag_id}'):
+                                        try:
+                                            db.delete_tag(tag.tag_id)
+                                            st.success(f"Deleted tag: {tag.name}")
                                             st.rerun()
+                                        except ValueError as e:
+                                            st.error(str(e))
+                                    else:
+                                        st.session_state[f'confirm_delete_{tag.tag_id}'] = True
+                                        st.warning("Click again to confirm deletion")
+                                        st.rerun()
 
     # TAB 2: Create new tag
     with tab2:
