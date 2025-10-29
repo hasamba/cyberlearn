@@ -105,17 +105,15 @@ The dashboard automatically shows:
 # 1. Copy the universal lesson prompt
 cat UNIVERSAL_LESSON_PROMPT.md
 
-# 2. Paste the entire prompt into your LLM (ChatGPT, Claude, etc.)
+# 2. Paste the entire prompt into your LLM (ChatGPT, Claude, Gemini, etc.)
 
-# 3. Add your topic at the end:
+# 3. Add ONE LINE with your topic:
 Topic: SQL Injection Attacks
-Domain: pentest
-Difficulty: 2
-Order Index: 5
-Prerequisites: none
 
-# 4. LLM generates complete JSON lesson (4,000-5,500 words)
-# 5. Save output to content/lesson_pentest_05_sql_injection_RICH.json
+# 4. LLM automatically infers domain, difficulty, order_index, prerequisites
+#    and generates complete JSON lesson (4,000-5,500 words)
+
+# 5. Save output to content/lesson_<domain>_<number>_<topic>_RICH.json
 
 # 6. Fix any validation errors (optional)
 python comprehensive_fix.py
@@ -127,9 +125,9 @@ python load_all_lessons.py
 python list_lessons.py | grep -i "sql injection"
 ```
 
-**That's it!** Just specify the topic and the LLM generates a complete, production-ready lesson following all CyberLearn standards.
+**That's it!** Just ONE LINE ("Topic: XYZ") and the LLM generates a complete, production-ready lesson following all CyberLearn standards. The AI intelligently determines domain, difficulty, order, and prerequisites from your topic.
 
-**Time Estimate**: 2-3 minutes per lesson (vs 4-6 hours manual)
+**Time Estimate**: 1-2 minutes per lesson (vs 4-6 hours manual)
 
 ### Method 2: Template-Based (Manual)
 

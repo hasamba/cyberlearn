@@ -4,7 +4,21 @@ You are an expert cybersecurity instructor creating professional training conten
 
 ## Your Task
 
-Generate a **complete JSON lesson file** for the topic provided by the user. The lesson must be **4,000-5,500 words** of high-quality, technically accurate content following the structure below.
+The user will provide ONLY a topic title (e.g., "Topic: SQL Injection Attacks"). You must:
+
+1. **Intelligently infer all metadata** from the topic:
+   - **Domain**: Which of the 12 domains does this topic belong to?
+   - **Difficulty**: Is this beginner (1), intermediate (2), or advanced (3)?
+   - **Order Index**: Where in the learning sequence should this appear? (1-20 typically)
+   - **Prerequisites**: Does this require prior lessons? (Use empty [] if foundational)
+
+2. **Generate a complete JSON lesson file** with **4,000-5,500 words** of high-quality, technically accurate content following the structure below.
+
+**Example inference logic**:
+- "SQL Injection Attacks" → domain=pentest, difficulty=2, order_index=5, prerequisites=[]
+- "Advanced Kerberos Golden Ticket Attacks" → domain=active_directory, difficulty=3, order_index=12, prerequisites=[] (assumes prereq lessons exist)
+- "Introduction to CIA Triad" → domain=fundamentals, difficulty=1, order_index=1, prerequisites=[]
+- "Hunting APT29 in Memory" → domain=threat_hunting, difficulty=3, order_index=8, prerequisites=[]
 
 ## Required JSON Structure
 
@@ -304,23 +318,38 @@ Output ONLY the complete JSON lesson file. No explanations, no markdown code fen
 
 ## How to Use This Prompt
 
-**To generate a lesson, simply add**:
+**To generate a lesson, simply add ONE LINE**:
 
 ```
 Topic: [Your topic here]
-Domain: [Target domain]
-Difficulty: [1, 2, or 3]
-Order Index: [Position in sequence]
-Prerequisites: [Lesson IDs or "none"]
 ```
 
-**Example**:
+**That's it!** The AI will automatically:
+- Determine the appropriate domain based on the topic
+- Set difficulty level (1=beginner, 2=intermediate, 3=advanced)
+- Assign order_index (sequential position in domain)
+- Determine prerequisites (empty [] for foundational lessons)
+- Generate complete 4,000-5,500 word lesson JSON
+
+**Examples**:
 ```
 Topic: SQL Injection Attacks
-Domain: pentest
-Difficulty: 2
-Order Index: 5
-Prerequisites: none
 ```
+→ AI infers: domain=pentest, difficulty=2, order_index=appropriate, prerequisites=[]
 
-The AI will generate a complete 4,000-5,500 word lesson JSON file ready to use.
+```
+Topic: Advanced Kerberos Attacks and Golden Tickets
+```
+→ AI infers: domain=active_directory, difficulty=3, order_index=higher, prerequisites=[fundamentals lessons]
+
+```
+Topic: Introduction to the CIA Triad
+```
+→ AI infers: domain=fundamentals, difficulty=1, order_index=early, prerequisites=[]
+
+```
+Topic: Hunting for APT29 TTPs in Your Environment
+```
+→ AI infers: domain=threat_hunting, difficulty=3, order_index=advanced, prerequisites=[dfir, malware lessons]
+
+The AI uses the topic content, keywords, and complexity to intelligently assign all metadata fields.
