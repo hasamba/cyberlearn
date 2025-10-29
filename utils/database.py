@@ -205,39 +205,86 @@ class Database:
     def update_user(self, user: UserProfile) -> bool:
         """Update existing user"""
         cursor = self.conn.cursor()
-        cursor.execute(
-            """
-            UPDATE users SET
-                email = ?, last_login = ?, skill_levels = ?, total_xp = ?,
-                level = ?, streak_days = ?, longest_streak = ?, badges = ?,
-                learning_preferences = ?, total_lessons_completed = ?,
-                total_time_spent = ?, diagnostic_completed = ?,
-                last_username = ?, preferred_tag_filters = ?
-            WHERE user_id = ?
-        """,
-            (
-                user.email,
-                user.last_login.isoformat(),
-                user.skill_levels.json(),
-                user.total_xp,
-                user.level,
-                user.streak_days,
-                user.longest_streak,
-                json.dumps(user.badges),
-                user.learning_preferences.json(),
-                user.total_lessons_completed,
-                user.total_time_spent,
-                int(user.diagnostic_completed),
-                user.last_username,
-                json.dumps(user.preferred_tag_filters),
-                str(user.user_id),
-            ),
-        )
+
+        # Check if new columns exist
+        cursor.execute("PRAGMA table_info(users)")
+        columns = [row[1] for row in cursor.fetchall()]
+        has_new_columns = 'last_username' in columns and 'preferred_tag_filters' in columns
+
+        if has_new_columns:
+            # Use new query with all fields
+            cursor.execute(
+                """
+                UPDATE users SET
+                    email = ?, last_login = ?, skill_levels = ?, total_xp = ?,
+                    level = ?, streak_days = ?, longest_streak = ?, badges = ?,
+                    learning_preferences = ?, total_lessons_completed = ?,
+                    total_time_spent = ?, diagnostic_completed = ?,
+                    last_username = ?, preferred_tag_filters = ?
+                WHERE user_id = ?
+            """,
+                (
+                    user.email,
+                    user.last_login.isoformat(),
+                    user.skill_levels.json(),
+                    user.total_xp,
+                    user.level,
+                    user.streak_days,
+                    user.longest_streak,
+                    json.dumps(user.badges),
+                    user.learning_preferences.json(),
+                    user.total_lessons_completed,
+                    user.total_time_spent,
+                    int(user.diagnostic_completed),
+                    user.last_username,
+                    json.dumps(user.preferred_tag_filters),
+                    str(user.user_id),
+                ),
+            )
+        else:
+            # Use old query without new fields (backward compatible)
+            cursor.execute(
+                """
+                UPDATE users SET
+                    email = ?, last_login = ?, skill_levels = ?, total_xp = ?,
+                    level = ?, streak_days = ?, longest_streak = ?, badges = ?,
+                    learning_preferences = ?, total_lessons_completed = ?,
+                    total_time_spent = ?, diagnostic_completed = ?
+                WHERE user_id = ?
+            """,
+                (
+                    user.email,
+                    user.last_login.isoformat(),
+                    user.skill_levels.json(),
+                    user.total_xp,
+                    user.level,
+                    user.streak_days,
+                    user.longest_streak,
+                    json.dumps(user.badges),
+                    user.learning_preferences.json(),
+                    user.total_lessons_completed,
+                    user.total_time_spent,
+                    int(user.diagnostic_completed),
+                    str(user.user_id),
+                ),
+            )
+
         self.conn.commit()
         return cursor.rowcount > 0
 
     def _row_to_user(self, row: sqlite3.Row) -> UserProfile:
         """Convert DB row to UserProfile"""
+        # Handle optional fields (may not exist before migration)
+        try:
+            last_username = row["last_username"]
+        except (IndexError, KeyError):
+            last_username = None
+
+        try:
+            preferred_tag_filters = json.loads(row["preferred_tag_filters"])
+        except (IndexError, KeyError):
+            preferred_tag_filters = []
+
         return UserProfile(
             user_id=UUID(row["user_id"]),
             username=row["username"],
@@ -256,8 +303,8 @@ class Database:
             total_lessons_completed=row["total_lessons_completed"],
             total_time_spent=row["total_time_spent"],
             diagnostic_completed=bool(row["diagnostic_completed"]),
-            last_username=row.get("last_username"),
-            preferred_tag_filters=json.loads(row.get("preferred_tag_filters", "[]")),
+            last_username=last_username,
+            preferred_tag_filters=preferred_tag_filters,
         )
 
     # LESSON OPERATIONS
