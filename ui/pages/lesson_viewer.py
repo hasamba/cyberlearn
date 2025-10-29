@@ -31,7 +31,7 @@ def render(user: UserProfile, db: Database):
     if all_tags:
         st.markdown("#### 🏷️ Filter by Tags")
 
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([4, 1])
 
         with col1:
             # Multi-select for tags
@@ -39,13 +39,15 @@ def render(user: UserProfile, db: Database):
                 "Select tags to filter lessons",
                 options=[tag.name for tag in all_tags],
                 default=[],
-                help="Filter lessons by tags. Leave empty to show all lessons."
+                help="Filter lessons by tags. Leave empty to show all lessons.",
+                label_visibility="visible"
             )
 
         with col2:
-            # Match all vs any
+            # Match all vs any - add empty label to align with multiselect
+            st.markdown('<div style="height: 28px;"></div>', unsafe_allow_html=True)  # Spacer to align with label
             match_all = st.checkbox(
-                "Match ALL",
+                "Match ALL tags",
                 value=False,
                 help="If checked, lessons must have ALL selected tags"
             )
