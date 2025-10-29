@@ -1,40 +1,61 @@
 #!/usr/bin/env python3
 """
-Force reload OSINT lessons into database.
-This script deletes existing OSINT lessons and reloads them from JSON files.
+Force reload lessons for a specific domain into database.
+This script deletes existing lessons for a domain and reloads them from JSON files.
+
+Usage:
+    python force_load_domain.py osint
+    python force_load_domain.py threat_hunting
 """
 
 import json
 import sqlite3
+import sys
 from pathlib import Path
 from models.lesson import Lesson
 
-def delete_osint_lessons():
-    """Delete all existing OSINT lessons from database"""
+def delete_domain_lessons(domain):
+    """Delete all existing lessons for a domain from database"""
     conn = sqlite3.connect('cyberlearn.db')
     cursor = conn.cursor()
 
-    # Check how many OSINT lessons exist
-    cursor.execute("SELECT COUNT(*) FROM lessons WHERE domain='osint'")
+    # Check how many lessons exist
+    cursor.execute("SELECT COUNT(*) FROM lessons WHERE domain=?", (domain,))
     count = cursor.fetchone()[0]
-    print(f"Found {count} existing OSINT lessons in database")
+    print(f"Found {count} existing {domain} lessons in database")
 
     if count > 0:
         # Delete them
-        cursor.execute("DELETE FROM lessons WHERE domain='osint'")
+        cursor.execute("DELETE FROM lessons WHERE domain=?", (domain,))
         conn.commit()
-        print(f"Deleted {count} OSINT lessons")
+        print(f"Deleted {count} {domain} lessons")
     else:
-        print("No OSINT lessons to delete")
+        print(f"No {domain} lessons to delete")
 
     conn.close()
 
-def load_osint_lessons():
-    """Load OSINT lessons from JSON files"""
+def load_domain_lessons(domain):
+    """Load lessons for a domain from JSON files"""
     content_dir = Path(__file__).parent / "content"
-    osint_files = sorted(content_dir.glob("lesson_osint_*_RICH.json"))
 
-    print(f"\nFound {len(osint_files)} OSINT lesson files")
+    # Handle both underscore and no underscore in filenames
+    patterns = [
+        f"lesson_{domain}_*_RICH.json",
+        f"lesson_{domain.replace('_', '')}_*_RICH.json"
+    ]
+
+    lesson_files = []
+    for pattern in patterns:
+        lesson_files.extend(content_dir.glob(pattern))
+
+    lesson_files = sorted(set(lesson_files))  # Remove duplicates
+
+    print(f"\nFound {len(lesson_files)} {domain} lesson files")
+
+    if len(lesson_files) == 0:
+        print(f"⚠ No lesson files found for domain '{domain}'")
+        print(f"   Searched for patterns: {patterns}")
+        return 0, 0
 
     conn = sqlite3.connect('cyberlearn.db')
     cursor = conn.cursor()
@@ -42,7 +63,7 @@ def load_osint_lessons():
     loaded = 0
     errors = 0
 
-    for filepath in osint_files:
+    for filepath in lesson_files:
         try:
             print(f"\nProcessing: {filepath.name}")
 
@@ -103,22 +124,22 @@ def load_osint_lessons():
 
     return loaded, errors
 
-def verify_osint_lessons():
-    """Verify OSINT lessons in database"""
+def verify_domain_lessons(domain):
+    """Verify lessons for a domain in database"""
     conn = sqlite3.connect('cyberlearn.db')
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT lesson_id, title, difficulty, order_index
         FROM lessons
-        WHERE domain='osint'
+        WHERE domain=?
         ORDER BY order_index
-    """)
+    """, (domain,))
 
     lessons = cursor.fetchall()
 
     print(f"\n{'='*60}")
-    print(f"OSINT Lessons in Database: {len(lessons)}")
+    print(f"{domain.upper()} Lessons in Database: {len(lessons)}")
     print(f"{'='*60}")
 
     if lessons:
@@ -126,22 +147,33 @@ def verify_osint_lessons():
             print(f"{order_index}. {title} (difficulty: {difficulty})")
             print(f"   ID: {lesson_id}")
     else:
-        print("⚠ No OSINT lessons found")
+        print(f"⚠ No {domain} lessons found")
 
     conn.close()
+    return len(lessons)
 
 def main():
+    if len(sys.argv) < 2:
+        print("Usage: python force_load_domain.py <domain>")
+        print("\nExamples:")
+        print("  python force_load_domain.py osint")
+        print("  python force_load_domain.py threat_hunting")
+        print("  python force_load_domain.py blueteam")
+        sys.exit(1)
+
+    domain = sys.argv[1]
+
     print("="*60)
-    print("Force Reload OSINT Lessons")
+    print(f"Force Reload {domain.upper()} Lessons")
     print("="*60)
 
-    # Step 1: Delete existing OSINT lessons
-    print("\nStep 1: Deleting existing OSINT lessons...")
-    delete_osint_lessons()
+    # Step 1: Delete existing lessons
+    print(f"\nStep 1: Deleting existing {domain} lessons...")
+    delete_domain_lessons(domain)
 
-    # Step 2: Load OSINT lessons from files
-    print("\nStep 2: Loading OSINT lessons from JSON files...")
-    loaded, errors = load_osint_lessons()
+    # Step 2: Load lessons from files
+    print(f"\nStep 2: Loading {domain} lessons from JSON files...")
+    loaded, errors = load_domain_lessons(domain)
 
     print(f"\n{'='*60}")
     print(f"Results:")
@@ -150,15 +182,18 @@ def main():
     print(f"{'='*60}")
 
     # Step 3: Verify
-    print("\nStep 3: Verifying OSINT lessons in database...")
-    verify_osint_lessons()
+    print(f"\nStep 3: Verifying {domain} lessons in database...")
+    count = verify_domain_lessons(domain)
 
-    if loaded > 0:
-        print(f"\n✓ Success! {loaded} OSINT lessons loaded into database")
+    if loaded > 0 and count > 0:
+        print(f"\n✓ Success! {loaded} {domain} lessons loaded into database")
         print("\nNext steps:")
         print("  1. Restart Streamlit: streamlit run app.py")
-        print("  2. Go to My Learning → OSINT tab")
+        print(f"  2. Go to My Learning → {domain.replace('_', ' ').title()} tab")
         print("  3. Verify all lessons appear")
+    elif count == 0 and loaded == 0 and errors == 0:
+        print(f"\n⚠ No lesson files found for domain '{domain}'")
+        print(f"   Create lesson files first: content/lesson_{domain}_*_RICH.json")
     else:
         print("\n✗ No lessons were loaded. Check validation errors above.")
 
