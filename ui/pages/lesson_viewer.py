@@ -50,11 +50,13 @@ def render(user: UserProfile, db: Database):
                 options=[tag.name for tag in all_tags],
                 default=st.session_state[tag_pref_key],
                 help="Filter lessons by tags. Leave empty to show all lessons.",
-                label_visibility="visible"
+                label_visibility="visible",
+                key=f"tag_multiselect_{user.user_id}"
             )
 
-            # Save user's selection
-            st.session_state[tag_pref_key] = selected_tag_names
+            # Save user's selection for next time
+            if selected_tag_names != st.session_state[tag_pref_key]:
+                st.session_state[tag_pref_key] = selected_tag_names
 
         with col2:
             # Match all vs any - add empty label to align with multiselect
@@ -217,32 +219,31 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 editor_key = f"show_tag_editor_{lesson.lesson_id}"
                 is_editing = st.session_state.get(editor_key, False)
 
-                tags_html = ""
-                for tag in lesson_tags:
-                    tags_html += f"""<span style="
-                        display: inline-block;
-                        padding: 3px 10px;
-                        margin: 2px 3px;
-                        background-color: {tag.color}20;
-                        border: 1px solid {tag.color};
-                        border-radius: 10px;
-                        color: {tag.color};
-                        font-size: 0.75em;
-                        font-weight: 500;
-                    ">{tag.icon} {tag.name}</span>"""
+                # Create inline layout for tags + manage button
+                cols_inline = st.columns([10, 1])
 
-                st.markdown(tags_html, unsafe_allow_html=True)
+                with cols_inline[0]:
+                    # Build tags HTML
+                    tags_html = ''
+                    for tag in lesson_tags:
+                        tags_html += f"""<span style="
+                            display: inline-block;
+                            padding: 3px 10px;
+                            margin: 2px 3px;
+                            background-color: {tag.color}20;
+                            border: 1px solid {tag.color};
+                            border-radius: 10px;
+                            color: {tag.color};
+                            font-size: 0.75em;
+                            font-weight: 500;
+                        ">{tag.icon} {tag.name}</span>"""
 
-                # Clickable "Manage Tags" button styled as a tag badge
-                # Use columns to make button compact and inline-looking
-                col_tags, col_spacer = st.columns([1, 5])
-                with col_tags:
-                    if st.button(
-                        f"🏷️ Manage",
-                        key=manage_tags_key,
-                        help="Click to manage lesson tags",
-                        use_container_width=True
-                    ):
+                    if tags_html:
+                        st.markdown(tags_html, unsafe_allow_html=True)
+
+                with cols_inline[1]:
+                    # Compact button on same line
+                    if st.button("🏷️", key=manage_tags_key, help="Manage tags"):
                         st.session_state[editor_key] = not is_editing
                         st.rerun()
 
