@@ -31,26 +31,25 @@ CyberLearn is a **complete adaptive learning platform** that delivers profession
 
 ### Installation & Setup
 
-**On Your VM, run these commands**:
+**Linux/Mac**:
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/hasamba/cyberlearn.git
 cd cyberlearn
+chmod +x setup.sh start.sh
+./setup.sh    # One-time setup: creates venv, installs deps, loads lessons
+./start.sh    # Start the application
 
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# Or: venv\Scripts\activate  # Windows
+# Access at: http://localhost:8501
+```
 
-# 3. Install dependencies
-pip install -r requirements.txt
+**Windows**:
 
-# 4. Load all lessons into database
-python load_all_lessons.py
-
-# 5. Start the application
-streamlit run app.py
+```batch
+git clone https://github.com/hasamba/cyberlearn.git
+cd cyberlearn
+setup.bat     # One-time setup: creates venv, installs deps, loads lessons
+start.bat     # Start the application
 
 # Access at: http://localhost:8501
 ```
@@ -100,27 +99,37 @@ The dashboard automatically shows:
 
 ### Method 1: AI-Assisted (Recommended - Fastest)
 
-**Using ChatGPT** (GPT-4 or o1):
+**Using Any LLM** (ChatGPT, Claude, Gemini, etc.):
 
 ```bash
-# 1. Use the batch prompt template
-cat BATCH_LESSONS_PROMPT_PENTEST.md  # Or create your own
+# 1. Copy the universal lesson prompt
+cat UNIVERSAL_LESSON_PROMPT.md
 
-# 2. Copy entire prompt and paste into ChatGPT
-# 3. ChatGPT generates complete JSON lesson files
-# 4. Save each JSON file to content/ directory
+# 2. Paste the entire prompt into your LLM (ChatGPT, Claude, etc.)
 
-# 5. Fix validation errors
+# 3. Add your topic at the end:
+Topic: SQL Injection Attacks
+Domain: pentest
+Difficulty: 2
+Order Index: 5
+Prerequisites: none
+
+# 4. LLM generates complete JSON lesson (4,000-5,500 words)
+# 5. Save output to content/lesson_pentest_05_sql_injection_RICH.json
+
+# 6. Fix any validation errors (optional)
 python comprehensive_fix.py
 
-# 6. Load lessons into database
+# 7. Load lesson into database
 python load_all_lessons.py
 
-# 7. Verify loaded
-python list_lessons.py
+# 8. Verify it loaded
+python list_lessons.py | grep -i "sql injection"
 ```
 
-**Time Estimate**: 10-15 minutes per lesson (vs 4-6 hours manual)
+**That's it!** Just specify the topic and the LLM generates a complete, production-ready lesson following all CyberLearn standards.
+
+**Time Estimate**: 2-3 minutes per lesson (vs 4-6 hours manual)
 
 ### Method 2: Template-Based (Manual)
 
