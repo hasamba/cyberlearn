@@ -158,6 +158,7 @@ def render_skill_progress(user: UserProfile):
 
     domains = [
         "Fundamentals",
+        "OSINT",
         "DFIR",
         "Malware",
         "Active Directory",
@@ -167,10 +168,12 @@ def render_skill_progress(user: UserProfile):
         "Pentest",
         "Red Team",
         "Blue Team",
+        "Threat Hunting",
     ]
 
     skills = [
         user.skill_levels.fundamentals,
+        user.skill_levels.osint,
         user.skill_levels.dfir,
         user.skill_levels.malware,
         user.skill_levels.active_directory,
@@ -180,6 +183,7 @@ def render_skill_progress(user: UserProfile):
         user.skill_levels.pentest,
         user.skill_levels.redteam,
         user.skill_levels.blueteam,
+        user.skill_levels.threat_hunting,
     ]
 
     # Radar chart

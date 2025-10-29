@@ -118,12 +118,17 @@ def render_diagnostic_quiz(user: UserProfile, db: Database):
 
         domains = [
             ("fundamentals", "🔐 Fundamentals"),
+            ("osint", "🔎 OSINT"),
             ("dfir", "🔍 DFIR"),
             ("malware", "🦠 Malware"),
             ("active_directory", "🗂️ Active Directory"),
+            ("system", "💻 System"),
+            ("linux", "🐧 Linux"),
+            ("cloud", "☁️ Cloud"),
             ("pentest", "🎯 Pentest"),
             ("redteam", "🔴 Red Team"),
             ("blueteam", "🛡️ Blue Team"),
+            ("threat_hunting", "🎯 Threat Hunting"),
         ]
 
         for domain_key, domain_name in domains:
