@@ -133,6 +133,87 @@ def add_tags_system():
                 "icon": "🏆",
                 "description": "Lessons aligned with industry certifications",
                 "is_system": 1
+            },
+            # Career Path Tags
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "SOC Tier 1",
+                "color": "#06B6D4",  # Cyan
+                "icon": "🛡️",
+                "description": "Security Operations Center Tier 1 Analyst career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "SOC Tier 2",
+                "color": "#0891B2",  # Darker Cyan
+                "icon": "🛡️",
+                "description": "Security Operations Center Tier 2 Analyst career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Incident Responder",
+                "color": "#DC2626",  # Dark Red
+                "icon": "🚨",
+                "description": "Incident Response Specialist career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Threat Hunter",
+                "color": "#7C3AED",  # Violet
+                "icon": "🎯",
+                "description": "Threat Hunting Specialist career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Forensic Analyst",
+                "color": "#059669",  # Emerald
+                "icon": "🔬",
+                "description": "Digital Forensics Analyst career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Malware Analyst",
+                "color": "#B91C1C",  # Crimson
+                "icon": "🦠",
+                "description": "Malware Reverse Engineering Analyst career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Penetration Tester",
+                "color": "#CA8A04",  # Gold
+                "icon": "🔓",
+                "description": "Penetration Testing / Ethical Hacking career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Red Team Operator",
+                "color": "#BE123C",  # Rose
+                "icon": "⚔️",
+                "description": "Red Team Operations career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Security Engineer",
+                "color": "#4F46E5",  # Indigo
+                "icon": "🔧",
+                "description": "Security Engineering career path",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Cloud Security",
+                "color": "#0D9488",  # Teal
+                "icon": "☁️",
+                "description": "Cloud Security Specialist career path",
+                "is_system": 1
             }
         ]
 
@@ -198,10 +279,17 @@ def add_tags_system():
         print(f"Tables created: {[t[0] for t in tables]}")
         print(f"System tags: {tag_count}")
         print(f"Lesson-tag associations: {lesson_tag_count}")
+        print("\nTag Categories:")
+        print("  • Content Tags: Built-In, Advanced, PWK Course, Eric Zimmerman Tools, SANS-Aligned")
+        print("  • Source Tags: User Content, Community, Certification Prep")
+        print("  • Career Paths: SOC Tier 1, SOC Tier 2, Incident Responder, Threat Hunter,")
+        print("                  Forensic Analyst, Malware Analyst, Penetration Tester,")
+        print("                  Red Team Operator, Security Engineer, Cloud Security")
         print("\nNext steps:")
         print("1. Run the app: streamlit run app.py")
         print("2. Use tag filters to organize lesson view")
         print("3. Manage tags via the new Tag Management page")
+        print("4. Tag lessons with career paths for role-based learning")
 
     except Exception as e:
         conn.rollback()
