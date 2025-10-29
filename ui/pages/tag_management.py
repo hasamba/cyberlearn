@@ -28,10 +28,13 @@ def render_tag_management(db: Database):
         if not tags:
             st.info("No tags found. Create your first tag in the 'Create Tag' tab.")
         else:
+            # Sort tags: system tags first, then custom tags
+            sorted_tags = sorted(tags, key=lambda t: (not t.is_system, t.name))
+
             # Display tags in a nice grid
             cols = st.columns(3)
 
-            for idx, tag in enumerate(tags):
+            for idx, tag in enumerate(sorted_tags):
                 with cols[idx % 3]:
                     # Check if editing this tag
                     is_editing = st.session_state.get(f'editing_tag') == tag.tag_id
