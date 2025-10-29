@@ -162,8 +162,13 @@ def render_sidebar():
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
+                # Save username before clearing session
+                saved_username = st.session_state.get('last_username', None)
                 st.session_state.current_user = None
                 st.session_state.current_page = "welcome"
+                # Restore username for next login
+                if saved_username:
+                    st.session_state.last_username = saved_username
                 st.rerun()
 
             # Debug info section
@@ -180,15 +185,19 @@ def render_sidebar():
             # Login/Create Account in sidebar
             st.markdown("### 🔐 Login")
 
+            # Get saved username from session state
+            saved_username = st.session_state.get('last_username', '')
+
             # Login form
             with st.form("login_form_sidebar"):
-                username = st.text_input("Username")
+                username = st.text_input("Username", value=saved_username)
                 submit = st.form_submit_button("Login", use_container_width=True)
 
                 if submit and username:
                     user = st.session_state.db.get_user_by_username(username)
                     if user:
                         st.session_state.current_user = user
+                        st.session_state.last_username = username  # Save username
                         user.update_streak()
                         st.session_state.db.update_user(user)
                         st.session_state.current_page = "dashboard"
@@ -219,6 +228,7 @@ def render_sidebar():
                                 user.update_streak()
                                 st.session_state.db.update_user(user)
                                 st.session_state.current_user = user
+                                st.session_state.last_username = new_username  # Save username
                                 st.session_state.current_page = "diagnostic"
                                 st.success(f"Welcome, {new_username}!")
                                 st.rerun()
