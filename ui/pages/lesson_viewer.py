@@ -28,6 +28,7 @@ def render(user: UserProfile, db: Database):
     # Domain tabs
     domains = [
         ("fundamentals", "🔐 Fundamentals"),
+        ("osint", "🔎 OSINT"),
         ("dfir", "🔍 DFIR"),
         ("malware", "🦠 Malware"),
         ("active_directory", "🗂️ Active Directory"),
@@ -37,6 +38,7 @@ def render(user: UserProfile, db: Database):
         ("pentest", "🎯 Pentest"),
         ("redteam", "🔴 Red Team"),
         ("blueteam", "🛡️ Blue Team"),
+        ("threat_hunting", "🎯 Threat Hunting"),
     ]
 
     tabs = st.tabs([name for _, name in domains])
