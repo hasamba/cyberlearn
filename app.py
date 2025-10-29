@@ -209,6 +209,7 @@ def render_welcome_page():
         st.markdown("#### 📊 Learning Domains")
         domains = [
             "🔐 Cybersecurity Fundamentals",
+            "🔎 OSINT (Open Source Intelligence)",
             "🔍 DFIR (Digital Forensics & Incident Response)",
             "🦠 Malware Analysis",
             "🗂️ Active Directory Security",
@@ -218,6 +219,7 @@ def render_welcome_page():
             "🎯 Penetration Testing",
             "🔴 Red Team Operations",
             "🛡️ Blue Team Defense",
+            "🎯 Threat Hunting",
         ]
         for domain in domains:
             st.markdown(f"- {domain}")
