@@ -36,8 +36,8 @@ def render(user: UserProfile, db: Database):
         ("linux", "🐧 Linux"),
         ("cloud", "☁️ Cloud"),
         ("pentest", "🎯 Pentest"),
-        ("redteam", "🔴 Red Team"),
-        ("blueteam", "🛡️ Blue Team"),
+        ("red_team", "🔴 Red Team"),
+        ("blue_team", "🛡️ Blue Team"),
         ("threat_hunting", "🎯 Threat Hunting"),
     ]
 
