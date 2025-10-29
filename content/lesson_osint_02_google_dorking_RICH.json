@@ -4,7 +4,9 @@
   "title": "Google Dorking & Search Mastery",
   "difficulty": 1,
   "order_index": 2,
-  "prerequisites": ["a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"],
+  "prerequisites": [
+    "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+  ],
   "concepts": [
     "Advanced Search Operators",
     "Google Dorks for Security Research",
@@ -97,7 +99,9 @@
       ],
       "correct_answer": 3,
       "explanation": "This question tests advanced query refinement and understanding that OSINT often requires iterative, context-dependent approaches. Option D is correct because each approach has merit depending on the target's specific characteristics. Option A uses negative keywords to exclude common false positives (guides, benchmarks, public resources)—effective if these terms consistently appear in unwanted results. Option B uses more specific phrases (\"employee salary\", \"internal compensation\") and excludes the HR subdomain—effective if internal docs use these exact terms and the HR site contains most public resources. Option C combines subdomain searching (*.targetcorp.com), excludes common public-facing subdomains (-www -hr), and looks for directory listings (intitle:\"index of\")—effective if internal spreadsheets are on non-public subdomains with directory listing enabled. The key insight: There's rarely one \"correct\" Google Dork. Professional OSINT requires experimentation, refinement based on initial results, and adapting queries to the target's specific structure. You should run all three queries, compare results, and refine based on what you find. This iterative approach is how real OSINT investigations work.",
-      "difficulty": 3
+      "difficulty": 3,
+      "question_id": "08cd1efe-d818-4d02-936f-c5e3c9e8d46c",
+      "type": "multiple_choice"
     },
     {
       "question": "During a Google Dorking exercise, you discover an exposed S3 bucket (site:s3.amazonaws.com \"company-backups\") that contains a file named \"customer_database_2024.sql\" (5.2GB). You have authorization to investigate this company's external exposure as part of a security audit. What is the most professionally appropriate action?",
@@ -109,15 +113,17 @@
       ],
       "correct_answer": 3,
       "explanation": "This question tests understanding of proportionate response and professional OSINT practices in a nuanced scenario. Option D is correct because it balances verification, evidence collection, and ethical restraint. Here's why: (1) VERIFICATION: You need to confirm the exposure is real (not a stale Google cache or false positive), so accessing the bucket is justified. (2) EVIDENCE: Screenshot of the file listing provides clear evidence of what's exposed (file name \"customer_database_2024.sql\" and size 5.2GB clearly indicate sensitive data). (3) MINIMAL INTERACTION: You're not downloading data, thus avoiding data handling risks, potential legal issues with bulk downloads, and delays from analyzing large datasets. (4) RAPID REPORTING: Immediate reporting enables quick remediation—every minute the bucket stays public increases risk. Why other options are problematic: Option A (download entire file) creates unnecessary risks—you're now handling 5.2GB of potentially sensitive customer data, which creates data protection obligations, potential legal liability even with authorization (GDPR, CCPA compliance), time delay while you analyze instead of reporting, and excessive interaction beyond what's needed to confirm exposure. The file name alone makes the content obvious. Option B (don't access at all) is overly cautious—Google's cache could be outdated, you can't confirm current exposure, and you're missing an opportunity to provide clear, current evidence. A screenshot showing current accessibility is much stronger evidence than a Google search result. Option C (download 1-5MB sample) is closer to correct but still unnecessary—you already have sufficient evidence from the filename and file size. Downloading even a sample involves data handling, potential policy violations, and time delay. The filename 'customer_database_2024.sql' at 5.2GB is definitive evidence without downloading. KEY PRINCIPLE: 'Evidence sufficiency'—collect only what's needed to prove the exposure and enable remediation. In this case, the file listing screenshot is sufficient. Don't let curiosity or thoroughness lead you to excessive data access. Professional OSINT requires restraint.",
-      "difficulty": 3
+      "difficulty": 3,
+      "question_id": "28d18d49-7c88-412a-974c-68f11ee74e3c",
+      "type": "multiple_choice"
     }
   ],
   "jim_kwik_principles": [
     "active_learning",
-    "spaced_repetition",
-    "real_world_application",
-    "mistakes_as_learning",
-    "chunking_information"
+    "learning_sprint",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "minimum_effective_dose"
   ],
   "mitre_attack_tags": [
     "T1593.002 - Search Engines",
