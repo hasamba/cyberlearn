@@ -169,8 +169,8 @@ def render_sidebar():
                 # Restore username for next login
                 if saved_username:
                     st.session_state.last_username = saved_username
-                # Reset auto-login flag to enable auto-login on next visit
-                st.session_state.disable_auto_login = False
+                # Disable auto-login after logout (require manual login)
+                st.session_state.disable_auto_login = True
                 st.rerun()
 
             # Debug info section
@@ -225,12 +225,26 @@ def render_sidebar():
                     st.session_state.current_page = "dashboard"
                     st.rerun()
 
-            # Manual login option
-            if st.button("🔄 Different User", use_container_width=True):
-                st.session_state.disable_auto_login = True
-                st.rerun()
+            # Manual login option (only if auto-login tried to happen)
+            if not st.session_state.disable_auto_login:
+                if st.button("🔄 Different User", use_container_width=True):
+                    st.session_state.disable_auto_login = True
+                    st.rerun()
 
             if st.session_state.disable_auto_login:
+                # Quick login button for last user
+                if default_username:
+                    if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
+                        user = st.session_state.db.get_user_by_username(default_username)
+                        if user:
+                            st.session_state.current_user = user
+                            user.last_username = default_username
+                            user.update_streak()
+                            st.session_state.db.update_user(user)
+                            st.session_state.current_page = "dashboard"
+                            st.session_state.disable_auto_login = False
+                            st.rerun()
+
                 # Manual login form
                 with st.form("login_form_sidebar"):
                     username = st.text_input("Username", value=st.session_state.get('last_username', ''), key="login_username_input")
