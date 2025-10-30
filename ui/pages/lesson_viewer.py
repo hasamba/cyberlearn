@@ -33,17 +33,28 @@ def render(user: UserProfile, db: Database):
 
         # Load tag preferences from database (not session state)
         tag_pref_key = f"tag_filter_{user.user_id}"
+        available_tag_names = [tag.name for tag in all_tags]
+
         if tag_pref_key not in st.session_state:
             # Load from user's database record
             if user.preferred_tag_filters:
-                st.session_state[tag_pref_key] = user.preferred_tag_filters
+                # Filter out tags that no longer exist (e.g., renamed tags)
+                valid_tags = [t for t in user.preferred_tag_filters if t in available_tag_names]
+                st.session_state[tag_pref_key] = valid_tags
             else:
-                # Default to Beginner tag for new users
-                beginner_tag = db.get_tag_by_name("Beginner")
+                # Default to Level: Beginner tag for new users
+                beginner_tag = db.get_tag_by_name("Level: Beginner")
+                if not beginner_tag:
+                    # Try old name for backward compatibility
+                    beginner_tag = db.get_tag_by_name("Beginner")
+
                 if beginner_tag:
-                    st.session_state[tag_pref_key] = ["Beginner"]
+                    st.session_state[tag_pref_key] = [beginner_tag.name]
                 else:
                     st.session_state[tag_pref_key] = []
+        else:
+            # Validate existing session state tags still exist
+            st.session_state[tag_pref_key] = [t for t in st.session_state[tag_pref_key] if t in available_tag_names]
 
         col1, col2 = st.columns([4, 1])
 
@@ -51,7 +62,7 @@ def render(user: UserProfile, db: Database):
             # Multi-select for tags with saved default
             selected_tag_names = st.multiselect(
                 "Select tags to filter lessons",
-                options=[tag.name for tag in all_tags],
+                options=available_tag_names,
                 default=st.session_state[tag_pref_key],
                 help="Filter lessons by tags. Leave empty to show all lessons.",
                 label_visibility="visible",
