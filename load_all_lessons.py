@@ -4,10 +4,68 @@ Load all lessons from content directory into database
 
 import json
 import os
+import sqlite3
 from uuid import UUID
 from pathlib import Path
+from datetime import datetime
 from utils.database import Database
 from models.lesson import Lesson
+
+def auto_tag_lessons(db_path="cyberlearn.db"):
+    """Automatically tag lessons with appropriate package tags after loading"""
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        # Get the Eric Zimmerman Tools tag
+        cursor.execute("SELECT tag_id FROM tags WHERE name = 'Package: Eric Zimmerman Tools'")
+        ez_tag = cursor.fetchone()
+
+        if not ez_tag:
+            print("[WARN] Package: Eric Zimmerman Tools tag not found, skipping auto-tagging")
+            return
+
+        ez_tag_id = ez_tag[0]
+
+        # Get DFIR lessons 11-24 (Eric Zimmerman Tools)
+        cursor.execute("""
+            SELECT lesson_id FROM lessons
+            WHERE domain = 'dfir' AND order_index BETWEEN 11 AND 24
+        """)
+        ez_lessons = cursor.fetchall()
+
+        if not ez_lessons:
+            return
+
+        # Tag each lesson if not already tagged
+        now = datetime.utcnow().isoformat()
+        tagged_count = 0
+
+        for (lesson_id,) in ez_lessons:
+            # Check if already tagged
+            cursor.execute("""
+                SELECT 1 FROM lesson_tags
+                WHERE lesson_id = ? AND tag_id = ?
+            """, (lesson_id, ez_tag_id))
+
+            if not cursor.fetchone():
+                cursor.execute("""
+                    INSERT INTO lesson_tags (lesson_id, tag_id, added_at)
+                    VALUES (?, ?, ?)
+                """, (lesson_id, ez_tag_id, now))
+                tagged_count += 1
+
+        conn.commit()
+
+        if tagged_count > 0:
+            print(f"[AUTO-TAG] Tagged {tagged_count} Eric Zimmerman Tools lessons")
+
+    except Exception as e:
+        conn.rollback()
+        print(f"[WARN] Auto-tagging failed: {e}")
+    finally:
+        conn.close()
 
 def load_all_lessons():
     """Load all lesson JSON files from content directory"""
@@ -60,6 +118,10 @@ def load_all_lessons():
     print(f"[SKIPPED] {skipped} lessons")
     print(f"[ERRORS] {errors} lessons")
     print(f"[TOTAL] {loaded + skipped} lessons in database")
+
+    # Auto-tag lessons with package tags
+    if loaded > 0 or skipped > 0:
+        auto_tag_lessons()
 
 
 if __name__ == "__main__":
