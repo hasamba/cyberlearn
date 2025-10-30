@@ -101,8 +101,8 @@ Only use these content block types (ContentType enum):
 ### Rich Lesson Standards
 
 Rich lessons should include:
-- **Length**: 4,000-5,500 words
-- **Mindset coaching**: Jim Kwik principles, encouragement
+- **Length**: 4,000-15,000 words (extended for complex topics)
+- **Mindset coaching**: All 10 Jim Kwik principles applied, encouragement throughout
 - **Deep technical content**: Not surface-level explanations
 - **Real-world examples**: Actual attacks, case studies, company examples
 - **Code snippets**: Commands, scripts, configurations (where applicable)
@@ -110,6 +110,21 @@ Rich lessons should include:
 - **Common pitfalls**: Warnings about mistakes
 - **Actionable takeaways**: Clear next steps
 - **ASCII art**: Diagrams where helpful (network topology, attack flow)
+- **Video content**: At least one video block (recommended)
+- **Content variety**: Minimum 4 different content block types
+- **Post-assessment**: Minimum 3 assessment questions
+
+**Jim Kwik Principles (All 10 Required):**
+1. `teach_like_im_10` - Simplify complex concepts
+2. `memory_hooks` - Create memorable associations
+3. `connect_to_what_i_know` - Link to existing knowledge
+4. `active_learning` - Hands-on practice and exercises
+5. `meta_learning` - Learn how to learn
+6. `minimum_effective_dose` - Focus on essential concepts
+7. `reframe_limiting_beliefs` - Overcome mental blocks
+8. `gamify_it` - Make learning engaging
+9. `learning_sprint` - Build momentum
+10. `multiple_memory_pathways` - Visual, auditory, kinesthetic learning
 
 ### Creating New Lessons
 

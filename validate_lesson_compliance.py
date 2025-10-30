@@ -3,7 +3,7 @@ Validate lesson compliance with CyberLearn rich lesson standards
 
 Requirements from CLAUDE.md:
 - Length: 4,000-15,000 words (RICH lessons - extended for complex topics)
-- Mindset coaching: Jim Kwik principles (minimum 3)
+- Mindset coaching: Jim Kwik principles (all 10 principles for RICH lessons)
 - Video content: At least one video block (recommended)
 - Assessment: Post-assessment questions (minimum 3)
 - Content variety: Multiple content block types (minimum 4 types)
@@ -18,7 +18,7 @@ Validates:
 ✓ Required fields (lesson_id, domain, title, etc.)
 ✓ Word count (4,000-15,000 for RICH lessons)
 ✓ Content blocks (min 5, valid types)
-✓ Jim Kwik principles (min 3, valid values)
+✓ Jim Kwik principles (all 10 for RICH lessons, valid values)
 ✓ Post-assessment (min 3 questions with all required fields)
 ✓ Video content (recommended)
 ✓ Content variety (min 4 different block types)
@@ -57,7 +57,8 @@ RICH_LESSON_MIN_WORDS = 4000
 RICH_LESSON_MAX_WORDS = 15000  # Extended for complex lessons
 MIN_CONTENT_BLOCKS = 5
 MIN_POST_ASSESSMENT = 3
-MIN_JIM_KWIK_PRINCIPLES = 3
+MIN_JIM_KWIK_PRINCIPLES = 10  # Rich lessons should use all 10 principles
+RECOMMENDED_JIM_KWIK_PRINCIPLES = 10  # Standard is to use all principles
 
 class LessonValidator:
     """Validator for lesson compliance"""
@@ -175,10 +176,14 @@ class LessonValidator:
 
         principles = lesson['jim_kwik_principles']
 
-        # Check minimum number of principles
+        # Check for RICH lessons: should have all 10 principles
         if len(principles) < MIN_JIM_KWIK_PRINCIPLES:
             self.issues.append(
-                f"Too few Jim Kwik principles: {len(principles)} (minimum: {MIN_JIM_KWIK_PRINCIPLES})"
+                f"Too few Jim Kwik principles: {len(principles)} (required: {MIN_JIM_KWIK_PRINCIPLES} for RICH lessons)"
+            )
+        elif len(principles) > MIN_JIM_KWIK_PRINCIPLES:
+            self.warnings.append(
+                f"More than {MIN_JIM_KWIK_PRINCIPLES} Jim Kwik principles: {len(principles)} (standard is {MIN_JIM_KWIK_PRINCIPLES})"
             )
 
         # Check principles are valid
