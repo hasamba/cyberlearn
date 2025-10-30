@@ -17,7 +17,7 @@ from datetime import datetime
 def add_course_apt_tags():
     """Add Course: PEN-200 and APT tags to the database."""
 
-    db_path = Path(__file__).parent / "cyberlearn.db"
+    db_path = Path(__file__).parent.parent / "cyberlearn.db"
 
     if not db_path.exists():
         print(f"❌ Database not found at {db_path}")

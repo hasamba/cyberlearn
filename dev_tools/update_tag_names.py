@@ -18,7 +18,8 @@ from pathlib import Path
 def update_tag_names():
     """Update tag names and remove deprecated tags."""
 
-    db_path = Path(__file__).parent / "cyberlearn.db"
+    # Database is in parent directory (project root)
+    db_path = Path(__file__).parent.parent / "cyberlearn.db"
 
     if not db_path.exists():
         print(f"❌ Database not found at {db_path}")

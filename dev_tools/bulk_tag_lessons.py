@@ -12,7 +12,7 @@ from datetime import datetime
 def bulk_tag_lessons():
     """Tag specific lessons with specific tags."""
 
-    db_path = Path(__file__).parent / "cyberlearn.db"
+    db_path = Path(__file__).parent.parent / "cyberlearn.db"
 
     if not db_path.exists():
         print(f"❌ Database not found at {db_path}")
