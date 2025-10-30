@@ -35,14 +35,14 @@ def add_emerging_tech_domains(db_path: str = "cyberlearn.db"):
                 print(f"Adding {display_name} domain...")
                 cursor.execute(f"ALTER TABLE users ADD COLUMN {column_name} INTEGER DEFAULT 0")
                 added_count += 1
-                print(f"  ✓ Added {column_name} column")
+                print(f"  [OK] Added {column_name} column")
             else:
-                print(f"  ⊙ {display_name} domain already exists")
+                print(f"  [SKIP] {display_name} domain already exists")
 
         conn.commit()
 
         if added_count > 0:
-            print(f"\n✓ Successfully added {added_count} new domain(s)")
+            print(f"\n[SUCCESS] Added {added_count} new domain(s)")
             print("\nNew domains available:")
             print("  - ai_security: AI/ML security, prompt injection, model security")
             print("  - iot_security: IoT/ICS security, embedded systems, OT networks")
@@ -57,7 +57,7 @@ def add_emerging_tech_domains(db_path: str = "cyberlearn.db"):
 
     except sqlite3.Error as e:
         conn.rollback()
-        print(f"✗ Error adding domains: {e}")
+        print(f"[ERROR] Error adding domains: {e}")
     finally:
         conn.close()
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     db_file = Path("cyberlearn.db")
     if not db_file.exists():
-        print(f"✗ Database file not found: {db_file}")
+        print(f"[ERROR] Database file not found: {db_file}")
         print("  Please run this script from the project root directory")
         exit(1)
 

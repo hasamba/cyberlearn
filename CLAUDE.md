@@ -11,8 +11,22 @@ CyberLearn is an adaptive cybersecurity learning platform built with:
 ## General Guidelines
 
 - Always save new or changed code in files in the project folder
-- Don't run commands - this is just a host machine, tell me what to run on my VMs
 - Write files only in the project folder, not anywhere else
+
+## CRITICAL: Development Environment Rules
+
+**THIS IS A DEVELOPMENT HOST MACHINE - NOT THE VM!!!**
+
+- ✅ **DO**: Run Python scripts on THIS dev host (where Claude is)
+- ✅ **DO**: Execute database migrations, validation scripts, data processing
+- ✅ **DO**: Create files, edit code, commit to git, push to GitHub
+- ❌ **DON'T**: Tell user to run Python scripts on their VM
+- ❌ **DON'T**: Ask user to run any commands - just run them here!
+- ❌ **DON'T**: Provide "Next steps on your VM" instructions
+
+**If a Python script needs to run, RUN IT HERE IMMEDIATELY. Do NOT ask the user to run it.**
+
+The user's VM is for running the actual application (Streamlit, FastAPI), NOT for running development/migration scripts.
 
 ## Project Structure
 
