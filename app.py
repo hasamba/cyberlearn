@@ -186,29 +186,27 @@ def render_sidebar():
             st.markdown("### 🔐 Login")
 
             # Get last username from database (most recently logged in user)
-            if 'last_username_loaded' not in st.session_state:
-                # Check if column exists (migration may not have run yet)
-                cursor = st.session_state.db.conn.cursor()
-                cursor.execute("PRAGMA table_info(users)")
-                columns = [row[1] for row in cursor.fetchall()]
+            # Always reload to get the latest saved username
+            cursor = st.session_state.db.conn.cursor()
+            cursor.execute("PRAGMA table_info(users)")
+            columns = [row[1] for row in cursor.fetchall()]
 
-                if 'last_username' in columns:
-                    # Get most recently logged in user's username
-                    cursor.execute("""
-                        SELECT last_username
-                        FROM users
-                        WHERE last_username IS NOT NULL
-                        ORDER BY last_login DESC
-                        LIMIT 1
-                    """)
-                    row = cursor.fetchone()
-                    default_username = row[0] if row else ''
-                else:
-                    # Column doesn't exist yet, use empty default
-                    default_username = ''
+            if 'last_username' in columns:
+                # Get most recently logged in user's username
+                cursor.execute("""
+                    SELECT last_username
+                    FROM users
+                    WHERE last_username IS NOT NULL
+                    ORDER BY last_login DESC
+                    LIMIT 1
+                """)
+                row = cursor.fetchone()
+                default_username = row[0] if row else ''
+            else:
+                # Column doesn't exist yet, use empty default
+                default_username = ''
 
-                st.session_state.last_username = default_username
-                st.session_state.last_username_loaded = True
+            st.session_state.last_username = default_username
 
             # Login form
             with st.form("login_form_sidebar"):
