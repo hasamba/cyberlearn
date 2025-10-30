@@ -132,6 +132,9 @@ def render(user: UserProfile, db: Database):
         ("red_team", "🔴 Red Team"),
         ("blue_team", "🛡️ Blue Team"),
         ("threat_hunting", "🎯 Threat Hunting"),
+        ("ai_security", "🤖 AI Security"),
+        ("iot_security", "🔌 IoT Security"),
+        ("web3_security", "🔗 Web3 Security"),
     ]
 
     tabs = st.tabs([name for _, name in domains])
