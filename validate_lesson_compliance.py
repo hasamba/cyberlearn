@@ -24,6 +24,9 @@ Validates:
 ✓ Content variety (min 4 different block types)
 ✓ Mindset coaching block (recommended)
 ✓ Memory aid block (recommended)
+✓ Placeholder text detection (TODO, TBD, [INSERT], etc.)
+✓ Empty content blocks (excluding video/diagram/quiz)
+✓ Very short content blocks (< 10 words, may be incomplete)
 
 Output:
 - Per-lesson validation results
@@ -59,6 +62,20 @@ MIN_CONTENT_BLOCKS = 5
 MIN_POST_ASSESSMENT = 3
 MIN_JIM_KWIK_PRINCIPLES = 10  # Rich lessons should use all 10 principles
 RECOMMENDED_JIM_KWIK_PRINCIPLES = 10  # Standard is to use all principles
+
+# Placeholder text detection patterns
+PLACEHOLDER_PATTERNS = [
+    'TODO', 'PLACEHOLDER', '[INSERT', '[ADD', 'TBD', 'TO BE DETERMINED',
+    'Coming soon', 'Content coming', 'To be added', 'Will be added',
+    'Lorem ipsum', 'Fill in', 'Example text', '[Your text here]',
+    'XXX', 'FIXME', 'Sample content', '[Description]', '[Content]',
+    '[Text here]', 'Placeholder text', 'Add content here', 'Insert text',
+    'This section will', 'Content pending', '[To be completed]',
+    'Need to add', 'Write content', '[Update this]'
+]
+
+# Content types that may have minimal or no text (use URLs, embedded content)
+MINIMAL_TEXT_ALLOWED = {'video', 'diagram', 'quiz', 'simulation'}
 
 class LessonValidator:
     """Validator for lesson compliance"""
@@ -97,6 +114,9 @@ class LessonValidator:
 
         # Check content variety
         self._check_content_variety(lesson_data)
+
+        # Check for placeholder text
+        self._check_placeholder_text(lesson_data)
 
         is_compliant = len(self.issues) == 0
 
@@ -261,6 +281,48 @@ class LessonValidator:
             self.warnings.append(
                 "No memory aid block found (recommended for retention)"
             )
+
+    def _check_placeholder_text(self, lesson: dict):
+        """Check for placeholder text in content blocks"""
+        if 'content_blocks' not in lesson:
+            return
+
+        for i, block in enumerate(lesson['content_blocks']):
+            block_type = block.get('type', 'unknown')
+            content = block.get('content', {})
+
+            # Extract text from content
+            if isinstance(content, dict):
+                text = content.get('text', '')
+            elif isinstance(content, str):
+                text = content
+            else:
+                text = ''
+
+            if not text:
+                # Empty text is acceptable for certain content types
+                if block_type not in MINIMAL_TEXT_ALLOWED:
+                    self.warnings.append(
+                        f"Content block {i} ({block_type}) has empty text content"
+                    )
+                continue
+
+            # Check for placeholder patterns (case-insensitive)
+            text_upper = text.upper()
+            for pattern in PLACEHOLDER_PATTERNS:
+                if pattern.upper() in text_upper:
+                    self.issues.append(
+                        f"Content block {i} ({block_type}) contains placeholder text: '{pattern}'"
+                    )
+                    break  # Only report first match per block
+
+            # Check for very short content (likely incomplete)
+            word_count = len(text.split())
+            if word_count < 10 and block_type not in MINIMAL_TEXT_ALLOWED:
+                self.warnings.append(
+                    f"Content block {i} ({block_type}) has very short content: {word_count} words "
+                    f"(may be incomplete)"
+                )
 
 
 def validate_all_lessons(content_dir: Path = Path('content')) -> Dict:
