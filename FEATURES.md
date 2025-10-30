@@ -1,0 +1,522 @@
+# CyberLearn Platform - Master Features List
+
+**Last Updated:** 2025-10-30
+**Current Version:** 1.0
+**Total Features Tracked:** 6 planned, 0 in progress, 2 completed
+
+---
+
+## How to Use This File
+
+1. **Add new features** under the appropriate category
+2. **Update status** as you work: `[ ]` → `[IN PROGRESS]` → `[✓]`
+3. **Add notes** with implementation details, blockers, or decisions
+4. **Link to PRs/commits** when features are completed
+5. **Archive completed features** periodically to keep this file focused
+
+---
+
+## Status Legend
+
+- `[ ]` - Planned (not started)
+- `[IN PROGRESS]` - Currently being worked on
+- `[✓]` - Completed
+- `[BLOCKED]` - Blocked by dependency or issue
+- `[DEFERRED]` - Postponed to future release
+
+---
+
+## Feature Categories
+
+- [Content & Curriculum](#content--curriculum)
+- [Learning Experience](#learning-experience)
+- [Gamification & Engagement](#gamification--engagement)
+- [User Management](#user-management)
+- [Analytics & Reporting](#analytics--reporting)
+- [Technical Infrastructure](#technical-infrastructure)
+- [UI/UX Improvements](#uiux-improvements)
+- [Integration & API](#integration--api)
+- [Security & Privacy](#security--privacy)
+- [Admin & Content Creation](#admin--content-creation)
+
+---
+
+## Content & Curriculum
+
+### Lesson Content
+
+- [ ] **Feature:** Add AI Security Domain
+  - **Priority:** High
+  - **Description:** Create new "ai_security" domain in the platform to house AI/ML security lessons (currently 3 lessons planned in lesson_ideas.csv)
+  - **Acceptance Criteria:**
+    - [ ] Add "ai_security" to SkillLevels model in models/user.py
+    - [ ] Update adaptive_engine.py with AI security prerequisites and diagnostic questions
+    - [ ] Create database migration script to add ai_security skill column
+    - [ ] Add AI security domain icon/color to UI
+    - [ ] Create first 3 lessons from lesson_ideas.csv:
+      - [ ] ML Security Fundamentals (order_index 1)
+      - [ ] AI/ML Model Attacks and Defense (order_index 2)
+      - [ ] LLM Security and Prompt Injection (order_index 3)
+    - [ ] Update documentation (CLAUDE.md, ADD_NEW_DOMAINS.md)
+  - **Technical Details:**
+    - **Domain name:** `ai_security`
+    - **Prerequisites:** None (foundational) or fundamentals domain
+    - **Skill progression:** 0 (Novice) → 5 (Expert)
+    - **Domain color/icon:** Consider 🤖 or 🧠 with purple/blue color
+    - **Initial lessons:** 3 (can expand to 8-12 per domain standard)
+  - **Notes:** This is an emerging, high-demand domain. Consider linking to fundamentals and system domains for prerequisite knowledge. AI security is relevant across multiple career paths (AppSec, Cloud Security, Blue Team).
+  - **Dependencies:** None (standard domain addition)
+  - **Estimated Effort:** Medium (3-5 days)
+
+---
+
+## Learning Experience
+
+### Adaptive Learning
+
+- [ ] **Feature:** Enhanced User Skill Assessment Questionnaire
+  - **Priority:** High
+  - **Description:** Redesign the new user onboarding assessment to accurately evaluate user skill levels across all domains, providing better initial lesson recommendations and adaptive learning paths
+  - **Acceptance Criteria:**
+    - [ ] Comprehensive assessment covering all 12 active domains
+    - [ ] Multiple question types:
+      - [ ] Knowledge-based questions (technical understanding)
+      - [ ] Experience-based questions (practical experience, tools used)
+      - [ ] Scenario-based questions (applied knowledge)
+      - [ ] Self-assessment scale (confidence levels)
+    - [ ] Domain-specific diagnostic questions:
+      - [ ] Fundamentals (5-7 questions): Networking, cryptography, authentication, threat landscape
+      - [ ] DFIR (5-7 questions): Evidence collection, timeline analysis, memory forensics, disk forensics
+      - [ ] Malware (5-7 questions): Static/dynamic analysis, reverse engineering, detection
+      - [ ] Active Directory (5-7 questions): Domain structure, authentication protocols, exploitation
+      - [ ] System (5-7 questions): Windows/Linux internals, kernel, file systems
+      - [ ] Cloud (5-7 questions): AWS/Azure/GCP, IAM, cloud security services
+      - [ ] Pentest (5-7 questions): Methodology, reconnaissance, exploitation, reporting
+      - [ ] Red Team (5-7 questions): C2, evasion, persistence, operations
+      - [ ] Blue Team (5-7 questions): Detection, SIEM, incident response, threat hunting
+      - [ ] OSINT (3-5 questions): Sources, tools, methodology
+      - [ ] Threat Hunting (3-5 questions): Hypothesis development, tools, TTPs
+      - [ ] Linux (3-5 questions): Command line, administration, security
+    - [ ] Adaptive questioning (skip advanced questions if fundamentals fail)
+    - [ ] Results processing:
+      - [ ] Calculate skill level (0-5) for each domain
+      - [ ] Identify knowledge gaps
+      - [ ] Generate personalized learning path
+      - [ ] Recommend starting lessons for each domain
+    - [ ] Results visualization:
+      - [ ] Radar chart showing skill levels across domains
+      - [ ] Suggested career paths based on strengths
+      - [ ] Recommended first lessons
+    - [ ] Option to retake assessment later
+    - [ ] Track assessment history and skill progression over time
+  - **Technical Details:**
+    - **Question pool**: 60-80 diagnostic questions total (5-7 per domain)
+    - **Question difficulty**: Mix of beginner (40%), intermediate (40%), advanced (20%)
+    - **Scoring algorithm**:
+      - Beginner questions correct → Skill level 1-2
+      - Intermediate questions correct → Skill level 3-4
+      - Advanced questions correct → Skill level 5
+      - Account for confidence levels (self-assessment)
+    - **Database**:
+      - `assessment_questions` table (domain, difficulty, question_text, options, correct_answer)
+      - `user_assessments` table (user_id, assessment_date, domain_scores, recommendations)
+    - **UI flow**:
+      1. Welcome screen explaining assessment purpose
+      2. Domain-by-domain questioning (progress bar)
+      3. Results screen with visualizations
+      4. Personalized learning path recommendations
+      5. Start learning button
+  - **Use Cases:**
+    - New user onboarding: Establish baseline skill levels
+    - Career changers: Identify transferable skills and gaps
+    - Experienced professionals: Skip basics, jump to advanced content
+    - Progress tracking: Retake assessment to measure improvement
+    - Curriculum personalization: Adaptive recommendations based on assessment
+  - **Question Examples:**
+    - **Fundamentals**: "What is the difference between symmetric and asymmetric encryption?"
+    - **DFIR**: "Which Volatility plugin would you use to analyze network connections in a memory dump?"
+    - **Malware**: "What is the primary purpose of packing malware?"
+    - **AD**: "What authentication protocol does Kerberoasting exploit?"
+    - **Red Team**: "What is the main advantage of using domain fronting for C2?"
+  - **Notes:**
+    - Assessment should take 15-20 minutes to complete
+    - Questions should be stored in database for easy updates
+    - Consider adding "I don't know" option to avoid guessing
+    - Results should map directly to lesson recommendations in adaptive_engine.py
+    - Track which questions are too easy/hard and adjust difficulty over time
+  - **Dependencies:** Requires updated adaptive_engine.py with skill-based recommendation logic
+  - **Estimated Effort:** Large (1+ week)
+
+### Personalization
+
+- [ ] **Feature:** Hide/Unhide Lessons with Management Page
+  - **Priority:** Medium
+  - **Description:** Allow users to hide lessons from the main UI (lesson catalog, recommendations), with a dedicated "Hidden Lessons" page where users can view and unhide lessons
+  - **Acceptance Criteria:**
+    - [ ] Add "hidden" boolean field to lessons table (default: False)
+    - [ ] "Hide Lesson" action in lesson UI (context menu or button)
+    - [ ] Hidden lessons excluded from:
+      - [ ] Domain lesson lists
+      - [ ] Adaptive recommendations
+      - [ ] Search results
+      - [ ] Progress calculations
+    - [ ] "Hidden Lessons" page accessible from main menu/settings
+    - [ ] Hidden lessons page shows:
+      - [ ] List of all hidden lessons with title, domain, difficulty
+      - [ ] "Unhide" button for each lesson
+      - [ ] Bulk unhide option (select multiple)
+      - [ ] Filter/sort by domain, difficulty, date hidden
+    - [ ] Confirmation dialog before hiding (prevent accidental hides)
+    - [ ] Visual indicator count (e.g., "X lessons hidden") in UI
+  - **Technical Details:**
+    - **Database:** Add `hidden` column (BOOLEAN, default FALSE) to lessons table
+    - **API endpoints:**
+      - `POST /api/lessons/{lesson_id}/hide`
+      - `POST /api/lessons/{lesson_id}/unhide`
+      - `GET /api/lessons/hidden` (returns all hidden lessons)
+    - **UI route:** New Streamlit page "Hidden Lessons" or modal
+    - **Filter logic:** Add `WHERE hidden = FALSE` to all lesson queries
+  - **Use Cases:**
+    - User wants to focus on specific domains/topics
+    - Remove outdated or irrelevant content from view
+    - Temporarily hide completed lessons to reduce clutter
+    - Hide user-imported lessons that don't fit learning path
+  - **Notes:** Hidden lessons should still be accessible via direct URL (in case shared). Consider adding "Hide until [date]" for temporary hiding. Track date_hidden for sorting.
+  - **Dependencies:** None
+  - **Estimated Effort:** Small (1-2 days)
+
+### Practice & Labs
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Gamification & Engagement
+
+### Achievements & Badges
+- [ ] **Feature:** [Add feature here]
+
+### Leaderboards
+- [ ] **Feature:** [Add feature here]
+
+### Challenges & Events
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## User Management
+
+### Authentication
+- [ ] **Feature:** [Add feature here]
+
+### User Profiles
+- [ ] **Feature:** [Add feature here]
+
+### Social Features
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Analytics & Reporting
+
+### Learning Analytics
+- [ ] **Feature:** [Add feature here]
+
+### Progress Tracking
+- [ ] **Feature:** [Add feature here]
+
+### Reports & Dashboards
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Technical Infrastructure
+
+### Performance
+- [ ] **Feature:** [Add feature here]
+
+### Database
+- [ ] **Feature:** [Add feature here]
+
+### Deployment
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## UI/UX Improvements
+
+### Navigation
+
+- [ ] **Feature:** Global Lesson Search
+  - **Priority:** High
+  - **Description:** Implement search functionality that searches across all domains by keyword, matching against lesson titles and descriptions/content
+  - **Acceptance Criteria:**
+    - [ ] Search bar in main UI (header/sidebar)
+    - [ ] Search across all domains simultaneously
+    - [ ] Search fields:
+      - [ ] Lesson title (primary match)
+      - [ ] Learning objectives
+      - [ ] Concepts
+      - [ ] Content blocks text (secondary match)
+    - [ ] Real-time search results (type-ahead/autocomplete)
+    - [ ] Search results page showing:
+      - [ ] Lesson title with search term highlighted
+      - [ ] Domain badge
+      - [ ] Difficulty indicator
+      - [ ] Brief snippet showing context of match
+      - [ ] Tags (Career Path, Course, Package)
+    - [ ] Filter search results by:
+      - [ ] Domain (multi-select)
+      - [ ] Difficulty (1-3)
+      - [ ] Tags
+      - [ ] Completion status (not started, in progress, completed)
+    - [ ] Sort results by:
+      - [ ] Relevance (default)
+      - [ ] Title (A-Z)
+      - [ ] Difficulty
+      - [ ] Order index
+    - [ ] "No results" message with suggestions
+    - [ ] Search history (recent searches)
+  - **Technical Details:**
+    - **Search method:** SQLite FTS (Full-Text Search) or simple LIKE query
+    - **Indexed fields:** title, learning_objectives, concepts, content_blocks.text
+    - **Query example:**
+      ```sql
+      SELECT * FROM lessons
+      WHERE hidden = FALSE
+      AND (title LIKE '%keyword%'
+           OR learning_objectives LIKE '%keyword%'
+           OR concepts LIKE '%keyword%')
+      ORDER BY
+        CASE
+          WHEN title LIKE '%keyword%' THEN 1
+          ELSE 2
+        END
+      ```
+    - **Performance:** Consider FTS5 virtual table for large content searches
+    - **UI component:** Streamlit search input with results dataframe
+  - **Use Cases:**
+    - User searches "Kerberos" → finds AD lessons about Kerberoasting
+    - User searches "memory forensics" → finds DFIR and malware lessons
+    - User searches "docker" → finds Linux, Cloud, and System lessons
+    - User searches by tool name (e.g., "Volatility", "Mimikatz")
+  - **Notes:** Exclude hidden lessons from search results. Consider adding fuzzy search for typo tolerance. Search should respect user's current learning context (highlight recommended matches).
+  - **Dependencies:** None
+  - **Estimated Effort:** Medium (3-5 days)
+
+### Visual Design
+- [ ] **Feature:** [Add feature here]
+
+### Accessibility
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Integration & API
+
+### External Integrations
+- [ ] **Feature:** [Add feature here]
+
+### API Development
+- [ ] **Feature:** [Add feature here]
+
+### Content Import/Export
+
+- [ ] **Feature:** Single/Multiple JSON Lesson File Upload
+  - **Priority:** High
+  - **Description:** Allow users to browse and upload one or multiple lesson JSON files through the UI, which are automatically validated, tagged as "User Content", and populated into the database
+  - **Acceptance Criteria:**
+    - [ ] File browser UI component for selecting JSON files (single or multiple)
+    - [ ] File validation against Pydantic Lesson model
+    - [ ] Automatic tagging with "User Content" tag on successful import
+    - [ ] Duplicate lesson detection (by lesson_id)
+    - [ ] Success/error feedback to user with validation messages
+    - [ ] Imported lessons immediately available in lesson catalog
+    - [ ] Support for drag-and-drop file upload
+  - **Notes:** Should integrate with existing load_all_lessons.py validation logic. Consider max file size limits (e.g., 5MB per file). May need to handle prerequisite validation if referenced lessons don't exist.
+  - **Dependencies:** Requires "User Content" tag in database (already exists)
+  - **Estimated Effort:** Medium (3-5 days)
+
+- [ ] **Feature:** Lesson Package Import/Export (ZIP)
+  - **Priority:** High
+  - **Description:** Enable import and export of lesson packages as ZIP files containing multiple JSON lesson files. Imported packages are automatically unpacked, validated, populated into database, and tagged with the ZIP filename (without .zip extension)
+  - **Acceptance Criteria:**
+    - [ ] **Export functionality:**
+      - [ ] Select multiple lessons from catalog
+      - [ ] Export to ZIP file with custom package name
+      - [ ] Include metadata file (package.json) with package info, lesson count, domains, tags
+      - [ ] Download ZIP to user's machine
+    - [ ] **Import functionality:**
+      - [ ] File browser for selecting ZIP file
+      - [ ] Automatic extraction and validation of all JSON files in ZIP
+      - [ ] Create package tag from ZIP filename (e.g., "advanced-ad-attacks.zip" → Tag: "Package: Advanced AD Attacks")
+      - [ ] Apply package tag to all imported lessons
+      - [ ] Also apply "User Content" tag to all imported lessons
+      - [ ] Duplicate detection across all lessons in package
+      - [ ] Batch validation with detailed error report
+      - [ ] Transaction support (all-or-nothing import on validation failure)
+      - [ ] Success summary showing imported lesson count, domains, package name
+  - **Technical Details:**
+    - **ZIP structure:** Flat (all JSON files in root) or with metadata subfolder
+    - **Package metadata file (optional):** `package.json` with:
+      ```json
+      {
+        "package_name": "Advanced AD Attacks",
+        "version": "1.0",
+        "author": "Username",
+        "description": "Advanced Active Directory attack techniques",
+        "lesson_count": 8,
+        "domains": ["active_directory"],
+        "created_date": "2025-10-30"
+      }
+      ```
+    - **Tag creation:** Auto-create package tag with category="package", icon="📦", random color
+    - **Error handling:** Validate all files before importing any, rollback on failure
+  - **Notes:** This enables community lesson sharing and custom curriculum packages. Consider adding package marketplace in future. Max ZIP size limit (e.g., 50MB).
+  - **Dependencies:** Requires "User Content" tag system (already exists), extends single file upload feature
+  - **Estimated Effort:** Large (1+ week)
+
+---
+
+## Security & Privacy
+
+### Security Features
+- [ ] **Feature:** [Add feature here]
+
+### Privacy & Compliance
+- [ ] **Feature:** [Add feature here]
+
+### Data Protection
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Admin & Content Creation
+
+### Content Management
+- [ ] **Feature:** [Add feature here]
+
+### Admin Tools
+- [ ] **Feature:** [Add feature here]
+
+### Bulk Operations
+- [ ] **Feature:** [Add feature here]
+
+---
+
+## Completed Features Archive
+
+Move completed features here periodically to keep the main list focused on upcoming work.
+
+### 2025-10-30
+
+- [✓] **Feature:** Many-to-Many Lesson Tagging System
+  - **Priority:** High
+  - **Description:** Flexible tagging system allowing multiple tags per lesson and multiple lessons per tag, supporting Career Path, Course, and Package categorization
+  - **Completed:** 2025-10-30
+  - **PR/Commit:** Multiple PRs (#11, #12, #13)
+  - **Acceptance Criteria:**
+    - [✓] Database schema with lesson_tags junction table
+    - [✓] Tag model with name, icon (emoji), color, category
+    - [✓] 17 system tags created (Career Path, Course, Package categories)
+    - [✓] Auto-tagging functionality in load_all_lessons.py
+    - [✓] Course-specific tags: Eric Zimmerman Tools, 13Cubed courses (Memory, Endpoints, Linux)
+    - [✓] Template database includes all tags pre-populated
+    - [✓] UI displays tags correctly with emojis and colors
+  - **Technical Details:**
+    - **Database:** `tags` table + `lesson_tags` junction table
+    - **Tag Categories:** career_path, course, package
+    - **System Tags:** 10 Career Path (SOC Analyst, Pentester, Red Teamer, etc.), 5 Course tags, 2 Package tags
+    - **Auto-tagging:** DFIR lessons 11-24 → Eric Zimmerman Tools, 11-41 → 13Cubed Memory, 42-70 → 13Cubed Endpoints, 71-111 → 13Cubed Linux
+  - **Files Modified:**
+    - `database.py` - Added Tag model and lesson_tags table
+    - `load_all_lessons.py` - Added auto_tag_lessons() function
+    - `add_all_tags.py` - Script to populate system tags
+    - `add_13cubed_tags.py` - Script to add course-specific tags
+    - `cyberlearn_template.db` - Updated with all tags
+  - **Notes:** Solved Unicode encoding issues with emoji printing on Windows (cp1252 codec). Template database ships ready with all tags - no manual scripts needed on VM.
+
+- [✓] **Feature:** Linux Forensics Course (41 Rich Lessons)
+  - **Priority:** High
+  - **Description:** Complete Linux forensics curriculum based on 13Cubed "Investigating Linux Devices" course, covering foundations through advanced memory forensics
+  - **Completed:** 2025-10-30
+  - **PR/Commit:** PR #13 (60 lessons), plus earlier PRs for lessons 71-80
+  - **Acceptance Criteria:**
+    - [✓] 41 lessons created (DFIR order_index 71-111)
+    - [✓] Organized into 9 modules (Foundations, Advanced Logging, File Systems, Persistence, Evidence Collection, Timelining, Memory Forensics, Live Response, Case Studies)
+    - [✓] All lessons validated and loaded into database
+    - [✓] Course tag applied: "Course: 13Cubed-Investigating Linux Devices"
+    - [✓] Proper prerequisites chaining
+    - [✓] Difficulty progression (beginner → intermediate → advanced)
+  - **Module Breakdown:**
+    - Module 1: Linux Foundations (7 lessons) - Distributions, file hierarchy, permissions, users, shells, logs
+    - Module 2: Advanced Logging (3 lessons) - auditd, Sysmon for Linux, VMware ESXi
+    - Module 3: File Systems (7 lessons) - ext2/3/4, Sleuth Kit, timestomping, Btrfs/XFS, ZFS
+    - Module 4: Persistence (4 lessons) - systemd, cron, SSH keys, rootkits
+    - Module 5: Evidence Collection (4 lessons) - dd/dcfldd, AVML, UAC, virtualized environments
+    - Module 6: Timelining (3 lessons) - mactime, Plaso/log2timeline, comprehensive timeline lab
+    - Module 7: Memory Forensics (8 lessons) - Volatility 3, process analysis, bash history, network, code injection, dumping, plugins, case study
+    - Module 8: Live Response (2 lessons) - UAC walkthrough, best practices
+    - Module 9: Case Studies (3 lessons) - Disk analysis, memory analysis, capstone lab
+  - **Technical Details:**
+    - All lessons include post_assessment with question_id and explanation fields
+    - Fixed validation errors across all 41 lessons
+    - Tagged with "Course: 13Cubed-Investigating Linux Devices" (🐧, teal #14B8A6)
+  - **Files Created:**
+    - 41 JSON files: `content/lesson_dfir_71.json` through `content/lesson_dfir_111.json`
+    - `fix_pr13_lessons.py` - Bulk validation fix script
+    - `lesson_ideas.json` - Course specification with full module structure
+  - **Notes:** This represents the largest single course addition to CyberLearn, nearly doubling DFIR content from 30 to 93 lessons
+
+---
+
+## Future Ideas (Not Yet Planned)
+
+Use this section for brainstorming features that aren't fully scoped yet:
+
+- Idea: Mobile app version
+- Idea: Offline mode for lessons
+- Idea: Collaborative learning (study groups)
+- Idea: Live instructor-led sessions
+- Idea: Integration with CTF platforms
+- Idea: Resume/CV builder based on completed lessons
+- Idea: Job board integration
+- Idea: Mentor matching system
+
+---
+
+## Notes & Decisions
+
+### Architecture Decisions
+- Using SQLite for simplicity (may migrate to PostgreSQL for scale)
+- Streamlit for frontend (rapid development, may migrate to React later)
+- FastAPI for backend API layer
+
+### Content Strategy
+- Target 80-100 rich lessons minimum (8-12 per domain)
+- Current: 275 lessons loaded, 45 rich lessons completed
+- Focus on quality over quantity (4,000-5,500 words per lesson)
+
+### Release Planning
+- Version 1.0: Core learning platform with 9 domains
+- Version 2.0: Advanced gamification and social features
+- Version 3.0: Enterprise features (teams, organizations, SSO)
+
+---
+
+## Contributing
+
+When adding features to this list:
+1. Use the feature template provided
+2. Assign priority based on user impact and business value
+3. Break large features into smaller, trackable sub-features
+4. Update status regularly as work progresses
+5. Archive completed features to keep list manageable
+
+---
+
+**Quick Stats:**
+- Total lessons planned: 124 (lesson_ideas.csv)
+- Total lessons created: 275 (cyberlearn.db)
+- Rich lessons completed: 45
+- Domains: 12 (9 core + 3 emerging tech)
+- Tags: 17 system tags

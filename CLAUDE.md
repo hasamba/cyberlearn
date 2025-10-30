@@ -38,8 +38,9 @@ c:\Users\yaniv\...\57.14_Learning_app\
 └── cyberlearn.db          # SQLite database
 ```
 
-## Domain Structure (9 Domains)
+## Domain Structure (15 Domains)
 
+### Core Domains (12)
 1. **fundamentals** - Prerequisites: none
 2. **dfir** - Prerequisites: fundamentals
 3. **malware** - Prerequisites: fundamentals
@@ -47,10 +48,21 @@ c:\Users\yaniv\...\57.14_Learning_app\
 5. **system** - Prerequisites: fundamentals (Windows/Linux internals)
 6. **cloud** - Prerequisites: fundamentals + system (AWS, Azure, GCP)
 7. **pentest** - Prerequisites: fundamentals + active_directory
-8. **redteam** - Prerequisites: pentest + malware
-9. **blueteam** - Prerequisites: dfir + malware
+8. **red_team** - Prerequisites: pentest + malware
+9. **blue_team** - Prerequisites: dfir + malware
+10. **osint** - Prerequisites: fundamentals
+11. **threat_hunting** - Prerequisites: blue_team
+12. **linux** - Prerequisites: fundamentals
 
-**Important**: Keep pentest and redteam separate (different career paths and skill progressions)
+### Emerging Technology Domains (3)
+13. **ai_security** - Prerequisites: fundamentals (Planned - see FEATURES.md)
+14. **iot_security** - Prerequisites: fundamentals + system (Planned)
+15. **web3_security** - Prerequisites: fundamentals (Planned)
+
+**Important Notes:**
+- Keep pentest and red_team separate (different career paths and skill progressions)
+- Domain naming: Use underscores (e.g., `blue_team` not `blueteam`) for consistency
+- Emerging domains are in planning phase - see [lesson_ideas.csv](lesson_ideas.csv) and [FEATURES.md](FEATURES.md)
 
 ## Working with Lessons
 
@@ -143,11 +155,20 @@ python fix_placeholder_prerequisites.py  # Remove invalid prerequisites
 python add_system_cloud_domains.py    # Add system and cloud domains
 ```
 
+### Tagging Scripts
+```bash
+python add_all_tags.py                # Add all 17 system tags to database
+python add_13cubed_tags.py            # Add 13Cubed course tags and auto-tag lessons
+python verify_tags.py                 # Verify all lessons are correctly tagged
+```
+
 ### Content Generation
 ```bash
 python create_lesson_template.py      # Create lesson JSON template
 python fill_lesson_with_ai.py         # AI-assisted content filling
 python create_rich_lesson.py --interactive  # Interactive lesson creator
+python add_lesson_ideas.py            # Add lesson ideas to lesson_ideas.csv
+python add_comprehensive_lesson_ideas.py  # Add 53 comprehensive lesson ideas
 ```
 
 ## Validation Error Troubleshooting
@@ -206,29 +227,65 @@ See [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) for detailed guide.
 4. **Maintain progression**: Easy (1) → Medium (2) → Hard (3)
 5. **Link prerequisites**: Each lesson builds on previous concepts
 
-## Current Status (Latest Update: 2025-10-23)
+## Current Status (Latest Update: 2025-10-30)
 
-- ✅ **45 rich lessons completed** (600,000+ words total)
-- ✅ **9 domains** fully defined with prerequisites
-- ✅ **All validation errors fixed** with comprehensive_fix.py
-- ✅ **82 total lessons** in database (45 rich + 37 placeholders)
-- ✅ **Load scripts** updated for Pydantic V2 (emoji-free output)
+- ✅ **275 total lessons** in database
+- ✅ **12 active domains** (9 core + 3 specialized)
+- ✅ **17 system tags** implemented (Career Path, Course, Package)
+- ✅ **Tagging system** with many-to-many relationships
+- ✅ **Linux Forensics course** (41 lessons, 13Cubed)
+- ✅ **124 lesson ideas** planned in lesson_ideas.csv
+- ✅ **5 planned features** in FEATURES.md
 
-### Domains with Rich Content:
-- **Active Directory**: 8 lessons (Fundamentals → AD CS Exploitation)
-- **Blue Team**: 7 lessons (Fundamentals → Incident Response Automation)
-- **Cloud**: 5 lessons (AWS, Azure, Kubernetes, IAM, Serverless)
-- **DFIR**: 4 lessons (Digital Forensics → Advanced Memory Forensics)
-- **Fundamentals**: 4 lessons (Auth, Encryption, Network, Threat Landscape)
-- **Malware**: 4 lessons (Types → Advanced Reverse Engineering)
-- **Pentest**: 3 lessons (Methodology, Recon, Exploitation)
-- **Red Team**: 6 lessons (Fundamentals → Lazarus Group)
-- **System**: 1 lesson (Windows Internals)
+### Lessons by Domain (Database):
+- **DFIR**: 93 lessons (includes 70 Windows + 41 Linux forensics from 13Cubed courses)
+- **Pentest**: 36 lessons
+- **Red Team**: 19 lessons
+- **Active Directory**: 16 lessons
+- **Blue Team**: 16 lessons
+- **Linux**: 16 lessons
+- **Malware**: 16 lessons
+- **Cloud**: 15 lessons
+- **System**: 15 lessons
+- **Fundamentals**: 13 lessons
+- **OSINT**: 10 lessons
+- **Threat Hunting**: 10 lessons
+
+### Tagging System:
+- **17 system tags** across 3 categories:
+  - **Career Path** (10 tags): SOC Analyst, Pentester, Red Teamer, Blue Teamer, DFIR Specialist, Malware Analyst, Cloud Security, Threat Hunter, GRC Analyst, Security Engineer
+  - **Course** (5 tags): 13Cubed courses (Windows Memory, Windows Endpoints, Linux Forensics), Eric Zimmerman Tools, Log2Timeline/Plaso
+  - **Package** (2 tags): Eric Zimmerman Tools, User Content
+- **Auto-tagging**: Lessons automatically tagged based on order_index ranges
+- **Template database**: Ships with all tags pre-populated
+
+### Lesson Ideas Pipeline (lesson_ideas.csv):
+- **124 lesson ideas** planned across 15 domains
+- **53 new ideas** added 2025-10-30:
+  - Red Team Advanced Operations (7 lessons)
+  - Pentest Web App Security (6 lessons)
+  - Malware Advanced Topics (5 lessons)
+  - Active Directory Advanced (8 lessons)
+  - Linux Security & Hardening (4 lessons)
+  - Fundamentals GRC (3 lessons)
+  - Blue Team Detection Engineering (5 lessons)
+  - OSINT Threat Intel (5 lessons)
+  - AI Security (3 lessons)
+  - IoT Security (4 lessons)
+  - Web3 Security (3 lessons)
+
+### Planned Features (FEATURES.md):
+1. **Single/Multiple JSON Lesson Upload** - High priority
+2. **Lesson Package Import/Export (ZIP)** - High priority
+3. **Add AI Security Domain** - High priority
+4. **Global Lesson Search** - High priority
+5. **Hide/Unhide Lessons** - Medium priority
 
 ### Completion Status:
-- **Target**: 80-100 rich lessons (8-12 per domain)
-- **Current**: 45 rich lessons (56% of minimum target)
-- **Next Priority**: Expand System domain (7 more lessons needed)
+- **Target**: 325+ lessons for comprehensive coverage (8-12 per domain)
+- **Current**: 275 lessons in database
+- **Completion**: 84% of target
+- **Next Priority**: Implement planned features, add AI/IoT/Web3 domains
 
 ## Important Notes
 
@@ -254,28 +311,62 @@ See [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) for detailed guide.
 - Verify in Streamlit app: XP awards, skill updates, prerequisites
 - Check adaptive recommendations: Does engine suggest appropriate lessons?
 
-## Resources
+## Planning & Documentation Files
 
+### Primary Planning
+- **[FEATURES.md](FEATURES.md)** - Master features list (5 planned, 2 completed)
+- **[lesson_ideas.csv](lesson_ideas.csv)** - 124 lesson ideas across 15 domains
+- **[lesson_ideas.json](lesson_ideas.json)** - Linux Forensics course specification (41 lessons)
+- **[UNIVERSAL_LESSON_PROMPT.md](UNIVERSAL_LESSON_PROMPT.md)** - Template for AI lesson generation
+
+### Implementation Guides
 - **[HOW_TO_ADD_NEW_LESSONS.md](HOW_TO_ADD_NEW_LESSONS.md)** - Complete guide with examples and commands
-- [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) - Domain creation guide
-- [FINAL_FIXES_READY.md](FINAL_FIXES_READY.md) - Deployment instructions
-- [SESSION_ACCOMPLISHMENTS.md](SESSION_ACCOMPLISHMENTS.md) - Recent work summary
-- [DOMAINS_ADDED_SUMMARY.md](DOMAINS_ADDED_SUMMARY.md) - System/cloud domains
+- **[ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md)** - Domain creation guide
+- **[FINAL_FIXES_READY.md](FINAL_FIXES_READY.md)** - Deployment instructions
+
+### Recent Work
+- **[SESSION_ACCOMPLISHMENTS.md](SESSION_ACCOMPLISHMENTS.md)** - Recent work summary
+- **[DOMAINS_ADDED_SUMMARY.md](DOMAINS_ADDED_SUMMARY.md)** - System/cloud domains
+
+### Key Differences to Understand
+- **lesson_ideas.csv** vs **lesson_ideas.json**:
+  - CSV = Master curriculum planning for ALL domains (124 lessons)
+  - JSON = Detailed specification for Linux Forensics course only (41 lessons)
+- **lesson_ideas.csv** vs **content/lesson_*.json**:
+  - CSV = Planning/roadmap (lightweight metadata)
+  - JSON = Production content (4,000-5,500 words, full teaching material)
 
 ## Contact & Development
 
-- **Platform**: Adaptive learning with gamification (XP, levels, achievements)
-- **Goal**: Comprehensive cybersecurity education across 9 domains
-- **Target**: 80-100 rich lessons (8-12 per domain)
-- **Current**: 45 rich lessons (56% of minimum target, 600,000+ words)
+- **Platform**: Adaptive cybersecurity learning with gamification (XP, levels, achievements)
+- **Goal**: Comprehensive cybersecurity education across 15 domains
+- **Target**: 325+ lessons (8-12 per domain)
+- **Current**: 275 lessons (84% of target)
+- **Architecture**: FastAPI + Streamlit + SQLite + Pydantic V2
 
+### Development Workflow
 When working on this project:
-- Prioritize content quality over quantity
-- Maintain consistent lesson structure
-- Follow validation requirements strictly
-- **Always run `comprehensive_fix.py` before loading lessons**
-- Test thoroughly before considering complete
-- Document all changes and decisions
+1. **Check FEATURES.md** for planned work and priorities
+2. **Review lesson_ideas.csv** for curriculum gaps
+3. **Follow validation requirements** strictly (use comprehensive_fix.py)
+4. **Test thoroughly** before considering complete:
+   - Run `python load_all_lessons.py`
+   - Test in Streamlit app
+   - Verify tags, XP, prerequisites
+5. **Document all changes** in appropriate files (FEATURES.md, CLAUDE.md, session docs)
+6. **Prioritize quality over quantity** - rich, technical content with real-world examples
+
+### Feature Implementation Priority
+1. **High Priority**: Search, JSON upload, AI domain, package import/export
+2. **Medium Priority**: Hide/unhide lessons
+3. **Future**: See FEATURES.md Future Ideas section
+
+### Recent Major Updates (2025-10-30)
+- ✅ Merged PR #11, #12, #13 (Linux forensics, 75 lessons)
+- ✅ Implemented tagging system (17 tags, many-to-many)
+- ✅ Created FEATURES.md master features list
+- ✅ Added 124 lesson ideas to lesson_ideas.csv
+- ✅ Fixed domain naming consistency (blue_team, red_team)
 
 ## Quick Start for Adding Lessons
 

@@ -1,0 +1,241 @@
+{
+  "lesson_id": "a7f8e9d6-c5b4-4a3b-9e8f-7d6c5b4a3e2f",
+  "domain": "fundamentals",
+  "title": "Git and GitHub Basics for Security Professionals",
+  "difficulty": 1,
+  "order_index": 13,
+  "estimated_time": 50,
+  "prerequisites": [],
+  "concepts": [
+    "Version control fundamentals",
+    "Git repository management",
+    "Branching and merging",
+    "GitHub collaboration",
+    "Pull requests and code review",
+    "Git security best practices",
+    "Commit signing",
+    "Repository security"
+  ],
+  "learning_objectives": [
+    "Understand version control concepts and why Git is essential for security work",
+    "Create and manage Git repositories locally and on GitHub",
+    "Master basic Git commands for daily workflow",
+    "Implement branching strategies for security projects",
+    "Collaborate effectively using GitHub pull requests and issues",
+    "Apply security best practices to Git workflows",
+    "Sign commits with GPG for authentication",
+    "Protect sensitive data in Git repositories"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "title": "Why Git Matters in Cybersecurity",
+      "content": {
+        "text": "Welcome to Git and GitHub! Whether you're tracking malware samples, managing security scripts, collaborating on incident response playbooks, or contributing to open-source security tools, Git is the universal language of version control in cybersecurity.\n\nIn this lesson, you'll learn why Git has become indispensable for security professionals and how to use it effectively.\n\n## What is Git?\n\nGit is a distributed version control system created by Linus Torvalds in 2005. Unlike centralized systems, every Git repository contains the complete history of the project, making it resilient, fast, and perfect for both solo and team work.\n\n## Why Security Professionals Need Git\n\n**1. Script and Tool Management**\nSecurity professionals write countless scripts - from reconnaissance tools to automation frameworks. Git tracks every change, allowing you to:\n- Revert to working versions when experiments fail\n- Document what each script version does\n- Share tools with teammates while maintaining attribution\n- Collaborate on security automation\n\n**2. Incident Response Documentation**\nDuring incidents, you need to track:\n- YARA rules as threats evolve\n- Sigma detection rules\n- IOC lists and threat intelligence\n- Incident timelines and findings\n- Remediation scripts\n\nGit provides the audit trail you need.\n\n**3. Security Research**\nWhen analyzing malware or researching vulnerabilities:\n- Track your analysis notes and findings\n- Version your proof-of-concept code\n- Collaborate with other researchers\n- Maintain reproducible research\n\n**4. Open Source Security**\nThe security community thrives on GitHub:\n- MITRE ATT&CK framework\n- Metasploit Framework\n- Burp Suite extensions\n- Detection rules (Sigma, YARA)\n- CTF write-ups and learning resources\n\n**5. Career Development**\nYour GitHub profile is your security portfolio:\n- Showcase projects to employers\n- Contribute to security tools\n- Build reputation in the community\n- Document your learning journey\n\n## Git vs GitHub: Understanding the Difference\n\n**Git** = The tool (version control system)\n- Runs on your computer\n- Tracks changes locally\n- Works offline\n- Free and open source\n\n**GitHub** = The platform (hosting service)\n- Cloud storage for Git repositories\n- Collaboration features (pull requests, issues, wikis)\n- Social coding (follow, star, fork)\n- CI/CD integration\n- Free for public and private repos\n\n**Alternatives to GitHub:**\n- GitLab (self-hosted option, popular in enterprises)\n- Bitbucket (integrates with Atlassian tools)\n- Gitea (lightweight self-hosted)\n\nBut GitHub dominates the security community, so we'll focus there.\n\n## The Git Mental Model\n\nThink of Git as taking snapshots of your project over time:\n\n```\nSnapshot 1 → Snapshot 2 → Snapshot 3 → Snapshot 4\n   (Initial)   (Added     (Fixed bug)  (New feature)\n              feature)\n```\n\nEach snapshot is called a **commit**. You can:\n- Jump to any snapshot\n- Create alternate timelines (branches)\n- Merge timelines together\n- Compare snapshots\n\nThis is incredibly powerful for security work where you need to experiment safely."
+      },
+      "order": 1
+    },
+    {
+      "type": "code_exercise",
+      "title": "Installing and Configuring Git",
+      "content": {
+        "text": "Let's get Git installed and configured properly. This is crucial because your Git configuration affects commit attribution and security.\n\n## Installation\n\n**Linux (Debian/Ubuntu):**\n```bash\nsudo apt update\nsudo apt install git\n```\n\n**Linux (RHEL/CentOS):**\n```bash\nsudo yum install git\n```\n\n**macOS:**\n```bash\n# Using Homebrew\nbrew install git\n\n# Or install Xcode Command Line Tools\nxcode-select --install\n```\n\n**Windows:**\n1. Download from https://git-scm.com/download/win\n2. Run installer (keep defaults)\n3. Use Git Bash for commands\n\n## Verify Installation\n\n```bash\ngit --version\n# Should output: git version 2.x.x\n```\n\n## Essential Configuration\n\nConfigure your identity (this appears in every commit):\n\n```bash\n# Set your name\ngit config --global user.name \"Your Name\"\n\n# Set your email (use your GitHub email)\ngit config --global user.email \"your.email@example.com\"\n\n# Set default branch name to 'main' (modern standard)\ngit config --global init.defaultBranch main\n\n# Set default editor (choose one)\ngit config --global core.editor \"vim\"      # Linux/Mac\ngit config --global core.editor \"nano\"     # Beginner-friendly\ngit config --global core.editor \"code --wait\"  # VS Code\n\n# Enable colored output\ngit config --global color.ui auto\n```\n\n## View Your Configuration\n\n```bash\n# View all settings\ngit config --list\n\n# View specific setting\ngit config user.name\ngit config user.email\n```\n\n## Configuration Levels\n\nGit has three configuration levels:\n\n1. **--system** (all users): `/etc/gitconfig`\n2. **--global** (your user): `~/.gitconfig` or `~/.config/git/config`\n3. **--local** (specific repo): `.git/config`\n\nLocal overrides global, global overrides system.\n\n## Security Best Practice: Use Different Emails\n\nFor privacy, use GitHub's noreply email:\n\n```bash\n# Find it at: GitHub Settings → Emails → Keep my email private\ngit config --global user.email \"username@users.noreply.github.com\"\n```",
+        "code": "# Complete Git setup\ngit --version\ngit config --global user.name \"Security Pro\"\ngit config --global user.email \"secpro@users.noreply.github.com\"\ngit config --global init.defaultBranch main\ngit config --global color.ui auto\ngit config --list"
+      },
+      "order": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Git Basics: Your First Repository",
+      "content": {
+        "text": "Let's create your first Git repository and learn the fundamental workflow.\n\n## Creating a Repository\n\nThere are two ways to start:\n\n**Option 1: Create a new repository**\n```bash\n# Create project directory\nmkdir security-scripts\ncd security-scripts\n\n# Initialize Git repository\ngit init\n# Output: Initialized empty Git repository in /path/to/security-scripts/.git/\n```\n\n**Option 2: Clone an existing repository**\n```bash\n# Clone from GitHub\ngit clone https://github.com/username/repo-name.git\ncd repo-name\n```\n\n## The Three States of Git\n\nFiles in your Git repository exist in three states:\n\n1. **Modified** - You changed the file but haven't committed\n2. **Staged** - You marked the file to go into the next commit\n3. **Committed** - The file is safely stored in the Git database\n\nThis translates to three areas:\n\n```\nWorking Directory  →  Staging Area  →  Repository\n   (Modified)         (Staged)        (Committed)\n      ↓                   ↓                ↓\n   edit files         git add          git commit\n```\n\n## The Basic Git Workflow\n\n**Step 1: Create or modify files**\n```bash\necho '#!/bin/bash' > port-scanner.sh\necho 'nmap -sV $1' >> port-scanner.sh\nchmod +x port-scanner.sh\n```\n\n**Step 2: Check status**\n```bash\ngit status\n# Output:\n# On branch main\n# Untracked files:\n#   port-scanner.sh\n```\n\n**Step 3: Stage files (prepare for commit)**\n```bash\n# Stage specific file\ngit add port-scanner.sh\n\n# Or stage all changes\ngit add .\n\n# Or stage by pattern\ngit add *.sh\n```\n\n**Step 4: Check status again**\n```bash\ngit status\n# Output:\n# Changes to be committed:\n#   new file: port-scanner.sh\n```\n\n**Step 5: Commit (save snapshot)**\n```bash\ngit commit -m \"Add basic port scanner script\"\n# Output:\n# [main abc1234] Add basic port scanner script\n#  1 file changed, 2 insertions(+)\n```\n\n## Commit Message Best Practices\n\nGood commit messages are crucial for security work:\n\n**Good commit messages:**\n- \"Add Kerberoasting detection rule for Splunk\"\n- \"Fix false positive in ransomware YARA rule\"\n- \"Update incident response playbook with new TTPs\"\n- \"Refactor credential dumping script for stealth\"\n\n**Bad commit messages:**\n- \"update\"\n- \"fix stuff\"\n- \"asdfasdf\"\n- \"final version\" (spoiler: it's never final)\n\n**Format:**\n```\nSubject line (50 chars or less)\n\nDetailed explanation if needed. Explain WHAT changed\nand WHY, not HOW (the code shows how).\n\n- Use bullet points for multiple changes\n- Reference issue numbers: Fixes #123\n- Keep lines under 72 characters\n```\n\n## Viewing History\n\n```bash\n# View commit history\ngit log\n\n# One line per commit (better for quick overview)\ngit log --oneline\n\n# View last 5 commits\ngit log -5\n\n# View commits with file changes\ngit log --stat\n\n# View commits with actual changes\ngit log -p\n\n# Search commits\ngit log --grep=\"malware\"\n\n# View commits by author\ngit log --author=\"YourName\"\n```"
+      },
+      "order": 3
+    },
+    {
+      "type": "code_exercise",
+      "title": "Hands-On: Creating Your First Security Tool Repository",
+      "content": {
+        "text": "Let's create a repository for a simple security tool collection.\n\n## Exercise: Build a Security Toolbox\n\nCreate a repository to track your growing collection of security scripts:\n\n```bash\n# Step 1: Create and initialize repository\nmkdir my-security-toolbox\ncd my-security-toolbox\ngit init\n\n# Step 2: Create README\ncat > README.md << 'EOF'\n# My Security Toolbox\n\nA collection of security scripts and tools for penetration testing and incident response.\n\n## Tools\n\n- port-scanner.sh - Basic port scanning wrapper\n- hash-identifier.sh - Identify hash types\n- log-analyzer.sh - Parse and analyze logs\n\n## Usage\n\nEach tool includes usage instructions in comments.\n\n## License\n\nMIT License - Use freely, attribute appropriately.\nEOF\n\n# Step 3: Create .gitignore (important!)\ncat > .gitignore << 'EOF'\n# Credentials and sensitive data\n*.key\n*.pem\npasswords.txt\nsecrets/\n\n# Log files\n*.log\nlogs/\n\n# Temporary files\n*.tmp\n*.swp\n*~\n\n# OS files\n.DS_Store\nThumbs.db\n\n# IDE files\n.vscode/\n.idea/\nEOF\n\n# Step 4: Create first tool\ncat > port-scanner.sh << 'EOF'\n#!/bin/bash\n# Simple port scanner using nmap\n# Usage: ./port-scanner.sh <target-ip>\n\nif [ -z \"$1\" ]; then\n    echo \"Usage: $0 <target-ip>\"\n    exit 1\nfi\n\necho \"[*] Scanning $1...\"\nnmap -sV -T4 $1\nEOF\n\nchmod +x port-scanner.sh\n\n# Step 5: Stage all files\ngit add .\n\n# Step 6: Check what's staged\ngit status\n\n# Step 7: Make first commit\ngit commit -m \"Initial commit: Add README, .gitignore, and port scanner\"\n\n# Step 8: View your commit\ngit log\n```\n\n## Understanding .gitignore\n\nThe `.gitignore` file is CRITICAL for security:\n\n**Never commit:**\n- Private keys (`.key`, `.pem`)\n- Passwords or credentials\n- API tokens\n- Session cookies\n- Database dumps with real data\n- Compiled malware samples\n\n**Pattern matching:**\n```\n# Ignore specific file\npasswords.txt\n\n# Ignore all files with extension\n*.key\n\n# Ignore directory\nsecrets/\n\n# Ignore files in any directory\n**/credentials.txt\n\n# Don't ignore (override)\n!important.key\n```\n\n## Adding More Tools\n\n```bash\n# Create second tool\ncat > hash-identifier.sh << 'EOF'\n#!/bin/bash\n# Identify hash type\n# Usage: ./hash-identifier.sh <hash>\n\nlength=${#1}\n\ncase $length in\n    32) echo \"Possibly MD5\" ;;\n    40) echo \"Possibly SHA-1\" ;;\n    64) echo \"Possibly SHA-256\" ;;\n    128) echo \"Possibly SHA-512\" ;;\n    *) echo \"Unknown hash type\" ;;\nesac\nEOF\n\nchmod +x hash-identifier.sh\n\n# Quick workflow (stage + commit)\ngit add hash-identifier.sh\ngit commit -m \"Add hash identifier tool\"\n```",
+        "code": "# Complete repository creation workflow\nmkdir my-security-toolbox && cd my-security-toolbox\ngit init\necho '# My Security Toolbox' > README.md\necho '*.key' > .gitignore\necho '*.log' >> .gitignore\ngit add .\ngit commit -m \"Initial commit\"\ngit log --oneline"
+      },
+      "order": 4
+    },
+    {
+      "type": "explanation",
+      "title": "Branching: Experimenting Safely",
+      "content": {
+        "text": "Branching is Git's killer feature. It lets you experiment without breaking your working code - perfect for security research where you need to test multiple approaches.\n\n## What is a Branch?\n\nA branch is an independent line of development. Think of it as a parallel universe where you can make changes without affecting the main timeline.\n\n```\nmain:     A---B---C---D\n               \\\n feature:        E---F\n```\n\n## Why Branch?\n\n**In Security Work:**\n- Test new detection rules without breaking production\n- Experiment with exploit modifications\n- Develop new features for your tools\n- Work on multiple investigations simultaneously\n- Collaborate without conflicts\n\n## Basic Branch Commands\n\n```bash\n# List all branches (* = current)\ngit branch\n\n# Create new branch\ngit branch feature-new-scanner\n\n# Switch to branch\ngit checkout feature-new-scanner\n# Or use newer command\ngit switch feature-new-scanner\n\n# Create and switch in one command\ngit checkout -b feature-new-scanner\n# Or\ngit switch -c feature-new-scanner\n\n# View all branches (including remote)\ngit branch -a\n\n# Delete branch\ngit branch -d feature-name\n\n# Force delete (unmerged changes)\ngit branch -D feature-name\n```\n\n## Branching Workflow Example\n\n**Scenario:** You want to add a vulnerability scanner but don't want to break your working port scanner.\n\n```bash\n# Start on main branch\ngit checkout main\n\n# Create feature branch\ngit checkout -b feature-vuln-scanner\n\n# Make your changes\ncat > vuln-scanner.sh << 'EOF'\n#!/bin/bash\n# Vulnerability scanner using nmap NSE scripts\nnmap --script vuln $1\nEOF\n\nchmod +x vuln-scanner.sh\n\n# Commit on feature branch\ngit add vuln-scanner.sh\ngit commit -m \"Add vulnerability scanner using NSE\"\n\n# Switch back to main (vuln-scanner.sh disappears!)\ngit checkout main\nls  # No vuln-scanner.sh here\n\n# Switch back to feature (it's back!)\ngit checkout feature-vuln-scanner\nls  # vuln-scanner.sh is here\n```\n\n## Merging Branches\n\nOnce your feature works, merge it back to main:\n\n```bash\n# Switch to main\ngit checkout main\n\n# Merge feature branch\ngit merge feature-vuln-scanner\n\n# Delete feature branch (optional)\ngit branch -d feature-vuln-scanner\n```\n\n## Common Branching Strategies\n\n**1. Feature Branch Workflow (Recommended for small teams)**\n```\nmain (stable)\n  |\n  ├─ feature-1 (new detection rule)\n  ├─ feature-2 (fix false positive)\n  └─ feature-3 (update documentation)\n```\n\n**2. Gitflow (Complex projects)**\n```\nmain (production)\n  └─ develop (integration)\n       ├─ feature branches\n       ├─ release branches\n       └─ hotfix branches\n```\n\n**3. Trunk-Based (Simple projects)**\n```\nmain (everything happens here)\n  └─ short-lived feature branches\n```\n\n## Branch Naming Conventions\n\n**Good names:**\n- `feature/yara-rule-emotet`\n- `fix/false-positive-mimikatz`\n- `doc/update-readme`\n- `experiment/new-evasion-technique`\n\n**Bad names:**\n- `test`\n- `mybranch`\n- `asdf`\n- `final` (again, never final)\n\n## Viewing Branch Differences\n\n```bash\n# Compare branches\ngit diff main..feature-vuln-scanner\n\n# List commits in feature not in main\ngit log main..feature-vuln-scanner\n\n# Show branches merged into main\ngit branch --merged main\n\n# Show branches not yet merged\ngit branch --no-merged main\n```"
+      },
+      "order": 5
+    },
+    {
+      "type": "explanation",
+      "title": "GitHub: Collaborating with the Security Community",
+      "content": {
+        "text": "Now let's connect your local Git repository to GitHub and learn how to collaborate effectively.\n\n## Creating a GitHub Account\n\n1. Go to https://github.com\n2. Sign up (use a professional username)\n3. Verify your email\n4. Set up two-factor authentication (CRITICAL for security)\n\n## Creating a GitHub Repository\n\n**Via Web Interface:**\n1. Click '+' → 'New repository'\n2. Name: `my-security-toolbox`\n3. Description: \"Security scripts and tools\"\n4. Public or Private\n5. Don't initialize with README (we already have one)\n6. Click 'Create repository'\n\n## Connecting Local Repository to GitHub\n\nGitHub will show you commands like this:\n\n```bash\n# Add GitHub as remote\ngit remote add origin https://github.com/username/my-security-toolbox.git\n\n# Verify remote\ngit remote -v\n# Output:\n# origin  https://github.com/username/my-security-toolbox.git (fetch)\n# origin  https://github.com/username/my-security-toolbox.git (push)\n\n# Push to GitHub\ngit push -u origin main\n```\n\nThe `-u` flag sets 'origin main' as the default, so future pushes are just `git push`.\n\n## Authentication Methods\n\n**Personal Access Token (Recommended):**\n\n1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)\n2. Generate new token\n3. Select scopes: `repo` (full control of private repositories)\n4. Copy token (you won't see it again!)\n5. Use token as password when pushing:\n   ```bash\n   git push\n   Username: your-username\n   Password: ghp_yourpersonalaccesstoken\n   ```\n\n**SSH Keys (Power User Method):**\n\n```bash\n# Generate SSH key\nssh-keygen -t ed25519 -C \"your_email@example.com\"\n\n# Start SSH agent\neval \"$(ssh-agent -s)\"\n\n# Add key\nssh-add ~/.ssh/id_ed25519\n\n# Copy public key\ncat ~/.ssh/id_ed25519.pub\n\n# Add to GitHub: Settings → SSH and GPG keys → New SSH key\n# Paste the public key\n\n# Test connection\nssh -T git@github.com\n\n# Use SSH URL for remote\ngit remote set-url origin git@github.com:username/my-security-toolbox.git\n```\n\n## The GitHub Workflow\n\n**Daily workflow:**\n\n```bash\n# 1. Start your day: Pull latest changes\ngit pull origin main\n\n# 2. Create feature branch\ngit checkout -b feature-new-tool\n\n# 3. Make changes, commit locally\ngit add new-tool.sh\ngit commit -m \"Add new reconnaissance tool\"\n\n# 4. Push branch to GitHub\ngit push origin feature-new-tool\n\n# 5. Create Pull Request on GitHub\n# (We'll cover this next)\n\n# 6. After PR is merged, update local main\ngit checkout main\ngit pull origin main\n\n# 7. Delete feature branch\ngit branch -d feature-new-tool\n```\n\n## Cloning Others' Repositories\n\n```bash\n# Clone any public repository\ngit clone https://github.com/danielmiessler/SecLists.git\ncd SecLists\n\n# View branches\ngit branch -a\n\n# Check out specific branch\ngit checkout -b local-branch origin/remote-branch\n```\n\n## Forking: Contributing to Open Source\n\n**Fork workflow:**\n\n1. **Fork** on GitHub (creates your copy)\n2. **Clone** your fork:\n   ```bash\n   git clone https://github.com/YOUR-USERNAME/project.git\n   cd project\n   ```\n3. **Add upstream** (original repo):\n   ```bash\n   git remote add upstream https://github.com/ORIGINAL-OWNER/project.git\n   ```\n4. **Create feature branch**:\n   ```bash\n   git checkout -b fix-typo\n   ```\n5. **Make changes and commit**\n6. **Push to your fork**:\n   ```bash\n   git push origin fix-typo\n   ```\n7. **Create Pull Request** on GitHub\n\n## Keeping Your Fork Updated\n\n```bash\n# Fetch changes from original repo\ngit fetch upstream\n\n# Merge into your main\ngit checkout main\ngit merge upstream/main\n\n# Push to your fork\ngit push origin main\n```"
+      },
+      "order": 6
+    },
+    {
+      "type": "explanation",
+      "title": "Pull Requests: Code Review and Collaboration",
+      "content": {
+        "text": "Pull Requests (PRs) are how teams review and merge code. They're essential for collaborative security projects.\n\n## What is a Pull Request?\n\nA Pull Request says: \"I have changes on my branch, please review and merge them into main.\"\n\nIt's called a \"pull\" request because you're asking the repository owner to pull your changes.\n\n## Creating a Pull Request\n\n**Via GitHub Web Interface:**\n\n1. Push your branch to GitHub:\n   ```bash\n   git push origin feature-new-detection-rule\n   ```\n\n2. Visit your repository on GitHub\n3. Click \"Compare & pull request\" (appears after push)\n4. Fill in PR template:\n   - **Title:** Clear, descriptive (like commit message)\n   - **Description:** Explain what, why, how\n   - **Screenshots:** If UI changes\n   - **Testing:** How you tested\n   - **Related Issues:** Reference #123\n\n5. Request reviewers\n6. Add labels (bug, enhancement, security)\n7. Click \"Create pull request\"\n\n## Good PR Description Template\n\n```markdown\n## Summary\nAdds new YARA rule to detect Emotet malware variants.\n\n## Changes\n- Created emotet-detection.yar with 3 signatures\n- Updated README with new rule\n- Added test cases\n\n## Testing\n- Tested against 50 known Emotet samples: 48/50 detected\n- Ran against 1000 benign files: 0 false positives\n- Validated YARA syntax with yara-validator\n\n## References\n- MITRE ATT&CK: T1566 (Phishing)\n- Related issue: #456\n- Research: https://example.com/emotet-analysis\n\n## Checklist\n- [x] Code follows project style guide\n- [x] Comments added for complex logic\n- [x] Documentation updated\n- [x] Tests pass\n- [ ] Reviewed by security lead (pending)\n```\n\n## Code Review Process\n\n**As a reviewer:**\n- Read the code thoroughly\n- Test locally if possible\n- Look for:\n  - Security vulnerabilities\n  - Logic errors\n  - Code quality issues\n  - False positive potential\n  - Performance concerns\n\n**Commenting:**\n```\n# Good comments\n\"This regex could cause catastrophic backtracking. Consider: ...\"\n\"Great catch! This covers the latest Emotet variant.\"\n\"Could we add a check for empty input here?\"\n\n# Bad comments\n\"This is bad.\"\n\"Why did you do it this way?\"\n\"Doesn't work.\" (without explaining)\n```\n\n**As an author:**\n- Respond to all comments\n- Make requested changes\n- Push updates (they automatically appear in PR)\n- Thank reviewers\n- Don't take criticism personally\n\n## PR Workflow\n\n```bash\n# Reviewer requests changes\n# You update the code locally\nvim emotet-detection.yar\n\n# Commit changes\ngit add emotet-detection.yar\ngit commit -m \"Fix regex backtracking issue\"\n\n# Push (updates PR automatically)\ngit push origin feature-emotet-detection\n\n# Reviewer approves\n# You or maintainer merges PR\n\n# Clean up\ngit checkout main\ngit pull origin main\ngit branch -d feature-emotet-detection\n```\n\n## Handling Merge Conflicts\n\nConflicts occur when the same file is modified in different ways:\n\n```bash\n# Pull latest main\ngit checkout main\ngit pull origin main\n\n# Attempt to merge your feature\ngit checkout feature-branch\ngit merge main\n\n# Conflict! Git marks the file:\ncat conflicted-file.sh\n# <<<<<<< HEAD (your changes)\n# Your code\n# =======\n# Their code\n# >>>>>>> main\n\n# Edit file to resolve\nvim conflicted-file.sh\n# Remove markers, keep correct code\n\n# Mark as resolved\ngit add conflicted-file.sh\ngit commit -m \"Resolve merge conflict\"\n\n# Push resolved version\ngit push origin feature-branch\n```\n\n## GitHub Issues\n\nIssues track bugs, features, and tasks:\n\n**Creating an issue:**\n1. Go to repository → Issues → New issue\n2. Title: \"False positive in Mimikatz detection rule\"\n3. Description:\n   ```markdown\n   ## Description\n   Rule triggers on legitimate Windows administration tools.\n   \n   ## Steps to Reproduce\n   1. Run rule against psexec.exe\n   2. Observe false positive\n   \n   ## Expected Behavior\n   Should not trigger on legitimate tools.\n   \n   ## Suggested Fix\n   Add additional conditions to rule.\n   ```\n4. Add labels: bug, priority-high\n5. Assign to someone\n6. Submit\n\n**Closing issues via commits:**\n```bash\ngit commit -m \"Fix Mimikatz false positive. Fixes #123\"\n# When merged, issue #123 auto-closes\n```"
+      },
+      "order": 7
+    },
+    {
+      "type": "explanation",
+      "title": "Git Security Best Practices",
+      "content": {
+        "text": "As security professionals, we must practice what we preach. Here's how to use Git securely.\n\n## 1. Never Commit Secrets\n\n**What NOT to commit:**\n- API keys\n- Passwords\n- Private keys (SSH, TLS, GPG)\n- Database credentials\n- Session tokens\n- AWS access keys\n- OAuth tokens\n\n**Prevention:**\n\n```bash\n# Use .gitignore\ncat >> .gitignore << EOF\n# Secrets\n*.key\n*.pem\n.env\nsecrets.yml\nconfig/credentials.yml\nEOF\n\n# Check what you're committing\ngit diff --staged\n\n# Use git-secrets (AWS tool)\ngit clone https://github.com/awslabs/git-secrets.git\ncd git-secrets\nsudo make install\n\n# Install in repo\ncd your-repo\ngit secrets --install\ngit secrets --register-aws\n```\n\n**If you commit a secret by accident:**\n\n```bash\n# DANGER: Rewrites history\ngit filter-branch --force --index-filter \\\n  'git rm --cached --ignore-unmatch secrets.txt' \\\n  --prune-empty --tag-name-filter cat -- --all\n\n# Or use BFG Repo-Cleaner (easier)\nbfg --delete-files secrets.txt\n```\n\n**Important:** Rewriting history doesn't help if already pushed! Anyone who cloned the repo has the secret. You must:\n1. Revoke/rotate the compromised credential\n2. Clean the history\n3. Force push (warning: affects collaborators)\n\n## 2. Sign Your Commits\n\nCommit signing proves you wrote the code:\n\n```bash\n# Generate GPG key\ngpg --full-generate-key\n# Choose: (1) RSA and RSA\n# Key size: 4096\n# Valid for: 1y (renew yearly)\n# Enter name and email\n\n# List keys\ngpg --list-secret-keys --keyid-format=long\n\n# Copy key ID (after sec rsa4096/)\n# Example: rsa4096/ABCD1234\n\n# Export public key\ngpg --armor --export ABCD1234\n\n# Add to GitHub: Settings → SSH and GPG keys → New GPG key\n\n# Configure Git to sign\ngit config --global user.signingkey ABCD1234\ngit config --global commit.gpgsign true\n\n# Sign commits\ngit commit -S -m \"Signed commit\"\n\n# Verify signature\ngit log --show-signature\n```\n\n## 3. Enable 2FA on GitHub\n\n1. Settings → Password and authentication\n2. Enable two-factor authentication\n3. Use authenticator app (Google Authenticator, Authy)\n4. Save recovery codes securely\n\n## 4. Review Dependencies\n\nWhen cloning repos:\n\n```bash\n# Check who owns the repo\n# Look at commit history\ngit log --all --format='%aN <%aE>' | sort -u\n\n# Check recent activity\ngit log --since=\"1 month ago\" --oneline\n\n# Review what you're about to run\ncat install.sh  # Before running!\n\n# Check for suspicious files\nfind . -name \"*.exe\" -o -name \"*.dll\" -o -name \"*.sh\"\n```\n\n## 5. Protect Main Branch\n\n**On GitHub:**\n1. Settings → Branches → Add rule\n2. Branch name pattern: `main`\n3. Enable:\n   - Require pull request reviews (at least 1)\n   - Require status checks\n   - Require signed commits\n   - Include administrators\n4. Save\n\nNow no one (including you) can push directly to main.\n\n## 6. Audit Repository Access\n\n```bash\n# View who has access (repo settings)\nSettings → Manage access\n\n# Review webhook configurations\nSettings → Webhooks\n\n# Check deploy keys\nSettings → Deploy keys\n\n# Monitor security alerts\nSecurity → Security advisories\n```\n\n## 7. Use Private Repositories for Sensitive Work\n\n- Security research\n- Internal tools\n- Client projects\n- Unpublished exploits\n- Red team infrastructure\n\n## 8. Regular Security Practices\n\n```bash\n# Keep Git updated\ngit --version\nsudo apt update && sudo apt upgrade git\n\n# Review .git/config for suspicious remotes\ncat .git/config\n\n# Check for hooks (can execute code)\nls -la .git/hooks/\n\n# Verify remote URLs\ngit remote -v\n```\n\n## 9. Malware Research Repositories\n\nSpecial considerations:\n\n```bash\n# Use .gitattributes to mark malware\ncat > .gitattributes << EOF\n*.exe binary\n*.dll binary\nmalware-samples/** binary\nEOF\n\n# Use Git LFS for large files\ngit lfs track \"*.exe\"\n\n# Add disclaimer to README\ncat >> README.md << EOF\n## ⚠️ WARNING\n\nThis repository contains malware samples for research purposes.\n\n**DO NOT RUN ON PRODUCTION SYSTEMS**\n\nAll samples are password-protected (password: infected)\nUse only in isolated environments.\nEOF\n```\n\n## 10. License Your Work\n\nAlways include a LICENSE file:\n\n```bash\n# Common licenses for security tools\n# MIT - Permissive\n# GPL-3.0 - Copyleft\n# Apache-2.0 - Permissive with patent grant\n\n# Add LICENSE file\nwget https://raw.githubusercontent.com/licenses/license-templates/master/templates/mit.txt -O LICENSE\n\n# Commit it\ngit add LICENSE\ngit commit -m \"Add MIT license\"\n```"
+      },
+      "order": 8
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Git Scenarios in Security",
+      "content": {
+        "text": "Let's look at how Git is used in actual security scenarios.\n\n## Scenario 1: Incident Response\n\n**Situation:** Ransomware attack, you're creating IOCs and detection rules.\n\n```bash\n# Create incident repository\nmkdir incident-2024-01-15-ransomware\ncd incident-2024-01-15-ransomware\ngit init\n\n# Structure the investigation\nmkdir -p {\n  iocs/{\n    ips,domains,hashes,yara\n  },\n  evidence/screenshots,\n  notes,\n  timeline,\n  remediation\n}\n\n# Add .gitignore\ncat > .gitignore << EOF\n# Sensitive incident data\nevidence/memory-dumps/\nevidence/disk-images/\nvictim-names.txt\nEOF\n\n# Initial commit\ngit add .\ngit commit -m \"Initialize incident 2024-01-15 structure\"\n\n# As you find IOCs\necho \"192.168.1.100\" > iocs/ips/c2-servers.txt\ngit add iocs/ips/c2-servers.txt\ngit commit -m \"Add C2 server IP from packet capture\"\n\n# Create YARA rule\ncat > iocs/yara/ransomware-variant.yar << EOF\nrule Ransomware_Variant_Jan2024 {\n    meta:\n        description = \"Detects January 2024 ransomware variant\"\n        author = \"IR Team\"\n        date = \"2024-01-15\"\n    strings:\n        $string1 = \"YOUR FILES HAVE BEEN ENCRYPTED\" ascii\n        $string2 = \"ransom.txt\" ascii\n    condition:\n        all of them\n}\nEOF\n\ngit add iocs/yara/ransomware-variant.yar\ngit commit -m \"Add YARA rule for ransomware detection\"\n\n# Create timeline\ncat > timeline/events.md << EOF\n# Incident Timeline\n\n## 2024-01-15\n\n- 08:23 - First alert: Unusual encryption activity\n- 08:45 - Confirmed ransomware, isolated affected hosts\n- 09:30 - Identified C2 server: 192.168.1.100\n- 10:00 - Blocked C2 at firewall\n- 11:00 - Created YARA rule for detection\nEOF\n\ngit add timeline/events.md\ngit commit -m \"Update timeline with morning events\"\n\n# End of day: Push to secure internal GitLab\ngit remote add origin git@gitlab.internal.company.com:ir/incident-2024-01-15.git\ngit push -u origin main\n```\n\n## Scenario 2: Red Team Campaign\n\n**Situation:** Multi-week engagement, tracking tools and infrastructure.\n\n```bash\n# Create campaign repo\nmkdir campaign-megacorp-2024\ncd campaign-megacorp-2024\ngit init\n\n# Directory structure\nmkdir -p {\n  infrastructure/{\n    ansible,terraform,configs\n  },\n  payloads/{\n    droppers,implants,stagers\n  },\n  tools/scripts,\n  recon/{\n    osint,scanning,screenshots\n  },\n  reporting\n}\n\n# Add .gitignore for sensitive data\ncat > .gitignore << EOF\n# Target information\ntargets.txt\nemployee-lists/\n\n# Live credentials\ncredentials/\n*.kirbi\n*.ccache\n\n# Infrastructure IPs\ninfrastructure/live-ips.txt\n\n# Session data\n*.sessions\nEOF\n\n# Track infrastructure as code\ncat > infrastructure/terraform/c2-server.tf << EOF\nresource \"aws_instance\" \"c2_server\" {\n  ami           = var.kali_ami\n  instance_type = \"t2.medium\"\n  key_name      = var.ssh_key_name\n  \n  tags = {\n    Name = \"legitimate-business-app\"\n  }\n}\nEOF\n\ngit add infrastructure/\ngit commit -m \"Add C2 infrastructure Terraform config\"\n\n# Version payloads\ncp latest-implant.exe payloads/implants/implant-v1.0.exe\ngit add payloads/implants/implant-v1.0.exe\ngit commit -m \"Add implant v1.0 - initial version\"\n\n# Update after AV evasion\ncp evasion-updated-implant.exe payloads/implants/implant-v1.1.exe\ngit add payloads/implants/implant-v1.1.exe\ngit commit -m \"Add implant v1.1 - AV evasion improvements\"\n\n# Track what works\ncat > reporting/techniques-log.md << EOF\n# Techniques Used\n\n## Initial Access\n- [SUCCESS] Phishing with macro-enabled document\n- [FAILED] USB drop (no bites)\n\n## Execution\n- [SUCCESS] PowerShell Empire\n- [DETECTION] Cobalt Strike beacon (caught by EDR)\n\n## Persistence\n- [SUCCESS] Scheduled task\n- [SUCCESS] Registry run key\nEOF\n\ngit add reporting/techniques-log.md\ngit commit -m \"Document successful and failed techniques\"\n```\n\n## Scenario 3: Contributing to MITRE ATT&CK\n\n**Situation:** You discovered a new technique and want to contribute.\n\n```bash\n# Fork MITRE ATT&CK on GitHub\n# Clone your fork\ngit clone https://github.com/YOUR-USERNAME/attack-website.git\ncd attack-website\n\n# Add upstream\ngit remote add upstream https://github.com/mitre-attack/attack-website.git\n\n# Create feature branch\ngit checkout -b new-technique-cloud-api-abuse\n\n# Make changes to technique files\nvim content/techniques/T1234.md\n\n# Commit with detailed message\ngit add content/techniques/T1234.md\ngit commit -m \"Add T1234: Cloud API Abuse\n\nThis technique describes how adversaries abuse legitimate cloud\nservice APIs to maintain persistence and evade detection.\n\nIncludes:\n- Detailed description\n- Real-world examples (SolarWinds, CloudHopper)\n- Detection methods\n- Mitigation strategies\n\nReferences:\n- CVE-2023-XXXXX\n- Research: https://example.com/cloud-api-abuse\"\n\n# Push to your fork\ngit push origin new-technique-cloud-api-abuse\n\n# Create PR on GitHub\n# Wait for MITRE team review\n```\n\n## Scenario 4: Managing Security Scripts Across Teams\n\n**Situation:** SOC team sharing detection scripts.\n\n```bash\n# Clone team repository\ngit clone git@gitlab.company.com:soc/detection-scripts.git\ncd detection-scripts\n\n# Create feature branch for your detection\ngit checkout -b detection-suspicious-powershell\n\n# Create detection script\ncat > splunk/suspicious-powershell.spl << EOF\nindex=windows EventCode=4688\n| where match(CommandLine, \"(?i)-(enc|encodedcommand|nop|noprofile)\")\n| stats count by Computer, User, CommandLine\n| where count > 5\nEOF\n\n# Test locally\n# Once working, commit\ngit add splunk/suspicious-powershell.spl\ngit commit -m \"Add detection for suspicious PowerShell\n\nDetects PowerShell with common evasion flags:\n- EncodedCommand\n- NoProfile\n- NonInteractive\n\nTested against 3 months of logs: 12 true positives, 0 false positives.\n\nMaps to MITRE ATT&CK T1059.001 (PowerShell)\"\n\n# Push and create PR\ngit push origin detection-suspicious-powershell\n\n# Team reviews, requests changes\n# You update\nvim splunk/suspicious-powershell.spl\ngit add splunk/suspicious-powershell.spl\ngit commit -m \"Reduce false positives in PowerShell detection\"\ngit push\n\n# Approved and merged\n# Update local main\ngit checkout main\ngit pull origin main\n\n# Delete feature branch\ngit branch -d detection-suspicious-powershell\n```"
+      },
+      "order": 9
+    },
+    {
+      "type": "memory_aid",
+      "title": "Git Command Cheat Sheet",
+      "content": {
+        "text": "## Essential Git Commands (Memorize These)\n\n### Setup & Configuration\n```bash\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"email@example.com\"\ngit config --list                    # View all settings\n```\n\n### Creating & Cloning\n```bash\ngit init                            # Create new repo\ngit clone <url>                     # Clone existing repo\n```\n\n### Basic Workflow\n```bash\ngit status                          # Check status\ngit add <file>                      # Stage file\ngit add .                           # Stage all changes\ngit commit -m \"message\"             # Commit staged changes\ngit push                            # Push to remote\ngit pull                            # Pull from remote\n```\n\n### Branching\n```bash\ngit branch                          # List branches\ngit branch <name>                   # Create branch\ngit checkout <branch>               # Switch branch\ngit checkout -b <name>              # Create & switch\ngit merge <branch>                  # Merge branch\ngit branch -d <name>                # Delete branch\n```\n\n### History & Inspection\n```bash\ngit log                             # View commits\ngit log --oneline                   # Compact view\ngit diff                            # Show changes\ngit show <commit>                   # Show commit details\n```\n\n### Remote Operations\n```bash\ngit remote -v                       # List remotes\ngit remote add origin <url>         # Add remote\ngit push -u origin main             # Push & set upstream\ngit fetch                           # Fetch from remote\ngit pull                            # Fetch + merge\n```\n\n### Undoing Changes\n```bash\ngit checkout -- <file>              # Discard changes\ngit reset HEAD <file>               # Unstage file\ngit revert <commit>                 # Revert commit\ngit reset --hard HEAD               # Reset to last commit (DANGER)\n```\n\n## Memory Mnemonics\n\n**The Git Cycle (SAC):**\n- **S**tatus (git status)\n- **A**dd (git add)\n- **C**ommit (git commit)\n\n**Branch Operations (CBC-MD):**\n- **C**reate (git branch name)\n- **B**ranch list (git branch)\n- **C**heckout (git checkout name)\n- **M**erge (git merge name)\n- **D**elete (git branch -d name)\n\n**Remote Dance (FAP):**\n- **F**etch (git fetch)\n- **A**dd (git remote add)\n- **P**ush (git push)\n\n**Commit Message Formula:**\n- **A**ction (Add/Fix/Update/Remove)\n- **S**ubject (what changed)\n- **R**eason (why it changed)\n\nExample: \"Fix false positive in malware detection (improved accuracy)\""
+      },
+      "order": 10
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Building Your Git Confidence",
+      "content": {
+        "text": "Git can feel overwhelming at first, but remember: every security professional you admire had to learn it too. Here's how to build your confidence:\n\n## Start Small\n\nYou don't need to master Git to use it effectively. Focus on:\n1. Creating repos\n2. Making commits\n3. Pushing to GitHub\n\nThat's 90% of daily Git usage. The advanced stuff comes with time.\n\n## Make Mistakes\n\nGit is forgiving (that's its whole point!). Try things:\n- Create test repositories to experiment\n- Break things deliberately\n- Practice recovery techniques\n- You can't break Git itself\n\n## Practice Daily\n\nMake Git part of your routine:\n- Track your learning notes in a Git repo\n- Version your security scripts\n- Contribute to one open-source project\n- Document your labs and CTF write-ups\n\n## Join the Community\n\nYour GitHub profile is your security portfolio:\n- Start with simple scripts\n- Contribute to documentation (easy first PRs)\n- Engage with projects you use\n- Share your learning journey\n\n## Real-World Impact\n\nEvery command you learn:\n- Makes collaboration easier\n- Prevents catastrophic mistakes\n- Builds your professional reputation\n- Opens career opportunities\n\nSecurity hiring managers look at GitHub profiles. Your commits tell your story.\n\n## Git is Your Safety Net\n\nWith Git, you can:\n- Experiment without fear\n- Recover from mistakes\n- Track your progress\n- Collaborate effectively\n- Build a public portfolio\n\nYou've got this! Start with a simple project today and commit something - anything. That's how mastery begins.\n\n## Next Steps\n\n1. Create your first GitHub repository\n2. Push your security notes or scripts\n3. Star some projects that interest you\n4. Follow security professionals\n5. Make your first contribution to open source\n\nWelcome to the Git-powered security community!"
+      },
+      "order": 11
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e",
+      "question": "What is the primary difference between Git and GitHub?",
+      "difficulty": 1,
+      "options": [
+        "A) Git is a tool for version control, GitHub is a cloud hosting platform for Git repositories",
+        "B) Git is made by Microsoft, GitHub is open source",
+        "C) Git only works on Linux, GitHub works on all platforms",
+        "D) Git is for individuals, GitHub is for teams"
+      ],
+      "correct_answer": "A",
+      "explanation": "Git is the version control system (the tool) that runs on your computer, while GitHub is a cloud-based hosting service that provides a platform for storing Git repositories and collaborating with others. Git works offline, GitHub provides online collaboration features like pull requests, issues, and wikis.",
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f",
+      "question": "Which command creates a new Git repository in the current directory?",
+      "options": [
+        "A) git new",
+        "B) git start",
+        "C) git init",
+        "D) git create"
+      ],
+      "correct_answer": "C",
+      "explanation": "The 'git init' command initializes a new Git repository in the current directory by creating a hidden .git folder that stores all version control metadata. This is the first step when starting a new Git-tracked project.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "d3e4f5a6-b7c8-4d9e-0f1a-2b3c4d5e6f7a",
+      "question": "What is the correct order of operations to save changes in Git?",
+      "options": [
+        "A) git commit → git add → git push",
+        "B) git add → git commit → git push",
+        "C) git push → git add → git commit",
+        "D) git commit → git push → git add"
+      ],
+      "correct_answer": "B",
+      "explanation": "The correct Git workflow is: 1) 'git add' stages your changes (prepares them), 2) 'git commit' saves the staged changes to your local repository with a message, and 3) 'git push' uploads your commits to the remote repository (like GitHub). This follows the Working Directory → Staging Area → Repository flow.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "e4f5a6b7-c8d9-4e0f-1a2b-3c4d5e6f7a8b",
+      "question": "Why should you NEVER commit API keys or passwords to a Git repository?",
+      "options": [
+        "A) It makes the repository too large",
+        "B) Once committed, the secrets are in the Git history forever, even if deleted later",
+        "C) Git doesn't support text files with credentials",
+        "D) It slows down git push operations"
+      ],
+      "correct_answer": "B",
+      "explanation": "Once you commit secrets to Git, they become part of the repository's history permanently. Even if you delete the file in a later commit, the secret remains in the Git history and anyone with access can retrieve it. This is why .gitignore is critical for security files, and why you must rotate/revoke any accidentally committed credentials.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "f5a6b7c8-d9e0-4f1a-2b3c-4d5e6f7a8b9c",
+      "question": "What is a Git branch?",
+      "options": [
+        "A) A backup copy of your repository",
+        "B) An independent line of development that lets you work on features without affecting the main code",
+        "C) A folder in your Git repository",
+        "D) A remote repository on GitHub"
+      ],
+      "correct_answer": "B",
+      "explanation": "A Git branch is an independent line of development that allows you to work on new features, bug fixes, or experiments without affecting the main (production) code. Branches let you create parallel development timelines that can later be merged back together, making them essential for safe experimentation and team collaboration.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d",
+      "question": "What is the purpose of a Pull Request (PR) on GitHub?",
+      "options": [
+        "A) To pull the latest changes from a repository",
+        "B) To request that your code changes be reviewed and merged into another branch",
+        "C) To download a repository to your computer",
+        "D) To request permission to view a private repository"
+      ],
+      "correct_answer": "B",
+      "explanation": "A Pull Request (PR) is a GitHub feature that lets you notify project maintainers that you have changes ready to be reviewed and merged. It provides a platform for code review, discussion, and collaboration before the changes are merged into the main branch. PRs are essential for team collaboration and open-source contribution.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "b7c8d9e0-f1a2-4b3c-4d5e-6f7a8b9c0d1e",
+      "question": "Which file should you create to prevent Git from tracking sensitive files like API keys?",
+      "options": [
+        "A) .gitkeep",
+        "B) .gitignore",
+        "C) .gitblock",
+        "D) .gitsecret"
+      ],
+      "correct_answer": "B",
+      "explanation": "The .gitignore file tells Git which files or patterns to ignore and never track. This is critical for security - you should add patterns like '*.key', '*.pem', 'secrets/', and 'credentials.txt' to prevent accidentally committing sensitive data. This file should be one of the first things you create in any security-related repository.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    },
+    {
+      "question_id": "c8d9e0f1-a2b3-4c4d-5e6f-7a8b9c0d1e2f",
+      "question": "What does 'git commit -S' do?",
+      "options": [
+        "A) Creates a silent commit with no message",
+        "B) Signs the commit with your GPG key to prove authenticity",
+        "C) Saves the commit to a secure location",
+        "D) Synchronizes the commit with the remote immediately"
+      ],
+      "correct_answer": "B",
+      "explanation": "The -S flag signs your commit with your GPG (GNU Privacy Guard) key, creating a cryptographic signature that proves you authored the commit. This is important for security projects and open-source contribution, as it prevents impersonation and ensures code authenticity. GitHub displays a 'Verified' badge on signed commits.",
+      "difficulty": 1,
+      "type": "multiple_choice"
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "memory_hooks",
+    "gamify_it",
+    "multiple_memory_pathways"
+  ]
+}
