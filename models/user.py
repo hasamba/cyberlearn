@@ -35,6 +35,9 @@ class SkillLevels(BaseModel):
     red_team: int = Field(default=0, ge=0, le=100)
     blue_team: int = Field(default=0, ge=0, le=100)
     threat_hunting: int = Field(default=0, ge=0, le=100)
+    ai_security: int = Field(default=0, ge=0, le=100)
+    iot_security: int = Field(default=0, ge=0, le=100)
+    web3_security: int = Field(default=0, ge=0, le=100)
 
     def get_overall_level(self) -> int:
         """Calculate overall skill level across all domains"""
@@ -50,7 +53,10 @@ class SkillLevels(BaseModel):
             self.pentest,
             self.red_team,
             self.blue_team,
-            self.threat_hunting
+            self.threat_hunting,
+            self.ai_security,
+            self.iot_security,
+            self.web3_security
         ]
         return sum(skills) // len(skills)
 
@@ -68,7 +74,10 @@ class SkillLevels(BaseModel):
             self.pentest: "pentest",
             self.red_team: "red_team",
             self.blue_team: "blue_team",
-            self.threat_hunting: "threat_hunting"
+            self.threat_hunting: "threat_hunting",
+            self.ai_security: "ai_security",
+            self.iot_security: "iot_security",
+            self.web3_security: "web3_security"
         }
         return domain_map[min(domain_map.keys())]
 
