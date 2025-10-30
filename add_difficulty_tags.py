@@ -35,7 +35,7 @@ def add_difficulty_tags():
         difficulty_tags = [
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Beginner",
+                "name": "Level: ⭐ Beginner",
                 "color": "#22C55E",  # Green
                 "icon": "⭐",
                 "description": "Beginner-friendly lessons (difficulty 1)",
@@ -43,7 +43,7 @@ def add_difficulty_tags():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Intermediate",
+                "name": "Level: ⭐⭐ Intermediate",
                 "color": "#F59E0B",  # Orange
                 "icon": "⭐⭐",
                 "description": "Intermediate difficulty lessons (difficulty 2)",
@@ -51,7 +51,7 @@ def add_difficulty_tags():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Expert",
+                "name": "Level: ⭐⭐⭐ Expert",
                 "color": "#EF4444",  # Red
                 "icon": "⭐⭐⭐",
                 "description": "Advanced/Expert difficulty lessons (difficulty 3)",
@@ -83,12 +83,12 @@ def add_difficulty_tags():
         # Auto-tag lessons based on difficulty field
         print("\nAuto-tagging lessons by difficulty...")
 
-        # Get tag IDs
-        cursor.execute("SELECT tag_id FROM tags WHERE name = 'Beginner'")
+        # Get tag IDs (try both old and new names for compatibility)
+        cursor.execute("SELECT tag_id FROM tags WHERE name IN ('Beginner', 'Level: ⭐ Beginner')")
         beginner_tag = cursor.fetchone()
-        cursor.execute("SELECT tag_id FROM tags WHERE name = 'Intermediate'")
+        cursor.execute("SELECT tag_id FROM tags WHERE name IN ('Intermediate', 'Level: ⭐⭐ Intermediate')")
         intermediate_tag = cursor.fetchone()
-        cursor.execute("SELECT tag_id FROM tags WHERE name = 'Expert'")
+        cursor.execute("SELECT tag_id FROM tags WHERE name IN ('Expert', 'Level: ⭐⭐⭐ Expert')")
         expert_tag = cursor.fetchone()
 
         if beginner_tag and intermediate_tag and expert_tag:

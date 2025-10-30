@@ -55,12 +55,12 @@ def add_ui_preferences():
             # Initialize all existing users with default Beginner tag preference
             print("\nInitializing default tag preferences for existing users...")
 
-            # Check if Beginner tag exists
-            cursor.execute("SELECT name FROM tags WHERE name = 'Beginner'")
+            # Check if Beginner tag exists (try both old and new names)
+            cursor.execute("SELECT name FROM tags WHERE name IN ('Beginner', 'Level: ⭐ Beginner') LIMIT 1")
             beginner_tag = cursor.fetchone()
 
             if beginner_tag:
-                default_filters = json.dumps(["Beginner"])
+                default_filters = json.dumps([beginner_tag[0]])
                 cursor.execute("""
                     UPDATE users
                     SET preferred_tag_filters = ?
