@@ -77,13 +77,16 @@ def update_tag_names():
             "Cloud Security": "Career Path: Cloud Security",
             "Eric Zimmerman Tools": "Package: Eric Zimmerman Tools",
             "APT": "Package: APT",
-            # Difficulty level tags (keep star emojis)
-            "Beginner": "Level: ⭐ Beginner",
-            "⭐ Beginner": "Level: ⭐ Beginner",
-            "Intermediate": "Level: ⭐⭐ Intermediate",
-            "⭐⭐ Intermediate": "Level: ⭐⭐ Intermediate",
-            "Expert": "Level: ⭐⭐⭐ Expert",
-            "⭐⭐⭐ Expert": "Level: ⭐⭐⭐ Expert"
+            # Difficulty level tags (stars are in icon, not name)
+            "Beginner": "Level: Beginner",
+            "⭐ Beginner": "Level: Beginner",
+            "Level: ⭐ Beginner": "Level: Beginner",
+            "Intermediate": "Level: Intermediate",
+            "⭐⭐ Intermediate": "Level: Intermediate",
+            "Level: ⭐⭐ Intermediate": "Level: Intermediate",
+            "Expert": "Level: Expert",
+            "⭐⭐⭐ Expert": "Level: Expert",
+            "Level: ⭐⭐⭐ Expert": "Level: Expert"
         }
 
         print("\n2. Renaming tags...")
