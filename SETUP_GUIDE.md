@@ -23,23 +23,22 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Run the App
+### 4. Setup Database
+```bash
+python setup_database.py
+```
+
+This creates your database from the template with:
+- ✅ 82 lessons across 9 domains
+- ✅ 15 system tags (career paths, packages, content)
+- ✅ All migrations applied
+
+### 5. Run the App
 ```bash
 streamlit run app.py
 ```
 
 That's it! The app will open in your browser.
-
----
-
-## First-Time Setup
-
-The database comes pre-configured with:
-- ✅ 82 lessons across 9 domains
-- ✅ 15 system tags (career paths, packages, content)
-- ✅ All migrations applied
-
-**You don't need to run any setup scripts!**
 
 ---
 
