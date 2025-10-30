@@ -350,6 +350,9 @@ def render_welcome_page():
             "🔴 Red Team Operations",
             "🛡️ Blue Team Defense",
             "🎯 Threat Hunting",
+            "🤖 AI Security (LLM & ML Security)",
+            "🔌 IoT Security (Embedded & ICS)",
+            "🔗 Web3 Security (Blockchain & DeFi)",
         ]
         for domain in domains:
             st.markdown(f"- {domain}")
