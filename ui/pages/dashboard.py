@@ -173,6 +173,9 @@ def render_skill_progress(user: UserProfile):
         "Red Team",
         "Blue Team",
         "Threat Hunting",
+        "AI Security",
+        "IoT Security",
+        "Web3 Security",
     ]
 
     skills = [
@@ -188,6 +191,9 @@ def render_skill_progress(user: UserProfile):
         user.skill_levels.red_team,
         user.skill_levels.blue_team,
         user.skill_levels.threat_hunting,
+        user.skill_levels.ai_security,
+        user.skill_levels.iot_security,
+        user.skill_levels.web3_security,
     ]
 
     # Radar chart
