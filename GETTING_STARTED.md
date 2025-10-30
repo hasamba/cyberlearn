@@ -39,7 +39,21 @@ This will create all 15 system tags:
 
 ---
 
-## Step 3: Verify Database State
+## Step 3: Migrate User Tag Preferences
+
+If you have existing users with saved tag preferences, update them to match the new tag names:
+
+```bash
+python migrate_user_tag_preferences.py
+```
+
+This updates saved preferences like "Beginner" → "Level: Beginner"
+
+**Note:** If this is a fresh installation with no users yet, you can skip this step.
+
+---
+
+## Step 4: Verify Database State
 
 Run the check script to confirm everything is correct:
 
@@ -77,7 +91,7 @@ Career Path Tags (10):
 
 ---
 
-## Step 4: Test Username and Tag Persistence
+## Step 5: Test Username and Tag Persistence
 
 Test that the persistence features work:
 
@@ -89,7 +103,7 @@ This will verify that username and tag preferences are being saved to the databa
 
 ---
 
-## Step 5: Test the App
+## Step 6: Test the App
 
 Start the app and test the features:
 
@@ -107,7 +121,7 @@ streamlit run app.py
 
 ---
 
-## Step 6: Commit to Repo
+## Step 7: Commit to Repo
 
 Once everything works on your dev machine, commit the database:
 
@@ -119,7 +133,7 @@ git push
 
 ---
 
-## Step 7: Test on VM
+## Step 8: Test on VM
 
 On your test VM, just pull and run:
 
