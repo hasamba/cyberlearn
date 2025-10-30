@@ -599,7 +599,9 @@ def render_mindset_block(block):
 
 def render_explanation_block(block):
     """Render explanation content"""
-    st.markdown(block.content.get("text", ""))
+    text = block.content.get("text", "")
+    if text:
+        render_markdown_with_code(text)
 
     if block.simplified_explanation:
         with st.expander("🎈 Simplified Explanation (ELI10)"):
@@ -710,13 +712,37 @@ def render_video_block(block):
         st.video(block.content["video_url"])
 
 
+def render_markdown_with_code(text: str):
+    """Render markdown text with proper code block support"""
+    import re
+
+    # Split by code blocks
+    pattern = r'```(\w+)?\n(.*?)```'
+    parts = re.split(pattern, text, flags=re.DOTALL)
+
+    i = 0
+    while i < len(parts):
+        if i % 3 == 0:
+            # Regular markdown text
+            if parts[i].strip():
+                st.markdown(parts[i])
+            i += 1
+        else:
+            # Code block: parts[i] is language, parts[i+1] is code
+            language = parts[i] if parts[i] else 'text'
+            code = parts[i+1] if i+1 < len(parts) else ''
+            if code.strip():
+                st.code(code, language=language)
+            i += 2
+
+
 def render_code_exercise_block(block):
     """Render code exercise block"""
     st.markdown("### 💻 Code Exercise")
 
     text_content = block.content.get("text", "")
     if text_content:
-        st.markdown(text_content)
+        render_markdown_with_code(text_content)
 
     # Display code examples if present
     if "code" in block.content:
@@ -736,7 +762,7 @@ def render_real_world_block(block):
 
     text_content = block.content.get("text") or block.content.get("description", "")
     if text_content:
-        st.markdown(text_content)
+        render_markdown_with_code(text_content)
 
     # Display case studies if present
     if "cases" in block.content:
