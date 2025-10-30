@@ -7,7 +7,7 @@ from pathlib import Path
 from utils.database import Database
 import sys
 
-db_path = Path(__file__).parent / "cyberlearn.db"
+db_path = Path(__file__).parent.parent / "cyberlearn.db"
 
 if not db_path.exists():
     print(f"❌ Database not found at {db_path}")

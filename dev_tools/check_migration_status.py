@@ -5,7 +5,7 @@ Quick script to check if UI preferences migration has been applied.
 import sqlite3
 from pathlib import Path
 
-db_path = Path(__file__).parent / "cyberlearn.db"
+db_path = Path(__file__).parent.parent / "cyberlearn.db"
 
 if not db_path.exists():
     print(f"❌ Database not found at {db_path}")
