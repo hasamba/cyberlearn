@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-10-30
 **Current Version:** 1.0
-**Total Features Tracked:** 6 planned, 0 in progress, 2 completed
+**Total Features Tracked:** 7 planned, 0 in progress, 2 completed
 
 ---
 
@@ -184,6 +184,115 @@
   - **Notes:** Hidden lessons should still be accessible via direct URL (in case shared). Consider adding "Hide until [date]" for temporary hiding. Track date_hidden for sorting.
   - **Dependencies:** None
   - **Estimated Effort:** Small (1-2 days)
+
+### User Notes & Annotations
+
+- [ ] **Feature:** Lesson User Notes with Rich Content Support
+  - **Priority:** High
+  - **Description:** Allow users to add personal notes throughout each lesson, with support for text, URLs, screenshots/images, and embedded videos. Notes are accessible on every page/section within a lesson, enabling progressive learning documentation
+  - **Acceptance Criteria:**
+    - [ ] Notes interface available on every lesson page/section
+    - [ ] Rich content support:
+      - [ ] Plain text notes (markdown support)
+      - [ ] URL attachments (with link preview)
+      - [ ] Screenshot/image uploads (drag-and-drop)
+      - [ ] Embedded videos (YouTube, Vimeo, direct uploads)
+      - [ ] Code snippets with syntax highlighting
+    - [ ] Notes organization:
+      - [ ] Timestamped entries (auto-saved)
+      - [ ] Attached to specific lesson content blocks
+      - [ ] Searchable across all lessons
+      - [ ] Exportable (Markdown, PDF)
+    - [ ] Notes UI features:
+      - [ ] Collapsible notes panel (sidebar or bottom)
+      - [ ] Add note button on each content block
+      - [ ] Rich text editor (WYSIWYG)
+      - [ ] Image paste from clipboard
+      - [ ] Video URL embed with preview
+    - [ ] Notes management:
+      - [ ] Edit/delete existing notes
+      - [ ] Filter notes by lesson, domain, date
+      - [ ] Tag notes with custom labels
+      - [ ] Pin important notes to top
+    - [ ] Notes visibility:
+      - [ ] Private (default) - only visible to user
+      - [ ] Option to share notes with other users (future)
+  - **Technical Details:**
+    - **Database schema:**
+      ```sql
+      CREATE TABLE lesson_notes (
+        note_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        lesson_id TEXT NOT NULL,
+        content_block_index INTEGER,  -- NULL for general lesson notes
+        note_text TEXT,
+        note_html TEXT,  -- rendered HTML for rich content
+        attachments JSON,  -- Array of {type, url, filename}
+        created_at TIMESTAMP,
+        updated_at TIMESTAMP,
+        is_pinned BOOLEAN DEFAULT FALSE,
+        tags JSON,  -- Array of custom tag strings
+        FOREIGN KEY (user_id) REFERENCES users(user_id),
+        FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id)
+      );
+      ```
+    - **Attachments JSON structure:**
+      ```json
+      [
+        {"type": "url", "url": "https://example.com", "title": "Resource"},
+        {"type": "image", "url": "/uploads/notes/abc123.png", "filename": "screenshot.png"},
+        {"type": "video", "url": "https://youtube.com/watch?v=xyz", "provider": "youtube"}
+      ]
+      ```
+    - **API endpoints:**
+      - `POST /api/lessons/{lesson_id}/notes` - Create note
+      - `GET /api/lessons/{lesson_id}/notes` - Get all notes for lesson
+      - `PUT /api/notes/{note_id}` - Update note
+      - `DELETE /api/notes/{note_id}` - Delete note
+      - `POST /api/notes/{note_id}/upload` - Upload image/file
+      - `GET /api/users/{user_id}/notes` - Get all user notes across lessons
+    - **File storage:**
+      - Image uploads: `/uploads/notes/{user_id}/{note_id}/`
+      - Max file size: 10MB per image, 100MB per video
+      - Supported formats: PNG, JPG, GIF, MP4, MOV, AVI
+    - **Rich text editor:** Consider using TipTap, Quill, or Streamlit's native markdown editor
+    - **Video embedding:** Support YouTube, Vimeo, Loom with oEmbed API for previews
+  - **Use Cases:**
+    - **During learning:** User reads lesson on Kerberoasting, pastes commands they tried in lab, attaches screenshot of successful attack
+    - **Resource collection:** User adds links to related blog posts, research papers, tool documentation
+    - **Lab documentation:** User embeds video walkthrough of their CTF solution for future reference
+    - **Study notes:** User summarizes key concepts in their own words, adds mnemonic devices
+    - **Troubleshooting:** User documents errors encountered and solutions found
+    - **Progress tracking:** User notes what they understood vs. what needs review
+  - **UI/UX Considerations:**
+    - **Notes panel placement:** Sidebar (desktop) or bottom sheet (mobile)
+    - **Inline notes:** Small icon next to each content block to add contextual note
+    - **Visual distinction:** Different background color for notes section
+    - **Auto-save:** Save notes as user types (debounced, every 2 seconds)
+    - **Image preview:** Click to expand, lightbox view
+    - **Video preview:** Embedded player with controls
+    - **Export:** Generate PDF with lesson content + user notes for offline study
+  - **Security Considerations:**
+    - Validate image uploads (check file signatures, not just extensions)
+    - Sanitize HTML input to prevent XSS
+    - Limit upload file sizes and types
+    - Virus scan uploaded files (if possible)
+    - Rate limit API endpoints to prevent abuse
+  - **Accessibility:**
+    - Alt text for images
+    - Keyboard navigation for notes panel
+    - Screen reader support for note content
+    - High contrast mode for notes UI
+  - **Notes:** This feature transforms passive learning into active documentation. Users can build personal knowledge bases as they progress. Consider adding note templates (e.g., "Lab Result", "Key Concept", "Question"). Future: Allow users to share notes publicly or with study groups.
+  - **Dependencies:** User authentication system (to associate notes with users), file upload infrastructure
+  - **Estimated Effort:** Large (2+ weeks)
+  - **Future Enhancements:**
+    - AI-powered note suggestions based on lesson content
+    - Collaborative notes (shared notes within study groups)
+    - Note version history
+    - Link notes across lessons (knowledge graph)
+    - Note templates and formatting presets
+    - Voice note recording
 
 ### Practice & Labs
 - [ ] **Feature:** [Add feature here]
