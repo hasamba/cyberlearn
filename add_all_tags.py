@@ -55,27 +55,27 @@ def add_all_tags():
         print("ADDING ALL SYSTEM TAGS")
         print("=" * 60)
 
-        # Define all tags
+        # Define all tags with proper emoji icons
         default_tags = [
             # Content Tags
             {
                 "name": "Built-In",
                 "color": "#3B82F6",
-                "icon": "[BI]",
+                "icon": "🔵",
                 "description": "Core platform lessons included by default",
                 "is_system": 1
             },
             {
                 "name": "User Content",
                 "color": "#6B7280",
-                "icon": "[UC]",
+                "icon": "⚪",
                 "description": "User-created or imported lessons",
                 "is_system": 0
             },
             {
                 "name": "Community",
                 "color": "#EC4899",
-                "icon": "[CM]",
+                "icon": "🩷",
                 "description": "Community-contributed lessons",
                 "is_system": 0
             },
@@ -83,70 +83,70 @@ def add_all_tags():
             {
                 "name": "Career Path: SOC Tier 1",
                 "color": "#06B6D4",
-                "icon": "[S1]",
+                "icon": "🛡️",
                 "description": "Security Operations Center Tier 1 Analyst career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: SOC Tier 2",
                 "color": "#0891B2",
-                "icon": "[S2]",
+                "icon": "🛡️",
                 "description": "Security Operations Center Tier 2 Analyst career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Incident Responder",
                 "color": "#DC2626",
-                "icon": "[IR]",
+                "icon": "🚨",
                 "description": "Incident Response Specialist career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Threat Hunter",
                 "color": "#7C3AED",
-                "icon": "[TH]",
+                "icon": "🎯",
                 "description": "Threat Hunting Specialist career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Forensic Analyst",
                 "color": "#059669",
-                "icon": "[FA]",
+                "icon": "🔬",
                 "description": "Digital Forensics Analyst career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Malware Analyst",
                 "color": "#B91C1C",
-                "icon": "[MA]",
+                "icon": "🦠",
                 "description": "Malware Reverse Engineering Analyst career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Penetration Tester",
                 "color": "#CA8A04",
-                "icon": "[PT]",
+                "icon": "🔓",
                 "description": "Penetration Testing / Ethical Hacking career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Red Team Operator",
                 "color": "#BE123C",
-                "icon": "[RT]",
+                "icon": "⚔️",
                 "description": "Red Team Operations career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Security Engineer",
                 "color": "#4F46E5",
-                "icon": "[SE]",
+                "icon": "🔧",
                 "description": "Security Engineering career path",
                 "is_system": 1
             },
             {
                 "name": "Career Path: Cloud Security",
                 "color": "#0D9488",
-                "icon": "[CS]",
+                "icon": "☁️",
                 "description": "Cloud Security Specialist career path",
                 "is_system": 1
             },
@@ -154,14 +154,14 @@ def add_all_tags():
             {
                 "name": "Package: Eric Zimmerman Tools",
                 "color": "#F59E0B",
-                "icon": "[EZ]",
+                "icon": "🟠",
                 "description": "Lessons focused on Eric Zimmerman's forensic tool suite",
                 "is_system": 1
             },
             {
                 "name": "Package: APT",
                 "color": "#7C2D12",
-                "icon": "[APT]",
+                "icon": "🎯",
                 "description": "Advanced Persistent Threat campaigns and techniques",
                 "is_system": 1
             }
@@ -185,7 +185,7 @@ def add_all_tags():
                     now,
                     tag["is_system"]
                 ))
-                print(f"  [OK] Added: {tag['icon']} {tag['name']}")
+                print(f"  [OK] Added: {tag['name']}")
                 added_count += 1
             except sqlite3.IntegrityError:
                 print(f"  [SKIP] Exists: {tag['name']}")
