@@ -70,44 +70,13 @@ def add_tags_system():
         # Insert default system tags
         print("Adding default system tags...")
         default_tags = [
+            # Content Tags
             {
                 "tag_id": str(uuid.uuid4()),
                 "name": "Built-In",
                 "color": "#3B82F6",  # Blue
                 "icon": "🔵",
                 "description": "Core platform lessons included by default",
-                "is_system": 1
-            },
-            {
-                "tag_id": str(uuid.uuid4()),
-                "name": "Advanced",
-                "color": "#8B5CF6",  # Purple
-                "icon": "🟣",
-                "description": "Advanced difficulty lessons for experienced users",
-                "is_system": 1
-            },
-            {
-                "tag_id": str(uuid.uuid4()),
-                "name": "PWK Course",
-                "color": "#EF4444",  # Red
-                "icon": "🔴",
-                "description": "Offensive Security PWK/OSCP course aligned lessons",
-                "is_system": 1
-            },
-            {
-                "tag_id": str(uuid.uuid4()),
-                "name": "Eric Zimmerman Tools",
-                "color": "#F59E0B",  # Orange
-                "icon": "🟠",
-                "description": "Lessons focused on Eric Zimmerman's forensic tool suite",
-                "is_system": 1
-            },
-            {
-                "tag_id": str(uuid.uuid4()),
-                "name": "SANS-Aligned",
-                "color": "#10B981",  # Green
-                "icon": "🟢",
-                "description": "Lessons aligned with SANS course content and methodology",
                 "is_system": 1
             },
             {
@@ -126,18 +95,10 @@ def add_tags_system():
                 "description": "Community-contributed lessons",
                 "is_system": 0
             },
-            {
-                "tag_id": str(uuid.uuid4()),
-                "name": "Certification Prep",
-                "color": "#14B8A6",  # Teal
-                "icon": "🏆",
-                "description": "Lessons aligned with industry certifications",
-                "is_system": 1
-            },
             # Career Path Tags
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "SOC Tier 1",
+                "name": "Career Path: SOC Tier 1",
                 "color": "#06B6D4",  # Cyan
                 "icon": "🛡️",
                 "description": "Security Operations Center Tier 1 Analyst career path",
@@ -145,7 +106,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "SOC Tier 2",
+                "name": "Career Path: SOC Tier 2",
                 "color": "#0891B2",  # Darker Cyan
                 "icon": "🛡️",
                 "description": "Security Operations Center Tier 2 Analyst career path",
@@ -153,7 +114,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Incident Responder",
+                "name": "Career Path: Incident Responder",
                 "color": "#DC2626",  # Dark Red
                 "icon": "🚨",
                 "description": "Incident Response Specialist career path",
@@ -161,7 +122,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Threat Hunter",
+                "name": "Career Path: Threat Hunter",
                 "color": "#7C3AED",  # Violet
                 "icon": "🎯",
                 "description": "Threat Hunting Specialist career path",
@@ -169,7 +130,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Forensic Analyst",
+                "name": "Career Path: Forensic Analyst",
                 "color": "#059669",  # Emerald
                 "icon": "🔬",
                 "description": "Digital Forensics Analyst career path",
@@ -177,7 +138,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Malware Analyst",
+                "name": "Career Path: Malware Analyst",
                 "color": "#B91C1C",  # Crimson
                 "icon": "🦠",
                 "description": "Malware Reverse Engineering Analyst career path",
@@ -185,7 +146,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Penetration Tester",
+                "name": "Career Path: Penetration Tester",
                 "color": "#CA8A04",  # Gold
                 "icon": "🔓",
                 "description": "Penetration Testing / Ethical Hacking career path",
@@ -193,7 +154,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Red Team Operator",
+                "name": "Career Path: Red Team Operator",
                 "color": "#BE123C",  # Rose
                 "icon": "⚔️",
                 "description": "Red Team Operations career path",
@@ -201,7 +162,7 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Security Engineer",
+                "name": "Career Path: Security Engineer",
                 "color": "#4F46E5",  # Indigo
                 "icon": "🔧",
                 "description": "Security Engineering career path",
@@ -209,24 +170,24 @@ def add_tags_system():
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Cloud Security",
+                "name": "Career Path: Cloud Security",
                 "color": "#0D9488",  # Teal
                 "icon": "☁️",
                 "description": "Cloud Security Specialist career path",
                 "is_system": 1
             },
-            # Course Tags
+            # Package Tags
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "Course: PEN-200",
-                "color": "#DC2626",  # Dark Red
-                "icon": "🎓",
-                "description": "Offensive Security PEN-200 (OSCP) course aligned lessons",
+                "name": "Package: Eric Zimmerman Tools",
+                "color": "#F59E0B",  # Orange
+                "icon": "🟠",
+                "description": "Lessons focused on Eric Zimmerman's forensic tool suite",
                 "is_system": 1
             },
             {
                 "tag_id": str(uuid.uuid4()),
-                "name": "APT",
+                "name": "Package: APT",
                 "color": "#7C2D12",  # Darker Red/Brown
                 "icon": "🎯",
                 "description": "Advanced Persistent Threat campaigns and techniques",
@@ -297,12 +258,11 @@ def add_tags_system():
         print(f"System tags: {tag_count}")
         print(f"Lesson-tag associations: {lesson_tag_count}")
         print("\nTag Categories:")
-        print("  • Content Tags: Built-In, Advanced, PWK Course, Eric Zimmerman Tools, SANS-Aligned")
-        print("  • Source Tags: User Content, Community, Certification Prep")
-        print("  • Career Paths: SOC Tier 1, SOC Tier 2, Incident Responder, Threat Hunter,")
-        print("                  Forensic Analyst, Malware Analyst, Penetration Tester,")
-        print("                  Red Team Operator, Security Engineer, Cloud Security")
-        print("  • Course Tags: Course: PEN-200, APT")
+        print("  • Content Tags: Built-In, User Content, Community")
+        print("  • Career Paths (10): SOC Tier 1/2, Incident Responder, Threat Hunter,")
+        print("                       Forensic Analyst, Malware Analyst, Penetration Tester,")
+        print("                       Red Team Operator, Security Engineer, Cloud Security")
+        print("  • Package Tags: Eric Zimmerman Tools, APT")
         print("\nNext steps:")
         print("1. Run the app: streamlit run app.py")
         print("2. Use tag filters to organize lesson view")
