@@ -214,6 +214,23 @@ def add_tags_system():
                 "icon": "☁️",
                 "description": "Cloud Security Specialist career path",
                 "is_system": 1
+            },
+            # Course Tags
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "Course: PEN-200",
+                "color": "#DC2626",  # Dark Red
+                "icon": "🎓",
+                "description": "Offensive Security PEN-200 (OSCP) course aligned lessons",
+                "is_system": 1
+            },
+            {
+                "tag_id": str(uuid.uuid4()),
+                "name": "APT",
+                "color": "#7C2D12",  # Darker Red/Brown
+                "icon": "🎯",
+                "description": "Advanced Persistent Threat campaigns and techniques",
+                "is_system": 1
             }
         ]
 
@@ -285,11 +302,13 @@ def add_tags_system():
         print("  • Career Paths: SOC Tier 1, SOC Tier 2, Incident Responder, Threat Hunter,")
         print("                  Forensic Analyst, Malware Analyst, Penetration Tester,")
         print("                  Red Team Operator, Security Engineer, Cloud Security")
+        print("  • Course Tags: Course: PEN-200, APT")
         print("\nNext steps:")
         print("1. Run the app: streamlit run app.py")
         print("2. Use tag filters to organize lesson view")
         print("3. Manage tags via the new Tag Management page")
         print("4. Tag lessons with career paths for role-based learning")
+        print("5. Run bulk_tag_lessons.py to tag specific lesson ranges")
 
     except Exception as e:
         conn.rollback()
