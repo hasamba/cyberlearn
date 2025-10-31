@@ -171,6 +171,10 @@ def render_sidebar():
                 st.session_state.current_page = "diagnostic"
                 st.rerun()
 
+            if st.button("📤 Upload Lessons", use_container_width=True):
+                st.session_state.current_page = "upload_lessons"
+                st.rerun()
+
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
@@ -433,6 +437,9 @@ def main():
         elif page == "hidden_lessons":
             from ui.pages import hidden_lessons
             hidden_lessons.render_hidden_lessons_page()
+        elif page == "upload_lessons":
+            from ui.pages import upload_lessons
+            upload_lessons.render_upload_lessons_page()
         elif page == "lesson":
             if st.session_state.current_lesson:
                 lesson_viewer.render_lesson(
