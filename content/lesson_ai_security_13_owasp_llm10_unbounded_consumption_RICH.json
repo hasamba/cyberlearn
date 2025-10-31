@@ -1,0 +1,124 @@
+{
+  "lesson_id": "3e1bf53f-235a-4d93-9f49-fae5b391f9eb",
+  "domain": "ai_security",
+  "title": "OWASP LLM10: Unbounded Consumption",
+  "subtitle": "Preventing denial-of-wallet and resource exhaustion",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 13,
+  "prerequisites": [],
+  "concepts": [
+    "rate limiting",
+    "cost controls",
+    "quota management",
+    "abuse detection",
+    "autoscaling governance",
+    "observability"
+  ],
+  "learning_objectives": [
+    "Identify how attackers or runaway workflows can trigger excessive LLM usage.",
+    "Implement quotas, circuit breakers, and budgeting controls for AI services.",
+    "Design monitoring dashboards that reveal anomalous consumption patterns.",
+    "Develop response strategies when usage exceeds expectations or budget thresholds."
+  ],
+  "post_assessment": [
+    {
+      "question": "Which scenario exemplifies unbounded consumption risk?",
+      "options": [
+        "A chatbot caches frequent responses.",
+        "An attacker scripts thousands of complex prompts, causing massive API spend and degraded performance.",
+        "Users take a scheduled maintenance window.",
+        "A model returns an error for a malformed request."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice"
+    },
+    {
+      "question": "What control helps prevent runaway workflows from consuming unlimited tokens?",
+      "options": [
+        "Disable logging to save disk space.",
+        "Implement rate limits, per-user quotas, and circuit breakers that halt requests when thresholds are exceeded.",
+        "Allow unauthenticated access to the API.",
+        "Increase maximum context window to the largest setting by default."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice"
+    },
+    {
+      "question": "Why should finance teams partner with engineering on LLM deployments?",
+      "options": [
+        "Finance teams configure GPUs.",
+        "Usage directly impacts spend; collaborative budgeting ensures alerts, forecasts, and controls align with business risk.",
+        "Finance teams write system prompts.",
+        "Engineering must approve expense reports."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice"
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "\nUnbounded consumption describes scenarios where LLM usage grows without control, leading to denial-of-service, denial-of-wallet, or degraded user experience. Because modern models can process long contexts and complex tool chains, a single automated workflow might consume millions of tokens if it loops unexpectedly. Attackers exploit this by sending floods of adversarial prompts or chaining API calls that trigger expensive retrievals and computations. Internal misuse is also common\u2014teams may experiment with production credentials, running large-scale analyses without realizing the associated cost. Cloud billing models mean that excessive usage translates directly into financial risk, especially when budgets are thin.\n\nBeyond cost, resource exhaustion can starve legitimate traffic. Autoscaling may provision additional GPUs or servers, but if the workload is abusive, infrastructure can still hit limits, causing latency spikes or outages. Without guardrails, organizations may fail to notice runaway consumption until invoices arrive or service-level objectives are breached. Understanding how demand fluctuates and which workflows are most expensive is crucial for resilience.\n"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "\nDefensive strategies mirror those used for traditional APIs. Require authentication for every request and enforce per-user and per-application quotas. Implement rate limiting at multiple layers\u2014edge gateways, API servers, and model providers. Circuit breakers should cut off sessions when abnormal spikes occur, while graceful degradation offers lighter-weight models or cached responses to maintain service. Budget alerts notify teams when spend approaches thresholds; some organizations integrate cost policies that automatically pause non-critical workloads once limits are hit.\n\nObservability ties it all together. Build dashboards that track token usage, request volume, latency, and cost per feature. Tag requests with business context so spikes can be traced to specific teams or experiments. Detect anomalies using statistical baselines or machine learning\u2014unexpected bursts, long-running conversations, or high-error sessions warrant investigation. When unbounded consumption is detected, responders should throttle offending clients, communicate with stakeholders, and review governance policies. Post-incident analysis often uncovers missing approvals, misconfigured batch jobs, or insufficient rate limits. Closing these gaps keeps AI services reliable and affordable.\n"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "\n### Lab: Implementing a Token Budget Guardrail\n\n1. **Track usage** per API key and enforce soft/hard limits.\n\n```python\nfrom collections import defaultdict\n\nTOKEN_BUDGET = {\"team-red\": 5_000_000, \"team-blue\": 2_000_000}\nusage = defaultdict(int)\n\ndef record_request(team: str, tokens: int) -> bool:\n    usage[team] += tokens\n    if usage[team] > TOKEN_BUDGET.get(team, 0):\n        return False\n    return True\n```\n\n2. **Integrate with the LLM client** to abort requests when `record_request` returns `False` and notify the team.\n3. **Expose dashboards** showing remaining budget so teams plan workloads responsibly.\n4. **Reset counters** on a billing cadence and review anomalies with finance partners.\n"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "\nA SaaS provider launched a public beta for its AI assistant without per-user quotas. A botnet quickly discovered the endpoint and generated complex legal prompts, consuming the month's budget in hours and degrading service for legitimate customers. After the incident, the company introduced authentication, tiered rate limits, cost alerts, and automatic shutdown of abusive sessions.\n"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "\nRemember **LIMIT COST**:\n\n- **L**imit requests with authentication and quotas.\n- **I**nstrument dashboards for usage visibility.\n- **M**onitor spend in near real time.\n- **I**nitiate circuit breakers during anomalies.\n- **T**eam up with finance for budgeting.\n- **C**ache frequent responses or offer lightweight models.\n- **O**bligate approvals for large batch jobs.\n- **S**et alerts before invoices spike.\n- **T**est throttling policies with red-team simulations.\n"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "\n1. How can organizations avoid surprise AI invoices?  \n   **Answer:** Establish budgets, automated alerts, and quotas aligned with business priorities, and review usage with finance regularly.\n\n2. Why are circuit breakers valuable?  \n   **Answer:** They halt runaway sessions quickly, preventing service degradation and excessive costs while teams investigate.\n\n3. What role does caching play in controlling consumption?  \n   **Answer:** Caching serves common responses cheaply, reducing repeated token usage and improving latency.\n"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "\n- Which endpoints or workflows currently lack rate limits or quotas?  \n- How often do you review AI spend with finance and leadership?  \n- Do you have a response plan if an attacker attempts a denial-of-wallet campaign?\n"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "\nCost awareness empowers innovation. By designing controls alongside budgeting partners, teams can experiment confidently knowing safety nets will catch runaway consumption before it harms the business.\n"
+      }
+    }
+  ]
+}
