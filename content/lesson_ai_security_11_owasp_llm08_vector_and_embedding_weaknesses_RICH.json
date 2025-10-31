@@ -32,7 +32,9 @@
       ],
       "correct_answer": 1,
       "difficulty": 3,
-      "type": "multiple_choice"
+      "type": "multiple_choice",
+      "question_id": "98894730-e0f9-4f18-a479-56289b5e836e",
+      "explanation": "Correct answer explained in lesson content."
     },
     {
       "question": "How can teams prevent cross-tenant data exposure in shared vector stores?",
@@ -44,7 +46,9 @@
       ],
       "correct_answer": 1,
       "difficulty": 3,
-      "type": "multiple_choice"
+      "type": "multiple_choice",
+      "question_id": "5297c202-529c-4f55-b726-842d03c828ac",
+      "explanation": "Correct answer explained in lesson content."
     },
     {
       "question": "Which signal suggests retrieval poisoning may be underway?",
@@ -56,7 +60,9 @@
       ],
       "correct_answer": 1,
       "difficulty": 3,
-      "type": "multiple_choice"
+      "type": "multiple_choice",
+      "question_id": "1386d6a3-210b-414f-891e-47abcdee6c37",
+      "explanation": "Correct answer explained in lesson content."
     }
   ],
   "jim_kwik_principles": [
@@ -81,13 +87,13 @@
     {
       "type": "explanation",
       "content": {
-        "text": "\nDefending RAG systems requires control at every layer. First, authenticate all write operations to the vector store and assign per-tenant namespaces. Enforce metadata constraints that restrict which documents can satisfy a query based on user role, classification, or document state. Validate content before embedding\u2014scan for prompt injections, secrets, or policy violations. Embed only sanitized text, and store hashes of source documents so tampering can be detected. Consider using separate embedding models for trusted vs. untrusted sources to prevent contamination.\n\nAt retrieval time, apply scoring ensembles that combine vector similarity with metadata weights, lexical matching, or trust scores. Cap the number of results pulled from each data source and run retrieved snippets through sanitizers before they reach the LLM. Monitoring is essential: track insert rates, vector similarity distributions, and query patterns. Alert when new embeddings closely match sensitive documents or when a tenant suddenly inserts thousands of vectors. Incident response should include quarantining suspect namespaces, re-embedding clean data, and notifying affected users. By layering controls, teams can enjoy the power of RAG while minimizing the attack surface.\n"
+        "text": "\nDefending RAG systems requires control at every layer. First, authenticate all write operations to the vector store and assign per-tenant namespaces. Enforce metadata constraints that restrict which documents can satisfy a query based on user role, classification, or document state. Validate content before embedding—scan for prompt injections, secrets, or policy violations. Embed only sanitized text, and store hashes of source documents so tampering can be detected. Consider using separate embedding models for trusted vs. untrusted sources to prevent contamination.\n\nAt retrieval time, apply scoring ensembles that combine vector similarity with metadata weights, lexical matching, or trust scores. Cap the number of results pulled from each data source and run retrieved snippets through sanitizers before they reach the LLM. Monitoring is essential: track insert rates, vector similarity distributions, and query patterns. Alert when new embeddings closely match sensitive documents or when a tenant suddenly inserts thousands of vectors. Incident response should include quarantining suspect namespaces, re-embedding clean data, and notifying affected users. By layering controls, teams can enjoy the power of RAG while minimizing the attack surface.\n"
       }
     },
     {
       "type": "code_exercise",
       "content": {
-        "text": "\n### Lab: Enforcing Namespace Isolation in a Vector Store\n\n1. **Wrap vector operations** with authentication checks.\n\n```python\nclass VectorStoreClient:\n    def __init__(self, backend):\n        self.backend = backend\n\n    def upsert(self, tenant: str, vectors: list[dict]):\n        if not self._is_authorized(tenant, \"write\"):\n            raise PermissionError(\"Unauthorized tenant\")\n        namespaced = [dict(v, namespace=tenant) for v in vectors]\n        self.backend.upsert(vectors=namespaced)\n\n    def query(self, tenant: str, embedding: list[float], filters: dict):\n        if not self._is_authorized(tenant, \"read\"):\n            raise PermissionError(\"Unauthorized tenant\")\n        filters = dict(filters or {})\n        filters[\"namespace\"] = tenant\n        return self.backend.query(vector=embedding, filters=filters)\n\n    def _is_authorized(self, tenant: str, action: str) -> bool:\n        # Replace with real policy engine\n        return tenant in {\"tenant-a\", \"tenant-b\"}\n```\n\n2. **Attach metadata filters** for document classification (e.g., public, confidential) and enforce them per user role.\n3. **Log insertion and query metrics** to detect anomalies such as unusual vector similarity spikes.\n4. **Run cleanup scripts** that remove orphaned or stale embeddings regularly.\n"
+        "text": "\n### Lab: Enforcing Namespace Isolation in a Vector Store\n\n1. **Wrap vector operations** with authentication checks.\n\n```python\nclass VectorStoreClient:\ndef __init__(self, backend):\nself.backend = backend\n\ndef upsert(self, tenant: str, vectors: list[dict]):\nif not self._is_authorized(tenant, \"write\"):\nraise PermissionError(\"Unauthorized tenant\")\nnamespaced = [dict(v, namespace=tenant) for v in vectors]\nself.backend.upsert(vectors=namespaced)\n\ndef query(self, tenant: str, embedding: list[float], filters: dict):\nif not self._is_authorized(tenant, \"read\"):\nraise PermissionError(\"Unauthorized tenant\")\nfilters = dict(filters or {})\nfilters[\"namespace\"] = tenant\nreturn self.backend.query(vector=embedding, filters=filters)\n\ndef _is_authorized(self, tenant: str, action: str) -> bool:\n# Replace with real policy engine\nreturn tenant in {\"tenant-a\", \"tenant-b\"}\n```\n\n2. **Attach metadata filters** for document classification (e.g., public, confidential) and enforce them per user role.\n3. **Log insertion and query metrics** to detect anomalies such as unusual vector similarity spikes.\n4. **Run cleanup scripts** that remove orphaned or stale embeddings regularly.\n"
       }
     },
     {
@@ -105,7 +111,7 @@
     {
       "type": "quiz",
       "content": {
-        "text": "\n1. Why should retrieval pipelines limit the number of documents per source?  \n   **Answer:** It prevents a single poisoned source from dominating the context and encourages diverse, trustworthy evidence.\n\n2. How can metadata enhance vector security?  \n   **Answer:** Metadata enables role-based filtering, classification enforcement, and detection of unusual tags that may signal manipulation.\n\n3. What telemetry helps spot embedding abuse?  \n   **Answer:** Monitoring insert volume, cosine similarity distributions, new tenant activity, and retrieval success rates reveals anomalies associated with poisoning.\n"
+        "text": "\n1. Why should retrieval pipelines limit the number of documents per source?  \n**Answer:** It prevents a single poisoned source from dominating the context and encourages diverse, trustworthy evidence.\n\n2. How can metadata enhance vector security?  \n**Answer:** Metadata enables role-based filtering, classification enforcement, and detection of unusual tags that may signal manipulation.\n\n3. What telemetry helps spot embedding abuse?  \n**Answer:** Monitoring insert volume, cosine similarity distributions, new tenant activity, and retrieval success rates reveals anomalies associated with poisoning.\n"
       }
     },
     {
@@ -117,7 +123,7 @@
     {
       "type": "mindset_coach",
       "content": {
-        "text": "\nRAG pipelines are powerful but delicate. Treat embeddings and vector stores as critical infrastructure\u2014regular maintenance, access reviews, and proactive monitoring keep the knowledge graph trustworthy.\n"
+        "text": "\nRAG pipelines are powerful but delicate. Treat embeddings and vector stores as critical infrastructure—regular maintenance, access reviews, and proactive monitoring keep the knowledge graph trustworthy.\n"
       }
     }
   ]
