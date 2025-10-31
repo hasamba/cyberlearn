@@ -211,7 +211,7 @@ def render_note_card(note: Dict, db):
                             from pathlib import Path
                             image_path = Path(attachment['path'])
                             if image_path.exists():
-                                st.image(str(image_path), caption=attachment['filename'], use_column_width=True)
+                                st.image(str(image_path), caption=attachment['filename'], use_container_width=True)
                             else:
                                 st.warning(f"Image not found: {attachment['filename']}")
                 except Exception as e:
