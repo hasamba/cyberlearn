@@ -119,24 +119,46 @@ def render_export_tab(db, user):
 
     st.markdown("---")
 
-    # Domain selector
-    all_domains = [
-        "fundamentals", "osint", "dfir", "malware",
-        "active_directory", "system", "linux", "cloud",
-        "pentest", "red_team", "blue_team", "threat_hunting",
-        "ai_security", "iot_security", "web3_security"
-    ]
+    # Filters in columns
+    col1, col2 = st.columns(2)
 
-    selected_domain = st.selectbox("Filter by Domain", ["All Domains"] + all_domains)
+    with col1:
+        # Domain selector
+        all_domains = [
+            "fundamentals", "osint", "dfir", "malware",
+            "active_directory", "system", "linux", "cloud",
+            "pentest", "red_team", "blue_team", "threat_hunting",
+            "ai_security", "iot_security", "web3_security"
+        ]
+        selected_domain = st.selectbox("Filter by Domain", ["All Domains"] + all_domains)
 
-    # Get lessons
-    if selected_domain == "All Domains":
-        all_lessons_metadata = db.get_all_lessons_metadata()
+    with col2:
+        # Tag selector
+        all_tags = db.get_all_tags()
+        tag_names = ["All Tags"] + [tag.name for tag in all_tags]
+        selected_tag = st.selectbox("Filter by Tag", tag_names)
+
+    # Get lessons based on filters
+    if selected_tag != "All Tags":
+        # Filter by tag
+        from models.tag import TagFilter
+        tag = db.get_tag_by_name(selected_tag)
+        if tag:
+            tag_filter = TagFilter(tag_ids=[tag.tag_id], match_all=False)
+            all_lessons_metadata = db.get_lessons_by_tags(tag_filter)
+
+            # Further filter by domain if selected
+            if selected_domain != "All Domains":
+                all_lessons_metadata = [l for l in all_lessons_metadata if l.domain == selected_domain]
     else:
-        all_lessons_metadata = db.get_lessons_by_domain(selected_domain)
+        # No tag filter, just domain
+        if selected_domain == "All Domains":
+            all_lessons_metadata = db.get_all_lessons_metadata()
+        else:
+            all_lessons_metadata = db.get_lessons_by_domain(selected_domain)
 
     if not all_lessons_metadata:
-        st.warning("No lessons found")
+        st.warning("No lessons found matching filters")
         return
 
     st.success(f"Found {len(all_lessons_metadata)} lessons")
