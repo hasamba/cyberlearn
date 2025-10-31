@@ -256,36 +256,52 @@ See [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) for detailed guide.
 4. **Maintain progression**: Easy (1) → Medium (2) → Hard (3)
 5. **Link prerequisites**: Each lesson builds on previous concepts
 
-## Current Status (Latest Update: 2025-10-30)
+## Current Status (Latest Update: 2025-10-31)
 
-- ✅ **275 total lessons** in database
-- ✅ **12 active domains** (9 core + 3 specialized)
+- ✅ **591 total lessons** in database (115% increase from 275)
+- ✅ **15 active domains** (12 core + 3 emerging tech)
 - ✅ **17 system tags** implemented (Career Path, Course, Package)
+- ✅ **10 course tags** applied (13Cubed, SANS courses, OWASP)
 - ✅ **Tagging system** with many-to-many relationships
-- ✅ **Linux Forensics course** (41 lessons, 13Cubed)
-- ✅ **124 lesson ideas** planned in lesson_ideas.csv
-- ✅ **5 planned features** in FEATURES.md
+- ✅ **100% lesson compliance** (all 591 lessons validated)
+- ✅ **Notes system** with image support
+- ✅ **Hide/unhide lessons** functionality
+- ✅ **Assessment system** integrated
 
 ### Lessons by Domain (Database):
-- **DFIR**: 93 lessons (includes 70 Windows + 41 Linux forensics from 13Cubed courses)
-- **Pentest**: 36 lessons
-- **Red Team**: 19 lessons
-- **Active Directory**: 16 lessons
-- **Blue Team**: 16 lessons
-- **Linux**: 16 lessons
-- **Malware**: 16 lessons
-- **Cloud**: 15 lessons
-- **System**: 15 lessons
-- **Fundamentals**: 13 lessons
-- **OSINT**: 10 lessons
-- **Threat Hunting**: 10 lessons
+- **DFIR**: 237 lessons (156% increase - includes SANS FOR500/508/528/572, 13Cubed courses)
+- **Pentest**: 62 lessons (72% increase - includes SANS SEC504)
+- **Cloud**: 45 lessons (200% increase - includes SANS FOR509)
+- **OSINT**: 37 lessons (270% increase - includes SANS FOR589)
+- **Threat Hunting**: 30 lessons (200% increase - includes SANS FOR608)
+- **Blue Team**: 28 lessons (75% increase)
+- **Red Team**: 26 lessons (37% increase)
+- **Active Directory**: 24 lessons (50% increase)
+- **Linux**: 22 lessons (38% increase)
+- **System**: 22 lessons (47% increase)
+- **Malware**: 21 lessons (31% increase)
+- **Fundamentals**: 17 lessons (31% increase)
+- **AI Security**: 13 lessons (NEW - includes OWASP LLM Top 10)
+- **IoT Security**: 4 lessons (NEW)
+- **Web3 Security**: 3 lessons (NEW)
 
 ### Tagging System:
 - **17 system tags** across 3 categories:
   - **Career Path** (10 tags): SOC Analyst, Pentester, Red Teamer, Blue Teamer, DFIR Specialist, Malware Analyst, Cloud Security, Threat Hunter, GRC Analyst, Security Engineer
   - **Course** (5 tags): 13Cubed courses (Windows Memory, Windows Endpoints, Linux Forensics), Eric Zimmerman Tools, Log2Timeline/Plaso
   - **Package** (2 tags): Eric Zimmerman Tools, User Content
-- **Auto-tagging**: Lessons automatically tagged based on order_index ranges
+- **10 course tags** applied to 226 lessons:
+  - **Course: 13Cubed-Investigating Linux Devices**: 41 lessons
+  - **Course: OWASP LLM Top 10**: 10 lessons
+  - **Course: SANS-FOR500**: 19 lessons (Windows Forensics)
+  - **Course: SANS-FOR508**: 18 lessons (Advanced IR)
+  - **Course: SANS-FOR509**: 25 lessons (Cloud Forensics)
+  - **Course: SANS-FOR528**: 16 lessons (Ransomware)
+  - **Course: SANS-FOR572**: 25 lessons (Network Forensics)
+  - **Course: SANS-FOR589**: 22 lessons (Cybercrime Intelligence)
+  - **Course: SANS-FOR608**: 27 lessons (Enterprise IR)
+  - **Course: SANS-SEC504**: 28 lessons (Hacker Tools)
+- **Auto-tagging**: Course tags assigned via lesson_ideas.csv mapping
 - **Template database**: Ships with all tags pre-populated
 
 ### Lesson Ideas Pipeline (lesson_ideas.csv):
@@ -304,17 +320,19 @@ See [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) for detailed guide.
   - Web3 Security (3 lessons)
 
 ### Planned Features (FEATURES.md):
-1. **Single/Multiple JSON Lesson Upload** - High priority
+1. **Single/Multiple JSON Lesson Upload** - High priority ✅ COMPLETED (PR#4)
 2. **Lesson Package Import/Export (ZIP)** - High priority
-3. **Add AI Security Domain** - High priority
-4. **Global Lesson Search** - High priority
-5. **Hide/Unhide Lessons** - Medium priority
+3. **Global Lesson Search** - High priority ✅ COMPLETED (PR#5)
+4. **Hide/Unhide Lessons** - Medium priority ✅ COMPLETED (PR#8)
+5. **Notes System** - ✅ COMPLETED (PR#10, V1.3)
+6. **Assessment System** - ✅ COMPLETED
 
 ### Completion Status:
 - **Target**: 325+ lessons for comprehensive coverage (8-12 per domain)
-- **Current**: 275 lessons in database
-- **Completion**: 84% of target
-- **Next Priority**: Implement planned features, add AI/IoT/Web3 domains
+- **Current**: 591 lessons in database
+- **Completion**: 182% of target (EXCEEDED)
+- **Achievement**: All 15 domains now have substantial content (13-237 lessons each)
+- **Next Priority**: Expand emerging tech domains (AI Security, IoT, Web3)
 
 ## Important Notes
 
@@ -370,32 +388,35 @@ See [ADD_NEW_DOMAINS.md](ADD_NEW_DOMAINS.md) for detailed guide.
 - **Platform**: Adaptive cybersecurity learning with gamification (XP, levels, achievements)
 - **Goal**: Comprehensive cybersecurity education across 15 domains
 - **Target**: 325+ lessons (8-12 per domain)
-- **Current**: 275 lessons (84% of target)
+- **Current**: 591 lessons (182% of target - EXCEEDED)
 - **Architecture**: FastAPI + Streamlit + SQLite + Pydantic V2
 
 ### Development Workflow
 When working on this project:
 1. **Check FEATURES.md** for planned work and priorities
 2. **Review lesson_ideas.csv** for curriculum gaps
-3. **Follow validation requirements** strictly (use comprehensive_fix.py)
+3. **Follow validation requirements** strictly (use validate_lesson_compliance.py)
 4. **Test thoroughly** before considering complete:
    - Run `python load_all_lessons.py`
+   - Run `python validate_lesson_compliance.py`
    - Test in Streamlit app
    - Verify tags, XP, prerequisites
-5. **Document all changes** in appropriate files (FEATURES.md, CLAUDE.md, session docs)
+5. **Document all changes** in appropriate files (FEATURES.md, CLAUDE.md)
 6. **Prioritize quality over quantity** - rich, technical content with real-world examples
 
 ### Feature Implementation Priority
-1. **High Priority**: Search, JSON upload, AI domain, package import/export
-2. **Medium Priority**: Hide/unhide lessons
-3. **Future**: See FEATURES.md Future Ideas section
+1. **High Priority**: Lesson Package Import/Export (ZIP)
+2. **Medium Priority**: Expand emerging tech domains (AI, IoT, Web3)
+3. **Completed**: ✅ Search, ✅ JSON upload, ✅ Hide/unhide, ✅ Notes, ✅ Assessments
 
-### Recent Major Updates (2025-10-30)
-- ✅ Merged PR #11, #12, #13 (Linux forensics, 75 lessons)
-- ✅ Implemented tagging system (17 tags, many-to-many)
-- ✅ Created FEATURES.md master features list
-- ✅ Added 124 lesson ideas to lesson_ideas.csv
-- ✅ Fixed domain naming consistency (blue_team, red_team)
+### Recent Major Updates (2025-10-31)
+- ✅ Merged PR #16 (180 SANS-based lessons across multiple domains)
+- ✅ Tagged 226 lessons with 10 course tags (SANS, 13Cubed, OWASP)
+- ✅ Updated lesson_ideas.csv status (all created lessons marked completed)
+- ✅ Achieved 100% lesson compliance (591/591 lessons pass validation)
+- ✅ Cleaned up 30 temporary/obsolete scripts and files
+- ✅ Added 3 emerging tech domains: AI Security, IoT Security, Web3 Security
+- ✅ Total lesson count: 591 (115% increase from 275)
 
 ## Quick Start for Adding Lessons
 
