@@ -29,15 +29,18 @@ def render_search_page():
     user: Optional[UserProfile] = st.session_state.get('current_user')
 
     # Check if there's a popular search term selected
+    default_search = ""
     if 'popular_search_term' in st.session_state:
-        # Set the search input to the popular term
-        if 'search_input' not in st.session_state:
-            st.session_state.search_input = st.session_state.popular_search_term
+        default_search = st.session_state.popular_search_term
         del st.session_state.popular_search_term
+        # Force clear the widget to allow new value
+        if 'search_input' in st.session_state:
+            del st.session_state.search_input
 
     # Search input
     search_query = st.text_input(
         "Search for lessons",
+        value=default_search,
         placeholder="Enter keywords (e.g., 'Kerberos', 'memory forensics', 'docker')...",
         key="search_input"
     )
