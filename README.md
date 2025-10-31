@@ -16,10 +16,10 @@ CyberLearn is a **complete adaptive learning platform** that delivers profession
 - **🎮 Gamification**: Earn XP, unlock badges, maintain streaks, and level up from Apprentice to Grandmaster
 - **⚡ Accelerated Learning**: Every lesson implements all 10 Jim Kwik learning principles for faster, deeper mastery
 - **📊 Spaced Repetition**: Smart review scheduling ensures long-term retention using cognitive science
-- **🎯 12 Core Domains**: Fundamentals, OSINT, DFIR, Malware, Active Directory, System, Linux, Cloud, Pentest, Red Team, Blue Team, Threat Hunting
-- **⏱️ 30-Minute Sessions**: Focused daily learning designed to fit busy schedules
+- **🎯 15 Domains**: 12 core domains + 3 emerging tech (AI Security, IoT, Web3)
+- **⏱️ 30-60 Minute Sessions**: Focused learning designed to fit busy schedules
 
-**Current Status**: 180+ professional lessons (600,000+ words) covering all 12 domains
+**Current Status**: 591 professional lessons (2.4+ million words) covering all 15 domains, with 100% compliance validation
 
 ---
 
@@ -76,11 +76,11 @@ start.bat     # Start the application
 ```bash
 # On your VM, run:
 cd cyberlearn
-python git_pull.py  # Updates timestamp & pulls from GitHub
+git pull  # Pull latest changes from GitHub
 
 # If new lessons were added:
-python comprehensive_fix.py  # Fix any validation errors
-python load_all_lessons.py   # Load new lessons into database
+python validate_lesson_compliance.py  # Validate all lessons
+python load_all_lessons.py            # Load new lessons into database
 
 # Restart app:
 streamlit run app.py
@@ -115,8 +115,8 @@ Topic: SQL Injection Attacks
 
 # 5. Save output to content/lesson_<domain>_<number>_<topic>_RICH.json
 
-# 6. Fix any validation errors (optional)
-python comprehensive_fix.py
+# 6. Validate the lesson
+python validate_lesson_compliance.py
 
 # 7. Load lesson into database
 python load_all_lessons.py
@@ -154,7 +154,7 @@ python create_rich_lesson.py --interactive
 
 **All lessons MUST have**:
 - Valid UUID (use `uuid.uuid4()`)
-- Domain from: fundamentals, osint, dfir, malware, active_directory, system, linux, cloud, pentest, red_team, blue_team, threat_hunting
+- Domain from: fundamentals, osint, dfir, malware, active_directory, system, linux, cloud, pentest, red_team, blue_team, threat_hunting, ai_security, iot_security, web3_security
 - Difficulty: 1 (beginner), 2 (intermediate), 3 (advanced)
 - `estimated_time`: 30-60 minutes
 - `prerequisites`: List of lesson_id UUIDs (empty if none)
@@ -173,52 +173,71 @@ python create_rich_lesson.py --interactive
 
 ---
 
-## 🛠️ Common Scripts & Tools
+## 🛠️ Scripts & Tools Reference
 
-### Loading & Fixing Lessons
+### 📚 Core Application Scripts
 
-```bash
-# Load all lessons from content/ into database
-python load_all_lessons.py
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `app.py` | Main Streamlit application | `streamlit run app.py` |
+| `database.py` | Database setup and models | Imported by other scripts |
+| `config.py` | Configuration management | Imported by other scripts |
+| `setup_database.py` | Initialize database schema | `python setup_database.py` |
 
-# Fix validation errors automatically
-python comprehensive_fix.py
+### 📖 Lesson Management
 
-# List all loaded lessons by domain
-python list_lessons.py
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `load_all_lessons.py` | Load all lessons from content/ into database | `python load_all_lessons.py` |
+| `reload_lesson.py` | Reload a specific lesson by ID | `python reload_lesson.py <lesson_id>` |
+| `list_lessons.py` | List all loaded lessons by domain | `python list_lessons.py` |
+| `validate_lesson_compliance.py` | Validate all lessons against standards | `python validate_lesson_compliance.py` |
+| `validate_lesson_content.py` | Validate lesson content structure | `python validate_lesson_content.py` |
+| `comprehensive_fix.py` | Auto-fix common validation errors | `python comprehensive_fix.py` |
 
-# Force reload specific domain
-python force_load_domain.py <domain_name>
-```
+### ✍️ Lesson Creation Tools
 
-### Database Operations
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `create_rich_lesson.py` | Interactive lesson creator with CLI | `python create_rich_lesson.py --interactive` |
+| `create_lesson_template.py` | Generate lesson JSON template | `python create_lesson_template.py` |
 
-```bash
-# Check database contents
-python check_database.py
+### 🏷️ Tagging System
 
-# Sync database with content files
-python sync_database.py
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `tag_lessons_from_csv.py` | Tag lessons based on lesson_ideas.csv | `python tag_lessons_from_csv.py` |
+| `check_tags.py` | Verify tag assignments | `python check_tags.py` |
 
-# Remove orphaned lessons
-python remove_orphaned_lessons.py
+### 🗄️ Database Operations
 
-# Fix duplicate domains
-python fix_duplicate_domains.py
-```
+| Script | Description | Usage |
+|--------|-------------|-------|
+| `rebuild_database.py` | Rebuild database from scratch | `python rebuild_database.py` |
+| `sync_database.py` | Sync database with content files | `python sync_database.py` |
+| `check_database.py` | Check database state and contents | `python check_database.py` |
+| `test_hide_functionality.py` | Test lesson hide/unhide feature | `python test_hide_functionality.py` |
 
-### Content Creation Tools
+### 📝 Documentation Files
 
-```bash
-# Create lesson template
-python create_lesson_template.py
+| File | Description |
+|------|-------------|
+| `README.md` | Main project documentation (this file) |
+| `CLAUDE.md` | Complete project guide for development |
+| `ARCHITECTURE.md` | System architecture and design |
+| `FEATURES.md` | Feature tracking and roadmap |
+| `HOW_TO_ADD_NEW_LESSONS.md` | Complete lesson creation guide |
+| `UNIVERSAL_LESSON_PROMPT.md` | AI lesson generation template |
+| `TAGGING_GUIDE.md` | Tagging system documentation |
+| `RUN_ON_VM.md` | VM deployment instructions |
+| `SYNC_DATABASE_TO_VM.md` | Database sync guide for VM |
 
-# AI-assisted content filling
-python fill_lesson_with_ai.py
+### 📊 Planning & Tracking
 
-# Interactive lesson creator
-python create_rich_lesson.py --interactive
-```
+| File | Description |
+|------|-------------|
+| `lesson_ideas.csv` | Lesson curriculum planning (231 lessons tracked) |
+| `requirements.txt` | Python dependencies |
 
 ---
 
@@ -259,24 +278,34 @@ python create_rich_lesson.py --interactive
 
 ---
 
-## 📊 Domain Structure (12 Domains)
+## 📊 Domain Structure (15 Domains)
+
+### Core Domains (12)
 
 | Domain | Lessons | Prerequisites | Description |
 |--------|---------|---------------|-------------|
-| **fundamentals** | 13 | None | Security basics, CIA Triad, Authentication |
-| **osint** | 10 | fundamentals | Open-source intelligence gathering |
-| **dfir** | 17 | fundamentals | Digital forensics & incident response |
-| **malware** | 16 | fundamentals | Malware analysis & reverse engineering |
-| **active_directory** | 16 | fundamentals | AD security, attacks, defense |
-| **system** | 15 | fundamentals | Windows/Linux internals |
-| **linux** | 16 | fundamentals | Linux security & administration |
-| **cloud** | 15 | fundamentals + system | AWS, Azure, GCP security |
-| **pentest** | 35 | fundamentals + AD | Penetration testing methodology |
-| **red_team** | 18 | pentest + malware | Red team operations |
-| **blue_team** | 15 | dfir + malware | Blue team defense |
-| **threat_hunting** | 10 | dfir + malware | Proactive threat hunting |
+| **fundamentals** | 17 | None | Security basics, CIA Triad, Authentication, GRC |
+| **osint** | 37 | fundamentals | OSINT, cybercrime intelligence (SANS FOR589) |
+| **dfir** | 237 | fundamentals | Digital forensics, IR (SANS FOR500/508/528/572, 13Cubed) |
+| **malware** | 21 | fundamentals | Malware analysis & reverse engineering |
+| **active_directory** | 24 | fundamentals | AD security, attacks, defense |
+| **system** | 22 | fundamentals | Windows/Linux internals |
+| **linux** | 22 | fundamentals | Linux security & administration |
+| **cloud** | 45 | fundamentals + system | AWS, Azure, GCP, Kubernetes (SANS FOR509) |
+| **pentest** | 62 | fundamentals + AD | Penetration testing (SANS SEC504) |
+| **red_team** | 26 | pentest + malware | Red team operations & TTPs |
+| **blue_team** | 28 | dfir + malware | Blue team defense, SIEM (SANS FOR608) |
+| **threat_hunting** | 30 | blue_team | Threat hunting & enterprise IR (SANS FOR608) |
 
-**Total**: 180+ professional lessons
+### Emerging Technology Domains (3)
+
+| Domain | Lessons | Prerequisites | Description |
+|--------|---------|---------------|-------------|
+| **ai_security** | 13 | fundamentals | AI/ML security, OWASP LLM Top 10 |
+| **iot_security** | 4 | fundamentals + system | IoT device security, embedded systems |
+| **web3_security** | 3 | fundamentals | Blockchain, smart contract security |
+
+**Total**: 591 professional lessons (2.4+ million words)
 
 ---
 
@@ -337,7 +366,11 @@ Every lesson implements all 10 accelerated learning principles:
 **Error**: `Field required` or `Input should be 'explanation', 'video'...`
 
 ```bash
-# Run comprehensive fix script
+# Validate lessons first
+python validate_lesson_compliance.py
+
+# If validation fails, check specific errors
+# Fix manually or use comprehensive_fix.py for auto-correction
 python comprehensive_fix.py
 
 # This auto-fixes:
@@ -418,28 +451,35 @@ Month 3:  Threat Hunting Mastery (10 lessons)
 
 ## 🎯 Content Roadmap
 
-### ✅ Complete (180+ lessons)
-- Fundamentals (13)
-- OSINT (10)
-- DFIR (17)
-- Malware (16)
-- Active Directory (16)
-- System (15)
-- Linux (16)
-- Cloud (15)
-- Pentest (35)
-- Red Team (18)
-- Blue Team (15)
-- Threat Hunting (10 in progress)
+### ✅ Complete (591 lessons - TARGET EXCEEDED)
+**Core Domains (12)**:
+- Fundamentals (17), OSINT (37), DFIR (237), Malware (21)
+- Active Directory (24), System (22), Linux (22), Cloud (45)
+- Pentest (62), Red Team (26), Blue Team (28), Threat Hunting (30)
 
-### 🚧 Future Additions
-- Advanced cloud security (Kubernetes, serverless)
-- Container security (Docker, Kubernetes)
+**Emerging Tech Domains (3)**:
+- AI Security (13), IoT Security (4), Web3 Security (3)
+
+**Course-Based Content**:
+- 13Cubed Linux Forensics: 41 lessons
+- SANS FOR500 (Windows Forensics): 19 lessons
+- SANS FOR508 (Advanced IR): 18 lessons
+- SANS FOR509 (Cloud Forensics): 25 lessons
+- SANS FOR528 (Ransomware): 16 lessons
+- SANS FOR572 (Network Forensics): 25 lessons
+- SANS FOR589 (Cybercrime): 22 lessons
+- SANS FOR608 (Enterprise IR): 27 lessons
+- SANS SEC504 (Hacker Tools): 28 lessons
+- OWASP LLM Top 10: 10 lessons
+
+### 🚧 Future Expansion
+- Expand AI Security: Adversarial ML, model security
+- Expand IoT Security: Industrial IoT, firmware analysis
+- Expand Web3 Security: DeFi, smart contract auditing
 - Mobile security (iOS, Android)
-- IoT security
-- AI/ML security
+- DevSecOps and CI/CD security
 
-**See [NEXT_LESSONS_PLAN.md](NEXT_LESSONS_PLAN.md) for detailed roadmap**
+**See [lesson_ideas.csv](lesson_ideas.csv) for detailed lesson pipeline**
 
 ---
 
