@@ -81,10 +81,10 @@ def render_search_page():
         # Build search query
         cursor = db.conn.cursor()
 
-        # Base query
+        # Base query (note: no concepts column in lessons table)
         query = '''
             SELECT DISTINCT l.lesson_id, l.title, l.domain, l.difficulty,
-                   l.order_index, l.concepts, l.learning_objectives
+                   l.order_index, l.learning_objectives
             FROM lessons l
             WHERE 1=1
         '''
@@ -103,12 +103,11 @@ def render_search_page():
             query += '''
                 AND (
                     l.title LIKE ?
-                    OR l.concepts LIKE ?
                     OR l.learning_objectives LIKE ?
                 )
             '''
             search_param = f"%{search_query}%"
-            params.extend([search_param, search_param, search_param])
+            params.extend([search_param, search_param])
 
         # Domain filter
         if selected_domain != "All Domains":
@@ -158,7 +157,7 @@ def render_search_page():
             st.success(f"Found {len(results)} lesson(s)")
 
             for row in results:
-                lesson_id, title, domain, difficulty, order_index, concepts, learning_objectives = row
+                lesson_id, title, domain, difficulty, order_index, learning_objectives = row
 
                 # Create lesson card
                 with st.container():
@@ -190,13 +189,13 @@ def render_search_page():
                             f"{difficulty_colors[difficulty]} {difficulty_names[difficulty]}"
                         )
 
-                        # Show snippet of concepts or objectives
-                        if concepts:
+                        # Show snippet of learning objectives
+                        if learning_objectives:
                             import json
                             try:
-                                concepts_list = json.loads(concepts) if isinstance(concepts, str) else concepts
-                                if concepts_list:
-                                    st.caption(f"**Concepts**: {', '.join(concepts_list[:3])}" + ("..." if len(concepts_list) > 3 else ""))
+                                objectives_list = json.loads(learning_objectives) if isinstance(learning_objectives, str) else learning_objectives
+                                if objectives_list:
+                                    st.caption(f"**Learning Objectives**: {', '.join(objectives_list[:3])}" + ("..." if len(objectives_list) > 3 else ""))
                             except:
                                 pass
 
