@@ -1,0 +1,154 @@
+{
+  "lesson_id": "82a536d1-5f95-45e2-9d33-d7f964917726",
+  "domain": "cloud",
+  "title": "Google Compute Engine Forensics",
+  "subtitle": "Section 5: Google Cloud Focus on GCE instance snapshots",
+  "difficulty": 2,
+  "estimated_time": 49,
+  "order_index": 43,
+  "prerequisites": [
+    "f06a1927-6cd4-40c5-bab7-6c26b12a41f3",
+    "89e7ba0b-77a6-4fce-8130-e603e7b59fdf"
+  ],
+  "concepts": [
+    "GCE instance snapshots",
+    "persistent disk forensics",
+    "instance metadata",
+    "startup scripts analysis",
+    "OS Login logs",
+    "serial console logs",
+    "compromised instance investigation"
+  ],
+  "learning_objectives": [
+    "Summarize why Google Compute Engine Forensics matters for cloud incident response and forensic readiness and how it guides decision-making.",
+    "Apply GCE instance snapshots and persistent disk forensics to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Google Compute Engine Forensics.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does GCE instance snapshots strengthen the Google Compute Engine Forensics workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "049333c7-f8f8-4953-b613-86d6057bf135",
+      "explanation": "GCE instance snapshots provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Google Compute Engine Forensics process consistently improves."
+    },
+    {
+      "question": "How does persistent disk forensics strengthen the Google Compute Engine Forensics workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "72c520c0-df81-4eb6-b258-a33205eedfdc",
+      "explanation": "persistent disk forensics provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Google Compute Engine Forensics process consistently improves."
+    },
+    {
+      "question": "How does instance metadata strengthen the Google Compute Engine Forensics workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "b06b2c31-a1ac-4e82-a196-fa035d2a66ae",
+      "explanation": "instance metadata provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Google Compute Engine Forensics process consistently improves."
+    },
+    {
+      "question": "How does startup scripts analysis strengthen the Google Compute Engine Forensics workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "4c2edc90-f11c-4ccc-8b3d-62e4abf21b13",
+      "explanation": "startup scripts analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Google Compute Engine Forensics process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 5: Google Cloud \u2013 Google Compute Engine Forensics\n\nCloud responders rely on **Google Compute Engine Forensics** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: GCE VM forensics\n\nGCE instance snapshots keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how gce instance snapshots supports resilience and recovery.\n\npersistent disk forensics keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how persistent disk forensics supports resilience and recovery.\n\ninstance metadata keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how instance metadata supports resilience and recovery.\n\nstartup scripts analysis keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how startup scripts analysis supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the google compute engine forensics habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=rQyw5n2y7p8 \u2014 Microsoft's Incident Response team walks through Microsoft 365 cloud forensics workflows, showing authentic evidence pulls and response coordination that align with this lesson."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 5: Google Cloud \u2013 Google Compute Engine Forensics\n\nCloud responders rely on **Google Compute Engine Forensics** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: GCE VM forensics\n\nOS Login logs keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how os login logs supports resilience and recovery.\n\nserial console logs keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how serial console logs supports resilience and recovery.\n\ncompromised instance investigation keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 5: google cloud commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how compromised instance investigation supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the google compute engine forensics habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Google Compute Engine Forensics\n\nSet up a sandbox aligned with section 5: google cloud commitments. The goal is to narrate every investigative move so cloud responders can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **GCE instance snapshots**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **persistent disk forensics**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **instance metadata**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **startup scripts analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **OS Login logs**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **serial console logs**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Google Compute Engine Forensics\n\nA regional team experienced a high-pressure incident that exposed gaps in cloud incident response and forensic readiness. Cloud responders regrouped and replayed the timeline using the lesson structure from Google Compute Engine Forensics.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: GCE VM forensics"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: GCEF\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend cloud incident response and forensic readiness under stress.\n\n- G \u2013 GCE instance snapshots\n- C \u2013 persistent disk forensics\n- E \u2013 instance metadata\n- F \u2013 startup scripts analysis\n\n### Mnemonic: GCEF\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- G \u2013 Lessons Learned\n- C \u2013 Resilience Testing\n- E \u2013 Automation Backlog\n- F \u2013 Telemetry Mapping\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Google Compute Engine Forensics\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **GCE instance snapshots** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **persistent disk forensics** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **instance metadata** influence the triage path, and which warning signs should cloud responders flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in cloud incident response and forensic readiness, and how would the Google Compute Engine Forensics workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so cloud responders have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an intermediate journey. Celebrate each iteration where cloud responders narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Google Compute Engine Forensics.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}
