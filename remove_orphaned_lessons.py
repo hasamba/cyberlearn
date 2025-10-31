@@ -10,18 +10,17 @@ Usage:
     python remove_orphaned_lessons.py --confirm # Actually delete orphaned lessons
 """
 
-import sys
+import json
+import sqlite3
 import argparse
 from pathlib import Path
-from database import SessionLocal, Lesson
 
 CONTENT_DIR = Path(__file__).parent / 'content'
+DB_PATH = "cyberlearn.db"
 
 
 def get_existing_lesson_ids():
     """Get set of lesson_ids from JSON files in content/"""
-    import json
-
     existing_ids = set()
 
     for filepath in CONTENT_DIR.glob('lesson_*.json'):
@@ -37,29 +36,39 @@ def get_existing_lesson_ids():
     return existing_ids
 
 
-def find_orphaned_lessons(db):
+def find_orphaned_lessons(conn):
     """Find lessons in database that don't have JSON files"""
     existing_ids = get_existing_lesson_ids()
-    all_lessons = db.query(Lesson).all()
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT lesson_id, domain, title, order_index FROM lessons")
+    all_lessons = cursor.fetchall()
 
     orphaned = []
     for lesson in all_lessons:
-        if lesson.lesson_id not in existing_ids:
-            orphaned.append(lesson)
+        lesson_id, domain, title, order_index = lesson
+        if lesson_id not in existing_ids:
+            orphaned.append({
+                'lesson_id': lesson_id,
+                'domain': domain,
+                'title': title,
+                'order_index': order_index
+            })
 
     return orphaned
 
 
 def remove_orphaned_lessons(confirm=False):
     """Remove orphaned lessons from database"""
-    db = SessionLocal()
+    conn = sqlite3.connect(DB_PATH)
 
     try:
         print("Scanning for orphaned lessons...")
         print(f"Content directory: {CONTENT_DIR}")
+        print(f"Database: {DB_PATH}")
         print()
 
-        orphaned = find_orphaned_lessons(db)
+        orphaned = find_orphaned_lessons(conn)
 
         if not orphaned:
             print("✅ No orphaned lessons found! Database is clean.")
@@ -69,9 +78,9 @@ def remove_orphaned_lessons(confirm=False):
         print("=" * 80)
 
         for lesson in orphaned:
-            print(f"  - [{lesson.domain}] {lesson.title}")
-            print(f"    lesson_id: {lesson.lesson_id}")
-            print(f"    order_index: {lesson.order_index}")
+            print(f"  - [{lesson['domain']}] {lesson['title']}")
+            print(f"    lesson_id: {lesson['lesson_id']}")
+            print(f"    order_index: {lesson['order_index']}")
             print()
 
         print("=" * 80)
@@ -93,25 +102,32 @@ def remove_orphaned_lessons(confirm=False):
             return
 
         # Delete orphaned lessons
+        cursor = conn.cursor()
         deleted_count = 0
+
         for lesson in orphaned:
             try:
-                db.delete(lesson)
-                deleted_count += 1
-                print(f"✅ Deleted: [{lesson.domain}] {lesson.title}")
-            except Exception as e:
-                print(f"❌ Error deleting {lesson.title}: {e}")
+                # Delete from lesson_tags first (foreign key constraint)
+                cursor.execute("DELETE FROM lesson_tags WHERE lesson_id = ?", (lesson['lesson_id'],))
 
-        db.commit()
+                # Delete from lessons table
+                cursor.execute("DELETE FROM lessons WHERE lesson_id = ?", (lesson['lesson_id'],))
+
+                deleted_count += 1
+                print(f"✅ Deleted: [{lesson['domain']}] {lesson['title']}")
+            except Exception as e:
+                print(f"❌ Error deleting {lesson['title']}: {e}")
+
+        conn.commit()
 
         print()
         print(f"Successfully deleted {deleted_count} orphaned lesson(s).")
 
     except Exception as e:
         print(f"❌ Error: {e}")
-        db.rollback()
+        conn.rollback()
     finally:
-        db.close()
+        conn.close()
 
 
 def main():
