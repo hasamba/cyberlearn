@@ -1,0 +1,156 @@
+{
+  "lesson_id": "ce71396c-a714-47e9-8cc3-c9720ac52125",
+  "domain": "dfir",
+  "title": "AWS Foundations for Incident Response",
+  "subtitle": "Section 5: Cloud Attacks and Response Focus on AWS architecture overview",
+  "difficulty": 2,
+  "estimated_time": 49,
+  "order_index": 151,
+  "prerequisites": [
+    "0c1b5e1a-7ed5-4cb4-9574-cb5a6d1caec4",
+    "9f62a725-7811-4364-90a2-fbe231b684cd",
+    "9b822685-a29d-4286-b6e7-9ab605e3d153",
+    "a686bda2-4bb3-4472-844d-b26c90ae5fec"
+  ],
+  "concepts": [
+    "AWS architecture overview",
+    "IAM deep dive",
+    "VPC concepts",
+    "EC2 and S3 security",
+    "CloudTrail logging",
+    "GuardDuty alerts",
+    "AWS security services for IR"
+  ],
+  "learning_objectives": [
+    "Summarize why AWS Foundations for Incident Response matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply AWS architecture overview and IAM deep dive to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing AWS Foundations for Incident Response.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does AWS architecture overview strengthen the AWS Foundations for Incident Response workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "bd3ef15d-d503-4d9f-89be-293541218aab",
+      "explanation": "AWS architecture overview provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Foundations for Incident Response process consistently improves."
+    },
+    {
+      "question": "How does IAM deep dive strengthen the AWS Foundations for Incident Response workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "0d0df2ba-35d4-4dc8-86b5-de4eef96f761",
+      "explanation": "IAM deep dive provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Foundations for Incident Response process consistently improves."
+    },
+    {
+      "question": "How does VPC concepts strengthen the AWS Foundations for Incident Response workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "25fe427b-7214-4413-9195-244144cd1d77",
+      "explanation": "VPC concepts provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Foundations for Incident Response process consistently improves."
+    },
+    {
+      "question": "How does EC2 and S3 security strengthen the AWS Foundations for Incident Response workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "ddf41531-d2b3-418b-8506-3d973cf1466c",
+      "explanation": "EC2 and S3 security provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Foundations for Incident Response process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 5: Cloud Attacks and Response \u2013 AWS Foundations for Incident Response\n\nForensic analysts rely on **AWS Foundations for Incident Response** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: AWS IR foundation - builds on FOR509\n\nAWS architecture overview keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how aws architecture overview supports resilience and recovery.\n\nIAM deep dive keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how iam deep dive supports resilience and recovery.\n\nVPC concepts keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how vpc concepts supports resilience and recovery.\n\nEC2 and S3 security keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how ec2 and s3 security supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the aws foundations for incident response habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=8yI7pMifS8s \u2014 DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 5: Cloud Attacks and Response \u2013 AWS Foundations for Incident Response\n\nForensic analysts rely on **AWS Foundations for Incident Response** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: AWS IR foundation - builds on FOR509\n\nCloudTrail logging keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how cloudtrail logging supports resilience and recovery.\n\nGuardDuty alerts keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how guardduty alerts supports resilience and recovery.\n\nAWS security services for IR keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 5: cloud attacks and response commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how aws security services for ir supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the aws foundations for incident response habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for AWS Foundations for Incident Response\n\nSet up a sandbox aligned with section 5: cloud attacks and response commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **AWS architecture overview**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **IAM deep dive**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **VPC concepts**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **EC2 and S3 security**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **CloudTrail logging**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **GuardDuty alerts**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying AWS Foundations for Incident Response\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from AWS Foundations for Incident Response.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: AWS IR foundation - builds on FOR509"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: AFFIR\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- A \u2013 AWS architecture overview\n- F \u2013 IAM deep dive\n- F \u2013 VPC concepts\n- I \u2013 EC2 and S3 security\n- R \u2013 CloudTrail logging\n\n### Mnemonic: AFFIR\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- A \u2013 Lessons Learned\n- F \u2013 Resilience Testing\n- F \u2013 Automation Backlog\n- I \u2013 Telemetry Mapping\n- R \u2013 Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: AWS Foundations for Incident Response\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **AWS architecture overview** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **IAM deep dive** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **VPC concepts** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the AWS Foundations for Incident Response workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an intermediate journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through AWS Foundations for Incident Response.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}
