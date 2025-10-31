@@ -519,12 +519,29 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
         # Quiz time
         render_quiz(lesson, user, db)
 
-    # Back button
-    if st.button("🔙 Back to Lessons"):
-        cleanup_lesson_state()
-        st.session_state.current_page = "learning"
-        st.session_state.scroll_to_top = True
-        st.rerun()
+    # Back button and Hide button
+    col_back, col_hide = st.columns(2)
+
+    with col_back:
+        if st.button("🔙 Back to Lessons", use_container_width=True):
+            cleanup_lesson_state()
+            st.session_state.current_page = "learning"
+            st.session_state.scroll_to_top = True
+            st.rerun()
+
+    with col_hide:
+        if st.button("🙈 Hide Lesson", use_container_width=True):
+            # Hide the lesson
+            cursor = db.conn.cursor()
+            cursor.execute("UPDATE lessons SET hidden = 1 WHERE lesson_id = ?", (str(lesson.lesson_id),))
+            db.conn.commit()
+
+            # Clean up and go back
+            cleanup_lesson_state()
+            st.session_state.current_page = "learning"
+            st.session_state.scroll_to_top = True
+            st.success("Lesson hidden! View in Hidden Lessons page.")
+            st.rerun()
 
     _maybe_scroll_to_top()
 
