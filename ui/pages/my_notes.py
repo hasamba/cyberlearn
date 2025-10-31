@@ -162,7 +162,24 @@ def render_note_card_full(note: Dict, db):
                     st.rerun()
 
         # Note content
-        st.markdown(note['note_text'])
+        if note['note_text']:
+            st.markdown(note['note_text'])
+
+        # Display attachments (images)
+        if note.get('attachments'):
+            try:
+                import json
+                from pathlib import Path
+                attachments = json.loads(note['attachments']) if isinstance(note['attachments'], str) else note['attachments']
+                for attachment in attachments:
+                    if attachment['type'] == 'image':
+                        image_path = Path(attachment['path'])
+                        if image_path.exists():
+                            st.image(str(image_path), caption=attachment['filename'], use_column_width=True)
+                        else:
+                            st.warning(f"📷 Image not found: {attachment['filename']}")
+            except Exception as e:
+                st.error(f"Error loading attachment: {str(e)}")
 
         # Edit/Delete buttons
         col_edit, col_pin, col_delete = st.columns([1, 1, 1])
