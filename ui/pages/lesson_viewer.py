@@ -465,13 +465,21 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     st.markdown(f"# {lesson.title}")
     st.markdown(f"*{lesson.subtitle}*" if lesson.subtitle else "")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
     with col1:
         st.caption(f"📚 Domain: {lesson.domain.replace('_', ' ').title()}")
     with col2:
         st.caption(f"🎯 Difficulty: {lesson.get_difficulty_name()}")
     with col3:
         st.caption(f"⏱️ Est. Time: {lesson.estimated_time} min")
+    with col4:
+        # Notes position toggle
+        current_position = st.session_state.get('notes_position', 'bottom')
+        if st.button("📝 ⚙️" if current_position == 'bottom' else "📝 ↕️",
+                     help="Toggle notes position: Bottom ↔ Right sidebar",
+                     use_container_width=True):
+            st.session_state.notes_position = 'right' if current_position == 'bottom' else 'bottom'
+            st.rerun()
 
     # Progress bar for lesson
     total_blocks = len(lesson.content_blocks)
@@ -491,18 +499,40 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     # Render current content block
     if current_idx < total_blocks:
         block = lesson.content_blocks[current_idx]
-        render_content_block(block, lesson, user, db)
 
-        # Notes section for this content block
-        st.markdown("---")
-        with st.expander("📝 Notes for this section", expanded=False):
-            from ui.components import lesson_notes
-            lesson_notes.render_notes_panel(
-                str(lesson.lesson_id),
-                str(user.user_id),
-                db,
-                content_block_index=current_idx
-            )
+        # Check notes position preference (default: bottom)
+        notes_position = st.session_state.get('notes_position', 'bottom')
+
+        if notes_position == 'right':
+            # Side-by-side layout: content on left, notes on right
+            col_content, col_notes = st.columns([2, 1])
+
+            with col_content:
+                render_content_block(block, lesson, user, db)
+
+            with col_notes:
+                st.markdown("### 📝 Notes")
+                from ui.components import lesson_notes
+                lesson_notes.render_notes_panel(
+                    str(lesson.lesson_id),
+                    str(user.user_id),
+                    db,
+                    content_block_index=current_idx
+                )
+        else:
+            # Bottom layout (default): notes below content
+            render_content_block(block, lesson, user, db)
+
+            # Notes section for this content block
+            st.markdown("---")
+            with st.expander("📝 Notes for this section", expanded=False):
+                from ui.components import lesson_notes
+                lesson_notes.render_notes_panel(
+                    str(lesson.lesson_id),
+                    str(user.user_id),
+                    db,
+                    content_block_index=current_idx
+                )
 
         # Compact navigation - all buttons in one line (4 columns)
         col_back, col_prev, col_next, col_hide = st.columns(4)
