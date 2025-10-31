@@ -179,6 +179,10 @@ def render_sidebar():
                 st.session_state.current_page = "lesson_packages"
                 st.rerun()
 
+            if st.button("📝 My Notes", use_container_width=True):
+                st.session_state.current_page = "my_notes"
+                st.rerun()
+
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
@@ -447,6 +451,9 @@ def main():
         elif page == "lesson_packages":
             from ui.pages import lesson_packages
             lesson_packages.render_lesson_packages_page()
+        elif page == "my_notes":
+            from ui.pages import my_notes
+            my_notes.render_my_notes_page()
         elif page == "lesson":
             if st.session_state.current_lesson:
                 lesson_viewer.render_lesson(
