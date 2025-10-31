@@ -16,7 +16,7 @@ import argparse
 from pathlib import Path
 
 CONTENT_DIR = Path(__file__).parent / 'content'
-DB_PATH = "cyberlearn.db"
+DB_PATH = "cyberlearn_template.db"  # Use template database
 
 
 def get_existing_lesson_ids():
@@ -71,7 +71,7 @@ def remove_orphaned_lessons(confirm=False):
         orphaned = find_orphaned_lessons(conn)
 
         if not orphaned:
-            print("✅ No orphaned lessons found! Database is clean.")
+            print("[OK] No orphaned lessons found! Database is clean.")
             return
 
         print(f"Found {len(orphaned)} orphaned lesson(s):")
@@ -87,7 +87,7 @@ def remove_orphaned_lessons(confirm=False):
 
         if not confirm:
             print()
-            print("⚠️  DRY RUN MODE - No changes made")
+            print("[DRY RUN] No changes made")
             print()
             print("To actually delete these lessons, run:")
             print("  python remove_orphaned_lessons.py --confirm")
@@ -114,9 +114,9 @@ def remove_orphaned_lessons(confirm=False):
                 cursor.execute("DELETE FROM lessons WHERE lesson_id = ?", (lesson['lesson_id'],))
 
                 deleted_count += 1
-                print(f"✅ Deleted: [{lesson['domain']}] {lesson['title']}")
+                print(f"[OK] Deleted: [{lesson['domain']}] {lesson['title']}")
             except Exception as e:
-                print(f"❌ Error deleting {lesson['title']}: {e}")
+                print(f"[ERROR] Error deleting {lesson['title']}: {e}")
 
         conn.commit()
 
@@ -124,7 +124,7 @@ def remove_orphaned_lessons(confirm=False):
         print(f"Successfully deleted {deleted_count} orphaned lesson(s).")
 
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] {e}")
         conn.rollback()
     finally:
         conn.close()
