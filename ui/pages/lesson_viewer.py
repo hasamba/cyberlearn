@@ -493,12 +493,19 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
         block = lesson.content_blocks[current_idx]
         render_content_block(block, lesson, user, db)
 
-        # Navigation buttons
-        col_prev, col_next = st.columns(2)
+        # Compact navigation - all buttons in one line (4 columns)
+        col_back, col_prev, col_next, col_hide = st.columns(4)
+
+        with col_back:
+            if st.button("🔙 Back", use_container_width=True, key="back_content"):
+                cleanup_lesson_state()
+                st.session_state.current_page = "learning"
+                st.session_state.scroll_to_top = True
+                st.rerun()
 
         with col_prev:
             if current_idx > 0:
-                if st.button("⬅️ Previous", use_container_width=True):
+                if st.button("⬅️ Prev", use_container_width=True):
                     st.session_state.current_block_index -= 1
                     st.session_state.scroll_to_top = True
                     st.rerun()
@@ -511,37 +518,52 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                     st.rerun()
             else:
                 # Last block - show quiz
-                if st.button("📝 Take Quiz ➡️", use_container_width=True):
+                if st.button("Quiz ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
                     st.session_state.scroll_to_top = True
                     st.rerun()
+
+        with col_hide:
+            if st.button("🙈 Hide", use_container_width=True, key="hide_content"):
+                # Hide the lesson
+                cursor = db.conn.cursor()
+                cursor.execute("UPDATE lessons SET hidden = 1 WHERE lesson_id = ?", (str(lesson.lesson_id),))
+                db.conn.commit()
+
+                # Clean up and go back
+                cleanup_lesson_state()
+                st.session_state.current_page = "learning"
+                st.session_state.scroll_to_top = True
+                st.success("Lesson hidden! View in Hidden Lessons page.")
+                st.rerun()
+
     else:
         # Quiz time
         render_quiz(lesson, user, db)
 
-    # Back button and Hide button
-    col_back, col_hide = st.columns(2)
+        # Compact navigation for quiz page (2 columns)
+        col_back_quiz, col_hide_quiz = st.columns([1, 1])
 
-    with col_back:
-        if st.button("🔙 Back to Lessons", use_container_width=True):
-            cleanup_lesson_state()
-            st.session_state.current_page = "learning"
-            st.session_state.scroll_to_top = True
-            st.rerun()
+        with col_back_quiz:
+            if st.button("🔙 Back to Lessons", use_container_width=True, key="back_quiz"):
+                cleanup_lesson_state()
+                st.session_state.current_page = "learning"
+                st.session_state.scroll_to_top = True
+                st.rerun()
 
-    with col_hide:
-        if st.button("🙈 Hide Lesson", use_container_width=True):
-            # Hide the lesson
-            cursor = db.conn.cursor()
-            cursor.execute("UPDATE lessons SET hidden = 1 WHERE lesson_id = ?", (str(lesson.lesson_id),))
-            db.conn.commit()
+        with col_hide_quiz:
+            if st.button("🙈 Hide Lesson", use_container_width=True, key="hide_quiz"):
+                # Hide the lesson
+                cursor = db.conn.cursor()
+                cursor.execute("UPDATE lessons SET hidden = 1 WHERE lesson_id = ?", (str(lesson.lesson_id),))
+                db.conn.commit()
 
-            # Clean up and go back
-            cleanup_lesson_state()
-            st.session_state.current_page = "learning"
-            st.session_state.scroll_to_top = True
-            st.success("Lesson hidden! View in Hidden Lessons page.")
-            st.rerun()
+                # Clean up and go back
+                cleanup_lesson_state()
+                st.session_state.current_page = "learning"
+                st.session_state.scroll_to_top = True
+                st.success("Lesson hidden! View in Hidden Lessons page.")
+                st.rerun()
 
     _maybe_scroll_to_top()
 
