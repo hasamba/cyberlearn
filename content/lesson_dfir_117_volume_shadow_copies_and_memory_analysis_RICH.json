@@ -1,0 +1,154 @@
+{
+  "lesson_id": "8d055e7c-afc2-482f-8dfc-b190ff6dd39b",
+  "domain": "dfir",
+  "title": "Volume Shadow Copies and Memory Analysis",
+  "subtitle": "Section 1: Digital Forensics and Advanced Data Triage Focus on VSS forensics",
+  "difficulty": 2,
+  "estimated_time": 49,
+  "order_index": 117,
+  "prerequisites": [
+    "0dea5c2c-3081-4c96-ae9c-98faa9512dd3",
+    "5b6dde80-6b19-4aac-997a-d69fbdbdb10b",
+    "b27eb7f6-0d48-43e4-9249-7cbfecf0f2f2"
+  ],
+  "concepts": [
+    "VSS forensics",
+    "recovering deleted files from shadow copies",
+    "historical artifact analysis",
+    "pagefile analysis",
+    "memory dump analysis",
+    "unallocated space analysis"
+  ],
+  "learning_objectives": [
+    "Summarize why Volume Shadow Copies and Memory Analysis matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply VSS forensics and recovering deleted files from shadow copies to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Volume Shadow Copies and Memory Analysis.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does VSS forensics strengthen the Volume Shadow Copies and Memory Analysis workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "7e8f0474-2dd8-4a60-87f1-49d24b14403a",
+      "explanation": "VSS forensics provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Volume Shadow Copies and Memory Analysis process consistently improves."
+    },
+    {
+      "question": "How does recovering deleted files from shadow copies strengthen the Volume Shadow Copies and Memory Analysis workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "0d975b37-8dcb-42e8-974c-f7bdd6e37a27",
+      "explanation": "recovering deleted files from shadow copies provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Volume Shadow Copies and Memory Analysis process consistently improves."
+    },
+    {
+      "question": "How does historical artifact analysis strengthen the Volume Shadow Copies and Memory Analysis workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "16fd85d7-c7d2-4299-bd1e-255abdc8bbb9",
+      "explanation": "historical artifact analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Volume Shadow Copies and Memory Analysis process consistently improves."
+    },
+    {
+      "question": "How does pagefile analysis strengthen the Volume Shadow Copies and Memory Analysis workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "f50a07a1-f376-44b0-b3b0-ac225a92c32c",
+      "explanation": "pagefile analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Volume Shadow Copies and Memory Analysis process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 1: Digital Forensics and Advanced Data Triage \u2013 Volume Shadow Copies and Memory Analysis\n\nForensic analysts rely on **Volume Shadow Copies and Memory Analysis** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Leveraging VSS for historical forensics\n\nVSS forensics keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how vss forensics supports resilience and recovery.\n\nrecovering deleted files from shadow copies keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how recovering deleted files from shadow copies supports resilience and recovery.\n\nhistorical artifact analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how historical artifact analysis supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the volume shadow copies and memory analysis habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=8yI7pMifS8s \u2014 DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 1: Digital Forensics and Advanced Data Triage \u2013 Volume Shadow Copies and Memory Analysis\n\nForensic analysts rely on **Volume Shadow Copies and Memory Analysis** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Leveraging VSS for historical forensics\n\npagefile analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how pagefile analysis supports resilience and recovery.\n\nmemory dump analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how memory dump analysis supports resilience and recovery.\n\nunallocated space analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 1: digital forensics and advanced data triage commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how unallocated space analysis supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the volume shadow copies and memory analysis habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Volume Shadow Copies and Memory Analysis\n\nSet up a sandbox aligned with section 1: digital forensics and advanced data triage commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **VSS forensics**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **recovering deleted files from shadow copies**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **historical artifact analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **pagefile analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **memory dump analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **unallocated space analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Volume Shadow Copies and Memory Analysis\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from Volume Shadow Copies and Memory Analysis.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Leveraging VSS for historical forensics"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: VSCAM\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- V \u2013 VSS forensics\n- S \u2013 recovering deleted files from shadow copies\n- C \u2013 historical artifact analysis\n- A \u2013 pagefile analysis\n- M \u2013 memory dump analysis\n\n### Mnemonic: SCAMA\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- S \u2013 Lessons Learned\n- C \u2013 Resilience Testing\n- A \u2013 Automation Backlog\n- M \u2013 Telemetry Mapping\n- A \u2013 Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Volume Shadow Copies and Memory Analysis\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **VSS forensics** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **recovering deleted files from shadow copies** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **historical artifact analysis** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the Volume Shadow Copies and Memory Analysis workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an intermediate journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Volume Shadow Copies and Memory Analysis.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}
