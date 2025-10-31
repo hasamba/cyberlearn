@@ -94,7 +94,7 @@
     {
       "type": "code_exercise",
       "content": {
-        "text": "### Hands-on Automation\nUse the following commands to practice sleuth kit (tsk) fls and mactime and reinforce forensic timeline integration.\n\n```powershell\n# Inspecting artifacts with Sleuth Kit\nSleuth Kit --help\n```\n\n```powershell\n# Inspecting artifacts with mactime\nmactime --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\n    if 'suspicious' in entry.tags:\n        print(entry.timestamp, entry.source, entry.details)\n```"
+        "text": "### Hands-on Automation\nUse the following commands to practice sleuth kit (tsk) fls and mactime and reinforce forensic timeline integration.\n\n```powershell\n# Inspecting artifacts with Sleuth Kit\nSleuth Kit --help\n```\n\n```powershell\n# Inspecting artifacts with mactime\nmactime --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\nif 'suspicious' in entry.tags:\nprint(entry.timestamp, entry.source, entry.details)\n```"
       }
     },
     {
