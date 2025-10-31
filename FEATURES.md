@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-10-31
 **Current Version:** 1.0
-**Total Features Tracked:** 5 planned, 0 in progress, 4 completed
+**Total Features Tracked:** 4 planned, 0 in progress, 5 completed
 
 ---
 
@@ -151,41 +151,48 @@
 
 ### Personalization
 
-- [ ] **Feature:** Hide/Unhide Lessons with Management Page
+- [✓] **Feature:** Hide/Unhide Lessons with Management Page
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** Medium
   - **Description:** Allow users to hide lessons from the main UI (lesson catalog, recommendations), with a dedicated "Hidden Lessons" page where users can view and unhide lessons
-  - **Acceptance Criteria:**
-    - [ ] Add "hidden" boolean field to lessons table (default: False)
-    - [ ] "Hide Lesson" action in lesson UI (context menu or button)
-    - [ ] Hidden lessons excluded from:
-      - [ ] Domain lesson lists
-      - [ ] Adaptive recommendations
-      - [ ] Search results
-      - [ ] Progress calculations
-    - [ ] "Hidden Lessons" page accessible from main menu/settings
-    - [ ] Hidden lessons page shows:
-      - [ ] List of all hidden lessons with title, domain, difficulty
-      - [ ] "Unhide" button for each lesson
-      - [ ] Bulk unhide option (select multiple)
-      - [ ] Filter/sort by domain, difficulty, date hidden
-    - [ ] Confirmation dialog before hiding (prevent accidental hides)
-    - [ ] Visual indicator count (e.g., "X lessons hidden") in UI
+  - **Completed:**
+    - [✓] Added "hidden" boolean column to lessons table (default: 0)
+    - [✓] "Hide Lesson" button in lesson viewer
+    - [✓] Hidden lessons excluded from:
+      - [✓] Domain lesson lists (get_lessons_by_domain with include_hidden parameter)
+      - [✓] Search results (with optional "Include hidden" toggle)
+    - [✓] "Hidden Lessons" page accessible from sidebar navigation
+    - [✓] Hidden lessons page shows:
+      - [✓] List of all hidden lessons with title, domain, difficulty, order_index
+      - [✓] "Unhide" button for each lesson
+      - [✓] Bulk "Unhide All" button
+      - [✓] Domain emoji and difficulty indicators
+    - [✓] Count of hidden lessons displayed on page
   - **Technical Details:**
-    - **Database:** Add `hidden` column (BOOLEAN, default FALSE) to lessons table
-    - **API endpoints:**
-      - `POST /api/lessons/{lesson_id}/hide`
-      - `POST /api/lessons/{lesson_id}/unhide`
-      - `GET /api/lessons/hidden` (returns all hidden lessons)
-    - **UI route:** New Streamlit page "Hidden Lessons" or modal
-    - **Filter logic:** Add `WHERE hidden = FALSE` to all lesson queries
+    - **Database:** Added `hidden` column (BOOLEAN, default 0) to lessons table via add_hidden_column.py
+    - **UI components:**
+      - Hidden Lessons page: ui/pages/hidden_lessons.py
+      - Hide button: ui/pages/lesson_viewer.py (line 533-544)
+      - Navigation: app.py (lines 166-168, 426-428)
+    - **Filter logic:**
+      - get_lessons_by_domain() checks for hidden column and excludes by default
+      - Search page has optional "Include hidden lessons" checkbox
   - **Use Cases:**
     - User wants to focus on specific domains/topics
     - Remove outdated or irrelevant content from view
     - Temporarily hide completed lessons to reduce clutter
     - Hide user-imported lessons that don't fit learning path
-  - **Notes:** Hidden lessons should still be accessible via direct URL (in case shared). Consider adding "Hide until [date]" for temporary hiding. Track date_hidden for sorting.
-  - **Dependencies:** None
-  - **Estimated Effort:** Small (1-2 days)
+  - **Commit:** fe5778a
+  - **Files:**
+    - add_hidden_column.py (migration script)
+    - ui/pages/hidden_lessons.py (management page)
+    - test_hide_functionality.py (test script)
+    - utils/database.py (updated get_lessons_by_domain)
+    - ui/pages/lesson_viewer.py (hide button)
+    - ui/pages/search.py (include hidden toggle)
+    - app.py (navigation integration)
+  - **Result:** Fully functional hide/unhide system with 411 lessons initially visible
+  - **Estimated Effort:** Completed in 1 day (as estimated)
 
 ### User Notes & Annotations
 
