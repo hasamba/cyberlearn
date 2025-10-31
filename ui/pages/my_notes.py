@@ -27,7 +27,7 @@ def render_my_notes_page():
     cursor = db.conn.cursor()
     cursor.execute("""
         SELECT n.note_id, n.lesson_id, n.content_block_index, n.note_text,
-               n.is_pinned, n.created_at, n.updated_at,
+               n.attachments, n.is_pinned, n.created_at, n.updated_at,
                l.title as lesson_title, l.domain
         FROM lesson_notes n
         JOIN lessons l ON n.lesson_id = l.lesson_id
@@ -175,7 +175,7 @@ def render_note_card_full(note: Dict, db):
                     if attachment['type'] == 'image':
                         image_path = Path(attachment['path'])
                         if image_path.exists():
-                            st.image(str(image_path), caption=attachment['filename'], use_column_width=True)
+                            st.image(str(image_path), caption=attachment['filename'], use_container_width=True)
                         else:
                             st.warning(f"📷 Image not found: {attachment['filename']}")
             except Exception as e:
