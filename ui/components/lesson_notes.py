@@ -229,7 +229,7 @@ def get_notes(lesson_id: str, user_id: str, db, content_block_index: Optional[in
         # Get notes for specific block + general notes
         cursor.execute("""
             SELECT note_id, user_id, lesson_id, content_block_index, note_text,
-                   note_type, is_pinned, created_at, updated_at
+                   note_type, attachments, is_pinned, created_at, updated_at
             FROM lesson_notes
             WHERE user_id = ? AND lesson_id = ?
               AND (content_block_index = ? OR content_block_index IS NULL)
@@ -239,7 +239,7 @@ def get_notes(lesson_id: str, user_id: str, db, content_block_index: Optional[in
         # Get all notes for lesson
         cursor.execute("""
             SELECT note_id, user_id, lesson_id, content_block_index, note_text,
-                   note_type, is_pinned, created_at, updated_at
+                   note_type, attachments, is_pinned, created_at, updated_at
             FROM lesson_notes
             WHERE user_id = ? AND lesson_id = ?
             ORDER BY is_pinned DESC, created_at DESC
