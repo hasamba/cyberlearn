@@ -1,0 +1,154 @@
+{
+  "lesson_id": "719f33a1-e7ef-44d4-b7eb-d2e3f18dbfa7",
+  "domain": "dfir",
+  "title": "Windows Application Execution Artifacts",
+  "subtitle": "Section 2: Registry Analysis Focus on UserAssist (program execution tracking)",
+  "difficulty": 3,
+  "estimated_time": 56,
+  "order_index": 120,
+  "prerequisites": [
+    "bb521363-fa8b-4902-b3ed-5cbe1e8ca816",
+    "fd1748b3-47e0-4c0f-80b7-b3b6e51f4092"
+  ],
+  "concepts": [
+    "UserAssist (program execution tracking)",
+    "Shimcache (AppCompatCache)",
+    "AmCache.hve",
+    "BAM/DAM (Background Activity Moderator)",
+    "prefetch files",
+    "recent file analysis",
+    "MUI cache"
+  ],
+  "learning_objectives": [
+    "Summarize why Windows Application Execution Artifacts matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply UserAssist (program execution tracking) and Shimcache (AppCompatCache) to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Windows Application Execution Artifacts.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does UserAssist (program execution tracking) strengthen the Windows Application Execution Artifacts workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "682cf180-c986-409b-9eb1-52ad78a9d4e0",
+      "explanation": "UserAssist (program execution tracking) provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Application Execution Artifacts process consistently improves."
+    },
+    {
+      "question": "How does Shimcache (AppCompatCache) strengthen the Windows Application Execution Artifacts workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "dd8371de-fefb-4a0a-b69b-66e711d2b2c9",
+      "explanation": "Shimcache (AppCompatCache) provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Application Execution Artifacts process consistently improves."
+    },
+    {
+      "question": "How does AmCache.hve strengthen the Windows Application Execution Artifacts workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "456ab8b6-0e3c-41fb-8c22-98fb6c473629",
+      "explanation": "AmCache.hve provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Application Execution Artifacts process consistently improves."
+    },
+    {
+      "question": "How does BAM/DAM (Background Activity Moderator) strengthen the Windows Application Execution Artifacts workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "b1a3b859-8aaa-4c3b-81f3-3af72ce62369",
+      "explanation": "BAM/DAM (Background Activity Moderator) provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Application Execution Artifacts process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 2: Registry Analysis \u2013 Windows Application Execution Artifacts\n\nForensic analysts rely on **Windows Application Execution Artifacts** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Tracking program execution and file access\n\nUserAssist (program execution tracking) keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how userassist (program execution tracking) supports resilience and recovery.\n\nShimcache (AppCompatCache) keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how shimcache (appcompatcache) supports resilience and recovery.\n\nAmCache.hve keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how amcache.hve supports resilience and recovery.\n\nBAM/DAM (Background Activity Moderator) keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how bam/dam (background activity moderator) supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows application execution artifacts habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=8yI7pMifS8s \u2014 DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 2: Registry Analysis \u2013 Windows Application Execution Artifacts\n\nForensic analysts rely on **Windows Application Execution Artifacts** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Tracking program execution and file access\n\nprefetch files keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how prefetch files supports resilience and recovery.\n\nrecent file analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how recent file analysis supports resilience and recovery.\n\nMUI cache keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how mui cache supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows application execution artifacts habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Windows Application Execution Artifacts\n\nSet up a sandbox aligned with section 2: registry analysis commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **UserAssist (program execution tracking)**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **Shimcache (AppCompatCache)**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **AmCache.hve**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **BAM/DAM (Background Activity Moderator)**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **prefetch files**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **recent file analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Windows Application Execution Artifacts\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from Windows Application Execution Artifacts.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Tracking program execution and file access"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: WAEA\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- W \u2013 UserAssist (program execution tracking)\n- A \u2013 Shimcache (AppCompatCache)\n- E \u2013 AmCache.hve\n- A \u2013 BAM/DAM (Background Activity Moderator)\n\n### Mnemonic: WAEA\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- W \u2013 Lessons Learned\n- A \u2013 Resilience Testing\n- E \u2013 Automation Backlog\n- A \u2013 Telemetry Mapping\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Windows Application Execution Artifacts\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **UserAssist (program execution tracking)** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **Shimcache (AppCompatCache)** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **AmCache.hve** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the Windows Application Execution Artifacts workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an advanced journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Windows Application Execution Artifacts.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}

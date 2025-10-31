@@ -1,0 +1,155 @@
+{
+  "lesson_id": "83d57199-d371-417d-ac97-9eb09e2b4b2b",
+  "domain": "cloud",
+  "title": "AWS Native Log Searching and Analysis",
+  "subtitle": "Section 3: AWS Focus on CloudWatch Logs Insights",
+  "difficulty": 3,
+  "estimated_time": 56,
+  "order_index": 35,
+  "prerequisites": [
+    "846fae99-1fa6-4cb4-8cb6-6515aec47a3d",
+    "4f61e854-60e9-4df3-8017-97015e5adb2f",
+    "af355c6d-67c4-4587-9a00-83d2be91b3d6",
+    "d50ac8aa-da1f-4a32-8bc8-a36730ec92d0"
+  ],
+  "concepts": [
+    "CloudWatch Logs Insights",
+    "Athena for CloudTrail analysis",
+    "querying S3 access logs",
+    "GuardDuty findings",
+    "Security Hub aggregation",
+    "automated hunting queries"
+  ],
+  "learning_objectives": [
+    "Summarize why AWS Native Log Searching and Analysis matters for cloud incident response and forensic readiness and how it guides decision-making.",
+    "Apply CloudWatch Logs Insights and Athena for CloudTrail analysis to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing AWS Native Log Searching and Analysis.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does CloudWatch Logs Insights strengthen the AWS Native Log Searching and Analysis workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "13f37185-0ee5-43c0-9597-90b05fe577e1",
+      "explanation": "CloudWatch Logs Insights provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Native Log Searching and Analysis process consistently improves."
+    },
+    {
+      "question": "How does Athena for CloudTrail analysis strengthen the AWS Native Log Searching and Analysis workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "e413f75f-934c-4f24-bec0-a541373a0810",
+      "explanation": "Athena for CloudTrail analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Native Log Searching and Analysis process consistently improves."
+    },
+    {
+      "question": "How does querying S3 access logs strengthen the AWS Native Log Searching and Analysis workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "b0cf8d6d-d465-41bf-b96d-93ee085e3103",
+      "explanation": "querying S3 access logs provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Native Log Searching and Analysis process consistently improves."
+    },
+    {
+      "question": "How does GuardDuty findings strengthen the AWS Native Log Searching and Analysis workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "9eb3a156-6d52-4705-b446-aec450e24bf5",
+      "explanation": "GuardDuty findings provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the AWS Native Log Searching and Analysis process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: AWS \u2013 AWS Native Log Searching and Analysis\n\nCloud responders rely on **AWS Native Log Searching and Analysis** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: Scalable log analysis in AWS\n\nCloudWatch Logs Insights keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how cloudwatch logs insights supports resilience and recovery.\n\nAthena for CloudTrail analysis keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how athena for cloudtrail analysis supports resilience and recovery.\n\nquerying S3 access logs keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how querying s3 access logs supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the aws native log searching and analysis habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=rQyw5n2y7p8 \u2014 Microsoft's Incident Response team walks through Microsoft 365 cloud forensics workflows, showing authentic evidence pulls and response coordination that align with this lesson."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: AWS \u2013 AWS Native Log Searching and Analysis\n\nCloud responders rely on **AWS Native Log Searching and Analysis** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: Scalable log analysis in AWS\n\nGuardDuty findings keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how guardduty findings supports resilience and recovery.\n\nSecurity Hub aggregation keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how security hub aggregation supports resilience and recovery.\n\nautomated hunting queries keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 3: aws commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how automated hunting queries supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the aws native log searching and analysis habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for AWS Native Log Searching and Analysis\n\nSet up a sandbox aligned with section 3: aws commitments. The goal is to narrate every investigative move so cloud responders can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **CloudWatch Logs Insights**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **Athena for CloudTrail analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **querying S3 access logs**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **GuardDuty findings**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **Security Hub aggregation**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **automated hunting queries**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying AWS Native Log Searching and Analysis\n\nA regional team experienced a high-pressure incident that exposed gaps in cloud incident response and forensic readiness. Cloud responders regrouped and replayed the timeline using the lesson structure from AWS Native Log Searching and Analysis.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Scalable log analysis in AWS"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: ANLSA\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend cloud incident response and forensic readiness under stress.\n\n- A \u2013 CloudWatch Logs Insights\n- N \u2013 Athena for CloudTrail analysis\n- L \u2013 querying S3 access logs\n- S \u2013 GuardDuty findings\n- A \u2013 Security Hub aggregation\n\n### Mnemonic: NLSAA\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- N \u2013 Lessons Learned\n- L \u2013 Resilience Testing\n- S \u2013 Automation Backlog\n- A \u2013 Telemetry Mapping\n- A \u2013 Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: AWS Native Log Searching and Analysis\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **CloudWatch Logs Insights** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **Athena for CloudTrail analysis** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **querying S3 access logs** influence the triage path, and which warning signs should cloud responders flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in cloud incident response and forensic readiness, and how would the AWS Native Log Searching and Analysis workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so cloud responders have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an advanced journey. Celebrate each iteration where cloud responders narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through AWS Native Log Searching and Analysis.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}
