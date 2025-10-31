@@ -1,0 +1,155 @@
+{
+  "lesson_id": "b153e5d3-649f-4cf6-b4b5-18446cc37467",
+  "domain": "cloud",
+  "title": "Common Kubernetes Attacks and Detection",
+  "subtitle": "Section 4: Kubernetes Focus on Container escape",
+  "difficulty": 3,
+  "estimated_time": 56,
+  "order_index": 38,
+  "prerequisites": [
+    "e0a0bb94-0d9c-4bf9-8b23-4b1e531b539a",
+    "a0f5c59a-0479-41d6-9bfc-9169f41a90a7"
+  ],
+  "concepts": [
+    "Container escape",
+    "privilege escalation",
+    "misconfigured RBAC",
+    "exposed dashboards",
+    "cryptomining",
+    "supply chain attacks",
+    "malicious images",
+    "detecting compromised pods"
+  ],
+  "learning_objectives": [
+    "Summarize why Common Kubernetes Attacks and Detection matters for cloud incident response and forensic readiness and how it guides decision-making.",
+    "Apply Container escape and privilege escalation to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Common Kubernetes Attacks and Detection.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does Container escape strengthen the Common Kubernetes Attacks and Detection workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "c5d9de12-d90b-4a0a-aede-df33425beae4",
+      "explanation": "Container escape provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Common Kubernetes Attacks and Detection process consistently improves."
+    },
+    {
+      "question": "How does privilege escalation strengthen the Common Kubernetes Attacks and Detection workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "f64caab3-e85f-42c6-9ef9-9d2ef98b10e6",
+      "explanation": "privilege escalation provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Common Kubernetes Attacks and Detection process consistently improves."
+    },
+    {
+      "question": "How does misconfigured RBAC strengthen the Common Kubernetes Attacks and Detection workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "b416f978-46b4-493d-8a36-f3a10c55668a",
+      "explanation": "misconfigured RBAC provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Common Kubernetes Attacks and Detection process consistently improves."
+    },
+    {
+      "question": "How does exposed dashboards strengthen the Common Kubernetes Attacks and Detection workflow?",
+      "options": [
+        "It distracts cloud responders from cloud incident response and forensic readiness priorities by focusing on unrelated administrative work.",
+        "It guides cloud responders to gather evidence, compare telemetry, and communicate findings tied to cloud incident response and forensic readiness.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "caebabd3-99a1-495f-bba9-e8bb38fda7da",
+      "explanation": "exposed dashboards provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Common Kubernetes Attacks and Detection process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 4: Kubernetes \u2013 Common Kubernetes Attacks and Detection\n\nCloud responders rely on **Common Kubernetes Attacks and Detection** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: K8s threat landscape\n\nContainer escape keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how container escape supports resilience and recovery.\n\nprivilege escalation keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how privilege escalation supports resilience and recovery.\n\nmisconfigured RBAC keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how misconfigured rbac supports resilience and recovery.\n\nexposed dashboards keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how exposed dashboards supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the common kubernetes attacks and detection habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=rQyw5n2y7p8 \u2014 Microsoft's Incident Response team walks through Microsoft 365 cloud forensics workflows, showing authentic evidence pulls and response coordination that align with this lesson."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 4: Kubernetes \u2013 Common Kubernetes Attacks and Detection\n\nCloud responders rely on **Common Kubernetes Attacks and Detection** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding cloud incident response and forensic readiness.\n\nRemember from the planning notes: K8s threat landscape\n\ncryptomining keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how cryptomining supports resilience and recovery.\n\nsupply chain attacks keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how supply chain attacks supports resilience and recovery.\n\nmalicious images keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how malicious images supports resilience and recovery.\n\ndetecting compromised pods keeps cloud responders grounded in repeatable practice. Within cloud incident response and forensic readiness, this element clarifies how to brief peers, review telemetry, and translate the section 4: kubernetes commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how detecting compromised pods supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the common kubernetes attacks and detection habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Common Kubernetes Attacks and Detection\n\nSet up a sandbox aligned with section 4: kubernetes commitments. The goal is to narrate every investigative move so cloud responders can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **Container escape**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **privilege escalation**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **misconfigured RBAC**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **exposed dashboards**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **cryptomining**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **supply chain attacks**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Common Kubernetes Attacks and Detection\n\nA regional team experienced a high-pressure incident that exposed gaps in cloud incident response and forensic readiness. Cloud responders regrouped and replayed the timeline using the lesson structure from Common Kubernetes Attacks and Detection.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: K8s threat landscape"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: CKAAD\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend cloud incident response and forensic readiness under stress.\n\n- C \u2013 Container escape\n- K \u2013 privilege escalation\n- A \u2013 misconfigured RBAC\n- A \u2013 exposed dashboards\n- D \u2013 cryptomining\n\n### Mnemonic: CKAAD\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- C \u2013 Lessons Learned\n- K \u2013 Resilience Testing\n- A \u2013 Automation Backlog\n- A \u2013 Telemetry Mapping\n- D \u2013 Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Common Kubernetes Attacks and Detection\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **Container escape** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **privilege escalation** influence the triage path, and which warning signs should cloud responders flag immediately?\n\n- How does **misconfigured RBAC** influence the triage path, and which warning signs should cloud responders flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in cloud incident response and forensic readiness, and how would the Common Kubernetes Attacks and Detection workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so cloud responders have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an advanced journey. Celebrate each iteration where cloud responders narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Common Kubernetes Attacks and Detection.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ]
+}
