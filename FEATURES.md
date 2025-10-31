@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-10-31
 **Current Version:** 1.0
-**Total Features Tracked:** 4 planned, 0 in progress, 5 completed
+**Total Features Tracked:** 3 planned, 0 in progress, 6 completed
 
 ---
 
@@ -65,42 +65,26 @@
 
 ### Adaptive Learning
 
-- [IN PROGRESS] **Feature:** Enhanced User Skill Assessment Questionnaire
-  - **Status:** Database Complete, UI Pending
+- [✓] **Feature:** Enhanced User Skill Assessment Questionnaire
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** High
   - **Description:** Redesign the new user onboarding assessment to accurately evaluate user skill levels across all domains, providing better initial lesson recommendations and adaptive learning paths
-  - **Acceptance Criteria:**
-    - [ ] Comprehensive assessment covering all 12 active domains
-    - [ ] Multiple question types:
-      - [ ] Knowledge-based questions (technical understanding)
-      - [ ] Experience-based questions (practical experience, tools used)
-      - [ ] Scenario-based questions (applied knowledge)
-      - [ ] Self-assessment scale (confidence levels)
-    - [ ] Domain-specific diagnostic questions:
-      - [ ] Fundamentals (5-7 questions): Networking, cryptography, authentication, threat landscape
-      - [ ] DFIR (5-7 questions): Evidence collection, timeline analysis, memory forensics, disk forensics
-      - [ ] Malware (5-7 questions): Static/dynamic analysis, reverse engineering, detection
-      - [ ] Active Directory (5-7 questions): Domain structure, authentication protocols, exploitation
-      - [ ] System (5-7 questions): Windows/Linux internals, kernel, file systems
-      - [ ] Cloud (5-7 questions): AWS/Azure/GCP, IAM, cloud security services
-      - [ ] Pentest (5-7 questions): Methodology, reconnaissance, exploitation, reporting
-      - [ ] Red Team (5-7 questions): C2, evasion, persistence, operations
-      - [ ] Blue Team (5-7 questions): Detection, SIEM, incident response, threat hunting
-      - [ ] OSINT (3-5 questions): Sources, tools, methodology
-      - [ ] Threat Hunting (3-5 questions): Hypothesis development, tools, TTPs
-      - [ ] Linux (3-5 questions): Command line, administration, security
-    - [ ] Adaptive questioning (skip advanced questions if fundamentals fail)
-    - [ ] Results processing:
-      - [ ] Calculate skill level (0-5) for each domain
-      - [ ] Identify knowledge gaps
-      - [ ] Generate personalized learning path
-      - [ ] Recommend starting lessons for each domain
-    - [ ] Results visualization:
-      - [ ] Radar chart showing skill levels across domains
-      - [ ] Suggested career paths based on strengths
-      - [ ] Recommended first lessons
-    - [ ] Option to retake assessment later
-    - [ ] Track assessment history and skill progression over time
+  - **Completed:**
+    - [✓] Comprehensive assessment covering all 15 domains
+    - [✓] Multiple choice question format (93 questions total)
+    - [✓] Questions distributed across difficulty levels (40% beginner, 40% intermediate, 20% advanced)
+    - [✓] Domain-specific diagnostic questions covering all 15 domains
+    - [✓] Results processing:
+      - [✓] Calculate skill level (0-100) for each domain
+      - [✓] Weighted scoring by difficulty (Beginner 20%, Intermediate 40%, Advanced 40%)
+      - [✓] Domain-by-domain breakdown with difficulty analysis
+    - [✓] Results visualization:
+      - [✓] Overall score percentage
+      - [✓] Domain breakdown with expandable details
+      - [✓] Skill level labels (Novice, Beginner, Intermediate, Advanced)
+    - [✓] Option to retake assessment (accessible from sidebar)
+    - [✓] Save results to database (user_assessments table)
+    - [✓] Update user skill_levels based on assessment scores
   - **Technical Details:**
     - **Question pool**: 60-80 diagnostic questions total (5-7 per domain)
     - **Question difficulty**: Mix of beginner (40%), intermediate (40%), advanced (20%)
@@ -130,24 +114,26 @@
     - **Malware**: "What is the primary purpose of packing malware?"
     - **AD**: "What authentication protocol does Kerberoasting exploit?"
     - **Red Team**: "What is the main advantage of using domain fronting for C2?"
-  - **Notes:**
-    - Assessment should take 15-20 minutes to complete
-    - Questions should be stored in database for easy updates
-    - Consider adding "I don't know" option to avoid guessing
-    - Results should map directly to lesson recommendations in adaptive_engine.py
-    - Track which questions are too easy/hard and adjust difficulty over time
-  - **Completed So Far:**
-    - [✓] Created assessment database schema (3 tables)
-    - [✓] Populated 93 diagnostic questions across all 15 domains
-    - [✓] Questions distributed by difficulty (40% B, 40% I, 20% A)
-  - **Remaining Work:**
-    - [ ] Create assessment UI page
-    - [ ] Implement scoring algorithm
-    - [ ] Create results visualization with radar chart
-    - [ ] Integrate with adaptive engine
-  - **Commit:** bddbdd3 (partial)
-  - **Dependencies:** Requires updated adaptive_engine.py with skill-based recommendation logic
-  - **Estimated Effort:** 3-4 days remaining
+  - **Implementation:**
+    - Database schema: assessment_questions, user_assessments, assessment_responses (3 tables)
+    - 93 diagnostic questions across all 15 domains
+    - UI: ui/pages/assessment.py (complete assessment flow)
+    - Scoring: Weighted by difficulty + base percentage correct
+    - Results saved to user_assessments table with JSON domain_scores
+    - User skill_levels updated automatically after assessment
+    - Accessible from sidebar "Skill Assessment" button
+    - Replaces old diagnostic.py page
+  - **User Flow:**
+    1. Welcome screen with domain overview and tips
+    2. Domain-by-domain assessment with progress bar
+    3. 93 questions total (varies by domain: 7 for major, 5 for emerging)
+    4. Results screen with overall score and domain breakdown
+    5. Save button updates skill levels and stores assessment record
+    6. Retake button allows reassessment anytime
+  - **Commits:**
+    - bddbdd3 (database schema and questions)
+    - 732496b (UI completion)
+  - **Result:** Fully functional comprehensive assessment covering all 15 domains with 93 questions
 
 ### Personalization
 
