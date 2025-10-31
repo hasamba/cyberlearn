@@ -17,7 +17,7 @@ Filter by:
 import streamlit as st
 from typing import List, Optional
 from models.lesson import Lesson
-from models.user import User
+from models.user import UserProfile
 
 def render_search_page():
     """Render the global lesson search page"""
@@ -26,7 +26,7 @@ def render_search_page():
 
     # Get database and user from session
     db = st.session_state.db
-    user: Optional[User] = st.session_state.get('current_user')
+    user: Optional[UserProfile] = st.session_state.get('current_user')
 
     # Search input
     search_query = st.text_input(
