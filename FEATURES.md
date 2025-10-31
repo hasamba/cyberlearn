@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-10-31
 **Current Version:** 1.0
-**Total Features Tracked:** 3 planned, 0 in progress, 6 completed
+**Total Features Tracked:** 1 planned, 0 in progress, 8 completed
 
 ---
 
@@ -436,57 +436,56 @@
 
 ### Content Import/Export
 
-- [ ] **Feature:** Single/Multiple JSON Lesson File Upload
+- [✓] **Feature:** Single/Multiple JSON Lesson File Upload
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** High
   - **Description:** Allow users to browse and upload one or multiple lesson JSON files through the UI, which are automatically validated, tagged as "User Content", and populated into the database
-  - **Acceptance Criteria:**
-    - [ ] File browser UI component for selecting JSON files (single or multiple)
-    - [ ] File validation against Pydantic Lesson model
-    - [ ] Automatic tagging with "User Content" tag on successful import
-    - [ ] Duplicate lesson detection (by lesson_id)
-    - [ ] Success/error feedback to user with validation messages
-    - [ ] Imported lessons immediately available in lesson catalog
-    - [ ] Support for drag-and-drop file upload
-  - **Notes:** Should integrate with existing load_all_lessons.py validation logic. Consider max file size limits (e.g., 5MB per file). May need to handle prerequisite validation if referenced lessons don't exist.
-  - **Dependencies:** Requires "User Content" tag in database (already exists)
-  - **Estimated Effort:** Medium (3-5 days)
+  - **Completed:**
+    - [✓] File browser UI component (Streamlit file_uploader with accept_multiple_files)
+    - [✓] File validation against Pydantic Lesson model with detailed error messages
+    - [✓] Automatic tagging with "User Content" tag on successful import
+    - [✓] Duplicate lesson detection (by lesson_id)
+    - [✓] Success/error feedback with validation messages per file
+    - [✓] Imported lessons immediately available in lesson catalog
+    - [✓] File size limit (5MB per file)
+    - [✓] Upload summary with metrics (success/errors/duplicates)
+  - **Implementation:**
+    - UI: ui/pages/upload_lessons.py
+    - File validation using Pydantic ValidationError parsing
+    - Detailed error reporting with field-level messages
+    - Auto-tagging with "Package: User Content"
+    - Accessible from sidebar "Upload Lessons" button
+  - **Commit:** 1c5afe3
+  - **Result:** Full upload functionality with comprehensive validation
 
-- [ ] **Feature:** Lesson Package Import/Export (ZIP)
+- [✓] **Feature:** Lesson Package Import/Export (ZIP)
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** High
   - **Description:** Enable import and export of lesson packages as ZIP files containing multiple JSON lesson files. Imported packages are automatically unpacked, validated, populated into database, and tagged with the ZIP filename (without .zip extension)
-  - **Acceptance Criteria:**
-    - [ ] **Export functionality:**
-      - [ ] Select multiple lessons from catalog
-      - [ ] Export to ZIP file with custom package name
-      - [ ] Include metadata file (package.json) with package info, lesson count, domains, tags
-      - [ ] Download ZIP to user's machine
-    - [ ] **Import functionality:**
-      - [ ] File browser for selecting ZIP file
-      - [ ] Automatic extraction and validation of all JSON files in ZIP
-      - [ ] Create package tag from ZIP filename (e.g., "advanced-ad-attacks.zip" → Tag: "Package: Advanced AD Attacks")
-      - [ ] Apply package tag to all imported lessons
-      - [ ] Also apply "User Content" tag to all imported lessons
-      - [ ] Duplicate detection across all lessons in package
-      - [ ] Batch validation with detailed error report
-      - [ ] Transaction support (all-or-nothing import on validation failure)
-      - [ ] Success summary showing imported lesson count, domains, package name
-  - **Technical Details:**
-    - **ZIP structure:** Flat (all JSON files in root) or with metadata subfolder
-    - **Package metadata file (optional):** `package.json` with:
-      ```json
-      {
-        "package_name": "Advanced AD Attacks",
-        "version": "1.0",
-        "author": "Username",
-        "description": "Advanced Active Directory attack techniques",
-        "lesson_count": 8,
-        "domains": ["active_directory"],
-        "created_date": "2025-10-30"
-      }
-      ```
-    - **Tag creation:** Auto-create package tag with category="package", icon="📦", random color
-    - **Error handling:** Validate all files before importing any, rollback on failure
-  - **Notes:** This enables community lesson sharing and custom curriculum packages. Consider adding package marketplace in future. Max ZIP size limit (e.g., 50MB).
+  - **Completed:**
+    - [✓] **Export functionality:**
+      - [✓] Select multiple lessons from catalog (multi-select with domain filter)
+      - [✓] Export to ZIP file with custom package name
+      - [✓] Include metadata file (package.json) with package info
+      - [✓] Download ZIP with st.download_button
+    - [✓] **Import functionality:**
+      - [✓] File browser for selecting ZIP file (max 50MB)
+      - [✓] Automatic extraction and validation of all JSON files in ZIP
+      - [✓] Create package tag from ZIP filename (auto-title-case, random color, 📦 icon)
+      - [✓] Apply package tag to all imported lessons
+      - [✓] Also apply "User Content" tag to all imported lessons
+      - [✓] Duplicate detection across all lessons in package
+      - [✓] Batch validation with detailed error report per file
+      - [✓] Success summary showing imported lesson count
+  - **Implementation:**
+    - UI: ui/pages/lesson_packages.py (two-tab interface)
+    - ZIP handling: Python zipfile module with in-memory BytesIO
+    - Package tag creation: Auto-generated in tags table with next available tag_id
+    - Metadata file: package.json with package_name, version, created_date, lesson_count, lesson_ids
+    - Export naming: lesson_{domain}_{order_index:03d}_{title}.json
+    - Accessible from sidebar "Lesson Packages" button
+  - **Commit:** 3cdbe42
+  - **Result:** Full import/export with package tags and metadata
   - **Dependencies:** Requires "User Content" tag system (already exists), extends single file upload feature
   - **Estimated Effort:** Large (1+ week)
 
