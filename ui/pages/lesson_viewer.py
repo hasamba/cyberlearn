@@ -493,6 +493,17 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
         block = lesson.content_blocks[current_idx]
         render_content_block(block, lesson, user, db)
 
+        # Notes section for this content block
+        st.markdown("---")
+        with st.expander("📝 Notes for this section", expanded=False):
+            from ui.components import lesson_notes
+            lesson_notes.render_notes_panel(
+                str(lesson.lesson_id),
+                str(user.user_id),
+                db,
+                content_block_index=current_idx
+            )
+
         # Compact navigation - all buttons in one line (4 columns)
         col_back, col_prev, col_next, col_hide = st.columns(4)
 
