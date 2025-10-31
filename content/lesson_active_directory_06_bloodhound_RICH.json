@@ -112,7 +112,7 @@
     {
       "type": "explanation",
       "content": {
-        "text": "# Visualizing Privilege Escalation Paths\n\nOnce SharpHound data is imported, BloodHound visualizes it as a graph. Analysts can use **shortest path analysis** to find the quickest route from a low-privilege account to a domain admin.\n\n**Example Query:**\n- Find the shortest path to domain admin:\n  - `MATCH p=shortestPath((u:User {name:\"lowprivuser@example.local\"})-[:MemberOf*1..]->(g:Group {name:\"Domain Admins\"})) RETURN p`\n\n**Key Visualization Features:**\n- Node colors indicate object type.\n- Edge types show relationship paths.\n- Filters highlight specific privilege types.\n\nThis graph-based visualization transforms complex permission data into actionable insights for both offense and defense."
+        "text": "# Visualizing Privilege Escalation Paths\n\nOnce SharpHound data is imported, BloodHound visualizes it as a graph. Analysts can use **shortest path analysis** to find the quickest route from a low-privilege account to a domain admin.\n\n**Example Query:**\n- Find the shortest path to domain admin:\n- `MATCH p=shortestPath((u:User {name:\"lowprivuser@example.local\"})-[:MemberOf*1..]->(g:Group {name:\"Domain Admins\"})) RETURN p`\n\n**Key Visualization Features:**\n- Node colors indicate object type.\n- Edge types show relationship paths.\n- Filters highlight specific privilege types.\n\nThis graph-based visualization transforms complex permission data into actionable insights for both offense and defense."
       }
     },
     {

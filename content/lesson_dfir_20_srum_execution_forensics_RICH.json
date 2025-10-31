@@ -92,7 +92,7 @@
     {
       "type": "code_exercise",
       "content": {
-        "text": "### Hands-on Automation\nUse the following commands to practice system resource usage monitor (srum) and reinforce evidence of execution forensics.\n\n```powershell\n# Inspecting artifacts with srum_dump\nsrum_dump --help\n```\n\n```powershell\n# Inspecting artifacts with SRUM-Dump\nSRUM-Dump --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\n    if 'suspicious' in entry.tags:\n        print(entry.timestamp, entry.source, entry.details)\n```"
+        "text": "### Hands-on Automation\nUse the following commands to practice system resource usage monitor (srum) and reinforce evidence of execution forensics.\n\n```powershell\n# Inspecting artifacts with srum_dump\nsrum_dump --help\n```\n\n```powershell\n# Inspecting artifacts with SRUM-Dump\nSRUM-Dump --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\nif 'suspicious' in entry.tags:\nprint(entry.timestamp, entry.source, entry.details)\n```"
       }
     },
     {

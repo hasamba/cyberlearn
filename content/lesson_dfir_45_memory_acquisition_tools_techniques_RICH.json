@@ -92,7 +92,7 @@
     {
       "type": "code_exercise",
       "content": {
-        "text": "### Hands-on Automation\nUse the following commands to practice memory acquisition - tools and techniques and reinforce memory forensics deep dive.\n\n```powershell\n# Inspecting artifacts with WinPmem\nWinPmem --help\n```\n\n```powershell\n# Inspecting artifacts with Magnet RAM Capture\nMagnet RAM Capture --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\n    if 'suspicious' in entry.tags:\n        print(entry.timestamp, entry.source, entry.details)\n```"
+        "text": "### Hands-on Automation\nUse the following commands to practice memory acquisition - tools and techniques and reinforce memory forensics deep dive.\n\n```powershell\n# Inspecting artifacts with WinPmem\nWinPmem --help\n```\n\n```powershell\n# Inspecting artifacts with Magnet RAM Capture\nMagnet RAM Capture --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\nif 'suspicious' in entry.tags:\nprint(entry.timestamp, entry.source, entry.details)\n```"
       }
     },
     {

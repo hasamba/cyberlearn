@@ -92,7 +92,7 @@
     {
       "type": "code_exercise",
       "content": {
-        "text": "### Hands-on Automation\nUse the following commands to practice hibernation file (hiberfil.sys) analysis and reinforce alternative memory analysis tooling.\n\n```powershell\n# Inspecting artifacts with Hibr2Bin\nHibr2Bin --help\n```\n\n```powershell\n# Inspecting artifacts with Volatility\nVolatility --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\n    if 'suspicious' in entry.tags:\n        print(entry.timestamp, entry.source, entry.details)\n```"
+        "text": "### Hands-on Automation\nUse the following commands to practice hibernation file (hiberfil.sys) analysis and reinforce alternative memory analysis tooling.\n\n```powershell\n# Inspecting artifacts with Hibr2Bin\nHibr2Bin --help\n```\n\n```powershell\n# Inspecting artifacts with Volatility\nVolatility --help\n```\n\n```python\nfrom forensic_pipeline import load_artifact\nartifacts = load_artifact('evidence.raw')\nfor entry in artifacts.iter_timeline():\nif 'suspicious' in entry.tags:\nprint(entry.timestamp, entry.source, entry.details)\n```"
       }
     },
     {

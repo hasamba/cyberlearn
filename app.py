@@ -147,6 +147,10 @@ def render_sidebar():
                 st.session_state.current_page = "learning"
                 st.rerun()
 
+            if st.button("🔍 Search Lessons", use_container_width=True):
+                st.session_state.current_page = "search"
+                st.rerun()
+
             if st.button("👤 Profile", use_container_width=True):
                 st.session_state.current_page = "profile"
                 st.rerun()
@@ -412,6 +416,9 @@ def main():
         elif page == "tags":
             from ui.pages import tag_management
             tag_management.render_tag_management(st.session_state.db)
+        elif page == "search":
+            from ui.pages import search
+            search.render_search_page()
         elif page == "lesson":
             if st.session_state.current_lesson:
                 lesson_viewer.render_lesson(
