@@ -167,6 +167,10 @@ def render_sidebar():
                 st.session_state.current_page = "hidden_lessons"
                 st.rerun()
 
+            if st.button("🎯 Skill Assessment", use_container_width=True):
+                st.session_state.current_page = "diagnostic"
+                st.rerun()
+
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
@@ -401,9 +405,12 @@ def main():
                 st.session_state.current_user, st.session_state.db
             )
         elif page == "diagnostic":
-            diagnostic.render(
-                st.session_state.current_user, st.session_state.db
-            )
+            # Use new assessment page instead of old diagnostic
+            from ui.pages import assessment
+            assessment.render_assessment_page()
+            # diagnostic.render(
+            #     st.session_state.current_user, st.session_state.db
+            # )
         elif page == "learning":
             lesson_viewer.render(
                 st.session_state.current_user, st.session_state.db
