@@ -163,6 +163,10 @@ def render_sidebar():
                 st.session_state.current_page = "tags"
                 st.rerun()
 
+            if st.button("🙈 Hidden Lessons", use_container_width=True):
+                st.session_state.current_page = "hidden_lessons"
+                st.rerun()
+
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
@@ -419,6 +423,9 @@ def main():
         elif page == "search":
             from ui.pages import search
             search.render_search_page()
+        elif page == "hidden_lessons":
+            from ui.pages import hidden_lessons
+            hidden_lessons.render_hidden_lessons_page()
         elif page == "lesson":
             if st.session_state.current_lesson:
                 lesson_viewer.render_lesson(

@@ -71,6 +71,9 @@ def render_search_page():
     sort_options = ["Relevance", "Title (A-Z)", "Difficulty", "Domain"]
     selected_sort = st.selectbox("Sort by", sort_options, key="search_sort")
 
+    # Include hidden lessons toggle
+    include_hidden = st.checkbox("Include hidden lessons", value=False, key="search_include_hidden")
+
     st.markdown("---")
 
     # Perform search
@@ -86,6 +89,14 @@ def render_search_page():
             WHERE 1=1
         '''
         params = []
+
+        # Exclude hidden lessons by default
+        if not include_hidden:
+            # Check if hidden column exists
+            cursor.execute("PRAGMA table_info(lessons)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'hidden' in columns:
+                query += ' AND (l.hidden = 0 OR l.hidden IS NULL)'
 
         # Search term filter
         if search_query:

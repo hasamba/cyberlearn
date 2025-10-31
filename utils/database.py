@@ -377,17 +377,34 @@ class Database:
 
         return Lesson(**row_dict)
 
-    def get_lessons_by_domain(self, domain: str) -> List[LessonMetadata]:
-        """Get all lesson metadata for a domain"""
+    def get_lessons_by_domain(self, domain: str, include_hidden: bool = False) -> List[LessonMetadata]:
+        """Get all lesson metadata for a domain (excludes hidden by default)"""
         cursor = self.conn.cursor()
-        cursor.execute(
-            """
-            SELECT lesson_id, domain, title, difficulty, estimated_time,
-                   order_index, is_core_concept, prerequisites
-            FROM lessons WHERE domain = ? ORDER BY order_index
-        """,
-            (domain,),
-        )
+
+        # Check if hidden column exists
+        cursor.execute("PRAGMA table_info(lessons)")
+        columns = [row[1] for row in cursor.fetchall()]
+        has_hidden = 'hidden' in columns
+
+        if has_hidden and not include_hidden:
+            cursor.execute(
+                """
+                SELECT lesson_id, domain, title, difficulty, estimated_time,
+                       order_index, is_core_concept, prerequisites
+                FROM lessons WHERE domain = ? AND (hidden = 0 OR hidden IS NULL)
+                ORDER BY order_index
+            """,
+                (domain,),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT lesson_id, domain, title, difficulty, estimated_time,
+                       order_index, is_core_concept, prerequisites
+                FROM lessons WHERE domain = ? ORDER BY order_index
+            """,
+                (domain,),
+            )
 
         lessons = []
         for row in cursor.fetchall():

@@ -1,8 +1,8 @@
 # CyberLearn Platform - Master Features List
 
-**Last Updated:** 2025-10-30
+**Last Updated:** 2025-10-31
 **Current Version:** 1.0
-**Total Features Tracked:** 7 planned, 0 in progress, 2 completed
+**Total Features Tracked:** 5 planned, 0 in progress, 4 completed
 
 ---
 
@@ -45,28 +45,19 @@
 
 ### Lesson Content
 
-- [ ] **Feature:** Add AI Security Domain
+- [✓] **Feature:** Add AI Security Domain
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** High
-  - **Description:** Create new "ai_security" domain in the platform to house AI/ML security lessons (currently 3 lessons planned in lesson_ideas.csv)
-  - **Acceptance Criteria:**
-    - [ ] Add "ai_security" to SkillLevels model in models/user.py
-    - [ ] Update adaptive_engine.py with AI security prerequisites and diagnostic questions
-    - [ ] Create database migration script to add ai_security skill column
-    - [ ] Add AI security domain icon/color to UI
-    - [ ] Create first 3 lessons from lesson_ideas.csv:
-      - [ ] ML Security Fundamentals (order_index 1)
-      - [ ] AI/ML Model Attacks and Defense (order_index 2)
-      - [ ] LLM Security and Prompt Injection (order_index 3)
-    - [ ] Update documentation (CLAUDE.md, ADD_NEW_DOMAINS.md)
-  - **Technical Details:**
-    - **Domain name:** `ai_security`
-    - **Prerequisites:** None (foundational) or fundamentals domain
-    - **Skill progression:** 0 (Novice) → 5 (Expert)
-    - **Domain color/icon:** Consider 🤖 or 🧠 with purple/blue color
-    - **Initial lessons:** 3 (can expand to 8-12 per domain standard)
-  - **Notes:** This is an emerging, high-demand domain. Consider linking to fundamentals and system domains for prerequisite knowledge. AI security is relevant across multiple career paths (AppSec, Cloud Security, Blue Team).
-  - **Dependencies:** None (standard domain addition)
-  - **Estimated Effort:** Medium (3-5 days)
+  - **Description:** Create new "ai_security" domain in the platform to house AI/ML security lessons
+  - **Completed:**
+    - [✓] Added ai_security, iot_security, web3_security to SkillLevels model
+    - [✓] Created database migration (add_emerging_tech_domains.py)
+    - [✓] Added domains to UI (dashboard, lesson viewer)
+    - [✓] Created 10 OWASP LLM Top 10 lessons (order_index 4-13)
+    - [✓] Tagged all lessons with "Package: OWASP AI Top 10"
+    - [✓] Updated documentation
+  - **Commit:** PR #15 merged, commits 202df1a, 04915dd
+  - **Result:** 13 AI Security lessons (3 foundation + 10 OWASP), fully integrated
 
 ---
 
@@ -74,7 +65,8 @@
 
 ### Adaptive Learning
 
-- [ ] **Feature:** Enhanced User Skill Assessment Questionnaire
+- [IN PROGRESS] **Feature:** Enhanced User Skill Assessment Questionnaire
+  - **Status:** Database Complete, UI Pending
   - **Priority:** High
   - **Description:** Redesign the new user onboarding assessment to accurately evaluate user skill levels across all domains, providing better initial lesson recommendations and adaptive learning paths
   - **Acceptance Criteria:**
@@ -144,8 +136,18 @@
     - Consider adding "I don't know" option to avoid guessing
     - Results should map directly to lesson recommendations in adaptive_engine.py
     - Track which questions are too easy/hard and adjust difficulty over time
+  - **Completed So Far:**
+    - [✓] Created assessment database schema (3 tables)
+    - [✓] Populated 93 diagnostic questions across all 15 domains
+    - [✓] Questions distributed by difficulty (40% B, 40% I, 20% A)
+  - **Remaining Work:**
+    - [ ] Create assessment UI page
+    - [ ] Implement scoring algorithm
+    - [ ] Create results visualization with radar chart
+    - [ ] Integrate with adaptive engine
+  - **Commit:** bddbdd3 (partial)
   - **Dependencies:** Requires updated adaptive_engine.py with skill-based recommendation logic
-  - **Estimated Effort:** Large (1+ week)
+  - **Estimated Effort:** 3-4 days remaining
 
 ### Personalization
 
@@ -355,7 +357,8 @@
 
 ### Navigation
 
-- [ ] **Feature:** Global Lesson Search
+- [✓] **Feature:** Global Lesson Search
+  - **Status:** COMPLETED 2025-10-31
   - **Priority:** High
   - **Description:** Implement search functionality that searches across all domains by keyword, matching against lesson titles and descriptions/content
   - **Acceptance Criteria:**
@@ -408,9 +411,19 @@
     - User searches "memory forensics" → finds DFIR and malware lessons
     - User searches "docker" → finds Linux, Cloud, and System lessons
     - User searches by tool name (e.g., "Volatility", "Mimikatz")
-  - **Notes:** Exclude hidden lessons from search results. Consider adding fuzzy search for typo tolerance. Search should respect user's current learning context (highlight recommended matches).
-  - **Dependencies:** None
-  - **Estimated Effort:** Medium (3-5 days)
+  - **Completed:**
+    - [✓] Search across title, concepts, learning objectives
+    - [✓] Filter by domain (15 domains)
+    - [✓] Filter by difficulty (1-3)
+    - [✓] Filter by tags (18 tags)
+    - [✓] Filter by completion status (logged-in users)
+    - [✓] Sort by Relevance, Title, Difficulty, Domain
+    - [✓] Popular search suggestions (9 terms)
+    - [✓] Direct navigation to lessons
+    - [✓] Added to sidebar navigation
+  - **Commit:** bddbdd3
+  - **File:** ui/pages/search.py
+  - **Result:** Fully functional search across all 411 lessons
 
 ### Visual Design
 - [ ] **Feature:** [Add feature here]
