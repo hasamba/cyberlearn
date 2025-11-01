@@ -7,10 +7,11 @@ import streamlit as st
 import uuid
 from datetime import datetime
 from models.tag import Tag, TagCreate, TagUpdate
+from models.user import UserProfile
 from utils.database import Database
 
 
-def render_tag_management(db: Database):
+def render_tag_management(db: Database, current_user: UserProfile):
     """Render tag management interface"""
 
     st.title("Tag Management")
@@ -21,9 +22,10 @@ def render_tag_management(db: Database):
 
     # TAB 1: View and manage existing tags
     with tab1:
-        st.subheader("All Tags")
+        st.subheader("My Tags & System Tags")
 
-        tags = db.get_all_tags()
+        # Get tags visible to this user (their tags + system tags, excluding auto-generated Custom tags)
+        tags = db.get_user_tags(str(current_user.user_id))
 
         if not tags:
             st.info("No tags found. Create your first tag in the 'Create Tag' tab.")
@@ -84,13 +86,13 @@ def render_tag_management(db: Database):
                             </h3>
                             <p style="margin: 5px 0; font-size: 0.9em;">{tag.description or 'No description'}</p>
                             <p style="margin: 5px 0; font-size: 0.8em; color: #666;">
-                                {'🔒 System Tag' if tag.is_system else '✏️ Custom Tag'}
+                                {f'📦 {tag.category}' if tag.user_id is None else '✏️ My Tag'}
                             </p>
                         </div>
                         """, unsafe_allow_html=True)
 
-                        # Functional buttons for custom tags
-                        if not tag.is_system:
+                        # Functional buttons only for user's own tags
+                        if tag.user_id == str(current_user.user_id):
                             col_a, col_b = st.columns(2)
                             with col_a:
                                 if st.button(f"✏️ Edit", key=f"edit_{tag.tag_id}", use_container_width=True):
@@ -131,11 +133,13 @@ def render_tag_management(db: Database):
                     new_tag = Tag(
                         tag_id=str(uuid.uuid4()),
                         name=name,
+                        category="Custom",  # User-created tags are "Custom" category
                         color=color.upper(),
                         icon=icon or None,
                         description=description or None,
                         created_at=datetime.utcnow(),
-                        is_system=False
+                        is_system=False,
+                        user_id=str(current_user.user_id)  # Set the creator
                     )
 
                     if db.create_tag(new_tag):

@@ -142,7 +142,8 @@ class Database:
                 color TEXT NOT NULL,
                 icon TEXT,
                 is_system INTEGER DEFAULT 0,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                user_id TEXT
             )
         """
         )
@@ -825,17 +826,19 @@ class Database:
             cursor = self.conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO tags (tag_id, name, color, icon, description, created_at, is_system)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO tags (id, name, category, color, icon, description, created_at, is_system, user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     tag.tag_id,
                     tag.name,
+                    tag.category,
                     tag.color,
                     tag.icon,
                     tag.description,
                     tag.created_at.isoformat(),
-                    int(tag.is_system)
+                    int(tag.is_system),
+                    tag.user_id
                 )
             )
             self.conn.commit()
@@ -846,7 +849,7 @@ class Database:
     def get_tag(self, tag_id: str) -> Optional[Tag]:
         """Get tag by ID"""
         cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM tags WHERE tag_id = ?", (tag_id,))
+        cursor.execute("SELECT * FROM tags WHERE id = ?", (tag_id,))
         row = cursor.fetchone()
 
         if not row:
@@ -860,7 +863,8 @@ class Database:
             icon=row['icon'],
             description=row['description'],
             created_at=datetime.fromisoformat(row['created_at']),
-            is_system=bool(row['is_system'])
+            is_system=bool(row['is_system']),
+            user_id=row.get('user_id')
         )
 
     def get_tag_by_name(self, name: str) -> Optional[Tag]:
@@ -880,7 +884,8 @@ class Database:
             icon=row['icon'],
             description=row['description'],
             created_at=datetime.fromisoformat(row['created_at']),
-            is_system=bool(row['is_system'])
+            is_system=bool(row['is_system']),
+            user_id=row.get('user_id')
         )
 
     def get_all_tags(self) -> List[Tag]:
@@ -898,7 +903,45 @@ class Database:
                 icon=row['icon'],
                 description=row['description'],
                 created_at=datetime.fromisoformat(row['created_at']),
-                is_system=bool(row['is_system'])
+                is_system=bool(row['is_system']),
+                user_id=row.get('user_id')
+            ))
+
+        return tags
+
+    def get_user_tags(self, user_id: str) -> List[Tag]:
+        """
+        Get tags visible to user:
+        - Tags created by this user (user_id = current user)
+        - System tags (Career Path, Course, Package categories)
+        - Excludes auto-generated "Custom" category tags
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT * FROM tags
+            WHERE user_id = ? OR (category IN ('Career Path', 'Course', 'Package'))
+            ORDER BY
+                CASE category
+                    WHEN 'Career Path' THEN 1
+                    WHEN 'Course' THEN 2
+                    WHEN 'Package' THEN 3
+                    ELSE 4
+                END,
+                name
+        """, (user_id,))
+
+        tags = []
+        for row in cursor.fetchall():
+            tags.append(Tag(
+                tag_id=row['id'],
+                name=row['name'],
+                category=row['category'],
+                color=row['color'],
+                icon=row['icon'],
+                description=row['description'],
+                created_at=datetime.fromisoformat(row['created_at']),
+                is_system=bool(row['is_system']),
+                user_id=row.get('user_id')
             ))
 
         return tags

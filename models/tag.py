@@ -30,6 +30,7 @@ class Tag(BaseModel):
     description: Optional[str] = Field(None, description="Tag description")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_system: bool = Field(default=False, description="System-managed tag (cannot be deleted)")
+    user_id: Optional[str] = Field(None, description="User who created this tag (NULL for system tags)")
 
     @field_validator("color")
     @classmethod
