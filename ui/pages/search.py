@@ -28,28 +28,16 @@ def render_search_page():
     db = st.session_state.db
     user: Optional[UserProfile] = st.session_state.get('current_user')
 
-    # Determine the initial search value (priority: popular_search_term > saved_search_query > empty)
-    default_search = ""
-
-    # First check for popular search term (highest priority)
-    if 'popular_search_term' in st.session_state:
-        default_search = st.session_state.popular_search_term
+    # Check if there's a popular search term selected
+    initial_value = st.session_state.get('popular_search_term', '')
+    if initial_value:
+        # Clear it after using
         del st.session_state.popular_search_term
-        # Force clear the widget to allow new value
-        if 'search_input' in st.session_state:
-            del st.session_state.search_input
-    # Then check for saved search query from navigation
-    elif 'saved_search_query' in st.session_state:
-        default_search = st.session_state.saved_search_query
-        del st.session_state.saved_search_query
-        # Clear the widget state to force update
-        if 'search_input' in st.session_state:
-            del st.session_state.search_input
 
     # Search input
     search_query = st.text_input(
         "Search for lessons",
-        value=default_search,
+        value=initial_value,
         placeholder="Enter keywords (e.g., 'Kerberos', 'memory forensics', 'docker')...",
         key="search_input"
     )
@@ -95,9 +83,8 @@ def render_search_page():
 
     st.markdown("---")
 
-    # Perform search (use search_query if available, otherwise use default_search for first render)
-    active_search = search_query if search_query else default_search
-    if active_search or selected_domain != "All Domains" or selected_tag != "All Tags":
+    # Perform search
+    if search_query or selected_domain != "All Domains" or selected_tag != "All Tags":
         # Build search query
         cursor = db.conn.cursor()
 
@@ -119,14 +106,14 @@ def render_search_page():
                 query += ' AND (l.hidden = 0 OR l.hidden IS NULL)'
 
         # Search term filter
-        if active_search:
+        if search_query:
             query += '''
                 AND (
                     l.title LIKE ?
                     OR l.learning_objectives LIKE ?
                 )
             '''
-            search_param = f"%{active_search}%"
+            search_param = f"%{search_query}%"
             params.extend([search_param, search_param])
 
         # Domain filter
@@ -160,7 +147,7 @@ def render_search_page():
                     CASE WHEN l.title LIKE ? THEN 1 ELSE 2 END,
                     l.order_index
             '''
-            params.append(f"%{active_search}%") if active_search else params.append("%")
+            params.append(f"%{search_query}%") if search_query else params.append("%")
         elif selected_sort == "Title (A-Z)":
             query += ' ORDER BY l.title'
         elif selected_sort == "Difficulty":
@@ -186,7 +173,7 @@ def render_search_page():
                     with col_left:
                         # Highlight search term in title
                         display_title = title
-                        if active_search and active_search.lower() in title.lower():
+                        if search_query and search_query.lower() in title.lower():
                             # Simple highlight (could be enhanced)
                             display_title = f"**{title}**"
 
@@ -231,12 +218,6 @@ def render_search_page():
                             # Load full lesson
                             lesson = db.get_lesson(lesson_id)
                             if lesson:
-                                # Save current search query (use active_search to capture both typed and popular searches)
-                                if active_search:
-                                    st.session_state.saved_search_query = active_search
-                                # Clear popular search term to prevent interference
-                                if 'popular_search_term' in st.session_state:
-                                    del st.session_state.popular_search_term
                                 st.session_state.current_lesson = lesson
                                 st.session_state.current_page = "lesson"
                                 # Initialize lesson state
