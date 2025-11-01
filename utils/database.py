@@ -49,7 +49,9 @@ class Database:
                 learning_preferences TEXT NOT NULL,
                 total_lessons_completed INTEGER DEFAULT 0,
                 total_time_spent INTEGER DEFAULT 0,
-                diagnostic_completed INTEGER DEFAULT 0
+                diagnostic_completed INTEGER DEFAULT 0,
+                last_username TEXT,
+                preferred_tag_filters TEXT DEFAULT '[]'
             )
         """
         )
