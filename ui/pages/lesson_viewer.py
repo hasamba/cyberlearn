@@ -576,24 +576,8 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Add HTML-based back to top button that actually works
-    st.markdown(
-        """
-        <div style="position: sticky; top: 0; z-index: 1000; background: white; padding: 10px 0; margin-bottom: 10px;">
-            <a href="#" style="
-                display: inline-block;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 10px 20px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-weight: bold;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            ">⬆️ Back to Top</a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Add visible navigation tip (Streamlit's HTML rendering is unreliable)
+    st.info("💡 **Scroll Tip:** Press **Home** key to jump to top, or use mouse wheel to scroll up")
 
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
