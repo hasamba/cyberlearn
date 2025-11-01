@@ -423,52 +423,86 @@ def _maybe_scroll_to_top():
 
     import streamlit.components.v1 as components
 
-    # Scroll to top by targeting the parent document's main container
     components.html(
         """
         <script>
         (function() {
-            var attemptDelays = [0, 50, 120, 250, 500];
+            var attemptDelays = [0, 80, 160, 320, 640];
+
+            function resolveContext() {
+                var frameWindow = window;
+                var targetWindow = frameWindow;
+                try {
+                    if (frameWindow.parent && frameWindow.parent !== frameWindow) {
+                        var _ = frameWindow.parent.document;
+                        targetWindow = frameWindow.parent;
+                    }
+                } catch (err) {
+                    targetWindow = frameWindow;
+                }
+
+                var targetDocument = null;
+                try {
+                    targetDocument = targetWindow.document;
+                } catch (err) {
+                    targetDocument = frameWindow.document;
+                    targetWindow = frameWindow;
+                }
+
+                if (!targetDocument) {
+                    targetDocument = frameWindow.document;
+                    targetWindow = frameWindow;
+                }
+
+                return { win: targetWindow, doc: targetDocument };
+            }
 
             function scrollElementToTop(element, behavior) {
-                if (!element) return;
+                if (!element) {
+                    return;
+                }
 
                 if (typeof element.scrollTo === 'function') {
                     try {
                         element.scrollTo({ top: 0, behavior: behavior });
+                        return;
                     } catch (err) {
                         element.scrollTop = 0;
                     }
-                } else {
-                    element.scrollTop = 0;
                 }
+
+                element.scrollTop = 0;
             }
 
             function performScroll() {
-                try {
-                    var parentWindow = window.parent || window;
-                    var parentDoc = parentWindow.document;
+                var context = resolveContext();
+                var doc = context.doc;
+                var win = context.win;
 
-                    var candidates = [
-                        parentDoc.querySelector('section.main div.block-container'),
-                        parentDoc.querySelector('section.main'),
-                        parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                        parentDoc.body
-                    ];
+                if (!doc) {
+                    return;
+                }
 
-                    for (var i = 0; i < candidates.length; i++) {
-                        scrollElementToTop(candidates[i], 'auto');
+                var candidates = [
+                    doc.querySelector('section.main div.block-container'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                    doc.documentElement,
+                    doc.body
+                ];
+
+                for (var i = 0; i < candidates.length; i++) {
+                    scrollElementToTop(candidates[i], 'auto');
+                }
+
+                if (win && typeof win.scrollTo === 'function') {
+                    try {
+                        win.scrollTo({ top: 0, behavior: 'auto' });
+                    } catch (err) {
+                        win.scrollTop = 0;
                     }
-
-                    if (typeof parentWindow.scrollTo === 'function') {
-                        parentWindow.scrollTo({ top: 0, behavior: 'auto' });
-                    } else {
-                        parentWindow.scrollTop = 0;
-                    }
-
-                    scrollElementToTop(parentDoc.documentElement, 'auto');
-                } catch (e) {
-                    console.log('Scroll to top error:', e);
+                } else if (win) {
+                    win.scrollTop = 0;
                 }
             }
 
@@ -480,8 +514,15 @@ def _maybe_scroll_to_top():
                 }
             });
 
-            if (window.parent && typeof window.parent.requestAnimationFrame === 'function') {
-                window.parent.requestAnimationFrame(performScroll);
+            try {
+                var rafContext = resolveContext();
+                if (rafContext.win && typeof rafContext.win.requestAnimationFrame === 'function') {
+                    rafContext.win.requestAnimationFrame(performScroll);
+                }
+            } catch (err) {
+                if (typeof window.requestAnimationFrame === 'function') {
+                    window.requestAnimationFrame(performScroll);
+                }
             }
         })();
         </script>
@@ -494,19 +535,49 @@ def _add_floating_top_button():
     """Add a floating 'Back to Top' button to lesson pages"""
     import streamlit.components.v1 as components
 
-    # Inject CSS and JavaScript into the parent page
     components.html(
         """
         <script>
         (function() {
-            var parentWindow = window.parent || window;
-            var parentDoc = parentWindow.document;
-            var btn = parentDoc.getElementById('back-to-top-btn');
+            var BUTTON_ID = 'back-to-top-btn';
+            var STYLE_ID = 'back-to-top-style';
 
-            // Create button if it doesn't exist
-            if (!btn) {
-                var style = parentDoc.createElement('style');
-                style.innerHTML = `
+            function resolveContext() {
+                var frameWindow = window;
+                var targetWindow = frameWindow;
+                try {
+                    if (frameWindow.parent && frameWindow.parent !== frameWindow) {
+                        var _ = frameWindow.parent.document;
+                        targetWindow = frameWindow.parent;
+                    }
+                } catch (err) {
+                    targetWindow = frameWindow;
+                }
+
+                var targetDocument = null;
+                try {
+                    targetDocument = targetWindow.document;
+                } catch (err) {
+                    targetDocument = frameWindow.document;
+                    targetWindow = frameWindow;
+                }
+
+                if (!targetDocument) {
+                    targetDocument = frameWindow.document;
+                    targetWindow = frameWindow;
+                }
+
+                return { win: targetWindow, doc: targetDocument };
+            }
+
+            function ensureStyle(doc) {
+                if (!doc || doc.getElementById(STYLE_ID)) {
+                    return;
+                }
+
+                var styleEl = doc.createElement('style');
+                styleEl.id = STYLE_ID;
+                styleEl.innerHTML = `
                     #back-to-top-btn {
                         position: fixed !important;
                         top: 50% !important;
@@ -557,89 +628,141 @@ def _add_floating_top_button():
                         }
                     }
                 `;
-                parentDoc.head.appendChild(style);
 
-                btn = parentDoc.createElement('button');
-                btn.id = 'back-to-top-btn';
-                btn.type = 'button';
-                btn.setAttribute('aria-label', 'Scroll to top of lesson');
-                btn.innerHTML = '<span class="icon">⬆️</span><span>TOP</span>';
-                parentDoc.body.appendChild(btn);
+                doc.head ? doc.head.appendChild(styleEl) : doc.body.appendChild(styleEl);
             }
 
-            if (!btn) {
-                return;
+            function ensureButton(doc) {
+                if (!doc || !doc.body) {
+                    return null;
+                }
+
+                var existing = doc.getElementById(BUTTON_ID);
+                if (existing) {
+                    return existing;
+                }
+
+                var button = doc.createElement('button');
+                button.id = BUTTON_ID;
+                button.type = 'button';
+                button.setAttribute('aria-label', 'Scroll to top of lesson');
+                button.innerHTML = '<span class="icon">⬆️</span><span>TOP</span>';
+                doc.body.appendChild(button);
+                return button;
             }
 
-            function smoothScrollToTop() {
-                var targetSelectors = [
-                    'section.main div.block-container',
-                    'div[data-testid="stAppViewBlockContainer"]',
-                    'section.main'
+            function scrollContainers(context, behavior) {
+                var doc = context.doc;
+                var win = context.win;
+                var targets = [
+                    doc && doc.querySelector('section.main div.block-container'),
+                    doc && doc.querySelector('section.main'),
+                    doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                    doc && doc.documentElement,
+                    doc && doc.body
                 ];
-                targetSelectors.forEach(function(selector) {
-                    var el = parentDoc.querySelector(selector);
-                    if (el && typeof el.scrollTo === 'function') {
-                        el.scrollTo({ top: 0, behavior: 'smooth' });
-                    } else if (el) {
-                        el.scrollTop = 0;
+
+                targets.forEach(function(target) {
+                    if (!target) {
+                        return;
                     }
+
+                    if (typeof target.scrollTo === 'function') {
+                        try {
+                            target.scrollTo({ top: 0, behavior: behavior });
+                            return;
+                        } catch (err) {
+                            target.scrollTop = 0;
+                        }
+                    }
+
+                    target.scrollTop = 0;
                 });
 
-                if (typeof parentWindow.scrollTo === 'function') {
-                    parentWindow.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-
-                parentDoc.documentElement.scrollTop = 0;
-                parentDoc.body.scrollTop = 0;
-            }
-
-            if (!btn.dataset.boundToTop) {
-                btn.addEventListener('click', smoothScrollToTop);
-                btn.dataset.boundToTop = 'true';
-            }
-
-            function checkScroll() {
-                var scrolled = false;
-                var mainContainer = parentDoc.querySelector('section.main');
-                var altContainer = parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]');
-
-                if (mainContainer && mainContainer.scrollTop > 250) {
-                    scrolled = true;
-                }
-
-                if (altContainer && altContainer.scrollTop > 250) {
-                    scrolled = true;
-                }
-
-                if (parentWindow.pageYOffset > 250) {
-                    scrolled = true;
-                }
-
-                if (scrolled) {
-                    btn.classList.add('show');
-                } else {
-                    btn.classList.remove('show');
+                if (win && typeof win.scrollTo === 'function') {
+                    try {
+                        win.scrollTo({ top: 0, behavior: behavior });
+                    } catch (err) {
+                        win.scrollTop = 0;
+                    }
+                } else if (win) {
+                    win.scrollTop = 0;
                 }
             }
 
-            if (!btn.dataset.boundScroll) {
-                var mainContainer = parentDoc.querySelector('section.main');
-                var altContainer = parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]');
-
-                if (mainContainer) {
-                    mainContainer.addEventListener('scroll', checkScroll, { passive: true });
+            function bindInteractions(button) {
+                if (!button) {
+                    return;
                 }
 
-                if (altContainer) {
-                    altContainer.addEventListener('scroll', checkScroll, { passive: true });
+                if (!button.dataset.boundClick) {
+                    button.addEventListener('click', function() {
+                        scrollContainers(resolveContext(), 'smooth');
+                    });
+                    button.dataset.boundClick = 'true';
                 }
 
-                parentWindow.addEventListener('scroll', checkScroll, { passive: true });
-                btn.dataset.boundScroll = 'true';
+                if (!button.dataset.boundScroll) {
+                    var updateVisibility = function() {
+                        var context = resolveContext();
+                        var doc = context.doc;
+                        var win = context.win;
+                        var scrolled = false;
+
+                        var mainContainer = doc && doc.querySelector('section.main');
+                        var altContainer = doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]');
+
+                        if (mainContainer && mainContainer.scrollTop > 250) {
+                            scrolled = true;
+                        }
+                        if (altContainer && altContainer.scrollTop > 250) {
+                            scrolled = true;
+                        }
+
+                        try {
+                            if (win && win.pageYOffset > 250) {
+                                scrolled = true;
+                            }
+                        } catch (err) {
+                            // Ignore access errors
+                        }
+
+                        if (scrolled) {
+                            button.classList.add('show');
+                        } else {
+                            button.classList.remove('show');
+                        }
+                    };
+
+                    var context = resolveContext();
+                    var doc = context.doc;
+                    var win = context.win;
+                    var mainContainer = doc && doc.querySelector('section.main');
+                    var altContainer = doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]');
+
+                    if (mainContainer) {
+                        mainContainer.addEventListener('scroll', updateVisibility, { passive: true });
+                    }
+                    if (altContainer) {
+                        altContainer.addEventListener('scroll', updateVisibility, { passive: true });
+                    }
+                    if (win) {
+                        win.addEventListener('scroll', updateVisibility, { passive: true });
+                    }
+
+                    button.dataset.boundScroll = 'true';
+                    setTimeout(updateVisibility, 300);
+                }
             }
 
-            setTimeout(checkScroll, 300);
+            try {
+                var context = resolveContext();
+                ensureStyle(context.doc);
+                var button = ensureButton(context.doc);
+                bindInteractions(button);
+            } catch (err) {
+                console.error('Back-to-top setup failed', err);
+            }
         })();
         </script>
         """,
@@ -1151,80 +1274,286 @@ def complete_lesson(
         # Lesson exists but was never completed before
         is_first_completion = True
 
-    existing_scores = list(progress.quiz_scores)
-    previous_best = max(existing_scores) if existing_scores else None
-
-    # Complete - this changes status to COMPLETED/MASTERED
-    completion_info = progress.complete_lesson(score, time_spent)
-
-    # Initialize gamification engine
-    gamification = GamificationEngine()
-    xp_info = None
-    level_info = None
-    new_badges = []
-    encouragement = None
-
-    next_review_iso = (
-        completion_info.get("next_review").isoformat()
-        if completion_info.get("next_review")
-        else None
-    )
-
-    # Only award XP and update skills on FIRST completion
-    if is_first_completion:
-        # Calculate XP with bonuses
-        xp_info = gamification.calculate_xp(
-            base_xp=lesson.base_xp_reward,
-            score=score,
-            time_spent=time_spent,
-            estimated_time=lesson.estimated_time,
-            streak=user.streak_days,
-            difficulty=lesson.difficulty,
-            first_attempt=(progress.attempts == 1),
-        )
-
-        # Award XP
-        level_info = user.add_xp(xp_info["total_xp"])
-
-        # Update skill level
-        domain = lesson.domain
-        current_skill = getattr(user.skill_levels, domain)
-        adaptive = __import__("core.adaptive_engine", fromlist=["AdaptiveEngine"]).AdaptiveEngine()
-        new_skill = adaptive.calculate_skill_update(current_skill, lesson.difficulty, score)
-        setattr(user.skill_levels, domain, new_skill)
-
-        # Update stats (only on first completion)
-        user.total_lessons_completed += 1
-        user.total_time_spent += time_spent
-
-        # Check for badges (only on first completion)
-        user_progress_list = db.get_user_progress(user.user_id)
-        new_badges = gamification.check_badge_unlocks(user, user_progress_list, progress)
-
-        for badge in new_badges:
-            user.add_badge(badge.badge_id)
-
-        encouragement = gamification.generate_encouragement(
-            "perfect_score" if score == 100 else "level_up" if level_info["level_up"] else "streak_maintained",
-            user,
-        )
-    else:
-        # Retake - only update time spent
-        user.total_time_spent += time_spent
-        encouragement = gamification.generate_encouragement(
-            "streak_maintained" if score >= 80 else "low_score",
-            user,
-        )
-
-    # Save to database
-    if progress_exists_in_db:
-        db.update_progress(progress)
-    else:
-        db.create_progress(progress)
-
-    db.update_user(user)
-
-    badge_payload = [
+    existing_scores = list(progress.quiz_scores)
+
+    previous_best = max(existing_scores) if existing_scores else None
+
+
+
+    # Complete - this changes status to COMPLETED/MASTERED
+
+    completion_info = progress.complete_lesson(score, time_spent)
+
+
+
+    # Initialize gamification engine
+
+    gamification = GamificationEngine()
+
+    xp_info = None
+
+    level_info = None
+
+    new_badges = []
+
+    encouragement = None
+
+
+
+    next_review_iso = (
+
+        completion_info.get("next_review").isoformat()
+
+        if completion_info.get("next_review")
+
+        else None
+
+    )
+
+
+
+    # Only award XP and update skills on FIRST completion
+
+    if is_first_completion:
+
+        # Calculate XP with bonuses
+
+        xp_info = gamification.calculate_xp(
+
+            base_xp=lesson.base_xp_reward,
+
+            score=score,
+
+            time_spent=time_spent,
+
+            estimated_time=lesson.estimated_time,
+
+            streak=user.streak_days,
+
+            difficulty=lesson.difficulty,
+
+            first_attempt=(progress.attempts == 1),
+
+        )
+
+
+
+        # Award XP
+
+        level_info = user.add_xp(xp_info["total_xp"])
+
+
+
+        # Update skill level
+
+        domain = lesson.domain
+
+        current_skill = getattr(user.skill_levels, domain)
+
+        adaptive = __import__("core.adaptive_engine", fromlist=["AdaptiveEngine"]).AdaptiveEngine()
+
+        new_skill = adaptive.calculate_skill_update(current_skill, lesson.difficulty, score)
+
+        setattr(user.skill_levels, domain, new_skill)
+
+
+
+        # Update stats (only on first completion)
+
+        user.total_lessons_completed += 1
+
+        user.total_time_spent += time_spent
+
+
+
+        # Check for badges (only on first completion)
+
+        user_progress_list = db.get_user_progress(user.user_id)
+
+        new_badges = gamification.check_badge_unlocks(user, user_progress_list, progress)
+
+
+
+        for badge in new_badges:
+
+            user.add_badge(badge.badge_id)
+
+
+
+        encouragement = gamification.generate_encouragement(
+
+            "perfect_score" if score == 100 else "level_up" if level_info["level_up"] else "streak_maintained",
+
+            user,
+
+        )
+
+    else:
+
+        # Retake - only update time spent
+
+        user.total_time_spent += time_spent
+
+        encouragement = gamification.generate_encouragement(
+
+            "streak_maintained" if score >= 80 else "low_score",
+
+            user,
+
+        )
+
+
+
+    # Save to database
+
+    if progress_exists_in_db:
+
+        db.update_progress(progress)
+
+    else:
+
+        db.create_progress(progress)
+
+
+
+    db.update_user(user)
+
+
+
+    badge_payload = [
+
+        {"id": badge.badge_id, "name": badge.name, "description": badge.description}
+
+        for badge in new_badges
+
+    ]
+
+
+
+    xp_payload = None
+
+    if xp_info:
+
+        xp_payload = {
+
+            "base_xp": xp_info["base_xp"],
+
+            "bonus_xp": xp_info["bonus_xp"],
+
+            "total_xp": xp_info["total_xp"],
+
+            "total_multiplier": xp_info["total_multiplier"],
+
+            "multipliers": [
+
+                {"label": name, "value": mult} for name, mult in xp_info["multipliers"]
+
+            ],
+
+        }
+
+
+
+    status_value = (
+
+        progress.status.value
+
+        if isinstance(progress.status, LessonStatus)
+
+        else str(progress.status)
+
+    )
+
+
+
+    retake_details = None
+
+    if not is_first_completion:
+
+        retake_details = {
+
+            "attempts": progress.attempts,
+
+            "best_score": progress.best_score,
+
+            "previous_best": previous_best,
+
+            "improved": (
+
+                progress.best_score > (previous_best or 0)
+
+                if previous_best is not None
+
+                else progress.best_score > 0
+
+            ),
+
+        }
+
+
+
+    completion_summary = {
+
+        "lesson_id": str(lesson.lesson_id),
+
+        "lesson_title": lesson.title,
+
+        "domain": lesson.domain,
+
+        "score": score,
+
+        "status": status_value,
+
+        "mastered": progress.status == LessonStatus.MASTERED,
+
+        "is_first_completion": is_first_completion,
+
+        "xp_info": xp_payload,
+
+        "level_info": level_info,
+
+        "new_badges": badge_payload,
+
+        "encouragement": encouragement,
+
+        "retake_details": retake_details,
+
+        "time_spent": time_spent,
+
+        "completed_at": progress.completed_at.isoformat() if progress.completed_at else None,
+
+        "next_review": next_review_iso,
+
+        "trigger_balloons": is_first_completion,
+
+    }
+
+
+
+    st.session_state.completion_summary = completion_summary
+
+
+
+    # Cleanup
+
+    cleanup_lesson_state()
+
+
+
+
+def cleanup_lesson_state():
+    """Clean up lesson session state"""
+    keys_to_remove = [
+        "lesson_start_time",
+        "current_block_index",
+        "quiz_answers",
+        "current_lesson",
+    ]
+
+    for key in keys_to_remove:
+        if key in st.session_state:
+            del st.session_state[key]
+
         {"id": badge.badge_id, "name": badge.name, "description": badge.description}
         for badge in new_badges
     ]
