@@ -37,6 +37,11 @@ def render_search_page():
         if 'search_input' in st.session_state:
             del st.session_state.search_input
 
+    # If we have a saved search query from before navigation, restore it
+    if 'saved_search_query' in st.session_state and not default_search:
+        default_search = st.session_state.saved_search_query
+        del st.session_state.saved_search_query
+
     # Search input
     search_query = st.text_input(
         "Search for lessons",
@@ -221,6 +226,9 @@ def render_search_page():
                             # Load full lesson
                             lesson = db.get_lesson(lesson_id)
                             if lesson:
+                                # Save current search query to restore when returning to search
+                                if search_query:
+                                    st.session_state.saved_search_query = search_query
                                 # Clear popular search term to prevent interference
                                 if 'popular_search_term' in st.session_state:
                                     del st.session_state.popular_search_term
