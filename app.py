@@ -292,20 +292,31 @@ def render_sidebar():
             cursor.execute("PRAGMA table_info(users)")
             columns = [row[1] for row in cursor.fetchall()]
 
+            default_username = ''
             if 'last_username' in columns:
-                # Get most recently logged in user's username
+                # Get most recently logged in user
+                # Look for users with last_username set, ordered by last_login
                 cursor.execute("""
-                    SELECT last_username
+                    SELECT username, last_username
                     FROM users
-                    WHERE last_username IS NOT NULL
+                    WHERE last_username IS NOT NULL AND last_username != ''
                     ORDER BY last_login DESC
                     LIMIT 1
                 """)
                 row = cursor.fetchone()
-                default_username = row[0] if row else ''
-            else:
-                # Column doesn't exist yet, use empty default
-                default_username = ''
+                if row:
+                    # Use the last_username field (which should match username)
+                    default_username = row[1] if row[1] else row[0]
+                else:
+                    # Fallback: get most recent user even if last_username not set
+                    cursor.execute("""
+                        SELECT username
+                        FROM users
+                        ORDER BY last_login DESC
+                        LIMIT 1
+                    """)
+                    row = cursor.fetchone()
+                    default_username = row[0] if row else ''
 
             st.session_state.last_username = default_username
 
