@@ -884,9 +884,29 @@ class Database:
         )
 
     def get_all_tags(self) -> List[Tag]:
-        """Get all tags"""
+        """Get all tags (including system tags)"""
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM tags ORDER BY name")
+
+        tags = []
+        for row in cursor.fetchall():
+            tags.append(Tag(
+                tag_id=row['id'],
+                name=row['name'],
+                category=row['category'],
+                color=row['color'],
+                icon=row['icon'],
+                description=row['description'],
+                created_at=datetime.fromisoformat(row['created_at']),
+                is_system=bool(row['is_system'])
+            ))
+
+        return tags
+
+    def get_user_tags(self) -> List[Tag]:
+        """Get only user-created tags (excludes system tags)"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM tags WHERE is_system = 0 ORDER BY name")
 
         tags = []
         for row in cursor.fetchall():
