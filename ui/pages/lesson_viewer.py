@@ -423,49 +423,41 @@ def _maybe_scroll_to_top():
 
     import streamlit.components.v1 as components
 
-    # More aggressive scrolling with multiple strategies
+    # Scroll to top by targeting the parent document's main container
     components.html(
         """
         <script>
         (function() {
-            // Strategy 1: Immediate scroll
-            function scrollToTop(win) {
+            function scrollToTop() {
                 try {
-                    win.scrollTo({top: 0, behavior: 'instant'});
-                    win.document.documentElement.scrollTop = 0;
-                    win.document.body.scrollTop = 0;
-                } catch (e) {}
+                    // Get parent document
+                    var parentDoc = window.parent.document;
 
-                // Scroll all potential container elements
-                var selectors = ['section.main', '.block-container', '.main', '[data-testid="stAppViewContainer"]'];
-                selectors.forEach(function(sel) {
-                    try {
-                        var el = win.document.querySelector(sel);
-                        if (el) {
-                            el.scrollTop = 0;
-                            el.scrollTo({top: 0, behavior: 'instant'});
-                        }
-                    } catch (e) {}
-                });
-            }
+                    // Scroll the main Streamlit container
+                    var mainContainer = parentDoc.querySelector('section.main');
+                    if (mainContainer) {
+                        mainContainer.scrollTop = 0;
+                        mainContainer.scrollTo({top: 0, behavior: 'instant'});
+                    }
 
-            // Strategy 2: Scroll parent and current window
-            var targets = [window];
-            if (window.parent && window.parent !== window) {
-                targets.push(window.parent);
-            }
-            if (window.top && window.top !== window) {
-                targets.push(window.top);
+                    // Also scroll the parent window
+                    window.parent.scrollTo({top: 0, behavior: 'instant'});
+
+                    // Scroll document elements
+                    parentDoc.documentElement.scrollTop = 0;
+                    parentDoc.body.scrollTop = 0;
+                } catch (e) {
+                    console.log('Scroll to top error:', e);
+                }
             }
 
             // Execute immediately
-            targets.forEach(scrollToTop);
+            scrollToTop();
 
-            // Strategy 3: Retry after DOM updates
-            setTimeout(function(){ targets.forEach(scrollToTop); }, 50);
-            setTimeout(function(){ targets.forEach(scrollToTop); }, 150);
-            setTimeout(function(){ targets.forEach(scrollToTop); }, 300);
-            setTimeout(function(){ targets.forEach(scrollToTop); }, 500);
+            // Retry after DOM updates (Streamlit renders in phases)
+            setTimeout(scrollToTop, 50);
+            setTimeout(scrollToTop, 150);
+            setTimeout(scrollToTop, 300);
         })();
         </script>
         """,
@@ -477,104 +469,86 @@ def _add_floating_top_button():
     """Add a floating 'Back to Top' button to lesson pages"""
     import streamlit.components.v1 as components
 
+    # Inject CSS and JavaScript into the parent page
     components.html(
         """
-        <style>
-        #back-to-top-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 9999;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #back-to-top-btn.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        #back-to-top-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        }
-        #back-to-top-btn:active {
-            transform: translateY(-2px);
-        }
-        </style>
-
-        <button id="back-to-top-btn" title="Back to Top">⬆️</button>
-
         <script>
         (function() {
-            var btn = document.getElementById('back-to-top-btn');
+            // Find or create the back-to-top button in the parent document
+            var parentDoc = window.parent.document;
+            var btn = parentDoc.getElementById('back-to-top-btn');
 
-            function scrollToTop(win) {
-                try {
-                    win.scrollTo({top: 0, behavior: 'smooth'});
-                    win.document.documentElement.scrollTop = 0;
-                    win.document.body.scrollTop = 0;
-                } catch (e) {}
+            // Create button if it doesn't exist
+            if (!btn) {
+                // Add CSS to parent document
+                var style = parentDoc.createElement('style');
+                style.innerHTML = `
+                    #back-to-top-btn {
+                        position: fixed !important;
+                        bottom: 30px !important;
+                        right: 30px !important;
+                        z-index: 999999 !important;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                        color: white !important;
+                        border: none !important;
+                        border-radius: 50% !important;
+                        width: 56px !important;
+                        height: 56px !important;
+                        font-size: 24px !important;
+                        cursor: pointer !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+                        transition: all 0.3s ease !important;
+                        opacity: 0 !important;
+                        visibility: hidden !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                    #back-to-top-btn.show {
+                        opacity: 1 !important;
+                        visibility: visible !important;
+                    }
+                    #back-to-top-btn:hover {
+                        transform: translateY(-5px) !important;
+                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+                    }
+                    #back-to-top-btn:active {
+                        transform: translateY(-2px) !important;
+                    }
+                `;
+                parentDoc.head.appendChild(style);
 
-                var selectors = ['section.main', '.block-container', '.main', '[data-testid="stAppViewContainer"]'];
-                selectors.forEach(function(sel) {
-                    try {
-                        var el = win.document.querySelector(sel);
-                        if (el) {
-                            el.scrollTo({top: 0, behavior: 'smooth'});
-                        }
-                    } catch (e) {}
+                // Create button
+                btn = parentDoc.createElement('button');
+                btn.id = 'back-to-top-btn';
+                btn.title = 'Back to Top';
+                btn.innerHTML = '⬆️';
+                parentDoc.body.appendChild(btn);
+
+                // Button click handler
+                btn.addEventListener('click', function() {
+                    // Scroll the main container
+                    var mainContainer = parentDoc.querySelector('section.main');
+                    if (mainContainer) {
+                        mainContainer.scrollTo({top: 0, behavior: 'smooth'});
+                    }
+                    // Also scroll window
+                    window.parent.scrollTo({top: 0, behavior: 'smooth'});
                 });
             }
 
-            // Button click handler
-            btn.addEventListener('click', function() {
-                var targets = [window];
-                if (window.parent && window.parent !== window) {
-                    targets.push(window.parent);
-                }
-                if (window.top && window.top !== window) {
-                    targets.push(window.top);
-                }
-                targets.forEach(scrollToTop);
-            });
-
             // Show/hide button based on scroll position
             function checkScroll() {
-                var targets = [window];
-                if (window.parent && window.parent !== window) {
-                    targets.push(window.parent);
+                var mainContainer = parentDoc.querySelector('section.main');
+                var scrolled = false;
+
+                if (mainContainer && mainContainer.scrollTop > 300) {
+                    scrolled = true;
                 }
 
-                var scrolled = false;
-                targets.forEach(function(win) {
-                    try {
-                        if (win.pageYOffset > 300 || win.document.documentElement.scrollTop > 300) {
-                            scrolled = true;
-                        }
-
-                        var selectors = ['section.main', '.block-container', '[data-testid="stAppViewContainer"]'];
-                        selectors.forEach(function(sel) {
-                            try {
-                                var el = win.document.querySelector(sel);
-                                if (el && el.scrollTop > 300) {
-                                    scrolled = true;
-                                }
-                            } catch (e) {}
-                        });
-                    } catch (e) {}
-                });
+                if (window.parent.pageYOffset > 300) {
+                    scrolled = true;
+                }
 
                 if (scrolled) {
                     btn.classList.add('show');
@@ -583,28 +557,15 @@ def _add_floating_top_button():
                 }
             }
 
-            // Listen for scroll events on all potential scroll containers
-            window.addEventListener('scroll', checkScroll);
-            if (window.parent && window.parent !== window) {
-                window.parent.addEventListener('scroll', checkScroll);
+            // Listen for scroll events
+            var mainContainer = parentDoc.querySelector('section.main');
+            if (mainContainer) {
+                mainContainer.addEventListener('scroll', checkScroll);
             }
-
-            // Check for scrollable containers
-            setTimeout(function() {
-                var selectors = ['section.main', '.block-container', '[data-testid="stAppViewContainer"]'];
-                selectors.forEach(function(sel) {
-                    try {
-                        var el = document.querySelector(sel);
-                        if (el) {
-                            el.addEventListener('scroll', checkScroll);
-                        }
-                    } catch (e) {}
-                });
-                checkScroll();
-            }, 1000);
+            window.parent.addEventListener('scroll', checkScroll);
 
             // Initial check
-            checkScroll();
+            setTimeout(checkScroll, 500);
         })();
         </script>
         """,

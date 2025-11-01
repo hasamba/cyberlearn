@@ -120,6 +120,10 @@ def sync_session_state_to_url():
     # Update URL without triggering rerun
     st.query_params.update(params)
 
+    # Update last known URL to prevent re-syncing on next render
+    if "last_url_params" in st.session_state:
+        st.session_state.last_url_params = dict(st.query_params)
+
 
 def initialize_session_state():
     """Initialize session state variables"""
@@ -139,8 +143,19 @@ def initialize_session_state():
     if "current_lesson" not in st.session_state:
         st.session_state.current_lesson = None
 
-    # Sync URL params to session state (handles browser back/forward)
-    sync_url_to_session_state()
+    # Track last known URL to detect browser navigation
+    if "last_url_params" not in st.session_state:
+        st.session_state.last_url_params = {}
+
+    # Get current URL params
+    current_url_params = dict(st.query_params)
+
+    # Only sync URL to session state if URL actually changed (browser back/forward)
+    # This prevents overriding user button clicks
+    if current_url_params != st.session_state.last_url_params:
+        # URL changed - user used browser back/forward or shared link
+        sync_url_to_session_state()
+        st.session_state.last_url_params = current_url_params
 
 
 def render_sidebar():
