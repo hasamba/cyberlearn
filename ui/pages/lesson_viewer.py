@@ -417,7 +417,7 @@ def _render_completion_feedback(summary):
 
 
 def _maybe_scroll_to_top():
-    """Scroll Streamlit view to the top on the next render cycle"""
+    """Scroll Streamlit view to the top on the next render cycle."""
     if not st.session_state.pop("scroll_to_top", False):
         return
 
@@ -427,13 +427,20 @@ def _maybe_scroll_to_top():
         """
         <script>
         (function() {
+            const SELECTORS = [
+                'section.main div.block-container',
+                'section.main',
+                'div[data-testid=\"stAppViewBlockContainer\"]',
+                'div[data-testid=\"stVerticalBlock\"]'
+            ];
+
             function safeContext(win) {
                 if (!win) {
                     return null;
                 }
 
                 try {
-                    var doc = win.document;
+                    const doc = win.document;
                     if (!doc) {
                         return null;
                     }
@@ -445,16 +452,12 @@ def _maybe_scroll_to_top():
             }
 
             function collectContexts() {
-                var contexts = [];
-                var queue = [];
-                var seen = [];
+                const contexts = [];
+                const seen = [];
+                const queue = [];
 
                 function enqueue(win) {
-                    if (!win) {
-                        return;
-                    }
-
-                    if (seen.indexOf(win) !== -1) {
+                    if (!win || seen.indexOf(win) !== -1) {
                         return;
                     }
 
@@ -469,7 +472,7 @@ def _maybe_scroll_to_top():
                         enqueue(window.parent);
                     }
                 } catch (err) {
-                    // Ignore parent access errors
+                    // Ignore parent frame errors.
                 }
 
                 try {
@@ -477,11 +480,11 @@ def _maybe_scroll_to_top():
                         enqueue(window.top);
                     }
                 } catch (err) {
-                    // Ignore top access errors
+                    // Ignore top frame errors.
                 }
 
-                for (var i = 0; i < queue.length; i++) {
-                    var ctx = safeContext(queue[i]);
+                for (let i = 0; i < queue.length; i += 1) {
+                    const ctx = safeContext(queue[i]);
                     if (!ctx) {
                         continue;
                     }
@@ -489,105 +492,107 @@ def _maybe_scroll_to_top():
                     contexts.push(ctx);
 
                     try {
-                        var frames = ctx.doc.querySelectorAll('iframe');
-                        frames.forEach(function(frame) {
+                        const frames = ctx.doc.querySelectorAll('iframe');
+                        frames.forEach((frameEl) => {
                             try {
-                                if (frame.contentWindow) {
-                                    enqueue(frame.contentWindow);
+                                if (frameEl.contentWindow) {
+                                    enqueue(frameEl.contentWindow);
                                 }
                             } catch (err) {
-                                // Ignore nested frame errors
+                                // Ignore child frame errors.
                             }
                         });
                     } catch (err) {
-                        // Ignore frame discovery errors
+                        // Ignore selector errors.
                     }
                 }
 
                 return contexts;
             }
 
-            function scrollContext(context, behavior) {
-                if (!context || !context.doc) {
+            function scrollNode(node, behavior) {
+                if (!node) {
                     return;
                 }
 
-                var doc = context.doc;
-                var win = context.win;
-                var targets = [
-                    doc.querySelector('section.main div.block-container'),
-                    doc.querySelector('section.main'),
-                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                    doc.querySelector('div[data-testid="stVerticalBlock"]'),
-                    doc.documentElement,
-                    doc.body
-                ];
+                if (typeof node.scrollTo === 'function') {
+                    try {
+                        node.scrollTo({ top: 0, behavior: behavior });
+                        return;
+                    } catch (err) {
+                        // Fallback to assignment.
+                    }
+                }
 
-                targets.forEach(function(target) {
-                    if (!target) {
+                if (typeof node.scrollTop === 'number') {
+                    node.scrollTop = 0;
+                }
+            }
+
+            function scrollContext(ctx, behavior) {
+                if (!ctx) {
+                    return;
+                }
+
+                const doc = ctx.doc;
+                const win = ctx.win;
+
+                SELECTORS.forEach((selector) => {
+                    if (!doc) {
                         return;
                     }
 
-                    if (typeof target.scrollTo === 'function') {
-                        try {
-                            target.scrollTo({ top: 0, behavior: behavior });
-                            return;
-                        } catch (err) {
-                            // Fall back to direct assignment
-                        }
-                    }
-
-                    if (typeof target.scrollTop === 'number') {
-                        target.scrollTop = 0;
+                    try {
+                        const node = doc.querySelector(selector);
+                        scrollNode(node, behavior);
+                    } catch (err) {
+                        // Ignore selector issues.
                     }
                 });
 
-                if (win && typeof win.scrollTo === 'function') {
-                    try {
-                        win.scrollTo({ top: 0, behavior: behavior });
-                    } catch (err) {
-                        if (typeof win.scrollTop === 'number') {
-                            win.scrollTop = 0;
+                if (doc) {
+                    scrollNode(doc.scrollingElement, behavior);
+                    scrollNode(doc.documentElement, behavior);
+                    scrollNode(doc.body, behavior);
+                }
+
+                if (win) {
+                    if (typeof win.scrollTo === 'function') {
+                        try {
+                            win.scrollTo({ top: 0, behavior: behavior });
+                        } catch (err) {
+                            if (typeof win.scrollTop === 'number') {
+                                win.scrollTop = 0;
+                            }
                         }
+                    } else if (typeof win.scrollTop === 'number') {
+                        win.scrollTop = 0;
                     }
-                } else if (win && typeof win.scrollTop === 'number') {
-                    win.scrollTop = 0;
                 }
             }
 
             function performScroll(behavior) {
-                var contexts = collectContexts();
-                contexts.forEach(function(context) {
-                    scrollContext(context, behavior);
-                });
+                const contexts = collectContexts();
+                contexts.forEach((ctx) => scrollContext(ctx, behavior));
             }
 
-            var delays = [0, 80, 160, 320, 640, 1280];
-            delays.forEach(function(delay) {
+            const DELAYS = [0, 80, 160, 320, 640];
+            DELAYS.forEach((delay) => {
+                const action = () => performScroll('auto');
                 if (delay === 0) {
-                    performScroll('auto');
+                    action();
                 } else {
-                    setTimeout(function() {
-                        performScroll('auto');
-                    }, delay);
+                    setTimeout(action, delay);
                 }
             });
 
             try {
-                var raf = window.requestAnimationFrame || window.parent.requestAnimationFrame;
+                const raf = window.requestAnimationFrame;
                 if (typeof raf === 'function') {
-                    raf(function() {
-                        performScroll('auto');
-                    });
-                } else {
-                    setTimeout(function() {
-                        performScroll('auto');
-                    }, 16);
+                    raf(() => performScroll('auto'));
                 }
             } catch (err) {
-                setTimeout(function() {
-                    performScroll('auto');
-                }, 16);
+                // Ignore animation frame errors.
             }
         })();
         </script>
@@ -603,142 +608,8 @@ def _add_floating_top_button():
         """
         <script>
         (function() {
-            var FRAME_ID = 'cyberlearn-top-button-frame';
-            var BUTTON_ID = 'cyberlearn-back-to-top-btn';
-            var STYLE_ID = 'cyberlearn-back-to-top-style';
-
-            var frame = window.frameElement;
-            if (frame) {
-                frame.id = FRAME_ID;
-
-                try {
-                    var owner = frame.ownerDocument;
-                    if (owner) {
-                        var duplicates = owner.querySelectorAll('#' + FRAME_ID);
-                        duplicates.forEach(function(node) {
-                            if (node !== frame) {
-                                node.parentNode && node.parentNode.removeChild(node);
-                            }
-                        });
-                    }
-                } catch (err) {
-                    // Ignore duplicate cleanup issues
-                }
-
-                frame.style.position = 'fixed';
-                frame.style.right = '24px';
-                frame.style.width = '68px';
-                frame.style.height = '68px';
-                frame.style.border = '0';
-                frame.style.background = 'transparent';
-                frame.style.zIndex = '2147483000';
-                frame.style.transition = 'opacity 0.25s ease';
-                frame.style.opacity = '0';
-                frame.style.pointerEvents = 'none';
-                frame.style.margin = '0';
-            }
-
-            function syncFramePosition() {
-                if (!frame) {
-                    return;
-                }
-
-                if (window.matchMedia('(max-width: 768px)').matches) {
-                    frame.style.bottom = '24px';
-                    frame.style.top = '';
-                    frame.style.transform = 'none';
-                } else {
-                    frame.style.top = '50%';
-                    frame.style.bottom = '';
-                    frame.style.transform = 'translateY(-50%)';
-                }
-            }
-
-            syncFramePosition();
-
-            try {
-                window.addEventListener('resize', syncFramePosition);
-            } catch (err) {
-                // Ignore resize binding failures
-            }
-
-            document.body.style.margin = '0';
-            document.body.style.background = 'transparent';
-
-            var style = document.getElementById(STYLE_ID);
-            if (!style) {
-                style = document.createElement('style');
-                style.id = STYLE_ID;
-                style.textContent = `
-                    #${BUTTON_ID} {
-                        all: unset;
-                        box-sizing: border-box;
-                        width: 64px;
-                        height: 64px;
-                        border-radius: 32px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: #ffffff;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 4px;
-                        font-weight: 600;
-                        font-size: 13px;
-                        letter-spacing: 0.08em;
-                        cursor: pointer;
-                        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-                        opacity: 0;
-                        transform: translateY(12px);
-                        transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-                        background-clip: padding-box;
-                        border: none;
-                        padding: 10px 12px;
-                        text-transform: uppercase;
-                        font-family: "Source Sans Pro", sans-serif;
-                    }
-                    #${BUTTON_ID}.show {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                    #${BUTTON_ID}:hover {
-                        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
-                    }
-                    #${BUTTON_ID}:active {
-                        transform: translateY(2px);
-                    }
-                    #${BUTTON_ID} .icon {
-                        font-size: 20px;
-                        line-height: 20px;
-                    }
-                    #${BUTTON_ID} .label {
-                        font-size: 12px;
-                        letter-spacing: 0.12em;
-                    }
-                    @media (max-width: 768px) {
-                        #${BUTTON_ID} {
-                            width: auto;
-                            min-width: 64px;
-                            height: 52px;
-                            flex-direction: row;
-                            padding: 0 18px;
-                            border-radius: 26px;
-                        }
-                    }
-                `;
-
-                document.head.appendChild(style);
-            }
-
-            var button = document.getElementById(BUTTON_ID);
-            if (!button) {
-                button = document.createElement('button');
-                button.id = BUTTON_ID;
-                button.type = 'button';
-                button.setAttribute('aria-label', 'Scroll to top of lesson');
-                button.innerHTML = '<span class="icon">⬆️</span><span class="label">TOP</span>';
-                document.body.appendChild(button);
-            }
+            const BUTTON_ID = 'cyberlearn-back-to-top-btn';
+            const STYLE_ID = 'cyberlearn-back-to-top-style';
 
             function safeContext(win) {
                 if (!win) {
@@ -746,7 +617,7 @@ def _add_floating_top_button():
                 }
 
                 try {
-                    var doc = win.document;
+                    const doc = win.document;
                     if (!doc) {
                         return null;
                     }
@@ -758,16 +629,12 @@ def _add_floating_top_button():
             }
 
             function collectContexts() {
-                var contexts = [];
-                var queue = [];
-                var seen = [];
+                const contexts = [];
+                const seen = [];
+                const queue = [];
 
                 function enqueue(win) {
-                    if (!win) {
-                        return;
-                    }
-
-                    if (seen.indexOf(win) !== -1) {
+                    if (!win || seen.indexOf(win) !== -1) {
                         return;
                     }
 
@@ -782,7 +649,7 @@ def _add_floating_top_button():
                         enqueue(window.parent);
                     }
                 } catch (err) {
-                    // Ignore parent access errors
+                    // Ignore parent frame errors.
                 }
 
                 try {
@@ -790,11 +657,11 @@ def _add_floating_top_button():
                         enqueue(window.top);
                     }
                 } catch (err) {
-                    // Ignore top access errors
+                    // Ignore top frame errors.
                 }
 
-                for (var i = 0; i < queue.length; i++) {
-                    var ctx = safeContext(queue[i]);
+                for (let i = 0; i < queue.length; i += 1) {
+                    const ctx = safeContext(queue[i]);
                     if (!ctx) {
                         continue;
                     }
@@ -802,205 +669,288 @@ def _add_floating_top_button():
                     contexts.push(ctx);
 
                     try {
-                        var frames = ctx.doc.querySelectorAll('iframe');
-                        frames.forEach(function(frameEl) {
+                        const frames = ctx.doc.querySelectorAll('iframe');
+                        frames.forEach((frameEl) => {
                             try {
                                 if (frameEl.contentWindow) {
                                     enqueue(frameEl.contentWindow);
                                 }
                             } catch (err) {
-                                // Ignore nested frame errors
+                                // Ignore nested frame errors.
                             }
                         });
                     } catch (err) {
-                        // Ignore frame lookup issues
+                        // Ignore selector errors.
                     }
                 }
 
                 return contexts;
             }
 
-            function scrollContext(context, behavior) {
-                if (!context || !context.doc) {
+            function ensureStyle(doc) {
+                if (!doc || doc.getElementById(STYLE_ID)) {
                     return;
                 }
 
-                var doc = context.doc;
-                var win = context.win;
-                var targets = [
-                    doc.querySelector('section.main div.block-container'),
-                    doc.querySelector('section.main'),
-                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                    doc.querySelector('div[data-testid="stVerticalBlock"]'),
-                    doc.documentElement,
-                    doc.body
-                ];
+                const style = doc.createElement('style');
+                style.id = STYLE_ID;
+                style.textContent = `
+                    #${BUTTON_ID} {
+                        all: unset;
+                        position: fixed;
+                        bottom: 32px;
+                        right: 28px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 12px 18px;
+                        border-radius: 999px;
+                        background: linear-gradient(135deg, #5a67d8 0%, #7f53ac 100%);
+                        color: #ffffff;
+                        font-weight: 600;
+                        font-size: 14px;
+                        letter-spacing: 0.08em;
+                        cursor: pointer;
+                        box-shadow: 0 12px 24px rgba(79, 114, 205, 0.35);
+                        opacity: 0;
+                        transform: translateY(12px);
+                        transition: opacity 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
+                        z-index: 2147482000;
+                    }
 
-                targets.forEach(function(target) {
-                    if (!target) {
+                    #${BUTTON_ID} svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+
+                    #${BUTTON_ID}.visible {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+
+                    #${BUTTON_ID}:hover {
+                        box-shadow: 0 16px 32px rgba(79, 114, 205, 0.45);
+                    }
+
+                    @media (max-width: 768px) {
+                        #${BUTTON_ID} {
+                            right: 16px;
+                            bottom: 24px;
+                            padding: 10px 16px;
+                            font-size: 13px;
+                        }
+                    }
+                `;
+
+                (doc.head || doc.body || doc.documentElement).appendChild(style);
+            }
+
+            function ensureButton(doc) {
+                if (!doc) {
+                    return null;
+                }
+
+                let button = doc.getElementById(BUTTON_ID);
+                if (!button) {
+                    button = doc.createElement('button');
+                    button.id = BUTTON_ID;
+                    button.type = 'button';
+                    button.setAttribute('aria-label', 'Scroll to top of lesson');
+                    button.innerHTML = `
+                        <svg viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">
+                            <path d=\"M12 5L12 19\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" />
+                            <path d=\"M6 9L12 5L18 9\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />
+                        </svg>
+                        <span>TOP</span>
+                    `;
+                    doc.body.appendChild(button);
+                }
+
+                return button;
+            }
+
+            function scrollNode(node, behavior) {
+                if (!node) {
+                    return;
+                }
+
+                if (typeof node.scrollTo === 'function') {
+                    try {
+                        node.scrollTo({ top: 0, behavior: behavior });
                         return;
+                    } catch (err) {
+                        // Fallback to assignment.
                     }
+                }
 
-                    if (typeof target.scrollTo === 'function') {
+                if (typeof node.scrollTop === 'number') {
+                    node.scrollTop = 0;
+                }
+            }
+
+            function scrollContext(ctx, behavior) {
+                if (!ctx) {
+                    return;
+                }
+
+                const doc = ctx.doc;
+                const win = ctx.win;
+
+                if (doc) {
+                    const selectors = [
+                        'section.main div.block-container',
+                        'section.main',
+                        'div[data-testid=\"stAppViewBlockContainer\"]'
+                    ];
+
+                    selectors.forEach((selector) => {
                         try {
-                            target.scrollTo({ top: 0, behavior: behavior });
-                            return;
+                            const node = doc.querySelector(selector);
+                            scrollNode(node, behavior);
                         } catch (err) {
-                            // Fall back to direct assignment
+                            // Ignore selector errors.
                         }
-                    }
+                    });
 
-                    if (typeof target.scrollTop === 'number') {
-                        target.scrollTop = 0;
-                    }
-                });
+                    scrollNode(doc.scrollingElement, behavior);
+                    scrollNode(doc.documentElement, behavior);
+                    scrollNode(doc.body, behavior);
+                }
 
-                if (win && typeof win.scrollTo === 'function') {
-                    try {
-                        win.scrollTo({ top: 0, behavior: behavior });
-                    } catch (err) {
-                        if (typeof win.scrollTop === 'number') {
-                            win.scrollTop = 0;
+                if (win) {
+                    if (typeof win.scrollTo === 'function') {
+                        try {
+                            win.scrollTo({ top: 0, behavior: behavior });
+                        } catch (err) {
+                            if (typeof win.scrollTop === 'number') {
+                                win.scrollTop = 0;
+                            }
                         }
+                    } else if (typeof win.scrollTop === 'number') {
+                        win.scrollTop = 0;
                     }
-                } else if (win && typeof win.scrollTop === 'number') {
-                    win.scrollTop = 0;
                 }
             }
 
-            function maxScrollOffset() {
-                var contexts = collectContexts();
-                var maxOffset = 0;
-
-                contexts.forEach(function(context) {
-                    try {
-                        var doc = context.doc;
-                        var win = context.win;
-
-                        var candidates = [
-                            doc && doc.querySelector('section.main div.block-container'),
-                            doc && doc.querySelector('section.main'),
-                            doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                            doc && doc.documentElement,
-                            doc && doc.body
-                        ];
-
-                        candidates.forEach(function(target) {
-                            if (!target) {
-                                return;
-                            }
-
-                            var value = 0;
-                            if (typeof target.scrollTop === 'number') {
-                                value = Math.abs(target.scrollTop || 0);
-                            }
-
-                            if (value > maxOffset) {
-                                maxOffset = value;
-                            }
-                        });
-
-                        if (win) {
-                            var winOffset = 0;
-                            try {
-                                winOffset = Math.abs(win.pageYOffset || win.scrollY || 0);
-                            } catch (err) {
-                                winOffset = 0;
-                            }
-
-                            if (winOffset > maxOffset) {
-                                maxOffset = winOffset;
-                            }
-                        }
-                    } catch (err) {
-                        // Ignore read errors
-                    }
-                });
-
-                return maxOffset;
-            }
-
-            var raf = window.requestAnimationFrame || function(cb) { return setTimeout(cb, 16); };
-            var caf = window.cancelAnimationFrame || clearTimeout;
-            var rafId = null;
-
-            function scheduleVisibilityCheck() {
-                if (rafId !== null) {
-                    caf(rafId);
+            function maxOffset(ctx) {
+                if (!ctx) {
+                    return 0;
                 }
 
-                rafId = raf(function() {
-                    updateVisibility();
-                    rafId = null;
-                });
+                let max = 0;
+                const doc = ctx.doc;
+                const win = ctx.win;
+
+                if (doc) {
+                    const nodes = [
+                        doc.querySelector('section.main div.block-container'),
+                        doc.querySelector('section.main'),
+                        doc.querySelector('div[data-testid=\"stAppViewBlockContainer\"]'),
+                        doc.scrollingElement,
+                        doc.documentElement,
+                        doc.body
+                    ];
+
+                    nodes.forEach((node) => {
+                        if (!node) {
+                            return;
+                        }
+
+                        const value = Math.abs(node.scrollTop || 0);
+                        if (value > max) {
+                            max = value;
+                        }
+                    });
+                }
+
+                if (win) {
+                    try {
+                        const value = Math.abs(win.pageYOffset || win.scrollY || win.scrollTop || 0);
+                        if (value > max) {
+                            max = value;
+                        }
+                    } catch (err) {
+                        // Ignore window read errors.
+                    }
+                }
+
+                return max;
+            }
+
+            const contexts = collectContexts();
+            const hostContext = contexts.find((ctx) => ctx.win && ctx.win !== window) || contexts[0];
+            const hostDoc = hostContext && hostContext.doc ? hostContext.doc : document;
+
+            ensureStyle(hostDoc);
+            const button = ensureButton(hostDoc);
+            if (!button) {
+                return;
             }
 
             function updateVisibility() {
-                var offset = maxScrollOffset();
-                var shouldShow = offset > 240;
+                let visible = false;
+                contexts.forEach((ctx) => {
+                    if (maxOffset(ctx) > 240) {
+                        visible = true;
+                    }
+                });
 
-                if (shouldShow) {
-                    button.classList.add('show');
-                    if (frame) {
-                        frame.style.opacity = '1';
-                        frame.style.pointerEvents = 'auto';
-                    }
+                if (visible) {
+                    button.classList.add('visible');
                 } else {
-                    button.classList.remove('show');
-                    if (frame) {
-                        frame.style.opacity = '0';
-                        frame.style.pointerEvents = 'none';
-                    }
+                    button.classList.remove('visible');
                 }
             }
 
             function bindListeners() {
-                var contexts = collectContexts();
+                contexts.forEach((ctx) => {
+                    if (!ctx || !ctx.win) {
+                        return;
+                    }
 
-                contexts.forEach(function(context) {
                     try {
-                        var win = context.win;
-                        if (win && !win.__cyberlearnTopButtonBound) {
-                            win.addEventListener('scroll', scheduleVisibilityCheck, { passive: true });
-                            win.addEventListener('resize', scheduleVisibilityCheck, { passive: true });
+                        const win = ctx.win;
+                        if (!win.__cyberlearnTopButtonBound) {
+                            win.addEventListener('scroll', updateVisibility, { passive: true });
+                            win.addEventListener('resize', updateVisibility, { passive: true });
                             win.__cyberlearnTopButtonBound = true;
                         }
                     } catch (err) {
-                        // Ignore window binding errors
+                        // Ignore listener errors.
                     }
 
-                    var doc = context.doc;
-                    var elements = [];
-                    try { elements.push(doc.querySelector('section.main div.block-container')); } catch (err) { }
-                    try { elements.push(doc.querySelector('section.main')); } catch (err) { }
-                    try { elements.push(doc.querySelector('div[data-testid="stAppViewBlockContainer"]')); } catch (err) { }
+                    const doc = ctx.doc;
+                    if (!doc) {
+                        return;
+                    }
 
-                    elements.forEach(function(el) {
-                        if (!el || el.__cyberlearnTopButtonBound) {
+                    const nodes = [
+                        doc.querySelector('section.main div.block-container'),
+                        doc.querySelector('section.main'),
+                        doc.querySelector('div[data-testid=\"stAppViewBlockContainer\"]')
+                    ];
+
+                    nodes.forEach((node) => {
+                        if (!node || node.__cyberlearnTopButtonBound) {
                             return;
                         }
 
                         try {
-                            el.addEventListener('scroll', scheduleVisibilityCheck, { passive: true });
-                            el.__cyberlearnTopButtonBound = true;
+                            node.addEventListener('scroll', updateVisibility, { passive: true });
+                            node.__cyberlearnTopButtonBound = true;
                         } catch (err) {
-                            // Ignore element binding errors
+                            // Ignore listener errors.
                         }
                     });
                 });
             }
 
             bindListeners();
-            scheduleVisibilityCheck();
-
-            setInterval(bindListeners, 2000);
+            updateVisibility();
 
             button.addEventListener('click', function(event) {
                 event.preventDefault();
-                var contexts = collectContexts();
-                contexts.forEach(function(context) {
-                    scrollContext(context, 'smooth');
-                });
+                contexts.forEach((ctx) => scrollContext(ctx, 'smooth'));
             });
         })();
         </script>
