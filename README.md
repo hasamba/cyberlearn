@@ -216,7 +216,7 @@ python create_rich_lesson.py --interactive
 | `rebuild_database.py` | Rebuild database from scratch | `python rebuild_database.py` |
 | `sync_database.py` | Sync database with content files | `python sync_database.py` |
 | `check_database.py` | Check database state and contents | `python check_database.py` |
-| `remove_orphaned_lessons.py` | Remove lessons without JSON files | `python remove_orphaned_lessons.py --confirm` |
+| `remove_orphaned_lessons.py` | Sync DB: remove orphaned, reload modified | `python remove_orphaned_lessons.py --confirm` |
 | `test_hide_functionality.py` | Test lesson hide/unhide feature | `python test_hide_functionality.py` |
 
 ### 📝 Documentation Files
