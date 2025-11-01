@@ -176,6 +176,37 @@ class Database:
         """
         )
 
+        # Assessment questions table
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS assessment_questions (
+                question_id TEXT PRIMARY KEY,
+                domain TEXT NOT NULL,
+                question_text TEXT NOT NULL,
+                options TEXT NOT NULL,
+                correct_answer INTEGER NOT NULL,
+                difficulty INTEGER NOT NULL,
+                explanation TEXT,
+                created_at TEXT NOT NULL
+            )
+        """
+        )
+
+        # User assessments table (stores completed assessment results)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS user_assessments (
+                assessment_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                assessment_date TEXT NOT NULL,
+                domain_scores TEXT NOT NULL,
+                total_score INTEGER NOT NULL,
+                total_questions INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """
+        )
+
         # Create indexes
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_progress_user ON progress(user_id)"
@@ -197,6 +228,12 @@ class Database:
         )
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_notes_lesson ON notes(lesson_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_assessment_questions_domain ON assessment_questions(domain)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_user_assessments_user ON user_assessments(user_id)"
         )
 
         self.conn.commit()
