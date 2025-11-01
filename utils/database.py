@@ -129,6 +129,53 @@ class Database:
         """
         )
 
+        # Tags table (for organizing and filtering lessons)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS tags (
+                id TEXT PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL,
+                category TEXT NOT NULL,
+                description TEXT,
+                color TEXT NOT NULL,
+                icon TEXT,
+                is_system INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL
+            )
+        """
+        )
+
+        # Lesson tags junction table (many-to-many relationship)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS lesson_tags (
+                lesson_id TEXT NOT NULL,
+                tag_id TEXT NOT NULL,
+                added_at TEXT NOT NULL,
+                PRIMARY KEY (lesson_id, tag_id),
+                FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE,
+                FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+            )
+        """
+        )
+
+        # Notes table (for user notes on lessons)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS notes (
+                note_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                lesson_id TEXT NOT NULL,
+                content TEXT NOT NULL,
+                images TEXT DEFAULT '[]',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE
+            )
+        """
+        )
+
         # Create indexes
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_progress_user ON progress(user_id)"
@@ -138,6 +185,18 @@ class Database:
         )
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_lessons_domain ON lessons(domain)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_lesson_tags_lesson ON lesson_tags(lesson_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_lesson_tags_tag ON lesson_tags(tag_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_user ON notes(user_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_lesson ON notes(lesson_id)"
         )
 
         self.conn.commit()
@@ -729,8 +788,9 @@ class Database:
             return None
 
         return Tag(
-            tag_id=row['tag_id'],
+            tag_id=row['id'],
             name=row['name'],
+            category=row['category'],
             color=row['color'],
             icon=row['icon'],
             description=row['description'],
@@ -748,8 +808,9 @@ class Database:
             return None
 
         return Tag(
-            tag_id=row['tag_id'],
+            tag_id=row['id'],
             name=row['name'],
+            category=row['category'],
             color=row['color'],
             icon=row['icon'],
             description=row['description'],
@@ -765,8 +826,9 @@ class Database:
         tags = []
         for row in cursor.fetchall():
             tags.append(Tag(
-                tag_id=row['tag_id'],
+                tag_id=row['id'],
                 name=row['name'],
+                category=row['category'],
                 color=row['color'],
                 icon=row['icon'],
                 description=row['description'],
@@ -862,7 +924,7 @@ class Database:
         cursor.execute(
             """
             SELECT t.* FROM tags t
-            JOIN lesson_tags lt ON t.tag_id = lt.tag_id
+            JOIN lesson_tags lt ON t.id = lt.tag_id
             WHERE lt.lesson_id = ?
             ORDER BY t.name
             """,
@@ -872,8 +934,9 @@ class Database:
         tags = []
         for row in cursor.fetchall():
             tags.append(Tag(
-                tag_id=row['tag_id'],
+                tag_id=row['id'],
                 name=row['name'],
+                category=row['category'],
                 color=row['color'],
                 icon=row['icon'],
                 description=row['description'],

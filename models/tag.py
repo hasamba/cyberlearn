@@ -24,6 +24,7 @@ class Tag(BaseModel):
 
     tag_id: str = Field(..., description="Unique identifier (UUID)")
     name: str = Field(..., min_length=1, max_length=100, description="Display name")
+    category: str = Field(..., description="Tag category (Course, Career Path, Package, Custom, etc.)")
     color: str = Field(..., description="Hex color code (e.g., #3B82F6)")
     icon: Optional[str] = Field(None, description="Emoji icon (e.g., 🔵)")
     description: Optional[str] = Field(None, description="Tag description")
