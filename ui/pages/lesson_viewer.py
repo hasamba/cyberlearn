@@ -576,6 +576,9 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
+    # Scroll to top BEFORE rendering content (if flag is set)
+    _maybe_scroll_to_top()
+
     # Add floating "Back to Top" button
     _add_floating_top_button()
 
@@ -741,8 +744,6 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 st.query_params.update({"page": "learning"})
                 st.success("Lesson hidden! View in Hidden Lessons page.")
                 st.rerun()
-
-    _maybe_scroll_to_top()
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
