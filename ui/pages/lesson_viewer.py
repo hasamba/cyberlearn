@@ -309,13 +309,14 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                     key=f"lesson_{lesson.lesson_id}",
                     use_container_width=True,
                 ):
+                    import time
                     st.session_state.current_lesson = lesson
                     st.session_state.current_page = "lesson"
-                    st.session_state.scroll_to_top = True
-                    # Update URL with lesson info
+                    # Update URL with lesson info and timestamp to force scroll reset
                     st.query_params.update({
                         "page": "lesson",
-                        "lesson_id": str(lesson.lesson_id)
+                        "lesson_id": str(lesson.lesson_id),
+                        "_t": str(int(time.time() * 1000))
                     })
                     st.rerun()
 
@@ -576,9 +577,6 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Add invisible anchor at the top for scroll target
-    st.markdown('<div id="lesson-top" style="position: absolute; top: 0;"></div>', unsafe_allow_html=True)
-
     # Add floating "Back to Top" button
     _add_floating_top_button()
 
@@ -591,21 +589,6 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
 
     if "quiz_answers" not in st.session_state:
         st.session_state.quiz_answers = {}
-
-    # Scroll to top if flag is set (using hash navigation)
-    if st.session_state.pop("scroll_to_top", False):
-        # Force scroll by updating URL with hash, then clearing it
-        st.markdown(
-            """
-            <script>
-            window.location.hash = '#lesson-top';
-            setTimeout(function() {
-                history.replaceState(null, null, ' ');
-            }, 100);
-            </script>
-            """,
-            unsafe_allow_html=True
-        )
 
     # Header
     st.markdown(f"# {lesson.title}")
@@ -696,20 +679,26 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
             if current_idx > 0:
                 if st.button("⬅️ Prev", use_container_width=True):
                     st.session_state.current_block_index -= 1
-                    st.session_state.scroll_to_top = True
+                    # Force scroll to top by adding timestamp to URL
+                    import time
+                    st.query_params.update({"_t": str(int(time.time() * 1000))})
                     st.rerun()
 
         with col_next:
             if current_idx < total_blocks - 1:
                 if st.button("Next ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
-                    st.session_state.scroll_to_top = True
+                    # Force scroll to top by adding timestamp to URL
+                    import time
+                    st.query_params.update({"_t": str(int(time.time() * 1000))})
                     st.rerun()
             else:
                 # Last block - show quiz
                 if st.button("Quiz ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
-                    st.session_state.scroll_to_top = True
+                    # Force scroll to top by adding timestamp to URL
+                    import time
+                    st.query_params.update({"_t": str(int(time.time() * 1000))})
                     st.rerun()
 
         with col_hide:
