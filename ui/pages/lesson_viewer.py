@@ -427,239 +427,100 @@ def _maybe_scroll_to_top():
         """
         <script>
         (function() {
-            var attemptDelays = [0, 80, 160, 320, 640];
-
-            function resolveContext() {
-                var frameWindow = window;
-                var targetWindow = frameWindow;
-                try {
-                    if (frameWindow.parent && frameWindow.parent !== frameWindow) {
-                        var _ = frameWindow.parent.document;
-                        targetWindow = frameWindow.parent;
-                    }
-                } catch (err) {
-                    targetWindow = frameWindow;
-                }
-
-                var targetDocument = null;
-                try {
-                    targetDocument = targetWindow.document;
-                } catch (err) {
-                    targetDocument = frameWindow.document;
-                    targetWindow = frameWindow;
-                }
-
-                if (!targetDocument) {
-                    targetDocument = frameWindow.document;
-                    targetWindow = frameWindow;
-                }
-
-                return { win: targetWindow, doc: targetDocument };
-            }
-
-            function scrollElementToTop(element, behavior) {
-                if (!element) {
-                    return;
-                }
-
-                if (typeof element.scrollTo === 'function') {
-                    try {
-                        element.scrollTo({ top: 0, behavior: behavior });
-                        return;
-                    } catch (err) {
-                        element.scrollTop = 0;
-                    }
-                }
-
-                element.scrollTop = 0;
-            }
-
-            function performScroll() {
-                var context = resolveContext();
-                var doc = context.doc;
-                var win = context.win;
-
-                if (!doc) {
-                    return;
-                }
-
-                var candidates = [
-                    doc.querySelector('section.main div.block-container'),
-                    doc.querySelector('section.main'),
-                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                    doc.documentElement,
-                    doc.body
-                ];
-
-                for (var i = 0; i < candidates.length; i++) {
-                    scrollElementToTop(candidates[i], 'auto');
-                }
-
-                if (win && typeof win.scrollTo === 'function') {
-                    try {
-                        win.scrollTo({ top: 0, behavior: 'auto' });
-                    } catch (err) {
-                        win.scrollTop = 0;
-                    }
-                } else if (win) {
-                    win.scrollTop = 0;
-                }
-            }
-
-            attemptDelays.forEach(function(delay) {
-                if (delay === 0) {
-                    performScroll();
-                } else {
-                    setTimeout(performScroll, delay);
-                }
-            });
-
-            try {
-                var rafContext = resolveContext();
-                if (rafContext.win && typeof rafContext.win.requestAnimationFrame === 'function') {
-                    rafContext.win.requestAnimationFrame(performScroll);
-                }
-            } catch (err) {
-                if (typeof window.requestAnimationFrame === 'function') {
-                    window.requestAnimationFrame(performScroll);
-                }
-            }
-        })();
-        </script>
-        """,
-        height=0,
-    )
-
-
-def _add_floating_top_button():
-    """Add a floating 'Back to Top' button to lesson pages"""
-    import streamlit.components.v1 as components
-
-    components.html(
-        """
-        <script>
-        (function() {
-            var BUTTON_ID = 'back-to-top-btn';
-            var STYLE_ID = 'back-to-top-style';
-
-            function resolveContext() {
-                var frameWindow = window;
-                var targetWindow = frameWindow;
-                try {
-                    if (frameWindow.parent && frameWindow.parent !== frameWindow) {
-                        var _ = frameWindow.parent.document;
-                        targetWindow = frameWindow.parent;
-                    }
-                } catch (err) {
-                    targetWindow = frameWindow;
-                }
-
-                var targetDocument = null;
-                try {
-                    targetDocument = targetWindow.document;
-                } catch (err) {
-                    targetDocument = frameWindow.document;
-                    targetWindow = frameWindow;
-                }
-
-                if (!targetDocument) {
-                    targetDocument = frameWindow.document;
-                    targetWindow = frameWindow;
-                }
-
-                return { win: targetWindow, doc: targetDocument };
-            }
-
-            function ensureStyle(doc) {
-                if (!doc || doc.getElementById(STYLE_ID)) {
-                    return;
-                }
-
-                var styleEl = doc.createElement('style');
-                styleEl.id = STYLE_ID;
-                styleEl.innerHTML = `
-                    #back-to-top-btn {
-                        position: fixed !important;
-                        top: 50% !important;
-                        right: 24px !important;
-                        transform: translateY(-50%) !important;
-                        z-index: 999999 !important;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                        color: #ffffff !important;
-                        border: none !important;
-                        border-radius: 28px !important;
-                        padding: 12px 18px !important;
-                        font-size: 14px !important;
-                        font-weight: 600 !important;
-                        letter-spacing: 0.08em !important;
-                        cursor: pointer !important;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-                        transition: all 0.3s ease !important;
-                        opacity: 0 !important;
-                        visibility: hidden !important;
-                        display: flex !important;
-                        align-items: center !important;
-                        gap: 6px !important;
-                    }
-                    #back-to-top-btn span.icon {
-                        font-size: 18px !important;
-                    }
-                    #back-to-top-btn.show {
-                        opacity: 1 !important;
-                        visibility: visible !important;
-                    }
-                    #back-to-top-btn:hover {
-                        transform: translateY(-52%) !important;
-                        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
-                    }
-                    #back-to-top-btn:active {
-                        transform: translateY(-48%) !important;
-                    }
-                    @media (max-width: 768px) {
-                        #back-to-top-btn {
-                            top: auto !important;
-                            bottom: 24px !important;
-                            right: 18px !important;
-                            transform: none !important;
-                        }
-                        #back-to-top-btn:hover,
-                        #back-to-top-btn:active {
-                            transform: none !important;
-                        }
-                    }
-                `;
-
-                doc.head ? doc.head.appendChild(styleEl) : doc.body.appendChild(styleEl);
-            }
-
-            function ensureButton(doc) {
-                if (!doc || !doc.body) {
+            function safeContext(win) {
+                if (!win) {
                     return null;
                 }
 
-                var existing = doc.getElementById(BUTTON_ID);
-                if (existing) {
-                    return existing;
-                }
+                try {
+                    var doc = win.document;
+                    if (!doc) {
+                        return null;
+                    }
 
-                var button = doc.createElement('button');
-                button.id = BUTTON_ID;
-                button.type = 'button';
-                button.setAttribute('aria-label', 'Scroll to top of lesson');
-                button.innerHTML = '<span class="icon">⬆️</span><span>TOP</span>';
-                doc.body.appendChild(button);
-                return button;
+                    return { win: win, doc: doc };
+                } catch (err) {
+                    return null;
+                }
             }
 
-            function scrollContainers(context, behavior) {
+            function collectContexts() {
+                var contexts = [];
+                var queue = [];
+                var seen = [];
+
+                function enqueue(win) {
+                    if (!win) {
+                        return;
+                    }
+
+                    if (seen.indexOf(win) !== -1) {
+                        return;
+                    }
+
+                    seen.push(win);
+                    queue.push(win);
+                }
+
+                enqueue(window);
+
+                try {
+                    if (window.parent && window.parent !== window) {
+                        enqueue(window.parent);
+                    }
+                } catch (err) {
+                    // Ignore parent access errors
+                }
+
+                try {
+                    if (window.top && window.top !== window) {
+                        enqueue(window.top);
+                    }
+                } catch (err) {
+                    // Ignore top access errors
+                }
+
+                for (var i = 0; i < queue.length; i++) {
+                    var ctx = safeContext(queue[i]);
+                    if (!ctx) {
+                        continue;
+                    }
+
+                    contexts.push(ctx);
+
+                    try {
+                        var frames = ctx.doc.querySelectorAll('iframe');
+                        frames.forEach(function(frame) {
+                            try {
+                                if (frame.contentWindow) {
+                                    enqueue(frame.contentWindow);
+                                }
+                            } catch (err) {
+                                // Ignore nested frame errors
+                            }
+                        });
+                    } catch (err) {
+                        // Ignore frame discovery errors
+                    }
+                }
+
+                return contexts;
+            }
+
+            function scrollContext(context, behavior) {
+                if (!context || !context.doc) {
+                    return;
+                }
+
                 var doc = context.doc;
                 var win = context.win;
                 var targets = [
-                    doc && doc.querySelector('section.main div.block-container'),
-                    doc && doc.querySelector('section.main'),
-                    doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
-                    doc && doc.documentElement,
-                    doc && doc.body
+                    doc.querySelector('section.main div.block-container'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                    doc.querySelector('div[data-testid="stVerticalBlock"]'),
+                    doc.documentElement,
+                    doc.body
                 ];
 
                 targets.forEach(function(target) {
@@ -672,96 +533,61 @@ def _add_floating_top_button():
                             target.scrollTo({ top: 0, behavior: behavior });
                             return;
                         } catch (err) {
-                            target.scrollTop = 0;
+                            // Fall back to direct assignment
                         }
                     }
 
-                    target.scrollTop = 0;
+                    if (typeof target.scrollTop === 'number') {
+                        target.scrollTop = 0;
+                    }
                 });
 
                 if (win && typeof win.scrollTo === 'function') {
                     try {
                         win.scrollTo({ top: 0, behavior: behavior });
                     } catch (err) {
-                        win.scrollTop = 0;
+                        if (typeof win.scrollTop === 'number') {
+                            win.scrollTop = 0;
+                        }
                     }
-                } else if (win) {
+                } else if (win && typeof win.scrollTop === 'number') {
                     win.scrollTop = 0;
                 }
             }
 
-            function bindInteractions(button) {
-                if (!button) {
-                    return;
-                }
-
-                if (!button.dataset.boundClick) {
-                    button.addEventListener('click', function() {
-                        scrollContainers(resolveContext(), 'smooth');
-                    });
-                    button.dataset.boundClick = 'true';
-                }
-
-                if (!button.dataset.boundScroll) {
-                    var updateVisibility = function() {
-                        var context = resolveContext();
-                        var doc = context.doc;
-                        var win = context.win;
-                        var scrolled = false;
-
-                        var mainContainer = doc && doc.querySelector('section.main');
-                        var altContainer = doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]');
-
-                        if (mainContainer && mainContainer.scrollTop > 250) {
-                            scrolled = true;
-                        }
-                        if (altContainer && altContainer.scrollTop > 250) {
-                            scrolled = true;
-                        }
-
-                        try {
-                            if (win && win.pageYOffset > 250) {
-                                scrolled = true;
-                            }
-                        } catch (err) {
-                            // Ignore access errors
-                        }
-
-                        if (scrolled) {
-                            button.classList.add('show');
-                        } else {
-                            button.classList.remove('show');
-                        }
-                    };
-
-                    var context = resolveContext();
-                    var doc = context.doc;
-                    var win = context.win;
-                    var mainContainer = doc && doc.querySelector('section.main');
-                    var altContainer = doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]');
-
-                    if (mainContainer) {
-                        mainContainer.addEventListener('scroll', updateVisibility, { passive: true });
-                    }
-                    if (altContainer) {
-                        altContainer.addEventListener('scroll', updateVisibility, { passive: true });
-                    }
-                    if (win) {
-                        win.addEventListener('scroll', updateVisibility, { passive: true });
-                    }
-
-                    button.dataset.boundScroll = 'true';
-                    setTimeout(updateVisibility, 300);
-                }
+            function performScroll(behavior) {
+                var contexts = collectContexts();
+                contexts.forEach(function(context) {
+                    scrollContext(context, behavior);
+                });
             }
 
+            var delays = [0, 80, 160, 320, 640, 1280];
+            delays.forEach(function(delay) {
+                if (delay === 0) {
+                    performScroll('auto');
+                } else {
+                    setTimeout(function() {
+                        performScroll('auto');
+                    }, delay);
+                }
+            });
+
             try {
-                var context = resolveContext();
-                ensureStyle(context.doc);
-                var button = ensureButton(context.doc);
-                bindInteractions(button);
+                var raf = window.requestAnimationFrame || window.parent.requestAnimationFrame;
+                if (typeof raf === 'function') {
+                    raf(function() {
+                        performScroll('auto');
+                    });
+                } else {
+                    setTimeout(function() {
+                        performScroll('auto');
+                    }, 16);
+                }
             } catch (err) {
-                console.error('Back-to-top setup failed', err);
+                setTimeout(function() {
+                    performScroll('auto');
+                }, 16);
             }
         })();
         </script>
@@ -769,6 +595,418 @@ def _add_floating_top_button():
         height=0,
     )
 
+def _add_floating_top_button():
+    """Add a floating 'Back to Top' button to lesson pages"""
+    import streamlit.components.v1 as components
+
+    components.html(
+        """
+        <script>
+        (function() {
+            var FRAME_ID = 'cyberlearn-top-button-frame';
+            var BUTTON_ID = 'cyberlearn-back-to-top-btn';
+            var STYLE_ID = 'cyberlearn-back-to-top-style';
+
+            var frame = window.frameElement;
+            if (frame) {
+                frame.id = FRAME_ID;
+
+                try {
+                    var owner = frame.ownerDocument;
+                    if (owner) {
+                        var duplicates = owner.querySelectorAll('#' + FRAME_ID);
+                        duplicates.forEach(function(node) {
+                            if (node !== frame) {
+                                node.parentNode && node.parentNode.removeChild(node);
+                            }
+                        });
+                    }
+                } catch (err) {
+                    // Ignore duplicate cleanup issues
+                }
+
+                frame.style.position = 'fixed';
+                frame.style.right = '24px';
+                frame.style.width = '68px';
+                frame.style.height = '68px';
+                frame.style.border = '0';
+                frame.style.background = 'transparent';
+                frame.style.zIndex = '2147483000';
+                frame.style.transition = 'opacity 0.25s ease';
+                frame.style.opacity = '0';
+                frame.style.pointerEvents = 'none';
+                frame.style.margin = '0';
+            }
+
+            function syncFramePosition() {
+                if (!frame) {
+                    return;
+                }
+
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                    frame.style.bottom = '24px';
+                    frame.style.top = '';
+                    frame.style.transform = 'none';
+                } else {
+                    frame.style.top = '50%';
+                    frame.style.bottom = '';
+                    frame.style.transform = 'translateY(-50%)';
+                }
+            }
+
+            syncFramePosition();
+
+            try {
+                window.addEventListener('resize', syncFramePosition);
+            } catch (err) {
+                // Ignore resize binding failures
+            }
+
+            document.body.style.margin = '0';
+            document.body.style.background = 'transparent';
+
+            var style = document.getElementById(STYLE_ID);
+            if (!style) {
+                style = document.createElement('style');
+                style.id = STYLE_ID;
+                style.textContent = `
+                    #${BUTTON_ID} {
+                        all: unset;
+                        box-sizing: border-box;
+                        width: 64px;
+                        height: 64px;
+                        border-radius: 32px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: #ffffff;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 4px;
+                        font-weight: 600;
+                        font-size: 13px;
+                        letter-spacing: 0.08em;
+                        cursor: pointer;
+                        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+                        opacity: 0;
+                        transform: translateY(12px);
+                        transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+                        background-clip: padding-box;
+                        border: none;
+                        padding: 10px 12px;
+                        text-transform: uppercase;
+                        font-family: "Source Sans Pro", sans-serif;
+                    }
+                    #${BUTTON_ID}.show {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                    #${BUTTON_ID}:hover {
+                        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+                    }
+                    #${BUTTON_ID}:active {
+                        transform: translateY(2px);
+                    }
+                    #${BUTTON_ID} .icon {
+                        font-size: 20px;
+                        line-height: 20px;
+                    }
+                    #${BUTTON_ID} .label {
+                        font-size: 12px;
+                        letter-spacing: 0.12em;
+                    }
+                    @media (max-width: 768px) {
+                        #${BUTTON_ID} {
+                            width: auto;
+                            min-width: 64px;
+                            height: 52px;
+                            flex-direction: row;
+                            padding: 0 18px;
+                            border-radius: 26px;
+                        }
+                    }
+                `;
+
+                document.head.appendChild(style);
+            }
+
+            var button = document.getElementById(BUTTON_ID);
+            if (!button) {
+                button = document.createElement('button');
+                button.id = BUTTON_ID;
+                button.type = 'button';
+                button.setAttribute('aria-label', 'Scroll to top of lesson');
+                button.innerHTML = '<span class="icon">⬆️</span><span class="label">TOP</span>';
+                document.body.appendChild(button);
+            }
+
+            function safeContext(win) {
+                if (!win) {
+                    return null;
+                }
+
+                try {
+                    var doc = win.document;
+                    if (!doc) {
+                        return null;
+                    }
+
+                    return { win: win, doc: doc };
+                } catch (err) {
+                    return null;
+                }
+            }
+
+            function collectContexts() {
+                var contexts = [];
+                var queue = [];
+                var seen = [];
+
+                function enqueue(win) {
+                    if (!win) {
+                        return;
+                    }
+
+                    if (seen.indexOf(win) !== -1) {
+                        return;
+                    }
+
+                    seen.push(win);
+                    queue.push(win);
+                }
+
+                enqueue(window);
+
+                try {
+                    if (window.parent && window.parent !== window) {
+                        enqueue(window.parent);
+                    }
+                } catch (err) {
+                    // Ignore parent access errors
+                }
+
+                try {
+                    if (window.top && window.top !== window) {
+                        enqueue(window.top);
+                    }
+                } catch (err) {
+                    // Ignore top access errors
+                }
+
+                for (var i = 0; i < queue.length; i++) {
+                    var ctx = safeContext(queue[i]);
+                    if (!ctx) {
+                        continue;
+                    }
+
+                    contexts.push(ctx);
+
+                    try {
+                        var frames = ctx.doc.querySelectorAll('iframe');
+                        frames.forEach(function(frameEl) {
+                            try {
+                                if (frameEl.contentWindow) {
+                                    enqueue(frameEl.contentWindow);
+                                }
+                            } catch (err) {
+                                // Ignore nested frame errors
+                            }
+                        });
+                    } catch (err) {
+                        // Ignore frame lookup issues
+                    }
+                }
+
+                return contexts;
+            }
+
+            function scrollContext(context, behavior) {
+                if (!context || !context.doc) {
+                    return;
+                }
+
+                var doc = context.doc;
+                var win = context.win;
+                var targets = [
+                    doc.querySelector('section.main div.block-container'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                    doc.querySelector('div[data-testid="stVerticalBlock"]'),
+                    doc.documentElement,
+                    doc.body
+                ];
+
+                targets.forEach(function(target) {
+                    if (!target) {
+                        return;
+                    }
+
+                    if (typeof target.scrollTo === 'function') {
+                        try {
+                            target.scrollTo({ top: 0, behavior: behavior });
+                            return;
+                        } catch (err) {
+                            // Fall back to direct assignment
+                        }
+                    }
+
+                    if (typeof target.scrollTop === 'number') {
+                        target.scrollTop = 0;
+                    }
+                });
+
+                if (win && typeof win.scrollTo === 'function') {
+                    try {
+                        win.scrollTo({ top: 0, behavior: behavior });
+                    } catch (err) {
+                        if (typeof win.scrollTop === 'number') {
+                            win.scrollTop = 0;
+                        }
+                    }
+                } else if (win && typeof win.scrollTop === 'number') {
+                    win.scrollTop = 0;
+                }
+            }
+
+            function maxScrollOffset() {
+                var contexts = collectContexts();
+                var maxOffset = 0;
+
+                contexts.forEach(function(context) {
+                    try {
+                        var doc = context.doc;
+                        var win = context.win;
+
+                        var candidates = [
+                            doc && doc.querySelector('section.main div.block-container'),
+                            doc && doc.querySelector('section.main'),
+                            doc && doc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                            doc && doc.documentElement,
+                            doc && doc.body
+                        ];
+
+                        candidates.forEach(function(target) {
+                            if (!target) {
+                                return;
+                            }
+
+                            var value = 0;
+                            if (typeof target.scrollTop === 'number') {
+                                value = Math.abs(target.scrollTop || 0);
+                            }
+
+                            if (value > maxOffset) {
+                                maxOffset = value;
+                            }
+                        });
+
+                        if (win) {
+                            var winOffset = 0;
+                            try {
+                                winOffset = Math.abs(win.pageYOffset || win.scrollY || 0);
+                            } catch (err) {
+                                winOffset = 0;
+                            }
+
+                            if (winOffset > maxOffset) {
+                                maxOffset = winOffset;
+                            }
+                        }
+                    } catch (err) {
+                        // Ignore read errors
+                    }
+                });
+
+                return maxOffset;
+            }
+
+            var raf = window.requestAnimationFrame || function(cb) { return setTimeout(cb, 16); };
+            var caf = window.cancelAnimationFrame || clearTimeout;
+            var rafId = null;
+
+            function scheduleVisibilityCheck() {
+                if (rafId !== null) {
+                    caf(rafId);
+                }
+
+                rafId = raf(function() {
+                    updateVisibility();
+                    rafId = null;
+                });
+            }
+
+            function updateVisibility() {
+                var offset = maxScrollOffset();
+                var shouldShow = offset > 240;
+
+                if (shouldShow) {
+                    button.classList.add('show');
+                    if (frame) {
+                        frame.style.opacity = '1';
+                        frame.style.pointerEvents = 'auto';
+                    }
+                } else {
+                    button.classList.remove('show');
+                    if (frame) {
+                        frame.style.opacity = '0';
+                        frame.style.pointerEvents = 'none';
+                    }
+                }
+            }
+
+            function bindListeners() {
+                var contexts = collectContexts();
+
+                contexts.forEach(function(context) {
+                    try {
+                        var win = context.win;
+                        if (win && !win.__cyberlearnTopButtonBound) {
+                            win.addEventListener('scroll', scheduleVisibilityCheck, { passive: true });
+                            win.addEventListener('resize', scheduleVisibilityCheck, { passive: true });
+                            win.__cyberlearnTopButtonBound = true;
+                        }
+                    } catch (err) {
+                        // Ignore window binding errors
+                    }
+
+                    var doc = context.doc;
+                    var elements = [];
+                    try { elements.push(doc.querySelector('section.main div.block-container')); } catch (err) { }
+                    try { elements.push(doc.querySelector('section.main')); } catch (err) { }
+                    try { elements.push(doc.querySelector('div[data-testid="stAppViewBlockContainer"]')); } catch (err) { }
+
+                    elements.forEach(function(el) {
+                        if (!el || el.__cyberlearnTopButtonBound) {
+                            return;
+                        }
+
+                        try {
+                            el.addEventListener('scroll', scheduleVisibilityCheck, { passive: true });
+                            el.__cyberlearnTopButtonBound = true;
+                        } catch (err) {
+                            // Ignore element binding errors
+                        }
+                    });
+                });
+            }
+
+            bindListeners();
+            scheduleVisibilityCheck();
+
+            setInterval(bindListeners, 2000);
+
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                var contexts = collectContexts();
+                contexts.forEach(function(context) {
+                    scrollContext(context, 'smooth');
+                });
+            });
+        })();
+        </script>
+        """,
+        height=0,
+    )
 
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
