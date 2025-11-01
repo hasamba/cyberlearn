@@ -576,6 +576,9 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
+    # Add invisible anchor at the top for scroll target
+    st.markdown('<div id="lesson-top" style="position: absolute; top: 0;"></div>', unsafe_allow_html=True)
+
     # Add floating "Back to Top" button
     _add_floating_top_button()
 
@@ -588,6 +591,21 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
 
     if "quiz_answers" not in st.session_state:
         st.session_state.quiz_answers = {}
+
+    # Scroll to top if flag is set (using hash navigation)
+    if st.session_state.pop("scroll_to_top", False):
+        # Force scroll by updating URL with hash, then clearing it
+        st.markdown(
+            """
+            <script>
+            window.location.hash = '#lesson-top';
+            setTimeout(function() {
+                history.replaceState(null, null, ' ');
+            }, 100);
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
 
     # Header
     st.markdown(f"# {lesson.title}")
@@ -741,8 +759,6 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 st.query_params.update({"page": "learning"})
                 st.success("Lesson hidden! View in Hidden Lessons page.")
                 st.rerun()
-
-    _maybe_scroll_to_top()
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
