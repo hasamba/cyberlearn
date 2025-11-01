@@ -132,21 +132,39 @@ def initialize_session_state():
         if config.debug:
             debug_print("Database connection initialized")
 
-    # Store logged_in_username as a simple string for persistence
-    if "logged_in_username" not in st.session_state:
-        st.session_state.logged_in_username = None
-        if config.debug:
-            debug_print("Session state initialized (no user)")
+    # On fresh session (no current_user), check database for last user and auto-login
+    if "current_user" not in st.session_state or st.session_state.current_user is None:
+        # Check if we should auto-login (not explicitly disabled by logout)
+        if "disable_auto_login" not in st.session_state:
+            st.session_state.disable_auto_login = False
 
-    # Always reload user from database if we have a username
-    # This ensures fresh data and avoids Pydantic serialization issues
-    if st.session_state.logged_in_username:
-        st.session_state.current_user = st.session_state.db.get_user_by_username(st.session_state.logged_in_username)
-        if not st.session_state.current_user:
-            # User no longer exists, clear username
-            st.session_state.logged_in_username = None
-    else:
-        st.session_state.current_user = None
+        if not st.session_state.disable_auto_login:
+            # Get last logged-in user from database
+            cursor = st.session_state.db.conn.cursor()
+            cursor.execute("""
+                SELECT username
+                FROM users
+                WHERE last_username IS NOT NULL AND last_username != ''
+                ORDER BY last_login DESC
+                LIMIT 1
+            """)
+            row = cursor.fetchone()
+
+            if row:
+                username = row[0]
+                user = st.session_state.db.get_user_by_username(username)
+                if user:
+                    st.session_state.current_user = user
+                    if config.debug:
+                        debug_print(f"Auto-logged in as {username}")
+                else:
+                    st.session_state.current_user = None
+            else:
+                st.session_state.current_user = None
+        else:
+            st.session_state.current_user = None
+            if config.debug:
+                debug_print("Session state initialized (no user - auto-login disabled)")
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -272,14 +290,8 @@ def render_sidebar():
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
-                # Save username before clearing session
-                saved_username = st.session_state.get('last_username', None)
                 st.session_state.current_user = None
-                st.session_state.logged_in_username = None  # Clear username for persistence
                 st.session_state.current_page = "welcome"
-                # Restore username for next login
-                if saved_username:
-                    st.session_state.last_username = saved_username
                 # Disable auto-login after logout (require manual login)
                 st.session_state.disable_auto_login = True
                 st.rerun()
@@ -298,69 +310,31 @@ def render_sidebar():
             # Login/Create Account in sidebar
             st.markdown("### 🔐 Login")
 
-            # Get last username from database (most recently logged in user)
-            # Always reload to get the latest saved username
+            # Get last username for quick login button
             cursor = st.session_state.db.conn.cursor()
-            cursor.execute("PRAGMA table_info(users)")
-            columns = [row[1] for row in cursor.fetchall()]
+            cursor.execute("""
+                SELECT username
+                FROM users
+                WHERE last_username IS NOT NULL AND last_username != ''
+                ORDER BY last_login DESC
+                LIMIT 1
+            """)
+            row = cursor.fetchone()
+            default_username = row[0] if row else ''
 
-            default_username = ''
-            if 'last_username' in columns:
-                # Get most recently logged in user
-                # Look for users with last_username set, ordered by last_login
-                cursor.execute("""
-                    SELECT username, last_username
-                    FROM users
-                    WHERE last_username IS NOT NULL AND last_username != ''
-                    ORDER BY last_login DESC
-                    LIMIT 1
-                """)
-                row = cursor.fetchone()
-                if row:
-                    # Use the last_username field (which should match username)
-                    default_username = row[1] if row[1] else row[0]
-                else:
-                    # Fallback: get most recent user even if last_username not set
-                    cursor.execute("""
-                        SELECT username
-                        FROM users
-                        ORDER BY last_login DESC
-                        LIMIT 1
-                    """)
-                    row = cursor.fetchone()
-                    default_username = row[0] if row else ''
+            # Manual login option ("Different User" button)
+            if st.button("🔄 Different User", use_container_width=True):
+                st.session_state.disable_auto_login = True
+                st.session_state.current_user = None
+                st.rerun()
 
-            st.session_state.last_username = default_username
-
-            # Auto-login with last user (if available and not disabled)
-            if 'disable_auto_login' not in st.session_state:
-                st.session_state.disable_auto_login = False
-
-            if default_username and not st.session_state.disable_auto_login:
-                # Auto-login
-                user = st.session_state.db.get_user_by_username(default_username)
-                if user:
-                    st.session_state.logged_in_username = default_username  # Store username for persistence
-                    st.session_state.current_user = user
-                    user.last_username = default_username
-                    user.update_streak()
-                    st.session_state.db.update_user(user)
-                    st.session_state.current_page = "dashboard"
-                    st.rerun()
-
-            # Manual login option (only if auto-login tried to happen)
-            if not st.session_state.disable_auto_login:
-                if st.button("🔄 Different User", use_container_width=True):
-                    st.session_state.disable_auto_login = True
-                    st.rerun()
-
-            if st.session_state.disable_auto_login:
+            # Show login forms
+            if True:  # Always show login options
                 # Quick login button for last user
                 if default_username:
                     if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
                         user = st.session_state.db.get_user_by_username(default_username)
                         if user:
-                            st.session_state.logged_in_username = default_username  # Store username for persistence
                             st.session_state.current_user = user
                             user.last_username = default_username
                             user.update_streak()
@@ -371,15 +345,13 @@ def render_sidebar():
 
                 # Manual login form
                 with st.form("login_form_sidebar"):
-                    username = st.text_input("Username", value=st.session_state.get('last_username', ''), key="login_username_input")
+                    username = st.text_input("Username", value=default_username, key="login_username_input")
                     submit = st.form_submit_button("Login", use_container_width=True)
 
                     if submit and username:
                         user = st.session_state.db.get_user_by_username(username)
                         if user:
-                            st.session_state.logged_in_username = username  # Store username for persistence
                             st.session_state.current_user = user
-                            st.session_state.last_username = username
                             # Save username to user's database record
                             user.last_username = username
                             user.update_streak()
@@ -415,10 +387,9 @@ def render_sidebar():
                             if st.session_state.db.create_user(user):
                                 user.update_streak()
                                 st.session_state.db.update_user(user)
-                                st.session_state.logged_in_username = new_username  # Store username for persistence
                                 st.session_state.current_user = user
-                                st.session_state.last_username = new_username
                                 st.session_state.current_page = "diagnostic"
+                                st.session_state.disable_auto_login = False
                                 st.success(f"Welcome, {new_username}!")
                                 st.rerun()
                             else:
