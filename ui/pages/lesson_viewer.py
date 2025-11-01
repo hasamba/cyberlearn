@@ -428,36 +428,61 @@ def _maybe_scroll_to_top():
         """
         <script>
         (function() {
-            function scrollToTop() {
-                try {
-                    // Get parent document
-                    var parentDoc = window.parent.document;
+            var attemptDelays = [0, 50, 120, 250, 500];
 
-                    // Scroll the main Streamlit container
-                    var mainContainer = parentDoc.querySelector('section.main');
-                    if (mainContainer) {
-                        mainContainer.scrollTop = 0;
-                        mainContainer.scrollTo({top: 0, behavior: 'instant'});
+            function scrollElementToTop(element, behavior) {
+                if (!element) return;
+
+                if (typeof element.scrollTo === 'function') {
+                    try {
+                        element.scrollTo({ top: 0, behavior: behavior });
+                    } catch (err) {
+                        element.scrollTop = 0;
+                    }
+                } else {
+                    element.scrollTop = 0;
+                }
+            }
+
+            function performScroll() {
+                try {
+                    var parentWindow = window.parent || window;
+                    var parentDoc = parentWindow.document;
+
+                    var candidates = [
+                        parentDoc.querySelector('section.main div.block-container'),
+                        parentDoc.querySelector('section.main'),
+                        parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]'),
+                        parentDoc.body
+                    ];
+
+                    for (var i = 0; i < candidates.length; i++) {
+                        scrollElementToTop(candidates[i], 'auto');
                     }
 
-                    // Also scroll the parent window
-                    window.parent.scrollTo({top: 0, behavior: 'instant'});
+                    if (typeof parentWindow.scrollTo === 'function') {
+                        parentWindow.scrollTo({ top: 0, behavior: 'auto' });
+                    } else {
+                        parentWindow.scrollTop = 0;
+                    }
 
-                    // Scroll document elements
-                    parentDoc.documentElement.scrollTop = 0;
-                    parentDoc.body.scrollTop = 0;
+                    scrollElementToTop(parentDoc.documentElement, 'auto');
                 } catch (e) {
                     console.log('Scroll to top error:', e);
                 }
             }
 
-            // Execute immediately
-            scrollToTop();
+            attemptDelays.forEach(function(delay) {
+                if (delay === 0) {
+                    performScroll();
+                } else {
+                    setTimeout(performScroll, delay);
+                }
+            });
 
-            // Retry after DOM updates (Streamlit renders in phases)
-            setTimeout(scrollToTop, 50);
-            setTimeout(scrollToTop, 150);
-            setTimeout(scrollToTop, 300);
+            if (window.parent && typeof window.parent.requestAnimationFrame === 'function') {
+                window.parent.requestAnimationFrame(performScroll);
+            }
         })();
         </script>
         """,
@@ -474,79 +499,120 @@ def _add_floating_top_button():
         """
         <script>
         (function() {
-            // Find or create the back-to-top button in the parent document
-            var parentDoc = window.parent.document;
+            var parentWindow = window.parent || window;
+            var parentDoc = parentWindow.document;
             var btn = parentDoc.getElementById('back-to-top-btn');
 
             // Create button if it doesn't exist
             if (!btn) {
-                // Add CSS to parent document
                 var style = parentDoc.createElement('style');
                 style.innerHTML = `
                     #back-to-top-btn {
                         position: fixed !important;
-                        bottom: 30px !important;
-                        right: 30px !important;
+                        top: 50% !important;
+                        right: 24px !important;
+                        transform: translateY(-50%) !important;
                         z-index: 999999 !important;
                         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                        color: white !important;
+                        color: #ffffff !important;
                         border: none !important;
-                        border-radius: 50% !important;
-                        width: 56px !important;
-                        height: 56px !important;
-                        font-size: 24px !important;
+                        border-radius: 28px !important;
+                        padding: 12px 18px !important;
+                        font-size: 14px !important;
+                        font-weight: 600 !important;
+                        letter-spacing: 0.08em !important;
                         cursor: pointer !important;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
                         transition: all 0.3s ease !important;
                         opacity: 0 !important;
                         visibility: hidden !important;
                         display: flex !important;
                         align-items: center !important;
-                        justify-content: center !important;
+                        gap: 6px !important;
+                    }
+                    #back-to-top-btn span.icon {
+                        font-size: 18px !important;
                     }
                     #back-to-top-btn.show {
                         opacity: 1 !important;
                         visibility: visible !important;
                     }
                     #back-to-top-btn:hover {
-                        transform: translateY(-5px) !important;
-                        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+                        transform: translateY(-52%) !important;
+                        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
                     }
                     #back-to-top-btn:active {
-                        transform: translateY(-2px) !important;
+                        transform: translateY(-48%) !important;
+                    }
+                    @media (max-width: 768px) {
+                        #back-to-top-btn {
+                            top: auto !important;
+                            bottom: 24px !important;
+                            right: 18px !important;
+                            transform: none !important;
+                        }
+                        #back-to-top-btn:hover,
+                        #back-to-top-btn:active {
+                            transform: none !important;
+                        }
                     }
                 `;
                 parentDoc.head.appendChild(style);
 
-                // Create button
                 btn = parentDoc.createElement('button');
                 btn.id = 'back-to-top-btn';
-                btn.title = 'Back to Top';
-                btn.innerHTML = '⬆️';
+                btn.type = 'button';
+                btn.setAttribute('aria-label', 'Scroll to top of lesson');
+                btn.innerHTML = '<span class="icon">⬆️</span><span>TOP</span>';
                 parentDoc.body.appendChild(btn);
-
-                // Button click handler
-                btn.addEventListener('click', function() {
-                    // Scroll the main container
-                    var mainContainer = parentDoc.querySelector('section.main');
-                    if (mainContainer) {
-                        mainContainer.scrollTo({top: 0, behavior: 'smooth'});
-                    }
-                    // Also scroll window
-                    window.parent.scrollTo({top: 0, behavior: 'smooth'});
-                });
             }
 
-            // Show/hide button based on scroll position
-            function checkScroll() {
-                var mainContainer = parentDoc.querySelector('section.main');
-                var scrolled = false;
+            if (!btn) {
+                return;
+            }
 
-                if (mainContainer && mainContainer.scrollTop > 300) {
+            function smoothScrollToTop() {
+                var targetSelectors = [
+                    'section.main div.block-container',
+                    'div[data-testid="stAppViewBlockContainer"]',
+                    'section.main'
+                ];
+                targetSelectors.forEach(function(selector) {
+                    var el = parentDoc.querySelector(selector);
+                    if (el && typeof el.scrollTo === 'function') {
+                        el.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else if (el) {
+                        el.scrollTop = 0;
+                    }
+                });
+
+                if (typeof parentWindow.scrollTo === 'function') {
+                    parentWindow.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                parentDoc.documentElement.scrollTop = 0;
+                parentDoc.body.scrollTop = 0;
+            }
+
+            if (!btn.dataset.boundToTop) {
+                btn.addEventListener('click', smoothScrollToTop);
+                btn.dataset.boundToTop = 'true';
+            }
+
+            function checkScroll() {
+                var scrolled = false;
+                var mainContainer = parentDoc.querySelector('section.main');
+                var altContainer = parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]');
+
+                if (mainContainer && mainContainer.scrollTop > 250) {
                     scrolled = true;
                 }
 
-                if (window.parent.pageYOffset > 300) {
+                if (altContainer && altContainer.scrollTop > 250) {
+                    scrolled = true;
+                }
+
+                if (parentWindow.pageYOffset > 250) {
                     scrolled = true;
                 }
 
@@ -557,15 +623,23 @@ def _add_floating_top_button():
                 }
             }
 
-            // Listen for scroll events
-            var mainContainer = parentDoc.querySelector('section.main');
-            if (mainContainer) {
-                mainContainer.addEventListener('scroll', checkScroll);
-            }
-            window.parent.addEventListener('scroll', checkScroll);
+            if (!btn.dataset.boundScroll) {
+                var mainContainer = parentDoc.querySelector('section.main');
+                var altContainer = parentDoc.querySelector('div[data-testid="stAppViewBlockContainer"]');
 
-            // Initial check
-            setTimeout(checkScroll, 500);
+                if (mainContainer) {
+                    mainContainer.addEventListener('scroll', checkScroll, { passive: true });
+                }
+
+                if (altContainer) {
+                    altContainer.addEventListener('scroll', checkScroll, { passive: true });
+                }
+
+                parentWindow.addEventListener('scroll', checkScroll, { passive: true });
+                btn.dataset.boundScroll = 'true';
+            }
+
+            setTimeout(checkScroll, 300);
         })();
         </script>
         """,
