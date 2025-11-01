@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Migration script to add last_username and preferred_tag_filters columns to users table.
 These columns store UI preferences that persist across sessions.
 """
 
 import sqlite3
+import sys
 from pathlib import Path
+
+# Fix unicode output on Windows
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 DB_PATH = Path(__file__).parent / "cyberlearn.db"
 

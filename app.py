@@ -322,46 +322,38 @@ def render_sidebar():
             row = cursor.fetchone()
             default_username = row[0] if row else ''
 
-            # Manual login option ("Different User" button)
-            if st.button("🔄 Different User", use_container_width=True):
-                st.session_state.disable_auto_login = True
-                st.session_state.current_user = None
-                st.rerun()
+            # Quick login button for last user
+            if default_username:
+                if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
+                    user = st.session_state.db.get_user_by_username(default_username)
+                    if user:
+                        st.session_state.current_user = user
+                        user.last_username = default_username
+                        user.update_streak()
+                        st.session_state.db.update_user(user)
+                        st.session_state.current_page = "dashboard"
+                        st.session_state.disable_auto_login = False
+                        st.rerun()
 
-            # Show login forms
-            if True:  # Always show login options
-                # Quick login button for last user
-                if default_username:
-                    if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
-                        user = st.session_state.db.get_user_by_username(default_username)
-                        if user:
-                            st.session_state.current_user = user
-                            user.last_username = default_username
-                            user.update_streak()
-                            st.session_state.db.update_user(user)
-                            st.session_state.current_page = "dashboard"
-                            st.session_state.disable_auto_login = False
-                            st.rerun()
+            # Manual login form
+            with st.form("login_form_sidebar"):
+                username = st.text_input("Username", value=default_username, key="login_username_input")
+                submit = st.form_submit_button("Login", use_container_width=True)
 
-                # Manual login form
-                with st.form("login_form_sidebar"):
-                    username = st.text_input("Username", value=default_username, key="login_username_input")
-                    submit = st.form_submit_button("Login", use_container_width=True)
-
-                    if submit and username:
-                        user = st.session_state.db.get_user_by_username(username)
-                        if user:
-                            st.session_state.current_user = user
-                            # Save username to user's database record
-                            user.last_username = username
-                            user.update_streak()
-                            st.session_state.db.update_user(user)
-                            st.session_state.current_page = "dashboard"
-                            st.session_state.disable_auto_login = False  # Re-enable auto-login
-                            st.success(f"Welcome back, {username}!")
-                            st.rerun()
-                        else:
-                            st.error("User not found.")
+                if submit and username:
+                    user = st.session_state.db.get_user_by_username(username)
+                    if user:
+                        st.session_state.current_user = user
+                        # Save username to user's database record
+                        user.last_username = username
+                        user.update_streak()
+                        st.session_state.db.update_user(user)
+                        st.session_state.current_page = "dashboard"
+                        st.session_state.disable_auto_login = False  # Re-enable auto-login
+                        st.success(f"Welcome back, {username}!")
+                        st.rerun()
+                    else:
+                        st.error("User not found.")
 
             st.markdown("---")
             st.markdown("### ✨ Create Account")
