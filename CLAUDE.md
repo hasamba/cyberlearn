@@ -13,6 +13,31 @@ CyberLearn is an adaptive cybersecurity learning platform built with:
 - Always save new or changed code in files in the project folder
 - Write files only in the project folder, not anywhere else
 
+## CRITICAL: Template Database Workflow
+
+**IMPORTANT: After ANY database schema changes (migrations, new tables, etc.), ALWAYS update the template database:**
+
+```bash
+# 1. Update template database on dev machine
+python update_template_database.py
+
+# 2. Commit the updated template
+git add cyberlearn_template.db
+git commit -m "Update template database with [describe changes]"
+git push
+
+# 3. User runs on VM to get updated database
+bash update_vm.sh
+```
+
+**Why this matters**: The template database (`cyberlearn_template.db`) is copied to VMs when running `update_vm.sh`. If you don't update it after schema changes, VMs will get an outdated database and crash with "no such table" or "no such column" errors.
+
+**Template database should always include**:
+- All tables (lessons, users, progress, tags, lesson_tags, notes, etc.)
+- All system tags (Course tags, Career Path tags, etc.)
+- All lessons loaded and tagged
+- All migrations applied
+
 ## CRITICAL: Development Environment Rules
 
 **THIS IS A DEVELOPMENT HOST MACHINE - NOT THE VM!!!**
