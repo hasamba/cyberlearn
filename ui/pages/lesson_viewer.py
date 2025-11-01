@@ -421,44 +421,47 @@ def _maybe_scroll_to_top():
     if not st.session_state.pop("scroll_to_top", False):
         return
 
-    # Use st.markdown with unsafe_allow_html to inject JavaScript
-    # This executes more reliably than components.html with height=0
-    st.markdown(
+    import streamlit.components.v1 as components
+
+    # Use components.html which reliably executes after render
+    components.html(
         """
         <script>
         (function() {
             function scrollToTop() {
                 try {
+                    var parentDoc = window.parent.document;
+
                     // Scroll the main Streamlit container
-                    var mainContainer = document.querySelector('section.main');
+                    var mainContainer = parentDoc.querySelector('section.main');
                     if (mainContainer) {
                         mainContainer.scrollTop = 0;
                         mainContainer.scrollTo({top: 0, behavior: 'instant'});
                     }
 
-                    // Also scroll the window
-                    window.scrollTo({top: 0, behavior: 'instant'});
+                    // Also scroll parent window
+                    window.parent.scrollTo({top: 0, behavior: 'instant'});
 
                     // Scroll document elements
-                    document.documentElement.scrollTop = 0;
-                    document.body.scrollTop = 0;
+                    parentDoc.documentElement.scrollTop = 0;
+                    parentDoc.body.scrollTop = 0;
                 } catch (e) {
                     console.log('Scroll to top error:', e);
                 }
             }
 
-            // Execute immediately
+            // Execute multiple times to catch all Streamlit render phases
             scrollToTop();
-
-            // Retry after DOM updates (Streamlit renders in phases)
+            setTimeout(scrollToTop, 1);
             setTimeout(scrollToTop, 10);
             setTimeout(scrollToTop, 50);
             setTimeout(scrollToTop, 100);
             setTimeout(scrollToTop, 200);
+            setTimeout(scrollToTop, 300);
         })();
         </script>
         """,
-        unsafe_allow_html=True
+        height=0,
     )
 
 
@@ -572,9 +575,6 @@ def _add_floating_top_button():
 
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
-
-    # Scroll to top BEFORE rendering content (if flag is set)
-    _maybe_scroll_to_top()
 
     # Add floating "Back to Top" button
     _add_floating_top_button()
@@ -741,6 +741,9 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 st.query_params.update({"page": "learning"})
                 st.success("Lesson hidden! View in Hidden Lessons page.")
                 st.rerun()
+
+    # Scroll to top at the END of rendering (after all content is in DOM)
+    _maybe_scroll_to_top()
 
 
 def render_content_block(block, lesson: Lesson, user: UserProfile, db: Database):
