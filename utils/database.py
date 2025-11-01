@@ -864,7 +864,7 @@ class Database:
             description=row['description'],
             created_at=datetime.fromisoformat(row['created_at']),
             is_system=bool(row['is_system']),
-            user_id=row.get('user_id')
+            user_id=row['user_id'] if 'user_id' in row.keys() else None
         )
 
     def get_tag_by_name(self, name: str) -> Optional[Tag]:
@@ -885,7 +885,7 @@ class Database:
             description=row['description'],
             created_at=datetime.fromisoformat(row['created_at']),
             is_system=bool(row['is_system']),
-            user_id=row.get('user_id')
+            user_id=row['user_id'] if 'user_id' in row.keys() else None
         )
 
     def get_all_tags(self) -> List[Tag]:
@@ -904,7 +904,7 @@ class Database:
                 description=row['description'],
                 created_at=datetime.fromisoformat(row['created_at']),
                 is_system=bool(row['is_system']),
-                user_id=row.get('user_id')
+                user_id=row['user_id'] if 'user_id' in row.keys() else None
             ))
 
         return tags
@@ -941,7 +941,7 @@ class Database:
                 description=row['description'],
                 created_at=datetime.fromisoformat(row['created_at']),
                 is_system=bool(row['is_system']),
-                user_id=row.get('user_id')
+                user_id=row['user_id'] if 'user_id' in row.keys() else None
             ))
 
         return tags
