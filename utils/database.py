@@ -1027,8 +1027,8 @@ class Database:
         cursor.execute("""
             SELECT t.name, COUNT(lt.lesson_id) as lesson_count
             FROM tags t
-            LEFT JOIN lesson_tags lt ON t.tag_id = lt.tag_id
-            GROUP BY t.tag_id, t.name
+            LEFT JOIN lesson_tags lt ON t.id = lt.tag_id
+            GROUP BY t.id, t.name
             ORDER BY lesson_count DESC
         """)
 
