@@ -8,9 +8,9 @@ This script:
 3. Offers to reload modified lessons
 
 Usage:
-    python remove_orphaned_lessons.py                    # Dry run (show what would change)
-    python remove_orphaned_lessons.py --confirm          # Delete orphaned + reload modified
-    python remove_orphaned_lessons.py --orphaned-only    # Only remove orphaned lessons
+    python sync_lessons.py                    # Dry run (show what would change)
+    python sync_lessons.py --confirm          # Delete orphaned + reload modified
+    python sync_lessons.py --orphaned-only    # Only remove orphaned lessons
 """
 
 import json
@@ -224,9 +224,9 @@ def sync_database(confirm=False, orphaned_only=False):
             print()
             print("To actually perform these actions, run:")
             if orphaned_only:
-                print("  python remove_orphaned_lessons.py --orphaned-only --confirm")
+                print("  python sync_lessons.py --orphaned-only --confirm")
             else:
-                print("  python remove_orphaned_lessons.py --confirm")
+                print("  python sync_lessons.py --confirm")
             return
 
         # Confirm actions
@@ -298,9 +298,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python remove_orphaned_lessons.py                    # Dry run (show what would change)
-  python remove_orphaned_lessons.py --confirm          # Delete orphaned + reload modified
-  python remove_orphaned_lessons.py --orphaned-only    # Only check/remove orphaned lessons
+  python sync_lessons.py                    # Dry run (show what would change)
+  python sync_lessons.py --confirm          # Delete orphaned + reload modified
+  python sync_lessons.py --orphaned-only    # Only check/remove orphaned lessons
         """
     )
     parser.add_argument(
