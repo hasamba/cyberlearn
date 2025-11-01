@@ -576,8 +576,39 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Add visible navigation tip (Streamlit's HTML rendering is unreliable)
-    st.info("💡 **Scroll Tip:** Press **Home** key to jump to top, or use mouse wheel to scroll up")
+    # Inject floating button CSS (at document level, not iframe)
+    st.markdown(
+        """
+        <style>
+        .floating-top-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .floating-top-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+        </style>
+        <a href="#top" class="floating-top-button" title="Back to Top">⬆️</a>
+        <div id="top"></div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
