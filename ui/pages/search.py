@@ -91,8 +91,9 @@ def render_search_page():
 
     st.markdown("---")
 
-    # Perform search
-    if search_query or selected_domain != "All Domains" or selected_tag != "All Tags":
+    # Perform search (use search_query if available, otherwise use default_search for first render)
+    active_search = search_query if search_query else default_search
+    if active_search or selected_domain != "All Domains" or selected_tag != "All Tags":
         # Build search query
         cursor = db.conn.cursor()
 
@@ -114,14 +115,14 @@ def render_search_page():
                 query += ' AND (l.hidden = 0 OR l.hidden IS NULL)'
 
         # Search term filter
-        if search_query:
+        if active_search:
             query += '''
                 AND (
                     l.title LIKE ?
                     OR l.learning_objectives LIKE ?
                 )
             '''
-            search_param = f"%{search_query}%"
+            search_param = f"%{active_search}%"
             params.extend([search_param, search_param])
 
         # Domain filter
@@ -155,7 +156,7 @@ def render_search_page():
                     CASE WHEN l.title LIKE ? THEN 1 ELSE 2 END,
                     l.order_index
             '''
-            params.append(f"%{search_query}%") if search_query else params.append("%")
+            params.append(f"%{active_search}%") if active_search else params.append("%")
         elif selected_sort == "Title (A-Z)":
             query += ' ORDER BY l.title'
         elif selected_sort == "Difficulty":
@@ -181,7 +182,7 @@ def render_search_page():
                     with col_left:
                         # Highlight search term in title
                         display_title = title
-                        if search_query and search_query.lower() in title.lower():
+                        if active_search and active_search.lower() in title.lower():
                             # Simple highlight (could be enhanced)
                             display_title = f"**{title}**"
 
