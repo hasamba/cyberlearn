@@ -416,6 +416,15 @@ def _render_completion_feedback(summary):
         st.info(encouragement)
 
 
+def _render_js_template(template: str, **context: str) -> str:
+    """Utility to substitute placeholders in a JS/HTML template."""
+    from string import Template
+    from textwrap import dedent
+
+    tpl = Template(dedent(template))
+    return tpl.substitute(**context)
+
+
 def _maybe_scroll_to_top():
     """Scroll Streamlit view to the top on the next render cycle."""
     if not st.session_state.pop("scroll_to_top", False):
@@ -431,159 +440,162 @@ def _maybe_scroll_to_top():
         "div[data-testid='stVerticalBlock']",
     ]
 
-    script = f"""
-    <script>
-    (function() {{
-        const TARGET_SELECTORS = {json.dumps(selectors)};
+    script = _render_js_template(
+        """
+        <script>
+        (function() {
+            const TARGET_SELECTORS = $selectors;
 
-        function scrollElement(node, behavior) {{
-            if (!node) {{
-                return;
-            }}
-
-            if (typeof node.scrollTo === 'function') {{
-                try {{
-                    node.scrollTo({{ top: 0, behavior }});
+            function scrollElement(node, behavior) {
+                if (!node) {
                     return;
-                }} catch (err) {{}}
-            }}
+                }
 
-            if (typeof node.scrollTop === 'number') {{
-                try {{ node.scrollTop = 0; }} catch (err) {{}}
-            }}
-        }}
-
-        function scrollWindow(win, behavior) {{
-            if (!win) {{
-                return;
-            }}
-
-            if (typeof win.scrollTo === 'function') {{
-                try {{
-                    win.scrollTo({{ top: 0, behavior }});
-                    return;
-                }} catch (err) {{}}
-            }}
-
-            try {{
-                if (typeof win.scrollTop === 'number') {{
-                    win.scrollTop = 0;
-                }}
-            }} catch (err) {{}}
-        }}
-
-        function withDocument(win, callback) {{
-            if (!win) {{
-                return;
-            }}
-
-            let doc = null;
-            try {{
-                doc = win.document || null;
-            }} catch (err) {{
-                doc = null;
-            }}
-
-            callback(doc);
-        }}
-
-        function collectWindows() {{
-            const queue = [];
-            const seen = new Set();
-
-            function push(win) {{
-                if (!win || seen.has(win)) {{
-                    return;
-                }}
-
-                seen.add(win);
-                queue.push(win);
-            }}
-
-            push(window);
-
-            try {{
-                if (window.parent && window.parent !== window) {{
-                    push(window.parent);
-                }}
-            }} catch (err) {{}}
-
-            try {{
-                if (window.top && window.top !== window) {{
-                    push(window.top);
-                }}
-            }} catch (err) {{}}
-
-            for (let i = 0; i < queue.length; i += 1) {{
-                const current = queue[i];
-
-                withDocument(current, function(doc) {{
-                    if (!doc) {{
+                if (typeof node.scrollTo === 'function') {
+                    try {
+                        node.scrollTo({ top: 0, behavior });
                         return;
-                    }}
+                    } catch (err) {}
+                }
 
-                    try {{
-                        const frames = doc.querySelectorAll('iframe');
-                        frames.forEach(function(frame) {{
-                            try {{
-                                if (frame && frame.contentWindow) {{
-                                    push(frame.contentWindow);
-                                }}
-                            }} catch (err) {{}}
-                        }});
-                    }} catch (err) {{}}
-                }});
-            }}
+                if (typeof node.scrollTop === 'number') {
+                    try { node.scrollTop = 0; } catch (err) {}
+                }
+            }
 
-            return queue;
-        }}
+            function scrollWindow(win, behavior) {
+                if (!win) {
+                    return;
+                }
 
-        function runScroll(behavior) {{
-            const windows = collectWindows();
-            windows.forEach(function(win) {{
-                scrollWindow(win, behavior);
-
-                withDocument(win, function(doc) {{
-                    if (!doc) {{
+                if (typeof win.scrollTo === 'function') {
+                    try {
+                        win.scrollTo({ top: 0, behavior });
                         return;
-                    }}
+                    } catch (err) {}
+                }
 
-                    TARGET_SELECTORS.forEach(function(selector) {{
-                        let node = null;
-                        try {{
-                            node = doc.querySelector(selector);
-                        }} catch (err) {{
-                            node = null;
-                        }}
+                try {
+                    if (typeof win.scrollTop === 'number') {
+                        win.scrollTop = 0;
+                    }
+                } catch (err) {}
+            }
 
-                        scrollElement(node, behavior);
-                    }});
+            function withDocument(win, callback) {
+                if (!win) {
+                    return;
+                }
 
-                    scrollElement(doc.scrollingElement, behavior);
-                    scrollElement(doc.documentElement, behavior);
-                    scrollElement(doc.body, behavior);
-                }});
-            }});
-        }}
+                let doc = null;
+                try {
+                    doc = win.document || null;
+                } catch (err) {
+                    doc = null;
+                }
 
-        const delays = [0, 80, 160, 320, 640];
-        delays.forEach(function(delay) {{
-            if (delay === 0) {{
-                runScroll('auto');
-            }} else {{
-                setTimeout(function() {{ runScroll('auto'); }}, delay);
-            }}
-        }});
+                callback(doc);
+            }
 
-        try {{
-            const raf = window.requestAnimationFrame;
-            if (typeof raf === 'function') {{
-                raf(function() {{ runScroll('auto'); }});
-            }}
-        }} catch (err) {{}}
-    }})();
-    </script>
-    """
+            function collectWindows() {
+                const queue = [];
+                const seen = new Set();
+
+                function push(win) {
+                    if (!win || seen.has(win)) {
+                        return;
+                    }
+
+                    seen.add(win);
+                    queue.push(win);
+                }
+
+                push(window);
+
+                try {
+                    if (window.parent && window.parent !== window) {
+                        push(window.parent);
+                    }
+                } catch (err) {}
+
+                try {
+                    if (window.top && window.top !== window) {
+                        push(window.top);
+                    }
+                } catch (err) {}
+
+                for (let i = 0; i < queue.length; i += 1) {
+                    const current = queue[i];
+
+                    withDocument(current, function(doc) {
+                        if (!doc) {
+                            return;
+                        }
+
+                        try {
+                            const frames = doc.querySelectorAll('iframe');
+                            frames.forEach(function(frame) {
+                                try {
+                                    if (frame && frame.contentWindow) {
+                                        push(frame.contentWindow);
+                                    }
+                                } catch (err) {}
+                            });
+                        } catch (err) {}
+                    });
+                }
+
+                return queue;
+            }
+
+            function runScroll(behavior) {
+                const windows = collectWindows();
+                windows.forEach(function(win) {
+                    scrollWindow(win, behavior);
+
+                    withDocument(win, function(doc) {
+                        if (!doc) {
+                            return;
+                        }
+
+                        TARGET_SELECTORS.forEach(function(selector) {
+                            let node = null;
+                            try {
+                                node = doc.querySelector(selector);
+                            } catch (err) {
+                                node = null;
+                            }
+
+                            scrollElement(node, behavior);
+                        });
+
+                        scrollElement(doc.scrollingElement, behavior);
+                        scrollElement(doc.documentElement, behavior);
+                        scrollElement(doc.body, behavior);
+                    });
+                });
+            }
+
+            const delays = [0, 80, 160, 320, 640];
+            delays.forEach(function(delay) {
+                if (delay === 0) {
+                    runScroll('auto');
+                } else {
+                    setTimeout(function() { runScroll('auto'); }, delay);
+                }
+            });
+
+            try {
+                const raf = window.requestAnimationFrame;
+                if (typeof raf === 'function') {
+                    raf(function() { runScroll('auto'); });
+                }
+            } catch (err) {}
+        })();
+        </script>
+        """,
+        selectors=json.dumps(selectors),
+    )
 
     components.html(script, height=0)
 
@@ -601,358 +613,365 @@ def _add_floating_top_button():
         "div[data-testid='stAppViewBlockContainer']",
     ]
 
-    script = f"""
-    <script>
-    (function() {{
-        const BUTTON_ID = {json.dumps(button_id)};
-        const STYLE_ID = {json.dumps(style_id)};
-        const TARGET_SELECTORS = {json.dumps(selectors)};
-        const THRESHOLD = 240;
+    script = _render_js_template(
+        """
+        <script>
+        (function() {
+            const BUTTON_ID = $button_id_json;
+            const STYLE_ID = $style_id_json;
+            const TARGET_SELECTORS = $selectors;
+            const THRESHOLD = $threshold;
 
-        function collectContexts() {{
-            const contexts = [];
-            const queue = [];
-            const seen = new Set();
+            function collectContexts() {
+                const contexts = [];
+                const queue = [];
+                const seen = new Set();
 
-            function push(win) {{
-                if (!win || seen.has(win)) {{
+                function push(win) {
+                    if (!win || seen.has(win)) {
+                        return;
+                    }
+
+                    seen.add(win);
+
+                    let doc = null;
+                    try {
+                        doc = win.document || null;
+                    } catch (err) {
+                        doc = null;
+                    }
+
+                    const context = { win, doc };
+                    contexts.push(context);
+                    queue.push(context);
+                }
+
+                push(window);
+
+                for (let i = 0; i < queue.length; i += 1) {
+                    const ctx = queue[i];
+                    const win = ctx.win;
+                    const doc = ctx.doc;
+
+                    try {
+                        if (win && win.parent && win.parent !== win) {
+                            push(win.parent);
+                        }
+                    } catch (err) {}
+
+                    try {
+                        if (win && win.top && win.top !== win) {
+                            push(win.top);
+                        }
+                    } catch (err) {}
+
+                    if (!doc) {
+                        continue;
+                    }
+
+                    try {
+                        const frames = doc.querySelectorAll('iframe');
+                        frames.forEach(function(frame) {
+                            try {
+                                push(frame.contentWindow);
+                            } catch (err) {}
+                        });
+                    } catch (err) {}
+                }
+
+                return contexts;
+            }
+
+            function ensureStyle(doc) {
+                if (!doc || doc.getElementById($style_id_json)) {
                     return;
-                }}
+                }
 
-                seen.add(win);
+                const style = doc.createElement('style');
+                style.id = $style_id_json;
+                style.textContent = `
+                    #$button_id_css {
+                        all: unset;
+                        position: fixed;
+                        bottom: 32px;
+                        right: 28px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 12px 18px;
+                        border-radius: 999px;
+                        background: linear-gradient(135deg, #5a67d8 0%, #7f53ac 100%);
+                        color: #ffffff;
+                        font-weight: 600;
+                        font-size: 14px;
+                        letter-spacing: 0.08em;
+                        cursor: pointer;
+                        box-shadow: 0 12px 24px rgba(79, 114, 205, 0.35);
+                        opacity: 0;
+                        transform: translateY(12px);
+                        transition: opacity 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
+                        z-index: 2147482000;
+                    }
 
-                let doc = null;
-                try {{
-                    doc = win.document || null;
-                }} catch (err) {{
-                    doc = null;
-                }}
+                    #$button_id_css svg {
+                        width: 18px;
+                        height: 18px;
+                    }
 
-                const context = {{ win, doc }};
-                contexts.push(context);
-                queue.push(context);
-            }}
+                    #$button_id_css.visible {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
 
-            push(window);
+                    #$button_id_css:hover {
+                        box-shadow: 0 16px 32px rgba(79, 114, 205, 0.45);
+                    }
 
-            for (let i = 0; i < queue.length; i += 1) {{
-                const ctx = queue[i];
-                const win = ctx.win;
-                const doc = ctx.doc;
-
-                try {{
-                    if (win && win.parent && win.parent !== win) {{
-                        push(win.parent);
-                    }}
-                }} catch (err) {{}}
-
-                try {{
-                    if (win && win.top && win.top !== win) {{
-                        push(win.top);
-                    }}
-                }} catch (err) {{}}
-
-                if (!doc) {{
-                    continue;
-                }}
-
-                try {{
-                    const frames = doc.querySelectorAll('iframe');
-                    frames.forEach(function(frame) {{
-                        try {{
-                            push(frame.contentWindow);
-                        }} catch (err) {{}}
-                    }});
-                }} catch (err) {{}}
-            }}
-
-            return contexts;
-        }}
-
-        function ensureStyle(doc) {{
-            if (!doc || doc.getElementById(STYLE_ID)) {{
-                return;
-            }}
-
-            const style = doc.createElement('style');
-            style.id = STYLE_ID;
-            style.textContent = `
-                #${{BUTTON_ID}} {{
-                    all: unset;
-                    position: fixed;
-                    bottom: 32px;
-                    right: 28px;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 12px 18px;
-                    border-radius: 999px;
-                    background: linear-gradient(135deg, #5a67d8 0%, #7f53ac 100%);
-                    color: #ffffff;
-                    font-weight: 600;
-                    font-size: 14px;
-                    letter-spacing: 0.08em;
-                    cursor: pointer;
-                    box-shadow: 0 12px 24px rgba(79, 114, 205, 0.35);
-                    opacity: 0;
-                    transform: translateY(12px);
-                    transition: opacity 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
-                    z-index: 2147482000;
-                }}
-
-                #${{BUTTON_ID}} svg {{
-                    width: 18px;
-                    height: 18px;
-                }}
-
-                #${{BUTTON_ID}}.visible {{
-                    opacity: 1;
-                    transform: translateY(0);
-                }}
-
-                #${{BUTTON_ID}}:hover {{
-                    box-shadow: 0 16px 32px rgba(79, 114, 205, 0.45);
-                }}
-
-                @media (max-width: 768px) {{
-                    #${{BUTTON_ID}} {{
-                        right: 16px;
-                        bottom: 24px;
-                        padding: 10px 16px;
-                        font-size: 13px;
-                    }}
-                }}
-            `;
-
-            (doc.head || doc.body || doc.documentElement).appendChild(style);
-        }}
-
-        function ensureButton(doc) {{
-            if (!doc) {{
-                return null;
-            }}
-
-            let button = doc.getElementById(BUTTON_ID);
-            if (!button) {{
-                button = doc.createElement('button');
-                button.id = BUTTON_ID;
-                button.type = 'button';
-                button.setAttribute('aria-label', 'Scroll to top of lesson');
-                button.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                        <path d="M6 9L12 5L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span>TOP</span>
+                    @media (max-width: 768px) {
+                        #$button_id_css {
+                            right: 16px;
+                            bottom: 24px;
+                            padding: 10px 16px;
+                            font-size: 13px;
+                        }
+                    }
                 `;
 
-                const host = doc.body || doc.documentElement;
-                if (!host) {{
+                (doc.head || doc.body || doc.documentElement).appendChild(style);
+            }
+
+            function ensureButton(doc) {
+                if (!doc) {
                     return null;
-                }}
+                }
 
-                host.appendChild(button);
-            }}
+                let button = doc.getElementById($button_id_json);
+                if (!button) {
+                    button = doc.createElement('button');
+                    button.id = $button_id_json;
+                    button.type = 'button';
+                    button.setAttribute('aria-label', 'Scroll to top of lesson');
+                    button.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M6 9L12 5L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>TOP</span>
+                    `;
 
-            return button;
-        }}
+                    const host = doc.body || doc.documentElement;
+                    if (!host) {
+                        return null;
+                    }
 
-        function maxOffset(ctx) {{
-            if (!ctx) {{
-                return 0;
-            }}
+                    host.appendChild(button);
+                }
 
-            let max = 0;
-            const doc = ctx.doc;
-            const win = ctx.win;
+                return button;
+            }
 
-            if (doc) {{
-                TARGET_SELECTORS.forEach(function(selector) {{
-                    let node = null;
-                    try {{
-                        node = doc.querySelector(selector);
-                    }} catch (err) {{
-                        node = null;
-                    }}
+            function maxOffset(ctx) {
+                if (!ctx) {
+                    return 0;
+                }
 
-                    if (node && typeof node.scrollTop === 'number') {{
-                        const value = Math.abs(node.scrollTop || 0);
-                        if (value > max) {{
+                let max = 0;
+                const doc = ctx.doc;
+                const win = ctx.win;
+
+                if (doc) {
+                    TARGET_SELECTORS.forEach(function(selector) {
+                        let node = null;
+                        try {
+                            node = doc.querySelector(selector);
+                        } catch (err) {
+                            node = null;
+                        }
+
+                        if (node && typeof node.scrollTop === 'number') {
+                            const value = Math.abs(node.scrollTop || 0);
+                            if (value > max) {
+                                max = value;
+                            }
+                        }
+                    });
+
+                    const candidates = [doc.scrollingElement, doc.documentElement, doc.body];
+                    candidates.forEach(function(node) {
+                        if (node && typeof node.scrollTop === 'number') {
+                            const value = Math.abs(node.scrollTop || 0);
+                            if (value > max) {
+                                max = value;
+                            }
+                        }
+                    });
+                }
+
+                if (win) {
+                    try {
+                        const value = Math.abs(win.pageYOffset || win.scrollY || win.scrollTop || 0);
+                        if (value > max) {
                             max = value;
-                        }}
-                    }}
-                }});
+                        }
+                    } catch (err) {}
+                }
 
-                const candidates = [doc.scrollingElement, doc.documentElement, doc.body];
-                candidates.forEach(function(node) {{
-                    if (node && typeof node.scrollTop === 'number') {{
-                        const value = Math.abs(node.scrollTop || 0);
-                        if (value > max) {{
-                            max = value;
-                        }}
-                    }}
-                }});
-            }}
+                return max;
+            }
 
-            if (win) {{
-                try {{
-                    const value = Math.abs(win.pageYOffset || win.scrollY || win.scrollTop || 0);
-                    if (value > max) {{
-                        max = value;
-                    }}
-                }} catch (err) {{}}
-            }}
+            function scrollContext(ctx, behavior) {
+                if (!ctx) {
+                    return;
+                }
 
-            return max;
-        }}
+                const doc = ctx.doc;
+                const win = ctx.win;
 
-        function scrollContext(ctx, behavior) {{
-            if (!ctx) {{
+                if (doc) {
+                    TARGET_SELECTORS.forEach(function(selector) {
+                        let node = null;
+                        try {
+                            node = doc.querySelector(selector);
+                        } catch (err) {
+                            node = null;
+                        }
+
+                        if (node) {
+                            if (typeof node.scrollTo === 'function') {
+                                try { node.scrollTo({ top: 0, behavior }); } catch (err) {}
+                            }
+
+                            if (typeof node.scrollTop === 'number') {
+                                try { node.scrollTop = 0; } catch (err) {}
+                            }
+                        }
+                    });
+
+                    [doc.scrollingElement, doc.documentElement, doc.body].forEach(function(node) {
+                        if (!node) {
+                            return;
+                        }
+
+                        if (typeof node.scrollTo === 'function') {
+                            try { node.scrollTo({ top: 0, behavior }); } catch (err) {}
+                        }
+
+                        if (typeof node.scrollTop === 'number') {
+                            try { node.scrollTop = 0; } catch (err) {}
+                        }
+                    });
+                }
+
+                if (win) {
+                    if (typeof win.scrollTo === 'function') {
+                        try { win.scrollTo({ top: 0, behavior }); } catch (err) {}
+                    }
+
+                    try {
+                        if (typeof win.scrollTop === 'number') {
+                            win.scrollTop = 0;
+                        }
+                    } catch (err) {}
+                }
+            }
+
+            const contexts = collectContexts();
+            let hostDoc = null;
+
+            for (let i = 0; i < contexts.length; i += 1) {
+                const ctx = contexts[i];
+                if (ctx && ctx.doc) {
+                    hostDoc = ctx.doc;
+                    if (ctx.win && ctx.win !== window) {
+                        break;
+                    }
+                }
+            }
+
+            hostDoc = hostDoc || document;
+
+            ensureStyle(hostDoc);
+            const button = ensureButton(hostDoc);
+            if (!button) {
                 return;
-            }}
+            }
 
-            const doc = ctx.doc;
-            const win = ctx.win;
+            function updateVisibility() {
+                let visible = false;
 
-            if (doc) {{
-                TARGET_SELECTORS.forEach(function(selector) {{
+                for (let i = 0; i < contexts.length; i += 1) {
+                    if (maxOffset(contexts[i]) > THRESHOLD) {
+                        visible = true;
+                        break;
+                    }
+                }
+
+                if (visible) {
+                    button.classList.add('visible');
+                } else {
+                    button.classList.remove('visible');
+                }
+            }
+
+            if (!button.__cyberlearnTopButtonInitialized) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    contexts.forEach(function(ctx) {
+                        scrollContext(ctx, 'smooth');
+                    });
+                });
+
+                button.__cyberlearnTopButtonInitialized = true;
+            }
+
+            contexts.forEach(function(ctx) {
+                if (!ctx) {
+                    return;
+                }
+
+                const win = ctx.win;
+                if (win && !win.__cyberlearnTopButtonListeners) {
+                    try {
+                        win.addEventListener('scroll', updateVisibility, { passive: true });
+                        win.addEventListener('resize', updateVisibility, { passive: true });
+                        win.__cyberlearnTopButtonListeners = true;
+                    } catch (err) {}
+                }
+
+                const doc = ctx.doc;
+                if (!doc) {
+                    return;
+                }
+
+                TARGET_SELECTORS.forEach(function(selector) {
                     let node = null;
-                    try {{
+                    try {
                         node = doc.querySelector(selector);
-                    }} catch (err) {{
+                    } catch (err) {
                         node = null;
-                    }}
+                    }
 
-                    if (node) {{
-                        if (typeof node.scrollTo === 'function') {{
-                            try {{ node.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
-                        }}
+                    if (node && !node.__cyberlearnTopButtonListener) {
+                        try {
+                            node.addEventListener('scroll', updateVisibility, { passive: true });
+                            node.__cyberlearnTopButtonListener = true;
+                        } catch (err) {}
+                    }
+                });
+            });
 
-                        if (typeof node.scrollTop === 'number') {{
-                            try {{ node.scrollTop = 0; }} catch (err) {{}}
-                        }}
-                    }}
-                }});
-
-                [doc.scrollingElement, doc.documentElement, doc.body].forEach(function(node) {{
-                    if (!node) {{
-                        return;
-                    }}
-
-                    if (typeof node.scrollTo === 'function') {{
-                        try {{ node.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
-                    }}
-
-                    if (typeof node.scrollTop === 'number') {{
-                        try {{ node.scrollTop = 0; }} catch (err) {{}}
-                    }}
-                }});
-            }}
-
-            if (win) {{
-                if (typeof win.scrollTo === 'function') {{
-                    try {{ win.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
-                }}
-
-                try {{
-                    if (typeof win.scrollTop === 'number') {{
-                        win.scrollTop = 0;
-                    }}
-                }} catch (err) {{}}
-            }}
-        }}
-
-        const contexts = collectContexts();
-        let hostDoc = null;
-
-        for (let i = 0; i < contexts.length; i += 1) {{
-            const ctx = contexts[i];
-            if (ctx && ctx.doc) {{
-                hostDoc = ctx.doc;
-                if (ctx.win && ctx.win !== window) {{
-                    break;
-                }}
-            }}
-        }}
-
-        hostDoc = hostDoc || document;
-
-        ensureStyle(hostDoc);
-        const button = ensureButton(hostDoc);
-        if (!button) {{
-            return;
-        }}
-
-        function updateVisibility() {{
-            let visible = false;
-
-            for (let i = 0; i < contexts.length; i += 1) {{
-                if (maxOffset(contexts[i]) > THRESHOLD) {{
-                    visible = true;
-                    break;
-                }}
-            }}
-
-            if (visible) {{
-                button.classList.add('visible');
-            }} else {{
-                button.classList.remove('visible');
-            }}
-        }}
-
-        if (!button.__cyberlearnTopButtonInitialized) {{
-            button.addEventListener('click', function(event) {{
-                event.preventDefault();
-                contexts.forEach(function(ctx) {{
-                    scrollContext(ctx, 'smooth');
-                }});
-            }});
-
-            button.__cyberlearnTopButtonInitialized = true;
-        }}
-
-        contexts.forEach(function(ctx) {{
-            if (!ctx) {{
-                return;
-            }}
-
-            const win = ctx.win;
-            if (win && !win.__cyberlearnTopButtonListeners) {{
-                try {{
-                    win.addEventListener('scroll', updateVisibility, {{ passive: true }});
-                    win.addEventListener('resize', updateVisibility, {{ passive: true }});
-                    win.__cyberlearnTopButtonListeners = true;
-                }} catch (err) {{}}
-            }}
-
-            const doc = ctx.doc;
-            if (!doc) {{
-                return;
-            }}
-
-            TARGET_SELECTORS.forEach(function(selector) {{
-                let node = null;
-                try {{
-                    node = doc.querySelector(selector);
-                }} catch (err) {{
-                    node = null;
-                }}
-
-                if (node && !node.__cyberlearnTopButtonListener) {{
-                    try {{
-                        node.addEventListener('scroll', updateVisibility, {{ passive: true }});
-                        node.__cyberlearnTopButtonListener = true;
-                    }} catch (err) {{}}
-                }}
-            }});
-        }});
-
-        updateVisibility();
-        setTimeout(updateVisibility, 200);
-        setTimeout(updateVisibility, 600);
-    }})();
-    </script>
-    """
+            updateVisibility();
+            setTimeout(updateVisibility, 200);
+            setTimeout(updateVisibility, 600);
+        })();
+        </script>
+        """,
+        button_id_json=json.dumps(button_id),
+        style_id_json=json.dumps(style_id),
+        selectors=json.dumps(selectors),
+        threshold=json.dumps(240),
+        button_id_css=button_id,
+    )
 
     components.html(script, height=0)
 
