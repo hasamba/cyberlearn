@@ -579,6 +579,22 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     # Add floating "Back to Top" button
     _add_floating_top_button()
 
+    # Add a simple visible "Scroll to Top" instruction at the top
+    st.markdown(
+        """
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-size: 14px;">
+            💡 <strong>Tip:</strong> Press <kbd>Home</kbd> key to scroll to top, or use your browser's scroll bar
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
         st.session_state.lesson_start_time = time.time()
