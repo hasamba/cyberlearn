@@ -28,17 +28,18 @@ def render_search_page():
     db = st.session_state.db
     user: Optional[UserProfile] = st.session_state.get('current_user')
 
-    # Check if there's a popular search term selected
+    # Determine the initial search value (priority: popular_search_term > saved_search_query > empty)
     default_search = ""
+
+    # First check for popular search term (highest priority)
     if 'popular_search_term' in st.session_state:
         default_search = st.session_state.popular_search_term
         del st.session_state.popular_search_term
         # Force clear the widget to allow new value
         if 'search_input' in st.session_state:
             del st.session_state.search_input
-
-    # If we have a saved search query from before navigation, restore it
-    if 'saved_search_query' in st.session_state and not default_search:
+    # Then check for saved search query from navigation
+    elif 'saved_search_query' in st.session_state:
         default_search = st.session_state.saved_search_query
         del st.session_state.saved_search_query
         # Clear the widget state to force update
