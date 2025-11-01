@@ -221,6 +221,9 @@ def render_search_page():
                             # Load full lesson
                             lesson = db.get_lesson(lesson_id)
                             if lesson:
+                                # Clear popular search term to prevent interference
+                                if 'popular_search_term' in st.session_state:
+                                    del st.session_state.popular_search_term
                                 st.session_state.current_lesson = lesson
                                 st.session_state.current_page = "lesson"
                                 # Initialize lesson state
