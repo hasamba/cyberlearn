@@ -176,6 +176,26 @@ class Database:
         """
         )
 
+        # Lesson notes table (enhanced notes with block-level granularity)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS lesson_notes (
+                note_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                lesson_id TEXT NOT NULL,
+                content_block_index INTEGER,
+                note_text TEXT,
+                note_type TEXT DEFAULT 'text',
+                attachments TEXT DEFAULT '[]',
+                is_pinned INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE
+            )
+        """
+        )
+
         # Assessment questions table
         cursor.execute(
             """
@@ -228,6 +248,12 @@ class Database:
         )
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_notes_lesson ON notes(lesson_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_lesson_notes_user ON lesson_notes(user_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_lesson_notes_lesson ON lesson_notes(lesson_id)"
         )
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_assessment_questions_domain ON assessment_questions(domain)"
