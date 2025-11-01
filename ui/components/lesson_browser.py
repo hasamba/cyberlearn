@@ -105,8 +105,8 @@ def render_lesson_browser(user: UserProfile, db: Database):
 
     st.markdown("### 📚 Browse Lessons")
 
-    # Get only user-created tags
-    all_tags = db.get_user_tags()
+    # Get all tags
+    all_tags = db.get_all_tags()
 
     if not all_tags:
         st.info("No tags available. Visit the Tag Management page to create tags.")

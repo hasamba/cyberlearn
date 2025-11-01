@@ -133,8 +133,8 @@ def render_export_tab(db, user):
         selected_domain = st.selectbox("Filter by Domain", ["All Domains"] + all_domains)
 
     with col2:
-        # Tag selector (only show user-created tags)
-        all_tags = db.get_user_tags()
+        # Tag selector
+        all_tags = db.get_all_tags()
         tag_names = ["All Tags"] + [tag.name for tag in all_tags]
         selected_tag = st.selectbox("Filter by Tag", tag_names)
 
