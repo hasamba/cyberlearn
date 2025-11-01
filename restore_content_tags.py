@@ -45,7 +45,7 @@ def restore_content_tags():
             "color": "#6B7280",
             "icon": "⚪",
             "description": "User-created or imported lessons",
-            "is_system": 0,
+            "is_system": 1,
             "user_id": None
         },
         {
@@ -54,7 +54,7 @@ def restore_content_tags():
             "color": "#EC4899",
             "icon": "🩷",
             "description": "Community-contributed lessons",
-            "is_system": 0,
+            "is_system": 1,
             "user_id": None
         }
     ]
