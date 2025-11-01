@@ -132,10 +132,21 @@ def initialize_session_state():
         if config.debug:
             debug_print("Database connection initialized")
 
-    if "current_user" not in st.session_state:
-        st.session_state.current_user = None
+    # Store logged_in_username as a simple string for persistence
+    if "logged_in_username" not in st.session_state:
+        st.session_state.logged_in_username = None
         if config.debug:
             debug_print("Session state initialized (no user)")
+
+    # Always reload user from database if we have a username
+    # This ensures fresh data and avoids Pydantic serialization issues
+    if st.session_state.logged_in_username:
+        st.session_state.current_user = st.session_state.db.get_user_by_username(st.session_state.logged_in_username)
+        if not st.session_state.current_user:
+            # User no longer exists, clear username
+            st.session_state.logged_in_username = None
+    else:
+        st.session_state.current_user = None
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -264,6 +275,7 @@ def render_sidebar():
                 # Save username before clearing session
                 saved_username = st.session_state.get('last_username', None)
                 st.session_state.current_user = None
+                st.session_state.logged_in_username = None  # Clear username for persistence
                 st.session_state.current_page = "welcome"
                 # Restore username for next login
                 if saved_username:
@@ -328,6 +340,7 @@ def render_sidebar():
                 # Auto-login
                 user = st.session_state.db.get_user_by_username(default_username)
                 if user:
+                    st.session_state.logged_in_username = default_username  # Store username for persistence
                     st.session_state.current_user = user
                     user.last_username = default_username
                     user.update_streak()
@@ -347,6 +360,7 @@ def render_sidebar():
                     if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
                         user = st.session_state.db.get_user_by_username(default_username)
                         if user:
+                            st.session_state.logged_in_username = default_username  # Store username for persistence
                             st.session_state.current_user = user
                             user.last_username = default_username
                             user.update_streak()
@@ -363,6 +377,7 @@ def render_sidebar():
                     if submit and username:
                         user = st.session_state.db.get_user_by_username(username)
                         if user:
+                            st.session_state.logged_in_username = username  # Store username for persistence
                             st.session_state.current_user = user
                             st.session_state.last_username = username
                             # Save username to user's database record
@@ -400,6 +415,7 @@ def render_sidebar():
                             if st.session_state.db.create_user(user):
                                 user.update_streak()
                                 st.session_state.db.update_user(user)
+                                st.session_state.logged_in_username = new_username  # Store username for persistence
                                 st.session_state.current_user = user
                                 st.session_state.last_username = new_username
                                 st.session_state.current_page = "diagnostic"
