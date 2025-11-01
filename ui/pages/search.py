@@ -227,9 +227,9 @@ def render_search_page():
                             # Load full lesson
                             lesson = db.get_lesson(lesson_id)
                             if lesson:
-                                # Save current search query to restore when returning to search
-                                if search_query:
-                                    st.session_state.saved_search_query = search_query
+                                # Save current search query (use active_search to capture both typed and popular searches)
+                                if active_search:
+                                    st.session_state.saved_search_query = active_search
                                 # Clear popular search term to prevent interference
                                 if 'popular_search_term' in st.session_state:
                                     del st.session_state.popular_search_term
