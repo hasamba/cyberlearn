@@ -503,7 +503,10 @@ def main():
             )
         elif page == "tags":
             from ui.pages import tag_management
-            tag_management.render_tag_management(st.session_state.db)
+            tag_management.render_tag_management(
+                st.session_state.db,
+                st.session_state.current_user
+            )
         elif page == "search":
             from ui.pages import search
             search.render_search_page()
