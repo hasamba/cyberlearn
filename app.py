@@ -86,6 +86,41 @@ st.markdown(
 )
 
 
+def sync_url_to_session_state():
+    """Sync URL query parameters to session state (for browser back/forward)"""
+    # Get query params from URL
+    params = st.query_params
+
+    # If page is in URL, update session state
+    if "page" in params:
+        st.session_state.current_page = params["page"]
+
+    # If lesson_id is in URL, load that lesson
+    if "lesson_id" in params:
+        lesson_id = params["lesson_id"]
+        if st.session_state.get("db"):
+            lesson = st.session_state.db.get_lesson(lesson_id)
+            if lesson:
+                st.session_state.current_lesson = lesson
+                st.session_state.current_page = "lesson"
+
+
+def sync_session_state_to_url():
+    """Sync session state to URL query parameters (for shareable links)"""
+    params = {}
+
+    # Add current page to URL
+    if st.session_state.get("current_page"):
+        params["page"] = st.session_state.current_page
+
+    # Add lesson ID if viewing a lesson
+    if st.session_state.current_page == "lesson" and st.session_state.get("current_lesson"):
+        params["lesson_id"] = str(st.session_state.current_lesson.lesson_id)
+
+    # Update URL without triggering rerun
+    st.query_params.update(params)
+
+
 def initialize_session_state():
     """Initialize session state variables"""
     if "db" not in st.session_state:
@@ -103,6 +138,9 @@ def initialize_session_state():
 
     if "current_lesson" not in st.session_state:
         st.session_state.current_lesson = None
+
+    # Sync URL params to session state (handles browser back/forward)
+    sync_url_to_session_state()
 
 
 def render_sidebar():
@@ -141,46 +179,68 @@ def render_sidebar():
 
             if st.button("🏠 Dashboard", use_container_width=True):
                 st.session_state.current_page = "dashboard"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("📚 My Learning", use_container_width=True):
                 st.session_state.current_page = "learning"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("🔍 Search Lessons", use_container_width=True):
                 st.session_state.current_page = "search"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("👤 Profile", use_container_width=True):
                 st.session_state.current_page = "profile"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("🏆 Achievements", use_container_width=True):
                 st.session_state.current_page = "achievements"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("🏷️ Manage Tags", use_container_width=True):
                 st.session_state.current_page = "tags"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("🙈 Hidden Lessons", use_container_width=True):
                 st.session_state.current_page = "hidden_lessons"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("🎯 Skill Assessment", use_container_width=True):
                 st.session_state.current_page = "diagnostic"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("📤 Upload Lessons", use_container_width=True):
                 st.session_state.current_page = "upload_lessons"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("📦 Lesson Packages", use_container_width=True):
                 st.session_state.current_page = "lesson_packages"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             if st.button("📝 My Notes", use_container_width=True):
                 st.session_state.current_page = "my_notes"
+                st.session_state.current_lesson = None
+                sync_session_state_to_url()
                 st.rerun()
 
             st.markdown("---")
@@ -465,6 +525,9 @@ def main():
             dashboard.render(
                 st.session_state.current_user, st.session_state.db
             )
+
+    # Sync session state to URL after rendering (ensures URL is always current)
+    sync_session_state_to_url()
 
 
 if __name__ == "__main__":
