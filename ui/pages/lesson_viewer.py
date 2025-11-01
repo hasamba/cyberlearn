@@ -421,599 +421,541 @@ def _maybe_scroll_to_top():
     if not st.session_state.pop("scroll_to_top", False):
         return
 
+    import json
     import streamlit.components.v1 as components
 
-    components.html(
-        """
-        <script>
-        (function() {
-            const SELECTORS = [
-                'section.main div.block-container',
-                'section.main',
-                'div[data-testid=\"stAppViewBlockContainer\"]',
-                'div[data-testid=\"stVerticalBlock\"]'
-            ];
+    selectors = [
+        "section.main div.block-container",
+        "section.main",
+        "div[data-testid='stAppViewBlockContainer']",
+        "div[data-testid='stVerticalBlock']",
+    ]
 
-            function safeContext(win) {
-                if (!win) {
-                    return null;
-                }
+    script = f"""
+    <script>
+    (function() {{
+        const TARGET_SELECTORS = {json.dumps(selectors)};
 
-                let doc = null;
+        function scrollElement(node, behavior) {{
+            if (!node) {{
+                return;
+            }}
 
-                try {
-                    doc = win.document || null;
-                } catch (err) {
-                    doc = null;
-                }
+            if (typeof node.scrollTo === 'function') {{
+                try {{
+                    node.scrollTo({{ top: 0, behavior }});
+                    return;
+                }} catch (err) {{}}
+            }}
 
-                return { win: win, doc: doc };
-            }
+            if (typeof node.scrollTop === 'number') {{
+                try {{ node.scrollTop = 0; }} catch (err) {{}}
+            }}
+        }}
 
-            function collectContexts() {
-                const contexts = [];
-                const seen = [];
-                const queue = [];
+        function scrollWindow(win, behavior) {{
+            if (!win) {{
+                return;
+            }}
 
-                function enqueue(win) {
-                    if (!win || seen.indexOf(win) !== -1) {
+            if (typeof win.scrollTo === 'function') {{
+                try {{
+                    win.scrollTo({{ top: 0, behavior }});
+                    return;
+                }} catch (err) {{}}
+            }}
+
+            try {{
+                if (typeof win.scrollTop === 'number') {{
+                    win.scrollTop = 0;
+                }}
+            }} catch (err) {{}}
+        }}
+
+        function withDocument(win, callback) {{
+            if (!win) {{
+                return;
+            }}
+
+            let doc = null;
+            try {{
+                doc = win.document || null;
+            }} catch (err) {{
+                doc = null;
+            }}
+
+            callback(doc);
+        }}
+
+        function collectWindows() {{
+            const queue = [];
+            const seen = new Set();
+
+            function push(win) {{
+                if (!win || seen.has(win)) {{
+                    return;
+                }}
+
+                seen.add(win);
+                queue.push(win);
+            }}
+
+            push(window);
+
+            try {{
+                if (window.parent && window.parent !== window) {{
+                    push(window.parent);
+                }}
+            }} catch (err) {{}}
+
+            try {{
+                if (window.top && window.top !== window) {{
+                    push(window.top);
+                }}
+            }} catch (err) {{}}
+
+            for (let i = 0; i < queue.length; i += 1) {{
+                const current = queue[i];
+
+                withDocument(current, function(doc) {{
+                    if (!doc) {{
                         return;
-                    }
+                    }}
 
-                    seen.push(win);
-                    queue.push(win);
-                }
-
-                enqueue(window);
-
-                try {
-                    if (window.parent && window.parent !== window) {
-                        enqueue(window.parent);
-                    }
-                } catch (err) {
-                    // Ignore parent frame errors.
-                }
-
-                try {
-                    if (window.top && window.top !== window) {
-                        enqueue(window.top);
-                    }
-                } catch (err) {
-                    // Ignore top frame errors.
-                }
-
-                for (let i = 0; i < queue.length; i += 1) {
-                    const context = safeContext(queue[i]);
-                    if (!context) {
-                        continue;
-                    }
-
-                    contexts.push(context);
-
-                    const doc = context.doc;
-                    if (!doc) {
-                        continue;
-                    }
-
-                    try {
+                    try {{
                         const frames = doc.querySelectorAll('iframe');
-                        for (let j = 0; j < frames.length; j += 1) {
-                            const frameEl = frames[j];
-                            try {
-                                if (frameEl && frameEl.contentWindow) {
-                                    enqueue(frameEl.contentWindow);
-                                }
-                            } catch (err) {
-                                // Ignore nested frame errors.
-                            }
-                        }
-                    } catch (err) {
-                        // Ignore selector errors.
-                    }
-                }
+                        frames.forEach(function(frame) {{
+                            try {{
+                                if (frame && frame.contentWindow) {{
+                                    push(frame.contentWindow);
+                                }}
+                            }} catch (err) {{}}
+                        }});
+                    }} catch (err) {{}}
+                }});
+            }}
 
-                return contexts;
-            }
+            return queue;
+        }}
 
-            function scrollNode(node, behavior) {
-                if (!node) {
-                    return;
-                }
+        function runScroll(behavior) {{
+            const windows = collectWindows();
+            windows.forEach(function(win) {{
+                scrollWindow(win, behavior);
 
-                if (typeof node.scrollTo === 'function') {
-                    try {
-                        node.scrollTo({ top: 0, behavior: behavior });
+                withDocument(win, function(doc) {{
+                    if (!doc) {{
                         return;
-                    } catch (err) {
-                        // Fallback to assignment.
-                    }
-                }
+                    }}
 
-                if (typeof node.scrollTop === 'number') {
-                    node.scrollTop = 0;
-                }
-            }
+                    TARGET_SELECTORS.forEach(function(selector) {{
+                        let node = null;
+                        try {{
+                            node = doc.querySelector(selector);
+                        }} catch (err) {{
+                            node = null;
+                        }}
 
-            function scrollContext(ctx, behavior) {
-                if (!ctx) {
-                    return;
-                }
+                        scrollElement(node, behavior);
+                    }});
 
-                const doc = ctx.doc;
-                const win = ctx.win;
+                    scrollElement(doc.scrollingElement, behavior);
+                    scrollElement(doc.documentElement, behavior);
+                    scrollElement(doc.body, behavior);
+                }});
+            }});
+        }}
 
-                if (doc) {
-                    for (let i = 0; i < SELECTORS.length; i += 1) {
-                        const selector = SELECTORS[i];
-                        try {
-                            const node = doc.querySelector(selector);
-                            scrollNode(node, behavior);
-                        } catch (err) {
-                            // Ignore selector issues.
-                        }
-                    }
+        const delays = [0, 80, 160, 320, 640];
+        delays.forEach(function(delay) {{
+            if (delay === 0) {{
+                runScroll('auto');
+            }} else {{
+                setTimeout(function() {{ runScroll('auto'); }}, delay);
+            }}
+        }});
 
-                    scrollNode(doc.scrollingElement, behavior);
-                    scrollNode(doc.documentElement, behavior);
-                    scrollNode(doc.body, behavior);
-                }
+        try {{
+            const raf = window.requestAnimationFrame;
+            if (typeof raf === 'function') {{
+                raf(function() {{ runScroll('auto'); }});
+            }}
+        }} catch (err) {{}}
+    }})();
+    </script>
+    """
 
-                if (win) {
-                    if (typeof win.scrollTo === 'function') {
-                        try {
-                            win.scrollTo({ top: 0, behavior: behavior });
-                        } catch (err) {
-                            if (typeof win.scrollTop === 'number') {
-                                win.scrollTop = 0;
-                            }
-                        }
-                    } else if (typeof win.scrollTop === 'number') {
-                        win.scrollTop = 0;
-                    }
-                }
-            }
+    components.html(script, height=0)
 
-            function performScroll(behavior) {
-                const contexts = collectContexts();
-                for (let i = 0; i < contexts.length; i += 1) {
-                    scrollContext(contexts[i], behavior);
-                }
-            }
-
-            const DELAYS = [0, 80, 160, 320, 640];
-            for (let i = 0; i < DELAYS.length; i += 1) {
-                const delay = DELAYS[i];
-                const action = function() {
-                    performScroll('auto');
-                };
-
-                if (delay === 0) {
-                    action();
-                } else {
-                    setTimeout(action, delay);
-                }
-            }
-
-            try {
-                const raf = window.requestAnimationFrame;
-                if (typeof raf === 'function') {
-                    raf(function() {
-                        performScroll('auto');
-                    });
-                }
-            } catch (err) {
-                // Ignore animation frame errors.
-            }
-        })();
-        </script>
-        """,
-        height=0,
-    )
 
 def _add_floating_top_button():
-    """Add a floating 'Back to Top' button to lesson pages"""
+    """Add a floating 'Back to Top' button to lesson pages."""
+    import json
     import streamlit.components.v1 as components
 
-    components.html(
-        """
-        <script>
-        (function() {
-            const BUTTON_ID = 'cyberlearn-back-to-top-btn';
-            const STYLE_ID = 'cyberlearn-back-to-top-style';
+    button_id = "cyberlearn-back-to-top"
+    style_id = "cyberlearn-back-to-top-style"
+    selectors = [
+        "section.main div.block-container",
+        "section.main",
+        "div[data-testid='stAppViewBlockContainer']",
+    ]
 
-            function safeContext(win) {
-                if (!win) {
-                    return null;
-                }
+    script = f"""
+    <script>
+    (function() {{
+        const BUTTON_ID = {json.dumps(button_id)};
+        const STYLE_ID = {json.dumps(style_id)};
+        const TARGET_SELECTORS = {json.dumps(selectors)};
+        const THRESHOLD = 240;
+
+        function collectContexts() {{
+            const contexts = [];
+            const queue = [];
+            const seen = new Set();
+
+            function push(win) {{
+                if (!win || seen.has(win)) {{
+                    return;
+                }}
+
+                seen.add(win);
 
                 let doc = null;
-
-                try {
+                try {{
                     doc = win.document || null;
-                } catch (err) {
+                }} catch (err) {{
                     doc = null;
-                }
+                }}
 
-                return { win: win, doc: doc };
-            }
+                const context = {{ win, doc }};
+                contexts.push(context);
+                queue.push(context);
+            }}
 
-            function collectContexts() {
-                const contexts = [];
-                const seen = [];
-                const queue = [];
+            push(window);
 
-                function enqueue(win) {
-                    if (!win || seen.indexOf(win) !== -1) {
-                        return;
-                    }
+            for (let i = 0; i < queue.length; i += 1) {{
+                const ctx = queue[i];
+                const win = ctx.win;
+                const doc = ctx.doc;
 
-                    seen.push(win);
-                    queue.push(win);
-                }
+                try {{
+                    if (win && win.parent && win.parent !== win) {{
+                        push(win.parent);
+                    }}
+                }} catch (err) {{}}
 
-                enqueue(window);
+                try {{
+                    if (win && win.top && win.top !== win) {{
+                        push(win.top);
+                    }}
+                }} catch (err) {{}}
 
-                try {
-                    if (window.parent && window.parent !== window) {
-                        enqueue(window.parent);
-                    }
-                } catch (err) {
-                    // Ignore parent frame errors.
-                }
+                if (!doc) {{
+                    continue;
+                }}
 
-                try {
-                    if (window.top && window.top !== window) {
-                        enqueue(window.top);
-                    }
-                } catch (err) {
-                    // Ignore top frame errors.
-                }
+                try {{
+                    const frames = doc.querySelectorAll('iframe');
+                    frames.forEach(function(frame) {{
+                        try {{
+                            push(frame.contentWindow);
+                        }} catch (err) {{}}
+                    }});
+                }} catch (err) {{}}
+            }}
 
-                for (let i = 0; i < queue.length; i += 1) {
-                    const context = safeContext(queue[i]);
-                    if (!context) {
-                        continue;
-                    }
+            return contexts;
+        }}
 
-                    contexts.push(context);
+        function ensureStyle(doc) {{
+            if (!doc || doc.getElementById(STYLE_ID)) {{
+                return;
+            }}
 
-                    const doc = context.doc;
-                    if (!doc) {
-                        continue;
-                    }
+            const style = doc.createElement('style');
+            style.id = STYLE_ID;
+            style.textContent = `
+                #${{BUTTON_ID}} {{
+                    all: unset;
+                    position: fixed;
+                    bottom: 32px;
+                    right: 28px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 18px;
+                    border-radius: 999px;
+                    background: linear-gradient(135deg, #5a67d8 0%, #7f53ac 100%);
+                    color: #ffffff;
+                    font-weight: 600;
+                    font-size: 14px;
+                    letter-spacing: 0.08em;
+                    cursor: pointer;
+                    box-shadow: 0 12px 24px rgba(79, 114, 205, 0.35);
+                    opacity: 0;
+                    transform: translateY(12px);
+                    transition: opacity 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
+                    z-index: 2147482000;
+                }}
 
-                    try {
-                        const frames = doc.querySelectorAll('iframe');
-                        for (let j = 0; j < frames.length; j += 1) {
-                            const frameEl = frames[j];
-                            try {
-                                if (frameEl && frameEl.contentWindow) {
-                                    enqueue(frameEl.contentWindow);
-                                }
-                            } catch (err) {
-                                // Ignore nested frame errors.
-                            }
-                        }
-                    } catch (err) {
-                        // Ignore selector errors.
-                    }
-                }
+                #${{BUTTON_ID}} svg {{
+                    width: 18px;
+                    height: 18px;
+                }}
 
-                return contexts;
-            }
+                #${{BUTTON_ID}}.visible {{
+                    opacity: 1;
+                    transform: translateY(0);
+                }}
 
-            function ensureStyle(doc) {
-                if (!doc || doc.getElementById(STYLE_ID)) {
-                    return;
-                }
+                #${{BUTTON_ID}}:hover {{
+                    box-shadow: 0 16px 32px rgba(79, 114, 205, 0.45);
+                }}
 
-                const style = doc.createElement('style');
-                style.id = STYLE_ID;
-                style.textContent = `
-                    #${BUTTON_ID} {
-                        all: unset;
-                        position: fixed;
-                        bottom: 32px;
-                        right: 28px;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        padding: 12px 18px;
-                        border-radius: 999px;
-                        background: linear-gradient(135deg, #5a67d8 0%, #7f53ac 100%);
-                        color: #ffffff;
-                        font-weight: 600;
-                        font-size: 14px;
-                        letter-spacing: 0.08em;
-                        cursor: pointer;
-                        box-shadow: 0 12px 24px rgba(79, 114, 205, 0.35);
-                        opacity: 0;
-                        transform: translateY(12px);
-                        transition: opacity 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
-                        z-index: 2147482000;
-                    }
+                @media (max-width: 768px) {{
+                    #${{BUTTON_ID}} {{
+                        right: 16px;
+                        bottom: 24px;
+                        padding: 10px 16px;
+                        font-size: 13px;
+                    }}
+                }}
+            `;
 
-                    #${BUTTON_ID} svg {
-                        width: 18px;
-                        height: 18px;
-                    }
+            (doc.head || doc.body || doc.documentElement).appendChild(style);
+        }}
 
-                    #${BUTTON_ID}.visible {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+        function ensureButton(doc) {{
+            if (!doc) {{
+                return null;
+            }}
 
-                    #${BUTTON_ID}:hover {
-                        box-shadow: 0 16px 32px rgba(79, 114, 205, 0.45);
-                    }
-
-                    @media (max-width: 768px) {
-                        #${BUTTON_ID} {
-                            right: 16px;
-                            bottom: 24px;
-                            padding: 10px 16px;
-                            font-size: 13px;
-                        }
-                    }
+            let button = doc.getElementById(BUTTON_ID);
+            if (!button) {{
+                button = doc.createElement('button');
+                button.id = BUTTON_ID;
+                button.type = 'button';
+                button.setAttribute('aria-label', 'Scroll to top of lesson');
+                button.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M6 9L12 5L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>TOP</span>
                 `;
 
-                (doc.head || doc.body || doc.documentElement).appendChild(style);
-            }
-
-            function ensureButton(doc) {
-                if (!doc) {
+                const host = doc.body || doc.documentElement;
+                if (!host) {{
                     return null;
-                }
+                }}
 
-                let button = doc.getElementById(BUTTON_ID);
-                if (!button) {
-                    button = doc.createElement('button');
-                    button.id = BUTTON_ID;
-                    button.type = 'button';
-                    button.setAttribute('aria-label', 'Scroll to top of lesson');
-                    button.innerHTML = `
-                        <svg viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">
-                            <path d=\"M12 5L12 19\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" />
-                            <path d=\"M6 9L12 5L18 9\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />
-                        </svg>
-                        <span>TOP</span>
-                    `;
+                host.appendChild(button);
+            }}
 
-                    if (doc.body) {
-                        doc.body.appendChild(button);
-                    } else if (doc.documentElement) {
-                        doc.documentElement.appendChild(button);
-                    } else {
-                        return null;
-                    }
-                }
+            return button;
+        }}
 
-                return button;
-            }
+        function maxOffset(ctx) {{
+            if (!ctx) {{
+                return 0;
+            }}
 
-            function scrollNode(node, behavior) {
-                if (!node) {
-                    return;
-                }
+            let max = 0;
+            const doc = ctx.doc;
+            const win = ctx.win;
 
-                if (typeof node.scrollTo === 'function') {
-                    try {
-                        node.scrollTo({ top: 0, behavior: behavior });
-                        return;
-                    } catch (err) {
-                        // Fallback to assignment.
-                    }
-                }
+            if (doc) {{
+                TARGET_SELECTORS.forEach(function(selector) {{
+                    let node = null;
+                    try {{
+                        node = doc.querySelector(selector);
+                    }} catch (err) {{
+                        node = null;
+                    }}
 
-                if (typeof node.scrollTop === 'number') {
-                    node.scrollTop = 0;
-                }
-            }
-
-            function scrollContext(ctx, behavior) {
-                if (!ctx) {
-                    return;
-                }
-
-                const doc = ctx.doc;
-                const win = ctx.win;
-
-                if (doc) {
-                    const selectors = [
-                        'section.main div.block-container',
-                        'section.main',
-                        'div[data-testid=\"stAppViewBlockContainer\"]'
-                    ];
-
-                    for (let i = 0; i < selectors.length; i += 1) {
-                        const selector = selectors[i];
-                        try {
-                            const node = doc.querySelector(selector);
-                            scrollNode(node, behavior);
-                        } catch (err) {
-                            // Ignore selector errors.
-                        }
-                    }
-
-                    scrollNode(doc.scrollingElement, behavior);
-                    scrollNode(doc.documentElement, behavior);
-                    scrollNode(doc.body, behavior);
-                }
-
-                if (win) {
-                    if (typeof win.scrollTo === 'function') {
-                        try {
-                            win.scrollTo({ top: 0, behavior: behavior });
-                        } catch (err) {
-                            if (typeof win.scrollTop === 'number') {
-                                win.scrollTop = 0;
-                            }
-                        }
-                    } else if (typeof win.scrollTop === 'number') {
-                        win.scrollTop = 0;
-                    }
-                }
-            }
-
-            function maxOffset(ctx) {
-                if (!ctx) {
-                    return 0;
-                }
-
-                let max = 0;
-                const doc = ctx.doc;
-                const win = ctx.win;
-
-                if (doc) {
-                    const nodes = [
-                        doc.querySelector('section.main div.block-container'),
-                        doc.querySelector('section.main'),
-                        doc.querySelector('div[data-testid=\"stAppViewBlockContainer\"]'),
-                        doc.scrollingElement,
-                        doc.documentElement,
-                        doc.body
-                    ];
-
-                    for (let i = 0; i < nodes.length; i += 1) {
-                        const node = nodes[i];
-                        if (!node) {
-                            continue;
-                        }
-
+                    if (node && typeof node.scrollTop === 'number') {{
                         const value = Math.abs(node.scrollTop || 0);
-                        if (value > max) {
+                        if (value > max) {{
                             max = value;
-                        }
-                    }
-                }
+                        }}
+                    }}
+                }});
 
-                if (win) {
-                    try {
-                        const value = Math.abs(win.pageYOffset || win.scrollY || win.scrollTop || 0);
-                        if (value > max) {
+                const candidates = [doc.scrollingElement, doc.documentElement, doc.body];
+                candidates.forEach(function(node) {{
+                    if (node && typeof node.scrollTop === 'number') {{
+                        const value = Math.abs(node.scrollTop || 0);
+                        if (value > max) {{
                             max = value;
-                        }
-                    } catch (err) {
-                        // Ignore window read errors.
-                    }
-                }
+                        }}
+                    }}
+                }});
+            }}
 
-                return max;
-            }
+            if (win) {{
+                try {{
+                    const value = Math.abs(win.pageYOffset || win.scrollY || win.scrollTop || 0);
+                    if (value > max) {{
+                        max = value;
+                    }}
+                }} catch (err) {{}}
+            }}
 
-            const contexts = collectContexts();
-            let hostContext = null;
+            return max;
+        }}
 
-            for (let i = 0; i < contexts.length; i += 1) {
-                const ctx = contexts[i];
-                if (ctx && ctx.win && ctx.win !== window) {
-                    hostContext = ctx;
-                    break;
-                }
-            }
-
-            if (!hostContext && contexts.length > 0) {
-                hostContext = contexts[0];
-            }
-
-            const hostDoc = hostContext && hostContext.doc ? hostContext.doc : null;
-
-            ensureStyle(hostDoc || document);
-            const button = ensureButton(hostDoc || document);
-            if (!button) {
+        function scrollContext(ctx, behavior) {{
+            if (!ctx) {{
                 return;
-            }
+            }}
 
-            function updateVisibility() {
-                let visible = false;
+            const doc = ctx.doc;
+            const win = ctx.win;
 
-                for (let i = 0; i < contexts.length; i += 1) {
-                    if (maxOffset(contexts[i]) > 240) {
-                        visible = true;
-                        break;
-                    }
-                }
+            if (doc) {{
+                TARGET_SELECTORS.forEach(function(selector) {{
+                    let node = null;
+                    try {{
+                        node = doc.querySelector(selector);
+                    }} catch (err) {{
+                        node = null;
+                    }}
 
-                if (visible) {
-                    button.classList.add('visible');
-                } else {
-                    button.classList.remove('visible');
-                }
-            }
+                    if (node) {{
+                        if (typeof node.scrollTo === 'function') {{
+                            try {{ node.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
+                        }}
 
-            function bindListeners() {
-                for (let i = 0; i < contexts.length; i += 1) {
-                    const ctx = contexts[i];
-                    if (!ctx) {
-                        continue;
-                    }
+                        if (typeof node.scrollTop === 'number') {{
+                            try {{ node.scrollTop = 0; }} catch (err) {{}}
+                        }}
+                    }}
+                }});
 
-                    const win = ctx.win;
-                    if (win && !win.__cyberlearnTopButtonBound) {
-                        try {
-                            win.addEventListener('scroll', updateVisibility, { passive: true });
-                            win.addEventListener('resize', updateVisibility, { passive: true });
-                            win.__cyberlearnTopButtonBound = true;
-                        } catch (err) {
-                            // Ignore listener errors.
-                        }
-                    }
+                [doc.scrollingElement, doc.documentElement, doc.body].forEach(function(node) {{
+                    if (!node) {{
+                        return;
+                    }}
 
-                    const doc = ctx.doc;
-                    if (!doc) {
-                        continue;
-                    }
+                    if (typeof node.scrollTo === 'function') {{
+                        try {{ node.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
+                    }}
 
-                    const selectors = [
-                        'section.main div.block-container',
-                        'section.main',
-                        'div[data-testid=\"stAppViewBlockContainer\"]'
-                    ];
+                    if (typeof node.scrollTop === 'number') {{
+                        try {{ node.scrollTop = 0; }} catch (err) {{}}
+                    }}
+                }});
+            }}
 
-                    for (let j = 0; j < selectors.length; j += 1) {
-                        const selector = selectors[j];
-                        let node = null;
+            if (win) {{
+                if (typeof win.scrollTo === 'function') {{
+                    try {{ win.scrollTo({{ top: 0, behavior }}); }} catch (err) {{}}
+                }}
 
-                        try {
-                            node = doc.querySelector(selector);
-                        } catch (err) {
-                            node = null;
-                        }
+                try {{
+                    if (typeof win.scrollTop === 'number') {{
+                        win.scrollTop = 0;
+                    }}
+                }} catch (err) {{}}
+            }}
+        }}
 
-                        if (!node || node.__cyberlearnTopButtonBound) {
-                            continue;
-                        }
+        const contexts = collectContexts();
+        let hostDoc = null;
 
-                        try {
-                            node.addEventListener('scroll', updateVisibility, { passive: true });
-                            node.__cyberlearnTopButtonBound = true;
-                        } catch (err) {
-                            // Ignore listener errors.
-                        }
-                    }
-                }
-            }
+        for (let i = 0; i < contexts.length; i += 1) {{
+            const ctx = contexts[i];
+            if (ctx && ctx.doc) {{
+                hostDoc = ctx.doc;
+                if (ctx.win && ctx.win !== window) {{
+                    break;
+                }}
+            }}
+        }}
 
-            bindListeners();
-            updateVisibility();
+        hostDoc = hostDoc || document;
 
-            if (!button.__cyberlearnTopButtonBound) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    for (let i = 0; i < contexts.length; i += 1) {
-                        scrollContext(contexts[i], 'smooth');
-                    }
-                });
-                button.__cyberlearnTopButtonBound = true;
-            }
+        ensureStyle(hostDoc);
+        const button = ensureButton(hostDoc);
+        if (!button) {{
+            return;
+        }}
 
-            setTimeout(updateVisibility, 200);
-            setTimeout(updateVisibility, 600);
-        })();
-        </script>
-        """,
-        height=0,
-    )
+        function updateVisibility() {{
+            let visible = false;
+
+            for (let i = 0; i < contexts.length; i += 1) {{
+                if (maxOffset(contexts[i]) > THRESHOLD) {{
+                    visible = true;
+                    break;
+                }}
+            }}
+
+            if (visible) {{
+                button.classList.add('visible');
+            }} else {{
+                button.classList.remove('visible');
+            }}
+        }}
+
+        if (!button.__cyberlearnTopButtonInitialized) {{
+            button.addEventListener('click', function(event) {{
+                event.preventDefault();
+                contexts.forEach(function(ctx) {{
+                    scrollContext(ctx, 'smooth');
+                }});
+            }});
+
+            button.__cyberlearnTopButtonInitialized = true;
+        }}
+
+        contexts.forEach(function(ctx) {{
+            if (!ctx) {{
+                return;
+            }}
+
+            const win = ctx.win;
+            if (win && !win.__cyberlearnTopButtonListeners) {{
+                try {{
+                    win.addEventListener('scroll', updateVisibility, {{ passive: true }});
+                    win.addEventListener('resize', updateVisibility, {{ passive: true }});
+                    win.__cyberlearnTopButtonListeners = true;
+                }} catch (err) {{}}
+            }}
+
+            const doc = ctx.doc;
+            if (!doc) {{
+                return;
+            }}
+
+            TARGET_SELECTORS.forEach(function(selector) {{
+                let node = null;
+                try {{
+                    node = doc.querySelector(selector);
+                }} catch (err) {{
+                    node = null;
+                }}
+
+                if (node && !node.__cyberlearnTopButtonListener) {{
+                    try {{
+                        node.addEventListener('scroll', updateVisibility, {{ passive: true }});
+                        node.__cyberlearnTopButtonListener = true;
+                    }} catch (err) {{}}
+                }}
+            }});
+        }});
+
+        updateVisibility();
+        setTimeout(updateVisibility, 200);
+        setTimeout(updateVisibility, 600);
+    }})();
+    </script>
+    """
+
+    components.html(script, height=0)
+
 
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
