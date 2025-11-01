@@ -95,8 +95,9 @@ def sync_url_to_session_state():
     if "page" in params:
         st.session_state.current_page = params["page"]
 
-    # If lesson_id is in URL, load that lesson
-    if "lesson_id" in params:
+    # If lesson_id is in URL AND page is "lesson", load that lesson
+    # This prevents lesson from loading when on other pages
+    if "lesson_id" in params and params.get("page") == "lesson":
         lesson_id = params["lesson_id"]
         if st.session_state.get("db"):
             lesson = st.session_state.db.get_lesson(lesson_id)
@@ -117,7 +118,8 @@ def sync_session_state_to_url():
     if st.session_state.current_page == "lesson" and st.session_state.get("current_lesson"):
         params["lesson_id"] = str(st.session_state.current_lesson.lesson_id)
 
-    # Update URL without triggering rerun
+    # Clear and set URL parameters (prevents old params from persisting)
+    st.query_params.clear()
     st.query_params.update(params)
 
     # Update last known URL to prevent re-syncing on next render
