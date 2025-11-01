@@ -312,6 +312,11 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                     st.session_state.current_lesson = lesson
                     st.session_state.current_page = "lesson"
                     st.session_state.scroll_to_top = True
+                    # Update URL with lesson info
+                    st.query_params.update({
+                        "page": "lesson",
+                        "lesson_id": str(lesson.lesson_id)
+                    })
                     st.rerun()
 
         st.markdown("---")
@@ -418,29 +423,188 @@ def _maybe_scroll_to_top():
 
     import streamlit.components.v1 as components
 
+    # More aggressive scrolling with multiple strategies
     components.html(
         """
         <script>
         (function() {
-            function scrollAll(win) {
-                try { win.scrollTo(0, 0); } catch (e) {}
-                if (!win || !win.document) { return; }
-                ['section.main', '.block-container'].forEach(function(sel) {
-                    var el = win.document.querySelector(sel);
-                    if (el) { el.scrollTop = 0; }
-                });
+            // Strategy 1: Immediate scroll
+            function scrollToTop(win) {
                 try {
+                    win.scrollTo({top: 0, behavior: 'instant'});
                     win.document.documentElement.scrollTop = 0;
                     win.document.body.scrollTop = 0;
                 } catch (e) {}
+
+                // Scroll all potential container elements
+                var selectors = ['section.main', '.block-container', '.main', '[data-testid="stAppViewContainer"]'];
+                selectors.forEach(function(sel) {
+                    try {
+                        var el = win.document.querySelector(sel);
+                        if (el) {
+                            el.scrollTop = 0;
+                            el.scrollTo({top: 0, behavior: 'instant'});
+                        }
+                    } catch (e) {}
+                });
             }
+
+            // Strategy 2: Scroll parent and current window
             var targets = [window];
             if (window.parent && window.parent !== window) {
                 targets.push(window.parent);
             }
-            targets.forEach(scrollAll);
-            setTimeout(function(){ targets.forEach(scrollAll); }, 150);
-            setTimeout(function(){ targets.forEach(scrollAll); }, 400);
+            if (window.top && window.top !== window) {
+                targets.push(window.top);
+            }
+
+            // Execute immediately
+            targets.forEach(scrollToTop);
+
+            // Strategy 3: Retry after DOM updates
+            setTimeout(function(){ targets.forEach(scrollToTop); }, 50);
+            setTimeout(function(){ targets.forEach(scrollToTop); }, 150);
+            setTimeout(function(){ targets.forEach(scrollToTop); }, 300);
+            setTimeout(function(){ targets.forEach(scrollToTop); }, 500);
+        })();
+        </script>
+        """,
+        height=0,
+    )
+
+
+def _add_floating_top_button():
+    """Add a floating 'Back to Top' button to lesson pages"""
+    import streamlit.components.v1 as components
+
+    components.html(
+        """
+        <style>
+        #back-to-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #back-to-top-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #back-to-top-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+        #back-to-top-btn:active {
+            transform: translateY(-2px);
+        }
+        </style>
+
+        <button id="back-to-top-btn" title="Back to Top">⬆️</button>
+
+        <script>
+        (function() {
+            var btn = document.getElementById('back-to-top-btn');
+
+            function scrollToTop(win) {
+                try {
+                    win.scrollTo({top: 0, behavior: 'smooth'});
+                    win.document.documentElement.scrollTop = 0;
+                    win.document.body.scrollTop = 0;
+                } catch (e) {}
+
+                var selectors = ['section.main', '.block-container', '.main', '[data-testid="stAppViewContainer"]'];
+                selectors.forEach(function(sel) {
+                    try {
+                        var el = win.document.querySelector(sel);
+                        if (el) {
+                            el.scrollTo({top: 0, behavior: 'smooth'});
+                        }
+                    } catch (e) {}
+                });
+            }
+
+            // Button click handler
+            btn.addEventListener('click', function() {
+                var targets = [window];
+                if (window.parent && window.parent !== window) {
+                    targets.push(window.parent);
+                }
+                if (window.top && window.top !== window) {
+                    targets.push(window.top);
+                }
+                targets.forEach(scrollToTop);
+            });
+
+            // Show/hide button based on scroll position
+            function checkScroll() {
+                var targets = [window];
+                if (window.parent && window.parent !== window) {
+                    targets.push(window.parent);
+                }
+
+                var scrolled = false;
+                targets.forEach(function(win) {
+                    try {
+                        if (win.pageYOffset > 300 || win.document.documentElement.scrollTop > 300) {
+                            scrolled = true;
+                        }
+
+                        var selectors = ['section.main', '.block-container', '[data-testid="stAppViewContainer"]'];
+                        selectors.forEach(function(sel) {
+                            try {
+                                var el = win.document.querySelector(sel);
+                                if (el && el.scrollTop > 300) {
+                                    scrolled = true;
+                                }
+                            } catch (e) {}
+                        });
+                    } catch (e) {}
+                });
+
+                if (scrolled) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            }
+
+            // Listen for scroll events on all potential scroll containers
+            window.addEventListener('scroll', checkScroll);
+            if (window.parent && window.parent !== window) {
+                window.parent.addEventListener('scroll', checkScroll);
+            }
+
+            // Check for scrollable containers
+            setTimeout(function() {
+                var selectors = ['section.main', '.block-container', '[data-testid="stAppViewContainer"]'];
+                selectors.forEach(function(sel) {
+                    try {
+                        var el = document.querySelector(sel);
+                        if (el) {
+                            el.addEventListener('scroll', checkScroll);
+                        }
+                    } catch (e) {}
+                });
+                checkScroll();
+            }, 1000);
+
+            // Initial check
+            checkScroll();
         })();
         </script>
         """,
@@ -450,6 +614,9 @@ def _maybe_scroll_to_top():
 
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
+
+    # Add floating "Back to Top" button
+    _add_floating_top_button()
 
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
@@ -542,6 +709,8 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 cleanup_lesson_state()
                 st.session_state.current_page = "learning"
                 st.session_state.scroll_to_top = True
+                # Update URL to remove lesson
+                st.query_params.update({"page": "learning"})
                 st.rerun()
 
         with col_prev:
@@ -575,6 +744,8 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 cleanup_lesson_state()
                 st.session_state.current_page = "learning"
                 st.session_state.scroll_to_top = True
+                # Update URL to remove lesson
+                st.query_params.update({"page": "learning"})
                 st.success("Lesson hidden! View in Hidden Lessons page.")
                 st.rerun()
 
@@ -590,6 +761,8 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 cleanup_lesson_state()
                 st.session_state.current_page = "learning"
                 st.session_state.scroll_to_top = True
+                # Update URL to remove lesson
+                st.query_params.update({"page": "learning"})
                 st.rerun()
 
         with col_hide_quiz:
@@ -603,6 +776,8 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 cleanup_lesson_state()
                 st.session_state.current_page = "learning"
                 st.session_state.scroll_to_top = True
+                # Update URL to remove lesson
+                st.query_params.update({"page": "learning"})
                 st.success("Lesson hidden! View in Hidden Lessons page.")
                 st.rerun()
 
@@ -892,6 +1067,8 @@ def render_quiz(lesson: Lesson, user: UserProfile, db: Database):
             # Redirect back to lessons page to avoid empty page
             st.session_state.current_page = "learning"
             st.session_state.scroll_to_top = True
+            # Update URL to remove lesson
+            st.query_params.update({"page": "learning"})
             st.rerun()
 
 
