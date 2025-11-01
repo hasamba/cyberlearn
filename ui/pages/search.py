@@ -41,6 +41,9 @@ def render_search_page():
     if 'saved_search_query' in st.session_state and not default_search:
         default_search = st.session_state.saved_search_query
         del st.session_state.saved_search_query
+        # Clear the widget state to force update
+        if 'search_input' in st.session_state:
+            del st.session_state.search_input
 
     # Search input
     search_query = st.text_input(
