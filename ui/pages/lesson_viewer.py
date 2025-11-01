@@ -421,31 +421,27 @@ def _maybe_scroll_to_top():
     if not st.session_state.pop("scroll_to_top", False):
         return
 
-    import streamlit.components.v1 as components
-
-    # Scroll to top by targeting the parent document's main container
-    components.html(
+    # Use st.markdown with unsafe_allow_html to inject JavaScript
+    # This executes more reliably than components.html with height=0
+    st.markdown(
         """
         <script>
         (function() {
             function scrollToTop() {
                 try {
-                    // Get parent document
-                    var parentDoc = window.parent.document;
-
                     // Scroll the main Streamlit container
-                    var mainContainer = parentDoc.querySelector('section.main');
+                    var mainContainer = document.querySelector('section.main');
                     if (mainContainer) {
                         mainContainer.scrollTop = 0;
                         mainContainer.scrollTo({top: 0, behavior: 'instant'});
                     }
 
-                    // Also scroll the parent window
-                    window.parent.scrollTo({top: 0, behavior: 'instant'});
+                    // Also scroll the window
+                    window.scrollTo({top: 0, behavior: 'instant'});
 
                     // Scroll document elements
-                    parentDoc.documentElement.scrollTop = 0;
-                    parentDoc.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
                 } catch (e) {
                     console.log('Scroll to top error:', e);
                 }
@@ -455,13 +451,14 @@ def _maybe_scroll_to_top():
             scrollToTop();
 
             // Retry after DOM updates (Streamlit renders in phases)
+            setTimeout(scrollToTop, 10);
             setTimeout(scrollToTop, 50);
-            setTimeout(scrollToTop, 150);
-            setTimeout(scrollToTop, 300);
+            setTimeout(scrollToTop, 100);
+            setTimeout(scrollToTop, 200);
         })();
         </script>
         """,
-        height=0,
+        unsafe_allow_html=True
     )
 
 
