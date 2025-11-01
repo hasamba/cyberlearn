@@ -576,20 +576,20 @@ def _add_floating_top_button():
 def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     """Render interactive lesson content"""
 
-    # Add floating "Back to Top" button
-    _add_floating_top_button()
-
-    # Add a simple visible "Scroll to Top" instruction at the top
+    # Add HTML-based back to top button that actually works
     st.markdown(
         """
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    padding: 8px 16px;
-                    border-radius: 8px;
-                    text-align: center;
-                    margin-bottom: 10px;
-                    font-size: 14px;">
-            💡 <strong>Tip:</strong> Press <kbd>Home</kbd> key to scroll to top, or use your browser's scroll bar
+        <div style="position: sticky; top: 0; z-index: 1000; background: white; padding: 10px 0; margin-bottom: 10px;">
+            <a href="#" style="
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            ">⬆️ Back to Top</a>
         </div>
         """,
         unsafe_allow_html=True
