@@ -439,16 +439,15 @@ def _maybe_scroll_to_top():
                     return null;
                 }
 
-                try {
-                    const doc = win.document;
-                    if (!doc) {
-                        return null;
-                    }
+                let doc = null;
 
-                    return { win: win, doc: doc };
+                try {
+                    doc = win.document || null;
                 } catch (err) {
-                    return null;
+                    doc = null;
                 }
+
+                return { win: win, doc: doc };
             }
 
             function collectContexts() {
@@ -484,24 +483,30 @@ def _maybe_scroll_to_top():
                 }
 
                 for (let i = 0; i < queue.length; i += 1) {
-                    const ctx = safeContext(queue[i]);
-                    if (!ctx) {
+                    const context = safeContext(queue[i]);
+                    if (!context) {
                         continue;
                     }
 
-                    contexts.push(ctx);
+                    contexts.push(context);
+
+                    const doc = context.doc;
+                    if (!doc) {
+                        continue;
+                    }
 
                     try {
-                        const frames = ctx.doc.querySelectorAll('iframe');
-                        frames.forEach((frameEl) => {
+                        const frames = doc.querySelectorAll('iframe');
+                        for (let j = 0; j < frames.length; j += 1) {
+                            const frameEl = frames[j];
                             try {
-                                if (frameEl.contentWindow) {
+                                if (frameEl && frameEl.contentWindow) {
                                     enqueue(frameEl.contentWindow);
                                 }
                             } catch (err) {
-                                // Ignore child frame errors.
+                                // Ignore nested frame errors.
                             }
-                        });
+                        }
                     } catch (err) {
                         // Ignore selector errors.
                     }
@@ -537,20 +542,17 @@ def _maybe_scroll_to_top():
                 const doc = ctx.doc;
                 const win = ctx.win;
 
-                SELECTORS.forEach((selector) => {
-                    if (!doc) {
-                        return;
-                    }
-
-                    try {
-                        const node = doc.querySelector(selector);
-                        scrollNode(node, behavior);
-                    } catch (err) {
-                        // Ignore selector issues.
-                    }
-                });
-
                 if (doc) {
+                    for (let i = 0; i < SELECTORS.length; i += 1) {
+                        const selector = SELECTORS[i];
+                        try {
+                            const node = doc.querySelector(selector);
+                            scrollNode(node, behavior);
+                        } catch (err) {
+                            // Ignore selector issues.
+                        }
+                    }
+
                     scrollNode(doc.scrollingElement, behavior);
                     scrollNode(doc.documentElement, behavior);
                     scrollNode(doc.body, behavior);
@@ -573,23 +575,31 @@ def _maybe_scroll_to_top():
 
             function performScroll(behavior) {
                 const contexts = collectContexts();
-                contexts.forEach((ctx) => scrollContext(ctx, behavior));
+                for (let i = 0; i < contexts.length; i += 1) {
+                    scrollContext(contexts[i], behavior);
+                }
             }
 
             const DELAYS = [0, 80, 160, 320, 640];
-            DELAYS.forEach((delay) => {
-                const action = () => performScroll('auto');
+            for (let i = 0; i < DELAYS.length; i += 1) {
+                const delay = DELAYS[i];
+                const action = function() {
+                    performScroll('auto');
+                };
+
                 if (delay === 0) {
                     action();
                 } else {
                     setTimeout(action, delay);
                 }
-            });
+            }
 
             try {
                 const raf = window.requestAnimationFrame;
                 if (typeof raf === 'function') {
-                    raf(() => performScroll('auto'));
+                    raf(function() {
+                        performScroll('auto');
+                    });
                 }
             } catch (err) {
                 // Ignore animation frame errors.
@@ -616,16 +626,15 @@ def _add_floating_top_button():
                     return null;
                 }
 
-                try {
-                    const doc = win.document;
-                    if (!doc) {
-                        return null;
-                    }
+                let doc = null;
 
-                    return { win: win, doc: doc };
+                try {
+                    doc = win.document || null;
                 } catch (err) {
-                    return null;
+                    doc = null;
                 }
+
+                return { win: win, doc: doc };
             }
 
             function collectContexts() {
@@ -661,24 +670,30 @@ def _add_floating_top_button():
                 }
 
                 for (let i = 0; i < queue.length; i += 1) {
-                    const ctx = safeContext(queue[i]);
-                    if (!ctx) {
+                    const context = safeContext(queue[i]);
+                    if (!context) {
                         continue;
                     }
 
-                    contexts.push(ctx);
+                    contexts.push(context);
+
+                    const doc = context.doc;
+                    if (!doc) {
+                        continue;
+                    }
 
                     try {
-                        const frames = ctx.doc.querySelectorAll('iframe');
-                        frames.forEach((frameEl) => {
+                        const frames = doc.querySelectorAll('iframe');
+                        for (let j = 0; j < frames.length; j += 1) {
+                            const frameEl = frames[j];
                             try {
-                                if (frameEl.contentWindow) {
+                                if (frameEl && frameEl.contentWindow) {
                                     enqueue(frameEl.contentWindow);
                                 }
                             } catch (err) {
                                 // Ignore nested frame errors.
                             }
-                        });
+                        }
                     } catch (err) {
                         // Ignore selector errors.
                     }
@@ -763,7 +778,14 @@ def _add_floating_top_button():
                         </svg>
                         <span>TOP</span>
                     `;
-                    doc.body.appendChild(button);
+
+                    if (doc.body) {
+                        doc.body.appendChild(button);
+                    } else if (doc.documentElement) {
+                        doc.documentElement.appendChild(button);
+                    } else {
+                        return null;
+                    }
                 }
 
                 return button;
@@ -803,14 +825,15 @@ def _add_floating_top_button():
                         'div[data-testid=\"stAppViewBlockContainer\"]'
                     ];
 
-                    selectors.forEach((selector) => {
+                    for (let i = 0; i < selectors.length; i += 1) {
+                        const selector = selectors[i];
                         try {
                             const node = doc.querySelector(selector);
                             scrollNode(node, behavior);
                         } catch (err) {
                             // Ignore selector errors.
                         }
-                    });
+                    }
 
                     scrollNode(doc.scrollingElement, behavior);
                     scrollNode(doc.documentElement, behavior);
@@ -851,16 +874,17 @@ def _add_floating_top_button():
                         doc.body
                     ];
 
-                    nodes.forEach((node) => {
+                    for (let i = 0; i < nodes.length; i += 1) {
+                        const node = nodes[i];
                         if (!node) {
-                            return;
+                            continue;
                         }
 
                         const value = Math.abs(node.scrollTop || 0);
                         if (value > max) {
                             max = value;
                         }
-                    });
+                    }
                 }
 
                 if (win) {
@@ -878,22 +902,37 @@ def _add_floating_top_button():
             }
 
             const contexts = collectContexts();
-            const hostContext = contexts.find((ctx) => ctx.win && ctx.win !== window) || contexts[0];
-            const hostDoc = hostContext && hostContext.doc ? hostContext.doc : document;
+            let hostContext = null;
 
-            ensureStyle(hostDoc);
-            const button = ensureButton(hostDoc);
+            for (let i = 0; i < contexts.length; i += 1) {
+                const ctx = contexts[i];
+                if (ctx && ctx.win && ctx.win !== window) {
+                    hostContext = ctx;
+                    break;
+                }
+            }
+
+            if (!hostContext && contexts.length > 0) {
+                hostContext = contexts[0];
+            }
+
+            const hostDoc = hostContext && hostContext.doc ? hostContext.doc : null;
+
+            ensureStyle(hostDoc || document);
+            const button = ensureButton(hostDoc || document);
             if (!button) {
                 return;
             }
 
             function updateVisibility() {
                 let visible = false;
-                contexts.forEach((ctx) => {
-                    if (maxOffset(ctx) > 240) {
+
+                for (let i = 0; i < contexts.length; i += 1) {
+                    if (maxOffset(contexts[i]) > 240) {
                         visible = true;
+                        break;
                     }
-                });
+                }
 
                 if (visible) {
                     button.classList.add('visible');
@@ -903,36 +942,46 @@ def _add_floating_top_button():
             }
 
             function bindListeners() {
-                contexts.forEach((ctx) => {
-                    if (!ctx || !ctx.win) {
-                        return;
+                for (let i = 0; i < contexts.length; i += 1) {
+                    const ctx = contexts[i];
+                    if (!ctx) {
+                        continue;
                     }
 
-                    try {
-                        const win = ctx.win;
-                        if (!win.__cyberlearnTopButtonBound) {
+                    const win = ctx.win;
+                    if (win && !win.__cyberlearnTopButtonBound) {
+                        try {
                             win.addEventListener('scroll', updateVisibility, { passive: true });
                             win.addEventListener('resize', updateVisibility, { passive: true });
                             win.__cyberlearnTopButtonBound = true;
+                        } catch (err) {
+                            // Ignore listener errors.
                         }
-                    } catch (err) {
-                        // Ignore listener errors.
                     }
 
                     const doc = ctx.doc;
                     if (!doc) {
-                        return;
+                        continue;
                     }
 
-                    const nodes = [
-                        doc.querySelector('section.main div.block-container'),
-                        doc.querySelector('section.main'),
-                        doc.querySelector('div[data-testid=\"stAppViewBlockContainer\"]')
+                    const selectors = [
+                        'section.main div.block-container',
+                        'section.main',
+                        'div[data-testid=\"stAppViewBlockContainer\"]'
                     ];
 
-                    nodes.forEach((node) => {
+                    for (let j = 0; j < selectors.length; j += 1) {
+                        const selector = selectors[j];
+                        let node = null;
+
+                        try {
+                            node = doc.querySelector(selector);
+                        } catch (err) {
+                            node = null;
+                        }
+
                         if (!node || node.__cyberlearnTopButtonBound) {
-                            return;
+                            continue;
                         }
 
                         try {
@@ -941,17 +990,25 @@ def _add_floating_top_button():
                         } catch (err) {
                             // Ignore listener errors.
                         }
-                    });
-                });
+                    }
+                }
             }
 
             bindListeners();
             updateVisibility();
 
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                contexts.forEach((ctx) => scrollContext(ctx, 'smooth'));
-            });
+            if (!button.__cyberlearnTopButtonBound) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    for (let i = 0; i < contexts.length; i += 1) {
+                        scrollContext(contexts[i], 'smooth');
+                    }
+                });
+                button.__cyberlearnTopButtonBound = true;
+            }
+
+            setTimeout(updateVisibility, 200);
+            setTimeout(updateVisibility, 600);
         })();
         </script>
         """,
