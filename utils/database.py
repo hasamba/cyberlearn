@@ -913,13 +913,13 @@ class Database:
         """
         Get tags visible to user:
         - Tags created by this user (user_id = current user)
-        - System tags (Career Path, Course, Package categories)
-        - Excludes auto-generated "Custom" category tags
+        - All system tags (is_system = 1)
+        - Excludes auto-generated tags that have no user_id and aren't system
         """
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT * FROM tags
-            WHERE user_id = ? OR (category IN ('Career Path', 'Course', 'Package'))
+            WHERE user_id = ? OR is_system = 1
             ORDER BY
                 CASE category
                     WHEN 'Career Path' THEN 1
