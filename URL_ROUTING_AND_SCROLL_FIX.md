@@ -251,12 +251,25 @@ Two complementary approaches:
 
 | File | Lines | Description |
 |------|-------|-------------|
-| [app.py](app.py) | 89-143 | URL sync functions |
-| [app.py](app.py) | 180-244 | Navigation buttons |
+| [app.py](app.py) | 89-125 | URL sync functions with change detection |
+| [app.py](app.py) | 128-154 | Session state initialization with URL tracking |
+| [app.py](app.py) | 180-244 | Navigation buttons with URL sync |
 | [app.py](app.py) | 530 | Auto-sync in main() |
-| [ui/pages/lesson_viewer.py](ui/pages/lesson_viewer.py) | 414-468 | Enhanced auto-scroll |
-| [ui/pages/lesson_viewer.py](ui/pages/lesson_viewer.py) | 471-607 | Floating button |
+| [ui/pages/lesson_viewer.py](ui/pages/lesson_viewer.py) | 419-465 | Fixed auto-scroll targeting parent document |
+| [ui/pages/lesson_viewer.py](ui/pages/lesson_viewer.py) | 468-581 | Fixed floating button in parent document |
 | [ui/pages/lesson_viewer.py](ui/pages/lesson_viewer.py) | 316-319, 713-766, 1071 | URL updates on navigation |
+
+## Key Technical Fixes (v2)
+
+### URL Routing Fix
+The initial implementation had a critical bug where `sync_url_to_session_state()` was called on EVERY page render, causing it to override user button clicks.
+
+**Solution**: Added change detection by tracking `last_url_params` in session state. Now URL only syncs to session state when the URL actually changes (browser back/forward or shared link), not on every rerun.
+
+### Scroll & Button Fix
+The initial implementation used `height=0` iframes which couldn't properly render fixed-position elements or access the parent scroll container.
+
+**Solution**: Modified JavaScript to access `window.parent.document` and inject elements/styles directly into the parent page, bypassing iframe limitations.
 
 ---
 
