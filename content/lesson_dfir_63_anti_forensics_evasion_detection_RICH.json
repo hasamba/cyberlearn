@@ -1,0 +1,151 @@
+{
+  "lesson_id": "e8f9a0b1-c2d3-4e5f-6a7b-8c9d0e1f2a3b",
+  "domain": "dfir",
+  "title": "Anti-Forensics and Evasion Detection in Memory",
+  "difficulty": 3,
+  "order_index": 63,
+  "prerequisites": ["d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"],
+  "concepts": [
+    "Anti-forensics techniques",
+    "Memory wiping and obfuscation",
+    "Detecting anti-forensic tools",
+    "Encrypted memory analysis",
+    "Rootkit anti-detection",
+    "DKOM advanced evasion",
+    "Timing attacks on forensics",
+    "Memory smearing techniques"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Identify anti-forensics techniques used by advanced malware",
+    "Detect memory wiping and obfuscation attempts",
+    "Analyze encrypted and packed memory regions",
+    "Recognize rootkit anti-detection mechanisms",
+    "Counter DKOM and memory manipulation tactics",
+    "Detect timing-based anti-forensic techniques",
+    "Overcome anti-Volatility evasion methods"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "anti-forensics-001",
+      "question": "What is DKOM (Direct Kernel Object Manipulation) and why does it evade standard memory forensics?",
+      "options": [
+        "DKOM encrypts all kernel memory making analysis impossible",
+        "DKOM modifies kernel structures (like unlinking processes from ActiveProcessLinks) so tools like pslist don't see them",
+        "DKOM is a legitimate Windows feature with no forensic implications",
+        "DKOM only affects Linux systems, not Windows"
+      ],
+      "correct_answer": 1,
+      "explanation": "DKOM directly modifies kernel data structures to hide malware. Example: A rootkit unlinks its EPROCESS from the ActiveProcessLinks doubly-linked list. When pslist walks this list, it skips the hidden process. Detection requires alternative enumeration methods like psscan (scans for EPROCESS signatures) or checking handle tables.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "anti-forensics-002",
+      "question": "You find a process with RWX (Read-Write-Execute) memory but Volatility's malfind doesn't flag it. Why might this happen?",
+      "options": [
+        "Malfind is broken and never works",
+        "Malware used timing attacks - executed then changed permissions to RW before forensic snapshot",
+        "RWX memory is always legitimate",
+        "Only executable memory (RX) is suspicious"
+      ],
+      "correct_answer": 1,
+      "explanation": "Advanced malware uses timing-based anti-forensics: 1) Allocate RW memory, 2) Write shellcode, 3) Change to RWX and execute, 4) Immediately change back to RW. By the time forensics runs, memory appears non-executable. Detection: Look for recently freed executable pages, check VAD history flags, or use live memory acquisition to catch execution moments.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "anti-forensics-003",
+      "question": "Malware detects Volatility analysis and corrupts its own memory structures. What's the best countermeasure?",
+      "options": [
+        "Give up - if malware detects forensics, analysis is impossible",
+        "Use live memory acquisition and snapshot before malware detection triggers, or use hardware-based acquisition (DMA)",
+        "Reboot the system to clear malware",
+        "Only use file-based forensics"
+      ],
+      "correct_answer": 1,
+      "explanation": "Anti-forensic malware detects tools via: 1) Checking for forensic process names (volatility.exe), 2) Detecting memory reads (monitoring page faults), 3) Timing analysis. Countermeasures: 1) Live acquisition before detection (rapid DumpIt), 2) Hardware DMA acquisition (bypasses OS - malware can't detect), 3) Stealth tools (kernel-mode acquisition), 4) Snapshot VMs (pause VM, copy memory - malware frozen). Rebooting destroys evidence.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "anti-forensics-004",
+      "question": "You find encrypted blobs in process memory but no decryption key. How do you proceed?",
+      "options": [
+        "Impossible to decrypt - stop analysis",
+        "Search for XOR keys in nearby memory, check for runtime decryption, analyze encryption algorithm for weaknesses",
+        "Brute force with rainbow tables",
+        "Decrypt using Windows built-in tools"
+      ],
+      "correct_answer": 1,
+      "explanation": "Memory encryption analysis: 1) Identify algorithm (entropy analysis, crypto constants like AES S-boxes), 2) Find keys in memory (often near encrypted data, in process heap), 3) Detect runtime decryption (malware must decrypt before use - catch at execution), 4) Weak crypto (XOR with short keys, custom algorithms with flaws). Use tools: findcrypt (Yara), entropy analysis (detect high-entropy regions), debugger (catch decryption in real-time).",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "anti-forensics-005",
+      "question": "What is 'memory smearing' and how does it evade forensics?",
+      "options": [
+        "Encrypting all memory with unique keys",
+        "Continuously overwriting memory regions with garbage data to destroy forensic artifacts after use",
+        "A legitimate Windows memory management technique",
+        "Only affects disk, not memory"
+      ],
+      "correct_answer": 1,
+      "explanation": "Memory smearing: Malware overwrites sensitive data (credentials, C2 IPs) with random bytes after use. Example: After exfiltrating data, overwrite buffer with zeros or random data. Detection: 1) Acquire memory DURING activity (not after), 2) Check for patterns (repeated 0x00, 0xFF), 3) Analyze freed memory pools (may contain remnants), 4) Use memory carving (reconstruct from fragments). Timing is critical - smearing happens post-operation.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# The Cat-and-Mouse Game: Anti-Forensics\n\nYou've mastered memory forensics. You can analyze Windows, Linux, macOS, mobile, and even conduct enterprise-scale investigations. But here's the challenge: **Advanced attackers know you're coming.**\n\nSophisticated malware (APTs, nation-state actors, advanced ransomware) employs **anti-forensics** - techniques specifically designed to evade detection and analysis. This is the ultimate test of your skills.\n\n**What You're Up Against**:\n- Rootkits that hide processes from Volatility\n- Malware that encrypts its memory footprint\n- Code that detects forensic tools and self-destructs\n- Timing attacks that execute and vanish before snapshots\n- DKOM techniques that manipulate kernel structures\n\nThis lesson teaches you to **hunt what actively hides from you**. You'll learn to detect anti-forensics techniques and develop countermeasures. By the end, you'll be ready for the most evasive threats.\n\nLet's outsmart the adversaries who think they're invisible. 🎭🔍"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Anti-Forensics Techniques and Detection\n\n## 1. DKOM - Direct Kernel Object Manipulation\n\n**What It Is**: Rootkits directly modify kernel data structures to hide processes, drivers, network connections.\n\n**Example - Process Hiding**:\n```c\n// Rootkit unlinks process from ActiveProcessLinks\nEPROCESS *targetProcess = FindProcessByName(\"malware.exe\");\n\n// Remove from doubly-linked list\ntargetProcess->ActiveProcessLinks.Flink->Blink = targetProcess->ActiveProcessLinks.Blink;\ntargetProcess->ActiveProcessLinks.Blink->Flink = targetProcess->ActiveProcessLinks.Flink;\n\n// Process now invisible to pslist (walks ActiveProcessLinks)\n```\n\n**Detection**:\n```bash\n# Method 1: psscan (scans pool tags, not linked lists)\npython vol.py -f memory.dmp windows.psscan.PsScan > psscan.txt\n\n# Method 2: Compare pslist vs psscan\npython vol.py -f memory.dmp windows.pslist.PsList > pslist.txt\ndiff pslist.txt psscan.txt\n# Processes in psscan but NOT in pslist = hidden via DKOM\n```\n\n## 2. Memory Encryption and Obfuscation\n\n**Technique**: Malware encrypts its code/data in memory, decrypts only during execution.\n\n**Example**:\n```c\nvoid execute_payload() {\n    // Decrypt shellcode\n    xor_decrypt(encrypted_payload, key, size);\n    \n    // Execute\n    ((void(*)())encrypted_payload)();\n    \n    // Re-encrypt immediately\n    xor_decrypt(encrypted_payload, key, size);\n}\n```\n\n**Detection - Entropy Analysis**:\n```python\nimport math\nfrom collections import Counter\n\ndef calculate_entropy(data):\n    if not data:\n        return 0\n    entropy = 0\n    counter = Counter(data)\n    for count in counter.values():\n        p = count / len(data)\n        entropy -= p * math.log2(p)\n    return entropy\n\n# Scan process memory for high-entropy regions\nfor vad in process.get_vad_root().traverse():\n    data = read_vad_memory(vad)\n    entropy = calculate_entropy(data)\n    \n    if entropy > 7.5:  # High entropy = likely encrypted\n        print(f\"Suspicious region at {hex(vad.get_start())}: entropy={entropy}\")\n```\n\n## 3. Timing-Based Anti-Forensics\n\n**Technique**: Execute malicious code, then immediately change memory permissions or overwrite.\n\n**Example**:\n```c\n// Allocate RW memory\nvoid *mem = VirtualAlloc(NULL, 4096, MEM_COMMIT, PAGE_READWRITE);\n\n// Write shellcode\nmemcpy(mem, shellcode, shellcode_size);\n\n// Make executable\nVirtualProtect(mem, 4096, PAGE_EXECUTE_READ, &old_protect);\n\n// Execute\n((void(*)())mem)();\n\n// Immediately revert to non-executable\nVirtualProtect(mem, 4096, PAGE_READWRITE, &old_protect);\n// Forensic snapshot sees RW memory, not RWX - evades malfind\n```\n\n**Detection - Live Acquisition**:\n```bash\n# Rapid acquisition (minimize time window)\nDumpIt.exe /O memory.dmp /Q\n\n# Or use hardware DMA (sub-second acquisition)\n```\n\n## 4. Anti-Volatility Techniques\n\n**Technique**: Detect Volatility processes and corrupt memory structures.\n\n**Detection Methods Malware Uses**:\n```c\n// Check for forensic process names\nif (FindProcess(\"volatility.exe\") || FindProcess(\"vol.py\"))\n    corrupt_memory_structures();\n\n// Detect abnormal memory access patterns\nif (detect_sequential_memory_scans())\n    trigger_self_destruct();\n```\n\n**Countermeasure - Stealth Acquisition**:\n```bash\n# Rename tools\ncp vol.py system_update.py\n\n# Use kernel-mode acquisition (harder to detect)\n# Or hardware DMA (completely invisible to OS)\n```\n\n## 5. Memory Smearing\n\n**Technique**: Overwrite sensitive data after use.\n\n**Example**:\n```c\nvoid exfiltrate_credentials() {\n    char credentials[256];\n    \n    // Steal credentials from lsass\n    steal_from_lsass(credentials);\n    \n    // Send to C2\n    send_to_c2(credentials);\n    \n    // IMMEDIATELY overwrite\n    SecureZeroMemory(credentials, sizeof(credentials));\n    // Or use random data\n    fill_random(credentials, sizeof(credentials));\n}\n```\n\n**Detection - Timing and Artifacts**:\n```bash\n# Acquire DURING activity (not after)\n# Look for patterns in freed memory\npython vol.py -f memory.dmp windows.memmap.Memmap --pid <malware_pid> | strings | grep -E \"(password|secret|key)\"\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Hands-On: Detecting Anti-Forensics\n\n## Exercise 1: DKOM Process Hiding Detection\n\n```bash\n# Step 1: Run both pslist and psscan\npython vol.py -f memory.dmp windows.pslist.PsList > pslist.txt\npython vol.py -f memory.dmp windows.psscan.PsScan > psscan.txt\n\n# Step 2: Extract PIDs\ngrep -oP 'PID\\s+\\K\\d+' pslist.txt | sort -n > pslist_pids.txt\ngrep -oP 'PID\\s+\\K\\d+' psscan.txt | sort -n > psscan_pids.txt\n\n# Step 3: Find hidden processes\ncomm -13 pslist_pids.txt psscan_pids.txt\n# Output: PIDs that exist in psscan but not pslist = HIDDEN\n```\n\n## Exercise 2: Entropy Analysis for Encrypted Memory\n\n```python\nimport volatility3.framework as framework\nimport math\nfrom collections import Counter\n\ndef entropy(data):\n    if not data:\n        return 0\n    counter = Counter(data)\n    length = len(data)\n    return -sum((count/length) * math.log2(count/length) for count in counter.values())\n\ndef scan_for_encrypted_regions(memory_dump):\n    # Load memory dump\n    ctx = framework.contexts.Context()\n    # ... initialize context ...\n    \n    for proc in pslist.PsList.list_processes(ctx):\n        for vad in proc.get_vad_root().traverse():\n            # Read VAD memory\n            data = read_memory(vad.get_start(), vad.get_size())\n            \n            # Calculate entropy\n            ent = entropy(data)\n            \n            # Flag high entropy (>7.5 = likely encrypted)\n            if ent > 7.5:\n                print(f\"Process: {proc.ImageFileName}\")\n                print(f\"  Address: {hex(vad.get_start())}\")\n                print(f\"  Size: {vad.get_size()}\")\n                print(f\"  Entropy: {ent:.2f}\")\n                print(f\"  Protection: {vad.get_protection()}\")\n                print()\n\nscan_for_encrypted_regions(\"memory.dmp\")\n```\n\n## Exercise 3: Timing Attack Detection\n\n```python\n# Check VAD history for permission changes\ndef check_vad_permission_changes(memory_dump):\n    for proc in pslist.PsList.list_processes(ctx):\n        for vad in proc.get_vad_root().traverse():\n            current_prot = vad.get_protection()\n            \n            # Check for recently changed protections\n            # (VAD stores protection history in some structures)\n            if recently_changed_from_RWX_to_RW(vad):\n                print(f\"Timing evasion detected!\")\n                print(f\"  Process: {proc.ImageFileName}\")\n                print(f\"  Address: {hex(vad.get_start())}\")\n                print(f\"  Current: {current_prot}\")\n                print(f\"  Previous: RWX (executable)\")\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Real-World Anti-Forensics Cases\n\n## Case 1: TDL4 Rootkit (2011)\n\nTDL4 used extreme anti-forensics:\n- DKOM to hide processes and drivers\n- Bootkit (infected MBR) - persisted below OS\n- Encrypted virtual file system in memory\n- Anti-debugging and anti-VM checks\n\n**Detection**: Required psscan (not pslist), MBR analysis, and memory carving for encrypted FS.\n\n## Case 2: Duqu 2.0 (2015)\n\nDuqu 2.0 (Kaspersky breach) was nearly undetectable:\n- Memory-resident only (no files on disk)\n- Encrypted all modules in RAM\n- Detected forensic tools and disabled them\n- Used kernel-mode code to evade user-mode detection\n\n**How Kaspersky Caught It**: Hardware DMA-based memory acquisition (bypassed OS, malware couldn't detect).\n\n## Case 3: GrayFish UEFI Rootkit (2015)\n\nGrayFish (Equation Group) operated at firmware level:\n- UEFI rootkit (survives OS reinstall)\n- Encrypted disk and memory\n- Virtual machine to hide operations\n\n**Detection**: Required specialized firmware forensics tools (not standard Volatility)."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Anti-Forensics Detection Checklist\n\n## \"DETECT\" Mnemonic\n\n**D**KOM - Compare pslist vs psscan\n**E**ncryption - Entropy analysis (>7.5)\n**T**iming attacks - Live acquisition, VAD history\n**E**vasion tools - Check for anti-forensic software\n**C**orrupted structures - Validate kernel pointers\n**T**racing - Monitor for self-modifying code\n\n## Quick Reference\n\n```\nHidden Processes: pslist vs psscan diff\nEncrypted Memory: Entropy > 7.5\nTiming Evasion: RWX → RW permission changes\nAnti-Volatility: Rename tools, use DMA\nMemory Smearing: Acquire during activity\n```"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Reflection Questions\n\n1. Why can't traditional pslist detect DKOM-hidden processes? What makes psscan more resilient?\n\n2. If malware encrypts memory with AES-256, is analysis truly impossible? Or are there still forensic artifacts?\n\n3. How would you design memory acquisition to minimize the window for timing-based evasion?\n\n4. What ethical considerations exist when developing anti-anti-forensics techniques?\n\n5. If you discover advanced anti-forensics in an investigation, how does this inform your threat assessment?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You've Mastered the Hardest Challenge\n\nAnti-forensics is the final boss of memory forensics. You've learned to:\n- Detect DKOM rootkit hiding\n- Analyze encrypted memory regions\n- Counter timing-based evasion\n- Overcome anti-Volatility techniques\n\nThese skills separate experts from beginners. When malware actively tries to hide, you now know how to find it anyway.\n\n**Next**: Virtual environments and firmware forensics. 🚀"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR508"]
+}

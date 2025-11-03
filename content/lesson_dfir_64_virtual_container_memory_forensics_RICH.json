@@ -1,0 +1,151 @@
+{
+  "lesson_id": "f9a0b1c2-d3e4-5f6a-7b8c-9d0e1f2a3b4c",
+  "domain": "dfir",
+  "title": "Memory Forensics in Virtual and Container Environments",
+  "difficulty": 3,
+  "order_index": 64,
+  "prerequisites": ["e8f9a0b1-c2d3-4e5f-6a7b-8c9d0e1f2a3b"],
+  "concepts": [
+    "VMware memory forensics",
+    "Hyper-V memory analysis",
+    "Docker container memory",
+    "Kubernetes pod forensics",
+    "VM escape detection",
+    "Hypervisor forensics",
+    "Container breakout analysis",
+    "Cloud VM memory acquisition"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Acquire memory from VMware and Hyper-V virtual machines",
+    "Analyze Docker container memory and detect breakouts",
+    "Perform Kubernetes pod memory forensics",
+    "Detect VM escape attempts through memory analysis",
+    "Conduct hypervisor-level memory forensics",
+    "Investigate container security incidents",
+    "Understand virtualization-specific memory artifacts"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "virt-001",
+      "question": "How do you acquire memory from a running VMware VM?",
+      "options": [
+        "Impossible - VMs can't be analyzed",
+        "Suspend VM (creates .vmss/.vmem files) or use snapshot, or vmware-vmdump tool",
+        "Only reboot and capture during restart",
+        "VMware blocks all memory access"
+      ],
+      "correct_answer": 1,
+      "explanation": "VMware memory acquisition methods: 1) Suspend VM (creates .vmss snapshot + .vmem memory dump), 2) Snapshot (creates .vmsn + .vmem), 3) vmware-vmdump utility (live dump without suspension), 4) Copy .vmem file while VM running (may have inconsistencies). Analyze with Volatility using guest OS profile.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "virt-002",
+      "question": "What's unique about analyzing Docker container memory compared to physical host memory?",
+      "options": [
+        "No difference - containers are full VMs",
+        "Containers share host kernel; analyze host memory to see container processes, but namespace isolation requires mapping container PIDs to host PIDs",
+        "Docker memory is always encrypted",
+        "Containers have no memory footprint"
+      ],
+      "correct_answer": 1,
+      "explanation": "Containers share the host kernel (not full VMs). For forensics: 1) Acquire HOST memory (containers visible in host memory), 2) Container processes appear in host's process list but with different PIDs (namespace PID mapping), 3) Use docker inspect to map container IDs to host PIDs, 4) Analyze host memory with Volatility, filtering for container-specific processes. Container breakouts also visible in host memory.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "virt-003",
+      "question": "How do you detect a VM escape in memory?",
+      "options": [
+        "VM escapes are undetectable",
+        "Check for guest processes accessing hypervisor memory regions, hypercalls, or VMCS manipulation attempts",
+        "Only file system analysis works",
+        "VM escapes don't exist"
+      ],
+      "correct_answer": 1,
+      "explanation": "VM escape detection in memory: 1) Guest accessing hypervisor addresses (e.g., VMCS structures in Intel VT-x), 2) Unusual hypercalls (guest making privileged calls to hypervisor), 3) Hardware virtualization structure manipulation, 4) Guest processes with elevated CPU modes. Tools: Check for VMREAD/VMWRITE instructions in guest memory, analyze EPT (Extended Page Table) violations, monitor VMCALL usage patterns.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "virt-004",
+      "question": "What's the forensic advantage of analyzing hypervisor memory vs guest VM memory?",
+      "options": [
+        "No advantage - they contain the same data",
+        "Hypervisor memory contains ALL guest VM memory plus hypervisor state, immune to guest-level anti-forensics",
+        "Hypervisor memory is always encrypted",
+        "Only guest memory is useful"
+      ],
+      "correct_answer": 1,
+      "explanation": "Hypervisor-level forensics advantages: 1) God's-eye view - see ALL guest VMs simultaneously, 2) Immune to guest anti-forensics (rootkits can't hide from hypervisor), 3) Access to hypervisor state (VM scheduling, EPT mappings), 4) Detect VM-level attacks (escapes, hypercall abuse). Drawback: Requires hypervisor access (often not available to analysts). Use cases: Cloud provider investigations, virtualization security research.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "virt-005",
+      "question": "In Kubernetes pod forensics, where does the pod's memory actually reside?",
+      "options": [
+        "In a separate Kubernetes server",
+        "In the container runtime (Docker/containerd) on the worker node where pod is scheduled",
+        "Pods have no memory",
+        "In etcd database only"
+      ],
+      "correct_answer": 1,
+      "explanation": "Kubernetes pods run as containers on worker nodes. Memory forensics workflow: 1) Identify pod's worker node (kubectl get pod -o wide), 2) SSH to worker node, 3) Find container IDs for pod (docker ps or crictl ps), 4) Acquire worker node memory (contains all pod containers), 5) Map pod containers to host processes. Kubernetes itself is orchestration - actual execution is Docker/containerd on nodes.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Welcome to Virtualized Forensics!\n\nModern infrastructure runs on virtualization:\n- 95% of enterprises use VMware/Hyper-V\n- 90% of applications deploy in containers\n- Cloud providers (AWS, Azure, GCP) are massive VM farms\n\nYet traditional memory forensics training focuses on physical systems. This lesson bridges that gap.\n\nYou'll learn to:\n- Acquire memory from VMs (VMware, Hyper-V, KVM)\n- Analyze containers (Docker, Kubernetes)\n- Detect VM escapes and container breakouts\n- Perform hypervisor-level forensics\n\nThis is critical for modern incident response - most breaches happen in virtualized environments. Let's master them. 🖥️🐳☁️"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Virtual Machine Memory Forensics\n\n## VMware Memory Acquisition\n\n### Method 1: Suspend VM\n```bash\n# VMware creates two files when suspending:\n# 1. .vmss (VM state - CPU registers, device states)\n# 2. .vmem (memory dump)\n\n# Suspend via UI or command line:\nvim-cmd vmsvc/power.suspend <vmid>\n\n# Files created:\nls -lh /vmfs/volumes/datastore1/Windows10/\n# Output:\n# Windows10.vmss (500 MB - VM state)\n# Windows10.vmem (8 GB - memory dump)\n\n# Analyze with Volatility:\npython vol.py -f Windows10.vmem windows.pslist\n```\n\n### Method 2: Snapshot\n```bash\n# Create snapshot (doesn't pause VM)\nvim-cmd vmsvc/snapshot.create <vmid> \"forensic_snapshot\" \"Memory forensics\" 1 1\n\n# Files created:\n# .vmsn (snapshot metadata)\n# .vmem (memory at snapshot time)\n\n# Extract .vmem for analysis\n```\n\n### Method 3: Live Dump (vmware-vmdump)\n```bash\n# VMware vSphere only\nvmware-vmdump -l\n# Lists running VMs\n\nvmware-vmdump -d /output/memory.dmp <vmid>\n# Dumps memory without suspending\n```\n\n## Hyper-V Memory Forensics\n\n### Save VM State\n```powershell\n# PowerShell on Hyper-V host\nSave-VM -Name \"Windows10\"\n\n# Memory dump location:\n# C:\\ProgramData\\Microsoft\\Windows\\Hyper-V\\Virtual Machines\\<VMID>\\<VMID>.bin\n# Also: .vmrs (saved state), .vsv (memory)\n\n# Convert to raw format:\n# Use LiveKd or Volatility plugins for Hyper-V\n```\n\n### LiveKd for Live Analysis\n```bash\n# Microsoft LiveKd - analyze Hyper-V VM without saving state\nlivekd -hv <VMName>\n# Opens WinDbg attached to guest VM\n```\n\n## KVM/QEMU Memory Dump\n\n```bash\n# Dump VM memory via QEMU monitor\nvirsh qemu-monitor-command <vm_name> --hmp \"pmemsave 0 8G /tmp/vm_memory.dump\"\n\n# Or use dump-guest-memory:\nvirsh dump <vm_name> --memory-only /tmp/vm_memory.dump\n\n# Analyze with Volatility (supports KVM dumps)\n```\n\n# Container Memory Forensics\n\n## Docker Container Analysis\n\n### Understanding Containers\nContainers are NOT VMs:\n- Share host kernel\n- Namespace isolation (PID, network, mount, IPC)\n- Cgroups for resource limits\n\n**Forensic Implication**: Container processes appear in HOST memory.\n\n### Acquisition\n```bash\n# Step 1: Identify running containers\ndocker ps\n# Output:\nCONTAINER ID   IMAGE          COMMAND       CREATED        STATUS        NAMES\na1b2c3d4e5f6   nginx:latest   \"nginx\"       2 hours ago    Up 2 hours    web_server\n\n# Step 2: Get container details\ndocker inspect a1b2c3d4e5f6 | grep Pid\n# Output:\n# \"Pid\": 12345  # Host PID of container's main process\n\n# Step 3: Acquire HOST memory\nsudo ./lime-4.15.0-generic.ko \"path=/tmp/host_memory.lime format=lime\"\n\n# Step 4: Analyze with Volatility\npython vol.py -f host_memory.lime linux.pslist | grep 12345\n# Shows container process in host memory\n```\n\n### Container-Specific Artifacts\n```bash\n# Check container namespaces\nls -l /proc/12345/ns/\n# Output:\nnet -> net:[4026532123]   # Network namespace\npid -> pid:[4026532124]   # PID namespace\nmnt -> mnt:[4026532125]   # Mount namespace\n# Different from host namespaces = containerized process\n\n# Check cgroups\ncat /proc/12345/cgroup\n# Output:\n0::/docker/a1b2c3d4e5f6...\n# Confirms Docker container\n```\n\n### Detecting Container Breakouts\n\n**Breakout**: Container escaping to host.\n\n**Memory Indicators**:\n```bash\n# 1. Container process accessing host filesystem\npython vol.py -f memory.lime linux.lsof | grep \"^12345\" | grep -v \"/var/lib/docker\"\n# Files outside container filesystem = potential breakout\n\n# 2. Unusual capabilities\ncat /proc/12345/status | grep Cap\n# CapEff: 0000003fffffffff = Full capabilities = SUSPICIOUS\n# Containers should have limited caps\n\n# 3. Host namespaces\nls -l /proc/12345/ns/ | grep \"net->\"\n# If matches host namespace ID = breakout (escaped isolation)\n```\n\n## Kubernetes Pod Forensics\n\n### Architecture\n```\nKubernetes Cluster:\n  Control Plane (master node):\n    - API server\n    - etcd (state storage)\n    - Scheduler\n  \n  Worker Nodes (where pods run):\n    - kubelet (node agent)\n    - Container runtime (Docker/containerd)\n    - Pods (containers)\n```\n\n**Forensic Target**: Worker nodes (pods run here)\n\n### Investigation Workflow\n```bash\n# Step 1: Identify pod location\nkubectl get pod suspicious-pod -o wide\n# Output:\nNAME            READY   STATUS    NODE\nsuspicious-pod  1/1     Running   worker-node-2\n\n# Step 2: SSH to worker node\nssh admin@worker-node-2\n\n# Step 3: Find container IDs\nsudo crictl ps | grep suspicious-pod\n# Output:\nCONTAINER ID   IMAGE   NAME              POD ID\nabc123def456   nginx   suspicious-pod    xyz789\n\n# Step 4: Get host PID\nsudo crictl inspect abc123def456 | grep pid\n# \"pid\": 15678\n\n# Step 5: Acquire node memory\nsudo insmod lime.ko \"path=/tmp/worker_node_memory.lime format=lime\"\n\n# Step 6: Analyze\npython vol.py -f worker_node_memory.lime linux.pslist | grep 15678\n```\n\n### Kubernetes-Specific Artifacts\n```bash\n# Check pod secrets (in memory)\nsudo cat /proc/15678/environ | tr '\\0' '\\n' | grep -i secret\n# May reveal Kubernetes secrets mounted as env vars\n\n# Check service account tokens\nsudo ls -l /proc/15678/root/var/run/secrets/kubernetes.io/serviceaccount/\n# Output:\ntoken  # JWT for K8s API access\n\n# Extract token from memory\nsudo strings /proc/15678/mem | grep eyJ  # JWT starts with eyJ\n```\n\n# VM Escape Detection\n\n## What is VM Escape?\nGuest VM breaking out of virtualization boundary to access hypervisor or host.\n\n## Memory-Based Detection\n\n### Check for Hypervisor Access Attempts\n```bash\n# Intel VT-x: VMCS (Virtual Machine Control Structure) access\n# Guest shouldn't access VMCS - that's hypervisor's job\n\n# In guest memory, search for VMREAD/VMWRITE instructions:\nstrings memory.dmp | grep -E \"(VMREAD|VMWRITE|VMCALL)\"\n\n# Or check for VMCS address access:\n# VMCS lives in hypervisor memory (high addresses)\n# Guest accessing addresses > 0xFFFFFF8000000000 = SUSPICIOUS\n```\n\n### Hypercall Monitoring\n```python\n# Hypercall: Guest requesting hypervisor service\n# Normal: Limited hypercalls for I/O\n# Suspicious: Unusual hypercall patterns\n\ndef detect_vm_escape(memory_dump):\n    for proc in processes:\n        # Check for VMCALL instructions\n        if b'\\x0F\\x01\\xC1' in proc.memory:  # VMCALL opcode\n            print(f\"Hypercall detected in {proc.name}\")\n            \n            # Check context - legitimate virtualization tools?\n            if proc.name not in ['vmtoolsd', 'vmware-guestd']:\n                print(f\"ALERT: Unusual process making hypercalls\")\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Hands-On Exercises\n\n## Exercise 1: VMware Memory Analysis\n\n```bash\n# Given: Windows10.vmem (VMware memory dump)\n\n# Task 1: Verify it's a valid memory dump\nfile Windows10.vmem\n# Should show: data (if raw memory)\n\n# Task 2: Identify Windows version\npython vol.py -f Windows10.vmem windows.info\n\n# Task 3: List processes\npython vol.py -f Windows10.vmem windows.pslist\n\n# Task 4: Check for VM-aware malware\npython vol.py -f Windows10.vmem windows.cmdline | grep -E \"(vmware|virtualbox|vbox)\"\n# Malware often checks for VMs to evade analysis\n```\n\n## Exercise 2: Docker Container Investigation\n\n```bash\n# Scenario: Suspicious container detected\n\n# Step 1: List containers\ndocker ps -a\n\n# Step 2: Inspect suspicious container\ndocker inspect <container_id> > container_info.json\ncat container_info.json | jq '.[] | {Pid, NetworkMode, Privileged}'\n\n# Red flags:\n# - Privileged: true (full host access)\n# - NetworkMode: \"host\" (shares host network)\n\n# Step 3: Check what files container accessed\nsudo ls -la /proc/<container_pid>/fd/\n# Shows open file descriptors\n\n# Step 4: Examine container memory\nsudo gcore <container_pid>\n# Creates core dump: core.<pid>\n\n# Step 5: Analyze with strings\nstrings core.<pid> | grep -E \"(password|secret|token|key)\"\n```\n\n## Exercise 3: Kubernetes Pod Forensics\n\n```bash\n# Scenario: Cryptomining pod detected\n\n# Task 1: Find pod's worker node\nkubectl get pod crypto-miner -o jsonpath='{.spec.nodeName}'\n\n# Task 2: Describe pod (check resource usage)\nkubectl describe pod crypto-miner\n# Look for:\n# - High CPU request\n# - Unusual image registry\n# - Privileged security context\n\n# Task 3: Get pod logs\nkubectl logs crypto-miner\n\n# Task 4: Execute in pod (if still running)\nkubectl exec -it crypto-miner -- /bin/sh\nps aux  # Check running processes\nnetstat -an  # Check network connections\n\n# Task 5: On worker node, find host PID\nsudo crictl inspect $(crictl ps | grep crypto-miner | awk '{print $1}') | grep pid\n\n# Task 6: Acquire worker node memory\nsudo insmod lime.ko \"path=/forensics/worker_memory.lime format=lime\"\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Real-World Cases\n\n## Case 1: Docker Daemon Exploit (2019)\n\n**Vulnerability**: Docker daemon exposed on 0.0.0.0:2375 (no authentication).\n\n**Attack**: Attacker mounted host filesystem into container, gained root on host.\n\n**Memory Forensics Detection**:\n```bash\n# Container process accessing host files\nsudo ls -l /proc/<container_pid>/root/\n# Shows host filesystem mounted at /host_root/\n\n# Indicates container breakout\n```\n\n## Case 2: Kubernetes Privilege Escalation (2018)\n\n**Vulnerability**: Kubernetes API server privilege escalation (CVE-2018-1002105).\n\n**Attack**: Malicious pod gained cluster-admin privileges.\n\n**Detection**: Pod with service account token allowing exec/attach/portforward to other pods (visible in memory).\n\n## Case 3: VM Escape - VMSA-2017-0006\n\n**Vulnerability**: VMware Workstation/Fusion escape via drag-and-drop feature.\n\n**Attack**: Guest escaped to host, executed code on host OS.\n\n**Memory Detection**: Guest process making unusual VMCI (Virtual Machine Communication Interface) calls."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Quick Reference\n\n## \"VCD\" Mnemonic\n\n**V**Mware - .vmem files, suspend or snapshot\n**C**ontainers - Host memory + namespace mapping\n**D**etection - Breakouts via namespace escape, privilege escalation\n\n## Container vs VM\n\n```\nVirtual Machine:\n- Full OS, own kernel\n- Hypervisor isolation\n- Memory: Separate .vmem file\n- Analysis: Standard Volatility\n\nContainer:\n- Shared host kernel\n- Namespace isolation\n- Memory: In host memory\n- Analysis: Host memory + PID mapping\n```\n\n## Breakout Detection Checklist\n\n```markdown\n□ Check namespace IDs (should differ from host)\n□ Verify capabilities (should be limited)\n□ Examine file access (should be containerized FS only)\n□ Review network connections (inside container network?)\n□ Check cgroups (proper resource limits?)\n```"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Reflection Questions\n\n1. Why does Docker container forensics require analyzing the HOST memory rather than a separate container memory dump?\n\n2. What's the forensic trade-off between suspending a VM (to get clean snapshot) vs live dumping (to preserve running state)?\n\n3. How would you detect a container breakout if the attacker covers their tracks by restoring original namespace settings?\n\n4. In Kubernetes, why is worker node memory more valuable than control plane memory for pod forensics?\n\n5. What hypervisor-level artifacts would be invisible from guest VM analysis?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Virtual Environments Mastered\n\nYou now understand:\n- VM memory acquisition (VMware, Hyper-V, KVM)\n- Container forensics (Docker, Kubernetes)\n- Breakout/escape detection\n- Hypervisor-level analysis\n\nThis is cutting-edge - many forensic analysts still only know physical system analysis. You're ahead of the curve.\n\n**Next**: Firmware and embedded systems - the deepest level of memory forensics. 🔬"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR508"]
+}

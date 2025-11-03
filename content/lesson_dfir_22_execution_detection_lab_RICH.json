@@ -1,0 +1,130 @@
+{
+  "lesson_id": "6603ec74-98f9-4045-a152-17f273719422",
+  "domain": "dfir",
+  "title": "Evidence of Execution Detection Lab",
+  "difficulty": 3,
+  "order_index": 22,
+  "prerequisites": [
+    "054c9b0e-319c-40c0-9e5b-e17f95437c49"
+  ],
+  "concepts": [
+    "Hands-On Forensic Analysis",
+    "Multi-Artifact Investigation",
+    "Timeline Reconstruction Practice",
+    "Attack Pattern Recognition",
+    "Evidence Correlation Techniques",
+    "Malware Execution Identification",
+    "Lateral Movement Detection",
+    "Exfiltration Evidence Analysis",
+    "Forensic Report Generation",
+    "Real-World Case Simulation"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Apply execution artifact analysis to realistic forensic scenarios",
+    "Build complete attack timelines from multiple artifact sources",
+    "Identify initial access vectors through execution evidence",
+    "Detect lateral movement using cross-system artifact correlation",
+    "Quantify data exfiltration through network usage artifacts",
+    "Generate professional forensic reports with confidence ratings",
+    "Practice anti-forensics detection through anomaly identification",
+    "Correlate execution evidence with network and filesystem artifacts",
+    "Develop systematic investigation workflows for complex cases",
+    "Master real-world execution forensics scenarios"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q22_1",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "In the lab scenario, you find Prefetch for psexec.exe on Workstation A showing last run March 15. SRUM on Server B shows psexec.exe network activity on March 18. What does this indicate?",
+      "options": [
+        "SRUM timestamps are incorrect and should be ignored",
+        "PsExec was run FROM Server B TO Workstation A on March 18",
+        "PsExec was run FROM Workstation A TO Server B, and Server B's SRUM tracked the receiving connection",
+        "This is a false positive correlation"
+      ],
+      "correct_answer": 2,
+      "explanation": "When analyzing lateral movement, remember: (1) Prefetch is created on the SOURCE system (where psexec.exe RUNS), (2) SRUM can track network activity on BOTH source and target systems. Workstation A Prefetch (March 15) shows psexec.exe was executed there. Server B SRUM (March 18) shows network activity related to PsExec connections arriving at Server B. The 3-day gap suggests: First lateral movement attempt on March 15 (possibly failed or reconnaissance), successful compromise on March 18. This demonstrates why single-system analysis fails—you need artifacts from BOTH endpoints. Investigative steps: Check Server B Event Logs for network logon (4624 Type 3) from Workstation A IP on March 18, review Server B ShimCache for \\\\WorkstationA\\ADMIN$\\psexec.exe entries."
+    },
+    {
+      "question_id": "q22_2",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "Lab exercise shows UserAssist entries for 'Financial_Report.xlsx.exe' with focus time of 45 seconds. The file no longer exists on disk. What is your FIRST investigative step?",
+      "options": [
+        "File carving from unallocated space to recover the executable",
+        "Check AmCache for SHA-1 hash to submit to VirusTotal",
+        "Review MFT for deleted entry with original timestamps",
+        "Check ShimCache for full file path information"
+      ],
+      "correct_answer": 1,
+      "explanation": "For DELETED MALWARE with UserAssist evidence, prioritize hash identification: (1) AmCache preserves SHA-1 hashes even after file deletion (stored in Registry), (2) VirusTotal lookup confirms malicious nature instantly, (3) Hash enables threat intelligence correlation (known APT campaigns, malware families). The 45-second focus time proves user interaction (not background execution), suggesting successful social engineering. Workflow: (A) Extract AmCache SHA-1 → VirusTotal (if detected, you have malware family/campaign attribution), (B) Check ShimCache for full path (confirms C:\\Users\\Alice\\Downloads\\Financial_Report.xlsx.exe = phishing delivery), (C) Search MFT for deleted entry (birth time = download time, correlates with email delivery), (D) File carving if needed (recovers executable for deeper malware analysis). Starting with AmCache provides quickest threat identification before time-consuming carving operations."
+    },
+    {
+      "question_id": "q22_3",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "Lab timeline shows: 14:30 - powershell.exe (Prefetch Run Count: 156), 14:35 - mimikatz.exe (AmCache), 14:40 - psexec.exe (SRUM BytesSent: 15MB). What attack phase does this represent?",
+      "options": [
+        "Initial access and reconnaissance",
+        "Privilege escalation and persistence",
+        "Credential theft and lateral movement preparation",
+        "Data exfiltration"
+      ],
+      "correct_answer": 2,
+      "explanation": "This timeline represents POST-EXPLOITATION leading to lateral movement: (1) PowerShell (156 runs) = sustained post-exploitation activity (C2 beaconing, reconnaissance scripts, tool downloading), (2) Mimikatz = credential dumping (extracting passwords/hashes from LSASS memory), (3) PsExec (15 MB sent) = lateral movement tool transferring to remote system. The 10-minute sequence (14:30-14:40) shows efficient, practiced attacker workflow. Next investigative steps: (A) PowerShell logs 4104 (script block logging) to identify exact commands run, (B) Check SRUM for mimikatz.exe resource usage (how long did credential dumping take?), (C) Network logs during 14:40 to identify PsExec target system (which server received 15 MB?), (D) Target system forensics to confirm compromise. This pattern matches APT playbooks: post-exploit → cred theft → lateral move."
+    },
+    {
+      "question_id": "q22_4",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "In the lab, SRUM shows 'svchost.exe' sent 45 GB over 3 days. Prefetch shows normal svchost.exe activity. How do you determine if this is malicious or legitimate?",
+      "options": [
+        "45 GB from svchost.exe is always malicious",
+        "Check svchost.exe command-line parameters in Event 4688 to identify the hosted service",
+        "Compare hash of svchost.exe to known-good Windows system file",
+        "SRUM cannot distinguish between legitimate and malicious svchost instances"
+      ],
+      "correct_answer": 1,
+      "explanation": "svchost.exe (Service Host) legitimately runs dozens of Windows services, making execution artifacts ambiguous. The key is COMMAND-LINE ANALYSIS: (1) Event 4688 (process creation) includes full command-line showing which service group (-k parameter), (2) Legitimate svchost: 'C:\\Windows\\System32\\svchost.exe -k netsvcs' (network services), (3) Malicious svchost: 'C:\\Users\\Public\\svchost.exe' or 'C:\\Windows\\System32\\svchost.exe' with no -k parameter (process hollowing). For 45 GB transfer: (A) If legitimate Windows Update/BITS service → Check SRUM timeframe (does it align with Patch Tuesday?), (B) If service group is suspicious or svchost runs from non-System32 path → Malware. Additional checks: (C) Network logs showing WHAT was transferred (Windows Update uses microsoft.com domains, malware uses random IPs/domains), (D) Cross-reference with SRUM application timeline (legitimate services have consistent patterns, malware shows burst activity). Never assume svchost.exe is clean without validation."
+    },
+    {
+      "question_id": "q22_5",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "Lab final task: Generate executive summary stating data exfiltration occurred. What evidence MUST you include for defensibility?",
+      "options": [
+        "List of all executed programs with timestamps",
+        "Specific applications, bytes transferred (SRUM), destination evidence (network logs), timeline with confidence levels",
+        "Screenshots of all Prefetch files",
+        "AmCache SHA-1 hashes submitted to VirusTotal"
+      ],
+      "correct_answer": 1,
+      "explanation": "Defensible exfiltration claims require QUANTIFIABLE evidence: (1) **Which applications**: 'FileZilla.exe sent 12 GB' (SRUM Network Data), (2) **How much data**: Exact bytes transferred with timestamps (proves scale and duration), (3) **Where it went**: Network/firewall logs showing destination IPs or domains (proves external transfer, not internal), (4) **Confidence levels**: 'Definitive - SRUM + Network Logs + Prefetch correlation', (5) **Timeline**: 'March 18 14:30-16:45 (2.25 hours sustained transfer)'. Executive summary format: 'Investigation confirms 12 GB data exfiltration via FileZilla FTP client to external IP 203.0.113.50 (Russia) on March 18, 2024 between 14:30-16:45. Evidence: SRUM network usage logs (12,582,912,000 bytes sent), Prefetch confirms FileZilla execution (run count: 8), network packet captures show FTP PUT commands to 203.0.113.50:21. Confidence: Definitive (4 corroborating artifacts).' Avoid vague claims like 'possible data theft' - provide numbers, times, and artifact citations."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Evidence of Execution Detection Lab\n\n## Opening: Time to Apply Your Skills\n\nYou've learned Prefetch, AmCache, ShimCache, UserAssist, SRUM, and timeline correlation. Now you're ready for **hands-on practice**.\n\n**This lesson is different**: Instead of learning new concepts, you'll APPLY execution forensics to realistic scenarios. Think of this as your final exam—demonstrating mastery through practical investigation.\n\n**What you'll do**:\n- Analyze provided forensic artifacts (CSV exports, Registry hives)\n- Build attack timelines from multiple sources\n- Identify initial access, persistence, lateral movement, and exfiltration\n- Generate professional forensic reports\n\n**Why this matters**: Reading about forensics builds knowledge. DOING forensics builds expertise. Employers hire analysts who can solve real cases, not just recite theory.\n\nLet's investigate.\n\n---\n\n## Lab Scenario: Financial Services Intrusion\n\n### Background\n\n**Company**: GlobalBank Corp (5,000 employees)\n**Incident**: Suspicious network activity detected by SIEM on March 18, 2024\n**Systems of interest**:\n- **Workstation-Alice** (Finance employee, Windows 10)\n- **Server-FileShare01** (File server, Windows Server 2019)\n- **Server-DC01** (Domain controller, Windows Server 2022)\n\n**Your mission**: Determine:\n1. How did attackers gain initial access?\n2. What tools were used for lateral movement?\n3. Was data exfiltrated? If so, how much and when?\n4. What is the complete attack timeline?\n\n### Evidence Provided\n\nYou have extracted artifacts from all three systems:\n\n**Workstation-Alice**:\n- Prefetch directory (45 .pf files)\n- AmCache.hve\n- SYSTEM hive (ShimCache)\n- NTUSER.DAT (UserAssist, MUICache)\n- SRUDB.dat\n\n**Server-FileShare01**:\n- Prefetch directory (23 .pf files)\n- SYSTEM hive\n- SRUDB.dat\n\n**Server-DC01**:\n- Prefetch directory (18 .pf files)\n- SYSTEM hive\n- Event Logs (Security.evtx)\n\n---\n\n## Part 1: Initial Access Investigation\n\n### Task 1: Identify Suspicious Executables (Workstation-Alice)\n\n**Step 1: Extract Prefetch**\n\n```cmd\nPECmd.exe -d \"C:\\Evidence\\Alice\\Prefetch\" --csv \"C:\\Output\\Alice_Prefetch\"\n```\n\n**Sample output** (Alice_Prefetch_Timeline.csv):\n\n```csv\nExecutableName,LastRunTime,RunCount,FilesLoaded\nOUTLOOK.EXE,2024-03-18 09:15:00,847,C:\\Users\\Alice\\AppData\\...\nCHROME.EXE,2024-03-18 09:30:00,1205,C:\\Program Files\\Google\\...\nINVOICE_MARCH.PDF.EXE,2024-03-18 09:45:30,1,C:\\Users\\Alice\\Downloads\\...\nPOWERSHELL.EXE,2024-03-18 09:47:00,156,C:\\Windows\\System32\\...\nCMD.EXE,2024-03-18 09:48:15,89,C:\\Windows\\System32\\...\n```\n\n**Red flags**:\n\n1. **INVOICE_MARCH.PDF.EXE**\n   - Double extension (.pdf.exe) = social engineering\n   - Run count = 1 (first execution)\n   - Location: Downloads folder (email attachment)\n   - **Assessment**: Phishing payload\n\n2. **POWERSHELL.EXE (156 runs)**\n   - Abnormally high run count for finance user\n   - Timestamp immediately after Invoice execution (09:47 vs 09:45)\n   - **Assessment**: Post-exploitation framework\n\n3. **CMD.EXE (89 runs)**\n   - High run count\n   - Timestamp after PowerShell\n   - **Assessment**: Command-line automation (possibly credential dumping prep)\n\n**Step 2: Cross-reference with AmCache**\n\n```cmd\nAmCacheParser.exe -f \"C:\\Evidence\\Alice\\AmCache.hve\" --csv \"C:\\Output\\Alice_AmCache\"\n```\n\n**Key finding**:\n\n```csv\nApplicationName,FirstExecuted,SHA1\nINVOICE_MARCH.PDF.EXE,2024-03-18 09:45:30,a3f5d8c2e1b4...\n```\n\n**Action**: Submit SHA-1 to VirusTotal\n\n**VirusTotal result**: 58/70 vendors detect as \"Trojan.Emotet.Variant\"\n\n**Conclusion**: **Initial access = Emotet phishing (March 18, 09:45:30)**\n\n---\n\n## Part 2: Post-Exploitation Analysis\n\n### Task 2: Analyze PowerShell Activity\n\n**Step 1: UserAssist correlation**\n\n```cmd\nUserAssist.exe -f \"C:\\Evidence\\Alice\\NTUSER.DAT\" --csv \"C:\\Output\\Alice_UserAssist\"\n```\n\n**Finding**:\n\n```csv\nApplication,LastExecuted,RunCount,FocusTime\nINVOICE_MARCH.PDF.EXE,2024-03-18 09:45:25,1,850ms\npowershell.exe,2024-03-18 09:47:05,2,0ms\n```\n\n**Analysis**:\n- Invoice: 850ms focus time = user saw window briefly (malware executed)\n- PowerShell: 0ms focus time = background execution (no user interaction)\n- UserAssist run count (2) vs Prefetch (156) = PowerShell spawned 154 child processes\n\n**Interpretation**: Emotet dropped PowerShell script that spawned multiple instances (C2 beaconing, reconnaissance)\n\n**Step 2: SRUM resource usage**\n\n```cmd\nSrumECmd.exe -f \"C:\\Evidence\\Alice\\SRUDB.dat\" --csv \"C:\\Output\\Alice_SRUM\" -r \"C:\\Evidence\\Alice\\SOFTWARE\"\n```\n\n**SRUM Application Resource Usage**:\n\n```csv\nApplication,ExecutionCount,TotalDuration,AvgCPU\npowershell.exe,156,1800 seconds (30 min),25%\n```\n\n**SRUM Network Data**:\n\n```csv\nApplication,BytesSent,BytesReceived,Interface\npowershell.exe,5242880 (5 MB),157286400 (150 MB),Ethernet\nINVOICE_MARCH.PDF.EXE,1048576 (1 MB),0,Ethernet\n```\n\n**Analysis**:\n- PowerShell: 5 MB sent, **150 MB received** = payload download (tools, modules)\n- Invoice exe: 1 MB sent = C2 beacon confirmation\n\n**Conclusion**: **Post-exploitation = PowerShell Empire/Cobalt Strike (30 min, downloaded 150 MB tools)**\n\n---\n\n## Part 3: Lateral Movement Detection\n\n### Task 3: Identify Tools and Target Systems\n\n**Step 1: ShimCache analysis (Workstation-Alice)**\n\n```cmd\nAppCompatCacheParser.exe -f \"C:\\Evidence\\Alice\\SYSTEM\" --csv \"C:\\Output\\Alice_ShimCache\"\n```\n\n**Suspicious entries**:\n\n```csv\nPath,LastModified\nC:\\Users\\Alice\\AppData\\Local\\Temp\\mimikatz.exe,2024-03-18 09:50:00\nC:\\Users\\Alice\\AppData\\Local\\Temp\\psexec64.exe,2024-03-18 09:55:00\nC:\\Users\\Alice\\AppData\\Local\\Temp\\procdump64.exe,2024-03-18 09:58:00\n```\n\n**Attack tools identified**:\n- **mimikatz.exe**: Credential theft (extract passwords from LSASS)\n- **psexec64.exe**: Remote code execution (lateral movement)\n- **procdump64.exe**: Memory dumping (credential harvesting)\n\n**Step 2: Check Prefetch for execution confirmation**\n\n```\nMIMIKATZ.EXE-12AB34CD.pf\n  Last Run: 2024-03-18 09:50:15\n  Run Count: 1\n  \nPSEXEC64.EXE-56EF78GH.pf\n  Last Run: 2024-03-18 09:55:30\n  Run Count: 3\n  \nPROCDUMP64.EXE-9IJK01LM.pf\n  Last Run: 2024-03-18 09:58:45\n  Run Count: 2\n```\n\n**Analysis**:\n- Mimikatz: 1 execution (credential dump)\n- PsExec: 3 executions (3 remote systems targeted)\n- Procdump: 2 executions (2 systems memory-dumped)\n\n**Step 3: SRUM network correlation**\n\n```csv\nApplication,BytesSent,DestinationHint\npsexec64.exe,52428800 (50 MB),Internal network\nprocdump64.exe,104857600 (100 MB),Internal network\n```\n\n**Interpretation**: \n- PsExec sent 50 MB (transferring tools to 3 remote systems)\n- Procdump sent 100 MB (exfiltrated memory dumps from 2 systems)\n\n**Conclusion**: **Lateral movement = PsExec to 3 systems (FileShare01, DC01, unknown), credential dumping on 2**\n\n---\n\n## Part 4: Cross-System Correlation\n\n### Task 4: Analyze Server-FileShare01\n\n**Step 1: ShimCache (Server-FileShare01)**\n\n```csv\nPath,LastModified\n\\\\Workstation-Alice\\ADMIN$\\psexec64.exe,2024-03-18 09:56:00\n\\\\Workstation-Alice\\ADMIN$\\procdump64.exe,2024-03-18 09:59:00\nC:\\Windows\\Temp\\out.dmp,2024-03-18 09:59:30\n```\n\n**Evidence**:\n- UNC path = tools executed FROM remote share (Alice's workstation)\n- out.dmp = Procdump output (LSASS memory dump)\n\n**Step 2: Prefetch (Server-FileShare01)**\n\n```\nPSEXEC64.EXE-ABCD1234.pf\n  Last Run: 2024-03-18 09:56:10\n  Run Count: 1\n  Files Loaded: \\\\Workstation-Alice\\ADMIN$\\psexec64.exe\n```\n\n**Correlation**:\n- Alice ShimCache: psexec64.exe at 09:55:30\n- FileShare01 Prefetch: psexec64.exe at 09:56:10\n- **Gap**: 40 seconds (lateral movement transmission time)\n\n**Step 3: SRUM (Server-FileShare01)**\n\n```csv\nApplication,BytesSent,BytesReceived\nprocdump64.exe,52428800 (50 MB),0\n7z.exe,18874368000 (17.6 GB),0\n```\n\n**Critical finding**:\n- Procdump sent 50 MB back to Alice's workstation (memory dump exfiltration)\n- **7-Zip sent 17.6 GB** (massive file compression/staging)\n\n**Timeline**:\n```\n09:56 - PsExec lateral movement from Alice → FileShare01\n09:59 - Procdump dumps LSASS memory (50 MB)\n10:15 - 7-Zip compresses files (17.6 GB)\n```\n\n**Conclusion**: **FileShare01 compromised, 17.6 GB data staged**\n\n---\n\n## Part 5: Data Exfiltration Quantification\n\n### Task 5: Identify Exfiltration Method\n\n**Step 1: Timeline continuation (Workstation-Alice)**\n\n**Prefetch**:\n\n```\nFILEZILLA.EXE-MNOP2345.pf\n  Last Run: 2024-03-18 14:30:00\n  Run Count: 8\n  Volume Serial: Matches FileShare01 network share\n```\n\n**SRUM Network Data**:\n\n```csv\nApplication,BytesSent,BytesReceived,Timeframe\nfilezilla.exe,18874368000 (17.6 GB),0,March 18 14:30-16:45\n```\n\n**UserAssist**:\n\n```csv\nApplication,RunCount,FocusTime\nfilezilla.exe,8,14500000ms (4 hours)\n```\n\n**Analysis**:\n- FileZilla: 17.6 GB uploaded (matches 7-Zip compression size from FileShare01)\n- 0 bytes received = one-way upload (exfiltration, not synchronization)\n- 4 hours focus time = user actively monitored transfers\n- 8 executions = multiple transfer sessions\n\n**Conclusion**: **Data exfiltration = 17.6 GB via FTP (FileZilla) over 4 hours, 8 sessions**\n\n---\n\n## Part 6: Master Timeline\n\n### Complete Attack Reconstruction\n\n```\n=== INITIAL ACCESS (09:45) ===\n09:42:00 | Email Logs    | Phishing email received by Alice\n09:45:25 | UserAssist    | User clicked Invoice_March.pdf.exe\n09:45:30 | Prefetch      | INVOICE_MARCH.PDF.EXE executed\n09:45:30 | AmCache       | First execution logged (Emotet variant)\n09:45:35 | SRUM          | Invoice exe sent 1 MB (C2 beacon)\n\n=== POST-EXPLOITATION (09:47-10:00) ===\n09:47:00 | Prefetch      | PowerShell.exe spawned (run count begins)\n09:47-10:00 | SRUM       | PowerShell received 150 MB (tool download)\n09:50:15 | Prefetch      | Mimikatz.exe executed\n09:50:15 | ShimCache     | Mimikatz in Temp folder\n\n=== LATERAL MOVEMENT (09:55-10:00) ===\n09:55:30 | Prefetch      | PsExec64.exe executed (Alice workstation)\n09:56:10 | Prefetch      | PsExec64.exe on FileShare01 (lateral move confirmed)\n09:58:45 | Prefetch      | Procdump64.exe executed\n09:59:30 | ShimCache     | out.dmp created on FileShare01 (LSASS dump)\n\n=== DATA STAGING (10:15) ===\n10:15:00 | SRUM          | 7-Zip on FileShare01 compresses 17.6 GB\n\n=== DWELL TIME (10:00-14:30) ===\n[4.5 hour gap - attacker reconnaissance or waiting for off-hours]\n\n=== EXFILTRATION (14:30-16:45) ===\n14:30:00 | Prefetch      | FileZilla.exe first run\n14:30:00 | UserAssist    | FileZilla launched (user-initiated)\n14:30-16:45 | SRUM       | FileZilla sent 17.6 GB (0 received)\n16:45:00 | UserAssist    | FileZilla last focus (4 hours total)\n```\n\n**Attack summary**:\n- **Dwell time**: 7 hours (09:45 initial access → 16:45 exfiltration complete)\n- **Lateral movement**: 3 systems (Alice workstation → FileShare01 → DC01)\n- **Data stolen**: 17.6 GB\n- **Exfiltration method**: FTP (FileZilla)\n\n---\n\n## Part 7: Forensic Report Generation\n\n### Executive Summary (Template)\n\n**INCIDENT SUMMARY**\n\nGlobalBank experienced a targeted intrusion on March 18, 2024, resulting in the exfiltration of 17.6 GB of financial data.\n\n**ATTACK TIMELINE**: 09:45 - 16:45 (7 hours)\n\n**INITIAL ACCESS**: Emotet phishing email delivered to Finance employee (Alice), executed at 09:45:30\n\n**LATERAL MOVEMENT**: Attacker compromised 3 systems using PsExec and credential theft (Mimikatz, Procdump)\n\n**DATA EXFILTRATION**: 17.6 GB transferred via FTP (FileZilla) to external server between 14:30-16:45\n\n**EVIDENCE CONFIDENCE**: Definitive (6 corroborating artifact types)\n\n**BUSINESS IMPACT**: High - Financial records accessed from FileShare01 (customer data, transaction logs)\n\n**RECOMMENDATIONS**:\n1. Immediate password reset for compromised accounts\n2. Block external FTP connections\n3. Deploy EDR with PowerShell monitoring\n4. Phishing awareness training\n\n### Technical Findings (Detailed)\n\n**1. Initial Access Vector**\n- **Evidence**: Prefetch (INVOICE_MARCH.PDF.EXE), AmCache (SHA-1: a3f5d8c2...), UserAssist (focus time: 850ms)\n- **Timestamp**: 2024-03-18 09:45:30 UTC\n- **Confidence**: Definitive\n- **VirusTotal**: 58/70 detections (Emotet variant)\n\n**2. Post-Exploitation Framework**\n- **Evidence**: Prefetch (PowerShell.exe run count: 156), SRUM (150 MB received, 30 min runtime)\n- **Timestamp**: 09:47:00 - 10:17:00 UTC\n- **Confidence**: Definitive\n- **Assessment**: Cobalt Strike or PowerShell Empire\n\n**3. Credential Theft**\n- **Evidence**: ShimCache (mimikatz.exe, procdump64.exe), Prefetch (execution confirmed)\n- **Timestamp**: 09:50:15 - 09:59:30 UTC\n- **Confidence**: Definitive\n- **Impact**: LSASS memory dumped from FileShare01\n\n**4. Lateral Movement**\n- **Evidence**: Cross-system ShimCache UNC paths, Prefetch on FileShare01, SRUM network data (50 MB psexec transfer)\n- **Timestamp**: 09:55:30 - 09:56:10 UTC\n- **Confidence**: Definitive\n- **Systems compromised**: Workstation-Alice → FileShare01 → DC01\n\n**5. Data Exfiltration**\n- **Evidence**: SRUM (FileZilla 17.6 GB sent), UserAssist (4 hours focus time), Prefetch (8 executions)\n- **Timestamp**: 14:30:00 - 16:45:00 UTC\n- **Confidence**: Definitive\n- **Volume**: 17,600,000,000 bytes (17.6 GB)\n- **Method**: FTP upload\n\n---\n\n## Closing: You've Solved a Real-World Case\n\nCongratulations! You just completed a comprehensive forensic investigation using execution artifacts.\n\n**What you demonstrated**:\n✅ Multi-artifact correlation (6 sources)\n✅ Cross-system analysis (3 endpoints)\n✅ Attack timeline reconstruction (7-hour campaign)\n✅ Quantified exfiltration (17.6 GB)\n✅ Professional reporting (executive + technical)\n\n**Real-world readiness**: This lab mirrors actual APT investigations. You now have the skills to:\n- Handle enterprise breaches\n- Testify in court with evidence-based findings\n- Generate reports for C-level executives\n- Correlate artifacts across multiple systems\n\n**Next lesson**: **Services and Scheduled Tasks Forensics** - Learn persistence mechanism detection.\n\n**Practice challenge**: Download a NIST CFReDS image, apply this same workflow, build your portfolio case study.\n\nYou're now a practical execution forensics expert. Keep investigating! 🕵️"
+      }
+    }
+  ],
+  "tags": [
+    "Course: 13Cubed-Investigating Windows Endpoints"
+  ]
+}

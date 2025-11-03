@@ -1,0 +1,130 @@
+{
+  "lesson_id": "28617a91-ea3d-4e03-a55e-dca5f7f1d97a",
+  "domain": "dfir",
+  "title": "Lateral Movement: SMB, RDP, WMI, PsExec, and UAL Analysis",
+  "difficulty": 3,
+  "order_index": 25,
+  "prerequisites": [
+    "76ca7a78-11ff-4f39-adaa-8837327dd223"
+  ],
+  "concepts": [
+    "SMB Lateral Movement",
+    "RDP Session Forensics",
+    "WMI Remote Execution",
+    "PsExec Analysis",
+    "User Access Logging (UAL)",
+    "Network Logon Detection",
+    "Administrative Shares Abuse",
+    "Remote Desktop Artifacts",
+    "WMI Event Logs",
+    "Cross-System Timeline Correlation"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Detect SMB-based lateral movement through Event Logs and ShimCache",
+    "Analyze RDP session artifacts for remote access investigation",
+    "Identify WMI remote execution via Event Logs and execution artifacts",
+    "Investigate PsExec lateral movement across multiple systems",
+    "Parse User Access Logging (UAL) database for access history",
+    "Correlate network logon events (4624 Type 3) with execution artifacts",
+    "Build cross-system timelines for lateral movement campaigns",
+    "Detect Pass-the-Hash and Pass-the-Ticket attacks",
+    "Identify administrative share abuse (C$, ADMIN$, IPC$)",
+    "Apply lateral movement analysis to APT investigations"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q25_1",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "Event 4624 shows Logon Type 3 from 10.50.30.15 to FileServer01. Prefetch on FileServer01 shows NO new executables. What explains this?",
+      "options": [
+        "Event 4624 is a false positive",
+        "SMB file access (reading/copying files) doesn't create Prefetch",
+        "Prefetch was deleted by attacker",
+        "The logon failed before any execution occurred"
+      ],
+      "correct_answer": 1,
+      "explanation": "Logon Type 3 (Network) occurs for multiple activities: (1) SMB file access (browsing shares, copying files - NO execution), (2) Remote execution (PsExec, WMI - DOES create Prefetch on target), (3) Network service authentication. If Event 4624 Type 3 exists WITHOUT Prefetch, the user likely accessed FILE SHARES (C$, shared folders) but didn't EXECUTE anything. Forensic distinction: (A) File access only = Event 4624 + Event 5140 (share access) + NO Prefetch, (B) Remote execution = Event 4624 + Event 5140 + Prefetch for executed binary. Investigation steps: Check Event 5140 on FileServer01 (shows which share was accessed: \\\\FileServer01\\C$ or \\\\FileServer01\\Data), review file access logs (4663) to see WHAT files were read/copied, correlate with SRUM network data on source IP (10.50.30.15) to quantify data transfer. Absence of Prefetch eliminates remote code execution, focusing investigation on data theft vs. system compromise."
+    },
+    {
+      "question_id": "q25_2",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "UAL database shows user 'alice@evil.com' accessed Server01 on March 15. Alice's actual domain account is 'alice@company.com'. What does this indicate?",
+      "options": [
+        "Alice has two accounts (normal in enterprises)",
+        "External authentication (Azure AD, federated identity)",
+        "Compromised account used with forged/spoofed credentials",
+        "UAL database corruption"
+      ],
+      "correct_answer": 2,
+      "explanation": "UAL showing EXTERNAL domain (@evil.com instead of @company.com) indicates: (1) Attacker compromised Alice's credentials and authenticated using forged Kerberos ticket (Golden/Silver Ticket attack), (2) Attacker spoofed SPN or used Pass-the-Ticket with modified realm, (3) Federation misconfiguration allowing external domain authentication. This is HIGHLY suspicious - UAL should only show internal domain accounts (alice@company.com) or local accounts (alice). Investigation: (A) Check Event 4768 (Kerberos TGT request) for alice@evil.com - should show which DC issued ticket, (B) Review Event 4769 (Kerberos service ticket) for SPN requests, (C) Examine Event 4624 for LogonType and authentication package (Kerberos with external realm = Golden Ticket), (D) Check DC logs for anomalous ticket requests (ticket lifetime, encryption type). This pattern seen in APT groups using forged Kerberos tickets for stealth lateral movement (bypasses password authentication, harder to detect)."
+    },
+    {
+      "question_id": "q25_3",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "ShimCache on Server shows: \\\\10.50.30.15\\ADMIN$\\psexec.exe. Prefetch shows PSEXEC.EXE execution. Event Logs show Logon Type 3 from 10.50.30.15. What is the complete attack narrative?",
+      "options": [
+        "Server was compromised via PsExec lateral movement from workstation 10.50.30.15",
+        "Server initiated connection to workstation 10.50.30.15",
+        "PsExec was used for legitimate remote administration",
+        "ShimCache and Event Logs are from different incidents"
+      ],
+      "correct_answer": 0,
+      "explanation": "Artifact correlation proves lateral movement FROM 10.50.30.15 TO Server: (1) ShimCache UNC path (\\\\10.50.30.15\\ADMIN$\\psexec.exe) means PsExec executable was ACCESSED from remote share on 10.50.30.15, (2) Prefetch confirms PsExec EXECUTED on Server (not just accessed), (3) Event 4624 Type 3 shows NETWORK authentication from 10.50.30.15 (establishing connection before PsExec execution). Attack sequence: (A) Attacker on 10.50.30.15 runs 'psexec.exe \\\\Server cmd.exe', (B) PsExec connects to Server via SMB (Event 4624 Type 3), (C) PsExec binary copied to Server's ADMIN$ share (ShimCache logs UNC path), (D) Server executes PsExec from network share (Prefetch created), (E) PsExec spawns cmd.exe on Server (remote shell). Legitimacy determination: Check who authenticated (Event 4624 Account Name) - if Domain Admin during business hours with change ticket = legitimate, if compromised user at 3 AM = malicious. This technique bypasses traditional AV (no local malware file, execution from network share)."
+    },
+    {
+      "question_id": "q25_4",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "RDP investigation shows: Event 4624 Type 10 (RemoteInteractive) from 203.0.113.50 (Russia) to Server01 at 02:00 AM. User account: 'admin'. No VPN logs for this IP. What are the top 3 investigative priorities?",
+      "options": [
+        "Assume false positive and close investigation",
+        "1) Verify if 'admin' account is authorized for RDP, 2) Check MFA logs, 3) Review concurrent RDP sessions and post-logon activity",
+        "Immediately disable all RDP access company-wide",
+        "Wait for user to report the activity"
+      ],
+      "correct_answer": 1,
+      "explanation": "Suspicious RDP indicators: (1) Foreign IP (Russia) outside expected geography, (2) 02:00 AM (off-hours), (3) No VPN (direct internet exposure or compromised VPN bypass). Investigative workflow: **Priority 1 - Account verification**: (A) Is 'admin' a privileged account? (B) Is this account authorized for RDP? (C) Check account's recent password changes (Event 4723/4724 - password reset might indicate compromise), (D) Review Event 4720 (account creation) - new account = backdoor. **Priority 2 - MFA validation**: (A) Check MFA logs (if deployed) - did MFA challenge succeed? (B) MFA bypass = stolen session token or MFA fatigue attack, (C) No MFA = security gap. **Priority 3 - Post-logon analysis**: (A) Event 4688 (process creation) - which commands ran after RDP logon? (B) Prefetch - were hacking tools executed (mimikatz, procdump)? (C) SRUM - network activity during session (data exfiltration?), (D) Concurrent sessions - Event 4778/4779 (RDP session reconnect/disconnect) - how long was attacker connected? IMMEDIATE ACTION: Isolate Server01 from network, force password reset for 'admin', enable MFA, block 203.0.113.50 at firewall. RDP from foreign IPs at night = default to breach unless proven otherwise."
+    },
+    {
+      "question_id": "q25_5",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "Timeline across 5 systems shows WMI remote executions within 3-minute window, all using same compromised service account. What does this indicate about attacker sophistication?",
+      "options": [
+        "Low sophistication - manual execution",
+        "Medium sophistication - scripted automation",
+        "High sophistication - enterprise malware framework (Cobalt Strike, Empire)",
+        "False positive - legitimate IT automation"
+      ],
+      "correct_answer": 2,
+      "explanation": "Coordinated multi-system WMI executions in 3-minute window = AUTOMATED LATERAL MOVEMENT FRAMEWORK: (1) 3 minutes across 5 systems = ~36 seconds per system (too fast for manual), (2) Same service account = consistent operational security (OPSEC), (3) WMI choice = stealth (fileless execution, Living-off-the-Land). This pattern matches: (A) **Cobalt Strike** automated lateral movement modules, (B) **PowerShell Empire** multi-agent tasking, (C) **Metasploit** auxiliary modules. Framework indicators: (1) Precise timing (automated scripting loops), (2) Credential reuse across multiple targets (centralized credential management), (3) WMI over PsExec (stealthier, less EDR detection). Forensic correlation: Check Event 4688 on all 5 systems for wmiprvse.exe spawning child processes (identifies WHAT was executed via WMI), review network logs for C2 traffic from all 5 systems (confirms coordinated compromise), examine Sysmon Event 1 for parent process relationships (reveals execution chain). Legitimate IT automation would: (A) Use dedicated admin accounts (not service account), (B) Have change management tickets, (C) Execute during business hours with monitoring. Assume APT-level threat until proven otherwise - likely state-sponsored or organized crime group."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Lateral Movement: SMB, RDP, WMI, PsExec, and UAL Analysis\n\n## Opening: Tracking Attackers Across Your Network\n\nYou've detected initial access (phishing), credential theft (Mimikatz/LSASS). Now comes the CRITICAL phase: **lateral movement**—how attackers spread from Patient Zero to domain-wide compromise.\n\n**Why lateral movement matters**:\n- **Single system compromise** = containable incident\n- **Lateral movement** = network-wide breach, domain admin compromise, data exfiltration at scale\n\n**Attack progression**: Workstation compromise → Credential theft → Lateral movement (this lesson) → Domain Controller → Game over\n\n**Real-world stat**: Average APT lateral movement: 15 systems in first 72 hours (Mandiant M-Trends 2023)\n\nLet's detect lateral movement.\n\n---\n\n## Part 1: Understanding Lateral Movement Techniques\n\n### The Big Four Methods\n\n**1. SMB (Server Message Block)**\n- Access administrative shares (C$, ADMIN$, IPC$)\n- Copy files remotely\n- Execute via scheduled tasks or services\n- **Ports**: 445 (SMB), 139 (NetBIOS)\n\n**2. RDP (Remote Desktop Protocol)**\n- Interactive remote desktop session\n- GUI access to remote system\n- **Port**: 3389\n\n**3. WMI (Windows Management Instrumentation)**\n- Remote process execution (fileless)\n- System management and monitoring\n- **Port**: 135 (RPC), dynamic ports\n\n**4. PsExec** (Sysinternals tool)\n- Remote command execution via SMB\n- Lightweight alternative to RDP\n- **Port**: 445 (SMB)\n\n**Memory hook**: **\"SRWP\"** = SMB, RDP, WMI, PsExec (four pillars of lateral movement)\n\n---\n\n## Part 2: SMB Lateral Movement Detection\n\n### Event Log Indicators\n\n**Event 4624** (Logon):\n```\nLogon Type: 3 (Network)\nAccount Name: DOMAIN\\CompromisedUser\nSource IP: 10.50.30.15\nTarget: FileServer01\nTimestamp: 2024-03-18 14:30:00\n```\n\n**Logon Type 3** = Network authentication (SMB, network share access)\n\n**Event 5140** (Network Share Access):\n```\nShare Name: \\\\*\\ADMIN$\nSource IP: 10.50.30.15\nAccount Name: DOMAIN\\CompromisedUser\nAccess Mask: 0x1\n```\n\n**ADMIN$** = Administrative share (C:\\Windows), requires admin privileges\n\n**Event 5145** (Detailed File Share Access):\n```\nShare Name: \\\\*\\ADMIN$\nRelative Target Name: System32\\malware.exe\nAccess: WriteData\n```\n\nShows attacker WROTE malware.exe to ADMIN$ share.\n\n### ShimCache UNC Paths\n\n**Indicator**: Executables run from network shares\n\n```\nShimCache entry:\n\\\\10.50.30.15\\ADMIN$\\psexec.exe\n```\n\n**Interpretation**: Server accessed psexec.exe from remote share on 10.50.30.15 (lateral movement source)\n\n### Prefetch Correlation\n\n```\nPSEXEC.EXE-ABCD1234.pf (on target server)\n  Last Run: 2024-03-18 14:30:05\n  Volume Serial: Network UNC path (no local volume)\n  Files Loaded: \\\\10.50.30.15\\ADMIN$\\psexec.exe\n```\n\n**Cross-system correlation**:\n- **Source (10.50.30.15)**: Prefetch shows psexec.exe execution\n- **Target (FileServer01)**: ShimCache + Prefetch show psexec.exe from UNC path\n\n---\n\n## Part 3: RDP Session Forensics\n\n### Event Log Artifacts\n\n**Event 4624** (RDP Logon):\n```\nLogon Type: 10 (RemoteInteractive)\nAccount: DOMAIN\\alice\nSource IP: 10.50.30.20\nTimestamp: 2024-03-18 15:00:00\n```\n\n**Logon Type 10** = RDP session established\n\n**Event 4778** (Session Reconnected):\n```\nAccount: DOMAIN\\alice\nSession Name: RDP-Tcp#0\nSource IP: 10.50.30.20\n```\n\nUser reconnected to existing RDP session.\n\n**Event 4779** (Session Disconnected):\n```\nAccount: DOMAIN\\alice\nSession Name: RDP-Tcp#0\nReason: User initiated disconnect\n```\n\nSession ended (not logoff, just disconnect—session remains active).\n\n**Event 4647** (User Initiated Logoff):\n```\nAccount: DOMAIN\\alice\nLogon ID: 0x3E7ABC\n```\n\nComplete logoff (session terminated).\n\n### RDP Cache Files\n\n**Location**: `C:\\Users\\<username>\\AppData\\Local\\Microsoft\\Terminal Server Client\\Cache\\`\n\n**Files**: `bcache##.bmc` (bitmap cache from RDP sessions)\n\n**Forensic value**: \n- Screenshots of remote desktop sessions\n- Proves visual access to remote system\n- Can recover sensitive data viewed during session\n\n**Tool**: BMC-Tools (extract bitmaps from cache files)\n\n### Registry Artifacts\n\n**RDP connection history**:\n```\nHKCU\\Software\\Microsoft\\Terminal Server Client\\Servers\\\n  Server01.company.com\\\n    UsernameHint: alice\n```\n\n**Recent connections**:\n```\nHKCU\\Software\\Microsoft\\Terminal Server Client\\Default\\\n  MRU0: Server01.company.com\n  MRU1: 10.50.30.20\n```\n\n**Most Recently Used** (MRU) list shows RDP connection history.\n\n---\n\n## Part 4: WMI Remote Execution\n\n### Event Log Detection\n\n**Event 4688** (Process Creation via WMI):\n```\nProcess Name: C:\\Windows\\System32\\wbem\\WmiPrvSE.exe\nParent Process: C:\\Windows\\System32\\svchost.exe\nCommand Line: wmiprvse.exe\nCreator Process: C:\\Windows\\System32\\wbem\\wmiprvse.exe\n```\n\n**wmiprvse.exe** = WMI Provider Host (executes WMI commands)\n\n**Event 4688** (Child process spawned by WMI):\n```\nProcess Name: C:\\Windows\\System32\\cmd.exe\nParent Process: C:\\Windows\\System32\\wbem\\wmiprvse.exe\nCommand Line: cmd.exe /c \"whoami > C:\\Temp\\output.txt\"\n```\n\nWMI executed cmd.exe with specific command.\n\n**Sysmon Event 1** (Process Creation):\n```\nImage: C:\\Windows\\System32\\cmd.exe\nParentImage: C:\\Windows\\System32\\wbem\\wmiprvse.exe\nParentCommandLine: wmiprvse.exe\nCommandLine: cmd.exe /c \"powershell -enc <base64>\"\n```\n\nMore detailed than Event 4688, includes full command-line.\n\n### WMI Event Logs\n\n**Microsoft-Windows-WMI-Activity/Operational**:\n\n**Event 5857** (WMI Query):\n```\nNamespace: root\\cimv2\nQuery: SELECT * FROM Win32_Process WHERE Name='lsass.exe'\n```\n\nAttacker querying for LSASS process (credential dumping prep).\n\n### Prefetch Correlation\n\n```\nWMIC.EXE-ABCD1234.pf\n  Last Run: 2024-03-18 14:45:00\n  Command Line: wmic /node:FileServer01 process call create \"cmd.exe /c malware.exe\"\n```\n\nWMIC (WMI command-line) used for remote execution.\n\n---\n\n## Part 5: PsExec Analysis\n\n### How PsExec Works\n\n1. Connects to target via SMB (port 445)\n2. Copies PSEXESVC.exe to ADMIN$ share\n3. Creates temporary service on target\n4. Executes commanded process\n5. Deletes service and PSEXESVC.exe\n\n### Detection Artifacts\n\n**Source system (attacker)**:\n\n**Prefetch**:\n```\nPSEXEC.EXE-ABCD1234.pf\n  Last Run: 2024-03-18 14:50:00\n  Run Count: 15\n```\n\n15 executions = lateral movement to 15 systems.\n\n**Event 4688**:\n```\nProcess: C:\\Temp\\psexec.exe\nCommand Line: psexec.exe \\\\FileServer01 -s cmd.exe\n```\n\n**Target system**:\n\n**Event 7045** (Service Installation):\n```\nService Name: PSEXESVC\nImage Path: %SystemRoot%\\PSEXESVC.exe\nService Type: User Mode Service\nStart Type: Demand Start\nAccount: LocalSystem\n```\n\nTemporary PsExec service created.\n\n**Event 7036** (Service State Change):\n```\nService: PSEXESVC entered running state\n```\n\n**Prefetch**:\n```\nPSEXESVC.EXE-EFGH5678.pf\n  Last Run: 2024-03-18 14:50:05\n  Run Count: 1\n```\n\n**ShimCache**:\n```\n\\\\SourceIP\\ADMIN$\\psexec.exe\nC:\\Windows\\PSEXESVC.exe\n```\n\n**Event 4688**:\n```\nProcess: C:\\Windows\\System32\\cmd.exe\nParent: C:\\Windows\\PSEXESVC.exe\n```\n\nCmd.exe spawned by PsExec service.\n\n---\n\n## Part 6: User Access Logging (UAL)\n\n### What is UAL?\n\n**Purpose**: Windows Server tracks client access for licensing and auditing.\n\n**Database location**: `C:\\Windows\\System32\\LogFiles\\Sum\\`\n\n**Files**:\n- `Current.mdb` (active database)\n- `SystemIdentity.mdb` (system info)\n- `{GUID}.mdb` (role-specific logs)\n\n**Format**: ESE database (Extensible Storage Engine)\n\n### UAL Data Fields\n\n**Key information**:\n- **UserName**: Account that accessed server\n- **Client IP**: Source IP address\n- **Access Count**: Number of access events\n- **First/Last Access**: Timestamp range\n- **Role**: Server role accessed (File Server, DNS, etc.)\n\n### Extracting UAL\n\n**Tool**: KStrike UAL Parser\n\n```cmd\nUAL_Parser.py -d \"C:\\Evidence\\Sum\\\" -o output.csv\n```\n\n**Sample output**:\n\n```csv\nUserName,ClientIP,FirstAccess,LastAccess,AccessCount,Role\nDOMAIN\\alice,10.50.30.15,2024-03-15 09:00,2024-03-18 17:30,47,FileServer\nDOMAIN\\bob,203.0.113.50,2024-03-18 02:00,2024-03-18 02:45,3,RemoteDesktop\n```\n\n**Analysis**:\n- Alice: 47 accesses over 3 days (normal)\n- Bob: 3 accesses at 2 AM from external IP (suspicious)\n\n### UAL Forensic Value\n\n**Use cases**:\n1. **Identify all users** who accessed server (even if logs cleared)\n2. **Timeline reconstruction**: First/Last access shows compromise window\n3. **External access detection**: IP addresses outside corporate range\n4. **Compromised account identification**: Unusual access patterns\n\n**Retention**: UAL data retained for 3 years (longer than most Event Logs)\n\n---\n\n## Part 7: Cross-System Timeline Correlation\n\n### Example Investigation: APT Lateral Movement\n\n**Scenario**: 5 systems compromised via lateral movement\n\n**Timeline compilation**:\n\n```\n=== SYSTEM 1: Workstation-Alice (Patient Zero) ===\n09:45:00 | Event 4624  | Alice RDP logon from home IP\n09:47:00 | Prefetch    | Phishing payload executed\n09:50:00 | Event 4688  | Mimikatz.exe executed\n09:55:00 | Prefetch    | PsExec.exe first run\n09:55:05 | Event 4624  | Network logon to FileServer01 (Logon Type 3)\n\n=== SYSTEM 2: FileServer01 ===\n09:55:05 | Event 4624  | Network logon from Alice workstation\n09:55:10 | Event 7045  | PSEXESVC service created\n09:55:15 | Prefetch    | PSEXESVC.EXE execution\n09:55:20 | Event 4688  | cmd.exe spawned by PSEXESVC\n09:56:00 | Prefetch    | Mimikatz.exe executed on FileServer01\n\n=== SYSTEM 3: Server-DC01 (Domain Controller) ===\n10:00:00 | Event 4624  | Network logon from FileServer01\n10:00:05 | Event 4688  | ntdsutil.exe executed\n10:05:00 | Filesystem  | ntds.dit copied to Temp\n\n=== SYSTEMS 4-5: Additional Servers ===\n10:10:00 | Event 4624  | Simultaneous logons from Alice workstation to Server02, Server03\n10:10:05 | Event 7045  | PSEXESVC on both servers\n10:11:00 | Prefetch    | Mimikatz on both servers\n```\n\n**Attack path**:\n1. **Initial access**: Alice workstation (phishing)\n2. **Credential theft**: Mimikatz on Alice workstation\n3. **Lateral move 1**: PsExec to FileServer01\n4. **Lateral move 2**: FileServer01 to DC01 (domain admin credentials)\n5. **Domain compromise**: NTDS.dit extraction\n6. **Parallel spread**: Automated PsExec to 2 additional servers\n\n**Total dwell time**: 25 minutes (09:45 → 10:11)\n\n---\n\n## Closing: You've Mastered Lateral Movement Detection\n\nCongratulations! You can now detect:\n\n✅ SMB lateral movement (Events 4624/5140, ShimCache UNC paths)\n✅ RDP sessions (Events 4624/4778/4779, bitmap cache, Registry MRU)\n✅ WMI remote execution (Event 4688 wmiprvse.exe, Sysmon Event 1)\n✅ PsExec activity (Event 7045 PSEXESVC, cross-system Prefetch)\n✅ User Access Logging analysis (3-year access history)\n✅ Cross-system timeline correlation\n✅ Attack path reconstruction\n\n**Critical insight**: Lateral movement leaves artifacts on BOTH source and target systems. Single-system analysis misses the complete picture.\n\n**Your skillset**: You've completed Execution Artifacts mastery:\n- Prefetch, AmCache, ShimCache, UserAssist, SRUM (Lessons 16-21)\n- Services, Tasks, Credential theft, Lateral movement (Lessons 23-25)\n\n**Next category**: **NTFS Forensics** (MFT, timestamps, file carving, LNK files, Jump Lists)\n\n**Practice**: Set up a lab with 3 VMs, simulate lateral movement with PsExec, analyze all artifacts on source and target.\n\nYou're now an execution and lateral movement expert! 🚀"
+      }
+    }
+  ],
+  "tags": [
+    "Course: 13Cubed-Investigating Windows Endpoints"
+  ]
+}

