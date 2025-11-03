@@ -93,7 +93,13 @@ Every content block MUST have this structure:
 
 ## Rich Lesson Standards
 
-Generate lessons with **4,000-15,000 words** (adjust based on topic complexity):
+⚠️ **CRITICAL OUTPUT TOKEN LIMIT**: Claude Code has a 32,000 output token maximum per response. When generating lessons:
+- Target **6,000-8,000 words** for standard lessons (stays well under token limit)
+- For complex topics requiring more depth, split into 2-3 explanation blocks
+- Monitor token usage - if approaching 25,000 tokens, reduce content length
+- Prioritize quality over quantity - focus on essential technical content
+
+Generate lessons with **4,000-10,000 words** (adjust based on topic complexity):
 
 ### Content Requirements
 
