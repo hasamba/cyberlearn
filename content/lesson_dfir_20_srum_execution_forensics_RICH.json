@@ -1,0 +1,130 @@
+{
+  "lesson_id": "f789d4a9-d6e8-4681-bee0-92be2fb99acf",
+  "domain": "dfir",
+  "title": "System Resource Usage Monitor (SRUM) Forensics",
+  "difficulty": 2,
+  "order_index": 20,
+  "prerequisites": [
+    "562b03ba-4337-4056-8028-ef4c4dd933f2"
+  ],
+  "concepts": [
+    "SRUM Database Structure",
+    "Application Resource Usage Tracking",
+    "Network Data Usage Analysis",
+    "Process Timeline Reconstruction",
+    "SRUM-DUMP Tool",
+    "ESE Database Parsing",
+    "Bandwidth Consumption Tracking",
+    "Application Execution Evidence",
+    "Network Activity Correlation",
+    "Energy Usage Forensics"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Extract and analyze SRUM database (SRUDB.dat) for application execution evidence",
+    "Track network data usage per application for exfiltration detection",
+    "Correlate SRUM timestamps with other execution artifacts",
+    "Identify bandwidth-intensive applications and data transfer patterns",
+    "Use srum_dump and SrumECmd for SRUM parsing",
+    "Analyze application resource usage (CPU, memory, disk I/O)",
+    "Detect deleted applications through SRUM historical records",
+    "Build network activity timelines from SRUM data",
+    "Investigate insider threats using bandwidth consumption metrics",
+    "Apply SRUM forensics to APT lateral movement investigations"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q20_1",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question": "SRUM shows an application sent 15.7 GB of data over the network in the past 7 days. Which SRUM table contains this information?",
+      "options": [
+        "Application Resource Usage Provider",
+        "Network Data Usage Monitor",
+        "Energy Usage Provider",
+        "Application Timeline Provider"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Network Data Usage Monitor table (GUID {973F5D5C-1D90-4944-BE8E-24B94231A174}) tracks bytes sent and received per application. This table is critical for detecting data exfiltration because it shows: (1) Total bytes sent/received per application, (2) Interface type (WiFi, Ethernet, VPN), (3) User SID (which user account), (4) Timestamp ranges. In data theft investigations, sorting by BytesSent reveals exfiltration tools. For example: 15.7 GB sent by Dropbox.exe might be legitimate, but 15.7 GB sent by unknown.exe from C:\\Temp is highly suspicious. SRUM provides this data even if the application has been deleted."
+    },
+    {
+      "question_id": "q20_2",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "You're investigating suspected ransomware. SRUM shows `vssadmin.exe` consumed significant CPU resources at 14:25:00 on March 18. However, Prefetch for vssadmin.exe shows last run at 10:30:00 on March 10 (8 days earlier). What explains this discrepancy?",
+      "options": [
+        "SRUM timestamps are unreliable and should be ignored",
+        "Prefetch was cleared by the attacker, but SRUM preserves historical data",
+        "vssadmin.exe ran from C:\\Temp\\ (different copy than System32 version)",
+        "System clock was changed between the two executions"
+      ],
+      "correct_answer": 2,
+      "explanation": "SRUM tracks executable NAME, not full path, so multiple copies of vssadmin.exe (C:\\Windows\\System32\\vssadmin.exe vs. C:\\Temp\\vssadmin.exe) appear as the same entry in SRUM. Ransomware commonly copies legitimate Windows tools to staging directories. The Prefetch discrepancy reveals: (1) System32\\vssadmin.exe last ran March 10 (legitimate usage), (2) A DIFFERENT copy ran March 18 from Temp\\ (ransomware deleting shadow copies). Investigative steps: Check ShimCache for C:\\Temp\\vssadmin.exe entry, examine AmCache for SHA-1 hash comparison (both should match if copied), review Event 4688 for full command-line showing shadow deletion. SRUM's value here is detecting execution timeframes even when specific Prefetch files are missing or manipulated."
+    },
+    {
+      "question_id": "q20_3",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "SRUM Network Data Usage shows: Application='svchost.exe', BytesSent=0, BytesReceived=45.2 GB, Interface='Ethernet', User SID='S-1-5-21-...'. What is the MOST concerning aspect of this entry?",
+      "options": [
+        "svchost.exe should not use any network bandwidth",
+        "45.2 GB received with zero sent suggests large data download (possible malware payload, exfiltrated data retrieval)",
+        "Ethernet interface usage instead of WiFi is suspicious",
+        "The User SID indicates a non-admin account which cannot run svchost.exe"
+      ],
+      "correct_answer": 1,
+      "explanation": "The asymmetric traffic pattern (45.2 GB received, 0 bytes sent) is highly suspicious and suggests: (1) Large file downloads (malware payloads, tools, stolen databases being retrieved from C2), (2) One-way data transfer (no upload = possible attacker downloading previously staged data), (3) Bulk data ingestion (attacker pulling files from compromised cloud storage). svchost.exe IS a legitimate Windows service host that handles network traffic, but 45+ GB is excessive for normal operations. Investigative steps: (A) Check svchost.exe command-line in Event 4688 to identify which service (-k parameter), (B) Review network logs for destination IPs (external or internal?), (C) Correlate timestamp with firewall logs to identify contacted domains, (D) Examine Prefetch for DLLs loaded by this svchost instance (malicious DLL injection?). Legitimate svchost network usage (Windows Update, BITS) typically shows balanced sent/received or moderate volumes, not 45 GB one-way transfers."
+    },
+    {
+      "question_id": "q20_4",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "SRUM Application Resource Usage shows `powershell.exe` with 247 execution entries over 3 days, each lasting 2-5 seconds. Prefetch shows powershell.exe run count = 15. How can SRUM show MORE executions than Prefetch?",
+      "options": [
+        "SRUM is more accurate than Prefetch for execution counting",
+        "Prefetch was periodically cleared, but SRUM retains 30-day history",
+        "SRUM counts every PowerShell process spawn (including child processes), Prefetch counts unique parent executions",
+        "This indicates SRUM database corruption"
+      ],
+      "correct_answer": 2,
+      "explanation": "SRUM tracks EVERY process instance, including child processes spawned by scripts, while Prefetch counts parent process executions. For example: A single PowerShell script (.ps1) that spawns 20 child PowerShell processes creates: (1) 1 Prefetch entry (parent powershell.exe launch), (2) 20+ SRUM entries (each child process tracked separately). This is common in: (A) PowerShell scripts with Start-Process cmdlets, (B) Malware using PowerShell Empire or Cobalt Strike (beacon spawns multiple PS instances), (C) Scheduled tasks running PowerShell repeatedly. The 2-5 second duration per SRUM entry suggests automated, short-lived executions (characteristic of C2 beacons or reconnaissance scripts). Correlation strategy: Check SRUM timestamps for clustering (247 entries in 3 days = ~82/day = hourly beaconing?), review scheduled tasks for PowerShell entries, examine PowerShell event logs (4104 script block logging) for actual commands executed."
+    },
+    {
+      "question_id": "q20_5",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "You're investigating data exfiltration. SRUM shows total network activity for the past 30 days, but you need to identify WHICH FILES were transferred. What is SRUM's limitation?",
+      "options": [
+        "SRUM only tracks application names and bandwidth totals, not specific files or URLs transferred",
+        "SRUM data is encrypted and cannot be parsed without BitLocker keys",
+        "SRUM only retains 7 days of data, not 30 days",
+        "SRUM does not track network activity, only CPU/memory usage"
+      ],
+      "correct_answer": 0,
+      "explanation": "SRUM's limitation: It tracks WHICH APPLICATIONS used bandwidth and HOW MUCH data, but NOT specific files, URLs, or protocols. For file-level detail, correlate SRUM with: (1) **Browser history** (Chrome/Firefox SQLite databases) - shows URLs visited during SRUM-identified timeframes, (2) **LNK files** - reveals recently accessed files (cross-reference with SRUM timestamps), (3) **Network packet captures** - if available, filter by SRUM-identified application and timeframe, (4) **Cloud storage logs** (OneDrive, Dropbox) - check sync logs for file names, (5) **Firewall/proxy logs** - destination IPs and domains during exfiltration window, (6) **Jump Lists** - shows recent documents accessed by applications (e.g., which files were opened in 7-Zip before upload). Workflow: SRUM identifies WHEN exfiltration occurred and WHICH tool was used (e.g., FileZilla sent 8 GB at 14:30-15:45), then correlate with file-level artifacts to identify WHAT was stolen."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# System Resource Usage Monitor (SRUM) Forensics\n\n## Opening: The 30-Day Execution and Network Activity Database\n\nWelcome to SRUM—one of the most underutilized yet powerful forensic artifacts in Windows.\n\n**Why SRUM matters**: While Prefetch stores ~128 entries and ShimCache stores ~1,024, SRUM retains **30-60 days** of application execution and network usage data. This makes SRUM critical for:\n- Detecting deleted malware (SRUM entries persist after file deletion)\n- Tracking bandwidth usage per application (data exfiltration detection)\n- Building long-term execution timelines\n- Identifying resource-intensive malware (CPU/memory consumption)\n\n**Real-world case**: In a 2023 APT investigation, Prefetch showed no evidence of lateral movement tools (deleted by attackers). SRUM revealed psexec.exe consumed network bandwidth 47 times over 3 weeks, reconstructing the entire lateral movement timeline.\n\nLet's master SRUM forensics.\n\n---\n\n## Part 1: Understanding SRUM Structure\n\n### What is SRUM?\n\n**Purpose**: Windows System Resource Usage Monitor tracks application resource consumption for performance optimization and diagnostics.\n\n**Forensic value**: SRUM becomes a historical database of:\n- Application executions (with timestamps)\n- Network data usage (bytes sent/received per application)\n- Resource consumption (CPU, memory, disk I/O)\n- Energy usage (battery impact per application)\n\n**Database location**:\n```\nC:\\Windows\\System32\\sru\\SRUDB.dat\n```\n\n**Format**: Extensible Storage Engine (ESE) database (same format as Windows Search, Internet Explorer history)\n\n**Retention**: 30-60 days (configurable, default 60 days)\n\n### SRUM Tables (ESE Database Structure)\n\nSRUM contains multiple tables, each tracking different metrics:\n\n**1. Network Data Usage Monitor**\n- **GUID**: `{973F5D5C-1D90-4944-BE8E-24B94231A174}`\n- **Tracks**: Bytes sent/received per application, interface type (WiFi/Ethernet), user SID\n- **Forensic use**: Data exfiltration detection, bandwidth consumption analysis\n\n**2. Application Resource Usage Provider**\n- **GUID**: `{D10CA2FE-6FCF-4F6D-848E-B2E99266FA89}`\n- **Tracks**: CPU cycles, memory usage, disk I/O per application\n- **Forensic use**: Resource-intensive malware detection, crypto-mining identification\n\n**3. Application Timeline Provider**\n- **GUID**: `{5C8CF1C7-7257-4F13-B223-970EF5939312}`\n- **Tracks**: Application execution timestamps, duration\n- **Forensic use**: Execution timeline reconstruction\n\n**4. Energy Usage Provider**\n- **GUID**: `{FEE4E14F-02A9-4550-B5CE-5FA2DA202E37}`\n- **Tracks**: Battery consumption per application (laptops/tablets)\n- **Forensic use**: Identifying background processes, sustained malware activity\n\n**5. Windows Push Notification Provider**\n- **GUID**: `{D10CA2FE-6FCF-4F6D-848E-B2E99266FA86}`\n- **Tracks**: Push notification activity\n- **Forensic use**: Application communication patterns\n\n**Memory hook**: **SRUM = \"Super Retention of Usage Metrics\"** (30+ days of application activity)\n\n---\n\n## Part 2: Extracting SRUM Data\n\n### Tool 1: SrumECmd (Eric Zimmerman)\n\n**Recommended tool** for SRUM parsing.\n\n**Basic extraction**:\n```cmd\nSrumECmd.exe -f \"C:\\Evidence\\SRUDB.dat\" --csv \"C:\\Output\" -r \"C:\\Evidence\\SOFTWARE\"\n```\n\n**Parameters**:\n- `-f`: Path to SRUDB.dat file\n- `--csv`: Output directory for CSV files\n- `-r`: Path to SOFTWARE Registry hive (required for SID-to-username mapping)\n\n**Output**: Multiple CSV files, one per SRUM table:\n- `SRUM_Network_Data_Usage.csv`\n- `SRUM_Application_Resource_Usage.csv`\n- `SRUM_Application_Timeline.csv`\n- `SRUM_Energy_Usage.csv`\n\n**Sample Network Data output**:\n```csv\nTimestamp,Application,BytesSent,BytesReceived,InterfaceType,UserSID\n2024-03-18 14:30:00,chrome.exe,5242880,157286400,WiFi,S-1-5-21-...-1001\n2024-03-18 14:32:00,dropbox.exe,16777216000,1048576,Ethernet,S-1-5-21-...-1001\n2024-03-18 14:35:00,malware.exe,10485760000,0,Ethernet,S-1-5-21-...-1001\n```\n\n**Analysis**:\n- Chrome: 5 MB sent, 150 MB received (normal browsing)\n- Dropbox: **16 GB sent**, 1 MB received (massive upload = exfiltration?)\n- malware.exe: **10 GB sent**, 0 received (one-way data transfer = C2 exfiltration)\n\n### Tool 2: srum_dump (Python)\n\n**Open-source alternative** (GitHub: MarkBaggett/srum-dump)\n\n**Extraction**:\n```bash\npython srum_dump.py -i SRUDB.dat -r SOFTWARE -o output.xlsx\n```\n\n**Output**: Excel workbook with sheets for each SRUM table\n\n**Advantage**: Single Excel file (easier for non-technical stakeholders)\n\n**Disadvantage**: Requires Python dependencies (pyesedb, xlsxwriter)\n\n### Handling Locked Database\n\n**Problem**: SRUDB.dat is locked by Windows (in use by SRUM service)\n\n**Solutions**:\n\n**Option 1: Forensic imaging**\n- Extract from forensic image (DD, E01)\n- SRUDB.dat is unlocked in offline image\n\n**Option 2: Volume Shadow Copy**\n```powershell\nvssadmin list shadows\nmklink /d C:\\VSS_Mount \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\\ncopy C:\\VSS_Mount\\Windows\\System32\\sru\\SRUDB.dat C:\\Evidence\\\n```\n\n**Option 3: Robocopy with backup mode**\n```cmd\nrobocopy C:\\Windows\\System32\\sru C:\\Evidence SRUDB.dat /B /ZB\n```\n\n---\n\n## Part 3: Network Data Usage Analysis\n\n### Detecting Data Exfiltration\n\n**Workflow**: Sort SRUM Network Data by BytesSent (descending)\n\n**Sample analysis**:\n\n| Application | BytesSent | BytesReceived | User | Timeframe |\n|---|---|---|---|---|\n| chrome.exe | 45,000,000 | 1,200,000,000 | Alice | 30 days |\n| dropbox.exe | 18,000,000,000 | 5,000,000 | Alice | 30 days |\n| filezilla.exe | 12,500,000,000 | 0 | Alice | 7 days |\n| unknown.exe | 8,000,000,000 | 0 | Alice | 3 days |\n\n**Red flags**:\n\n1. **dropbox.exe: 18 GB uploaded**\n   - **Context needed**: Legitimate for cloud backup, or data exfiltration?\n   - **Check**: Dropbox sync logs, file modification times (MFT), user authorization\n\n2. **filezilla.exe: 12.5 GB uploaded, 0 received**\n   - **Suspicious**: FTP client with one-way upload (no downloads)\n   - **Action**: Check FileZilla logs (C:\\Users\\...\\AppData\\Roaming\\FileZilla), LNK files for uploaded documents\n\n3. **unknown.exe: 8 GB uploaded in 3 days**\n   - **Critical**: Unidentified application with massive data transfer\n   - **Action**: Search disk for unknown.exe (if deleted, check ShimCache/AmCache for path), VirusTotal hash lookup\n\n### Identifying Network Interface Usage\n\n**Interface types in SRUM**:\n- **WiFi**: Wireless connection\n- **Ethernet**: Wired connection\n- **VPN**: Virtual Private Network\n- **Mobile**: Cellular/tethering\n\n**Forensic significance**:\n\n**Example**:\n```\nApplication: tor.exe\nBytesReceived: 450,000,000\nInterface: VPN\nUser: Bob\n```\n\n**Interpretation**: User Bob ran Tor over VPN (double anonymization = high-risk behavior in corporate environment)\n\n**Investigation**: Check VPN logs for destination IPs, review acceptable use policy, examine browser history for darknet activity\n\n### User Attribution (SID Analysis)\n\n**SRUM tracks User SID** (Security Identifier) for each application\n\n**Example**:\n```\nApplication: psexec.exe\nBytesReceived: 250,000,000\nUser SID: S-1-5-21-3623811015-3361044348-30300820-1013\n```\n\n**SID resolution**:\n1. Cross-reference with SOFTWARE hive (SrumECmd does this automatically)\n2. Identify username: `DOMAIN\\ITAdmin`\n\n**Forensic value**: In multi-user systems, SRUM proves WHICH account executed suspicious applications\n\n---\n\n## Part 4: Application Resource Usage Analysis\n\n### Detecting Resource-Intensive Malware\n\n**CPU consumption analysis**:\n\nSort SRUM Application Resource Usage by CPU cycles (descending)\n\n**Sample findings**:\n\n| Application | CPU Cycles (billions) | Duration | Avg CPU % |\n|---|---|---|---|\n| svchost.exe | 45,000 | 30 days | 15% |\n| crypto_miner.exe | 230,000 | 14 days | 95% |\n| chrome.exe | 12,000 | 30 days | 5% |\n\n**Analysis**:\n- **crypto_miner.exe**: 95% sustained CPU usage = cryptocurrency mining malware\n- **Action**: Terminate process, quarantine executable, check parent process (how was it launched?), review scheduled tasks/services for persistence\n\n### Memory Usage Patterns\n\n**High memory consumption without user interaction**:\n\n```\nApplication: notepad.exe\nMemory (Peak): 8,500 MB (8.5 GB)\nExecution Count: 1\nDuration: 72 hours\n```\n\n**Red flag**: Notepad should use ~5-20 MB, not 8.5 GB\n\n**Possible causes**:\n1. **Process hollowing**: Legitimate notepad.exe replaced with malicious payload\n2. **DLL injection**: Malicious DLL loaded into notepad address space\n3. **Data staging**: Malware using notepad.exe as memory buffer before exfiltration\n\n**Investigation**: Check Event 4688 for notepad.exe parent process, examine loaded DLLs (via Prefetch or memory forensics), review network connections\n\n### Disk I/O Analysis\n\n**Excessive disk writes**:\n\n```\nApplication: ransomware.exe\nDisk Writes: 450 GB\nDuration: 45 minutes\nAvg Write Speed: 166 MB/s\n```\n\n**Interpretation**: 450 GB written in 45 minutes = file encryption (ransomware)\n\n**Correlation**:\n- Check MFT for mass file modifications at same timestamp\n- Review Volume Shadow Copy service logs (Event 8224 - shadow deletion)\n- Examine Prefetch for vssadmin.exe, cipher.exe (backup deletion tools)\n\n---\n\n## Part 5: Building Execution Timelines\n\n### SRUM Application Timeline Table\n\n**Data provided**:\n- Application name\n- First execution timestamp\n- Duration (seconds)\n- User SID\n\n**Sample timeline**:\n\n```\n2024-03-15 08:30:00 | phish.exe | 5 seconds | User: Alice\n2024-03-15 08:30:10 | powershell.exe | 120 seconds | User: Alice\n2024-03-15 08:32:15 | mimikatz.exe | 15 seconds | User: Alice\n2024-03-15 08:32:35 | psexec.exe | 8 seconds | User: Alice\n```\n\n**Attack chain reconstruction**:\n1. Phishing payload executed (5 sec = dropper)\n2. PowerShell launched (2 min = post-exploitation script)\n3. Mimikatz credential theft (15 sec)\n4. PsExec lateral movement (8 sec)\n\n**Advantage over Prefetch**: SRUM shows execution DURATION, helping distinguish quick reconnaissance from sustained activity\n\n### Correlation with Other Artifacts\n\n**Multi-artifact timeline**:\n\n| Time | Artifact | Finding |\n|---|---|---|\n| 14:25:00 | ShimCache | malware.exe in Downloads |\n| 14:25:05 | Prefetch | malware.exe first run |\n| 14:25:05 | SRUM Timeline | malware.exe execution start |\n| 14:25:10 | SRUM Network | malware.exe sent 150 MB |\n| 14:27:00 | SRUM Resource | malware.exe consumed 25% CPU |\n| 14:45:00 | SRUM Timeline | malware.exe execution end (20 min duration) |\n\n**Comprehensive picture**: Malware executed for 20 minutes, consumed 25% CPU, sent 150 MB to C2 server\n\n---\n\n## Part 6: Real-World Case Study\n\n### Case: 2023 Insider Threat - Healthcare Data Exfiltration\n\n**Background**: Hospital suspected nurse of stealing patient records.\n\n**SRUM Analysis**:\n\n**Network Data Usage** (sorted by BytesSent):\n\n```csv\nApplication,BytesSent,BytesReceived,Timeframe\nfirefox.exe,125000000,4500000000,30 days\noutlook.exe,85000000,950000000,30 days\ndropbox.exe,45000000000,25000000,14 days\npatient_export.exe,38000000000,0,7 days\n```\n\n**Red flags**:\n1. **dropbox.exe: 45 GB uploaded** in 14 days (abnormal for nursing staff)\n2. **patient_export.exe: 38 GB uploaded** with ZERO download (one-way exfiltration)\n\n**Application Resource Usage**:\n\n```csv\nApplication,ExecutionCount,TotalDuration,AvgCPU\npatient_export.exe,23,82800 seconds (23 hours),15%\n```\n\n**Analysis**: patient_export.exe ran 23 times with cumulative 23 hours of runtime (sustained, repeated usage)\n\n**Correlation with UserAssist**:\n\n```\npatient_export.exe\nLast Execution: 2024-02-20 18:45:00 (after shift)\nRun Count: 23\nFocus Time: 14,500,000 ms (4 hours)\n```\n\n**Timeline reconstruction**:\n\n```\nFeb 10, 14:30 - patient_export.exe first execution (SRUM Timeline)\nFeb 10-20 - 23 executions over 10 days (SRUM)\nFeb 10-20 - 38 GB uploaded via patient_export.exe (SRUM Network)\nFeb 10-20 - 45 GB uploaded via Dropbox (SRUM Network)\nTotal exfiltrated: 83 GB\n```\n\n**Investigation findings**:\n- patient_export.exe = custom SQL export tool (unauthorized)\n- Dropbox uploads contained 12,450 patient records (PHI violation)\n- SRUM showed executions occurred AFTER shifts (18:00-21:00 = off-hours access)\n\n**Legal outcome**:\n- SRUM network data proved 83 GB exfiltration\n- Application timeline showed sustained, deliberate activity (23 executions)\n- Resource usage metrics corroborated UserAssist (23-hour cumulative runtime)\n- Nurse prosecuted for HIPAA violation, sentenced to 2 years\n\n**SRUM's critical role**: Even though patient_export.exe was DELETED before forensic analysis, SRUM preserved 30 days of execution history, network usage, and resource consumption—providing irrefutable evidence.\n\n---\n\n## Part 7: Advanced Techniques\n\n### Detecting Deleted Malware\n\n**Scenario**: Attacker deletes malware after execution\n\n**SRUM advantage**: Entries persist for 30-60 days after file deletion\n\n**Workflow**:\n1. Extract SRUM Application Timeline\n2. Identify executables NOT found on current filesystem\n3. Cross-reference with ShimCache (path information)\n4. Search MFT for deleted entries ($FILE_NAME records)\n5. File carving from unallocated space\n\n**Example**:\n```\nSRUM: backdoor.exe executed 47 times (14:30-18:45)\nFilesystem: backdoor.exe NOT FOUND\nShimCache: C:\\Users\\Public\\backdoor.exe (LastModified: 2024-03-18)\nMFT: Deleted entry shows original file size 2.5 MB, creation time 14:25:00\n```\n\n**Recovery**: File carving recovers backdoor.exe, hash submitted to VirusTotal = malware confirmed\n\n### Identifying Long-Running Background Processes\n\n**SRUM Energy Usage Provider** (laptops)\n\n**Sample findings**:\n\n```\nApplication: update_service.exe\nEnergy Consumption: 45,000 mWh\nDuration: 720 hours (30 days continuous)\n```\n\n**Interpretation**: Process ran continuously for 30 days in background (persistence mechanism)\n\n**Investigation**: Check Services Registry (`HKLM\\SYSTEM\\...\\Services`) for update_service entry, examine ImagePath, verify digital signature\n\n### Network Activity Clustering\n\n**Pattern recognition**: Group applications by network activity patterns\n\n**Cluster 1: Normal business applications**\n```\noutlook.exe: 50 MB sent, 200 MB received\nteams.exe: 30 MB sent, 150 MB received\nchrome.exe: 20 MB sent, 500 MB received\n```\n\n**Cluster 2: Exfiltration tools**\n```\nfilezilla.exe: 8 GB sent, 0 received\ntor.exe: 5 GB sent, 50 MB received\nunknown.exe: 12 GB sent, 0 received\n```\n\n**Statistical outlier detection**: Applications with BytesSent > 3 standard deviations above mean = exfiltration candidates\n\n---\n\n## Closing: SRUM is Your Long-Term Execution Archive\n\nYou've mastered SRUM forensics. You can now:\n\n✅ Extract SRUM data with SrumECmd and srum_dump\n✅ Analyze network usage for data exfiltration detection\n✅ Track application resource consumption (CPU, memory, disk I/O)\n✅ Build 30-60 day execution timelines\n✅ Detect deleted malware through historical SRUM records\n✅ Correlate SRUM with Prefetch, AmCache, UserAssist for comprehensive analysis\n✅ Investigate insider threats using bandwidth metrics\n✅ Identify crypto-mining malware through CPU consumption analysis\n\n**Your competitive advantage**: SRUM provides execution evidence that persists long after Prefetch entries are purged and files are deleted. While others analyze point-in-time snapshots, you reconstruct month-long attack campaigns.\n\n**Next lesson**: **Execution Timeline Creation** - Combine ALL execution artifacts (Prefetch + AmCache + ShimCache + UserAssist + SRUM + BAM/DAM) into master forensic timelines.\n\n**Practice**: Extract SRUM from your own system, analyze your bandwidth usage by application. Identify which programs consume the most network/CPU resources.\n\nYou're building unstoppable execution forensics expertise. Keep going! 🚀"
+      }
+    }
+  ],
+  "tags": [
+    "Course: 13Cubed-Investigating Windows Endpoints"
+  ]
+}
