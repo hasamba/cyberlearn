@@ -27,6 +27,7 @@ Validates:
 ✓ Placeholder text detection (TODO, TBD, [INSERT], etc.)
 ✓ Empty content blocks (excluding video/diagram/quiz)
 ✓ Very short content blocks (< 10 words, may be incomplete)
+✓ Content duplication (identical or >90% similar content across blocks)
 
 Output:
 - Per-lesson validation results
@@ -117,6 +118,9 @@ class LessonValidator:
 
         # Check for placeholder text
         self._check_placeholder_text(lesson_data)
+
+        # Check for content duplication
+        self._check_content_duplication(lesson_data)
 
         is_compliant = len(self.issues) == 0
 
@@ -323,6 +327,65 @@ class LessonValidator:
                     f"Content block {i} ({block_type}) has very short content: {word_count} words "
                     f"(may be incomplete)"
                 )
+
+    def _check_content_duplication(self, lesson: dict):
+        """Check for duplicated content across blocks"""
+        if 'content_blocks' not in lesson:
+            return
+
+        blocks = lesson['content_blocks']
+        seen_content = {}  # Maps normalized content to block index
+
+        for i, block in enumerate(blocks):
+            block_type = block.get('type', 'unknown')
+            content = block.get('content', {})
+
+            # Extract text from content
+            if isinstance(content, dict):
+                text = content.get('text', '')
+            elif isinstance(content, str):
+                text = content
+            else:
+                text = ''
+
+            if not text or len(text.strip()) < 50:
+                # Skip very short content (likely titles, URLs, etc.)
+                continue
+
+            # Normalize text for comparison (lowercase, strip whitespace, collapse spaces)
+            normalized = ' '.join(text.lower().split())
+
+            # Check if we've seen this exact content before
+            if normalized in seen_content:
+                prev_index = seen_content[normalized]
+                prev_type = blocks[prev_index].get('type', 'unknown')
+                self.issues.append(
+                    f"Content blocks {prev_index} ({prev_type}) and {i} ({block_type}) "
+                    f"contain identical content (possible copy-paste error)"
+                )
+            else:
+                # Check for substantial overlap (>90% similar)
+                for existing_content, existing_index in seen_content.items():
+                    # Simple similarity check: count matching words
+                    normalized_words = set(normalized.split())
+                    existing_words = set(existing_content.split())
+
+                    if not normalized_words or not existing_words:
+                        continue
+
+                    intersection = normalized_words & existing_words
+                    union = normalized_words | existing_words
+                    similarity = len(intersection) / len(union)
+
+                    if similarity > 0.9:  # >90% similar
+                        existing_type = blocks[existing_index].get('type', 'unknown')
+                        self.warnings.append(
+                            f"Content blocks {existing_index} ({existing_type}) and {i} ({block_type}) "
+                            f"have very similar content ({similarity*100:.0f}% overlap)"
+                        )
+                        break
+
+                seen_content[normalized] = i
 
 
 def validate_all_lessons(content_dir: Path = Path('content')) -> Dict:

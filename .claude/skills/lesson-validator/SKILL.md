@@ -75,12 +75,18 @@ Automatically invoke when:
    - code_exercise
    - mindset_coach
 
-6. **Run comprehensive_fix.py** if errors found:
+6. **Check for content duplication**:
+   - Detect identical content across blocks (exact duplicates)
+   - Detect very similar content (>90% overlap)
+   - Flag as critical issue (likely copy-paste error)
+   - Common issue: Same content repeated in multiple sections
+
+7. **Run comprehensive_fix.py** if errors found:
    ```bash
    python comprehensive_fix.py
    ```
 
-7. **Test loading**:
+8. **Test loading**:
    ```bash
    python load_all_lessons.py 2>&1 | grep -A 5 "lesson_<domain>_<order>"
    ```
@@ -110,6 +116,7 @@ Errors found:
 1. post_assessment[2] missing "difficulty" field
 2. jim_kwik_principles contains invalid value: "real_world_application"
 3. content_blocks[5] has invalid type: "concept_deep_dive"
+4. Content blocks 3 (explanation) and 7 (real_world) contain identical content
 
 🔧 FIXES APPLIED:
 - Added difficulty=2 to question 3
