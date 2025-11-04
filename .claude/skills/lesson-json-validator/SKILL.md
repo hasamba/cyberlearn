@@ -1,11 +1,11 @@
 ---
-name: lesson-validator
+name: lesson-json-validator
 description: Validate CyberLearn lesson JSON files and suggest fixes for validation errors
 version: 1.0
 auto_invoke: true
 ---
 
-# Lesson Validator Skill
+# Lesson JSON Validator Skill
 
 Automatically validate lesson JSON files and provide actionable fix suggestions.
 
@@ -154,3 +154,4 @@ Status: Ready to commit
 - Works with **lesson-generator** to validate generated lessons
 - Works with **batch-lesson-generator** to validate batches
 - Works with **git-commit-helper** before committing
+- Complements **validate_lesson_compliance.py** script for automated validation
