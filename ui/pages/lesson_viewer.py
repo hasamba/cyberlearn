@@ -311,11 +311,13 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 ):
                     st.session_state.current_lesson = lesson
                     st.session_state.current_page = "lesson"
+                    st.session_state.current_block_index = 0  # Start at beginning
                     st.session_state.scroll_to_top = True
-                    # Update URL with lesson info
+                    # Update URL with lesson info and block_index
                     st.query_params.update({
                         "page": "lesson",
-                        "lesson_id": str(lesson.lesson_id)
+                        "lesson_id": str(lesson.lesson_id),
+                        "block_index": "0"
                     })
                     st.rerun()
 

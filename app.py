@@ -105,6 +105,17 @@ def sync_url_to_session_state():
                 st.session_state.current_lesson = lesson
                 st.session_state.current_page = "lesson"
 
+    # Sync block_index from URL if present (for lesson section navigation)
+    if "block_index" in params:
+        try:
+            block_index = int(params["block_index"])
+            # Validate block_index is non-negative
+            if block_index >= 0:
+                st.session_state.current_block_index = block_index
+        except (ValueError, TypeError):
+            # Invalid block_index - ignore it
+            pass
+
 
 def sync_session_state_to_url():
     """Sync session state to URL query parameters (for shareable links)"""
@@ -117,6 +128,10 @@ def sync_session_state_to_url():
     # Add lesson ID if viewing a lesson
     if st.session_state.current_page == "lesson" and st.session_state.get("current_lesson"):
         params["lesson_id"] = str(st.session_state.current_lesson.lesson_id)
+
+        # Add block_index if it exists (for lesson section navigation)
+        if "current_block_index" in st.session_state:
+            params["block_index"] = str(st.session_state.current_block_index)
 
     # Clear and set URL parameters (prevents old params from persisting)
     st.query_params.clear()
