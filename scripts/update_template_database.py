@@ -17,8 +17,10 @@ import sys
 
 def update_template_database():
     """Update template database from working database"""
-    working_db = Path(__file__).parent / "cyberlearn.db"
-    template_db = Path(__file__).parent / "cyberlearn_template.db"
+    # Look in parent directory (project root) for database files
+    project_root = Path(__file__).parent.parent
+    working_db = project_root / "cyberlearn.db"
+    template_db = project_root / "cyberlearn_template.db"
 
     print("=" * 60)
     print("UPDATE TEMPLATE DATABASE")
