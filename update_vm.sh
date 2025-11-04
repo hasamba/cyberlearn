@@ -46,12 +46,40 @@ if [ -f "cyberlearn.db" ]; then
             echo "Run the app: streamlit run app.py"
             break
         elif [[ $REPLY =~ ^[Nn]$ ]]; then
-            echo "Keeping existing database (tags may be outdated)"
+            echo "Keeping existing database"
             echo ""
-            echo "To update database later, run:"
-            echo "  rm cyberlearn.db"
-            echo "  python setup_database.py"
-            break
+
+            # Ask about updating outdated lessons
+            while true; do
+                read -p "Check for lesson content updates? This preserves user data (y/n): " -n 1 -r
+                echo ""
+
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo ""
+                    echo "Checking for outdated lessons..."
+                    python scripts/update_outdated_lessons.py
+
+                    echo ""
+                    echo "============================================================"
+                    echo "✅ VM UPDATED - Lessons synced, user data preserved!"
+                    echo "============================================================"
+                    echo ""
+                    echo "Run the app: streamlit run app.py"
+                    break 2
+                elif [[ $REPLY =~ ^[Nn]$ ]]; then
+                    echo "Skipping lesson updates"
+                    echo ""
+                    echo "To update lessons later, run:"
+                    echo "  python scripts/update_outdated_lessons.py"
+                    echo ""
+                    echo "To recreate database from scratch, run:"
+                    echo "  rm cyberlearn.db"
+                    echo "  python setup_database.py"
+                    break 2
+                else
+                    echo "Invalid input. Please enter 'y' or 'n'."
+                fi
+            done
         else
             echo "Invalid input. Please enter 'y' or 'n'."
         fi

@@ -4,7 +4,9 @@
   "title": "YARA Scanning in Memory: Detecting Malware Families in RAM",
   "difficulty": 2,
   "order_index": 49,
-  "prerequisites": ["b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e"],
+  "prerequisites": [
+    "b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e"
+  ],
   "concepts": [
     "YARA rule syntax and pattern matching",
     "Volatility yarascan plugin for memory scanning",
@@ -96,16 +98,30 @@
   ],
   "jim_kwik_principles": [
     "active_learning",
+    "minimum_effective_dose",
     "teach_like_im_10",
     "memory_hooks",
+    "meta_learning",
     "connect_to_what_i_know",
-    "minimum_effective_dose"
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {
       "type": "mindset_coach",
       "content": {
         "text": "# Welcome to YARA Scanning in Memory!\n\nYou're about to learn one of the most powerful malware hunting techniques: using **YARA rules** to detect malware families across memory dumps.\n\nThink about your workflow so far:\n- Lesson 48: You extracted malware from memory (procdump)\n- You analyzed it and found unique strings (\"EmotetLoader\", C2 URLs, Bitcoin addresses)\n- You identified one infected system\n\n**But what about the OTHER 500 endpoints in your network?**\n\nThis is where YARA becomes your superpower:\n\n1. **Create YARA signature** from extracted malware\n2. **Scan all memory dumps** with that signature  \n3. **Find every infected system** automatically\n4. **No manual analysis needed** - YARA does the hunting\n\nReal-world example: **2017 WannaCry ransomware outbreak**\n- Researchers extracted WannaCry from memory\n- Created YARA rule detecting 'tasksche.exe' (dropped filename) + 'WanaCrypt0r' strings\n- Rule shared globally within hours\n- Organizations scanned networks finding infections before encryption triggered\n- **YARA signatures saved millions in ransomware payments**\n\nYou'll learn to write rules that detect:\n- Malware families (Emotet, TrickBot, Cobalt Strike)\n- Specific techniques (process injection, credential dumping)\n- Custom threats unique to your organization\n\nLet's master YARA memory scanning!"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "**Video: Memory Forensics with Volatility - 13Cubed**\\n\\n**Duration**: 25:15\\n\\nThis video provides a visual demonstration of the concepts covered in this lesson. Watch to see practical examples and deepen your understanding of YARA Scanning in Memory: Detecting Malware Families in RAM.\\n\\n**Video Link**: [Memory Forensics with Volatility - 13Cubed](https://www.youtube.com/watch?v=BMFCdAGxVN4)\\n\\n**Embedded Video**:\\n\\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/BMFCdAGxVN4\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>\\n\\n**Learning Tips**:\\n- Watch the video first to get an overview\\n- Pause and take notes on key concepts\\n- Replay sections that cover complex topics\\n- Try to practice along with the video demonstrations\\n- Return to the video as needed while working through exercises",
+        "url": "https://www.youtube.com/watch?v=BMFCdAGxVN4",
+        "title": "Memory Forensics with Volatility - 13Cubed",
+        "duration": "25:15"
       }
     },
     {

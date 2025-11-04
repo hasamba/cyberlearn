@@ -118,6 +118,15 @@
       }
     },
     {
+      "type": "video",
+      "content": {
+        "text": "**Video: Linux Forensics Fundamentals - 13Cubed**\\n\\n**Duration**: 28:45\\n\\nThis video provides a visual demonstration of the concepts covered in this lesson. Watch to see practical examples and deepen your understanding of Linux File and Directory Permissions.\\n\\n**Video Link**: [Linux Forensics Fundamentals - 13Cubed](https://www.youtube.com/watch?v=oNgQX8E5gPs)\\n\\n**Embedded Video**:\\n\\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/oNgQX8E5gPs\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>\\n\\n**Learning Tips**:\\n- Watch the video first to get an overview\\n- Pause and take notes on key concepts\\n- Replay sections that cover complex topics\\n- Try to practice along with the video demonstrations\\n- Return to the video as needed while working through exercises",
+        "url": "https://www.youtube.com/watch?v=oNgQX8E5gPs",
+        "title": "Linux Forensics Fundamentals - 13Cubed",
+        "duration": "28:45"
+      }
+    },
+    {
       "type": "explanation",
       "content": {
         "text": "# Linux Permission Model\n\n## Basic Permission Structure\n\nEvery file and directory has three permission sets:\n- **User (u)**: The file owner\n- **Group (g)**: Users in the file's group  \n- **Others (o)**: Everyone else\n\nEach set has three permission types:\n- **Read (r)**: View file contents or list directory\n- **Write (w)**: Modify file or create/delete files in directory\n- **Execute (x)**: Run file or enter directory\n\n## Permission String Format\n\n```\n-rwxr-xr--\n│││││││││\n│└────────── User permissions (rwx)\n│ └──────── Group permissions (r-x)\n│  └────── Other permissions (r--)\n└────────── File type (- = file, d = directory, l = link)\n```bash\n\n## Numeric Notation\n\nPermissions can be expressed as numbers:\n- Read = 4\n- Write = 2  \n- Execute = 1\n\nAdd them up:\n- rwx = 4+2+1 = 7\n- rw- = 4+2+0 = 6\n- r-x = 4+0+1 = 5\n- r-- = 4+0+0 = 4\n\nExample: **755** = rwxr-xr-x (owner: all, group: read+execute, others: read+execute)\n\n## Special Permissions\n\n### SUID (Set User ID) - 4000\nFile executes with owner's permissions, not executor's.\n```bash\n-rwsr-xr-x  /usr/bin/passwd  # Runs as root\n```\nForensic importance: SUID binaries owned by root can be exploited for privilege escalation.\n\n### SGID (Set Group ID) - 2000  \nFiles inherit directory's group.\n```bash\ndrwxrwsr-x  /shared/project  # New files inherit project group\n```bash\n\n### Sticky Bit - 1000\nOnly owner can delete files in directory.\n```bash\ndrwxrwxrwt  /tmp  # Users can't delete each other's files\n```bash\n\n## Forensic Analysis\n\nFind dangerous permissions:\n```bash\n# World-writable files\nfind / -perm -002 -type f\n\n# SUID binaries  \nfind / -perm -4000 -type f\n\n# Files with no owner\nfind / -nouser -o -nogroup\n```"
