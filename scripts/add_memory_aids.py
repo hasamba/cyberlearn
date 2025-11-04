@@ -698,7 +698,286 @@ Q: Attacker modifies DNS records to redirect traffic. Which CIA principle is vio
 A: **Integrity** - data has been tampered with"""
     },
 
-    "lesson_fundamentals_07_common_vulnerabilities_RICH.json": {
+    "lesson_dfir_02_incident_response_RICH.json": {
+        "text": """**Memory Aid: Incident Response Process - "PICERL"**
+
+Remember the six phases of incident response with **PICERL** (pronounced "pickle"):
+
+**P**reparation - Set up tools, processes, and team before incidents
+**I**dentification - Detect and confirm security incidents
+**C**ontainment - Limit damage and prevent spread
+**E**radication - Remove threat from environment
+**R**ecovery - Restore systems to normal operations
+**L**essons Learned - Post-incident analysis and improvement
+
+**Detailed Mnemonic: "Please Investigate Carefully, Eradicate Rapidly, Learn"**
+
+**Containment Types - "SSH":**
+**S**hort-term containment - Quick isolation (network isolation, account disable)
+**S**ystem backup - Preserve evidence before eradication
+**H**ard containment - Long-term isolation (rebuild systems, patch vulnerabilities)
+
+**Order of Volatility (Data Collection) - "RAM CRASHD":**
+**R**egisters & Cache
+**A**ctive network connections
+**M**emory (RAM)
+**C**ommand history
+**R**unning processes
+**A**rtifacts (event logs, registry)
+**S**wap/page files
+**H**ard drive/Disk
+**D**ata backups
+
+**Severity Levels - "CLIMT":**
+**C**ritical - Immediate threat to business operations
+**L**ow - Minimal impact
+**I**nformation - FYI, no action needed
+**M**edium - Moderate impact
+**T**ime-sensitive - High impact
+
+**Communication During IR - "SWAT Team":**
+**S**takeholders - Keep leadership informed
+**W**orkforce - Internal communication
+**A**uthorities - Law enforcement if needed
+**T**echnical team - Coordinate response actions
+
+**Visual Memory Aid:**
+```
+INCIDENT OCCURS
+      ↓
+[P] Preparation ← (Done before incident)
+      ↓
+[I] Identification ← "What happened?"
+      ↓
+[C] Containment ← "Stop the bleeding"
+      ↓
+[E] Eradication ← "Remove the threat"
+      ↓
+[R] Recovery ← "Back to normal"
+      ↓
+[L] Lessons Learned ← "How do we prevent this?"
+```
+
+**Quick Recall:** You detect ransomware encrypting files. What's your PICERL action order?
+- **I**dentify: Confirm ransomware variant
+- **C**ontain: Isolate infected systems from network
+- **E**radicate: Remove malware, check for persistence
+- **R**ecover: Restore from clean backups
+- **L**earn: Review how ransomware entered, improve defenses"""
+    },
+
+    "lesson_dfir_04_disk_forensics_file_systems_RICH.json": {
+        "text": """**Memory Aid: Order of Volatility - "RAM CRASHD"**
+
+When collecting forensic evidence, remember the order from most to least volatile with **RAM CRASHD**:
+
+**R**egisters & CPU Cache
+**A**ctive network connections & ARP cache
+**M**emory (RAM)
+**C**ommand history (bash_history, PowerShell history)
+**R**unning processes & loaded modules
+**A**rtifacts (event logs, registry, temp files)
+**S**wap/Page files
+**H**ard drive / Disk
+**D**ata backups & archives
+
+**Mnemonic:** "**R**acing **A**gainst **M**emory loss, **C**ollect **R**apidly **A**ll **S**ystem **H**istory **D**ata"
+
+**NTFS Forensic Artifacts - "MUFT":**
+**M**FT ($MFT) - Master File Table (all file metadata)
+**U**SN Journal ($UsnJrnl) - File system change log
+**F**ile names ($I30) - Directory indexes
+**T**imestamps (MACB) - Modified, Accessed, Changed, Birth
+
+**MACB Timestamps Memory - "Make A Change, Baby":**
+**M**odified (M) - File content changed
+**A**ccessed (A) - File was read
+**C**hanged (C) - Metadata changed (rename, permissions)
+**B**irth (B) - File created (Born)
+
+**File Signature Memory - Magic Bytes:**
+- **PDF** = `%PDF` (25 50 44 46)
+- **ZIP** = `PK` (50 4B)
+- **JPEG** = `FF D8 FF`
+- **PNG** = `89 50 4E 47`
+- **EXE** = `MZ` (4D 5A)
+
+**Remember:** "**P**lease **K**eep **M**agic **Z**ips" for common signatures
+
+**Alternate Data Streams (ADS) - The Hidden Files:**
+- Normal file: `file.txt`
+- Hidden stream: `file.txt:hidden.exe`
+- **Memory hook:** "**ADS** = **A**lternate **D**ata = **S**ecret data hidden"
+
+**Slack Space Types - "FR":**
+**F**ile slack - Unused space between end of file and end of cluster
+**R**AM slack - Unused space between end of file and end of sector
+
+**Visual Memory Aid - Disk Structure:**
+```
+┌─────────────────────────────────────┐
+│  MBR (Master Boot Record)           │ ← Sector 0
+├─────────────────────────────────────┤
+│  Partition Table                    │
+├─────────────────────────────────────┤
+│  Boot Sector (VBR)                  │
+├─────────────────────────────────────┤
+│  $MFT (Master File Table)           │ ← File metadata
+├─────────────────────────────────────┤
+│  File System Data                   │
+│  (Your files and folders)           │
+└─────────────────────────────────────┘
+```
+
+**Forensic Tool Memory - "FASTE":**
+**F**TK (Forensic Toolkit)
+**A**utopsy (Open source)
+**S**leuth Kit (Command line)
+**T**SK (The Sleuth Kit utilities)
+**E**nCase (Commercial)
+
+**Quick Recall:** You find a suspicious file named `document.pdf:malware.exe`. What forensic concept is this?
+Answer: **Alternate Data Stream (ADS)** - hiding malware in ADS of PDF file"""
+    },
+
+    "lesson_fundamentals_04_network_security_RICH.json": {
+        "text": """**Memory Aid: OSI Model - "Please Do Not Throw Sausage Pizza Away"**
+
+Remember the 7 layers of the OSI model from Layer 1 to Layer 7:
+
+**P**hysical (Layer 1) - Cables, electrical signals, bits
+**D**ata Link (Layer 2) - MAC addresses, switches, frames
+**N**etwork (Layer 3) - IP addresses, routers, packets
+**T**ransport (Layer 4) - TCP/UDP, ports, segments
+**S**ession (Layer 5) - Session management, connections
+**P**resentation (Layer 6) - Data formatting, encryption
+**A**pplication (Layer 7) - HTTP, FTP, SMTP, user applications
+
+**Layer Device Memory - "HSwitch, Rout-3, Fire-3-7":**
+- **Hub** operates at Layer **1** (Physical)
+- **Switch** operates at Layer **2** (Data Link)
+- **Router** operates at Layer **3** (Network)
+- **Firewall** operates at Layer **3-7** (Network to Application)
+
+**TCP vs UDP - "Reliable vs Rapid":**
+
+**TCP (Transmission Control Protocol)** = **"The Careful Protocol"**
+- **C**onnection-oriented
+- **A**cknowledgments required
+- **R**eliable delivery
+- **E**rror checking
+- **S**low but sure
+
+**UDP (User Datagram Protocol)** = **"The Uncaring Deliverer Protocol"**
+- **U**nreliable (no guarantees)
+- **D**atagram (fire and forget)
+- **P**erformance over reliability (fast!)
+
+**Common Port Numbers - "The Essential Dozen":**
+```
+20/21   FTP     "2 ports for FTP"
+22      SSH     "Two 2wos = 22 SSH"
+23      Telnet  "23 = Old and insecure"
+25      SMTP    "25 sends mail"
+53      DNS     "53 = DNS (Domain Name System)"
+80      HTTP    "80 = 80s internet (plain web)"
+110     POP3    "110 = Pick up mail (P = 110)"
+143     IMAP    "143 = I Manage email (IMAP)"
+443     HTTPS   "443 = 4 letters (HTTP) + S = secure web"
+3389    RDP     "3389 = 3 + 8 + 9 = 20 (Remote 2020 vision - Desktop)"
+```
+
+**Three-Way Handshake (TCP) - "SYN, SYN-ACK, ACK":**
+```
+Client → [SYN] → Server          "Let's talk?"
+Client ← [SYN-ACK] ← Server      "Sure, ready!"
+Client → [ACK] → Server          "Great, here's data"
+```
+
+**Visual Memory Aid - Where Attacks Happen:**
+```
+Layer 7 (Application) ← SQL Injection, XSS, CSRF
+Layer 4 (Transport)   ← SYN Flood, Port Scanning
+Layer 3 (Network)     ← IP Spoofing, ICMP Flood
+Layer 2 (Data Link)   ← ARP Poisoning, MAC Flooding
+Layer 1 (Physical)    ← Cable cutting, Jamming
+```
+
+**Quick Recall Test:**
+Q: Attacker performs ARP poisoning. Which OSI layer?
+A: **Layer 2 (Data Link)** - ARP operates at MAC address level
+
+Q: You need reliable file transfer. TCP or UDP?
+A: **TCP** - file transfer requires guaranteed delivery"""
+    },
+
+    "lesson_fundamentals_05_cia_triad_security_principles_RICH.json": {
+        "text": """**Memory Aid: CIA Triad - "Confidential Integrity Available"**
+
+The three pillars of information security:
+
+**C**onfidentiality - Keep data private (only authorized access)
+**I**ntegrity - Keep data accurate (prevent unauthorized modification)
+**A**vailability - Keep data accessible (systems up and running)
+
+**Mnemonic:** "**C**an **I**nformation be **A**ccessed correctly and safely?"
+
+**Confidentiality Controls - "EACL":**
+**E**ncryption (AES, RSA)
+**A**ccess controls (RBAC, ACLs)
+**C**lassification (Top Secret, Confidential, Public)
+**L**east privilege (minimum necessary access)
+
+**Integrity Controls - "HAVOC":**
+**H**ashing (SHA-256 verify data hasn't changed)
+**A**ccess controls (prevent unauthorized modification)
+**V**ersioning (track changes, rollback if needed)
+**O**peration logging (audit trails)
+**C**hecksums (detect corruption)
+
+**Availability Controls - "RBFD":**
+**R**edundancy (backup systems)
+**B**ackups (regular data backups)
+**F**ailover (automatic switchover to backup)
+**D**DOS protection (prevent availability attacks)
+
+**Visual Memory Aid - The Security Triangle:**
+```
+           Confidentiality
+                 △
+                ╱ ╲
+               ╱   ╲
+              ╱  CIA ╲
+             ╱ Triad  ╲
+            ╱─────────╲
+    Integrity         Availability
+```
+
+**Attack Type by CIA Impact:**
+- **Confidentiality** breach = Data leak, eavesdropping, theft
+  - Example: Password database stolen
+- **Integrity** breach = Data tampering, unauthorized modification
+  - Example: Malware modifying system files
+- **Availability** breach = DoS, ransomware, system destruction
+  - Example: DDoS takes website offline
+
+**Related Concepts - "CIA's Friends: AAA":**
+**A**uthentication - Verify identity ("Who are you?")
+**A**uthorization - Grant permissions ("What can you do?")
+**A**ccounting - Track actions ("What did you do?")
+
+**Quick Recall Test:**
+Q: Ransomware encrypts all company files. Which CIA principle is violated?
+A: **Availability** - data exists but cannot be accessed
+
+Q: Attacker intercepts and reads email traffic. Which CIA principle is violated?
+A: **Confidentiality** - unauthorized access to private data
+
+Q: Attacker modifies DNS records to redirect traffic. Which CIA principle is violated?
+A: **Integrity** - data has been tampered with"""
+    },
+
+    "lesson_fundamentals_06_common_vulnerabilities_owasp_top_10_RICH.json": {
         "text": """**Memory Aid: OWASP Top 10 (2021) - "BAC IS SLICK SS"**
 
 Remember the OWASP Top 10 web vulnerabilities with this mnemonic:
