@@ -4,7 +4,9 @@
   "title": "Memory Timeline Reconstruction and Analysis",
   "difficulty": 3,
   "order_index": 56,
-  "prerequisites": ["c0d1e2f3-a4b5-6c7d-8e9f-0a1b2c3d4e5f"],
+  "prerequisites": [
+    "c0d1e2f3-a4b5-6c7d-8e9f-0a1b2c3d4e5f"
+  ],
   "concepts": [
     "Timeline forensics fundamentals",
     "Process creation timeline",
@@ -102,17 +104,30 @@
   ],
   "jim_kwik_principles": [
     "active_learning",
+    "minimum_effective_dose",
     "teach_like_im_10",
     "memory_hooks",
-    "connect_to_what_i_know",
     "meta_learning",
-    "minimum_effective_dose"
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {
       "type": "mindset_coach",
       "content": {
         "text": "# Welcome to Timeline Reconstruction: Telling the Story\n\n## From Data Points to Attack Narrative\n\nYou've learned to find individual artifacts:\n- ✅ Hidden processes (Lesson 54: Rootkits)\n- ✅ Injected code (Lesson 51: Code Injection)\n- ✅ Unpacked malware (Lesson 55: Unpacking)\n\n**But now comes the critical question**: *What actually happened?*\n\n## The Power of Timeline Analysis\n\n**Individual artifacts** tell you **what**:\n- Process: malware.exe\n- Network: Connection to 192.168.45.100\n- Registry: Run key modified\n\n**Timeline analysis** tells you **what, when, and how**:\n- **14:00:00**: User opened phishing email\n- **14:00:15**: WINWORD.EXE spawned (document opened)\n- **14:00:45**: PowerShell spawned from Word (macro execution)\n- **14:01:00**: C2 connection established\n- **14:01:20**: Credentials dumped from LSASS\n- **14:02:00**: Lateral movement to DC via PsExec\n- **14:05:00**: Domain Admin credentials obtained\n- **14:10:00**: Ransomware deployed enterprise-wide\n\n**Timeline = Attack Story**\n\n## Real-World Impact\n\n**Case: 2017 NotPetya Ransomware**\n\n**Without timeline analysis**:\n- \"We found ransomware on 300 systems\"\n- \"We don't know how it spread\"\n- \"Incident response took 2 weeks\"\n- **Cost**: $10 billion global damages\n\n**With timeline analysis**:\n- **Patient zero identified**: Accounting workstation, infected at 10:30 AM\n- **Attack vector**: Software update (MeDoc Ukrainian accounting software)\n- **Lateral movement**: EternalBlue (SMB exploit) + PsExec\n- **Timeline**: 10:30 AM infection → 11:00 AM domain compromise → 11:30 AM enterprise encryption\n- **Response**: Isolated patient zero network segment, contained in 4 hours (other companies)\n\n## What You'll Master Today\n\n1. **Timeline Extraction**: Pull temporal artifacts from memory (process creation, network connections, registry mods)\n2. **Timeline Correlation**: Combine multiple artifact types into unified timeline\n3. **Attack Stage Identification**: Map timeline to MITRE ATT&CK stages (Initial Access → Execution → Persistence → Lateral Movement)\n4. **Volatility Timeliner**: Automate timeline generation from memory dumps\n5. **Pattern Recognition**: Identify attack patterns (ransomware = tight temporal clustering, APT = slow burn over days/weeks)\n\n## Your \"Why\" for Learning This\n\n**Scenario**: Ransomware encrypted 500 servers. Board asks: \"How did this happen?\"\n\n**Without timeline skills**: \"Ransomware was present. We're investigating.\" (Vague, no actionable intelligence)\n\n**With timeline skills**: \"Patient zero: Server-05, infected 03:47:00. Lateral movement via compromised admin account 03:50:00. Full encryption 04:15:00. Attack duration: 28 minutes. Root cause: Unpatched EternalBlue vulnerability. Recommended fix: Patch MS17-010, segment network, implement EDR.\"\n\n**You become the analyst who explains not just what happened, but how and why.**\n\nLet's learn to reconstruct attack stories from memory. 📅🔍"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "**Video: Memory Forensics with Volatility - 13Cubed**\\n\\n**Duration**: 25:15\\n\\nThis video provides a visual demonstration of the concepts covered in this lesson. Watch to see practical examples and deepen your understanding of Memory Timeline Reconstruction and Analysis.\\n\\n**Video Link**: [Memory Forensics with Volatility - 13Cubed](https://www.youtube.com/watch?v=BMFCdAGxVN4)\\n\\n**Embedded Video**:\\n\\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/BMFCdAGxVN4\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>\\n\\n**Learning Tips**:\\n- Watch the video first to get an overview\\n- Pause and take notes on key concepts\\n- Replay sections that cover complex topics\\n- Try to practice along with the video demonstrations\\n- Return to the video as needed while working through exercises",
+        "url": "https://www.youtube.com/watch?v=BMFCdAGxVN4",
+        "title": "Memory Forensics with Volatility - 13Cubed",
+        "duration": "25:15"
       }
     },
     {
@@ -146,5 +161,14 @@
       }
     }
   ],
-  "tags": ["dfir", "memory-forensics", "timeline-reconstruction", "attack-chain", "volatility-timeliner", "mitre-attack", "incident-response", "advanced"]
+  "tags": [
+    "dfir",
+    "memory-forensics",
+    "timeline-reconstruction",
+    "attack-chain",
+    "volatility-timeliner",
+    "mitre-attack",
+    "incident-response",
+    "advanced"
+  ]
 }

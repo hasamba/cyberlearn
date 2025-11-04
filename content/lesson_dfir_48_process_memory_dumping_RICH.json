@@ -4,7 +4,9 @@
   "title": "Process Memory Dumping and Malware Extraction from RAM",
   "difficulty": 2,
   "order_index": 48,
-  "prerequisites": ["a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d"],
+  "prerequisites": [
+    "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d"
+  ],
   "concepts": [
     "Process address space and memory regions",
     "Volatility memmap and memdump plugins",
@@ -96,16 +98,30 @@
   ],
   "jim_kwik_principles": [
     "active_learning",
+    "minimum_effective_dose",
     "teach_like_im_10",
     "memory_hooks",
+    "meta_learning",
     "connect_to_what_i_know",
-    "minimum_effective_dose"
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
   "content_blocks": [
     {
       "type": "mindset_coach",
       "content": {
         "text": "# Welcome to Process Memory Dumping and Malware Extraction!\n\nYou're about to master one of the **most practical and powerful** skills in malware analysis: extracting malicious code directly from RAM for static analysis.\n\nWhy is this so important? Because modern malware uses sophisticated evasion techniques:\n\n- **Packers** (UPX, Themida) obfuscate malware on disk → Unpacked code visible in memory\n- **Fileless malware** (PowerShell, reflective DLLs) never touches disk → Only exists in RAM\n- **Process injection** hides malware in legitimate processes → Memory dumping reveals it\n- **Anti-forensics** deletes disk files after execution → Memory contains the evidence\n- **Encrypted C2** stores decrypted config in memory → Disk analysis misses it\n\nThink about the workflow:\n\n**Before this lesson**:\n1. You identified suspicious process via pslist (PID 2304: malware.exe)\n2. You found C2 connections via netscan (185.220.101.67:443)\n3. You discovered persistence via registry (Run key)\n\n**After this lesson**:\n4. **Extract the malware binary from memory** → Analyze in IDA/Ghidra\n5. **Reverse engineer** to understand capabilities\n6. **Create YARA signatures** for detection\n7. **Submit to VirusTotal** for threat intelligence\n8. **Develop remediation** based on malware behavior\n\nThis lesson transforms you from \"I know malware is running\" to \"I have the malware binary and understand exactly what it does.\"\n\nLet's master process memory dumping!"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "**Video: Memory Forensics with Volatility - 13Cubed**\\n\\n**Duration**: 25:15\\n\\nThis video provides a visual demonstration of the concepts covered in this lesson. Watch to see practical examples and deepen your understanding of Process Memory Dumping and Malware Extraction from RAM.\\n\\n**Video Link**: [Memory Forensics with Volatility - 13Cubed](https://www.youtube.com/watch?v=BMFCdAGxVN4)\\n\\n**Embedded Video**:\\n\\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/BMFCdAGxVN4\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>\\n\\n**Learning Tips**:\\n- Watch the video first to get an overview\\n- Pause and take notes on key concepts\\n- Replay sections that cover complex topics\\n- Try to practice along with the video demonstrations\\n- Return to the video as needed while working through exercises",
+        "url": "https://www.youtube.com/watch?v=BMFCdAGxVN4",
+        "title": "Memory Forensics with Volatility - 13Cubed",
+        "duration": "25:15"
       }
     },
     {
