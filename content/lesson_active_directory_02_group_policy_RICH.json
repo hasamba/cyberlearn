@@ -77,6 +77,12 @@
       "content": {
         "resources": "Watch this comprehensive video tutorial to reinforce your learning with visual demonstrations and practical examples.\n\n**Video**: [Group Policy Explained by Professor Messer](https://www.youtube.com/watch?v=rEhTzP-ScBo)\n\n**What you'll see:**\nUnderstanding Group Policy Objects (GPOs), policy settings, inheritance, and practical GPO management.\n\n**Duration**: ~15 minutes\n\n**Recommended viewing**: After completing the lesson to solidify understanding.\n\n**Additional Resources:**\n- [Microsoft: Group Policy Overview](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/hh831791(v=ws.11))\n- [Group Policy Best Practices](https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/best-practices-for-securing-active-directory)\n- [GPOZaurr - Group Policy Analysis Tool](https://github.com/EvotecIT/GPOZaurr)"
       }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "**Memory Aid: Group Policy Processing Order - LSDOU**\n\nTo remember the order that Group Policy Objects (GPOs) are applied:\n\n**L**ocal → **S**ite → **D**omain → **O**U\n\n**Mnemonic: \"**L**ocal **S**ecurity **D**epartment **O**rders **U**pdates\"\n\n**Key Points to Remember:**\n- **Last applied = Highest priority** (OU policies override Domain policies)\n- **LSDOU = Processing order from lowest to highest priority**\n- **Block inheritance** stops LSDOU chain at that OU\n- **Enforce** makes a GPO override all lower-level policies\n\n**Visual Memory Aid:**\n```\nPriority (Low → High):\n┌─────────────┐\n│   Local     │  (Computer-level policies)\n├─────────────┤\n│    Site     │  (Physical network location)\n├─────────────┤\n│   Domain    │  (Active Directory domain-wide)\n├─────────────┤\n│     OU      │  (Organizational Unit - HIGHEST PRIORITY)\n└─────────────┘\n```\n\n**Memory Hook for GPO Conflicts:**\n\"**OU**r policies **O**verride **U**nder-level settings\" (OU = highest priority)\n\n**Quick Recall Test:**\nIf you have conflicting settings in Domain GPO (password length: 10) and OU GPO (password length: 14), which wins?\nAnswer: OU GPO (14 characters) - last applied wins!"
+      }
     }
   ],
   "estimated_time": 30,
