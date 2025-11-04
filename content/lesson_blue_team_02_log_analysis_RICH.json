@@ -78,6 +78,12 @@
       "content": {
         "resources": "Watch this comprehensive video tutorial to reinforce your learning with visual demonstrations and practical examples.\n\n**Video**: [Windows Event Log Analysis by SANS](https://www.youtube.com/watch?v=H3t_kHQG1Js)\n\n**What you'll see:**\nAnalyzing Windows Event logs for security incidents, understanding key Event IDs, and building detection logic.\n\n**Duration**: ~30 minutes\n\n**Recommended viewing**: After completing the lesson to solidify understanding.\n\n**Additional Resources:**\n- [SANS Windows Event Log Cheat Sheet](https://www.sans.org/posters/windows-forensic-analysis/)\n- [Ultimate Windows Security Event ID List](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/)\n- [Sysmon Configuration Guide](https://github.com/SwiftOnSecurity/sysmon-config)"
       }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "**Memory Aid: Critical Windows Event IDs - \"The Security Big 5\"**\n\n**For Login Activity - \"45 is Alive, 40 is Dead\":**\n- **4624** = Successful login (user is **alive** in system)\n- **4625** = Failed login (access attempt **dead**/denied)\n- **4634/4647** = Logoff (session is **dead**)\n\n**For Account Changes - \"The 72x Series\":**\n- **4720** = Account created\n- **4722** = Account enabled\n- **4724** = Password reset attempt\n- **4725** = Account disabled\n- **4726** = Account deleted\n\n**For Privilege Escalation - \"The 67x Series\":**\n- **4672** = Special privileges assigned (Administrator login)\n- **4673** = Privileged service called\n- **4674** = Operation attempted on privileged object\n\n**Mnemonic for the Big 5 Security Events:**\n\"**46** **24/7** Login Monitoring Prevents **49** Problems\"\n- **4624** = Successful login\n- **4625** = Failed login\n- **4648** = Explicit credentials (RunAs)\n- **4672** = Admin login\n- **4720** = New account created\n\n**Linux Log Location Memory - \"/var/log/SAMBA\":**\n**S**yslog = /var/log/syslog\n**A**uth = /var/log/auth.log\n**M**essages = /var/log/messages\n**B**oot = /var/log/boot.log\n**A**pache = /var/log/apache2/\n\n**Process Events - \"The 4688 Rule\":**\n- **4688** = New process created\n- **4689** = Process terminated\n- **Remember:** \"**88** keys on piano, **4688** creates new process\"\n\n**Quick Recall Test:**\nUser successfully logs in with admin rights. Which two events fire?\nAnswer: **4624** (successful login) + **4672** (special privileges assigned)"
+      }
     }
   ],
   "estimated_time": 30,

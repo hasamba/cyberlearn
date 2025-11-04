@@ -130,6 +130,12 @@
       }
     },
     {
+      "type": "memory_aid",
+      "content": {
+        "text": "**Memory Aid: Critical Windows Event Logs - \"SAPS\"**\n\nRemember the four most critical Windows Event Logs with **SAPS**:\n\n**S**ecurity - Authentication, privilege use, policy changes\n**A**pplication - Software events and errors\n**P**owerShell - Script execution and commands\n**S**ystem - Service status, drivers, system events\n\n**Security Log Event Categories - \"ALPHA\":**\n**A**ccount logon/logoff (4624, 4625, 4634)\n**L**ogon events (4648, 4672)\n**P**rivilege use (4673, 4674)\n**H**istorical changes (4720-4726 account management)\n**A**udit policy changes (4719)\n\n**PowerShell Event IDs - \"The 4100 Series\":**\n- **4103** = Module logging (commands executed)\n- **4104** = Script block logging (full script content)\n- **4105** = Script execution start\n- **4106** = Script execution stop\n\n**Mnemonic: \"**4104** captures **FULL** script blocks\"** (Both have 4 letters)\n\n**Sysmon Event IDs - \"Process Power 3\":**\n- **Event 1** = Process creation (new executable started)\n- **Event 3** = Network connection (outbound connections)\n- **Event 11** = File creation (files written to disk)\n\n**Remember:** \"**1** process, **3** connections, **11** files\" (Ascending numbers for common events)\n\n**Log Locations - Windows Path Memory:**\n```\n%SystemRoot%\\System32\\winevt\\Logs    ├─ Security.evtx (The Big One)\n    ├─ System.evtx\n    ├─ Application.evtx\n    └─ Microsoft-Windows-PowerShell%4Operational.evtx\n```\n\n**Event ID Ranges by Category:**\n- **4xxx** = Security events (auditing)\n- **1xxx** = Application events\n- **7xxx** = Service Control Manager events\n- **10xx** = System events\n\n**Lateral Movement Detection - \"The 4648 Clue\":**\nEvent **4648** = Explicit credentials used (RunAs, PsExec, RDP)\n**Memory hook:** \"**48** hours to detect lateral movement = look for **4648**\"\n\n**Visual - Timeline Analysis:**\n```\nAttack Timeline Using Event IDs:\n4624 (Login) → 4688 (Process: mimikatz.exe) → 4648 (RunAs to DC) → 4672 (Admin rights) → 4720 (New account)\n```\n\n**Quick Recall:** Attacker uses mimikatz to dump credentials, then laterally moves to Domain Controller. Which 3 events would you search for?\nAnswer: **4688** (process creation: mimikatz), **4648** (explicit credentials for lateral movement), **4672** (special privileges assigned on DC)"
+      }
+    },
+    {
       "block_id": "4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
       "type": "reflection",
       "content": {

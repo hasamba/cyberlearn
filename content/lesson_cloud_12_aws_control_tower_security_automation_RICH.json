@@ -111,6 +111,12 @@
       "xp_reward": 25
     },
     {
+      "type": "memory_aid",
+      "content": {
+        "text": "**Memory Aid: AWS Control Tower Core Concepts - \"LOGS\"**\n\nRemember the four pillars of AWS Control Tower with **LOGS**:\n\n**L**anding Zone - Multi-account foundation\n**O**rganizational Units - Account structure\n**G**uardrails - Security and compliance controls\n**S**ervice Control Policies - Permission boundaries\n\n**Landing Zone Components - \"CASSH\":**\n**C**loudFormation StackSets\n**A**WS Organizations\n**S**ingle Sign-On (SSO)\n**S**ervice Catalog\n**H**ome Region\n\n**Guardrail Types - \"MPD\":**\n**M**andatory = Cannot be disabled (e.g., \"Disallow public write access to S3\")\n**P**reventive = Block actions before they happen (SCPs)\n**D**etective = Alert after actions occur (AWS Config rules)\n\n**OU Structure Memory - \"SALI\":**\n**S**ecurity OU - Security and compliance accounts\n**A**udit OU - Log Archive and Audit accounts\n**L**og Archive OU - Centralized logging\n**I**nfrastructure OU - Shared services (optional custom)\n\n**Baseline Accounts - \"The Three Pillars\":**\n1. **Management** account - Control Tower operations\n2. **Log Archive** account - Centralized logs\n3. **Audit** account - Security and compliance monitoring\n\n**Visual Memory Aid:**\n```\nControl Tower\n    │\n    ├─ Management Account (The Boss)\n    │\n    ├─ Security OU\n    │   ├─ Log Archive (Record Everything)\n    │   └─ Audit (Check Everything)\n    │\n    └─ Production OU\n        └─ Workload Accounts (Guardrails Applied)\n```\n\n**Guardrail Enforcement - \"Red Light, Yellow Light\":**\n- **Preventive** guardrails = **Red light** (STOP before action)\n- **Detective** guardrails = **Yellow light** (Alert AFTER action)\n\n**Quick Recall:** What's the difference between preventive and detective guardrails?\n- Preventive = Uses SCPs to **block** actions (e.g., can't delete CloudTrail logs)\n- Detective = Uses Config rules to **detect** violations (e.g., alerts if MFA disabled)"
+      }
+    },
+    {
       "block_id": "c552600e-1b57-4780-a0f3-fd557896e297",
       "type": "reflection",
       "title": "Teach Back",
