@@ -311,11 +311,13 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 ):
                     st.session_state.current_lesson = lesson
                     st.session_state.current_page = "lesson"
+                    st.session_state.current_block_index = 0  # Start from beginning
                     st.session_state.scroll_to_top = True
-                    # Update URL with lesson info
+                    # Update URL with lesson info and block index
                     st.query_params.update({
                         "page": "lesson",
-                        "lesson_id": str(lesson.lesson_id)
+                        "lesson_id": str(lesson.lesson_id),
+                        "block_index": "0"
                     })
                     st.rerun()
 
@@ -679,6 +681,12 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 if st.button("⬅️ Prev", use_container_width=True):
                     st.session_state.current_block_index -= 1
                     st.session_state.scroll_to_top = True
+                    # Update URL with new block index
+                    st.query_params.update({
+                        "page": "lesson",
+                        "lesson_id": str(lesson.lesson_id),
+                        "block_index": str(st.session_state.current_block_index)
+                    })
                     st.rerun()
 
         with col_next:
@@ -686,12 +694,24 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
                 if st.button("Next ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
                     st.session_state.scroll_to_top = True
+                    # Update URL with new block index
+                    st.query_params.update({
+                        "page": "lesson",
+                        "lesson_id": str(lesson.lesson_id),
+                        "block_index": str(st.session_state.current_block_index)
+                    })
                     st.rerun()
             else:
                 # Last block - show quiz
                 if st.button("Quiz ➡️", use_container_width=True):
                     st.session_state.current_block_index += 1
                     st.session_state.scroll_to_top = True
+                    # Update URL with new block index
+                    st.query_params.update({
+                        "page": "lesson",
+                        "lesson_id": str(lesson.lesson_id),
+                        "block_index": str(st.session_state.current_block_index)
+                    })
                     st.rerun()
 
         with col_hide:
