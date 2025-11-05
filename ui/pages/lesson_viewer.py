@@ -965,7 +965,7 @@ def render_markdown_with_code(text: str):
                 paragraphs = parts[i].split('\n\n')
                 for para in paragraphs:
                     if para.strip():
-                        st.markdown(para.strip())
+                        st.markdown(para.strip(), unsafe_allow_html=True)
             i += 1
         else:
             # Code block: parts[i] is language, parts[i+1] is code
