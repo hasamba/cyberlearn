@@ -939,7 +939,7 @@ def render_video_block(block):
     text_content = block.content.get("text") or block.content.get("resources") or block.content.get("description", "")
 
     if text_content:
-        st.markdown(text_content)
+        render_markdown_with_code(text_content)
 
     # Check for video URL
     if "url" in block.content:
