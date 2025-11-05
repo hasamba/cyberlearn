@@ -939,7 +939,7 @@ def render_video_block(block):
     text_content = block.content.get("text") or block.content.get("resources") or block.content.get("description", "")
 
     if text_content:
-        st.markdown(text_content)
+        render_markdown_with_code(text_content)
 
     # Check for video URL
     if "url" in block.content:
@@ -961,7 +961,11 @@ def render_markdown_with_code(text: str):
         if i % 3 == 0:
             # Regular markdown text
             if parts[i].strip():
-                st.markdown(parts[i])
+                # Split by double newlines for paragraphs, render each separately
+                paragraphs = parts[i].split('\n\n')
+                for para in paragraphs:
+                    if para.strip():
+                        st.markdown(para.strip(), unsafe_allow_html=True)
             i += 1
         else:
             # Code block: parts[i] is language, parts[i+1] is code
