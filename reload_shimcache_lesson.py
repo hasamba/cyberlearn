@@ -47,7 +47,32 @@ if existing:
     print(f"   ✓ Updated successfully!")
 else:
     print(f"   Lesson not found in database!")
-    print(f"   Please run: python load_all_lessons.py")
+    print(f"   Loading lesson for the first time...")
+
+    # Insert the lesson
+    cursor.execute("""
+        INSERT INTO lessons (
+            lesson_id, domain, title, difficulty, order_index,
+            prerequisites, concepts, estimated_time, learning_objectives,
+            content_blocks, post_assessment, jim_kwik_principles
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        lesson_id,
+        lesson_data['domain'],
+        lesson_data['title'],
+        lesson_data['difficulty'],
+        lesson_data['order_index'],
+        json.dumps(lesson_data['prerequisites']),
+        json.dumps(lesson_data['concepts']),
+        lesson_data['estimated_time'],
+        json.dumps(lesson_data['learning_objectives']),
+        json.dumps(lesson_data['content_blocks']),
+        json.dumps(lesson_data['post_assessment']),
+        json.dumps(lesson_data['jim_kwik_principles'])
+    ))
+
+    conn.commit()
+    print(f"   ✓ Loaded successfully!")
 
 # Verify the update
 cursor.execute("SELECT content_blocks FROM lessons WHERE lesson_id = ?", (lesson_id,))
