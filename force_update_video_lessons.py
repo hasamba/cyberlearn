@@ -98,7 +98,11 @@ def update_lesson_in_db(conn: sqlite3.Connection, lesson_data: dict) -> bool:
 
 
 def get_affected_lesson_files() -> list:
-    """Get all lesson files that contain broken video IDs."""
+    """Get all lesson files that contain replaced video IDs.
+
+    NOTE: Since we already replaced broken IDs with new IDs in JSON files,
+    we look for the NEW video IDs (which are in JSON but not yet in database).
+    """
 
     # Load mapping of broken videos
     if not MAPPING_FILE.exists():
@@ -108,18 +112,19 @@ def get_affected_lesson_files() -> list:
     with open(MAPPING_FILE, 'r', encoding='utf-8') as f:
         replacements = json.load(f)
 
-    broken_video_ids = list(replacements.keys())
+    # Get the NEW video IDs (not the old broken ones)
+    new_video_ids = [info['new_video_id'] for info in replacements.values()]
 
-    # Find all lesson files that contain these video IDs
+    # Find all lesson files that contain these NEW video IDs
     affected_files = []
 
-    for lesson_file in CONTENT_DIR.glob("lesson_*_RICH.json"):
+    for lesson_file in CONTENT_DIR.glob("lesson_*.json"):
         try:
             with open(lesson_file, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Check if any broken video ID is in this file
-            if any(video_id in content for video_id in broken_video_ids):
+            # Check if any NEW video ID is in this file
+            if any(video_id in content for video_id in new_video_ids):
                 lesson_data = load_lesson_from_file(lesson_file)
                 affected_files.append((lesson_file, lesson_data))
 
