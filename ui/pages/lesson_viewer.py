@@ -939,6 +939,8 @@ def render_video_block(block):
     text_content = block.content.get("text") or block.content.get("resources") or block.content.get("description", "")
 
     if text_content:
+        # Fix literal \n strings from database (convert to actual newlines)
+        text_content = text_content.replace('\\n', '\n')
         render_markdown_with_code(text_content)
 
     # Check for video URL
