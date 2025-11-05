@@ -961,9 +961,11 @@ def render_markdown_with_code(text: str):
         if i % 3 == 0:
             # Regular markdown text
             if parts[i].strip():
-                # Replace newlines with HTML breaks for proper rendering in Streamlit
-                formatted_text = parts[i].replace('\n', '<br>')
-                st.markdown(formatted_text, unsafe_allow_html=True)
+                # Split by double newlines for paragraphs, render each separately
+                paragraphs = parts[i].split('\n\n')
+                for para in paragraphs:
+                    if para.strip():
+                        st.markdown(para.strip())
             i += 1
         else:
             # Code block: parts[i] is language, parts[i+1] is code
