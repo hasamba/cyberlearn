@@ -944,6 +944,11 @@ def render_video_block(block):
         # Remove any iframe HTML from text before rendering
         # This prevents double rendering (iframe in text + st.video below)
         text_content = re.sub(r'<iframe[^>]*>.*?</iframe>', '', text_content, flags=re.DOTALL | re.IGNORECASE)
+
+        # Fix literal \n strings from database (double-escaped newlines)
+        # Database may have literal backslash-n instead of actual newlines
+        text_content = text_content.replace('\\n', '\n')
+
         text_content = text_content.strip()
 
         if text_content:
