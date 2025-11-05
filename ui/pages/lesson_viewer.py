@@ -933,26 +933,13 @@ def render_reflection_block(block, user: UserProfile, lesson: Lesson, db: Databa
 
 def render_video_block(block):
     """Render video content block"""
-    import re
-
     st.markdown("### 🎥 Video Tutorial")
 
     # Check for different possible keys in content
     text_content = block.content.get("text") or block.content.get("resources") or block.content.get("description", "")
 
     if text_content:
-        # Remove any iframe HTML from text before rendering
-        # This prevents double rendering (iframe in text + st.video below)
-        text_content = re.sub(r'<iframe[^>]*>.*?</iframe>', '', text_content, flags=re.DOTALL | re.IGNORECASE)
-
-        # Fix literal \n strings from database (double-escaped newlines)
-        # Database may have literal backslash-n instead of actual newlines
-        text_content = text_content.replace('\\n', '\n')
-
-        text_content = text_content.strip()
-
-        if text_content:
-            render_markdown_with_code(text_content)
+        render_markdown_with_code(text_content)
 
     # Check for video URL
     if "url" in block.content:
@@ -964,10 +951,6 @@ def render_video_block(block):
 def render_markdown_with_code(text: str):
     """Render markdown text with proper code block support"""
     import re
-
-    # Handle literal \\n\\n (from JSON) - these should NOT be converted
-    # The text in JSON has literal backslash-n-backslash-n which is correct
-    # We should NOT replace them as they represent actual newlines in the JSON format
 
     # Split by code blocks
     pattern = r'```(\w+)?\n(.*?)```'
