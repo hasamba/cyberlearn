@@ -28,6 +28,11 @@ print(f"\n2. Connecting to database: {db_path}")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
+# Check what columns exist in lessons table
+cursor.execute("PRAGMA table_info(lessons)")
+columns = [row[1] for row in cursor.fetchall()]
+print(f"   Available columns: {', '.join(columns)}")
+
 # Check if lesson exists
 cursor.execute("SELECT lesson_id, title FROM lessons WHERE lesson_id = ?", (lesson_id,))
 existing = cursor.fetchone()
@@ -47,32 +52,11 @@ if existing:
     print(f"   ✓ Updated successfully!")
 else:
     print(f"   Lesson not found in database!")
-    print(f"   Loading lesson for the first time...")
-
-    # Insert the lesson
-    cursor.execute("""
-        INSERT INTO lessons (
-            lesson_id, domain, title, difficulty, order_index,
-            prerequisites, concepts, estimated_time, learning_objectives,
-            content_blocks, post_assessment, jim_kwik_principles
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        lesson_id,
-        lesson_data['domain'],
-        lesson_data['title'],
-        lesson_data['difficulty'],
-        lesson_data['order_index'],
-        json.dumps(lesson_data['prerequisites']),
-        json.dumps(lesson_data['concepts']),
-        lesson_data['estimated_time'],
-        json.dumps(lesson_data['learning_objectives']),
-        json.dumps(lesson_data['content_blocks']),
-        json.dumps(lesson_data['post_assessment']),
-        json.dumps(lesson_data['jim_kwik_principles'])
-    ))
-
-    conn.commit()
-    print(f"   ✓ Loaded successfully!")
+    print(f"   Use load_all_lessons.py to load this lesson.")
+    print(f"   For now, just updating content_blocks would require the lesson to exist.")
+    print(f"\n   RECOMMENDATION: Run 'python load_all_lessons.py' to load all lessons.")
+    conn.close()
+    exit(1)
 
 # Verify the update
 cursor.execute("SELECT content_blocks FROM lessons WHERE lesson_id = ?", (lesson_id,))
