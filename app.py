@@ -102,15 +102,24 @@ def inject_browser_navigation_handler():
             }
             window.parent.__streamlit_navigation_handler_installed = true;
 
+            // Store the current URL to detect changes
+            let currentUrl = window.parent.location.href;
+
             // Listen for browser back/forward navigation (popstate event)
             window.parent.addEventListener('popstate', function(event) {
-                console.log('Browser navigation detected, forcing page reload');
+                const newUrl = window.parent.location.href;
 
-                // Force a full page reload to sync with the new URL
-                window.parent.location.reload();
+                // Only reload if URL actually changed
+                if (newUrl !== currentUrl) {
+                    console.log('Browser navigation detected:', currentUrl, '->', newUrl);
+                    currentUrl = newUrl;
+
+                    // Force immediate reload to sync URL with content
+                    window.parent.location.reload();
+                }
             }, false);
 
-            console.log('Browser navigation handler installed');
+            console.log('Browser navigation handler installed for URL:', currentUrl);
         })();
         </script>
         """,
