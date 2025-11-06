@@ -34,30 +34,35 @@ def main():
     print("REBUILD TEMPLATE DATABASE WITH TAGS")
     print("=" * 80)
     print("\nThis will:")
-    print("  1. Add tags to lesson JSON files from lesson_ideas.csv")
+    print("  1. Add course tags to lesson JSON files from lesson_ideas.csv")
     print("  2. Delete and rebuild cyberlearn.db with all lessons")
-    print("  3. Migrate tags from JSON files to database")
-    print("  4. Copy to cyberlearn_template.db")
+    print("  3. Migrate course tags from JSON files to database")
+    print("  4. Tag Built-In lessons and add career path tags")
+    print("  5. Copy to cyberlearn_template.db")
 
     response = input("\nProceed? (yes/no): ").strip().lower()
     if response != 'yes':
         print("Cancelled.")
         return
 
-    # Step 1: Add tags to JSON files from CSV
-    if not run_script("scripts/tag_lessons_from_csv.py", "Step 1/4: Adding tags to lesson JSON files"):
+    # Step 1: Add course tags to JSON files from CSV
+    if not run_script("scripts/tag_lessons_from_csv.py", "Step 1/5: Adding course tags to lesson JSON files"):
         return
 
     # Step 2: Rebuild database with all lessons
-    if not run_script("rebuild_all_lessons.py", "Step 2/4: Rebuilding database with all lessons"):
+    if not run_script("rebuild_all_lessons.py", "Step 2/5: Rebuilding database with all lessons"):
         return
 
-    # Step 3: Migrate tags from JSON to database
-    if not run_script("scripts/migrate_tags_to_database_v2.py", "Step 3/4: Migrating tags from JSON to database"):
+    # Step 3: Migrate course tags from JSON to database
+    if not run_script("scripts/migrate_tags_to_database_v2.py", "Step 3/5: Migrating course tags from JSON to database"):
         return
 
-    # Step 4: Update template database
-    if not run_script("scripts/update_template_database.py", "Step 4/4: Updating template database"):
+    # Step 4: Tag Built-In lessons and career paths
+    if not run_script("scripts/tag_builtin_lessons.py", "Step 4/5: Tagging Built-In lessons and career paths"):
+        return
+
+    # Step 5: Update template database
+    if not run_script("scripts/update_template_database.py", "Step 5/5: Updating template database"):
         return
 
     print("\n" + "=" * 80)
