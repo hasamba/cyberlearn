@@ -18,6 +18,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config import config, debug_print
 from ui.pages import dashboard, lesson_viewer, diagnostic, profile
 from utils.database import Database
+from utils.auth_manager import AuthManager
+from utils.cookie_manager import CookieManager
 from models.user import UserProfile
 
 # Show debug info if enabled
@@ -139,6 +141,34 @@ def sync_session_state_to_url():
         st.session_state.last_url_params = dict(st.query_params)
 
 
+def login_user(user: UserProfile):
+    """
+    Log in a user and create a session cookie
+
+    Args:
+        user: UserProfile object of the user to log in
+    """
+    # Update user's last login and streak
+    user.update_streak()
+    st.session_state.db.update_user(user)
+
+    # Create session and get token
+    session_token = st.session_state.auth_manager.create_session(user.user_id)
+
+    # Store token in cookie
+    st.session_state.cookie_manager.set(
+        AuthManager.COOKIE_NAME,
+        session_token,
+        max_age_days=AuthManager.COOKIE_EXPIRY_DAYS
+    )
+
+    # Set current user in session state
+    st.session_state.current_user = user
+
+    if config.debug:
+        debug_print(f"User logged in: {user.username}")
+
+
 def initialize_session_state():
     """Initialize session state variables"""
     if "db" not in st.session_state:
@@ -146,39 +176,52 @@ def initialize_session_state():
         if config.debug:
             debug_print("Database connection initialized")
 
-    # On fresh session (no current_user), check database for last user and auto-login
+    # Initialize auth manager
+    if "auth_manager" not in st.session_state:
+        st.session_state.auth_manager = AuthManager(st.session_state.db)
+        if config.debug:
+            debug_print("Auth manager initialized")
+
+    # Initialize cookie manager
+    if "cookie_manager" not in st.session_state:
+        st.session_state.cookie_manager = CookieManager()
+        if config.debug:
+            debug_print("Cookie manager initialized")
+
+    # Cleanup expired sessions periodically
+    st.session_state.auth_manager.cleanup_expired_sessions()
+
+    # Check for valid session cookie
     if "current_user" not in st.session_state or st.session_state.current_user is None:
-        # Check if we should auto-login (not explicitly disabled by logout)
-        if "disable_auto_login" not in st.session_state:
-            st.session_state.disable_auto_login = False
+        session_token = st.session_state.cookie_manager.get(AuthManager.COOKIE_NAME)
 
-        if not st.session_state.disable_auto_login:
-            # Get last logged-in user from database
-            cursor = st.session_state.db.conn.cursor()
-            cursor.execute("""
-                SELECT username
-                FROM users
-                WHERE last_username IS NOT NULL AND last_username != ''
-                ORDER BY last_login DESC
-                LIMIT 1
-            """)
-            row = cursor.fetchone()
+        if session_token:
+            # Validate session token
+            user_id = st.session_state.auth_manager.validate_session(session_token)
 
-            if row:
-                username = row[0]
-                user = st.session_state.db.get_user_by_username(username)
+            if user_id:
+                # Valid session - load user
+                user = st.session_state.db.get_user(user_id)
                 if user:
                     st.session_state.current_user = user
                     if config.debug:
-                        debug_print(f"Auto-logged in as {username}")
+                        debug_print(f"Session validated for user: {user.username}")
                 else:
+                    # User not found - invalid session
                     st.session_state.current_user = None
+                    st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+                    if config.debug:
+                        debug_print("Session validation failed: user not found")
             else:
+                # Invalid or expired session
                 st.session_state.current_user = None
+                st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+                if config.debug:
+                    debug_print("Session validation failed: invalid token")
         else:
             st.session_state.current_user = None
             if config.debug:
-                debug_print("Session state initialized (no user - auto-login disabled)")
+                debug_print("No session cookie found")
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -304,10 +347,15 @@ def render_sidebar():
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
+                # Revoke session and delete cookie
+                session_token = st.session_state.cookie_manager.get(AuthManager.COOKIE_NAME)
+                if session_token:
+                    st.session_state.auth_manager.revoke_session(session_token)
+                    st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+
+                # Clear session state
                 st.session_state.current_user = None
                 st.session_state.current_page = "welcome"
-                # Disable auto-login after logout (require manual login)
-                st.session_state.disable_auto_login = True
                 st.rerun()
 
             # Debug info section
@@ -341,12 +389,8 @@ def render_sidebar():
                 if st.button(f"⚡ Quick Login as {default_username}", use_container_width=True):
                     user = st.session_state.db.get_user_by_username(default_username)
                     if user:
-                        st.session_state.current_user = user
-                        user.last_username = default_username
-                        user.update_streak()
-                        st.session_state.db.update_user(user)
+                        login_user(user)
                         st.session_state.current_page = "dashboard"
-                        st.session_state.disable_auto_login = False
                         st.rerun()
 
             # Manual login form
@@ -357,13 +401,10 @@ def render_sidebar():
                 if submit and username:
                     user = st.session_state.db.get_user_by_username(username)
                     if user:
-                        st.session_state.current_user = user
                         # Save username to user's database record
                         user.last_username = username
-                        user.update_streak()
-                        st.session_state.db.update_user(user)
+                        login_user(user)
                         st.session_state.current_page = "dashboard"
-                        st.session_state.disable_auto_login = False  # Re-enable auto-login
                         st.success(f"Welcome back, {username}!")
                         st.rerun()
                     else:
@@ -391,11 +432,8 @@ def render_sidebar():
                             user.preferred_tag_filters = ["Beginner"]
                             user.last_username = new_username
                             if st.session_state.db.create_user(user):
-                                user.update_streak()
-                                st.session_state.db.update_user(user)
-                                st.session_state.current_user = user
+                                login_user(user)
                                 st.session_state.current_page = "diagnostic"
-                                st.session_state.disable_auto_login = False
                                 st.success(f"Welcome, {new_username}!")
                                 st.rerun()
                             else:
