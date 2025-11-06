@@ -86,7 +86,7 @@ class FileSessionManager:
 
         sessions[fingerprint] = {
             "token": session_token,
-            "user_id": user_id,
+            "user_id": str(user_id),  # Convert UUID to string for JSON
             "created_at": datetime.utcnow().isoformat()
         }
 
