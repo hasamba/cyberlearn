@@ -104,20 +104,10 @@ def inject_browser_navigation_handler():
 
             // Listen for browser back/forward navigation (popstate event)
             window.parent.addEventListener('popstate', function(event) {
-                console.log('Browser navigation detected, triggering Streamlit rerun');
+                console.log('Browser navigation detected, forcing page reload');
 
-                // Force Streamlit to rerun by pressing 'R' key programmatically
-                // This is a workaround since we can't directly trigger st.rerun() from JavaScript
-                var streamlitDoc = window.parent.document;
-                var event = new KeyboardEvent('keydown', {
-                    key: 'r',
-                    code: 'KeyR',
-                    keyCode: 82,
-                    which: 82,
-                    bubbles: true,
-                    cancelable: true
-                });
-                streamlitDoc.dispatchEvent(event);
+                // Force a full page reload to sync with the new URL
+                window.parent.location.reload();
             }, false);
 
             console.log('Browser navigation handler installed');
