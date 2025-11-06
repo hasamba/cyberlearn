@@ -48,8 +48,8 @@ def main():
     if not run_script("rebuild_all_lessons.py", "Step 1/3: Rebuilding database with all lessons"):
         return
 
-    # Step 2: Tag lessons from CSV
-    if not run_script("scripts/tag_lessons_from_csv.py", "Step 2/3: Tagging lessons from lesson_ideas.csv"):
+    # Step 2: Migrate tags from JSON to database
+    if not run_script("scripts/migrate_tags_to_database_v2.py", "Step 2/3: Migrating tags from JSON to database"):
         return
 
     # Step 3: Update template database
