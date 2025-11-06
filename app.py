@@ -19,7 +19,7 @@ from config import config, debug_print
 from ui.pages import dashboard, lesson_viewer, diagnostic, profile
 from utils.database import Database
 from utils.auth_manager import AuthManager
-from utils.cookie_manager import CookieManager
+from utils.session_manager import SessionManager
 from models.user import UserProfile
 
 # Show debug info if enabled
@@ -155,12 +155,8 @@ def login_user(user: UserProfile):
     # Create session and get token
     session_token = st.session_state.auth_manager.create_session(user.user_id)
 
-    # Store token in cookie
-    st.session_state.cookie_manager.set(
-        AuthManager.COOKIE_NAME,
-        session_token,
-        max_age_days=AuthManager.COOKIE_EXPIRY_DAYS
-    )
+    # Store token in browser's localStorage
+    st.session_state.session_manager.set_browser_session(session_token)
 
     # Set current user in session state
     st.session_state.current_user = user
@@ -182,18 +178,18 @@ def initialize_session_state():
         if config.debug:
             debug_print("Auth manager initialized")
 
-    # Initialize cookie manager
-    if "cookie_manager" not in st.session_state:
-        st.session_state.cookie_manager = CookieManager()
+    # Initialize session manager
+    if "session_manager" not in st.session_state:
+        st.session_state.session_manager = SessionManager()
         if config.debug:
-            debug_print("Cookie manager initialized")
+            debug_print("Session manager initialized")
 
     # Cleanup expired sessions periodically
     st.session_state.auth_manager.cleanup_expired_sessions()
 
-    # Check for valid session cookie
+    # Check for valid session token from browser
     if "current_user" not in st.session_state or st.session_state.current_user is None:
-        session_token = st.session_state.cookie_manager.get(AuthManager.COOKIE_NAME)
+        session_token = st.session_state.session_manager.get_browser_session()
 
         if session_token:
             # Validate session token
@@ -209,19 +205,19 @@ def initialize_session_state():
                 else:
                     # User not found - invalid session
                     st.session_state.current_user = None
-                    st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+                    st.session_state.session_manager.delete_browser_session()
                     if config.debug:
                         debug_print("Session validation failed: user not found")
             else:
                 # Invalid or expired session
                 st.session_state.current_user = None
-                st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+                st.session_state.session_manager.delete_browser_session()
                 if config.debug:
                     debug_print("Session validation failed: invalid token")
         else:
             st.session_state.current_user = None
             if config.debug:
-                debug_print("No session cookie found")
+                debug_print("No session token found")
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -347,11 +343,11 @@ def render_sidebar():
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
-                # Revoke session and delete cookie
-                session_token = st.session_state.cookie_manager.get(AuthManager.COOKIE_NAME)
+                # Revoke session and delete from browser
+                session_token = st.session_state.session_manager.get_browser_session()
                 if session_token:
                     st.session_state.auth_manager.revoke_session(session_token)
-                    st.session_state.cookie_manager.delete(AuthManager.COOKIE_NAME)
+                    st.session_state.session_manager.delete_browser_session()
 
                 # Clear session state
                 st.session_state.current_user = None
