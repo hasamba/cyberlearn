@@ -18,17 +18,30 @@ class SimpleSessionManager:
         if "_browser_id" not in st.session_state:
             # Check if we have a browser ID in query params
             query_params = st.query_params
-            if 'bid' in query_params:
-                # Use existing browser ID
-                st.session_state._browser_id = query_params['bid']
-            else:
+
+            # Try to get from query params first
+            browser_id = query_params.get('bid', None)
+
+            if not browser_id:
                 # Generate new browser ID (random)
                 import secrets
                 browser_id = secrets.token_urlsafe(16)
-                st.session_state._browser_id = browser_id
+                print(f"[SessionManager] Generated new browser_id: {browser_id[:8]}...")
 
-                # Add to URL without redirect (just update query params)
+                # Add to URL - this triggers a rerun with the param
                 st.query_params['bid'] = browser_id
+            else:
+                print(f"[SessionManager] Retrieved browser_id from URL: {browser_id[:8]}...")
+
+            # Store in session state
+            st.session_state._browser_id = browser_id
+
+            # Ensure it stays in URL
+            if 'bid' not in st.query_params or st.query_params['bid'] != browser_id:
+                st.query_params['bid'] = browser_id
+                print(f"[SessionManager] Added browser_id to URL params")
+        else:
+            print(f"[SessionManager] Using existing browser_id from session: {st.session_state._browser_id[:8]}...")
 
     def get_browser_id(self) -> str:
         """Get the current browser's unique ID"""
@@ -49,27 +62,37 @@ class SimpleSessionManager:
         # Query database for active session with this browser_id
         try:
             import sqlite3
+            from datetime import datetime
+
             conn = sqlite3.connect(db.db_path)
             cursor = conn.cursor()
+
+            # Get current time for comparison
+            now = datetime.utcnow().isoformat()
 
             cursor.execute("""
                 SELECT session_token, user_id, expires_at
                 FROM user_sessions
                 WHERE user_agent = ?
-                AND datetime(expires_at) > datetime('now')
+                AND expires_at > ?
                 ORDER BY created_at DESC
                 LIMIT 1
-            """, (browser_id,))
+            """, (browser_id, now))
 
             result = cursor.fetchone()
             conn.close()
 
             if result:
+                print(f"[SessionManager] Found session for browser {browser_id[:8]}...")
                 return result[0]  # session_token
+            else:
+                print(f"[SessionManager] No active session for browser {browser_id[:8]}...")
             return None
 
         except Exception as e:
-            print(f"Error getting session token: {e}")
+            print(f"[SessionManager] Error getting session token: {e}")
+            import traceback
+            traceback.print_exc()
             return None
 
     def save_session_token(self, token: str, user_id: str, db):
