@@ -1,0 +1,255 @@
+{
+  "lesson_id": "8e7fa2b1-c8e0-46fb-b3b5-354c2f4e5ffa",
+  "domain": "linux",
+  "title": "Advanced Linux Incident Response",
+  "subtitle": "Live forensics, memory analysis, rootkit detection, and incident containment",
+  "difficulty": 3,
+  "order_index": 13,
+  "estimated_time": 60,
+  "is_core_concept": true,
+  "base_xp_reward": 250,
+  "prerequisites": [],
+  "concepts": [
+    "live response",
+    "memory forensics",
+    "rootkit detection",
+    "timeline analysis",
+    "evidence preservation",
+    "forensic imaging",
+    "persistence mechanisms",
+    "incident containment",
+    "volatility framework",
+    "DFIR methodology"
+  ],
+  "learning_objectives": [
+    "Perform live response on compromised Linux systems",
+    "Acquire and analyze memory dumps",
+    "Detect rootkits and kernel-level malware",
+    "Preserve forensic evidence properly",
+    "Create forensic timelines from multiple sources",
+    "Contain incidents without destroying evidence",
+    "Use DFIR tools for Linux investigations"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Incident response is high-pressure detective work. You must think clearly, act methodically, and preserve evidence while the attacker may still be active. The golden rule: Volatile data first - memory, network connections, and running processes disappear when the system powers off. Document everything you do!"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "The Order of Volatility dictates what to collect first: (1) CPU registers and cache (2) RAM contents (3) Network connections and running processes (4) Disk contents (5) Logs and backups. Always collect more volatile data before less volatile. Powering off loses items 1-3 immediately."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "title": "Video: Advanced Linux Incident Response Overview",
+        "url": "https://www.youtube.com/embed/Vh_h6NfLkAg",
+        "description": "Watch this video for a visual introduction to the concepts covered in this lesson."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Live Response Triage Commands:\n\n# System information\nuname -a\nhostname\ndate\nuptime\n\n# Active network connections\nnetstat -anp\nss -tulpn\nlsof -i\n\n# Running processes\nps auxf\ntop -b -n 1\n\n# Logged in users\nw\nwho\nlast -20\n\n# Open files\nlsof\n\n# Scheduled tasks\ncrontab -l\ncat /etc/crontab\nls -la /etc/cron.*"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Memory Acquisition: Use tools like LiME (Linux Memory Extractor) or AVML to capture RAM. Memory contains encryption keys, passwords, command history, malware code, and network connections. Analyze with Volatility Framework. Always acquire memory BEFORE disk imaging to capture volatile data."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Memory Acquisition with LiME:\n\n# Install LiME\ngit clone https://github.com/504ensicsLabs/LiME\ncd LiME/src\nmake\n\n# Capture memory\nsudo insmod lime-$(uname -r).ko \"path=/tmp/ram.lime format=lime\"\n\n# Analyze with Volatility\nvolatility -f /tmp/ram.lime --profile=LinuxDebian11x64 linux_pslist\nvolatility -f /tmp/ram.lime --profile=LinuxDebian11x64 linux_netstat\nvolatility -f /tmp/ram.lime --profile=LinuxDebian11x64 linux_bash"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Rootkit Detection: Check for kernel-level malware hiding processes, files, and network connections. Tools: chkrootkit, rkhunter, OSSEC. Look for hooks in system call table, hidden kernel modules (compare lsmod vs /proc/modules), and modified binaries (use known-good checksums)."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Rootkit Detection Commands:\n\n# Run chkrootkit\nsudo chkrootkit\n\n# Run rkhunter\nsudo rkhunter --check\n\n# Check for hidden processes\nps auxf > ps_output.txt\nls /proc | grep '^[0-9]' | sort -n > proc_pids.txt\ncompare the two lists for discrepancies\n\n# Check kernel modules\nlsmod\ncat /proc/modules\ncompare for hidden modules\n\n# Verify system binaries\nrpm -Va  # Red Hat\ndebsums -c  # Debian\n\n# Check for LD_PRELOAD hijacking\ncat /etc/ld.so.preload\necho $LD_PRELOAD"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Disk Imaging: Create forensic copy using dd or dc3dd. Use write blockers to prevent accidental modification. Calculate hashes (MD5, SHA256) before and after imaging to prove integrity. Image the entire disk, not just partitions, to capture unallocated space and deleted files."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Forensic Disk Imaging:\n\n# Calculate hash BEFORE imaging\nsudo sha256sum /dev/sda > original_hash.txt\n\n# Create forensic image with dc3dd\nsudo dc3dd if=/dev/sda of=/mnt/evidence/disk.img hash=sha256 log=/mnt/evidence/imaging.log\n\n# OR use dd with progress\nsudo dd if=/dev/sda bs=4M status=progress | pv | dd of=/mnt/evidence/disk.img bs=4M\n\n# Calculate hash AFTER imaging\nsudo sha256sum /mnt/evidence/disk.img > image_hash.txt\n\n# Compare hashes\ndiff original_hash.txt image_hash.txt\n\n# Mount image read-only\nsudo mount -o ro,loop,noexec /mnt/evidence/disk.img /mnt/analysis"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Persistence Mechanisms to Check: (1) Cron jobs and systemd timers, (2) ~/.bashrc, ~/.profile, ~/.ssh/authorized_keys, (3) /etc/rc.local and systemd services, (4) Kernel modules in /lib/modules, (5) LD_PRELOAD hijacking, (6) SUID binaries, (7) Modified system binaries. Attackers often use multiple persistence methods."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Persistence Hunting:\n\n# Check cron jobs\nsudo crontab -l -u root\nfor user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done\n\n# Check systemd timers\nsystemctl list-timers --all\n\n# Check startup scripts\nls -la /etc/rc*.d/\nsystemctl list-unit-files --type=service --state=enabled\n\n# Check SSH authorized keys\nfind /home -name authorized_keys -exec cat {} \\;\n\n# Check SUID binaries\nfind / -perm -4000 -ls 2>/dev/null\n\n# Check for LD_PRELOAD\ngrep -r LD_PRELOAD /etc/\n\n# Check recently modified files\nfind / -mtime -7 -type f 2>/dev/null | head -100"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Real Case: E-commerce site compromised. Live response revealed: (1) Suspicious process /tmp/.x running as www-data, (2) Network connection to C2 server in Russia, (3) Modified /usr/bin/php with backdoor, (4) Cron job downloading updated malware hourly, (5) SSH key added to root authorized_keys. Memory analysis showed cleartext credit cards in RAM. Without proper IR, this breach cost $2M in fraud. Proper evidence collection led to attacker attribution and criminal prosecution."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Remember PICERL for incident response: Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned. For data collection, remember OOV: Order Of Volatility (most volatile first). For rootkits, remember PHKM: Processes Hidden, Kernel Modules, Files Modified."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "questions": [
+          {
+            "question_id": "q1",
+            "type": "multiple_choice",
+            "question": "What is the FIRST step in live response on a potentially compromised system?",
+            "options": [
+              "Power off the system to preserve evidence",
+              "Document state and collect volatile data (memory, network, processes)",
+              "Reinstall the operating system",
+              "Change all user passwords"
+            ],
+            "correct_answer": 1,
+            "explanation": "Option B: Volatile data disappears when powered off. Collect memory, network connections, and running processes FIRST. Powering off (A) loses critical evidence. Reinstalling (C) destroys all evidence. Password changes (D) can wait until after evidence collection.",
+            "difficulty": 2,
+            "memory_aid": "Volatile first - memory evaporates when power lost",
+            "points": 10
+          },
+          {
+            "question_id": "q2",
+            "type": "multiple_choice",
+            "question": "Which tool is used to acquire Linux memory for forensic analysis?",
+            "options": [
+              "dd",
+              "LiME (Linux Memory Extractor)",
+              "chkrootkit",
+              "rkhunter"
+            ],
+            "correct_answer": 1,
+            "explanation": "LiME is specifically designed for Linux memory acquisition as a kernel module. dd (A) is for disk imaging, not memory. chkrootkit (C) and rkhunter (D) are rootkit scanners, not memory acquisition tools.",
+            "difficulty": 2,
+            "memory_aid": "LiME extracts LInux MEMory",
+            "points": 10
+          },
+          {
+            "question_id": "q3",
+            "type": "multiple_choice",
+            "question": "What does the Order of Volatility principle state?",
+            "options": [
+              "Collect largest files first",
+              "Collect most volatile (temporary) data before less volatile (persistent) data",
+              "Always image disk before collecting memory",
+              "Collect logs before anything else"
+            ],
+            "correct_answer": 1,
+            "explanation": "Order of Volatility: RAM and running processes (most volatile) before disk contents (persistent). Memory is lost on power off, disk remains. This principle ensures maximum evidence preservation.",
+            "difficulty": 2,
+            "memory_aid": "OOV: Capture what disappears first",
+            "points": 10
+          }
+        ]
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Reflection: You discover a compromised web server at 3 AM. Walk through your incident response process step-by-step. What data do you collect first? What tools do you use? How do you balance evidence preservation with business continuity? When do you power off versus keep running? What documentation is critical?"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "pa1",
+      "type": "multiple_choice",
+      "question": "You find a suspicious cron job and want to check when it was created. Which is the BEST approach?",
+      "options": [
+        "Check crontab modification time and correlate with auth.log for crontab edits",
+        "Delete it immediately",
+        "Run it manually to see what it does",
+        "Just monitor it for now"
+      ],
+      "correct_answer": 0,
+      "explanation": "Option A: Forensic approach - check file timestamps (stat /var/spool/cron/crontabs/user) and search auth.log for crontab command execution to establish timeline. Deleting (B) destroys evidence. Running (C) may trigger additional malware. Monitoring (D) delays remediation.",
+      "difficulty": 3,
+      "memory_aid": "Timeline first - when and who created it before removing",
+      "points": 15
+    },
+    {
+      "question_id": "pa2",
+      "type": "multiple_choice",
+      "question": "What indicates a kernel-level rootkit may be present?",
+      "options": [
+        "High CPU usage",
+        "Discrepancy between ps output and /proc directory PIDs",
+        "Slow network speed",
+        "Disk space is low"
+      ],
+      "correct_answer": 1,
+      "explanation": "Option B: Rootkits hide processes by hooking system calls. If PIDs exist in /proc but don't show in ps, the ps command is compromised or rootkit is hiding them. CPU/network/disk issues (A, C, D) are generic symptoms, not rootkit-specific.",
+      "difficulty": 3,
+      "memory_aid": "Hidden PIDs = kernel hooks = rootkit",
+      "points": 15
+    },
+    {
+      "question": "What is the most important takeaway from this lesson?",
+      "options": [
+        "Understanding the core concepts and their practical applications",
+        "Memorizing all technical details",
+        "Only knowing the theory without practice",
+        "Focusing on a single aspect"
+      ],
+      "correct_answer": 0,
+      "explanation": "The key takeaway is understanding how to apply the concepts learned in real-world scenarios, combining both theoretical knowledge and practical skills.",
+      "question_id": "56478252-063b-4f13-851d-f913fbb6e3a0",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "tags": [
+    "linux",
+    "incident_response",
+    "forensics",
+    "memory_analysis",
+    "rootkit_detection",
+    "DFIR",
+    "live_response"
+  ],
+  "version": "1.0",
+  "author": "CyberLearn Platform",
+  "created_at": "2025-01-28T16:00:00Z",
+  "updated_at": "2025-01-28T19:00:00Z"
+}

@@ -1,0 +1,158 @@
+{
+  "lesson_id": "086f0188-ee9d-4e32-8788-4c0db2d3c511",
+  "domain": "dfir",
+  "title": "Windows Shell Items and ShellBags",
+  "subtitle": "Section 3: Shell Items and Removable Device Profiling Focus on Shell item structure",
+  "difficulty": 2,
+  "estimated_time": 49,
+  "order_index": 140,
+  "prerequisites": [
+    "bb521363-fa8b-4902-b3ed-5cbe1e8ca816",
+    "719f33a1-e7ef-44d4-b7eb-d2e3f18dbfa7"
+  ],
+  "concepts": [
+    "Shell item structure",
+    "ShellBags analysis",
+    "folder access tracking",
+    "LNK file analysis",
+    "Jump Lists",
+    "recent documents",
+    "network share access",
+    "MRU lists"
+  ],
+  "learning_objectives": [
+    "Summarize why Windows Shell Items and ShellBags matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply Shell item structure and ShellBags analysis to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Windows Shell Items and ShellBags.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does Shell item structure strengthen the Windows Shell Items and ShellBags workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "e910975e-33e6-4741-997c-0378c16de8a9",
+      "explanation": "Shell item structure provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Shell Items and ShellBags process consistently improves."
+    },
+    {
+      "question": "How does ShellBags analysis strengthen the Windows Shell Items and ShellBags workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "7118bb00-3f58-444c-8c0d-11fa3eec53dd",
+      "explanation": "ShellBags analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Shell Items and ShellBags process consistently improves."
+    },
+    {
+      "question": "How does folder access tracking strengthen the Windows Shell Items and ShellBags workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "f4a914fd-7902-4bab-8f46-b92c28f64bfb",
+      "explanation": "folder access tracking provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Shell Items and ShellBags process consistently improves."
+    },
+    {
+      "question": "How does LNK file analysis strengthen the Windows Shell Items and ShellBags workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "fbb3853a-db84-4be0-8fad-2c56ccb57a0a",
+      "explanation": "LNK file analysis provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Shell Items and ShellBags process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Shell Items and Removable Device Profiling – Windows Shell Items and ShellBags\n\nForensic analysts rely on **Windows Shell Items and ShellBags** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Detailed user activity reconstruction\n\nShell item structure keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how shell item structure supports resilience and recovery.\n\nShellBags analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how shellbags analysis supports resilience and recovery.\n\nfolder access tracking keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how folder access tracking supports resilience and recovery.\n\nLNK file analysis keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how lnk file analysis supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows shell items and shellbags habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=mKUZx1z9dxo — DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Shell Items and Removable Device Profiling – Windows Shell Items and ShellBags\n\nForensic analysts rely on **Windows Shell Items and ShellBags** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Detailed user activity reconstruction\n\nJump Lists keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how jump lists supports resilience and recovery.\n\nrecent documents keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how recent documents supports resilience and recovery.\n\nnetwork share access keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how network share access supports resilience and recovery.\n\nMRU lists keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how mru lists supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows shell items and shellbags habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Windows Shell Items and ShellBags\n\nSet up a sandbox aligned with section 3: shell items and removable device profiling commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **Shell item structure**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **ShellBags analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **folder access tracking**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **LNK file analysis**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **Jump Lists**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **recent documents**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Windows Shell Items and ShellBags\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from Windows Shell Items and ShellBags.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Detailed user activity reconstruction"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: WSIAS\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- W – Shell item structure\n- S – ShellBags analysis\n- I – folder access tracking\n- A – LNK file analysis\n- S – Jump Lists\n\n### Mnemonic: WSIAS\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- W – Lessons Learned\n- S – Resilience Testing\n- I – Automation Backlog\n- A – Telemetry Mapping\n- S – Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Windows Shell Items and ShellBags\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **Shell item structure** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **ShellBags analysis** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **folder access tracking** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the Windows Shell Items and ShellBags workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an intermediate journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Windows Shell Items and ShellBags.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR500"
+  ]
+}

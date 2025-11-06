@@ -1,0 +1,218 @@
+{
+  "lesson_id": "7df76daa-7d24-4ea0-ab43-dda0d04e6183",
+  "domain": "linux",
+  "title": "Container Runtime Threat Hunting",
+  "subtitle": "Falco, eBPF, and Kubernetes audit insights for cloud-native defenders",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 11,
+  "prerequisites": [
+    "Linux Security Monitoring & Logging",
+    "Cloud Native Security Fundamentals"
+  ],
+  "concepts": [
+    "Container runtime internals",
+    "Falco rules and response",
+    "eBPF-based telemetry",
+    "Kubernetes audit logging",
+    "Threat detection patterns (cryptominers, escape attempts)",
+    "MITRE ATT&CK for containers",
+    "Hunting playbooks and hypotheses",
+    "Integration with SIEM and SOAR",
+    "Signal-to-noise tuning",
+    "Purple-team validation loops"
+  ],
+  "learning_objectives": [
+    "Instrument container runtimes using Falco and eBPF collectors",
+    "Analyse Kubernetes audit logs to detect suspicious control-plane activity",
+    "Develop hunting hypotheses aligned with MITRE ATT&CK for containers",
+    "Tune Falco and eBPF rules to balance fidelity and performance",
+    "Integrate detections into SIEM/SOAR workflows for rapid response",
+    "Design purple-team drills to validate container-focused analytics"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "ace54213-4b70-43f9-a026-5dd217af2185",
+      "type": "mindset_coach",
+      "title": "Hunt the Invisible Layers",
+      "content": {
+        "text": "Containers abstract away the host—but attackers still leave signals. Adopt the mindset of a detective who sees through orchestration layers and translates noise into narratives."
+      },
+      "simplified_explanation": "Look beneath orchestration to find attacker footprints.",
+      "memory_aids": [
+        "See past the scheduler"
+      ],
+      "real_world_connection": "Threat hunters in large SaaS companies spend half their time chasing signals inside container telemetry.",
+      "reflection_prompt": "Which container signal has puzzled you recently?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "42f2f269-a185-4a88-86ba-d9d2ba285ce8",
+      "type": "explanation",
+      "title": "Hunting Framework",
+      "content": {
+        "text": "## C.A.N.I.S.\n- **C**ollect runtime events (Falco, eBPF).\n- **A**nalyse audit logs for control-plane anomalies.\n- **N**ormalise signals into ATT&CK techniques.\n- **I**terate on hypotheses with purple-team feedback.\n- **S**hare detections with SOC automation."
+      },
+      "simplified_explanation": "Use CANIS to structure every hunting sprint.",
+      "memory_aids": [
+        "Collect → Analyse → Normalise → Iterate → Share"
+      ],
+      "real_world_connection": "Security teams at container-heavy organisations follow similar cycles.",
+      "reflection_prompt": "Which CANIS step is your weakest link today?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d7595278-8401-44bb-b56f-eacf27379fe4",
+      "type": "video",
+      "title": "Falco Runtime Security Demo",
+      "content": {
+        "resources": "Watch Falco detect container escape attempts and suspicious syscalls.\n\n**Video**: [Container Runtime Security with Falco](https://www.youtube.com/watch?v=t-7sq1_wYP4)\n\nCapture rule-writing techniques, response hooks, and integration tips."
+      },
+      "simplified_explanation": "See how Falco rules translate runtime syscalls into alerts.",
+      "memory_aids": [
+        "Note each rule pattern for your lab"
+      ],
+      "real_world_connection": "This demo mirrors workshops hosted by the Falco community.",
+      "reflection_prompt": "Which rule will you adapt for your environment first?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9b164659-bb33-4717-b9e6-72a0c9dde6e2",
+      "type": "memory_aid",
+      "title": "POD Signals",
+      "content": {
+        "text": "### P.O.D.\n- **P**lane activity (kubectl exec, RoleBinding changes).\n- **O**S-level anomalies (unexpected syscalls, proc drift).\n- **D**ata movement (suspicious network egress, cloud metadata hits)."
+      },
+      "simplified_explanation": "Always check POD signals: control-plane, OS, and data flows.",
+      "memory_aids": [
+        "Plane → OS → Data"
+      ],
+      "real_world_connection": "Threat hunters triage incidents by checking these three lenses.",
+      "reflection_prompt": "Which POD signal do you log least effectively right now?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "ea456b46-0679-42d0-957d-3eb665886fcb",
+      "type": "real_world",
+      "title": "Field Example: Crypto Mining Campaign",
+      "content": {
+        "text": "A gaming company detected a crypto miner deployed through a compromised Helm chart. Falco flagged abnormal syscalls, Kubernetes audit logs showed anomalous service account creation, and eBPF telemetry revealed outbound connections to mining pools. Purple-team drills later added automated containment scripts."
+      },
+      "simplified_explanation": "Correlating runtime, audit, and network signals exposed the attacker quickly.",
+      "memory_aids": [
+        "Correlate to corroborate"
+      ],
+      "real_world_connection": "Incident summarised at a recent CNCF security meetup.",
+      "reflection_prompt": "How would you automate containment for a similar campaign?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "93642379-207e-4d44-8a7b-13863bd265d1",
+      "type": "simulation",
+      "title": "Container Hunting Lab",
+      "content": {
+        "text": "1. Deploy a lab cluster with Falco and capture sample events (e.g., sensitive file access).\n2. Pull Kubernetes audit logs for the same window and correlate events.\n3. Map findings to ATT&CK techniques and propose detection rules.\n4. Document a playbook entry with response steps and automation ideas."
+      },
+      "simplified_explanation": "Practise a full hunt from signal capture to playbook update.",
+      "memory_aids": [
+        "Signal → Correlate → Map → Document"
+      ],
+      "real_world_connection": "Security teams run similar labs before production rollouts.",
+      "reflection_prompt": "What automation will you add to reduce manual effort next time?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "57639b84-7b7b-4ae4-85ff-1e18db322b57",
+      "type": "reflection",
+      "title": "Teach Back the Hunt",
+      "content": {
+        "text": "### Reflect & Teach\n- Present your hunting findings to a teammate, highlighting POD signals and CANIS workflow.\n- List two detections you will operationalise in your SIEM or SOAR.\n- Identify one purple-team scenario to validate your new analytics."
+      },
+      "simplified_explanation": "Teaching cements your methodology and encourages cross-team validation.",
+      "memory_aids": [
+        "Explain → Operationalise → Validate"
+      ],
+      "real_world_connection": "Purple-team hotwashes follow identical talking points.",
+      "reflection_prompt": "Who will partner with you on the validation exercise?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What advantage does Falco provide during container threat hunting?",
+      "options": [
+        "It replaces the need for SIEM integration",
+        "It monitors kernel-level events in real time and maps them to rules",
+        "It only collects Kubernetes API events",
+        "It automatically remediates incidents"
+      ],
+      "correct_answer": 1,
+      "explanation": "Falco inspects system calls via eBPF and triggers rules for suspicious behaviour.",
+      "difficulty": 3,
+      "memory_aid": "Falco = runtime syscall watcher",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why should Kubernetes audit logs be correlated with runtime telemetry?",
+      "options": [
+        "Audit logs are optional if runtime telemetry exists",
+        "Correlation connects control-plane changes with container behaviour for fuller context",
+        "Runtime telemetry already contains audit log data",
+        "Correlation is only needed after incidents"
+      ],
+      "correct_answer": 1,
+      "explanation": "Audit logs show who initiated actions while runtime telemetry shows how workloads behaved, enabling richer investigations.",
+      "difficulty": 3,
+      "memory_aid": "Plane + runtime = context",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How can purple-team drills improve container hunting?",
+      "options": [
+        "They slow down hunts",
+        "They validate detections, surface gaps, and inspire new automation",
+        "They replace the need for detection tuning",
+        "They only benefit red teams"
+      ],
+      "correct_answer": 1,
+      "explanation": "Purple-team exercises provide feedback loops that refine detections and response playbooks.",
+      "difficulty": 3,
+      "memory_aid": "Purple feedback sharpens hunts",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:38:00",
+  "updated_at": "2025-10-28T15:38:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

@@ -223,12 +223,14 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 if progress and progress.status in [LessonStatus.COMPLETED, LessonStatus.MASTERED]:
                     st.markdown(f'<span style="background-color: {status_color}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">{status_emoji} {status_text}</span>', unsafe_allow_html=True)
 
-                col_a, col_b, col_c = st.columns(3)
+                col_a, col_b, col_c, col_d = st.columns(4)
                 with col_a:
-                    st.caption(f"⏱️ {lesson.estimated_time} min")
+                    st.caption(f"🆔 {lesson.get_short_id()}")
                 with col_b:
-                    st.caption(f"🎯 {lesson.get_difficulty_name()}")
+                    st.caption(f"⏱️ {lesson.estimated_time} min")
                 with col_c:
+                    st.caption(f"🎯 {lesson.get_difficulty_name()}")
+                with col_d:
                     st.caption(f"⚡ {lesson.base_xp_reward} XP")
 
                 if lesson.is_core_concept:
@@ -597,7 +599,7 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
 
     col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
     with col1:
-        st.caption(f"📚 Domain: {lesson.domain.replace('_', ' ').title()}")
+        st.caption(f"📚 Domain: {lesson.domain.replace('_', ' ').title()} | 🆔 {lesson.get_short_id()}")
     with col2:
         st.caption(f"🎯 Difficulty: {lesson.get_difficulty_name()}")
     with col3:

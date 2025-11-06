@@ -1,0 +1,209 @@
+{
+  "lesson_id": "e70572f5-75d3-4903-9675-f7bf7247c0b7",
+  "domain": "linux",
+  "title": "SOC Automation with eBPF",
+  "subtitle": "Custom probes for detection and response",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 16,
+  "prerequisites": [
+    "Container Runtime Threat Hunting",
+    "Linux Security Monitoring & Logging"
+  ],
+  "concepts": [
+    "eBPF fundamentals",
+    "Probe development lifecycle",
+    "Performance considerations",
+    "Security use cases",
+    "Integration with SIEM/SOAR",
+    "Automation triggers",
+    "Monitoring and alerting",
+    "Testing and validation",
+    "Compliance and governance",
+    "Roadmap planning"
+  ],
+  "learning_objectives": [
+    "Identify detection gaps addressed by eBPF",
+    "Develop probes with safety checks",
+    "Integrate eBPF telemetry into SOC tooling",
+    "Automate responses via SOAR",
+    "Monitor probe performance and impacts",
+    "Iterate instrumentation based on feedback"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "034da236-7ff0-4dd1-b21d-6abc09d86a2c",
+      "type": "mindset_coach",
+      "title": "Prime Your Approach",
+      "content": {
+        "text": "Enter this lesson ready to balance design discipline with creative problem solving."
+      },
+      "simplified_explanation": "Plan carefully, test thoroughly, and iterate often.",
+      "memory_aids": [
+        "Plan → Build → Review"
+      ],
+      "real_world_connection": "Security leaders rely on this mindset for durable improvements.",
+      "reflection_prompt": "Which detection gap would eBPF close for your SOC?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a93ad6e1-fdec-4dc6-a5ae-775338db1bab",
+      "type": "explanation",
+      "title": "Guiding Framework",
+      "content": {
+        "text": "### EBPF\n- **E**xplore telemetry gaps\n- **B**uild safe probes\n- **P**rocess events\n- **F**eedback into detections"
+      },
+      "simplified_explanation": "Keep the mnemonic close to stay oriented as complexity grows.",
+      "memory_aids": [
+        "EBPF"
+      ],
+      "real_world_connection": "Frameworks anchor busy teams navigating change.",
+      "reflection_prompt": "Which step of the framework will require the most collaboration?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "3ad4097d-2951-4267-ac47-63fcd4855b8f",
+      "type": "video",
+      "title": "eBPF for Security Observability",
+      "content": {
+        "resources": "Watch the expert session to reinforce these concepts.\n\n**Video**: [Liz Rice – eBPF for Security](https://www.youtube.com/watch?v=IF7bmm9140Q)\n\nKernel engineering teams explain building eBPF instrumentation for security."
+      },
+      "simplified_explanation": "Visual learning accelerates retention—take notes as you watch.",
+      "memory_aids": [
+        "Pause, summarise, apply"
+      ],
+      "real_world_connection": "Conference talks reveal hard-won lessons from practitioners.",
+      "reflection_prompt": "Which tactic from the video will you pilot?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "91d94eed-122f-47e7-9e60-fc4c3958d390",
+      "type": "real_world",
+      "title": "Field Example",
+      "content": {
+        "text": "A fintech SOC detected credential theft by deploying eBPF probes that triggered automated SOAR containment workflows."
+      },
+      "simplified_explanation": "See how peers translated theory into results.",
+      "memory_aids": [
+        "Outcome driven"
+      ],
+      "real_world_connection": "Sourced from public case studies and practitioner talks.",
+      "reflection_prompt": "What metric will prove success in your environment?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "dec40cfd-ae81-4960-aa96-50454c9e8aa3",
+      "type": "simulation",
+      "title": "Guided Simulation",
+      "content": {
+        "text": "1. Define a missing detection signal.\n2. Prototype an eBPF probe capturing that event.\n3. Forward data to the SIEM and SOAR.\n4. Evaluate performance and adjust."
+      },
+      "simplified_explanation": "Rehearse changes in a controlled setting to surface gaps early.",
+      "memory_aids": [
+        "Practice prevents surprises"
+      ],
+      "real_world_connection": "Tabletop and lab drills are standard before production rollouts.",
+      "reflection_prompt": "What support do you need to complete this simulation?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "type": "memory_aid",
+      "title": "Key Takeaways: SOC Automation with eBPF",
+      "content": {
+        "text": "**Memory Aid: SOC Automation with eBPF**\n\n**Key Concepts - Remember with MASTER:**\n- **M**ain principles and core concepts\n- **A**ttack vectors and defensive techniques\n- **S**ecurity implications and risks\n- **T**ools and technologies used\n- **E**xamples from real-world scenarios\n- **R**eview and practice regularly\n\n**Quick Reference:**\n\n**Essential Terms:**\n- Understand the critical terminology introduced in this lesson\n- Create mental associations between related concepts\n- Build on foundational knowledge from previous lessons\n\n**Practical Application:**\n- Connect theoretical concepts to hands-on practice\n- Visualize how techniques work in real environments\n- Remember context: when and why to use each approach\n\n**Memory Techniques:**\n1. **Acronyms & Mnemonics:** Create memorable abbreviations for complex concepts\n2. **Visual Associations:** Picture the workflow or architecture mentally\n3. **Story-Based Learning:** Frame concepts as a narrative or attack scenario\n4. **Teach to Learn:** Explain concepts to others to reinforce understanding\n\n**Common Pitfalls to Avoid:**\n- Don't memorize commands without understanding purpose\n- Avoid practicing only in theory - hands-on is essential\n- Don't skip fundamentals to jump to advanced topics\n- Remember to document your learning journey\n\n**Integration Tips:**\n- How does this lesson connect to your career goals in linux?\n- Which concepts will you use most frequently?\n- What related topics should you explore next?\n\n**Review Schedule:**\n- Day 1: Immediate review after completing lesson\n- Week 1: Quick recall of main concepts\n- Month 1: Practical application in lab environment\n- Quarter: Deep dive and advanced exploration"
+      }
+    },
+    {
+      "block_id": "1316ae6d-df5c-4449-8f3d-0d28b4850376",
+      "type": "reflection",
+      "title": "Teach Back",
+      "content": {
+        "text": "### Teach Back\n- Explain the framework to a teammate.\n- List two next actions and deadlines.\n- Schedule a review meeting to assess progress."
+      },
+      "simplified_explanation": "Teaching cements accountability.",
+      "memory_aids": [
+        "Explain → Act → Review"
+      ],
+      "real_world_connection": "High-performing teams embed teach-backs into their cadence.",
+      "reflection_prompt": "Who will you brief on your plan and when?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What ensures this capability continues delivering value?",
+      "options": [
+        "Ignore metrics once deployed",
+        "Monitor metrics, gather feedback, and iterate",
+        "Delegate entirely to vendors",
+        "Disable logging to reduce costs"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continual measurement, collaboration, and retros keep the programme healthy.",
+      "difficulty": 3,
+      "memory_aid": "EBPF",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why involve stakeholders early?",
+      "options": [
+        "They only slow progress",
+        "They provide context, approvals, and shared ownership",
+        "It is optional",
+        "Stakeholders only need the final report"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continual measurement, collaboration, and retros keep the programme healthy.",
+      "difficulty": 3,
+      "memory_aid": "EBPF",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How do lessons learned meetings support growth?",
+      "options": [
+        "They are ceremonial",
+        "They capture improvements for tooling, process, and training",
+        "They replace testing",
+        "They increase bureaucracy"
+      ],
+      "correct_answer": 1,
+      "explanation": "Continual measurement, collaboration, and retros keep the programme healthy.",
+      "difficulty": 3,
+      "memory_aid": "EBPF",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T16:45:00",
+  "updated_at": "2025-10-28T16:45:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

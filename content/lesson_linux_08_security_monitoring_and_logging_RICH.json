@@ -1,0 +1,219 @@
+{
+  "lesson_id": "bbccd28f-4fda-4230-89ed-cd72622ddc01",
+  "domain": "linux",
+  "title": "Linux Security Monitoring & Logging",
+  "subtitle": "Signal-rich telemetry for defenders and responders",
+  "difficulty": 2,
+  "estimated_time": 50,
+  "order_index": 8,
+  "prerequisites": [
+    "Linux Architecture and Filesystem",
+    "Linux Permissions and Access Control",
+    "Linux Networking and Firewall"
+  ],
+  "concepts": [
+    "Auditd configuration and rule design",
+    "Systemd journal optimisation",
+    "Syslog forwarding architectures",
+    "File integrity monitoring",
+    "Process accounting and psacct",
+    "Event schema normalisation",
+    "SIEM integration patterns",
+    "Open-source detection rules (Sigma, Falco)",
+    "Cloud-native Linux logging",
+    "Tamper resistance and resiliency"
+  ],
+  "learning_objectives": [
+    "Configure auditd and journald for high fidelity security telemetry",
+    "Normalise Linux logs for SIEM ingestion and correlation",
+    "Detect suspicious activity using open source rules and baseline tuning",
+    "Balance retention, cost, and compliance for log storage",
+    "Integrate Linux telemetry into DFIR and threat hunting workflows",
+    "Harden logging infrastructure against adversarial tampering"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "1430553c-0ac0-4ce5-9c46-c00e61397b90",
+      "type": "mindset_coach",
+      "title": "Treat Telemetry as a Product",
+      "content": {
+        "text": "Logs are not a by-product—they are the product defenders consume. Approach every configuration change with user empathy: will this signal help the responder make a faster, better decision?"
+      },
+      "simplified_explanation": "Craft logs so they are immediately useful to analysts.",
+      "memory_aids": [
+        "Signal beats storage"
+      ],
+      "real_world_connection": "High-performing SOCs run telemetry engineering as a product team.",
+      "reflection_prompt": "What log source currently frustrates your defenders the most?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "94b997e1-bf86-4a87-875e-53d83178f3ce",
+      "type": "explanation",
+      "title": "Telemetry Pillars",
+      "content": {
+        "text": "## Capture, Normalise, Operationalise\n- **Capture** – auditd, journald, FIM, and network sensors provide raw signal.\n- **Normalise** – translate into schemas (ECS/Sigma) and enrich with context.\n- **Operationalise** – build detections, dashboards, and playbooks."
+      },
+      "simplified_explanation": "Collect, standardise, and use the data—skip any step and value drops.",
+      "memory_aids": [
+        "Capture → Normalise → Operationalise"
+      ],
+      "real_world_connection": "Telemetry teams use this framing when negotiating roadmap priorities.",
+      "reflection_prompt": "Which pillar is weakest in your current environment?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "2a58dedc-9869-469e-a1dc-ffb4aea885bc",
+      "type": "video",
+      "title": "Linux Auditd and Logging Best Practices",
+      "content": {
+        "resources": "Walk through audit rule design, journald tuning, and SIEM integration.\n\n**Video**: [Linux Monitoring and Logging | HackerSploit Linux Security](https://www.youtube.com/watch?v=kZ5LhS6fThM)\n\nDocument the sample rules and export methods demonstrated."
+      },
+      "simplified_explanation": "Let the visuals guide your lab configuration changes.",
+      "memory_aids": [
+        "Pause and copy the rule templates"
+      ],
+      "real_world_connection": "Many MSSPs train analysts with this exact session.",
+      "reflection_prompt": "Which rule or pipeline will you prototype this week?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "6c7d3667-e81e-4876-a7b5-33fb0bb23452",
+      "type": "memory_aid",
+      "title": "LOGS Checklist",
+      "content": {
+        "text": "### L.O.G.S.\n- **L**ock down collectors\n- **O**ptimise for context (user, host, process)\n- **G**uard against tampering (remote storage, immutability)\n- **S**hare dashboards and detections with responders"
+      },
+      "simplified_explanation": "Use LOGS to sanity-check every pipeline.",
+      "memory_aids": [
+        "LOGS make logs useful"
+      ],
+      "real_world_connection": "Security architects apply similar checklists before promoting configs to production.",
+      "reflection_prompt": "Which LOGS element is missing from your current setup?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "6c7d3667-e81e-4876-a7b5-33fb0bb23453",
+      "type": "real_world",
+      "title": "Field Example: MSSP Detection Uplift",
+      "content": {
+        "text": "A managed security provider standardised audit rules across 2,000 Linux servers, fed enriched events into their detection platform, and reduced investigation time by 40%. They caught a coin-mining campaign that had previously evaded controls."
+      },
+      "simplified_explanation": "Consistent telemetry and enrichment unlock faster detection.",
+      "memory_aids": [
+        "Standardise to operationalise"
+      ],
+      "real_world_connection": "Adapted from an MSSP case study presented at a SANS summit.",
+      "reflection_prompt": "What is the first standard you will apply across your fleet?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "6c7d3667-e81e-4876-a7b5-33fb0bb23454",
+      "type": "simulation",
+      "title": "Build a Logging Blueprint",
+      "content": {
+        "text": "1. Draft auditd rules covering credential changes, process execution, and network sockets.\n2. Plan log forwarding to your SIEM, including fail-open behaviour and backlog handling.\n3. Identify dashboards or alerts that operationalise the telemetry.\n4. Capture the blueprint in your runbook and assign owners."
+      },
+      "simplified_explanation": "Design your telemetry pipeline on paper before altering production.",
+      "memory_aids": [
+        "Blueprint before build"
+      ],
+      "real_world_connection": "Blueprint exercises help SOCs justify tooling investments.",
+      "reflection_prompt": "Which stakeholders must approve this blueprint?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "6c7d3667-e81e-4876-a7b5-33fb0bb23455",
+      "type": "reflection",
+      "title": "Teach Back the Telemetry",
+      "content": {
+        "text": "### Reflect & Teach\n- Explain your blueprint to a responder, emphasising LOGS checkpoints.\n- List two detections you will build once telemetry is online.\n- Identify one safeguard that keeps attackers from tampering with logs."
+      },
+      "simplified_explanation": "Teaching ensures your telemetry plan is understandable and actionable.",
+      "memory_aids": [
+        "Explain → Detect → Safeguard"
+      ],
+      "real_world_connection": "Telemetry engineers share these briefings during sprint reviews.",
+      "reflection_prompt": "Which responder will you partner with for feedback?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why normalise Linux logs before sending them to a SIEM?",
+      "options": [
+        "To increase storage cost",
+        "To make correlation and detection rules consistent",
+        "To hide events from analysts",
+        "To disable alerting"
+      ],
+      "correct_answer": 1,
+      "explanation": "Normalised logs allow reusable detection logic and faster triage.",
+      "difficulty": 2,
+      "memory_aid": "Normalise to operationalise",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which component records kernel-level events for security monitoring?",
+      "options": [
+        "cron",
+        "auditd",
+        "rsync",
+        "iptables"
+      ],
+      "correct_answer": 1,
+      "explanation": "Auditd captures system calls and kernel events necessary for deep visibility.",
+      "difficulty": 2,
+      "memory_aid": "Auditd = kernel lens",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Why should logging infrastructure be hardened?",
+      "options": [
+        "Because it is optional",
+        "Attackers target logs to cover tracks; protecting them preserves evidence",
+        "To slow down analysts",
+        "To reduce compliance requirements"
+      ],
+      "correct_answer": 1,
+      "explanation": "Tamper-resistant logging ensures defenders can trust their telemetry.",
+      "difficulty": 2,
+      "memory_aid": "Protect the signal",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

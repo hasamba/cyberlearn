@@ -1,0 +1,159 @@
+{
+  "lesson_id": "51ea2c82-cfd9-4a1f-90a6-4f083544fee9",
+  "domain": "dfir",
+  "title": "Linux Triage Collection and Forensic Readiness",
+  "subtitle": "Section 3: Modern Attacks Against Windows and Linux DFIR Focus on Linux triage methodologies",
+  "difficulty": 3,
+  "estimated_time": 56,
+  "order_index": 160,
+  "prerequisites": [
+    "485eb65f-3182-439d-b180-9abb87c1e586",
+    "6226d62b-6261-4c9d-b56d-1a8e988cabb5",
+    "3e8c02c6-cb2d-4f38-a664-d802b8829c89",
+    "a40010da-0d51-4879-bbc2-6b4fb05362e9",
+    "fb3e10c1-60b3-4595-bed4-d139cb3c915a"
+  ],
+  "concepts": [
+    "Linux triage methodologies",
+    "UAC deployment",
+    "Velociraptor for Linux",
+    "forensic readiness planning",
+    "evidence preservation",
+    "remote Linux response"
+  ],
+  "learning_objectives": [
+    "Summarize why Linux Triage Collection and Forensic Readiness matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply Linux triage methodologies and UAC deployment to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Linux Triage Collection and Forensic Readiness.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does Linux triage methodologies strengthen the Linux Triage Collection and Forensic Readiness workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "b55ca982-d9bb-40b1-8309-59b9b5338906",
+      "explanation": "Linux triage methodologies provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Linux Triage Collection and Forensic Readiness process consistently improves."
+    },
+    {
+      "question": "How does UAC deployment strengthen the Linux Triage Collection and Forensic Readiness workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "0c92b411-9d21-499b-b464-8aacc1782b75",
+      "explanation": "UAC deployment provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Linux Triage Collection and Forensic Readiness process consistently improves."
+    },
+    {
+      "question": "How does Velociraptor for Linux strengthen the Linux Triage Collection and Forensic Readiness workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "c69590e3-4303-4c6e-82b0-7ce370766ace",
+      "explanation": "Velociraptor for Linux provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Linux Triage Collection and Forensic Readiness process consistently improves."
+    },
+    {
+      "question": "How does forensic readiness planning strengthen the Linux Triage Collection and Forensic Readiness workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "fe04d571-3530-4d18-b79a-773a3c6c08c0",
+      "explanation": "forensic readiness planning provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Linux Triage Collection and Forensic Readiness process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Modern Attacks Against Windows and Linux DFIR – Linux Triage Collection and Forensic Readiness\n\nForensic analysts rely on **Linux Triage Collection and Forensic Readiness** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Operationalizing Linux IR\n\nLinux triage methodologies keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how linux triage methodologies supports resilience and recovery.\n\nUAC deployment keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how uac deployment supports resilience and recovery.\n\nVelociraptor for Linux keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how velociraptor for linux supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the linux triage collection and forensic readiness habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=Wmmx8B29TNI — DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Modern Attacks Against Windows and Linux DFIR – Linux Triage Collection and Forensic Readiness\n\nForensic analysts rely on **Linux Triage Collection and Forensic Readiness** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Operationalizing Linux IR\n\nforensic readiness planning keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how forensic readiness planning supports resilience and recovery.\n\nevidence preservation keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how evidence preservation supports resilience and recovery.\n\nremote Linux response keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: modern attacks against windows and linux dfir commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how remote linux response supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the linux triage collection and forensic readiness habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Linux Triage Collection and Forensic Readiness\n\nSet up a sandbox aligned with section 3: modern attacks against windows and linux dfir commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **Linux triage methodologies**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **UAC deployment**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **Velociraptor for Linux**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **forensic readiness planning**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **evidence preservation**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **remote Linux response**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Linux Triage Collection and Forensic Readiness\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from Linux Triage Collection and Forensic Readiness.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Operationalizing Linux IR"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: LTCAF\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- L – Linux triage methodologies\n- T – UAC deployment\n- C – Velociraptor for Linux\n- A – forensic readiness planning\n- F – evidence preservation\n\n### Mnemonic: TCAFR\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- T – Lessons Learned\n- C – Resilience Testing\n- A – Automation Backlog\n- F – Telemetry Mapping\n- R – Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Linux Triage Collection and Forensic Readiness\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **Linux triage methodologies** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **UAC deployment** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **Velociraptor for Linux** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the Linux Triage Collection and Forensic Readiness workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an advanced journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Linux Triage Collection and Forensic Readiness.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR608"
+  ]
+}
