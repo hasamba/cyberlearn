@@ -13,8 +13,10 @@ import shutil
 
 def setup_database():
     """Copy template database to working database if it doesn't exist"""
-    template_db = Path(__file__).parent / "cyberlearn_template.db"
-    working_db = Path(__file__).parent / "cyberlearn.db"
+    # Template and working databases are in project root, not scripts/
+    project_root = Path(__file__).parent.parent
+    template_db = project_root / "cyberlearn_template.db"
+    working_db = project_root / "cyberlearn.db"
 
     print("=" * 60)
     print("CYBERLEARN DATABASE SETUP")
