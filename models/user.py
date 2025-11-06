@@ -112,6 +112,10 @@ class UserProfile(BaseModel):
     last_username: Optional[str] = None  # For login form convenience
     preferred_tag_filters: List[str] = Field(default_factory=list)  # List of tag names
 
+    # Continue Learning (persistent across devices)
+    last_active_lesson_id: Optional[UUID] = None  # Last lesson viewed
+    last_active_at: Optional[datetime] = None  # When user last viewed a lesson
+
     def calculate_level(self) -> int:
         """Calculate user level based on total XP"""
         if self.total_xp < 1000:

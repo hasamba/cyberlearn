@@ -585,6 +585,11 @@ def render_lesson(user: UserProfile, lesson: Lesson, db: Database):
     # Add floating "Back to Top" button
     _add_floating_top_button()
 
+    # Track last active lesson (for "Continue Learning" feature)
+    user.last_active_lesson_id = lesson.lesson_id
+    user.last_active_at = datetime.now()
+    db.update_user(user)
+
     # Initialize lesson state
     if "lesson_start_time" not in st.session_state:
         st.session_state.lesson_start_time = time.time()
