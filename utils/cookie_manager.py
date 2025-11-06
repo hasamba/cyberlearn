@@ -95,9 +95,11 @@ class CookieManager:
         Returns:
             Cookie value or default
         """
-        # Access the dictionary directly to avoid Streamlit API conflicts
-        cookies_dict = dict(st.session_state.cookies)
-        return cookies_dict.get(name, default)
+        # Use dictionary indexing instead of .get() to avoid Streamlit API conflicts
+        try:
+            return st.session_state.cookies[name]
+        except (KeyError, TypeError):
+            return default
 
     def delete(self, name: str):
         """
@@ -127,9 +129,22 @@ class CookieManager:
 
     def get_all(self) -> dict:
         """Get all cookies as a dictionary"""
-        return dict(st.session_state.cookies)
+        # Return a copy to avoid Streamlit API conflicts
+        result = {}
+        if hasattr(st.session_state, 'cookies'):
+            # Manually iterate to avoid .keys() or .items() interception
+            for key in st.session_state.cookies:
+                result[key] = st.session_state.cookies[key]
+        return result
 
     def clear_all(self):
         """Clear all cookies"""
-        for name in list(st.session_state.cookies.keys()):
+        # Get cookie names by iterating directly to avoid .keys() interception
+        cookie_names = []
+        if hasattr(st.session_state, 'cookies'):
+            for name in st.session_state.cookies:
+                cookie_names.append(name)
+
+        # Delete each cookie
+        for name in cookie_names:
             self.delete(name)
