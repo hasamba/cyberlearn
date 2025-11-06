@@ -1,0 +1,120 @@
+{
+  "lesson_id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+  "domain": "fundamentals",
+  "title": "DNS Security: Protecting the Internet's Phone Book",
+  "difficulty": 2,
+  "order_index": 20,
+  "prerequisites": ["f1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c", "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"],
+  "concepts": [
+    "DNS protocol and record types",
+    "DNS hierarchy and resolution process",
+    "DNS cache poisoning attacks",
+    "DNSSEC (DNS Security Extensions)",
+    "DNS tunneling and exfiltration",
+    "DNS over HTTPS (DoH) and DNS over TLS (DoT)",
+    "Common DNS attacks and mitigations",
+    "DNS forensics and threat hunting"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand DNS protocol structure and resolution process",
+    "Identify and prevent DNS cache poisoning attacks",
+    "Implement DNSSEC for domain integrity",
+    "Detect DNS tunneling and data exfiltration",
+    "Configure secure DNS resolvers (DoH/DoT)",
+    "Perform DNS-based threat hunting and forensics"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "dns-001",
+      "question": "Which DNS record type is used to map a domain name to an IPv4 address?",
+      "options": ["CNAME", "A", "MX", "TXT"],
+      "correct_answer": 1,
+      "explanation": "The A (Address) record maps a domain name to an IPv4 address. For example, example.com → 93.184.216.34. CNAME is for aliasing domains, MX is for mail servers, and TXT is for arbitrary text data. For IPv6 addresses, AAAA records are used instead.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "dns-002",
+      "question": "In a DNS cache poisoning attack, what is the attacker's primary goal?",
+      "options": [
+        "Steal DNS server credentials",
+        "Cause DNS server to crash",
+        "Inject false DNS records into cache",
+        "Delete legitimate DNS records"
+      ],
+      "correct_answer": 2,
+      "explanation": "DNS cache poisoning aims to inject false DNS records into a resolver's cache, causing users to be redirected to attacker-controlled servers. For example, poisoning the cache with 'bank.com → attacker-ip' redirects all users querying that resolver to a phishing site. The poisoned entries persist until the TTL expires, affecting all users of that DNS resolver.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "dns-003",
+      "question": "What does DNSSEC primarily protect against?",
+      "options": [
+        "DDoS attacks on DNS servers",
+        "DNS query privacy",
+        "DNS spoofing and tampering",
+        "DNS server performance issues"
+      ],
+      "correct_answer": 2,
+      "explanation": "DNSSEC (DNS Security Extensions) uses cryptographic signatures to verify that DNS responses haven't been tampered with and come from the authoritative source. It protects against DNS spoofing, cache poisoning, and man-in-the-middle attacks by allowing resolvers to validate the authenticity and integrity of DNS data. However, DNSSEC does NOT encrypt DNS queries (that's what DoH/DoT do), and it doesn't prevent DDoS attacks.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "dns-004",
+      "question": "An attacker is using DNS queries to slowly exfiltrate stolen data from a compromised system. What technique are they using?",
+      "options": ["DNS amplification", "DNS cache poisoning", "DNS tunneling", "DNS hijacking"],
+      "correct_answer": 2,
+      "explanation": "DNS tunneling encodes data within DNS queries and responses to bypass firewalls and exfiltrate data. For example, stolen data is encoded in subdomains: 'base64-encoded-data.attacker-domain.com'. Since DNS is rarely blocked and often not inspected deeply, it's an effective covert channel. Detection involves looking for unusually long domain names, high query volumes to uncommon TLDs, and suspicious patterns in subdomain structures.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "dns-005",
+      "question": "What is the key difference between DNS over HTTPS (DoH) and DNS over TLS (DoT)?",
+      "options": [
+        "DoH encrypts queries, DoT doesn't",
+        "DoH uses port 443, DoT uses port 853",
+        "DoH provides authentication, DoT doesn't",
+        "DoH is faster than DoT"
+      ],
+      "correct_answer": 1,
+      "explanation": "Both DoH and DoT encrypt DNS queries to prevent eavesdropping, but they use different protocols and ports. DoH encapsulates DNS queries in HTTPS requests on port 443 (blending with regular web traffic), while DoT establishes a dedicated TLS connection on port 853 (easily identifiable as DNS). DoH's use of port 443 makes it harder to block but also harder to monitor for corporate security teams. Both provide encryption and authentication, with similar performance characteristics.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "reframe_limiting_beliefs"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Welcome to DNS Security!\n\n**DNS is the internet's phone book** - and it's one of the most attacked protocols on the internet.\n\n## Why DNS Security Matters\n\nEvery single action you take online starts with DNS:\n- Browsing a website? DNS lookup first.\n- Sending an email? DNS finds the mail server.\n- Connecting to a VPN? DNS resolves the endpoint.\n- Running a mobile app? DNS in the background.\n\n**If attackers control DNS, they control where you go.**\n\n### Real-World Impact\n\n🚨 **DNS attacks are everywhere:**\n- **2016**: Dyn DNS DDoS took down Twitter, Netflix, Reddit, Spotify\n- **2018**: Router DNS hijacking redirected 200,000+ users to phishing sites\n- **2019**: Sea Turtle campaign hijacked DNS for government and ISP networks\n- **2021**: DNS tunneling used to exfiltrate data from Fortune 500 companies\n- **2024**: DNS-based malware C2 channels in 40% of enterprise breaches\n\n### What You'll Learn\n\nBy the end of this lesson, you'll:\n\n✅ **Understand DNS deeply** - Not just \"it translates names to IPs\" but how the entire resolution process works\n\n✅ **Identify DNS attacks** - Cache poisoning, tunneling, hijacking, amplification\n\n✅ **Implement DNS security** - DNSSEC, DoH, DoT, RPZ, proper configurations\n\n✅ **Hunt threats via DNS** - Detect malware C2, data exfiltration, phishing infrastructure\n\n✅ **Investigate DNS incidents** - Forensic analysis of DNS logs and traffic\n\n## The Mindset Shift\n\n**DNS seems simple**: \"Type google.com, get IP address, done.\"\n\n**Reality**: DNS is a complex, distributed, hierarchical system with billions of queries per day, thousands of caching layers, and minimal security built into the original design.\n\n**Your job**: Understand the complexity, identify the weaknesses, and defend against attacks that exploit this critical infrastructure.\n\n## Why This Is Exciting\n\nDNS security sits at the **intersection of networking, cryptography, malware analysis, and threat hunting**:\n\n- **Blue teams** monitor DNS for malicious domains and C2 infrastructure\n- **Red teams** use DNS tunneling to evade detection\n- **Threat hunters** analyze DNS patterns to detect APT campaigns\n- **Incident responders** use DNS logs to reconstruct attack timelines\n- **Security engineers** implement DNSSEC, DoH, and DNS firewalls\n\n**Master DNS, and you unlock a superpower in every security role.**\n\n---\n\nLet's dive into the internet's most critical (and most attacked) protocol! 🚀"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# DNS Fundamentals\n\n## What is DNS?\n\n**Domain Name System (DNS)** is a hierarchical, distributed database that translates human-readable domain names (like `example.com`) into IP addresses (like `93.184.216.34`) that computers use to communicate.\n\n### Why DNS Exists\n\n**The problem DNS solves:**\n```\nHuman: \"I want to visit google.com\"\nComputer: \"I can only connect to 142.250.185.46\"\nHuman: \"I can't remember that!\"\nDNS: \"No problem, I'll translate for you.\"\n```\n\n**Without DNS**, you'd need to memorize:\n- Google: 142.250.185.46\n- Facebook: 157.240.241.35\n- Amazon: 205.251.242.103\n- GitHub: 140.82.113.4\n- Thousands more...\n\n**With DNS**, you just remember names.\n\n## DNS Record Types\n\nDNS stores various types of records, each serving a different purpose:\n\n### A Record (Address)\n\n**Purpose**: Map domain name to IPv4 address\n\n```\nexample.com.    3600    IN    A    93.184.216.34\n│               │       │     │    │\nDomain          TTL     Class Type IP Address\n```\n\n**Example query:**\n```bash\n$ dig example.com A +short\n93.184.216.34\n```\n\n### AAAA Record (IPv6 Address)\n\n**Purpose**: Map domain name to IPv6 address\n\n```\nexample.com.    3600    IN    AAAA    2606:2800:220:1:248:1893:25c8:1946\n```\n\n### CNAME Record (Canonical Name)\n\n**Purpose**: Create alias (one domain pointing to another)\n\n```\nwww.example.com.    3600    IN    CNAME    example.com.\ncdn.example.com.    3600    IN    CNAME    cdn-provider.com.\n```\n\n**Use case**: Redirect `www.example.com` to `example.com` without maintaining duplicate A records\n\n### MX Record (Mail Exchange)\n\n**Purpose**: Specify mail servers for domain\n\n```\nexample.com.    3600    IN    MX    10 mail1.example.com.\nexample.com.    3600    IN    MX    20 mail2.example.com.\n│                           │  │    │\nDomain                      │  │    Mail server\n                            │  Priority (lower = preferred)\n                            Record type\n```\n\n**How email works:**\n1. Send email to `user@example.com`\n2. Look up MX record for `example.com`\n3. Find `mail1.example.com` (priority 10)\n4. Look up A record for `mail1.example.com`\n5. Connect to mail server IP\n\n### TXT Record (Text)\n\n**Purpose**: Store arbitrary text data\n\n**Common uses:**\n\n**1. SPF (Sender Policy Framework)** - Email authentication\n```\nexample.com.    IN    TXT    \"v=spf1 ip4:192.0.2.0/24 include:_spf.google.com ~all\"\n```\n\n**2. DKIM (DomainKeys Identified Mail)** - Email signatures\n```\ndefault._domainkey.example.com.    IN    TXT    \"v=DKIM1; k=rsa; p=MIGfMA0GCS...\"\n```\n\n**3. DMARC** - Email policy\n```\n_dmarc.example.com.    IN    TXT    \"v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com\"\n```\n\n**4. Domain verification** (Google, Microsoft, etc.)\n```\nexample.com.    IN    TXT    \"google-site-verification=rXOxyZounnZasA8Z7oaD3c14JdjS9aKSWvsR1EbUSIQ\"\n```\n\n**5. CAA (Certificate Authority Authorization)** - Control which CAs can issue certificates\n```\nexample.com.    IN    CAA    0 issue \"letsencrypt.org\"\nexample.com.    IN    CAA    0 issuewild \";\"\nexample.com.    IN    CAA    0 iodef \"mailto:security@example.com\"\n```\n\n### NS Record (Name Server)\n\n**Purpose**: Delegate zone to authoritative name servers\n\n```\nexample.com.    3600    IN    NS    ns1.example.com.\nexample.com.    3600    IN    NS    ns2.example.com.\n```\n\n**Glue records** (when name server is within delegated zone):\n```\nns1.example.com.    3600    IN    A    192.0.2.1\nns2.example.com.    3600    IN    A    192.0.2.2\n```\n\n### PTR Record (Pointer)\n\n**Purpose**: Reverse DNS lookup (IP to domain name)\n\n```\n34.216.184.93.in-addr.arpa.    3600    IN    PTR    example.com.\n```\n\n**Use cases:**\n- Email server validation (many mail servers check PTR records)\n- Security forensics (identify malicious IPs)\n- Network troubleshooting\n\n### SOA Record (Start of Authority)\n\n**Purpose**: Store authoritative information about zone\n\n```\nexample.com.    3600    IN    SOA    ns1.example.com. admin.example.com. (\n    2024110601 ; Serial (YYYYMMDDnn)\n    7200       ; Refresh (2 hours)\n    3600       ; Retry (1 hour)\n    604800     ; Expire (1 week)\n    86400      ; Minimum TTL (1 day)\n)\n```\n\n**Fields:**\n- **Primary NS**: Authoritative name server\n- **Admin email**: Responsible party (`admin.example.com.` = `admin@example.com`)\n- **Serial**: Version number (increment when zone changes)\n- **Refresh**: How often secondary NS should check for updates\n- **Retry**: How long to wait if refresh fails\n- **Expire**: When secondary NS should stop serving if can't contact primary\n- **Minimum TTL**: Default TTL for negative caching\n\n### SRV Record (Service)\n\n**Purpose**: Specify location of services\n\n```\n_ldap._tcp.example.com.    3600    IN    SRV    10 60 389 ldap.example.com.\n│      │                                  │  │  │   │\nService Protocol                          │  │  │   Target host\n                                          │  │  Port\n                                          │  Weight (load balancing)\n                                          Priority (lower = preferred)\n```\n\n**Common services:**\n- `_ldap._tcp` - LDAP directory service\n- `_kerberos._tcp` - Kerberos authentication\n- `_sip._tcp` - SIP telephony\n- `_xmpp-client._tcp` - XMPP/Jabber chat\n\n## DNS Resolution Process\n\n### Recursive vs. Iterative Resolution\n\n**Let's walk through resolving `www.example.com`:**\n\n```\n┌─────────────┐\n│   Client    │  \"What's the IP for www.example.com?\"\n└─────┬───────┘\n      │ (1) DNS query\n      ▼\n┌─────────────┐\n│  Recursive  │  \"I'll find that for you!\"\n│  Resolver   │  (Your ISP's DNS server or 8.8.8.8)\n└─────┬───────┘\n      │ (2) Query root servers: \"Where's .com?\"\n      ▼\n┌─────────────┐\n│ Root Server │  \"Ask the .com TLD servers\"\n│ (13 roots)  │  Returns: NS records for .com\n└─────────────┘\n      ▲\n      │ (3) Query TLD servers: \"Where's example.com?\"\n      ▼\n┌─────────────┐\n│ .com TLD    │  \"Ask example.com's name servers\"\n│   Server    │  Returns: NS records for example.com\n└─────────────┘\n      ▲\n      │ (4) Query authoritative: \"What's www.example.com?\"\n      ▼\n┌─────────────┐\n│Authoritative│  \"Here's the A record\"\n│ Name Server │  Returns: 93.184.216.34\n│(example.com)│\n└─────────────┘\n      ▲\n      │ (5) Return answer to client\n      ▼\n┌─────────────┐\n│   Client    │  Connects to 93.184.216.34\n└─────────────┘\n```\n\n**Step-by-step with actual DNS queries:**\n\n**1. Client asks recursive resolver:**\n```\nClient → Resolver: \"What's www.example.com?\"\n```\n\n**2. Resolver asks root server:**\n```\nResolver → Root: \"What's www.example.com?\"\nRoot → Resolver: \"I don't know, but ask these .com TLD servers:\"\n  a.gtld-servers.net.  192.5.6.30\n  b.gtld-servers.net.  192.33.14.30\n  ...\n```\n\n**3. Resolver asks TLD server:**\n```\nResolver → TLD: \"What's www.example.com?\"\nTLD → Resolver: \"I don't know, but ask these authoritative servers:\"\n  ns1.example.com.  192.0.2.1\n  ns2.example.com.  192.0.2.2\n```\n\n**4. Resolver asks authoritative server:**\n```\nResolver → Auth: \"What's www.example.com?\"\nAuth → Resolver: \"Here's the answer:\"\n  www.example.com.  93.184.216.34  (A record)\n```\n\n**5. Resolver returns to client:**\n```\nResolver → Client: \"www.example.com is 93.184.216.34\"\n(Resolver caches this for TTL duration)\n```\n\n### DNS Caching\n\n**Why caching matters:**\n- Reduces latency (local cache instant vs. multiple round trips)\n- Reduces load on root/TLD/authoritative servers\n- Improves resilience (cached answers survive authoritative server outages)\n\n**Cache levels:**\n\n```\n┌──────────────────┐\n│ Browser Cache    │  Caches DNS for active session\n└────────┬─────────┘\n         ▼\n┌──────────────────┐\n│ OS Cache         │  /etc/hosts + system resolver cache\n└────────┬─────────┘\n         ▼\n┌──────────────────┐\n│ Router Cache     │  Home/office router caches\n└────────┬─────────┘\n         ▼\n┌──────────────────┐\n│ Resolver Cache   │  ISP or public DNS (8.8.8.8)\n└────────┬─────────┘\n         ▼\n┌──────────────────┐\n│ Authoritative    │  Source of truth\n└──────────────────┘\n```\n\n**TTL (Time To Live)** controls caching:\n\n```\nexample.com.    300    IN    A    93.184.216.34\n                │\n                TTL = 300 seconds (5 minutes)\n```\n\n**After 5 minutes**, cache expires, next query fetches fresh data.\n\n**TTL considerations:**\n- **Low TTL (60-300s)**: Fast updates, higher load on servers\n- **High TTL (3600-86400s)**: Lower load, slower updates\n- **Best practice**: Use high TTL normally, lower it before planned changes\n\n### DNS Query Types\n\n**Recursive query:**\n```\nClient → Resolver: \"Find www.example.com for me (do all the work)\"\nResolver → Client: \"Here's the IP\" OR \"Doesn't exist\"\n```\n\n**Iterative query:**\n```\nResolver → Root: \"What's www.example.com?\"\nRoot → Resolver: \"I don't know, but try these .com servers\"\nResolver → TLD: \"What's www.example.com?\"\nTLD → Resolver: \"I don't know, but try these example.com servers\"\nResolver → Auth: \"What's www.example.com?\"\nAuth → Resolver: \"93.184.216.34\"\n```\n\n## DNS Protocol Structure\n\n### DNS Packet Format\n\n```\n 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15\n┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐\n│           Transaction ID (16 bits)            │  Random ID to match Q&A\n├──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┤\n│QR│ Opcode │AA│TC│RD│RA│ Z │   RCODE        │  Flags\n├──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┤\n│            Question Count (16 bits)           │  # of questions\n├──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┤\n│            Answer Count (16 bits)             │  # of answers\n├──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┤\n│            Authority Count (16 bits)          │  # of authority RRs\n├──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┤\n│            Additional Count (16 bits)         │  # of additional RRs\n├──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┤\n│                  Question Section             │  Query details\n│                  Answer Section               │  Response records\n│                  Authority Section            │  NS records\n│                  Additional Section           │  Extra helpful records\n└──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘\n```\n\n**Flag breakdown:**\n\n- **QR (Query/Response)**: 0=query, 1=response\n- **Opcode**: 0=standard query, 1=inverse query, 2=status request\n- **AA (Authoritative Answer)**: Response from authoritative server\n- **TC (Truncated)**: Message was truncated (use TCP)\n- **RD (Recursion Desired)**: Client wants recursive resolution\n- **RA (Recursion Available)**: Server supports recursion\n- **Z**: Reserved (must be zero)\n- **RCODE (Response Code)**:\n  - 0 = No error\n  - 1 = Format error\n  - 2 = Server failure\n  - 3 = Name error (NXDOMAIN - domain doesn't exist)\n  - 4 = Not implemented\n  - 5 = Refused\n\n### DNS Transport\n\n**UDP Port 53** (default):\n- Fast (no TCP handshake)\n- Low overhead\n- **Limited to 512 bytes** (original spec)\n- **Extended to 4096 bytes** with EDNS0\n\n**TCP Port 53** (used when):\n- Response > 512 bytes (or EDNS0 limit)\n- Zone transfers (AXFR/IXFR)\n- DNS over TLS (DoT)\n\n**Example packet capture:**\n```\n$ tcpdump -i any -n port 53\n\n# Query (UDP)\n12:34:56.123 IP 192.168.1.100.54321 > 8.8.8.8.53: 12345+ A? www.example.com.\n\n# Response (UDP)\n12:34:56.145 IP 8.8.8.8.53 > 192.168.1.100.54321: 12345 1/0/0 A 93.184.216.34\n```\n\n## DNS Security Weaknesses\n\n### Original DNS Design Flaws\n\n**DNS was designed in 1983 with NO security features:**\n\n❌ **No authentication**: Can't verify response came from legitimate server\n\n❌ **No encryption**: Queries and responses sent in cleartext\n\n❌ **No integrity checking**: Can't detect if response was tampered with\n\n❌ **Transaction ID easily guessed**: Only 16 bits of randomness\n\n❌ **Source port predictable**: Often fixed or sequential\n\n**Why this matters:**\n\n**Attacker can:**\n1. Eavesdrop on DNS queries (see what sites you visit)\n2. Inject fake responses (redirect you to phishing sites)\n3. Modify responses in transit (change A records)\n4. Impersonate DNS servers (respond before legitimate server)\n\n**These flaws enable:**\n- DNS cache poisoning\n- Man-in-the-middle attacks\n- DNS hijacking\n- Surveillance of browsing habits\n\nThe rest of this lesson covers how attackers exploit these weaknesses and how modern security extensions (DNSSEC, DoH, DoT) mitigate them."
+      }
+    }
+  ],
+  "tags": [
+    "Career Path: SOC Analyst",
+    "Career Path: Blue Teamer",
+    "Career Path: Threat Hunter",
+    "Career Path: Security Engineer",
+    "Career Path: DFIR Specialist"
+  ]
+}
