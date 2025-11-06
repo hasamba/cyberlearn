@@ -26,7 +26,7 @@ def render(user: UserProfile, db: Database):
         st.markdown("---")
 
     # Tag filter section
-    all_tags = db.get_all_tags()
+    all_tags = db.get_filterable_tags(user.user_id)
 
     if all_tags:
         st.markdown("#### 🏷️ Filter by Tags")

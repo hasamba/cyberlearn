@@ -946,6 +946,46 @@ class Database:
 
         return tags
 
+    def get_filterable_tags(self, user_id: str) -> List[Tag]:
+        """
+        Get tags for filtering lessons (excludes Content category system tags):
+        - Career Path tags (for filtering by role)
+        - Course tags (for filtering by course)
+        - Package tags (for filtering by tool package)
+        - User-created tags
+        - Excludes: Built-In, User Content, Community (Content category)
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT * FROM tags
+            WHERE (user_id = ? OR is_system = 1)
+            AND category != 'Content'
+            ORDER BY
+                CASE category
+                    WHEN 'Career Path' THEN 1
+                    WHEN 'Course' THEN 2
+                    WHEN 'Package' THEN 3
+                    ELSE 4
+                END,
+                name
+        """, (user_id,))
+
+        tags = []
+        for row in cursor.fetchall():
+            tags.append(Tag(
+                tag_id=row['id'],
+                name=row['name'],
+                category=row['category'],
+                color=row['color'],
+                icon=row['icon'],
+                description=row['description'],
+                created_at=datetime.fromisoformat(row['created_at']),
+                is_system=bool(row['is_system']),
+                user_id=row['user_id'] if 'user_id' in row.keys() else None
+            ))
+
+        return tags
+
     def update_tag(self, tag_id: str, update: TagUpdate) -> bool:
         """Update tag fields"""
         cursor = self.conn.cursor()
