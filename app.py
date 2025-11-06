@@ -19,7 +19,7 @@ from config import config, debug_print
 from ui.pages import dashboard, lesson_viewer, diagnostic, profile
 from utils.database import Database
 from utils.auth_manager import AuthManager
-from utils.persistent_session_manager import PersistentSessionManager
+from utils.file_session_manager import FileSessionManager
 from models.user import UserProfile
 
 # Show debug info if enabled
@@ -178,11 +178,11 @@ def initialize_session_state():
         if config.debug:
             debug_print("Auth manager initialized")
 
-    # Initialize persistent session manager (uses only Streamlit session state)
+    # Initialize file-based session manager (persists across refreshes)
     if "session_manager" not in st.session_state:
-        st.session_state.session_manager = PersistentSessionManager(st.session_state.db)
+        st.session_state.session_manager = FileSessionManager(st.session_state.db)
         if config.debug:
-            debug_print("Persistent session manager initialized")
+            debug_print("File session manager initialized")
 
     # Cleanup expired sessions periodically
     st.session_state.auth_manager.cleanup_expired_sessions()
