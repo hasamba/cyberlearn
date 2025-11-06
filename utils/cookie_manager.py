@@ -45,8 +45,8 @@ class CookieManager:
         </script>
         """
 
-        # Use a unique key for the component
-        component_value = html(js_code, height=0, key="cookie_loader")
+        # Use html component without key parameter for compatibility
+        component_value = html(js_code, height=0)
 
         if component_value:
             st.session_state.cookies = component_value
@@ -79,7 +79,7 @@ class CookieManager:
         </script>
         """
 
-        html(js_code, height=0, key=f"set_cookie_{name}")
+        html(js_code, height=0)
 
         # Update session state
         st.session_state.cookies[name] = value
@@ -117,7 +117,7 @@ class CookieManager:
         </script>
         """
 
-        html(js_code, height=0, key=f"delete_cookie_{name}")
+        html(js_code, height=0)
 
         # Remove from session state
         if name in st.session_state.cookies:
