@@ -36,7 +36,7 @@ if [ -f "cyberlearn.db" ]; then
 
             echo ""
             echo "Creating fresh database from template..."
-            python setup_database.py
+            python scripts/setup_database.py
 
             echo ""
             echo "============================================================"
@@ -86,7 +86,7 @@ if [ -f "cyberlearn.db" ]; then
     done
 else
     echo "Step 2: No database found, creating from template..."
-    python setup_database.py
+    python scripts/setup_database.py
 
     echo ""
     echo "============================================================"
