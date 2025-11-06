@@ -31,25 +31,86 @@ class FileSessionManager:
         self.sessions_file.parent.mkdir(exist_ok=True)
 
         # Generate stable browser fingerprint
+        # CRITICAL: Must persist across page reloads for browser back/forward navigation
         if "_browser_fingerprint" not in st.session_state:
-            # Use session_id from Streamlit runtime as fingerprint
-            # This is stable for a browser tab session
-            try:
-                from streamlit.runtime.scriptrunner import get_script_run_ctx
-                ctx = get_script_run_ctx()
-                if ctx:
-                    session_id = ctx.session_id
-                    st.session_state._browser_fingerprint = session_id
-                    print(f"[FileSessionManager] Browser fingerprint: {session_id[:16]}...")
-                else:
-                    # Fallback: use a random ID
-                    import secrets
-                    st.session_state._browser_fingerprint = secrets.token_urlsafe(16)
-                    print(f"[FileSessionManager] Fallback fingerprint generated")
-            except Exception as e:
-                print(f"[FileSessionManager] Error getting session context: {e}")
+            # Try to get fingerprint from query params (set by JavaScript)
+            query_params = st.query_params
+            if "_fp" in query_params:
+                st.session_state._browser_fingerprint = query_params["_fp"]
+                print(f"[FileSessionManager] Loaded fingerprint from URL: {query_params['_fp'][:16]}...")
+            else:
+                # Generate new fingerprint and inject JavaScript to persist it
                 import secrets
-                st.session_state._browser_fingerprint = secrets.token_urlsafe(16)
+                fingerprint = secrets.token_urlsafe(32)
+                st.session_state._browser_fingerprint = fingerprint
+                print(f"[FileSessionManager] Generated new fingerprint: {fingerprint[:16]}...")
+
+                # Inject JavaScript to store in localStorage and add to all navigation
+                self._inject_fingerprint_persistence(fingerprint)
+
+    def _inject_fingerprint_persistence(self, fingerprint: str):
+        """
+        Inject JavaScript to persist browser fingerprint across page reloads
+
+        This stores the fingerprint in localStorage and ensures it's added to
+        all URL navigations, making it survive page reloads (including browser
+        back/forward navigation).
+
+        Args:
+            fingerprint: The browser fingerprint to persist
+        """
+        import streamlit.components.v1 as components
+
+        components.html(
+            f"""
+            <script>
+            (function() {{
+                const fingerprint = '{fingerprint}';
+
+                // Store in localStorage for persistence
+                localStorage.setItem('_cyberlearn_fp', fingerprint);
+                console.log('[FileSessionManager] Stored fingerprint in localStorage');
+
+                // Add fingerprint to current URL if not present
+                const url = new URL(window.parent.location.href);
+                if (!url.searchParams.has('_fp')) {{
+                    url.searchParams.set('_fp', fingerprint);
+                    window.parent.history.replaceState(null, '', url.toString());
+                    console.log('[FileSessionManager] Added fingerprint to current URL');
+                }}
+
+                // Intercept all history.pushState calls to add fingerprint
+                const originalPushState = window.parent.history.pushState;
+                window.parent.history.pushState = function(state, title, url) {{
+                    if (url) {{
+                        const urlObj = new URL(url, window.parent.location.origin);
+                        if (!urlObj.searchParams.has('_fp')) {{
+                            urlObj.searchParams.set('_fp', fingerprint);
+                            url = urlObj.toString();
+                        }}
+                    }}
+                    return originalPushState.call(this, state, title, url);
+                }};
+
+                // Intercept all history.replaceState calls to add fingerprint
+                const originalReplaceState = window.parent.history.replaceState;
+                window.parent.history.replaceState = function(state, title, url) {{
+                    if (url) {{
+                        const urlObj = new URL(url, window.parent.location.origin);
+                        if (!urlObj.searchParams.has('_fp')) {{
+                            urlObj.searchParams.set('_fp', fingerprint);
+                            url = urlObj.toString();
+                        }}
+                    }}
+                    return originalReplaceState.call(this, state, title, url);
+                }};
+
+                console.log('[FileSessionManager] Fingerprint persistence installed');
+            }})();
+            </script>
+            """,
+            height=0,
+        )
 
     def _load_sessions(self) -> dict:
         """Load all sessions from file"""

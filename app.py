@@ -89,7 +89,13 @@ st.markdown(
 
 
 def inject_browser_navigation_handler():
-    """Inject JavaScript to handle browser back/forward button navigation"""
+    """Inject JavaScript to handle browser back/forward button navigation
+
+    NOTE: This forces a full page reload when back/forward is pressed.
+    This is necessary because Streamlit doesn't natively handle browser
+    history navigation. The reload ensures URL params are synced with
+    page content, though sessions should persist via FileSessionManager.
+    """
     import streamlit.components.v1 as components
 
     components.html(
@@ -105,21 +111,51 @@ def inject_browser_navigation_handler():
             // Store the current URL to detect changes
             let currentUrl = window.parent.location.href;
 
+            // Ensure browser fingerprint is in URL and localStorage
+            function ensureFingerprint(url) {
+                const urlObj = new URL(url);
+
+                // Get fingerprint from localStorage or URL
+                let fingerprint = localStorage.getItem('_cyberlearn_fp');
+                if (!fingerprint && urlObj.searchParams.has('_fp')) {
+                    fingerprint = urlObj.searchParams.get('_fp');
+                    localStorage.setItem('_cyberlearn_fp', fingerprint);
+                }
+
+                // Add to URL if missing
+                if (fingerprint && !urlObj.searchParams.has('_fp')) {
+                    urlObj.searchParams.set('_fp', fingerprint);
+                    return urlObj.toString();
+                }
+
+                return url;
+            }
+
             // Listen for browser back/forward navigation (popstate event)
             window.parent.addEventListener('popstate', function(event) {
-                const newUrl = window.parent.location.href;
+                let newUrl = window.parent.location.href;
+
+                // Ensure fingerprint is present in the URL
+                newUrl = ensureFingerprint(newUrl);
 
                 // Only reload if URL actually changed
                 if (newUrl !== currentUrl) {
-                    console.log('Browser navigation detected:', currentUrl, '->', newUrl);
+                    console.log('[BrowserNav] Navigation detected:', currentUrl, '->', newUrl);
                     currentUrl = newUrl;
 
-                    // Force immediate reload to sync URL with content
+                    // Update URL with fingerprint if needed, then reload
+                    if (newUrl !== window.parent.location.href) {
+                        window.parent.history.replaceState(null, '', newUrl);
+                    }
+
+                    // Force page reload to sync URL params with content
+                    // The fingerprint ensures sessions persist via FileSessionManager
+                    console.log('[BrowserNav] Reloading to sync content...');
                     window.parent.location.reload();
                 }
             }, false);
 
-            console.log('Browser navigation handler installed for URL:', currentUrl);
+            console.log('[BrowserNav] Handler installed for:', currentUrl);
         })();
         </script>
         """,
@@ -158,6 +194,12 @@ def sync_url_to_session_state():
 def sync_session_state_to_url():
     """Sync session state to URL query parameters (for shareable links)"""
     params = {}
+
+    # CRITICAL: Preserve browser fingerprint if present
+    # This ensures sessions persist across page reloads
+    current_params = st.query_params
+    if "_fp" in current_params:
+        params["_fp"] = current_params["_fp"]
 
     # Add current page to URL
     if st.session_state.get("current_page"):
