@@ -88,6 +88,46 @@ st.markdown(
 )
 
 
+def inject_browser_navigation_handler():
+    """Inject JavaScript to handle browser back/forward button navigation"""
+    import streamlit.components.v1 as components
+
+    components.html(
+        """
+        <script>
+        (function() {
+            // Check if handler already registered
+            if (window.parent.__streamlit_navigation_handler_installed) {
+                return;
+            }
+            window.parent.__streamlit_navigation_handler_installed = true;
+
+            // Listen for browser back/forward navigation (popstate event)
+            window.parent.addEventListener('popstate', function(event) {
+                console.log('Browser navigation detected, triggering Streamlit rerun');
+
+                // Force Streamlit to rerun by pressing 'R' key programmatically
+                // This is a workaround since we can't directly trigger st.rerun() from JavaScript
+                var streamlitDoc = window.parent.document;
+                var event = new KeyboardEvent('keydown', {
+                    key: 'r',
+                    code: 'KeyR',
+                    keyCode: 82,
+                    which: 82,
+                    bubbles: true,
+                    cancelable: true
+                });
+                streamlitDoc.dispatchEvent(event);
+            }, false);
+
+            console.log('Browser navigation handler installed');
+        })();
+        </script>
+        """,
+        height=0,
+    )
+
+
 def sync_url_to_session_state():
     """Sync URL query parameters to session state (for browser back/forward)"""
     # Get query params from URL
@@ -514,6 +554,10 @@ def render_welcome_page():
 def main():
     """Main application logic"""
     initialize_session_state()
+
+    # Inject browser back/forward navigation handler
+    inject_browser_navigation_handler()
+
     render_sidebar()
 
     # Route to appropriate page
