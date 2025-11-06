@@ -12,6 +12,60 @@ from models.progress import LessonStatus
 from utils.database import Database
 from core.adaptive_engine import AdaptiveEngine
 from core.gamification import GamificationEngine
+from datetime import datetime, timedelta
+
+
+def render_continue_learning(user: UserProfile, db: Database):
+    """Show 'Continue Learning' button for last active lesson"""
+
+    # Check if user has a last active lesson
+    if user.last_active_lesson_id and user.last_active_at:
+        # Get the lesson
+        lesson = db.get_lesson(user.last_active_lesson_id)
+
+        if lesson:
+            # Calculate time since last active
+            time_since = datetime.now() - user.last_active_at
+
+            # Format time message
+            if time_since < timedelta(hours=1):
+                time_msg = "a few moments ago"
+            elif time_since < timedelta(days=1):
+                hours = int(time_since.total_seconds() / 3600)
+                time_msg = f"{hours} hour{'s' if hours > 1 else ''} ago"
+            elif time_since < timedelta(days=7):
+                days = time_since.days
+                time_msg = f"{days} day{'s' if days > 1 else ''} ago"
+            else:
+                time_msg = user.last_active_at.strftime("%B %d, %Y")
+
+            # Show prominent "Continue Learning" card
+            st.markdown(
+                f"""
+                <div style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    color: white;
+                    margin-bottom: 1.5rem;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                ">
+                    <h3 style="margin-top: 0; color: white;">📖 Continue Learning</h3>
+                    <p style="margin-bottom: 0.5rem; font-size: 1.1rem;"><strong>{lesson.title}</strong></p>
+                    <p style="margin-bottom: 0; opacity: 0.9;">Last viewed: {time_msg}</p>
+                    <p style="margin-bottom: 0; opacity: 0.9;">Domain: {lesson.domain.replace('_', ' ').title()} | {lesson.get_difficulty_name()}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Continue button
+            if st.button("▶️ Continue Where You Left Off", key="continue_learning", use_container_width=True, type="primary"):
+                st.session_state.current_lesson = lesson
+                st.session_state.current_page = "lesson"
+                st.rerun()
+
+            st.markdown("---")
 
 
 def render(user: UserProfile, db: Database):
@@ -78,6 +132,9 @@ def render(user: UserProfile, db: Database):
         )
 
     st.markdown("---")
+
+    # Continue Learning section (if user has a last active lesson)
+    render_continue_learning(user, db)
 
     # Main content columns
     col_left, col_right = st.columns([2, 1])
