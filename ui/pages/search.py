@@ -69,7 +69,7 @@ def render_search_page():
             selected_completion = "All Lessons"
 
     # Tag filter
-    available_tags = db.get_all_tags()
+    available_tags = db.get_filterable_tags(str(user.user_id)) if user else []
     tag_names = ["All Tags"] + [tag.name for tag in available_tags]
     selected_tag = st.selectbox("Filter by Tag", tag_names, key="search_tag")
 
