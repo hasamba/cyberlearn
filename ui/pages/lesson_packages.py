@@ -134,7 +134,7 @@ def render_export_tab(db, user):
 
     with col2:
         # Tag selector
-        all_tags = db.get_all_tags()
+        all_tags = db.get_filterable_tags(str(user.user_id))
         tag_names = ["All Tags"] + [tag.name for tag in all_tags]
         selected_tag = st.selectbox("Filter by Tag", tag_names)
 

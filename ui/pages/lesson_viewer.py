@@ -26,7 +26,7 @@ def render(user: UserProfile, db: Database):
         st.markdown("---")
 
     # Tag filter section
-    all_tags = db.get_filterable_tags(user.user_id)
+    all_tags = db.get_filterable_tags(str(user.user_id))
 
     if all_tags:
         st.markdown("#### 🏷️ Filter by Tags")
@@ -275,7 +275,7 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
                 if is_editing:
                     st.markdown('<div style="background-color: #f8f9fa; padding: 8px; border-radius: 5px; margin: 5px 0;">', unsafe_allow_html=True)
 
-                    all_tags = db.get_filterable_tags(user.user_id)
+                    all_tags = db.get_filterable_tags(str(user.user_id))
                     current_tag_ids = {tag.tag_id for tag in lesson_tags}
 
                     # Current tags - compact

@@ -25,7 +25,7 @@ def render_tag_management(db: Database, current_user: UserProfile):
         st.subheader("My Tags & System Tags")
 
         # Get tags visible to this user (their tags + system tags, excluding auto-generated Custom tags)
-        tags = db.get_user_tags(str(current_user.user_id))
+        tags = db.get_filterable_tags(str(current_user.user_id))
 
         if not tags:
             st.info("No tags found. Create your first tag in the 'Create Tag' tab.")
