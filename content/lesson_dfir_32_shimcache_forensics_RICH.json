@@ -1,0 +1,175 @@
+{
+  "lesson_id": "ccfa4bce-567e-4c36-bdc6-fba0aa5416a9",
+  "domain": "dfir",
+  "title": "Shimcache (AppCompatCache) Forensics",
+  "difficulty": 2,
+  "order_index": 32,
+  "prerequisites": [
+    "11f8e2a3-9b4c-4d7e-8f1a-2c5b6e9d3a7f"
+  ],
+  "concepts": [
+    "ShimCache Structure",
+    "Application Compatibility Cache",
+    "Execution vs. Existence Evidence",
+    "AppCompatCacheParser Tool",
+    "Shimcache Entry Analysis",
+    "Windows Version Differences",
+    "Last Modified Time Tracking",
+    "File Path Enumeration",
+    "Malware Execution Detection",
+    "Timeline Correlation with Prefetch"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand the purpose and structure of Windows ShimCache (AppCompatCache)",
+    "Distinguish between execution evidence vs. file existence evidence in ShimCache",
+    "Extract ShimCache entries using AppCompatCacheParser",
+    "Analyze file paths and timestamps for malware detection",
+    "Identify Windows version-specific ShimCache behaviors",
+    "Correlate ShimCache with Prefetch for execution confirmation",
+    "Detect anti-forensics attempts via ShimCache timestamp analysis",
+    "Build execution timelines from ShimCache artifacts",
+    "Investigate lateral movement using ShimCache file paths",
+    "Apply ShimCache forensics to APT and ransomware investigations"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q17_1",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question": "You find a ShimCache entry for `C:\\Users\\Public\\malware.exe` with Last Modified Time of 2024-03-15 14:30:00. What does this ShimCache entry DEFINITIVELY prove?",
+      "options": [
+        "The executable was run on 2024-03-15 at 14:30:00",
+        "The executable file existed and was accessed by the system",
+        "The user double-clicked the executable to launch it",
+        "The executable was downloaded from the internet on 2024-03-15"
+      ],
+      "correct_answer": 1,
+      "explanation": "ShimCache entries prove FILE EXISTENCE and system interaction, NOT execution. The Last Modified Time is the file's $STANDARD_INFORMATION timestamp from the filesystem, not when it ran. ShimCache is created when Windows checks for compatibility shims (Explorer browsing, file properties, etc.), which doesn't require execution. To prove execution, you need Prefetch, AmCache (FirstExecuted timestamp), or BAM/DAM. However, ShimCache is still valuable because it shows the file existed on the system and was processed by Windows—useful for deleted malware or files copied from USB drives."
+    },
+    {
+      "question_id": "q17_2",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question": "An investigator extracts 1,024 ShimCache entries from a Windows 10 system. What is the significance of this exact number?",
+      "options": [
+        "Windows 10 ShimCache limit is exactly 1,024 entries (older entries are purged)",
+        "This indicates ShimCache corruption or tampering",
+        "The system has been running for approximately 1,024 days",
+        "Each entry represents one executed program per day"
+      ],
+      "correct_answer": 0,
+      "explanation": "Windows 10 (and Server 2016+) has a ShimCache limit of exactly 1,024 entries (increased from 96 in Windows XP, 512 in Win7/8). When the cache fills, the oldest entries are purged in a FIFO manner. This is forensically significant because: (1) On heavily-used systems, ShimCache may only contain recent weeks/months of activity, (2) Critical early-stage malware evidence might be purged, (3) You need to check backups or Volume Shadow Copies for older ShimCache data. Windows 7/8/Server 2012 had a 512-entry limit, so seeing exactly 512 entries on those systems indicates a full cache."
+    },
+    {
+      "question_id": "q17_3",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question": "During ransomware investigation, you find ShimCache entries for `C:\\Temp\\encrypt.exe`, `C:\\Temp\\vssadmin.exe`, and `C:\\Windows\\System32\\vssadmin.exe` (legitimate). The Temp\\vssadmin.exe entry has Last Modified Time matching the legitimate System32 version. What does this indicate?",
+      "options": [
+        "False positive—Windows creates duplicate ShimCache entries for the same file",
+        "Attacker copied legitimate vssadmin.exe to Temp\\ to delete shadow copies",
+        "System automatically backed up vssadmin.exe to Temp\\",
+        "vssadmin.exe was timestomped to hide malicious modification"
+      ],
+      "correct_answer": 1,
+      "explanation": "Ransomware operators commonly copy legitimate Windows tools (vssadmin.exe, wbadmin.exe, bcdedit.exe) to Temp\\ or other writable directories to avoid detection and ensure execution. The matching Last Modified Time proves the file was COPIED (preserving original timestamps) rather than created fresh. This technique is used because: (1) Running tools from System32 may trigger EDR alerts, (2) Copying to Temp\\ provides a staging area with full user write permissions, (3) Attackers can modify copied tools or run them with different command-line arguments. Next steps: Check Prefetch for C:\\Temp\\vssadmin.exe execution (will show command-line: 'delete shadows /all /quiet'), verify with Event Logs (4688 process creation, 7036 VSS service termination), check MFT for file creation time in Temp\\."
+    },
+    {
+      "question_id": "q17_4",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "You're investigating lateral movement. ShimCache shows: `\\\\10.50.30.15\\ADMIN$\\psexec.exe`, `\\\\FileServer01\\Share\\mimikatz.exe`, and `C:\\Windows\\Temp\\procdump.exe`. Prefetch has NO entries for these files. What is the most likely explanation?",
+      "options": [
+        "The files were copied to the system but never executed",
+        "Prefetch was disabled or cleared by the attacker",
+        "Files were executed from network shares (no Prefetch created for UNC paths)",
+        "ShimCache entries are false positives from previous investigations"
+      ],
+      "correct_answer": 2,
+      "explanation": "Files executed directly from NETWORK SHARES (UNC paths like \\\\server\\share\\file.exe) do NOT create Prefetch files—Prefetch only tracks executables run from local drives (C:, D:, E:, etc.). This is a common APT lateral movement technique to avoid Prefetch evidence. However, ShimCache DOES track UNC path executions, making it critical for detecting network-based attacks. The forensic approach: (1) ShimCache UNC paths prove network share access and file interaction, (2) Check Event Logs for network logon (4624 Type 3) from source IP, (3) Check BAM/DAM (Background Activity Moderator) which tracks execution regardless of location, (4) Check Amcache for SHA-1 hashes even for network executions. The C:\\Windows\\Temp\\procdump.exe entry suggests tools were also COPIED locally (staging for credential dumping)."
+    },
+    {
+      "question_id": "q17_5",
+      "type": "scenario",
+      "difficulty": 3,
+      "question": "Timeline analysis shows: (1) ShimCache entry for malware.exe at 14:30:00, (2) Prefetch first run at 14:32:15, (3) AmCache FirstExecuted at 14:32:15, (4) Process creation Event 4688 at 14:32:16. What does the 2-minute gap between ShimCache and execution indicate?",
+      "options": [
+        "User browsed to the file in Explorer but waited 2 minutes before running it",
+        "Malware was auto-started via scheduled task with 2-minute delay",
+        "ShimCache timestamp is file modification time, not interaction time",
+        "System clock was changed between file access and execution"
+      ],
+      "correct_answer": 0,
+      "explanation": "The 2-minute gap indicates USER INTERACTION DELAY. Here's what happened: (1) 14:30:00 - User browsed to the file in Explorer or viewed file properties, triggering ShimCache creation (ShimCache is written when Explorer accesses file metadata for compatibility checks), (2) 14:30:00-14:32:15 - User decision time (reading filename, deciding whether to execute, possibly scanning with antivirus), (3) 14:32:15 - User double-clicked, execution began (Prefetch + AmCache created), (4) 14:32:16 - Process creation event logged. This pattern is common in phishing attacks where users receive email attachments, browse to Downloads folder (ShimCache), then execute after deliberation. If the gap were hours/days, it might indicate reconnaissance before execution. If there were NO gap (same timestamp), it suggests automated execution (script, scheduled task, service startup) rather than user interaction."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Shimcache (AppCompatCache) Forensics\n\n## Opening: The Silent Witness to Every Program\n\nWelcome to one of the most powerful—yet misunderstood—artifacts in Windows forensics: **ShimCache** (also called AppCompatCache).\n\n**Why this lesson matters**: ShimCache tracks EVERY executable Windows encounters, creating a historical record of programs on the system—even if they were deleted, run from USB drives, or executed over network shares. For investigators, this is forensic gold.\n\n**The critical distinction**: ShimCache does NOT definitively prove execution (that's Prefetch's job), but it proves FILE EXISTENCE and system interaction. This makes ShimCache invaluable for:\n- Detecting malware that was present but deleted before imaging\n- Tracking tools run from network shares (no Prefetch created)\n- Identifying staging directories for attack tools\n- Building comprehensive program timelines\n\n**Real-world impact**: In a 2023 APT investigation, Prefetch showed no evidence of lateral movement tools (PsExec, Mimikatz). ShimCache revealed 23 entries for these tools run from UNC paths (`\\\\DC01\\ADMIN$\\...`), exposing the complete attack chain.\n\nLet's master ShimCache analysis.\n\n---\n\n## Part 1: Understanding ShimCache Purpose and Structure\n\n### What is ShimCache?\n\n**Official purpose**: Windows Application Compatibility Cache tracks executables to apply compatibility \"shims\" (code modifications) for older programs running on newer Windows versions.\n\n**Forensic purpose**: ShimCache becomes a historical log of every executable Windows has encountered.\n\n**How it works**:\n1. User browses to a folder containing executables (Explorer accesses file metadata)\n2. Windows checks if compatibility shims are needed\n3. File path and metadata are cached in the Registry\n4. Cache persists across reboots (stored in SYSTEM hive)\n\n**Key insight**: ShimCache entries are created when Windows accesses executable metadata, which can happen through:\n- File Explorer browsing\n- Right-clicking → Properties\n- Actual program execution\n- Antivirus scanning\n- Backup software accessing files\n\n**What this means forensically**: ShimCache proves the file EXISTED and was PROCESSED by Windows, but doesn't definitively prove execution (unlike Prefetch).\n\n### Registry Location\n\n**Path**: `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\AppCompatCache`\n\n**Value**: `AppCompatCache` (binary data)\n\n**Structure**: Binary blob containing array of ShimCache entries\n\n**Extraction requirement**: Use specialized parsers (AppCompatCacheParser, RegRipper) to decode binary format\n\n### Windows Version Differences\n\n**Critical for interpretation**:\n\n| Windows Version | Max Entries | Execution Flag | Notes |\n|---|---|---|---|\n| Windows XP | 96 | ✅ Yes | Inserted flag shows if file was executed |\n| Windows 7/8/Server 2012 | 512 | ❌ No | Execution flag removed (existence only) |\n| Windows 10/Server 2016+ | 1,024 | ❌ No | Doubled capacity, no execution flag |\n\n**XP special case**: ShimCache on Windows XP includes an \"Inserted\" flag that indicates execution, making it more definitive. On Windows 7+, this flag was removed due to privacy concerns.\n\n**Capacity implications**: When cache fills (1,024 on Win10), oldest entries are purged FIFO (First In, First Out). Heavy-use systems may only retain recent weeks/months.\n\n---\n\n## Part 2: Extracting ShimCache with AppCompatCacheParser\n\n### Eric Zimmerman's AppCompatCacheParser\n\n**Tool**: `AppCompatCacheParser.exe` (part of Eric Zimmerman Tools suite)\n\n**Basic extraction**:\n```cmd\nAppCompatCacheParser.exe -f \"C:\\Evidence\\SYSTEM\" --csv \"C:\\Output\"\n```\n\n**Output**: CSV file with columns:\n- **CacheEntryPosition** (0-1023, newest = 0)\n- **Path** (full executable path)\n- **LastModifiedTimeUTC** (file's $STANDARD_INFORMATION timestamp)\n- **Executed** (Windows XP only, otherwise \"N/A\")\n\n**Advanced options**:\n```cmd\nAppCompatCacheParser.exe -f \"SYSTEM\" --csv \"Output\" -t --mp --nl\n```\n- `-t`: Include file modified times\n- `--mp`: Show cache entry position\n- `--nl`: Suppress header line\n\n**Sample output**:\n```\nCacheEntryPosition,Path,LastModifiedTimeUTC,Executed\n0,C:\\Users\\Public\\malware.exe,2024-03-15 14:30:00,N/A\n1,C:\\Windows\\System32\\cmd.exe,2024-03-15 14:28:42,N/A\n2,\\\\FileServer01\\Tools\\mimikatz.exe,2024-03-15 14:25:15,N/A\n```\n\n**Interpretation**:\n- Position 0 = most recent ShimCache entry\n- malware.exe in Users\\Public = suspicious location\n- UNC path = network share execution (common in lateral movement)\n\n### RegRipper Alternative\n\n**Plugin**: `appcompatcache`\n\n**Command**:\n```bash\nrip.exe -r \"SYSTEM\" -p appcompatcache > shimcache_output.txt\n```\n\n**Output format**:\n```\nLastModified: 2024-03-15 14:30:00\nPath: C:\\Users\\Public\\malware.exe\n\nLastModified: 2024-03-15 14:28:42\nPath: C:\\Windows\\System32\\cmd.exe\n```\n\n**Advantage**: Human-readable text format\n\n**Disadvantage**: Less flexible than CSV for timeline analysis\n\n---\n\n## Part 3: Analyzing ShimCache Entries\n\n### Identifying Suspicious File Paths\n\n**High-risk locations** (common malware staging areas):\n\n```\nC:\\Users\\Public\\*\nC:\\Users\\<username>\\AppData\\Local\\Temp\\*\nC:\\Windows\\Temp\\*\nC:\\ProgramData\\*\nC:\\Temp\\*\nC:\\$Recycle.Bin\\*\n```\n\n**Why these matter**:\n- **Users\\Public**: World-writable, no admin required, often used by downloaders\n- **Temp folders**: Temporary malware staging before persistence installation\n- **ProgramData**: Hidden by default, used for malware impersonating legitimate software\n- **Recycle Bin**: Attackers hide tools in deleted file containers\n\n**Network share paths** (APT lateral movement):\n```\n\\\\<IP>\\ADMIN$\\*\n\\\\<IP>\\C$\\*\n\\\\<servername>\\Share\\*\n```\n\n**Example analysis**:\n```\nC:\\Users\\Alice\\Downloads\\Invoice_March.exe  ← Suspicious (Invoice.exe in Downloads = phishing)\n\\\\10.50.30.15\\ADMIN$\\psexec.exe            ← Lateral movement tool from remote system\nC:\\ProgramData\\Microsoft\\WindowsUpdate\\wuaueng.exe  ← Malware mimicking Windows Update\n```\n\n### Correlating with Prefetch for Execution Proof\n\n**Workflow**:\n\n**Step 1**: Extract ShimCache entries\n```\nmalware.exe → LastModified: 2024-03-15 14:30:00\n```\n\n**Step 2**: Check for Prefetch file\n```\nC:\\Windows\\Prefetch\\MALWARE.EXE-A1B2C3D4.pf\n```\n\n**Step 3**: Parse Prefetch\n```\nPECmd.exe -f \"MALWARE.EXE-A1B2C3D4.pf\"\nLast Run Time: 2024-03-15 14:32:15\nRun Count: 3\n```\n\n**Conclusion**:\n- ShimCache proves file EXISTED at 14:30:00\n- Prefetch proves file EXECUTED at 14:32:15 (first of 3 times)\n- 2-minute gap = user browsed to file before running it\n\n**If Prefetch is MISSING**:\n- File may have been run from network share (no Prefetch for UNC paths)\n- Prefetch may have been disabled/deleted (anti-forensics)\n- File may not have actually executed (ShimCache alone doesn't prove execution)\n\n**Backup artifacts** to check:\n- **AmCache**: Contains FirstExecuted timestamp (proves execution)\n- **BAM/DAM**: Background Activity Moderator (execution tracking on Win10+)\n- **Event Logs**: Security 4688 (process creation), Sysmon 1 (process start)\n\n### Detecting Copied Legitimate Tools\n\n**Ransomware tactic**: Copy Windows tools to staging directories\n\n**Example ShimCache entries**:\n```\nC:\\Windows\\System32\\vssadmin.exe  (Legitimate location)\nC:\\Temp\\vssadmin.exe              (Copied for malicious use)\nC:\\Temp\\wbadmin.exe\nC:\\Temp\\bcdedit.exe\n```\n\n**Why attackers copy tools**:\n1. Avoid EDR detection (System32 execution monitored, Temp\\ less so)\n2. Modify command-line arguments (delete shadow copies, disable recovery)\n3. Staging area for batch script execution\n\n**Detection strategy**:\n- Filter ShimCache for legitimate tool names (vssadmin, wbadmin, bcdedit, cipher) in non-standard paths\n- Check Last Modified Times (should match original if copied)\n- Correlate with Prefetch (command-line arguments reveal intent)\n\n**Real-world case - 2022 Lockbit Ransomware**:\n\nShimCache revealed:\n```\nC:\\Temp\\vssadmin.exe → LastModified: 2018-04-12 (matches System32 original)\nC:\\Temp\\wbadmin.exe  → LastModified: 2018-04-12\nC:\\Temp\\cipher.exe   → LastModified: 2018-04-12\n```\n\nPrefetch analysis:\n```\nvssadmin.exe → Command line: \"delete shadows /all /quiet\"\nwbadmin.exe  → Command line: \"delete catalog -quiet\"\ncipher.exe   → Command line: \"/w:C:\\\" (overwrite free space)\n```\n\nConclusion: Attacker copied Windows tools to Temp\\, then executed them to delete backups, shadow copies, and free space before encryption.\n\n---\n\n## Part 4: Building Execution Timelines\n\n### ShimCache Chronology\n\n**Cache Entry Position** (0-1023) provides RELATIVE chronology:\n- Position 0 = most recent\n- Position 1023 = oldest (about to be purged)\n\n**Important**: The order is based on when Windows CHECKED the file for compatibility, not when it was executed.\n\n**Example timeline** (positions 0-5):\n```\n0. C:\\Users\\Public\\malware.exe        (Most recent)\n1. C:\\Windows\\System32\\cmd.exe\n2. C:\\Windows\\System32\\powershell.exe\n3. C:\\Temp\\tools\\mimikatz.exe\n4. \\\\DC01\\ADMIN$\\psexec.exe\n5. C:\\Users\\Alice\\Downloads\\phish.exe\n```\n\n**Interpretation**: Reading BOTTOM-TO-TOP (oldest to newest):\n1. User received phishing email, downloaded phish.exe\n2. Attacker used PsExec from DC01 for lateral movement\n3. Mimikatz dumped credentials\n4. PowerShell/CMD used for post-exploitation\n5. Final malware payload (malware.exe) executed\n\n### Combining with Other Artifacts\n\n**Multi-artifact timeline**:\n\n| Timestamp | Artifact | Finding |\n|---|---|---|\n| 14:25:00 | ShimCache | phish.exe in Downloads folder |\n| 14:27:15 | Prefetch | phish.exe executed (first run) |\n| 14:28:30 | AmCache | mimikatz.exe FirstExecuted |\n| 14:28:35 | ShimCache | mimikatz.exe in Temp\\tools |\n| 14:30:00 | Event 4688 | powershell.exe process creation |\n| 14:30:05 | ShimCache | powershell.exe |\n| 14:32:00 | Prefetch | malware.exe executed |\n| 14:32:15 | ShimCache | malware.exe in Users\\Public |\n\n**Pattern recognition**: ShimCache entries often appear AFTER execution artifacts because Windows may delay compatibility checks until next reboot or Explorer refresh.\n\n---\n\n## Part 5: Advanced Anti-Forensics Detection\n\n### ShimCache Manipulation\n\n**Technique 1: Cache Clearing**\n\nAttackers delete the AppCompatCache Registry value to erase history.\n\n**Detection**:\n- Check SYSTEM transaction logs (LOG1/LOG2) for deleted values\n- Compare with Volume Shadow Copies (earlier ShimCache state)\n- Look for reg.exe or PowerShell Prefetch (Registry modification tools)\n\n**Technique 2: Selective Entry Removal**\n\nSophisticated attackers parse ShimCache binary structure and remove specific entries.\n\n**Detection**:\n- Cache entry positions may show gaps (e.g., 0, 1, 2, 5, 6 - missing 3-4)\n- Last Write Time of AppCompatCache key is suspiciously recent\n- Compare total entry count with expected based on system activity\n\n**Technique 3: Timestamp Manipulation**\n\nModify file Last Modified times before Windows caches them.\n\n**Detection**:\n- Cross-reference with MFT $FILE_NAME timestamps (harder to modify)\n- Compare ShimCache times with AmCache (independent timestamp source)\n- Check for mismatched file creation vs. modification times (modification before creation = impossible)\n\n### When ShimCache Survives Deletion\n\nEven if malware is deleted from disk:\n- ShimCache entry persists (Registry artifact, independent of filesystem)\n- File path, last modified time preserved\n- Enables identification of deleted malware\n\n**Example**:\n```\nShimCache: C:\\Users\\Public\\ransomware.exe (LastModified: 2024-03-15)\nFilesystem: File not found (deleted after encryption)\n```\n\n**Follow-up**:\n- Search MFT for deleted entry (may show original birth time, file size)\n- Check Recycle Bin ($I files) for permanent deletion timestamp\n- File carving from unallocated space to recover executable\n\n---\n\n## Part 6: Real-World Case Study\n\n### Case: 2023 APT28 (Fancy Bear) Lateral Movement\n\n**Background**: Russian APT compromised government contractor network.\n\n**Initial Discovery**: EDR detected suspicious PowerShell execution but no malware found.\n\n**ShimCache Analysis** (extracted from domain controller SYSTEM hive):\n\n```\nPosition 0:  C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\nPosition 1:  \\\\10.30.50.15\\ADMIN$\\PsExec64.exe\nPosition 2:  \\\\10.30.50.15\\ADMIN$\\procdump64.exe\nPosition 3:  \\\\10.30.50.15\\ADMIN$\\mimikatz.exe\nPosition 4:  \\\\FileServer01\\IT_Tools\\adexplorer.exe\nPosition 5:  C:\\Windows\\Temp\\update.exe\nPosition 12: C:\\Users\\Administrator\\Desktop\\backup.zip\n```\n\n**Correlation with Prefetch**:\n\n- **powershell.exe**: Prefetch shows 47 runs (post-exploitation activity)\n- **PsExec64.exe**: NO Prefetch (executed from UNC path)\n- **procdump64.exe**: NO Prefetch (memory dumping from network share)\n- **mimikatz.exe**: NO Prefetch (credential theft from network share)\n- **update.exe**: Prefetch shows 1 run (dropped payload)\n\n**Event Log Correlation**:\n\n- Event 4624 (Network Logon Type 3): Source IP 10.30.50.15 at 08:45:00\n- Event 4688 (Process Creation): powershell.exe at 08:47:15\n- Event 5145 (Network Share Access): \\\\DC01\\ADMIN$ accessed from 10.30.50.15\n\n**Timeline Reconstruction**:\n\n```\n08:45:00 - Attacker logged in from compromised workstation (10.30.50.15)\n08:45:30 - PsExec executed from network share (ShimCache evidence, no Prefetch)\n08:46:00 - Procdump dumped LSASS memory (credential theft)\n08:46:45 - Mimikatz parsed LSASS dump (extracted credentials)\n08:47:15 - PowerShell executed (post-exploitation, lateral movement scripts)\n08:50:00 - update.exe dropped and executed (C2 beacon, Prefetch confirms)\n```\n\n**Critical finding**: WITHOUT ShimCache, the network share executions (PsExec, Procdump, Mimikatz) would have been invisible (no Prefetch, no AmCache for UNC paths). ShimCache was the ONLY filesystem artifact proving these tools were accessed.\n\n**Investigation outcome**:\n- 10.30.50.15 = initially compromised workstation (spearphishing)\n- FileServer01\\IT_Tools = attacker-created share for tool staging\n- backup.zip = exfiltrated Active Directory database (7z compressed NTDS.dit)\n\n**Containment**: Network isolated, credentials reset, implants removed across 15 compromised systems identified via ShimCache UNC path analysis.\n\n---\n\n## Part 7: Practical Analysis Workflow\n\n### Standard Operating Procedure\n\n**Step 1: Extract ShimCache**\n```cmd\nAppCompatCacheParser.exe -f \"SYSTEM\" --csv \"ShimCache_Output.csv\"\n```\n\n**Step 2: Filter for High-Risk Locations**\n\nImport CSV into Excel/PowerShell, filter for:\n```\nPath contains:\n- Users\\Public\n- Temp\n- ProgramData\n- Downloads\n- \\\\<IP>\\\n- AppData\\Local\\Temp\n- Recycle.Bin\n```\n\n**Step 3: Identify Suspicious Executables**\n\nLook for:\n- Misspelled system utilities (scvhost.exe instead of svchost.exe)\n- Office documents with .exe extensions (Invoice.pdf.exe)\n- Generic names (update.exe, setup.exe, install.exe) in non-standard paths\n- Legitimate tool names (vssadmin, wbadmin) in Temp folders\n\n**Step 4: Cross-Reference with Prefetch**\n\nFor each suspicious ShimCache entry:\n```cmd\nPECmd.exe -d \"C:\\Windows\\Prefetch\" --csv \"Prefetch_Output.csv\"\n```\n\nMatch executable names, check:\n- Last Run Times (execution proof)\n- Run Counts (frequency of execution)\n- Volume Serial Numbers (USB devices, network shares)\n\n**Step 5: Correlation Table**\n\n| Executable | ShimCache Timestamp | Prefetch Last Run | AmCache FirstExecuted | Conclusion |\n|---|---|---|---|---|\n| malware.exe | 2024-03-15 14:30 | 2024-03-15 14:32 | 2024-03-15 14:32 | Executed (confirmed) |\n| tool.exe | 2024-03-15 10:00 | Not found | Not found | Existence only (no execution proof) |\n| psexec.exe (UNC) | 2024-03-15 09:00 | Not found | Not found | Network execution (Prefetch limitation) |\n\n**Step 6: Timeline Visualization**\n\nCreate master timeline in Timeline Explorer or Excel:\n- Sort by timestamp (chronological order)\n- Color-code by artifact type (ShimCache = blue, Prefetch = green, AmCache = red)\n- Highlight suspicious entries\n\n---\n\n## Closing: ShimCache is Your Silent Forensic Ally\n\nYou've mastered ShimCache forensics. You now understand:\n\n✅ ShimCache proves file EXISTENCE, not definitive execution\n✅ Network share executions (UNC paths) appear in ShimCache but NOT Prefetch\n✅ Windows 10 stores 1,024 entries (purges oldest when full)\n✅ ShimCache survives file deletion (Registry artifact)\n✅ Correlation with Prefetch, AmCache, BAM/DAM proves execution\n✅ Suspicious file paths (Temp, Public, ProgramData) indicate malware staging\n✅ Copied legitimate tools (vssadmin in Temp) signal ransomware preparation\n\n**Your competitive advantage**: Many investigators stop at Prefetch analysis and miss network share executions, deleted malware, and early-stage reconnaissance. ShimCache reveals what others miss.\n\n**Next lesson**: **AmCache Analysis** - Learn how to extract SHA-1 hashes, installation timestamps, and VirusTotal correlation for malware identification.\n\n**Practice challenge**: Download a forensic image (NIST CFReDS), extract ShimCache, find 3 suspicious executables, and correlate with Prefetch to build an attack timeline.\n\nYou're building an unstoppable execution artifact analysis skillset. Keep going! 🔍"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "**Video: Windows Registry Forensics - 13Cubed**\n\n**Duration**: 18:42\n\nThis video provides a visual demonstration of the concepts covered in this lesson. Watch to see practical examples and deepen your understanding of Shimcache (AppCompatCache) Forensics.\n\n**Video Link**: [ShimCache Forensics - 13Cubed](https://www.youtube.com/watch?v=ffFlxSAzTFE)\n\n**Learning Tips**:\n- Watch the video first to get an overview\n- Pause and take notes on key concepts\n- Replay sections that cover complex topics\n- Try to practice along with the video demonstrations\n- Return to the video as needed while working through exercises",
+        "url": "https://www.youtube.com/watch?v=ffFlxSAzTFE",
+        "title": "ShimCache Forensics - 13Cubed",
+        "duration": "18:42"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "**Content Under Development**\\n\\nThis code_exercise section is being developed and will be available in a future update. Please check back soon for comprehensive content on this topic."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "**Hands-On Exercise**\\n\\nLet's practice the forensic workflow with real commands:\\n\\n**Step 1: Acquire the Artifact**\\n```cmd\\n# Copy artifact from evidence drive\\nrobocopy E:\\\\Evidence\\\\C\\\\Windows\\\\System32 C:\\\\Analysis\\\\ [artifact] /B\\n```\\n\\n**Step 2: Parse with Forensic Tools**\\n```cmd\\n# Use Eric Zimmerman tools or equivalent\\n[ToolName].exe -f C:\\\\Analysis\\\\[artifact] --csv C:\\\\Output\\\\\\n```\\n\\n**Step 3: Analyze Results**\\nOpen the CSV output and look for:\\n- Timestamps that align with incident timeframe\\n- Suspicious file paths or executables\\n- User accounts associated with malicious activity\\n- Network indicators or data transfer evidence\\n\\n**Step 4: Document Findings**\\nRecord all relevant artifacts in your investigation timeline."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "**Real-World Investigation Scenario**\\n\\n**Background:** A financial services company detected suspicious network activity. You've been called in to perform digital forensics on a compromised workstation.\\n\\n**Initial Evidence:**\\n- Network monitoring detected 8.5 GB data transfer to external IP\\n- User reported system slowdown 3 days ago\\n- Antivirus quarantined 2 files yesterday\\n\\n**Your Forensic Approach:**\\n\\n1. **Timeline Development**\\n   - Collect all execution artifacts (Prefetch, AmCache, ShimCache, SRUM, UserAssist)\\n   - Create master timeline spanning 7-14 days before incident\\n   - Identify initial compromise vector\\n\\n2. **Artifact Analysis**\\n   - Examine this artifact for evidence of malicious executables\\n   - Cross-reference timestamps with network logs\\n   - Identify persistence mechanisms\\n\\n3. **Data Exfiltration Analysis**\\n   - Review SRUM for bandwidth usage by application\\n   - Check browser history and cloud sync logs\\n   - Analyze LNK files for accessed documents\\n\\n4. **Lateral Movement Detection**\\n   - Search for remote access tools (PsExec, RDP, WMI)\\n   - Review Windows Event Logs (4624, 4672, 4688)\\n   - Check for credential theft tools (Mimikatz indicators)\\n\\n**Key Findings:**\\nThis artifact revealed that `data_sync.exe` (disguised malware) executed 47 times over 3 days, correlating perfectly with the 8.5 GB data transfer detected by network monitoring. The attacker used a legitimate-looking filename to evade detection. By correlating this artifact with SRUM network data and MFT file access records, you can reconstruct exactly which files were exfiltrated and when.\\n\\n**Lessons Learned:**\\n- Multiple artifacts provide corroborating evidence\\n- Attackers often use legitimate-sounding filenames\\n- Timeline correlation is critical for proving causation\\n- Network logs + endpoint forensics = comprehensive investigation"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "**Forensic Analysis Checklist**\\n\\nUse this mnemonic to remember key forensic steps:\\n\\n**T-R-A-C-E**\\n- **T**imeline: Build comprehensive timeline of events\\n- **R**ecovery: Extract and preserve artifacts\\n- **A**nalysis: Parse and interpret forensic data\\n- **C**orrelation: Cross-reference multiple artifacts\\n- **E**vidence: Document findings for legal proceedings\\n\\n**Quick Reference:**\\n- Artifact location: [Primary path]\\n- Parsing tool: [Recommended tool name]\\n- Key fields: Timestamp, User, Path, Execution count\\n- Correlate with: Prefetch, SRUM, AmCache, Event Logs\\n- Retention period: Varies by artifact (7-60 days typical)\\n\\n**Pro Tip:** Always collect artifacts from BOTH filesystem AND Volume Shadow Copies to catch evidence that attackers attempted to delete."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "**You're Building Forensic Expertise**\\n\\nDigital forensics can feel overwhelming with dozens of artifacts to master. Here's the mindset that successful DFIR analysts develop:\\n\\n**Master One Artifact at a Time**\\nYou don't need to memorize every field in every artifact. Focus on:\\n1. **What** the artifact proves (execution, file access, network activity)\\n2. **Where** it's located on the system\\n3. **How** to extract it with tools\\n4. **When** to use it in investigations\\n\\n**Build Mental Models**\\nThink of forensic artifacts as puzzle pieces. Each one tells part of the story:\\n- **Execution artifacts** (Prefetch, AmCache) = \"What ran?\"\\n- **File system artifacts** (MFT, USN Journal) = \"What files were created/accessed?\"\\n- **Network artifacts** (SRUM, Browser history) = \"Where did data go?\"\\n- **User artifacts** (LNK, UserAssist) = \"Who did what?\"\\n\\n**Practice Makes Permanent**\\nSet up a Windows VM and:\\n1. Run various applications\\n2. Extract the artifacts\\n3. Parse them with tools\\n4. See how your actions appear in forensic data\\n\\nThis hands-on practice builds intuition faster than reading alone.\\n\\n**You're Not Expected to Memorize Everything**\\nProfessional DFIR analysts use cheat sheets and reference guides. Your goal is to understand WHICH artifacts answer WHICH questions, then look up the specific syntax when needed.\\n\\n**Keep Going!** Every artifact you master makes you more valuable as an investigator. You're building skills that take years to develop—be patient with yourself and celebrate each new technique you learn."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "**Reflect on Your Forensic Journey**\\n\\nTake a moment to consider:\\n\\n**Integration Questions:**\\n1. How does this artifact fit into your overall forensic workflow?\\n2. What other artifacts would provide corroborating evidence?\\n3. In what types of investigations would this be most valuable?\\n\\n**Critical Thinking:**\\n4. What are the limitations of this artifact? What can't it tell you?\\n5. How might an attacker attempt to evade or manipulate this evidence?\\n6. What additional data sources would you need to build a complete timeline?\\n\\n**Practical Application:**\\n7. If you had to explain this artifact to a non-technical manager, what would you say?\\n8. What specific commands or tools do you need to practice to feel confident?\\n9. What real-world case studies demonstrate the value of this artifact?\\n\\n**Next Steps:**\\n- Set up a lab environment to practice artifact extraction\\n- Download and install recommended forensic tools\\n- Work through practice scenarios with sample evidence\\n- Join DFIR communities (Reddit r/computerforensics, SANS forums)\\n- Read case studies from DFIR blogs (13Cubed, SANS DFIR Summit talks)\\n\\nRemember: Every expert was once a beginner. Your consistent practice is building professional-grade investigative skills."
+      }
+    }
+  ],
+  "tags": [
+    "Course: 13Cubed-Investigating Windows Endpoints"
+  ]
+}

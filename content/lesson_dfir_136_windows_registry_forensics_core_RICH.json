@@ -1,0 +1,157 @@
+{
+  "lesson_id": "bb521363-fa8b-4902-b3ed-5cbe1e8ca816",
+  "domain": "dfir",
+  "title": "Windows Registry Forensics Core",
+  "subtitle": "Section 2: Registry Analysis Focus on Registry structure (hives)",
+  "difficulty": 2,
+  "estimated_time": 49,
+  "order_index": 136,
+  "prerequisites": [
+    "0dea5c2c-3081-4c96-ae9c-98faa9512dd3",
+    "5b6dde80-6b19-4aac-997a-d69fbdbdb10b"
+  ],
+  "concepts": [
+    "Registry structure (hives)",
+    "SAM and SECURITY hives",
+    "SOFTWARE and SYSTEM hives",
+    "user hives (NTUSER.DAT",
+    "UsrClass.dat)",
+    "registry transaction logs",
+    "RegRipper and Registry Explorer tools"
+  ],
+  "learning_objectives": [
+    "Summarize why Windows Registry Forensics Core matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply Registry structure (hives) and SAM and SECURITY hives to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing Windows Registry Forensics Core.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does Registry structure (hives) strengthen the Windows Registry Forensics Core workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "e4f6a980-a7cd-4164-9e21-16e9528c6875",
+      "explanation": "Registry structure (hives) provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Registry Forensics Core process consistently improves."
+    },
+    {
+      "question": "How does SAM and SECURITY hives strengthen the Windows Registry Forensics Core workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "a0a30345-ca05-434e-a77b-a4d9a5d8f706",
+      "explanation": "SAM and SECURITY hives provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Registry Forensics Core process consistently improves."
+    },
+    {
+      "question": "How does SOFTWARE and SYSTEM hives strengthen the Windows Registry Forensics Core workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "6bec7627-b17c-433d-b958-93a93f236b66",
+      "explanation": "SOFTWARE and SYSTEM hives provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Registry Forensics Core process consistently improves."
+    },
+    {
+      "question": "How does user hives (NTUSER.DAT strengthen the Windows Registry Forensics Core workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "4cce1bf7-48b1-45b3-afe4-95a16d4ed31a",
+      "explanation": "user hives (NTUSER.DAT provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the Windows Registry Forensics Core process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 2: Registry Analysis – Windows Registry Forensics Core\n\nForensic analysts rely on **Windows Registry Forensics Core** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Foundation for all registry analysis\n\nRegistry structure (hives) keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how registry structure (hives) supports resilience and recovery.\n\nSAM and SECURITY hives keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how sam and security hives supports resilience and recovery.\n\nSOFTWARE and SYSTEM hives keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how software and system hives supports resilience and recovery.\n\nuser hives (NTUSER.DAT keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how user hives (ntuser.dat supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows registry forensics core habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=bhlGmjOaEl0 — DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 2: Registry Analysis – Windows Registry Forensics Core\n\nForensic analysts rely on **Windows Registry Forensics Core** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Foundation for all registry analysis\n\nUsrClass.dat) keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how usrclass.dat) supports resilience and recovery.\n\nregistry transaction logs keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how registry transaction logs supports resilience and recovery.\n\nRegRipper and Registry Explorer tools keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 2: registry analysis commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how regripper and registry explorer tools supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the windows registry forensics core habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for Windows Registry Forensics Core\n\nSet up a sandbox aligned with section 2: registry analysis commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **Registry structure (hives)**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **SAM and SECURITY hives**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **SOFTWARE and SYSTEM hives**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **user hives (NTUSER.DAT**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **UsrClass.dat)**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **registry transaction logs**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying Windows Registry Forensics Core\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from Windows Registry Forensics Core.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Foundation for all registry analysis"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: WRFC\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- W – Registry structure (hives)\n- R – SAM and SECURITY hives\n- F – SOFTWARE and SYSTEM hives\n- C – user hives (NTUSER.DAT\n\n### Mnemonic: WRFC\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- W – Lessons Learned\n- R – Resilience Testing\n- F – Automation Backlog\n- C – Telemetry Mapping\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: Windows Registry Forensics Core\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **Registry structure (hives)** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **SAM and SECURITY hives** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **SOFTWARE and SYSTEM hives** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the Windows Registry Forensics Core workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an intermediate journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through Windows Registry Forensics Core.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR500"
+  ]
+}

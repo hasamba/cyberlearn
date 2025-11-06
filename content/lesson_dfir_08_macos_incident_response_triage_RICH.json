@@ -1,0 +1,218 @@
+{
+  "lesson_id": "f425bd87-2621-451e-8651-84b26b4c8173",
+  "domain": "dfir",
+  "title": "macOS Incident Response Triage",
+  "subtitle": "Collecting and analysing Apple endpoint evidence under pressure",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 8,
+  "prerequisites": [
+    "Evidence Acquisition & Triage for DFIR Responders",
+    "macOS Security Fundamentals"
+  ],
+  "concepts": [
+    "macOS system architecture",
+    "File system artefacts (APFS, FSEvents)",
+    "Unified log collection",
+    "Process and binary triage",
+    "Launch agents and persistence mechanisms",
+    "Quarantine and Gatekeeper metadata",
+    "Memory capture options",
+    "Network telemetry sources",
+    "Scripting with osquery and Santa",
+    "Legal considerations for employee devices"
+  ],
+  "learning_objectives": [
+    "Identify key macOS artefacts that support rapid incident triage",
+    "Collect unified logs and FSEvents data without losing chain of custody",
+    "Detect common persistence mechanisms and remove them safely",
+    "Use osquery to hunt for malicious processes and binaries",
+    "Coordinate with legal and HR for employee-owned device handling",
+    "Package findings for cross-platform DFIR reporting"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "41b3aa87-c6d0-41e6-92b9-dda92e89fb27",
+      "type": "mindset_coach",
+      "title": "Stay Curious, Stay Compliant",
+      "content": {
+        "text": "macOS investigations blend technical nuance with legal guardrails. Maintain curiosity about artefacts while staying anchored to policy and regional privacy laws."
+      },
+      "simplified_explanation": "Balance your investigation with respect for privacy rules.",
+      "memory_aids": [
+        "Curious but compliant"
+      ],
+      "real_world_connection": "Enterprise responders often collaborate with legal counsel during macOS investigations.",
+      "reflection_prompt": "Which policy governs macOS device handling in your organisation?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "7df76daa-7d24-4ea0-ab43-dda0d04e6183",
+      "type": "explanation",
+      "title": "Triage Checklist",
+      "content": {
+        "text": "## A.P.P.L.E.\n- **A**rtifacts – FSEvents, unified logs, quarantine data.\n- **P**ersistence – LaunchAgents, LaunchDaemons, login hooks.\n- **P**rocesses – Current processes, binaries, code signing status.\n- **L**ogs – Unified log export with filters.\n- **E**xfil indicators – Network connections, cloud sync logs."
+      },
+      "simplified_explanation": "Use the APPLE acronym to cover the essentials quickly.",
+      "memory_aids": [
+        "Artifacts → Persistence → Processes → Logs → Exfil"
+      ],
+      "real_world_connection": "Major consultancies embed APPLE-like lists in macOS runbooks.",
+      "reflection_prompt": "Which APPLE component feels least familiar to you?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "ace54213-4b70-43f9-a026-5dd217af2185",
+      "type": "video",
+      "title": "macOS Forensics Crash Course",
+      "content": {
+        "resources": "Watch an experienced analyst walk through macOS triage artefacts and tooling.\n\n**Video**: [Day in the Life of DFIR (Digital Forensics and Incident Response) - interview with Becky Passmore](https://www.youtube.com/watch?v=MAE4N97NSM8)\n\nCapture the commands used to export unified logs and inspect persistence."
+      },
+      "simplified_explanation": "Visualise where each artefact lives before diving into a lab.",
+      "memory_aids": [
+        "Write down each command as you watch"
+      ],
+      "real_world_connection": "Clip mirrors trainings provided to managed detection teams.",
+      "reflection_prompt": "Which command will you add to your triage script first?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "42f2f269-a185-4a88-86ba-d9d2ba285ce8",
+      "type": "memory_aid",
+      "title": "LOGOUT Reminder",
+      "content": {
+        "text": "### L.O.G.O.U.T.\n- **L**ist currently running processes.\n- **O**bserve launch items.\n- **G**rab unified logs.\n- **O**utput quarantine metadata.\n- **U**pload volatile artefacts securely.\n- **T**rack chain of custody."
+      },
+      "simplified_explanation": "LOGOUT ensures you leave no gap in triage.",
+      "memory_aids": [
+        "LOGOUT before you leave the endpoint"
+      ],
+      "real_world_connection": "Analysts use similar mnemonics during on-call rotations.",
+      "reflection_prompt": "How will you document each LOGOUT step for court readiness?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "d7595278-8401-44bb-b56f-eacf27379fe4",
+      "type": "real_world",
+      "title": "Field Example: Insider Data Exfiltration",
+      "content": {
+        "text": "A media company discovered data exfiltration via personal iCloud accounts. Responders exported unified logs, analysed FSEvents for external drive usage, and identified unsanctioned LaunchAgents. The investigation led to updated policies and automated osquery checks."
+      },
+      "simplified_explanation": "macOS artefacts revealed exfil paths and policy gaps.",
+      "memory_aids": [
+        "Logs + FSEvents = exfil visibility"
+      ],
+      "real_world_connection": "Scenario based on a real insider investigation shared at a DFIR summit.",
+      "reflection_prompt": "What policy change would you recommend after a similar incident?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9b164659-bb33-4717-b9e6-72a0c9dde6e2",
+      "type": "simulation",
+      "title": "macOS Triage Playthrough",
+      "content": {
+        "text": "1. In a lab VM, simulate suspicious behaviour (create LaunchAgent, drop unsigned binary).\n2. Execute the APPLE checklist capturing logs, persistence entries, and process info.\n3. Hash and store artefacts, noting chain-of-custody details.\n4. Draft a short report summarising findings and recommended remediation."
+      },
+      "simplified_explanation": "Practise the full workflow so real incidents feel familiar.",
+      "memory_aids": [
+        "Simulate → Collect → Report"
+      ],
+      "real_world_connection": "Teams run similar exercises quarterly to stay macOS-ready.",
+      "reflection_prompt": "What step took the longest, and how can you streamline it?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "ea456b46-0679-42d0-957d-3eb665886fcb",
+      "type": "reflection",
+      "title": "Teach Back Your Findings",
+      "content": {
+        "text": "### Reflect & Teach\n- Explain the macOS triage process to a teammate, emphasising APPLE and LOGOUT.\n- List two automation ideas (osquery packs, unified log filters) you will build.\n- Identify one legal or privacy safeguard you will confirm with counsel."
+      },
+      "simplified_explanation": "Teaching cements both technical and governance considerations.",
+      "memory_aids": [
+        "Explain → Automate → Safeguard"
+      ],
+      "real_world_connection": "Cross-functional reviews often begin with these talking points.",
+      "reflection_prompt": "Who will you partner with to implement the automation or safeguard?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why are unified logs valuable during macOS triage?",
+      "options": [
+        "They store only network configuration",
+        "They provide rich, timestamped event data across subsystems",
+        "They replace the need for memory capture",
+        "They can only be accessed on jailbroken devices"
+      ],
+      "correct_answer": 1,
+      "explanation": "Unified logs aggregate detailed system events that help analysts reconstruct attacker actions.",
+      "difficulty": 2,
+      "memory_aid": "Unified logs = detailed timeline",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is a common persistence mechanism you should inspect on macOS?",
+      "options": [
+        "LaunchAgents and LaunchDaemons",
+        "Windows Registry Run keys",
+        "Cron jobs in /etc/crontab only",
+        "Group Policy logon scripts"
+      ],
+      "correct_answer": 0,
+      "explanation": "LaunchAgents and LaunchDaemons are typical persistence mechanisms on macOS environments.",
+      "difficulty": 2,
+      "memory_aid": "Launch items launch attackers",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How can osquery assist in macOS investigations?",
+      "options": [
+        "It automatically remediates incidents without review",
+        "It provides SQL-style queries to hunt for suspicious processes and artefacts",
+        "It encrypts unified logs automatically",
+        "It only runs on Linux"
+      ],
+      "correct_answer": 1,
+      "explanation": "osquery enables analysts to query system state using SQL, speeding detection and triage tasks.",
+      "difficulty": 2,
+      "memory_aid": "osquery = SQL for endpoints",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:34:00",
+  "updated_at": "2025-10-28T15:34:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

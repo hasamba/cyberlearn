@@ -133,6 +133,10 @@ class Lesson(BaseModel):
             self.difficulty, "Unknown"
         )
 
+    def get_short_id(self) -> str:
+        """Generate short lesson ID like 'dfir23' or 'malware04'"""
+        return f"{self.domain}{self.order_index:02d}"
+
     def calculate_xp(self, score: int, time_spent: int, streak: int = 0) -> int:
         """Calculate XP with bonuses"""
         base = self.base_xp_reward

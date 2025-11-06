@@ -1,0 +1,219 @@
+{
+  "lesson_id": "bb3261e0-65b9-46aa-b817-4864bfa77018",
+  "domain": "dfir",
+  "title": "Evidence Acquisition & Triage for DFIR Responders",
+  "subtitle": "Collecting defensible data at speed",
+  "difficulty": 2,
+  "estimated_time": 55,
+  "order_index": 6,
+  "prerequisites": [
+    "Introduction to Digital Forensics",
+    "DFIR Chain of Custody",
+    "DFIR Incident Response Process"
+  ],
+  "concepts": [
+    "Order of volatility",
+    "Live response vs dead box imaging",
+    "Forensic imaging tools and formats",
+    "Network capture and PCAP triage",
+    "Cloud and SaaS evidence preservation",
+    "Triage scripting with KAPE",
+    "Velociraptor collection packs",
+    "Integrity verification with hashes",
+    "Evidence lockers and documentation",
+    "Legal and regulatory considerations"
+  ],
+  "learning_objectives": [
+    "Determine the optimal acquisition strategy based on data volatility and legal scope",
+    "Use imaging tools to capture disk and memory while preserving integrity",
+    "Deploy triage scripts to extract high value artifacts rapidly",
+    "Validate evidence integrity with cryptographic hashes and documentation",
+    "Coordinate collection across on-prem, cloud, and SaaS environments",
+    "Maintain chain of custody records that stand up to legal scrutiny"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "93950416-1a25-4d90-92ba-dad1cb0ec25b",
+      "type": "mindset_coach",
+      "title": "Collect Calmly, Document Relentlessly",
+      "content": {
+        "text": "Evidence collection is the moment to breathe, slow down, and let muscle memory take over. Your calm focus ensures the investigation remains defensible months—even years—later."
+      },
+      "simplified_explanation": "Stay calm and document everything so evidence holds up in court.",
+      "memory_aids": [
+        "Calm mind, clear chain"
+      ],
+      "real_world_connection": "Seasoned responders repeat this mantra before every major acquisition.",
+      "reflection_prompt": "What documentation habit do you want to strengthen today?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "226fe402-7714-400a-a9b0-08ac3ddef228",
+      "type": "explanation",
+      "title": "Acquisition Framework",
+      "content": {
+        "text": "## V.I.P.E.R.\n- **V**olatility – capture the most volatile data first.\n- **I**nstruments – choose the right tools (KAPE, Velociraptor, dd, FTK).\n- **P**reservation – record hashes, timestamps, and storage locations.\n- **E**scalation – know when to escalate legal or scope issues.\n- **R**eview – sanity-check logs and artefacts before leaving the scene."
+      },
+      "simplified_explanation": "Follow VIPER to avoid omissions under pressure.",
+      "memory_aids": [
+        "VIPER keeps evidence alive"
+      ],
+      "real_world_connection": "Large consultancies teach VIPER-like mnemonics during onboarding.",
+      "reflection_prompt": "Which VIPER step do you occasionally skip, and why?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9cfe1903-bc7f-4525-9b3a-f68ad4c59a5e",
+      "type": "video",
+      "title": "Incident Response Evidence Collection Techniques",
+      "content": {
+        "resources": "Watch a field responder use Velociraptor and KAPE for rapid triage.\n\n**Video**: [Digital Forensics and Incident Response (DFIR): The Key to Cybersecurity Investigations](https://www.youtube.com/watch?v=PuNZZUaBD6k)\n\nFocus on pre-collection briefings, integrity checks, and hand-off procedures."
+      },
+      "simplified_explanation": "Visualise the workflow so muscle memory develops faster.",
+      "memory_aids": [
+        "Pause and note every integrity checkpoint"
+      ],
+      "real_world_connection": "The workflow mirrors real responders working in cloud-first environments.",
+      "reflection_prompt": "What command or workflow will you practise after the video?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "41fceda9-4fa6-4edd-8027-f75a57f8d2b1",
+      "type": "memory_aid",
+      "title": "Hash It Twice",
+      "content": {
+        "text": "### Integrity Checklist\n1. Hash media at acquisition.\n2. Hash again after transfer.\n3. Compare values and log results.\n4. Store hashes with chain of custody paperwork."
+      },
+      "simplified_explanation": "Two hashes beat one; log both.",
+      "memory_aids": [
+        "Hash → Transfer → Hash"
+      ],
+      "real_world_connection": "Courts often ask for proof of integrity across acquisition and analysis phases.",
+      "reflection_prompt": "Where will you store hash logs in your current workflow?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "803359d1-12cb-4d72-b75b-8441aad10137",
+      "type": "real_world",
+      "title": "Field Example: Cloud Breach Response",
+      "content": {
+        "text": "Responders collected volatile memory from compromised containers using automated collectors before the auto-scaling group replaced the nodes. Rigorous chain-of-custody notes and hash verification enabled successful legal action and regulatory reporting."
+      },
+      "simplified_explanation": "Preparation allowed evidence preservation even in ephemeral infrastructure.",
+      "memory_aids": [
+        "Ephemeral ≠ impossible"
+      ],
+      "real_world_connection": "Derived from a publicised response to a container compromise.",
+      "reflection_prompt": "How will you adapt your tooling to handle ephemeral assets?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "4a699581-5455-4873-9ca8-59b8fd2031cd",
+      "type": "simulation",
+      "title": "Draft an Acquisition Plan",
+      "content": {
+        "text": "1. Identify the order of volatility for a ransomware incident in a hybrid environment.\n2. List the tools and exact commands you will run in the first 30 minutes.\n3. Define how evidence will be labelled, hashed, transported, and stored.\n4. Record the plan in the incident log template and schedule a tabletop review."
+      },
+      "simplified_explanation": "Plan the run before you enter the war room.",
+      "memory_aids": [
+        "Plan → Execute → Verify"
+      ],
+      "real_world_connection": "Top DFIR teams rehearse acquisition plans regularly to reduce response friction.",
+      "reflection_prompt": "What legal or regulatory check must happen before execution?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "efceae39-3734-4141-a3a7-37215648bdec",
+      "type": "reflection",
+      "title": "Teach Back the Chain",
+      "content": {
+        "text": "### Reflect & Teach\n- Explain your evidence plan to a teammate, emphasising VIPER checkpoints.\n- List two documentation updates you will make to your current runbooks.\n- Identify one automation that could reduce human error."
+      },
+      "simplified_explanation": "Teaching debriefs make processes stick and expose gaps.",
+      "memory_aids": [
+        "Explain → Update → Automate"
+      ],
+      "real_world_connection": "Many firms require responders to brief peers after every major acquisition.",
+      "reflection_prompt": "Who will you brief and when will it happen?",
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What determines the order of volatility during evidence collection?",
+      "options": [
+        "File size",
+        "How quickly data changes or disappears",
+        "Network speed",
+        "Analyst preference"
+      ],
+      "correct_answer": 1,
+      "explanation": "Data that changes rapidly must be captured first to preserve evidence integrity.",
+      "difficulty": 2,
+      "memory_aid": "Volatile first, stable later",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why hash evidence immediately after acquisition?",
+      "options": [
+        "To encrypt it",
+        "To provide integrity assurance throughout the investigation",
+        "To shrink file size",
+        "To satisfy curiosity"
+      ],
+      "correct_answer": 1,
+      "explanation": "Hashing proves the evidence was not altered and withstands legal scrutiny.",
+      "difficulty": 2,
+      "memory_aid": "Hash = trust",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What is a benefit of triage tooling like KAPE?",
+      "options": [
+        "It replaces forensic analysts",
+        "It extracts high value artifacts rapidly for initial review",
+        "It automatically writes the final report",
+        "It removes the need for chain of custody"
+      ],
+      "correct_answer": 1,
+      "explanation": "Triage tools accelerate insight generation while full analysis continues in parallel.",
+      "difficulty": 2,
+      "memory_aid": "Triage accelerates decisions",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 140,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2025-10-28T15:00:00",
+  "updated_at": "2025-10-28T15:00:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.1"
+}

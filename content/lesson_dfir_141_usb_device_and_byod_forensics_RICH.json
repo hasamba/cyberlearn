@@ -1,0 +1,157 @@
+{
+  "lesson_id": "da694513-89f3-40f3-a9f6-ead3bafe15ec",
+  "domain": "dfir",
+  "title": "USB Device and BYOD Forensics",
+  "subtitle": "Section 3: Shell Items and Removable Device Profiling Focus on USB device tracking",
+  "difficulty": 3,
+  "estimated_time": 56,
+  "order_index": 141,
+  "prerequisites": [
+    "bb521363-fa8b-4902-b3ed-5cbe1e8ca816",
+    "086f0188-ee9d-4e32-8788-4c0db2d3c511"
+  ],
+  "concepts": [
+    "USB device tracking",
+    "USBSTOR registry key",
+    "first and last connection times",
+    "device serial numbers",
+    "volume name and capacity",
+    "files accessed on removable media",
+    "smartphone forensics artifacts"
+  ],
+  "learning_objectives": [
+    "Summarize why USB Device and BYOD Forensics matters for digital forensics and incident response and how it guides decision-making.",
+    "Apply USB device tracking and USBSTOR registry key to a scripted incident and document the workflow.",
+    "Evaluate telemetry, communication, and automation opportunities discovered while rehearsing USB Device and BYOD Forensics.",
+    "Coach peers through the lesson structure and record measurable improvements across the team."
+  ],
+  "post_assessment": [
+    {
+      "question": "How does USB device tracking strengthen the USB Device and BYOD Forensics workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "52eee2bd-8fa4-4c8d-a03f-ae55538135fb",
+      "explanation": "USB device tracking provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the USB Device and BYOD Forensics process consistently improves."
+    },
+    {
+      "question": "How does USBSTOR registry key strengthen the USB Device and BYOD Forensics workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "492768bd-bfb2-4bdc-82e7-1ce7a68ef184",
+      "explanation": "USBSTOR registry key provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the USB Device and BYOD Forensics process consistently improves."
+    },
+    {
+      "question": "How does first and last connection times strengthen the USB Device and BYOD Forensics workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "30e540f1-a8c8-4932-ba6d-90c2f8442769",
+      "explanation": "first and last connection times provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the USB Device and BYOD Forensics process consistently improves."
+    },
+    {
+      "question": "How does device serial numbers strengthen the USB Device and BYOD Forensics workflow?",
+      "options": [
+        "It distracts forensic analysts from digital forensics and incident response priorities by focusing on unrelated administrative work.",
+        "It guides forensic analysts to gather evidence, compare telemetry, and communicate findings tied to digital forensics and incident response.",
+        "It encourages teams to skip documentation and rely on ad-hoc conversations during crises.",
+        "It replaces the need for collaboration with external partners and legal advisors."
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "95c82c22-378a-441f-bd84-ac69efa23b97",
+      "explanation": "device serial numbers provides structure for capturing observations, testing hypotheses, and looping in stakeholders so the USB Device and BYOD Forensics process consistently improves."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Shell Items and Removable Device Profiling – USB Device and BYOD Forensics\n\nForensic analysts rely on **USB Device and BYOD Forensics** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Comprehensive USB investigation\n\nUSB device tracking keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how usb device tracking supports resilience and recovery.\n\nUSBSTOR registry key keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how usbstor registry key supports resilience and recovery.\n\nfirst and last connection times keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how first and last connection times supports resilience and recovery.\n\ndevice serial numbers keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Kickoff workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how device serial numbers supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the usb device and byod forensics habits are embedded across the program."
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=PuNZZUaBD6k — DFIR Science's case study on large-scale incident response illustrates log triage, artifact prioritization, and collaboration patterns mirrored in this module."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Section 3: Shell Items and Removable Device Profiling – USB Device and BYOD Forensics\n\nForensic analysts rely on **USB Device and BYOD Forensics** to express why this portion of the curriculum matters. The lesson connects strategy and day-to-day execution so the team can describe what good looks like when safeguarding digital forensics and incident response.\n\nRemember from the planning notes: Comprehensive USB investigation\n\nvolume name and capacity keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how volume name and capacity supports resilience and recovery.\n\nfiles accessed on removable media keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how files accessed on removable media supports resilience and recovery.\n\nsmartphone forensics artifacts keeps forensic analysts grounded in repeatable practice. Within digital forensics and incident response, this element clarifies how to brief peers, review telemetry, and translate the section 3: shell items and removable device profiling commitments into measurable action. Deep-dive workshops should document baseline data, escalation triggers, and links to automation backlogs so the entire unit understands how smartphone forensics artifacts supports resilience and recovery.\n\nClose the section by capturing success metrics, owner assignments, and retrospectives that prove the usb device and byod forensics habits are embedded across the program."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-on Simulation for USB Device and BYOD Forensics\n\nSet up a sandbox aligned with section 3: shell items and removable device profiling commitments. The goal is to narrate every investigative move so forensic analysts can replay the workflow with new data sets.\n\n1. Draft a playbook segment around **USB device tracking**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n2. Draft a playbook segment around **USBSTOR registry key**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n3. Draft a playbook segment around **first and last connection times**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n4. Draft a playbook segment around **device serial numbers**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n5. Draft a playbook segment around **volume name and capacity**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\n6. Draft a playbook segment around **files accessed on removable media**. Identify required tooling, the evidence collected, and the triage decisions the team must make. Capture command output, dashboards, and analyst notes.\n\nAfter the walkthrough, schedule a peer review. Each analyst explains what worked, what required escalation, and how to automate repetitive steps without losing investigative rigor.\n\nFinish by updating the runbook, linking recorded sessions, and tagging knowledge base articles so future rotations learn from the exercise."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Study: Applying USB Device and BYOD Forensics\n\nA regional team experienced a high-pressure incident that exposed gaps in digital forensics and incident response. Forensic analysts regrouped and replayed the timeline using the lesson structure from USB Device and BYOD Forensics.\n\nThey cataloged the signals they missed, the collaboration friction they encountered, and the stakeholders who needed clearer communication. By aligning remediation tasks to the lesson structure, they closed visibility gaps and launched new detection backlogs.\n\nDuring the postmortem, the team recorded how executive updates, compliance obligations, and vendor coordination all tied back to the lesson pillars. This ensured future incidents would follow a confident, rehearsed pathway to containment.\n\nPlanning reminder: Comprehensive USB investigation"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Architectures\n\n### Mnemonic: UDABF\n\nAssociate the acronym with the mission of this lesson. Visualize a war room where each station is labeled with these initials, reminding the crew how to defend digital forensics and incident response under stress.\n\n- U – USB device tracking\n- D – USBSTOR registry key\n- A – first and last connection times\n- B – device serial numbers\n- F – volume name and capacity\n\n### Mnemonic: UDABF\n\nUse this alternate mnemonic to trigger rapid debriefs. Picture sticky notes, dashboards, and alerts all echoing these letters so the practice becomes muscle memory.\n\n- U – Lessons Learned\n- D – Resilience Testing\n- A – Automation Backlog\n- B – Telemetry Mapping\n- F – Stakeholder Briefing\n\nTurn both memory tools into cue cards, whiteboard sketches, and spaced-repetition prompts so the team revisits them weekly."
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check: USB Device and BYOD Forensics\n\nDiscuss these prompts with a teammate before attempting the formal post-assessment. Emphasize storytelling and decision rationale.\n\n- How does **USB device tracking** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **USBSTOR registry key** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\n- How does **first and last connection times** influence the triage path, and which warning signs should forensic analysts flag immediately?\n\nCapture the answers in your runbook and update escalation thresholds so the lesson becomes part of daily stand-ups."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Journal\n\n- When did you last witness a breakdown in digital forensics and incident response, and how would the USB Device and BYOD Forensics workflow change the outcome?\n- Which allies outside your immediate team should be briefed on this lesson so forensic analysts have faster support?\n- What metric will you watch over the next two sprints to prove the lesson is embedded?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Mindset Coach\n\nThis is an advanced journey. Celebrate each iteration where forensic analysts narrate what they learned, how they collaborated, and which safeguards they reinforced.\n\nTreat mistakes as signal. Document them, share the story, and adjust the playbook so confidence keeps growing while working through USB Device and BYOD Forensics.\n\nEnd every session by identifying one action you can automate, one teammate you can mentor, and one stakeholder update you can improve."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR500"
+  ]
+}

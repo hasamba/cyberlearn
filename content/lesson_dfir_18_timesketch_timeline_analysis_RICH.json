@@ -1,0 +1,169 @@
+{
+  "lesson_id": "8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f",
+  "domain": "dfir",
+  "title": "TimeSketch: Timeline Analysis and Forensic Collaboration",
+  "difficulty": 2,
+  "order_index": 18,
+  "prerequisites": [
+    "dfir_08"
+  ],
+  "concepts": [
+    "Timeline analysis",
+    "TimeSketch architecture",
+    "Plaso and log2timeline",
+    "Collaborative investigations",
+    "Timeline visualization",
+    "Search and filtering",
+    "Event tagging and annotations",
+    "Sketch sharing"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand TimeSketch architecture and components",
+    "Master Plaso/log2timeline for timeline creation",
+    "Perform advanced timeline searches and filtering",
+    "Collaborate on investigations with team members",
+    "Analyze complex incident timelines effectively"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary tool used to create timeline files for TimeSketch?",
+      "options": [
+        "Volatility",
+        "Plaso/log2timeline",
+        "Autopsy",
+        "FTK Imager"
+      ],
+      "correct_answer": 1,
+      "explanation": "Plaso (log2timeline) is the primary tool for creating timeline files that TimeSketch ingests. It parses various forensic artifacts into a unified timeline format.",
+      "question_id": "c481b0ea-25f0-41eb-a6d6-debf5c4044fa",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question": "Which feature makes TimeSketch particularly valuable for team investigations?",
+      "options": [
+        "Automated malware detection",
+        "Collaborative sketches with shared annotations",
+        "Real-time memory analysis",
+        "Network packet capture"
+      ],
+      "correct_answer": 1,
+      "explanation": "TimeSketch's collaborative features allow multiple investigators to work on the same timeline, share annotations, and tag events together, making it ideal for team investigations.",
+      "question_id": "2707937c-18ec-4e75-b3c3-f78971f700bc",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question": "What is the most important takeaway from this lesson?",
+      "options": [
+        "Understanding the core concepts and their practical applications",
+        "Memorizing all technical details",
+        "Only knowing the theory without practice",
+        "Focusing on a single aspect"
+      ],
+      "correct_answer": 0,
+      "explanation": "The key takeaway is understanding how to apply the concepts learned in real-world scenarios, combining both theoretical knowledge and practical skills.",
+      "question_id": "6e0562d4-20a6-4ec8-bec8-29f73d2e567a",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "memory_hooks",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to the world of collaborative timeline analysis! 🕵️\n\nTimeline analysis can feel overwhelming when you're staring at millions of events from a compromised system. But here's the truth: **you don't need to be a forensic wizard to find the smoking gun**. TimeSketch transforms chaotic logs into a searchable, visual story that you and your team can investigate together.\n\nThink of TimeSketch as your forensic command center where timelines come alive, patterns emerge, and the 'needle in the haystack' becomes obvious through collaboration.\n\n**Mindset shift**: Timeline analysis isn't about reviewing every single event—it's about asking the right questions and letting the tools help you find the answers. You're building a story, not reading a dictionary.\n\nLet's master TimeSketch and turn overwhelming data into actionable intelligence! 💪"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## What is TimeSketch?\n\n**TimeSketch** is an open-source collaborative timeline analysis tool developed by Google. It's designed to help forensic investigators and incident responders analyze complex events by creating searchable, annotated timelines from various data sources.\n\n### Why TimeSketch Matters\n\nIn modern incident response, you might collect:\n- Windows Event Logs (thousands of events)\n- Browser history (months of activity)\n- File system metadata (millions of files)\n- Network logs (gigabytes of traffic)\n- Memory dumps and process artifacts\n\nManually reviewing these is impossible. TimeSketch solves this by:\n\n1. **Unifying disparate data sources** into a single timeline\n2. **Enabling collaborative investigation** with multiple analysts\n3. **Providing powerful search capabilities** (keyword, regex, time-based)\n4. **Supporting annotations and tagging** to mark significant events\n5. **Visualizing patterns** through graphs and aggregations\n\n### Real-World Use Case\n\nIn 2023, a financial services company used TimeSketch to investigate a suspected data exfiltration. By importing Windows Event Logs, web proxy logs, and file access logs into a single timeline, they:\n\n- Identified the initial compromise (phishing email at 9:14 AM)\n- Tracked lateral movement (RDP sessions at 2:47 PM)\n- Found data staging (7-Zip compression at 11:23 PM)\n- Discovered exfiltration (upload to file-sharing site at 2:18 AM)\n\nAll within 4 hours of collaborative analysis—what would have taken days manually.\n\n### TimeSketch Architecture\n\n```\n┌─────────────────────────────────────────────────────────┐\n│                    TIMESKETCH WEB UI                    │\n│            (Search, Visualize, Collaborate)             │\n└─────────────────────┬───────────────────────────────────┘\n│\n┌─────────────────────┴───────────────────────────────────┐\n│                  TIMESKETCH SERVER                      │\n│              (Flask API + PostgreSQL)                   │\n└─────────────────────┬───────────────────────────────────┘\n│\n┌─────────────────────┴───────────────────────────────────┐\n│                 ELASTICSEARCH CLUSTER                   │\n│           (Timeline Storage and Indexing)               │\n└─────────────────────────────────────────────────────────┘\n▲\n│\n┌───────────┴───────────┐\n│                       │\n┌─────┴─────┐           ┌────┴─────┐\n│   PLASO   │           │   CSV    │\n│ (log2time │           │  JSONL   │\n│  line)    │           │  IMPORT  │\n└───────────┘           └──────────┘\n```\n\n**Key Components**:\n\n1. **Plaso (log2timeline)**: Parses forensic artifacts into timeline format\n2. **Elasticsearch**: Stores and indexes timeline events for fast searching\n3. **PostgreSQL**: Stores sketches, users, and collaboration metadata\n4. **Flask API**: Backend server handling requests\n5. **Web UI**: React-based frontend for analysis"
+      }
+    },
+    {
+      "type": "video",
+      "content": {
+        "title": "Video: TimeSketch Timeline Analysis Overview",
+        "url": "https://www.youtube.com/embed/1NG7r9v8J0s",
+        "description": "Watch this comprehensive tutorial on using TimeSketch for forensic timeline analysis and collaborative investigations."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Creating Timelines with Plaso\n\n**Plaso** (Python Log2Timeline's Artifact Structured Object) is the engine that creates timeline files for TimeSketch. It parses 100+ artifact types from Windows, Linux, and macOS systems.\n\n### Installing Plaso\n\n```bash\n# Ubuntu/Debian\nsudo add-apt-repository ppa:gift/stable\nsudo apt update\nsudo apt install plaso-tools\n\n# Verify installation\nlog2timeline.py --version\n```bash\n\n### Basic Timeline Creation\n\n**Scenario**: Create a timeline from a Windows disk image\n\n```bash\n# Step 1: Create Plaso storage file from evidence\nlog2timeline.py \\\n--storage-file evidence.plaso \\\n/mnt/evidence/C_Drive\n\n# This parses:\n# - Event logs (EVTX)\n# - Registry hives\n# - Browser history\n# - Prefetch files\n# - NTFS $MFT\n# - LNK files\n# - And 100+ more artifacts\n\n# Step 2: Filter and export to CSV (for review)\npsort.py \\\n--output-format dynamic \\\n--write evidence.csv \\\nevidence.plaso\n\n# Step 3: Export for TimeSketch (JSONL format)\npsort.py \\\n--output-format json_line \\\n--write evidence.jsonl \\\nevidence.plaso\n```bash\n\n### Advanced Filtering During Export\n\n```bash\n# Filter by date range (focus on incident window)\npsort.py \\\n--output-format json_line \\\n--write filtered.jsonl \\\n--date-filter '2024-03-15T00:00:00,2024-03-16T23:59:59' \\\nevidence.plaso\n\n# Filter by specific parsers (only Windows Event Logs)\npsort.py \\\n--output-format json_line \\\n--write evtx_only.jsonl \\\n--parsers 'winevtx' \\\nevidence.plaso\n\n# Filter by keywords (find references to specific file)\npsort.py \\\n--output-format json_line \\\n--write suspicious.jsonl \\\n--filter 'message contains \"malware.exe\"' \\\nevidence.plaso\n```bash\n\n### Memory Aid: PLASO Framework\n\n**P**arse - Extract artifacts from evidence\n**L**og - Create structured timeline\n**A**nalyze - Filter and search events\n**S**ort - Order chronologically\n**O**utput - Export for analysis tools"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "title": "Hands-On: Create Your First Timeline",
+        "description": "Practice creating a timeline from a sample Windows image",
+        "code": "# Prerequisites: Ubuntu with Plaso installed\n\n# 1. Download sample Windows image (or use your own)\nmkdir ~/forensics\ncd ~/forensics\n\n# 2. Mount evidence (if using disk image)\nsudo mkdir /mnt/evidence\nsudo mount -o ro,loop,show_sys_files,streams_interface=windows evidence.E01 /mnt/evidence\n\n# 3. Create Plaso timeline (this may take 30-60 minutes)\nlog2timeline.py \\\n  --storage-file case001.plaso \\\n  --partitions all \\\n  --vss-stores all \\\n  /mnt/evidence\n\n# Watch the output:\n# [INFO] Processing: C:\\Windows\\System32\\winevt\\Logs\\Security.evtx\n# [INFO] Events processed: 45,231\n# [INFO] Processing: C:\\Windows\\Prefetch\\CHROME.EXE-*.pf\n\n# 4. Quick validation - check timeline contents\npinfo.py case001.plaso\n\n# Expected output:\n# Plaso Storage Information\n# Storage format version: 20230327\n# Number of events: 1,234,567\n# Parsers used: winevtx, prefetch, mft, registry, lnk\n\n# 5. Export to JSONL for TimeSketch\npsort.py \\\n  --output-format json_line \\\n  --write case001.jsonl \\\n  case001.plaso\n\n# Result: case001.jsonl ready for TimeSketch import!\n\n# 6. Clean up\nsudo umount /mnt/evidence",
+        "language": "bash",
+        "difficulty": "intermediate",
+        "text": "**Hands-On Exercise: TimeSketch: Timeline Analysis and Forensic Collaboration**\n\n**Objective:**\nPractice the techniques and tools covered in this lesson through hands-on exercises.\n\n**Prerequisites:**\n- Ensure you have the necessary tools installed\n- Review the lesson content before starting\n- Set up a safe lab environment (VM or isolated network)\n\n**Exercise Steps:**\n\n1. **Setup Environment:**\n   - Configure your test environment\n   - Verify all required tools are available\n   - Document your baseline configuration\n\n2. **Execute Core Tasks:**\n   - Follow the techniques demonstrated in the lesson\n   - Document each command and its output\n   - Take notes on any unexpected behavior\n\n3. **Analysis:**\n   - Review the results of your actions\n   - Identify patterns and anomalies\n   - Compare with expected outcomes\n\n4. **Troubleshooting:**\n   - If you encounter errors, review documentation\n   - Check syntax and parameters\n   - Verify permissions and network connectivity\n\n**Deliverables:**\n- Screenshot evidence of successful execution\n- Notes on commands used and results obtained\n- List of any challenges faced and how you resolved them\n\n**Additional Practice:**\nTry variations of the exercise with different parameters or in different scenarios to deepen your understanding."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Working with TimeSketch\n\n### Uploading Timelines\n\n**Option 1: Web UI Upload**\n\n1. Navigate to TimeSketch web interface (e.g., http://localhost:5000)\n2. Create a new sketch: \"Case 001 - Ransomware Investigation\"\n3. Click \"Add Timeline\" → \"Upload file\"\n4. Select your JSONL file (case001.jsonl)\n5. Wait for processing (Elasticsearch indexing)\n\n**Option 2: Command-Line Import (faster for large files)**\n\n```bash\n# Using timesketch_importer tool\ntimesketch_importer \\\n--token_password YOUR_API_TOKEN \\\n--timeline_name \"Windows Workstation Analysis\" \\\n--sketch_id 42 \\\ncase001.jsonl\n```bash\n\n### Search Techniques\n\nTimeSketch uses Elasticsearch Query String syntax:\n\n**1. Basic Keyword Search**\n```\npowershell.exe\n```\nFinds any event containing \"powershell.exe\"\n\n**2. Field-Specific Search**\n```\ncommand_line:\"whoami\"\n```\nSearches only in command_line field\n\n**3. Wildcard and Fuzzy**\n```\nfilename:*.exe\nusername:admin~\n```\n\n**4. Boolean Operators**\n```\n(mimikatz OR procdump) AND NOT user:system\n```\n\n**5. Time-Based Filters**\n```\ntimestamp:[2024-03-15 TO 2024-03-16]\n```\n\n**6. Regular Expressions**\n```\ncommand_line:/powershell.*-enc.*/\n```\nFinds encoded PowerShell commands\n\n### Real Investigation Examples\n\n**Example 1: Find Initial Access**\n```bash\n# Search for suspicious Office processes spawning executables\nparent_process:\"WINWORD.EXE\" AND process_name:*.exe\n```\n\n**Example 2: Detect Credential Dumping**\n```\n(process_name:mimikatz.exe OR command_line:\"lsadump::sam\") \nOR \n(process_name:procdump.exe AND command_line:lsass)\n```\n\n**Example 3: Identify Lateral Movement**\n```\nevent_id:4624 AND logon_type:3 AND account_name:administrator\n```\n\n**Example 4: Find Data Staging**\n```\nfilename:7z.exe OR filename:winrar.exe OR filename:zip\nAND \ncommand_line:\"a\" AND file_size:[1000000000 TO *]\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Collaborative Features\n\n### Tagging and Annotations\n\nTimeSketch's killer feature is **collaborative investigation**:\n\n**1. Event Tagging**\n- Select interesting events → Click \"Add Tag\"\n- Common tags: `initial_access`, `lateral_movement`, `exfiltration`, `persistence`\n- Team members see tags in real-time\n\n**2. Annotations (Comments)**\n- Click any event → \"Add comment\"\n- Example: \"This RDP session corresponds to attacker activity from IP 203.0.113.45\"\n- Builds institutional knowledge\n\n**3. Stories (Investigation Narratives)**\n- Create a story: \"Attack Timeline Summary\"\n- Drag important events into the story\n- Add markdown explanations between events\n- Export as report for management\n\n### Saved Searches\n\nCreate reusable search queries:\n\n```\nName: PowerShell Execution\nQuery: process_name:powershell.exe\nDescription: All PowerShell execution events\n\nName: Suspicious Network Connections  \nQuery: event_id:3 AND (destination_ip:\"10.0.*\" OR destination_ip:\"172.16.*\")\nDescription: Sysmon network connections to RFC1918 addresses\n```\n\nShare searches with team members!\n\n### Aggregations and Visualizations\n\n**Top Processes Executed**\n```\nAggregation Type: Terms\nField: process_name\nTop: 20\n```\n\nResult: Bar chart showing most common processes (useful for spotting outliers)\n\n**Activity Timeline Heatmap**\n```\nAggregation Type: Date Histogram\nField: timestamp\nInterval: 1 hour\n```\n\nResult: See when most activity occurred (detect off-hours anomalies)\n\n**User Account Activity**\n```\nAggregation Type: Terms\nField: username\nTop: 50\n```\n\nResult: Which accounts were most active (spot compromised accounts)"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Case Study: Healthcare Ransomware\n\n**Scenario**: A hospital's file server was encrypted by ransomware. Security team needs to determine:\n1. How did attackers get in?\n2. What did they do?\n3. What data was accessed?\n4. Were backups compromised?\n\n**Investigation Using TimeSketch**:\n\n**Step 1: Timeline Creation**\n```bash\n# Collected evidence:\n# - File server disk image (500 GB)\n# - Domain controller Event Logs (2 weeks)\n# - Firewall logs (1 week)\n\nlog2timeline.py --storage-file fileserver.plaso /mnt/evidence/fileserver\nlog2timeline.py --storage-file dc.plaso /mnt/evidence/dc_logs\n\n# Convert firewall logs to CSV, then import\npsort.py --output-format json_line --write fileserver.jsonl fileserver.plaso\npsort.py --output-format json_line --write dc.jsonl dc.plaso\n```\n\n**Step 2: Import into TimeSketch**\n- Created sketch: \"Hospital Ransomware Investigation\"\n- Uploaded 3 timelines: fileserver.jsonl, dc.jsonl, firewall.jsonl\n- Total events: 3.2 million\n\n**Step 3: Find Ransomware Execution**\n```bash\n# Search for common ransomware behaviors\nprocess_name:*.exe AND command_line:(*encrypt* OR *vssadmin delete* OR *wbadmin delete*)\n```\n\n**Finding**: At 2024-03-14 03:42:17 UTC, process \"svchost32.exe\" (note typo) executed:\n```\nvssadmin delete shadows /all /quiet\nwbadmin delete catalog -quiet\n```\n\nTagged as: `ransomware_execution`\n\n**Step 4: Work Backwards - Find Initial Access**\n```bash\n# Search for suspicious logons before ransomware execution\nevent_id:4624 AND timestamp:[2024-03-13 TO 2024-03-14T03:42:17]\n```\n\n**Finding**: At 2024-03-13 22:15:03 UTC, account \"backup_admin\" logged in via RDP from external IP 198.51.100.42\n\nTagged as: `initial_access`\n\n**Step 5: Track Lateral Movement**\n```bash\n# Find all activity from the compromised account\nusername:backup_admin AND timestamp:[2024-03-13T22:15:03 TO 2024-03-14T03:42:17]\n```\n\n**Findings**:\n- 22:23:45 - Accessed backup server via SMB\n- 22:47:12 - Copied 7z.exe to file server\n- 01:15:33 - Created scheduled task \"WindowsUpdate\" (actually ransomware)\n- 03:42:17 - Ransomware executed\n\nAll tagged and added to \"Attack Story\"\n\n**Step 6: Collaboration**\n- Analyst 1 focused on file server timeline\n- Analyst 2 focused on domain controller logs\n- Analyst 3 correlated firewall logs\n- Shared tags and annotations in real-time\n\n**Outcome**:\n- **Attack vector**: Compromised VPN credentials (backup_admin)\n- **Dwell time**: 5 hours 27 minutes\n- **Backups**: Partially compromised (offsite tape backups safe)\n- **IOCs**: IP 198.51.100.42, file hash of svchost32.exe\n- **Report**: Generated 47-page timeline story for legal team\n\n**Time saved**: Estimated 3-4 days of manual log review reduced to 6 hours with TimeSketch collaboration"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "question": "You're investigating a suspected data breach. Which TimeSketch search would find files being compressed before exfiltration?",
+        "options": [
+          "event_id:4624",
+          "process_name:(7z.exe OR rar.exe OR zip.exe)",
+          "command_line:\"net user\"",
+          "file_extension:.docx"
+        ],
+        "correct_answer": 1,
+        "explanation": "Data staging for exfiltration often involves compressing files using tools like 7-Zip, WinRAR, or built-in compression. Searching for these process names helps identify when attackers are preparing data for theft."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## TimeSketch Investigation Framework: SEARCH\n\nRemember the systematic approach to timeline analysis:\n\n**S**cope - Define time window and data sources\n**E**vents - Identify key event types (process execution, network, file access)\n**A**nomalies - Look for outliers (off-hours activity, unusual processes)\n**R**elationships - Connect events across timelines (user → process → network)\n**C**ollaborate - Use tags, annotations, and stories with team\n**H**ypothesis - Test theories with targeted searches\n\n### Common Search Patterns to Memorize\n\n**Initial Access**:\n```\nevent_id:4624 AND logon_type:(3 OR 10) AND timestamp:[START TO END]\n```\n\n**Lateral Movement**:\n```\n(process_name:psexec.exe OR process_name:wmic.exe) OR event_id:4648\n```\n\n**Credential Access**:\n```\n(mimikatz OR lsadump OR procdump) OR (process_name:lsass.exe AND event_id:10)\n```\n\n**Exfiltration**:\n```\n(process_name:7z.exe OR process_name:rclone.exe) OR (network_connection AND destination_port:(443 OR 80) AND bytes_sent:[100000000 TO *])\n```"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "question": "Imagine you're investigating a multi-month APT compromise with 10 million timeline events. How would you approach this using TimeSketch without getting overwhelmed? What's your first search?",
+        "guidance": "Think about: (1) Starting with high-confidence IOCs if available, (2) Using time-based filtering around known incident dates, (3) Leveraging aggregations to spot patterns before diving deep, (4) Dividing work among team members by timeline or event type, (5) Creating saved searches for common patterns.",
+        "text": "**Reflection Questions: TimeSketch: Timeline Analysis and Forensic Collaboration**\n\nTake time to reflect on what you've learned and how it applies to your work in dfir.\n\n**Understanding:**\n1. What were the three most important concepts you learned in this lesson?\n2. How do these concepts connect to topics you already know?\n3. What surprised you or challenged your previous understanding?\n\n**Application:**\n4. How would you apply this knowledge in a real-world scenario?\n5. What specific situations in your work could benefit from these techniques?\n6. What are the potential risks or limitations of applying these methods?\n\n**Critical Thinking:**\n7. What questions do you still have about this topic?\n8. How does this lesson relate to other areas of cybersecurity?\n9. What additional research or practice would help solidify your understanding?\n\n**Action Planning:**\n10. What is one thing you will implement or practice from this lesson within the next week?\n11. How will you measure whether you've successfully applied this knowledge?\n12. Who could you teach these concepts to, to reinforce your own learning?\n\n**Documentation:**\nRecord your reflections in a learning journal. Revisit these notes periodically to track your growth and identify areas for continued development."
+      }
+    }
+  ]
+}
