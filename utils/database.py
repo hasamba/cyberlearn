@@ -51,7 +51,9 @@ class Database:
                 total_time_spent INTEGER DEFAULT 0,
                 diagnostic_completed INTEGER DEFAULT 0,
                 last_username TEXT,
-                preferred_tag_filters TEXT DEFAULT '[]'
+                preferred_tag_filters TEXT DEFAULT '[]',
+                last_active_lesson_id TEXT,
+                last_active_at TEXT
             )
         """
         )
@@ -335,9 +337,43 @@ class Database:
         cursor.execute("PRAGMA table_info(users)")
         columns = [row[1] for row in cursor.fetchall()]
         has_new_columns = 'last_username' in columns and 'preferred_tag_filters' in columns
+        has_last_active = 'last_active_lesson_id' in columns and 'last_active_at' in columns
 
-        if has_new_columns:
-            # Use new query with all fields
+        if has_new_columns and has_last_active:
+            # Use new query with all fields including last_active
+            cursor.execute(
+                """
+                UPDATE users SET
+                    email = ?, last_login = ?, skill_levels = ?, total_xp = ?,
+                    level = ?, streak_days = ?, longest_streak = ?, badges = ?,
+                    learning_preferences = ?, total_lessons_completed = ?,
+                    total_time_spent = ?, diagnostic_completed = ?,
+                    last_username = ?, preferred_tag_filters = ?,
+                    last_active_lesson_id = ?, last_active_at = ?
+                WHERE user_id = ?
+            """,
+                (
+                    user.email,
+                    user.last_login.isoformat(),
+                    user.skill_levels.json(),
+                    user.total_xp,
+                    user.level,
+                    user.streak_days,
+                    user.longest_streak,
+                    json.dumps(user.badges),
+                    user.learning_preferences.json(),
+                    user.total_lessons_completed,
+                    user.total_time_spent,
+                    int(user.diagnostic_completed),
+                    user.last_username,
+                    json.dumps(user.preferred_tag_filters),
+                    str(user.last_active_lesson_id) if user.last_active_lesson_id else None,
+                    user.last_active_at.isoformat() if user.last_active_at else None,
+                    str(user.user_id),
+                ),
+            )
+        elif has_new_columns:
+            # Use query with last_username and preferred_tag_filters but not last_active
             cursor.execute(
                 """
                 UPDATE users SET
@@ -410,6 +446,16 @@ class Database:
         except (IndexError, KeyError):
             preferred_tag_filters = []
 
+        try:
+            last_active_lesson_id = UUID(row["last_active_lesson_id"]) if row["last_active_lesson_id"] else None
+        except (IndexError, KeyError, ValueError):
+            last_active_lesson_id = None
+
+        try:
+            last_active_at = datetime.fromisoformat(row["last_active_at"]) if row["last_active_at"] else None
+        except (IndexError, KeyError, ValueError):
+            last_active_at = None
+
         return UserProfile(
             user_id=UUID(row["user_id"]),
             username=row["username"],
@@ -430,6 +476,8 @@ class Database:
             diagnostic_completed=bool(row["diagnostic_completed"]),
             last_username=last_username,
             preferred_tag_filters=preferred_tag_filters,
+            last_active_lesson_id=last_active_lesson_id,
+            last_active_at=last_active_at,
         )
 
     # LESSON OPERATIONS
