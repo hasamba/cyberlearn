@@ -13,10 +13,14 @@ class CookieManager:
 
     def __init__(self):
         """Initialize cookie manager"""
-        # Initialize cookies in session state if not present
-        if "cookies" not in st.session_state:
-            st.session_state.cookies = {}
-            # Load cookies from browser on first run
+        # Initialize cookies in session state if not present or if it's not a dict
+        if "cookies" not in st.session_state or not isinstance(st.session_state.get("cookies", None), dict):
+            # Use a private key to avoid Streamlit interception
+            st.session_state["cookies"] = {}
+
+        # Load cookies from browser on first init
+        if "_cookies_loaded" not in st.session_state:
+            st.session_state["_cookies_loaded"] = False
             self._load_cookies_from_browser()
 
     def _load_cookies_from_browser(self):
@@ -48,8 +52,11 @@ class CookieManager:
         # Use html component without key parameter for compatibility
         component_value = html(js_code, height=0)
 
-        if component_value:
-            st.session_state.cookies = component_value
+        # Merge cookies from browser into session state
+        if component_value and isinstance(component_value, dict):
+            for key, value in component_value.items():
+                st.session_state["cookies"][key] = value
+            st.session_state["_cookies_loaded"] = True
 
     def set(self, name: str, value: str, max_age_days: int = 30):
         """
@@ -81,8 +88,8 @@ class CookieManager:
 
         html(js_code, height=0)
 
-        # Update session state
-        st.session_state.cookies[name] = value
+        # Update session state using bracket notation
+        st.session_state["cookies"][name] = value
 
     def get(self, name: str, default=None) -> str:
         """
@@ -97,7 +104,7 @@ class CookieManager:
         """
         # Use dictionary indexing instead of .get() to avoid Streamlit API conflicts
         try:
-            return st.session_state.cookies[name]
+            return st.session_state["cookies"][name]
         except (KeyError, TypeError):
             return default
 
@@ -123,26 +130,26 @@ class CookieManager:
 
         html(js_code, height=0)
 
-        # Remove from session state
-        if name in st.session_state.cookies:
-            del st.session_state.cookies[name]
+        # Remove from session state using bracket notation
+        if name in st.session_state["cookies"]:
+            del st.session_state["cookies"][name]
 
     def get_all(self) -> dict:
         """Get all cookies as a dictionary"""
         # Return a copy to avoid Streamlit API conflicts
         result = {}
-        if hasattr(st.session_state, 'cookies'):
+        if "cookies" in st.session_state:
             # Manually iterate to avoid .keys() or .items() interception
-            for key in st.session_state.cookies:
-                result[key] = st.session_state.cookies[key]
+            for key in st.session_state["cookies"]:
+                result[key] = st.session_state["cookies"][key]
         return result
 
     def clear_all(self):
         """Clear all cookies"""
         # Get cookie names by iterating directly to avoid .keys() interception
         cookie_names = []
-        if hasattr(st.session_state, 'cookies'):
-            for name in st.session_state.cookies:
+        if "cookies" in st.session_state:
+            for name in st.session_state["cookies"]:
                 cookie_names.append(name)
 
         # Delete each cookie
