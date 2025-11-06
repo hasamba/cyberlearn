@@ -948,18 +948,18 @@ class Database:
 
     def get_filterable_tags(self, user_id: str) -> List[Tag]:
         """
-        Get tags for filtering lessons (excludes Content category system tags):
+        Get tags for filtering lessons:
         - Career Path tags (for filtering by role)
         - Course tags (for filtering by course)
         - Package tags (for filtering by tool package)
-        - User-created tags
-        - Excludes: Built-In, User Content, Community (Content category)
+        - User-created custom tags only
+        - Excludes: System-generated Custom tags, Content category system tags
         """
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT * FROM tags
-            WHERE (user_id = ? OR is_system = 1)
-            AND category != 'Content'
+            WHERE user_id = ?
+            OR (is_system = 1 AND category IN ('Career Path', 'Course', 'Package'))
             ORDER BY
                 CASE category
                     WHEN 'Career Path' THEN 1

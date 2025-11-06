@@ -185,9 +185,10 @@ def render_domain_lessons(user: UserProfile, db: Database, domain: str):
 
         progress = progress_map.get(lesson_meta.lesson_id)
 
-        # Get lesson tags (filter out Content category system tags)
+        # Get lesson tags (filter out system-generated Custom and Content tags)
         lesson_tags = db.get_lesson_tags(str(lesson.lesson_id))
-        lesson_tags = [tag for tag in lesson_tags if tag.category != 'Content']
+        lesson_tags = [tag for tag in lesson_tags if
+                      tag.category in ('Career Path', 'Course', 'Package') or not tag.is_system]
 
         # Lesson card
         with st.container():
