@@ -95,7 +95,9 @@ class CookieManager:
         Returns:
             Cookie value or default
         """
-        return st.session_state.cookies.get(name, default)
+        # Access the dictionary directly to avoid Streamlit API conflicts
+        cookies_dict = dict(st.session_state.cookies)
+        return cookies_dict.get(name, default)
 
     def delete(self, name: str):
         """
@@ -125,7 +127,7 @@ class CookieManager:
 
     def get_all(self) -> dict:
         """Get all cookies as a dictionary"""
-        return st.session_state.cookies.copy()
+        return dict(st.session_state.cookies)
 
     def clear_all(self):
         """Clear all cookies"""
