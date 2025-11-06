@@ -5,7 +5,6 @@ Provides persistent browser-based authentication using localStorage via JavaScri
 
 import streamlit as st
 from streamlit.components.v1 import html
-import time
 
 
 class SessionManager:
@@ -15,10 +14,15 @@ class SessionManager:
 
     def __init__(self):
         """Initialize session manager"""
-        # Track if we've loaded from browser
-        if "_session_loaded" not in st.session_state:
-            st.session_state._session_loaded = False
+        # Initialize storage for token
+        if "_browser_session_token" not in st.session_state:
             st.session_state._browser_session_token = None
+
+        # Check query params first (from JavaScript redirect)
+        query_params = st.query_params
+        if 'st' in query_params and not st.session_state._browser_session_token:
+            # Token was passed via query param, store it
+            st.session_state._browser_session_token = query_params['st']
 
     def get_browser_session(self) -> str:
         """
@@ -27,39 +31,25 @@ class SessionManager:
         Returns:
             Session token or None
         """
-        if not st.session_state._session_loaded:
-            # Load from localStorage using JavaScript
+        # If we don't have a token yet, trigger JavaScript to load from localStorage
+        if not st.session_state._browser_session_token:
+            # This JavaScript will redirect with token in query param if found
             js_code = f"""
             <script>
-            // Get token from localStorage
-            const token = localStorage.getItem('{self.SESSION_KEY}');
-
-            // Send to Streamlit via query params (reliable method)
-            if (token) {{
-                const url = new URL(window.location);
-                url.searchParams.set('session_token', token);
-                // Use replace to avoid adding to history
-                window.history.replaceState({{}}, '', url);
-            }}
+            (function() {{
+                const token = localStorage.getItem('{self.SESSION_KEY}');
+                if (token) {{
+                    // Redirect with token in query param
+                    const url = new URL(window.location);
+                    if (!url.searchParams.has('st')) {{
+                        url.searchParams.set('st', token);
+                        window.location.href = url.toString();
+                    }}
+                }}
+            }})();
             </script>
             """
             html(js_code, height=0)
-            st.session_state._session_loaded = True
-
-            # Small delay to let JavaScript execute
-            time.sleep(0.1)
-
-        # Try to get from query params (set by JavaScript)
-        query_params = st.query_params
-        if 'session_token' in query_params:
-            token = query_params['session_token']
-            st.session_state._browser_session_token = token
-            # Clear query param to avoid exposure in URL
-            query_params_dict = dict(query_params)
-            if 'session_token' in query_params_dict:
-                del query_params_dict['session_token']
-            st.query_params.update(query_params_dict)
-            return token
 
         return st.session_state._browser_session_token
 
@@ -70,32 +60,42 @@ class SessionManager:
         Args:
             token: Session token to store
         """
+        # Store in session state
+        st.session_state._browser_session_token = token
+
+        # Store in localStorage and redirect with token
         js_code = f"""
         <script>
-        // Store token in localStorage
-        localStorage.setItem('{self.SESSION_KEY}', '{token}');
+        (function() {{
+            // Store token in localStorage
+            localStorage.setItem('{self.SESSION_KEY}', '{token}');
 
-        // Also set in query params for immediate use
-        const url = new URL(window.location);
-        url.searchParams.set('session_token', '{token}');
-        window.history.replaceState({{}}, '', url);
+            // Redirect with token in query param for immediate use
+            const url = new URL(window.location);
+            url.searchParams.set('st', '{token}');
+            window.location.href = url.toString();
+        }})();
         </script>
         """
         html(js_code, height=0)
-        st.session_state._browser_session_token = token
 
     def delete_browser_session(self):
         """Delete session token from browser's localStorage"""
+        # Clear from session state
+        st.session_state._browser_session_token = None
+
+        # Remove from localStorage and clear query params
         js_code = f"""
         <script>
-        // Remove token from localStorage
-        localStorage.removeItem('{self.SESSION_KEY}');
+        (function() {{
+            // Remove token from localStorage
+            localStorage.removeItem('{self.SESSION_KEY}');
 
-        // Clear query params
-        const url = new URL(window.location);
-        url.searchParams.delete('session_token');
-        window.history.replaceState({{}}, '', url);
+            // Clear query params
+            const url = new URL(window.location);
+            url.searchParams.delete('st');
+            window.location.href = url.toString();
+        }})();
         </script>
         """
         html(js_code, height=0)
-        st.session_state._browser_session_token = None
