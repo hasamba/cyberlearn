@@ -51,7 +51,7 @@ def setup_database():
         print("\nThe database includes:")
         print("  ✓ All migrations applied")
         print("  ✓ All system tags (17 tags)")
-        print("  ✓ All lessons loaded and tagged (401 lessons)")
+        print("  ✓ All lessons loaded and tagged (591 lessons)")
         print("  ✓ All 15 domains (including AI/IoT/Web3)")
         print("  ✓ Ready for user accounts")
         print("\n" + "=" * 60)
