@@ -67,6 +67,74 @@ def auto_tag_lessons(db_path="cyberlearn.db"):
     finally:
         conn.close()
 
+def is_lesson_outdated(db, lesson: Lesson) -> bool:
+    """Check if lesson in database is outdated compared to file"""
+    cursor = db.conn.cursor()
+    cursor.execute(
+        "SELECT updated_at FROM lessons WHERE lesson_id = ?",
+        (str(lesson.lesson_id),)
+    )
+    row = cursor.fetchone()
+
+    if not row:
+        return False  # Lesson doesn't exist
+
+    db_updated_at = row[0]
+    file_updated_at = lesson.updated_at.isoformat()
+
+    return file_updated_at > db_updated_at
+
+
+def update_lesson(db, lesson: Lesson) -> bool:
+    """Update existing lesson in database"""
+    try:
+        cursor = db.conn.cursor()
+        cursor.execute(
+            """
+            UPDATE lessons SET
+                domain = ?, title = ?, subtitle = ?, difficulty = ?,
+                estimated_time = ?, order_index = ?, prerequisites = ?,
+                learning_objectives = ?, content_blocks = ?,
+                pre_assessment = ?, post_assessment = ?,
+                mastery_threshold = ?, jim_kwik_principles = ?,
+                base_xp_reward = ?, badge_unlock = ?, is_core_concept = ?,
+                updated_at = ?, author = ?, version = ?
+            WHERE lesson_id = ?
+            """,
+            (
+                lesson.domain,
+                lesson.title,
+                lesson.subtitle,
+                lesson.difficulty,
+                lesson.estimated_time,
+                lesson.order_index,
+                json.dumps([str(p) for p in lesson.prerequisites]),
+                json.dumps(lesson.learning_objectives),
+                json.dumps([json.loads(block.model_dump_json()) for block in lesson.content_blocks]),
+                (
+                    json.dumps([json.loads(q.model_dump_json()) for q in lesson.pre_assessment])
+                    if lesson.pre_assessment
+                    else None
+                ),
+                json.dumps([json.loads(q.model_dump_json()) for q in lesson.post_assessment]),
+                lesson.mastery_threshold,
+                json.dumps(lesson.jim_kwik_principles),
+                lesson.base_xp_reward,
+                lesson.badge_unlock,
+                int(lesson.is_core_concept),
+                lesson.updated_at.isoformat(),
+                lesson.author,
+                lesson.version,
+                str(lesson.lesson_id),
+            ),
+        )
+        db.conn.commit()
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to update lesson: {e}")
+        return False
+
+
 def load_all_lessons():
     """Load all lesson JSON files from content directory"""
 
@@ -84,6 +152,7 @@ def load_all_lessons():
     print("=" * 60)
 
     loaded = 0
+    updated = 0
     skipped = 0
     errors = 0
 
@@ -100,12 +169,22 @@ def load_all_lessons():
             # Create lesson
             lesson = Lesson(**data)
 
+            # Try to create lesson first
             if db.create_lesson(lesson):
-                print(f"[OK] Loaded: {lesson.title}")
+                print(f"[NEW] Loaded: {lesson.title}")
                 loaded += 1
             else:
-                print(f"[SKIP] Already exists: {lesson.title}")
-                skipped += 1
+                # Lesson exists - check if outdated
+                if is_lesson_outdated(db, lesson):
+                    if update_lesson(db, lesson):
+                        print(f"[UPDATE] Updated: {lesson.title}")
+                        updated += 1
+                    else:
+                        print(f"[ERROR] Failed to update: {lesson.title}")
+                        errors += 1
+                else:
+                    print(f"[SKIP] Up to date: {lesson.title}")
+                    skipped += 1
 
         except Exception as e:
             print(f"[ERROR] Loading {lesson_file.name}: {e}")
@@ -114,13 +193,14 @@ def load_all_lessons():
     db.close()
 
     print("=" * 60)
-    print(f"[LOADED] {loaded} lessons")
+    print(f"[NEW] {loaded} lessons")
+    print(f"[UPDATED] {updated} lessons")
     print(f"[SKIPPED] {skipped} lessons")
     print(f"[ERRORS] {errors} lessons")
-    print(f"[TOTAL] {loaded + skipped} lessons in database")
+    print(f"[TOTAL] {loaded + updated + skipped} lessons in database")
 
     # Auto-tag lessons with package tags
-    if loaded > 0 or skipped > 0:
+    if loaded > 0 or updated > 0 or skipped > 0:
         auto_tag_lessons()
 
 
