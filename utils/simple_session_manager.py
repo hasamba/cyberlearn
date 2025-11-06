@@ -14,34 +14,37 @@ class SimpleSessionManager:
 
     def __init__(self):
         """Initialize session manager"""
-        # Generate or retrieve browser fingerprint from query params
-        if "_browser_id" not in st.session_state:
-            # Check if we have a browser ID in query params
-            query_params = st.query_params
+        # ALWAYS check query params first, as they persist across refreshes
+        query_params = st.query_params
+        url_browser_id = query_params.get('bid', None)
 
-            # Try to get from query params first
-            browser_id = query_params.get('bid', None)
-
-            if not browser_id:
-                # Generate new browser ID (random)
+        # If we have a browser_id in URL, use it (takes priority)
+        if url_browser_id:
+            if "_browser_id" not in st.session_state:
+                print(f"[SessionManager] Retrieved browser_id from URL: {url_browser_id[:8]}...")
+                st.session_state._browser_id = url_browser_id
+            elif st.session_state._browser_id != url_browser_id:
+                # URL has different ID than session - URL wins
+                print(f"[SessionManager] URL browser_id differs, using URL: {url_browser_id[:8]}...")
+                st.session_state._browser_id = url_browser_id
+            else:
+                print(f"[SessionManager] Using existing browser_id: {url_browser_id[:8]}...")
+        else:
+            # No browser_id in URL
+            if "_browser_id" not in st.session_state:
+                # Generate new browser ID
                 import secrets
                 browser_id = secrets.token_urlsafe(16)
                 print(f"[SessionManager] Generated new browser_id: {browser_id[:8]}...")
+                st.session_state._browser_id = browser_id
 
-                # Add to URL - this triggers a rerun with the param
+                # Add to URL (this should persist)
                 st.query_params['bid'] = browser_id
+                print(f"[SessionManager] Added browser_id to URL: {browser_id}")
             else:
-                print(f"[SessionManager] Retrieved browser_id from URL: {browser_id[:8]}...")
-
-            # Store in session state
-            st.session_state._browser_id = browser_id
-
-            # Ensure it stays in URL
-            if 'bid' not in st.query_params or st.query_params['bid'] != browser_id:
-                st.query_params['bid'] = browser_id
-                print(f"[SessionManager] Added browser_id to URL params")
-        else:
-            print(f"[SessionManager] Using existing browser_id from session: {st.session_state._browser_id[:8]}...")
+                # Have session ID but not in URL - re-add to URL
+                print(f"[SessionManager] Re-adding browser_id to URL: {st.session_state._browser_id[:8]}...")
+                st.query_params['bid'] = st.session_state._browser_id
 
     def get_browser_id(self) -> str:
         """Get the current browser's unique ID"""
