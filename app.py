@@ -19,7 +19,7 @@ from config import config, debug_print
 from ui.pages import dashboard, lesson_viewer, diagnostic, profile
 from utils.database import Database
 from utils.auth_manager import AuthManager
-from utils.simple_session_manager import SimpleSessionManager
+from utils.persistent_session_manager import PersistentSessionManager
 from models.user import UserProfile
 
 # Show debug info if enabled
@@ -152,13 +152,10 @@ def login_user(user: UserProfile):
     user.update_streak()
     st.session_state.db.update_user(user)
 
-    # Get browser ID for this session
-    browser_id = st.session_state.session_manager.get_browser_id()
-
-    # Create session with browser ID as user_agent
-    session_token = st.session_state.auth_manager.create_session(
+    # Create session (stored in tab session state + database)
+    st.session_state.session_manager.create_session(
         user.user_id,
-        user_agent=browser_id
+        st.session_state.auth_manager
     )
 
     # Set current user in session state
@@ -181,18 +178,18 @@ def initialize_session_state():
         if config.debug:
             debug_print("Auth manager initialized")
 
-    # Initialize simple session manager (no JavaScript, just query params + DB)
+    # Initialize persistent session manager (uses only Streamlit session state)
     if "session_manager" not in st.session_state:
-        st.session_state.session_manager = SimpleSessionManager()
+        st.session_state.session_manager = PersistentSessionManager(st.session_state.db)
         if config.debug:
-            debug_print("Simple session manager initialized")
+            debug_print("Persistent session manager initialized")
 
     # Cleanup expired sessions periodically
     st.session_state.auth_manager.cleanup_expired_sessions()
 
-    # Check for valid session in database for this browser
+    # Check for valid session in this browser tab
     if "current_user" not in st.session_state or st.session_state.current_user is None:
-        session_token = st.session_state.session_manager.get_session_token(st.session_state.db)
+        session_token = st.session_state.session_manager.get_current_session()
 
         if session_token:
             # Validate session token
@@ -208,19 +205,19 @@ def initialize_session_state():
                 else:
                     # User not found - invalid session
                     st.session_state.current_user = None
-                    st.session_state.session_manager.clear_session(st.session_state.db)
+                    st.session_state.session_manager.clear_session(st.session_state.auth_manager)
                     if config.debug:
                         debug_print("Session validation failed: user not found")
             else:
                 # Invalid or expired session
                 st.session_state.current_user = None
-                st.session_state.session_manager.clear_session(st.session_state.db)
+                st.session_state.session_manager.clear_session(st.session_state.auth_manager)
                 if config.debug:
                     debug_print("Session validation failed: invalid token")
         else:
             st.session_state.current_user = None
             if config.debug:
-                debug_print("No session found for this browser")
+                debug_print("No active session in this tab")
 
     if "current_page" not in st.session_state:
         st.session_state.current_page = "welcome"
@@ -346,13 +343,8 @@ def render_sidebar():
             st.markdown("---")
 
             if st.button("🚪 Logout", use_container_width=True):
-                # Revoke session from database
-                session_token = st.session_state.session_manager.get_session_token(st.session_state.db)
-                if session_token:
-                    st.session_state.auth_manager.revoke_session(session_token)
-
-                # Clear session for this browser
-                st.session_state.session_manager.clear_session(st.session_state.db)
+                # Clear session (revokes from database and clears tab state)
+                st.session_state.session_manager.clear_session(st.session_state.auth_manager)
 
                 # Clear session state
                 st.session_state.current_user = None
