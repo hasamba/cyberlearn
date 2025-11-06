@@ -19,11 +19,6 @@ This directory contains utility scripts for database management, lesson maintena
 
 ### Content Creation
 - **`create_rich_lesson.py`** - Interactive rich lesson generator
-- **`domain_content_library.py`** - Domain-specific content library and templates
-- **`generate_lessons_from_csv.py`** - Generate lessons from CSV curriculum file
-- **`generate_owasp_llm_lessons.py`** - Generate OWASP LLM Top 10 lessons
-- **`generate_windows_forensics_lessons.py`** - Generate Windows forensics lessons
-- **`rebuild_lessons_to_prompt.py`** - Rebuild lessons from prompts
 
 ### Content Validation & Fixing
 - **`validate_lesson_compliance.py`** - Validate all lessons against compliance requirements
@@ -31,26 +26,12 @@ This directory contains utility scripts for database management, lesson maintena
 - **`verify_prompt_compliance.py`** - Verify lessons meet prompt requirements
 - **`comprehensive_fix.py`** - Fix common validation issues (UUIDs, order_index, etc.)
 
-### Content Enhancement
-- **`add_memory_aids.py`** - Add memory aids to lessons
-- **`add_mindset_coaching.py`** - Add mindset coaching sections to lessons
-
-## Tag Management
-
-- **`check_tags.py`** - Verify tag assignments
-- **`tag_builtin_lessons.py`** - Tag lessons as built-in content
-- **`tag_lessons_from_csv.py`** - Apply tags from CSV mapping file
-- **`restore_all_system_tags.py`** - Restore all system tags to database
-- **`restore_content_tags.py`** - Restore content category tags
-- **`restore_package_tags.py`** - Restore package tags
-
 ## Utility Scripts
 
 ### Listing & Inspection
 - **`list_lessons.py`** - List all lessons with metadata
 - **`list_users_simple.py`** - Simple user list
 - **`reload_lesson.py`** - Reload a specific lesson
-- **`test_hide_functionality.py`** - Test lesson hide/unhide functionality
 
 ### Git Operations
 - **`git_commit.py`** - Automated git commit helper
@@ -81,20 +62,13 @@ python scripts/update_outdated_lessons.py
 python scripts/update_template_database.py
 ```
 
-### Bulk Lesson Generation
+### Content Creation
 ```bash
-# Generate lessons from CSV
-python scripts/generate_lessons_from_csv.py
+# Create a new rich lesson interactively
+python scripts/create_rich_lesson.py
 
-# Or generate specific lesson sets
-python scripts/generate_windows_forensics_lessons.py
-python scripts/generate_owasp_llm_lessons.py
-
-# Load generated lessons
+# Load new lessons into database
 python scripts/load_all_lessons.py
-
-# Apply tags
-python scripts/tag_lessons_from_csv.py
 ```
 
 ### Validation & Compliance
@@ -119,24 +93,6 @@ python scripts/compare_lessons_to_db.py
 
 # List all lessons
 python scripts/list_lessons.py
-
-# Verify tags
-python scripts/check_tags.py
-```
-
-### Tag Management Workflow
-```bash
-# Restore system tags
-python scripts/restore_all_system_tags.py
-
-# Tag built-in lessons
-python scripts/tag_builtin_lessons.py
-
-# Apply course tags from CSV
-python scripts/tag_lessons_from_csv.py
-
-# Verify tags applied correctly
-python scripts/check_tags.py
 ```
 
 ## Important Notes
@@ -161,26 +117,23 @@ python scripts/check_tags.py
 
 4. **Validation before deployment**: Always run `validate_lesson_compliance.py` before pushing changes
 
-5. **Tag restoration**: If tags get corrupted, use the restore scripts to rebuild from scratch
-
 ## Script Categories
 
 - **Core** (run regularly): `load_all_lessons.py`, `update_outdated_lessons.py`, `update_template_database.py`
-- **Maintenance** (run as needed): `validate_lesson_compliance.py`, `compare_lessons_to_db.py`, `check_database.py`
-- **Content creation** (one-time): `create_rich_lesson.py`, `generate_lessons_from_csv.py`
-- **Content enhancement** (batch operations): `add_memory_aids.py`, `add_mindset_coaching.py`
-- **Tag management** (as needed): `tag_builtin_lessons.py`, `tag_lessons_from_csv.py`, `restore_all_system_tags.py`
-- **Utilities** (helper scripts): `list_lessons.py`, `check_tags.py`, `test_hide_functionality.py`
+- **Maintenance** (run as needed): `validate_lesson_compliance.py`, `compare_lessons_to_db.py`, `check_database.py`, `sync_database.py`
+- **Content creation**: `create_rich_lesson.py`
+- **Validation & fixing**: `validate_lesson_content.py`, `verify_prompt_compliance.py`, `comprehensive_fix.py`
+- **Utilities**: `list_lessons.py`, `list_users_simple.py`, `reload_lesson.py`, `git_commit.py`, `check_git_status.py`
 
 ## Script Dependencies
 
 Some scripts have dependencies and should be run in order:
 
 1. **Database Setup**: `setup_database.py` → `load_all_lessons.py`
-2. **Tag System**: `restore_all_system_tags.py` → `tag_builtin_lessons.py` → `tag_lessons_from_csv.py`
-3. **Content Generation**: `generate_*_lessons.py` → `load_all_lessons.py` → `tag_lessons_from_csv.py`
+2. **Content Creation**: `create_rich_lesson.py` → `load_all_lessons.py` → `update_template_database.py`
+3. **Database Rebuild**: `rebuild_database.py` → `load_all_lessons.py` → `update_template_database.py`
 
 ---
 
 **Last Updated**: 2025-11-06
-**Total Scripts**: 33
+**Total Scripts**: 19
