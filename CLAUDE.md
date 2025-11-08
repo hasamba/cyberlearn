@@ -83,6 +83,41 @@ streamlit run app.py &
 # 4. Create PR with test results
 ```
 
+## VM Testing Instructions for PRs
+
+**CRITICAL: The `update_vm.sh` script ONLY pulls from `main` branch, NOT from PR branches!**
+
+When providing VM testing commands for a PR, NEVER tell the user to run `update_vm.sh` to test the PR. Instead, provide these commands:
+
+```bash
+# SSH into VM, then run:
+cd /path/to/cyberlearn
+
+# Fetch and checkout the PR branch
+git fetch origin <branch-name>
+git checkout <branch-name>
+git pull origin <branch-name>
+
+# Restart Streamlit app
+pkill -f streamlit
+bash start.sh
+# OR manually: streamlit run app.py
+
+# Test the changes in browser or with automated tests
+
+# After testing, return to main branch
+git checkout main
+git pull origin main
+pkill -f streamlit
+bash start.sh
+```
+
+**Why this matters:**
+- `update_vm.sh` always pulls from `main` branch
+- Testing a PR requires checking out the PR branch explicitly
+- After testing, the VM should return to `main` branch
+- Only after PR is merged to `main` should user run `update_vm.sh`
+
 ## Project Structure
 
 ```
