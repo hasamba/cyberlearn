@@ -224,27 +224,27 @@ def import_package(uploaded_zip: Any, package_name: str, db, user):
 
             if not package_tag:
                 # Create new package tag
-                cursor = db.conn.cursor()
+                from models.tag import Tag
 
                 # Generate random color
                 import random
                 colors = ["#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899"]
                 color = random.choice(colors)
 
-                cursor.execute("""
-                    INSERT INTO tags (tag_id, name, color, icon, description, is_system, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    db.conn.execute("SELECT COALESCE(MAX(tag_id), 0) + 1 FROM tags").fetchone()[0],
-                    package_tag_name,
-                    color,
-                    "📦",
-                    f"Lessons from {package_name} package",
-                    1,
-                    datetime.now().isoformat()
-                ))
-                db.conn.commit()
+                # Create tag using Tag model
+                new_tag = Tag(
+                    tag_id=str(uuid4()),
+                    name=package_tag_name,
+                    category="Package",
+                    color=color,
+                    icon="📦",
+                    description=f"Lessons from {package_name} package",
+                    is_system=True,
+                    created_at=datetime.now(),
+                    user_id=None
+                )
 
+                db.create_tag(new_tag)
                 package_tag = db.get_tag_by_name(package_tag_name)
                 st.success(f"✅ Created package tag: {package_tag_name}")
 
