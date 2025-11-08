@@ -162,12 +162,28 @@ def render_tag_management(db: Database, current_user: UserProfile):
     # TAB 3: Statistics
     with tab3:
         st.subheader("Tag Usage Statistics")
+        st.caption("Showing Career Path, Course, Package, Content, and user-created tags (auto-generated lesson tags are hidden)")
 
         stats = db.get_tag_stats()
 
         if not stats:
             st.info("No tag statistics available yet. Create tags and apply them to lessons.")
         else:
+            # Summary metrics
+            total_tags = len(stats)
+            total_lessons_tagged = sum(stats.values())
+
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Total Tags", total_tags)
+            with col2:
+                st.metric("Total Lessons Tagged", total_lessons_tagged)
+            with col3:
+                avg_lessons = total_lessons_tagged // total_tags if total_tags > 0 else 0
+                st.metric("Avg Lessons per Tag", avg_lessons)
+
+            st.markdown("---")
+
             # Display as bar chart
             import pandas as pd
 
@@ -181,19 +197,31 @@ def render_tag_management(db: Database, current_user: UserProfile):
             # Detailed table
             st.markdown("### Detailed Breakdown")
 
+            # Group tags by category
+            from collections import defaultdict
+            tags_by_category = defaultdict(list)
+
             for tag_name, count in sorted(stats.items(), key=lambda x: x[1], reverse=True):
                 tag = db.get_tag_by_name(tag_name)
                 if tag:
-                    st.markdown(f"""
-                    <div style="
-                        border-left: 4px solid {tag.color};
-                        padding: 10px;
-                        margin: 10px 0;
-                        background-color: {tag.color}10;
-                    ">
-                        <strong>{tag.icon} {tag.name}</strong>: {count} lesson{'s' if count != 1 else ''}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    tags_by_category[tag.category].append((tag, count))
+
+            # Display by category
+            for category in ["Career Path", "Course", "Package", "Content", "Custom"]:
+                if category in tags_by_category and tags_by_category[category]:
+                    st.markdown(f"#### {category}")
+
+                    for tag, count in tags_by_category[category]:
+                        st.markdown(f"""
+                        <div style="
+                            border-left: 4px solid {tag.color};
+                            padding: 10px;
+                            margin: 10px 0;
+                            background-color: {tag.color}10;
+                        ">
+                            <strong>{tag.icon or ''} {tag.name}</strong>: {count} lesson{'s' if count != 1 else ''}
+                        </div>
+                        """, unsafe_allow_html=True)
 
 
 def main():
