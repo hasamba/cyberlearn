@@ -40,18 +40,48 @@ bash update_vm.sh
 
 ## CRITICAL: Development Environment Rules
 
-**THIS IS A DEVELOPMENT HOST MACHINE - NOT THE VM!!!**
+**THIS IS A DEVELOPMENT HOST MACHINE**
 
 - ✅ **DO**: Run Python scripts on THIS dev host (where Claude is)
 - ✅ **DO**: Execute database migrations, validation scripts, data processing
 - ✅ **DO**: Create files, edit code, commit to git, push to GitHub
-- ❌ **DON'T**: Tell user to run Python scripts on their VM
-- ❌ **DON'T**: Ask user to run any commands - just run them here!
-- ❌ **DON'T**: Provide "Next steps on your VM" instructions
+- ✅ **DO**: Run the Streamlit app locally for testing (`streamlit run app.py`)
+- ✅ **DO**: Use Playwright MCP to test the application automatically
+- ✅ **DO**: Test all changes with Playwright BEFORE creating PRs (unless impossible)
+- ❌ **DON'T**: Tell user to run Python scripts - just run them here!
+- ❌ **DON'T**: Ask user to test manually - use Playwright to test automatically
+- ❌ **DON'T**: Create PRs without testing when testing is possible
 
 **If a Python script needs to run, RUN IT HERE IMMEDIATELY. Do NOT ask the user to run it.**
 
-The user's VM is for running the actual application (Streamlit, FastAPI), NOT for running development/migration scripts.
+**If a feature needs testing, USE PLAYWRIGHT MCP TO TEST IT. Do NOT ask the user to test it.**
+
+## Testing Requirements
+
+**CRITICAL: Always test changes before creating PRs**
+
+1. **For UI changes**: Use Playwright MCP (`mcp__playwright_*` tools) to:
+   - Navigate to the affected page
+   - Take screenshots before/after
+   - Verify the fix works
+   - Test edge cases
+
+2. **For backend/database changes**: Run validation scripts and verify data integrity
+
+3. **When to skip testing**: Only if Playwright cannot access the feature (auth walls, complex state) or user explicitly says to skip testing
+
+**Testing workflow:**
+```bash
+# 1. Run Streamlit app in background
+streamlit run app.py &
+
+# 2. Use Playwright MCP to test
+# (Use mcp__playwright_navigate, mcp__playwright_click, mcp__playwright_screenshot, etc.)
+
+# 3. Verify fix works
+
+# 4. Create PR with test results
+```
 
 ## Project Structure
 
