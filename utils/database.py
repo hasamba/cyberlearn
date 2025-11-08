@@ -1214,18 +1214,20 @@ class Database:
         return lessons
 
     def get_tag_stats(self) -> Dict[str, int]:
-        """Get statistics about tag usage (excluding system tags)"""
+        """Get statistics about tag usage (excluding auto-generated Custom tags)"""
         cursor = self.conn.cursor()
 
         stats = {}
 
-        # Lesson count per tag (exclude system tags)
+        # Lesson count per tag (exclude only auto-generated "Custom" category tags)
+        # Show Career Path, Course, Package, Content, and user-created tags
         cursor.execute("""
             SELECT t.name, COUNT(lt.lesson_id) as lesson_count
             FROM tags t
             LEFT JOIN lesson_tags lt ON t.id = lt.tag_id
-            WHERE t.is_system = 0
+            WHERE t.category != 'Custom' OR t.user_id IS NOT NULL
             GROUP BY t.id, t.name
+            HAVING lesson_count > 0
             ORDER BY lesson_count DESC
         """)
 
