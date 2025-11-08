@@ -248,11 +248,25 @@ def import_package(uploaded_zip: Any, package_name: str, db, user):
                 package_tag = db.get_tag_by_name(package_tag_name)
                 st.success(f"✅ Created package tag: {package_tag_name}")
 
-            # Get "User Content" tag
-            user_content_tag = db.get_tag_by_name("Package: User Content")
+            # Get or create "User Content" tag
+            user_content_tag = db.get_tag_by_name("User Content")
             if not user_content_tag:
-                st.error("❌ 'Package: User Content' tag not found")
-                return
+                from models.tag import Tag
+
+                user_content_tag_obj = Tag(
+                    tag_id=str(uuid4()),
+                    name="User Content",
+                    category="Package",
+                    color="#6B7280",
+                    icon="📦",
+                    description="User-uploaded lesson content",
+                    is_system=True,
+                    created_at=datetime.now(),
+                    user_id=None
+                )
+                db.create_tag(user_content_tag_obj)
+                user_content_tag = db.get_tag_by_name("User Content")
+                st.success("✅ Created 'User Content' system tag")
 
             # Process each JSON file
             results = {
