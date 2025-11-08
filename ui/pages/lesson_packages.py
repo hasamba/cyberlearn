@@ -69,9 +69,42 @@ def render_import_tab(db, user):
 
         st.markdown("---")
 
+        # Additional tagging options
+        st.markdown("### 🏷️ Additional Tags (Optional)")
+        st.markdown("Select existing tags or create a new tag to apply to all imported lessons:")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Get all available tags for user
+            all_tags = db.get_user_tags(str(user.user_id))
+            tag_options = ["(No additional tag)"] + [tag.name for tag in all_tags]
+            selected_existing_tag = st.selectbox(
+                "Select existing tag",
+                options=tag_options,
+                help="Choose an existing tag to apply to all lessons"
+            )
+
+        with col2:
+            # Option to create new tag
+            new_tag_name = st.text_input(
+                "Or create new tag",
+                placeholder="e.g., Advanced Training",
+                help="Enter a new tag name (leave empty to skip)"
+            )
+
+        st.markdown("---")
+
+        # Determine which additional tag to use
+        additional_tag_name = None
+        if new_tag_name.strip():
+            additional_tag_name = new_tag_name.strip()
+        elif selected_existing_tag != "(No additional tag)":
+            additional_tag_name = selected_existing_tag
+
         # Import button
         if st.button("🚀 Import Package", type="primary", use_container_width=True):
-            import_package(uploaded_zip, package_name, db, user)
+            import_package(uploaded_zip, package_name, db, user, additional_tag_name)
 
     else:
         st.info("👆 Select a ZIP file to import")
@@ -196,7 +229,7 @@ def render_export_tab(db, user):
         st.info("👆 Select lessons to export")
 
 
-def import_package(uploaded_zip: Any, package_name: str, db, user):
+def import_package(uploaded_zip: Any, package_name: str, db, user, additional_tag_name: str = None):
     """Import lessons from ZIP package"""
 
     st.markdown("### 🔍 Import Results")
@@ -268,6 +301,37 @@ def import_package(uploaded_zip: Any, package_name: str, db, user):
                 user_content_tag = db.get_tag_by_name("User Content")
                 st.success("✅ Created 'User Content' system tag")
 
+            # Handle additional tag (if provided)
+            additional_tag = None
+            if additional_tag_name:
+                # Check if tag exists
+                additional_tag = db.get_tag_by_name(additional_tag_name)
+
+                if not additional_tag:
+                    # Create new tag
+                    from models.tag import Tag
+                    import random
+
+                    colors = ["#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899"]
+                    color = random.choice(colors)
+
+                    new_additional_tag = Tag(
+                        tag_id=str(uuid4()),
+                        name=additional_tag_name,
+                        category="Custom",
+                        color=color,
+                        icon="🏷️",
+                        description=f"Custom tag created during package import",
+                        is_system=False,
+                        created_at=datetime.now(),
+                        user_id=str(user.user_id)
+                    )
+                    db.create_tag(new_additional_tag)
+                    additional_tag = db.get_tag_by_name(additional_tag_name)
+                    st.success(f"✅ Created custom tag: {additional_tag_name}")
+                else:
+                    st.info(f"ℹ️ Using existing tag: {additional_tag_name}")
+
             # Process each JSON file
             results = {
                 'success': [],
@@ -321,6 +385,10 @@ def import_package(uploaded_zip: Any, package_name: str, db, user):
                         # Tag with package and user content
                         db.add_tag_to_lesson(str(lesson.lesson_id), package_tag.tag_id)
                         db.add_tag_to_lesson(str(lesson.lesson_id), user_content_tag.tag_id)
+
+                        # Tag with additional tag if provided
+                        if additional_tag:
+                            db.add_tag_to_lesson(str(lesson.lesson_id), additional_tag.tag_id)
 
                         results['success'].append({
                             'file': json_filename,
