@@ -154,16 +154,87 @@ Rich lessons should include:
 - **Post-assessment**: Minimum 3 assessment questions
 
 **Jim Kwik Principles (All 10 Required):**
-1. `teach_like_im_10` - Simplify complex concepts
-2. `memory_hooks` - Create memorable associations
-3. `connect_to_what_i_know` - Link to existing knowledge
-4. `active_learning` - Hands-on practice and exercises
-5. `meta_learning` - Learn how to learn
-6. `minimum_effective_dose` - Focus on essential concepts
-7. `reframe_limiting_beliefs` - Overcome mental blocks
-8. `gamify_it` - Make learning engaging
-9. `learning_sprint` - Build momentum
-10. `multiple_memory_pathways` - Visual, auditory, kinesthetic learning
+
+**CRITICAL:** The `jim_kwik_principles` array is a metadata tag indicating which learning science principles are **actually implemented** in the lesson content, NOT just listed. Each principle must be evident in the content itself.
+
+---
+
+## 🚨 MOST IMPORTANT: teach_like_im_10 (MANDATORY FOR EVERY LESSON)
+
+**This is the foundation of all effective teaching. Every lesson MUST implement this principle.**
+
+**IMPORTANT:** This does NOT mean the entire lesson is written for 10-year-olds. It means there must be a dedicated section called "Teach Me Like I'm 10" that explains the core concepts simply.
+
+1. **`teach_like_im_10`** - Include a dedicated "Teach Me Like I'm 10" section ⭐ **MANDATORY - HIGHEST PRIORITY**
+   - ✅ **REQUIRED:** A content block with title "Teach Me Like I'm 10"
+   - ✅ **REQUIRED:** This block explains the lesson's core concepts in simple, everyday language
+   - ✅ **REQUIRED:** Use analogies a 10-year-old can understand ("like a hotel check-in", "like a locked safe", "like a security guard")
+   - ✅ **REQUIRED:** Typically 200-400 words
+   - ✅ **REQUIRED:** Should be one of the early content blocks (usually block 2 or 3)
+   - ✅ The REST of the lesson can and should contain technical depth appropriate to the difficulty level
+   - ❌ This is ONE dedicated section, not a requirement for the entire lesson to be written in simple language
+
+   **Validation:** Every lesson will be checked for the presence of a "Teach Me Like I'm 10" section. Lessons without this dedicated section will FAIL validation.
+
+---
+
+## Other Required Principles (All Important)
+
+2. **`memory_hooks`** - Create memorable associations
+   - ✅ Include `memory_aid` content blocks with mnemonics
+   - ✅ Create acronyms (e.g., "AAA = Authentication, Authorization, Accounting")
+   - ✅ Visual associations ("Think: 'Triple-A' like AAA batteries")
+   - ❌ Do NOT just list the principle without actual mnemonics
+
+3. **`connect_to_what_i_know`** - Link to existing knowledge
+   - ✅ Reference prior lessons ("Remember from lesson X...")
+   - ✅ Use `prerequisites` array to link related lessons
+   - ✅ Connect to familiar concepts ("Similar to how you...")
+   - ✅ Build on established knowledge
+
+4. **`active_learning`** - Hands-on practice and exercises
+   - ✅ Include `code_exercise` blocks with hands-on tasks
+   - ✅ Include `simulation` blocks with practice scenarios
+   - ✅ Include `quiz` blocks with interactive questions
+   - ✅ Minimum 2 active learning blocks per lesson
+
+5. **`meta_learning`** - Learn how to learn
+   - ✅ Include `reflection` blocks about the learning process
+   - ✅ Ask "How did you learn this?" questions
+   - ✅ Prompt students to monitor their own progress
+   - ✅ Encourage awareness of learning strategies
+
+6. **`minimum_effective_dose`** - Focus on essential concepts
+   - ✅ Limit to 6-8 key concepts per lesson
+   - ✅ Keep content blocks to 12-15 maximum
+   - ✅ Avoid information overload
+   - ✅ Focus on what matters most
+
+7. **`reframe_limiting_beliefs`** - Overcome mental blocks
+   - ✅ Include `mindset_coach` blocks with encouragement
+   - ✅ Address common fears ("This may seem complex, but...")
+   - ✅ Build confidence with positive framing
+   - ✅ Celebrate progress and learning
+
+8. **`gamify_it`** - Make learning engaging
+   - ✅ Include challenges and practice tasks
+   - ✅ Use engaging language ("mission", "challenge", "level up")
+   - ✅ Include `quiz` blocks as mini-challenges
+   - ✅ Post-assessment as final challenge
+
+9. **`learning_sprint`** - Build momentum
+   - ✅ Structure: Explanation → Practice → Reflection
+   - ✅ Clear progression through content blocks
+   - ✅ Sprint-sized: 30-60 minutes (estimated_time)
+   - ✅ Focused flow with clear beginning, middle, end
+
+10. **`multiple_memory_pathways`** - Visual, auditory, kinesthetic learning
+    - ✅ Visual: `diagram` blocks with ASCII art or visual aids
+    - ✅ Auditory: `video` blocks with video content
+    - ✅ Kinesthetic: `code_exercise` and `simulation` blocks
+    - ✅ Minimum 2 pathways per lesson (ideally all 3)
+
+**Quality Check:** Use `validate_content_quality.py` to verify that principles are ACTUALLY implemented in content, not just listed in metadata.
 
 ### Creating New Lessons
 
