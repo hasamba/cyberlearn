@@ -264,7 +264,7 @@ def import_package(uploaded_zip: Any, package_name: str, db, user, additional_ta
                 colors = ["#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899"]
                 color = random.choice(colors)
 
-                # Create tag using Tag model
+                # Create tag using Tag model (user-owned so they can edit/delete it)
                 new_tag = Tag(
                     tag_id=str(uuid4()),
                     name=package_tag_name,
@@ -272,9 +272,9 @@ def import_package(uploaded_zip: Any, package_name: str, db, user, additional_ta
                     color=color,
                     icon="📦",
                     description=f"Lessons from {package_name} package",
-                    is_system=True,
+                    is_system=False,
                     created_at=datetime.now(),
-                    user_id=None
+                    user_id=str(user.user_id)
                 )
 
                 db.create_tag(new_tag)
@@ -293,9 +293,9 @@ def import_package(uploaded_zip: Any, package_name: str, db, user, additional_ta
                     color="#6B7280",
                     icon="📦",
                     description="User-uploaded lesson content",
-                    is_system=True,
+                    is_system=False,
                     created_at=datetime.now(),
-                    user_id=None
+                    user_id=str(user.user_id)
                 )
                 db.create_tag(user_content_tag_obj)
                 user_content_tag = db.get_tag_by_name("User Content")
