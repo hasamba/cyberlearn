@@ -218,6 +218,103 @@ class LessonValidator:
                     f"(valid: {', '.join(sorted(VALID_JIM_KWIK_PRINCIPLES))})"
                 )
 
+        # Check that principles are ACTUALLY IMPLEMENTED in content
+        self._check_principle_implementation(lesson, principles)
+
+    def _check_principle_implementation(self, lesson: dict, principles: list):
+        """Verify that claimed Jim Kwik principles are actually implemented in content"""
+
+        content_blocks = lesson.get('content_blocks', [])
+        block_types = set(b.get('type') for b in content_blocks)
+
+        # Check each principle for evidence of implementation
+        if 'memory_hooks' in principles:
+            if 'memory_aid' not in block_types:
+                self.warnings.append(
+                    "Principle 'memory_hooks' listed but no memory_aid blocks found"
+                )
+
+        if 'active_learning' in principles:
+            active_types = {'code_exercise', 'simulation', 'quiz'}
+            if not (active_types & block_types):
+                self.warnings.append(
+                    "Principle 'active_learning' listed but no code_exercise/simulation/quiz blocks found"
+                )
+
+        if 'meta_learning' in principles:
+            if 'reflection' not in block_types:
+                self.warnings.append(
+                    "Principle 'meta_learning' listed but no reflection blocks found"
+                )
+
+        if 'reframe_limiting_beliefs' in principles:
+            if 'mindset_coach' not in block_types:
+                self.warnings.append(
+                    "Principle 'reframe_limiting_beliefs' listed but no mindset_coach blocks found"
+                )
+
+        if 'multiple_memory_pathways' in principles:
+            visual = {'diagram', 'memory_aid'}
+            auditory = {'video'}
+            kinesthetic = {'code_exercise', 'simulation', 'quiz'}
+
+            pathways = 0
+            if visual & block_types:
+                pathways += 1
+            if auditory & block_types:
+                pathways += 1
+            if kinesthetic & block_types:
+                pathways += 1
+
+            if pathways < 2:
+                self.warnings.append(
+                    f"Principle 'multiple_memory_pathways' listed but only {pathways} pathway(s) found "
+                    f"(need 2+: visual, auditory, kinesthetic)"
+                )
+
+        if 'learning_sprint' in principles:
+            has_explanation = 'explanation' in block_types
+            has_practice = any(t in block_types for t in ['code_exercise', 'simulation'])
+            has_reflection = any(t in block_types for t in ['reflection', 'quiz'])
+
+            if not (has_explanation and has_practice and has_reflection):
+                missing = []
+                if not has_explanation:
+                    missing.append('explanation')
+                if not has_practice:
+                    missing.append('practice/exercise')
+                if not has_reflection:
+                    missing.append('reflection/quiz')
+
+                self.warnings.append(
+                    f"Principle 'learning_sprint' listed but incomplete flow - missing: {', '.join(missing)}"
+                )
+
+        # Check for teach_like_im_10: look for excessive jargon in content
+        if 'teach_like_im_10' in principles:
+            jargon_phrases = [
+                'grounded in repeatable practice',
+                'measurable action',
+                'operationalize',
+                'synergize',
+                'leverage',
+                'paradigm',
+            ]
+
+            all_text = []
+            for block in content_blocks:
+                if isinstance(block.get('content'), dict):
+                    text = block['content'].get('text', '')
+                    all_text.append(text.lower())
+
+            combined_text = ' '.join(all_text)
+            jargon_found = [phrase for phrase in jargon_phrases if phrase in combined_text]
+
+            if len(jargon_found) >= 3:
+                self.warnings.append(
+                    f"Principle 'teach_like_im_10' listed but excessive jargon detected: {', '.join(jargon_found[:3])}"
+                )
+
     def _check_post_assessment(self, lesson: dict):
         """Check post assessment compliance"""
         if 'post_assessment' not in lesson:
