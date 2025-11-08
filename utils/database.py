@@ -1059,7 +1059,7 @@ class Database:
             return False
 
         values.append(tag_id)
-        query = f"UPDATE tags SET {', '.join(fields)} WHERE tag_id = ?"
+        query = f"UPDATE tags SET {', '.join(fields)} WHERE id = ?"
 
         cursor.execute(query, values)
         self.conn.commit()
@@ -1073,7 +1073,7 @@ class Database:
         cursor = self.conn.cursor()
 
         # Check if system tag
-        cursor.execute("SELECT is_system FROM tags WHERE tag_id = ?", (tag_id,))
+        cursor.execute("SELECT is_system FROM tags WHERE id = ?", (tag_id,))
         row = cursor.fetchone()
 
         if not row:
@@ -1083,7 +1083,7 @@ class Database:
             raise ValueError("Cannot delete system tags")
 
         # Delete tag (cascade handles lesson_tags)
-        cursor.execute("DELETE FROM tags WHERE tag_id = ?", (tag_id,))
+        cursor.execute("DELETE FROM tags WHERE id = ?", (tag_id,))
         self.conn.commit()
         return cursor.rowcount > 0
 
