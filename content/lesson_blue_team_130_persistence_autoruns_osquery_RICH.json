@@ -1,0 +1,134 @@
+{
+  "lesson_id": "3a7f9e2d-8c4b-4f1e-a9d6-5b8e3c7a2f4d",
+  "domain": "blue_team",
+  "title": "Catching Persistence with Autoruns and Osquery",
+  "difficulty": 2,
+  "order_index": 130,
+  "prerequisites": [],
+  "concepts": [
+    "Persistence mechanisms",
+    "Autoruns tool analysis",
+    "Osquery endpoint detection",
+    "Registry-based persistence",
+    "Scheduled tasks persistence",
+    "Service-based persistence",
+    "DLL hijacking detection",
+    "WMI event subscription persistence",
+    "Startup folder monitoring",
+    "Living-off-the-land binaries (LOLBins)"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand common Windows persistence mechanisms used by malware and attackers",
+    "Use Sysinternals Autoruns to detect suspicious autostart locations and persistence",
+    "Deploy Osquery for scalable endpoint monitoring and persistence detection across enterprise",
+    "Identify registry keys, scheduled tasks, and services commonly abused for persistence",
+    "Detect DLL hijacking, COM hijacking, and other advanced persistence techniques",
+    "Create Osquery queries to hunt for persistence indicators across thousands of endpoints"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "pa-001",
+      "question": "During incident response, you discover a malicious DLL in C:\\Windows\\System32. When you delete it and reboot, it reappears. Which persistence mechanism is MOST likely responsible?",
+      "type": "multiple_choice",
+      "options": [
+        "Registry Run key pointing to the DLL",
+        "Scheduled task recreating the DLL",
+        "Windows service with ServiceDLL registry value pointing to the malicious DLL",
+        "Startup folder shortcut"
+      ],
+      "correct_answer": 2,
+      "difficulty": 2,
+      "explanation": "A Windows service with ServiceDLL registry value (option C) is the most likely mechanism. Services defined in HKLM\\SYSTEM\\CurrentControlSet\\Services\\[ServiceName] can have a 'ServiceDLL' parameter pointing to a DLL that gets loaded when the service starts. Even if you delete the DLL, if the service is set to start automatically (Start = 2), Windows will load it on boot. The service itself may even have code to recreate the DLL if it's missing. Registry Run keys (A) typically point to EXE files, not DLLs directly. Scheduled tasks (B) could recreate files but are less common for DLL persistence. Startup folders (D) don't directly load DLLs. To detect this, use Autoruns (Services tab) or Osquery: SELECT name, path, start_type FROM services WHERE path LIKE '%malicious.dll%'. The fix requires both deleting the DLL AND disabling/removing the service."
+    },
+    {
+      "question_id": "pa-002",
+      "question": "You run Autoruns and see an entry under 'Logon' tab with '(File not found)' in red. What does this indicate, and should you investigate?",
+      "type": "multiple_choice",
+      "options": [
+        "Benign - just leftover configuration from uninstalled software",
+        "Suspicious - attacker may have deleted file after achieving persistence",
+        "Critical - active malware using file-less persistence",
+        "Error - Autoruns is malfunctioning"
+      ],
+      "correct_answer": 0,
+      "difficulty": 2,
+      "explanation": "This is typically benign - leftover configuration from uninstalled software (option A). When applications are uninstalled, they sometimes leave behind registry entries pointing to files that no longer exist. Autoruns highlights these in red/pink to draw attention, but they're usually harmless remnants. However, it's still worth brief investigation: if the path looks suspicious (e.g., %TEMP%, unusual filenames) or if the timestamp is recent, it could indicate an attacker who established persistence but later deleted the payload to reduce forensic artifacts while keeping the autostart mechanism as a backdoor. Option B is possible but less common. Option C is incorrect—file-less persistence wouldn't create file references that show as 'not found'. Option D is incorrect—Autoruns is working correctly by detecting and flagging broken references. Best practice: document the entry, check if it's a known application, and if suspicious, search for related registry keys or scheduled tasks that might recreate the file."
+    },
+    {
+      "question_id": "pa-003",
+      "question": "Your Osquery deployment detects a new WMI event subscription on multiple endpoints. Which query would BEST identify the details of this persistence mechanism?",
+      "type": "multiple_choice",
+      "options": [
+        "SELECT * FROM registry WHERE path LIKE '%Run%'",
+        "SELECT * FROM wmi_event_filters JOIN wmi_filter_consumer_binding JOIN wmi_event_consumers",
+        "SELECT * FROM scheduled_tasks WHERE enabled = 1",
+        "SELECT * FROM services WHERE start_type = 'AUTO_START'"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "explanation": "The WMI persistence query (option B) is correct. WMI event subscription persistence involves three components: WMI Event Filter (defines when to trigger), WMI Event Consumer (defines what action to take), and WMI Filter-to-Consumer Binding (links them together). The query joins all three tables to show complete persistence chains. This technique is stealthy because WMI subscriptions persist across reboots and don't appear in standard autostart locations like Run keys (A) or scheduled tasks (C). The other options detect different persistence mechanisms but won't show WMI subscriptions. A more detailed Osquery query: SELECT f.name AS filter_name, f.query AS filter_query, c.name AS consumer_name, c.command_line_template FROM wmi_event_filters f JOIN wmi_filter_consumer_binding b ON f.name = b.filter JOIN wmi_event_consumers c ON b.consumer = c.name. This persistence technique was famously used in the DNC breach (2016) and NotPetya (2017) malware campaigns."
+    },
+    {
+      "question_id": "pa-004",
+      "question": "During a security audit using Autoruns, you find an unsigned DLL loaded by explorer.exe under the 'Explorer' tab. Which action should you take FIRST?",
+      "type": "multiple_choice",
+      "options": [
+        "Immediately delete the DLL",
+        "Verify the DLL's digital signature and check VirusTotal hash",
+        "Reboot the system to clear the DLL from memory",
+        "Disable all unsigned DLLs via Group Policy"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "explanation": "Verify the DLL's digital signature and check VirusTotal hash (option B) is the correct first step. Not all unsigned DLLs are malicious—many legitimate third-party applications and even some older Microsoft components are unsigned. Autoruns shows the signature status, and you should: (1) Right-click → 'Check VirusTotal' to see if the hash is known-malicious, (2) Examine the DLL path (legitimate software usually installs to Program Files, not %TEMP% or AppData), (3) Check file metadata (description, company, version), (4) Research the filename online. Immediately deleting (A) could break legitimate software or destroy forensic evidence. Rebooting (C) doesn't prevent the DLL from loading again if it has persistence. Disabling all unsigned DLLs (D) would break many legitimate applications. If investigation confirms malicious, then document, take forensic snapshot, and remove using proper incident response procedures. Autoruns' VirusTotal integration (Options → Scan Options → Check VirusTotal.com) makes this analysis quick."
+    },
+    {
+      "question_id": "pa-005",
+      "question": "Your organization deploys Osquery across 5,000 endpoints. Which approach provides the MOST effective persistence hunting at scale?",
+      "type": "multiple_choice",
+      "options": [
+        "Run SELECT * FROM all tables every hour and store all results",
+        "Create scheduled queries targeting high-value persistence locations with differential logging",
+        "Manually SSH into each endpoint and run queries interactively",
+        "Only monitor endpoints that have triggered antivirus alerts"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "explanation": "Scheduled queries with differential logging (option B) is the most effective approach. Osquery's differential logging (snapshot + changes) only records when values change, dramatically reducing data volume while ensuring you catch new persistence mechanisms the moment they're created. Configure queries like: SELECT * FROM registry WHERE path LIKE 'HKLM\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run%' (Run every 15 minutes, log changes only). This catches new registry keys without storing unchanged data repeatedly. Option A creates massive data volumes (terabytes per day) that are expensive to store and analyze. Option C doesn't scale to 5,000 endpoints and is manual/slow. Option D is reactive (persistence may exist on un-alerted endpoints). Best practice: Use query packs (collections of targeted queries) covering MITRE ATT&CK T1547 (Boot/Logon Autostart), T1543 (Create/Modify System Process), T1053 (Scheduled Tasks), etc. Tools like Fleet, Kolide, or osquery-go provide centralized management and alerting."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Welcome to Persistence Detection Mastery",
+      "content": {
+        "text": "🎯 **Welcome to Catching Persistence with Autoruns and Osquery!**\n\nAfter attackers gain initial access to a system, their #1 priority is **establishing persistence**—ensuring they can return even after reboots, credential changes, or detection attempts. But here's the empowering truth: **persistence mechanisms leave forensic artifacts that are detectable and removable when you know where to look.**\n\n**What You'll Master:**\n- 🔍 Understanding the 50+ Windows persistence mechanisms attackers use\n- 🛠️ Using Sysinternals Autoruns to detect and remove persistence\n- 📊 Deploying Osquery for scalable persistence hunting across thousands of endpoints\n- 🗂️ Analyzing registry keys, scheduled tasks, services, and WMI subscriptions\n- 🎣 Hunting for advanced persistence (DLL hijacking, COM hijacking, AppInit DLLs)\n- 🚨 Creating detection rules and automated response workflows\n\n**Why This Matters:**\nPersistence is the bridge between initial compromise and long-term control:\n- **APT groups**: Use 5-10 different persistence mechanisms simultaneously (redundancy)\n- **Ransomware**: Often establishes persistence before deploying payload (may wait days/weeks)\n- **Insider threats**: Backdoor accounts, scheduled tasks, WMI subscriptions for long-term access\n\nYet **90% of persistence mechanisms are detectable with proper tools and knowledge**.\n\n**The Challenge Ahead:**\nYou might be thinking: \"Windows has hundreds of autostart locations—how can I possibly check them all?\" That's where Autoruns and Osquery come in. Autoruns shows you **everything that runs automatically** in one interface. Osquery lets you **query this information across thousands of systems** like a database.\n\n**Real-World Impact:**\n- **SolarWinds breach (2020)**: Attackers used DLL hijacking and scheduled tasks for persistence. Autoruns would have detected the malicious DLLs.\n- **Emotet malware**: Creates registry Run keys, scheduled tasks, and WMI subscriptions. Osquery queries can hunt all three simultaneously.\n- **APT29 (Cozy Bear)**: Uses WMI event subscriptions for fileless persistence. Autoruns' WMI tab exposes these.\n\n**Let's Begin!**\nThis is a hands-on lesson where you'll use industry-standard tools to hunt real persistence mechanisms. You'll analyze registry keys, examine services, and write Osquery queries that scale to enterprise environments. By the end, you'll know exactly how to detect and remove attacker persistence. You've got this! 💪"
+      }
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: What Is Persistence?",
+      "content": {
+        "text": "## 🎯 Teach Me Like I'm 10: What Is Persistence?\n\nImagine you have a secret treehouse, and you want to make sure you can always get back in, even if someone tries to lock you out.\n\n### **The Normal Way In (Initial Access)**\n\nYou climb up the ladder to get into the treehouse for the first time. This is like an **attacker breaking into a computer** (maybe through a phishing email or exploiting a bug).\n\n### **The Problem**\n\nWhat if someone removes the ladder? Or what if the owner changes the lock? You can't get back in! You'd have to break in all over again (which is hard and might get you caught).\n\n### **The Smart Attacker's Solution: Persistence**\n\nInstead of relying on the ladder, you secretly install **5 different ways to get back in**:\n\n**1. Hidden Door (Registry Run Key)**\n- You cut a secret door in the treehouse wall\n- Every time the owner starts using the treehouse (computer boots), your door automatically opens\n- You can walk right in without anyone noticing\n\n**2. Scheduled Delivery (Scheduled Task)**\n- You hire a friend to throw a rope ladder up every day at 3 PM\n- Even if the owner removes your hidden door, the rope ladder appears automatically\n- You can climb up when the owner isn't looking\n\n**3. Fake Security Guard (Service)**\n- You convince the owner that you're a \"security guard\" who needs to be in the treehouse 24/7\n- The owner trusts you and lets you in automatically\n- You're now considered a \"legitimate\" part of the treehouse\n\n**4. Remote Control Robot (WMI Event Subscription)**\n- You plant a tiny robot inside the treehouse\n- When the owner turns on the lights (specific event happens), the robot unlocks the door from inside\n- Very sneaky—owner doesn't even know the robot is there!\n\n**5. Replacement Board (DLL Hijacking)**\n- You replace one wooden board of the treehouse with your own lookalike board\n- The board looks identical, but it has a secret hinge\n- When the owner uses the treehouse normally, your secret board lets you in\n\n---\n\n## 🔄 Why Attackers Need Multiple Ways In\n\n**Redundancy = Backup Plans**\n\nIf the owner discovers ONE of your secret entrances:\n- They remove the hidden door → But the scheduled rope ladder still works!\n- They cancel the rope ladder → But the fake security guard is still there!\n- They fire the security guard → But the robot is still inside!\n\nTo kick you out **completely**, the owner needs to find and remove **ALL 5 entrances**. Most people only find 1 or 2 and think they're safe. The attacker just uses entrance #3, #4, or #5 to get back in.\n\n---\n\n## 🕵️ How We Detect Persistence (Autoruns & Osquery)\n\n**Autoruns = Inspector's Checklist**\n\nImagine you're a security inspector hired to find all the secret entrances to the treehouse. You have a special checklist that says:\n\n- ✅ Check all doors and windows (Registry Run keys)\n- ✅ Look for scheduled deliveries (Scheduled tasks)\n- ✅ Verify all \"security guards\" are real (Services)\n- ✅ Search for hidden robots (WMI subscriptions)\n- ✅ Inspect every wooden board for fakes (DLL hijacking)\n\n**Autoruns does exactly this for computers!** It checks 50+ hiding spots where attackers put secret entrances.\n\n---\n\n**Osquery = Inspector's Drone Fleet**\n\nNow imagine you need to inspect **1,000 treehouses** (a big company with 1,000 computers). You can't manually inspect each one—that would take years!\n\nInstead, you send out **1,000 tiny drones** (Osquery agents) that:\n1. Fly to each treehouse simultaneously\n2. Run the same checklist at all treehouses at once\n3. Report back: \"Treehouse #42 has a hidden door! Treehouse #137 has a fake security guard!\"\n4. You get a list of ALL suspicious findings from ALL 1,000 treehouses in seconds\n\n**Osquery does exactly this for computer networks!** It checks thousands of computers at once and tells you which ones have suspicious persistence mechanisms.\n\n---\n\n## 🎯 Real-World Example: Catching a Hacker\n\n**The Attack:**\n\nA hacker sends a phishing email to your company. An employee clicks a malicious link, and the hacker's malware runs. The hacker thinks: \"Great! I'm inside! But what if this computer reboots or someone logs out? I need persistence!\"\n\n**The Hacker's Persistence Plan:**\n\n**Method 1: Registry Run Key (Hidden Door)**\n```\nLocation: HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\nKey Name: \"WindowsUpdate\"\nValue: \"C:\\Users\\Bob\\AppData\\Local\\Temp\\malware.exe\"\n\nEvery time Bob logs in → malware.exe runs automatically\n```\n\n**Method 2: Scheduled Task (Scheduled Delivery)**\n```\nTask Name: \"Adobe Flash Update\"\nTrigger: Every day at 9:00 AM\nAction: Run \"C:\\Windows\\Temp\\backdoor.exe\"\n\nEvery morning → backdoor.exe runs automatically\n```\n\n**Method 3: Windows Service (Fake Security Guard)**\n```\nService Name: \"Windows Defender Service\" (fake name!)\nStart Type: Automatic\nPath: \"C:\\Windows\\System32\\svchost.exe -k netsvcs\"\n  (but secretly loads C:\\Windows\\System32\\evil.dll)\n\nEvery boot → evil.dll loads and gives hacker access\n```\n\n---\n\n**Your Defense with Autoruns:**\n\nYou run Autoruns on Bob's computer:\n\n**Finding 1: Logon Tab**\n- ⚠️ Entry: \"WindowsUpdate\" → C:\\Users\\Bob\\AppData\\Local\\Temp\\malware.exe\n- 🔴 **Signature: (Verified) Signed by: <Not verified>** (Unsigned!)\n- 🚨 **Suspicious Path: %TEMP%** (Legitimate Windows updates don't run from TEMP)\n- **Action**: Uncheck box → Persistence removed!\n\n**Finding 2: Scheduled Tasks Tab**\n- ⚠️ Entry: \"Adobe Flash Update\" → C:\\Windows\\Temp\\backdoor.exe\n- 🔴 **Adobe Flash is deprecated** (not updated since 2020!)\n- 🚨 **Suspicious Path: C:\\Windows\\Temp**\n- **Action**: Uncheck box → Scheduled task disabled!\n\n**Finding 3: Services Tab**\n- ⚠️ Entry: \"Windows Defender Service\" → svchost.exe loads evil.dll\n- 🔴 **Real Windows Defender uses different service name**\n- 🔴 **DLL not signed by Microsoft**\n- **Action**: Uncheck box → Service disabled!\n\n**Result**: All 3 persistence mechanisms removed! Hacker can't get back in.\n\n---\n\n## 🎮 Analogy: Hide-and-Seek Champion\n\n**Persistence = Hacker playing hide-and-seek**\n\nThe hacker hides in **5 different spots** in your house:\n- Behind the couch (Registry)\n- In the closet (Scheduled task)\n- Under the bed (Service)\n- In the attic (WMI subscription)\n- Inside the TV (DLL hijacking)\n\n**Without Autoruns/Osquery:**\nYou look behind the couch, find the hacker, kick them out. But they're still hiding in 4 other spots! Later, they come out from the closet and you think: \"How did they get back in?\"\n\n**With Autoruns/Osquery:**\nYou use a special scanner that shows ALL 5 hiding spots at once. You find the hacker in every location and remove them all simultaneously. Now they're truly gone!\n\n---\n\n## 🎯 Key Takeaway\n\n**Persistence = The attacker's secret doors to get back into your computer.**\n\n**Why it's important to detect:**\n- Even if you remove the attacker's malware, they can use persistence to come back\n- Persistence is hard to find manually (50+ hiding spots!)\n- But tools like Autoruns and Osquery make it easy\n\n**Remember**: Attackers ALWAYS establish persistence after breaking in. If you don't check for and remove ALL persistence mechanisms, you haven't actually kicked them out—they're just hiding and will return later.\n\nNext: Technical deep dive into Windows persistence mechanisms! 🚀"
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC599",
+    "Career Path: Blue Teamer"
+  ],
+  "course": "SEC599 S3"
+}
