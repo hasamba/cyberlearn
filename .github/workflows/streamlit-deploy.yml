@@ -1,0 +1,102 @@
+# GitHub Actions Workflow for Streamlit Cloud Deployment
+#
+# This workflow validates the app before Streamlit Cloud auto-deploys.
+# Streamlit Cloud automatically deploys from your connected GitHub repo,
+# so this workflow focuses on validation and notifications.
+
+name: Streamlit App CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Streamlit App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile app.py
+          python -m py_compile config.py
+          python -m py_compile setup.py
+
+      - name: Validate Pydantic models
+        run: |
+          python -c "from models.user import UserProfile, SkillLevels, LearningPreferences; print('User models OK')"
+          python -c "from models.lesson import Lesson, ContentBlock, Question; print('Lesson models OK')"
+          python -c "from models.progress import LessonProgress; print('Progress models OK')"
+          python -c "from models.tag import Tag; print('Tag models OK')"
+
+      - name: Check Streamlit config
+        run: |
+          if [ -f ".streamlit/config.toml" ]; then
+            echo "Streamlit config found"
+            cat .streamlit/config.toml
+          else
+            echo "Warning: No .streamlit/config.toml found"
+          fi
+
+      - name: Validate requirements.txt
+        run: |
+          echo "Checking required packages..."
+          grep -q "streamlit" requirements.txt && echo "✓ streamlit found"
+          grep -q "pydantic" requirements.txt && echo "✓ pydantic found"
+          grep -q "plotly" requirements.txt && echo "✓ plotly found"
+
+      - name: Check template database exists
+        run: |
+          if [ -f "cyberlearn_template.db" ]; then
+            echo "✓ Template database found"
+            ls -lh cyberlearn_template.db
+          else
+            echo "⚠ Warning: cyberlearn_template.db not found"
+            echo "The app may not work without initial data"
+          fi
+
+      - name: Validate lesson JSON files
+        run: |
+          echo "Checking lesson files in content/..."
+          LESSON_COUNT=$(find content -name "*.json" 2>/dev/null | wc -l)
+          echo "Found $LESSON_COUNT lesson JSON files"
+          if [ "$LESSON_COUNT" -eq 0 ]; then
+            echo "⚠ Warning: No lesson files found in content/"
+          fi
+
+  notify-deploy:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deployment status
+        run: |
+          echo "============================================"
+          echo "✅ Validation passed!"
+          echo "============================================"
+          echo ""
+          echo "Streamlit Cloud will automatically deploy from main branch."
+          echo ""
+          echo "Your app URL: https://share.streamlit.io/[your-username]/[repo-name]/main/app.py"
+          echo ""
+          echo "To check deployment status, visit:"
+          echo "https://share.streamlit.io"
+          echo "============================================"
