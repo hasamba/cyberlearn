@@ -1,0 +1,193 @@
+{
+  "lesson_id": "74490be7-02e5-4c08-9bf1-0e923bce0035",
+  "domain": "active_directory",
+  "title": "Active Directory Tools for Beginners",
+  "difficulty": 1,
+  "order_index": 28,
+  "prerequisites": [
+    "active_directory_26",
+    "active_directory_27"
+  ],
+  "estimated_time": 45,
+  "concepts": [
+    "RSAT",
+    "ADUC",
+    "Active Directory Users and Computers",
+    "PowerShell AD module",
+    "ADSI Edit",
+    "BloodHound",
+    "ldapdomaindump",
+    "AD Explorer",
+    "admin tools"
+  ],
+  "learning_objectives": [
+    "Identify and describe the primary tools used to manage and explore Active Directory",
+    "Use Active Directory Users and Computers (ADUC) for basic user and group management",
+    "Run fundamental PowerShell Active Directory module commands for querying and modifying AD",
+    "Understand how attackers use tools like BloodHound and ldapdomaindump to enumerate AD",
+    "Recognize the dual-use nature of AD administration tools in both defense and offense"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "0f9acf43-dd57-4bbb-a8c6-9417507c4f35",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Every skilled security professional — whether defender or attacker — uses tools. The difference is what you do with them. The tools in this lesson are dual-use: administrators use them to manage thousands of users and computers; attackers use them to map out attack paths. Learning these tools from both perspectives is what makes you effective. When you understand that BloodHound (a famous hacker tool) uses the exact same LDAP queries as legitimate AD management scripts, you understand why blocking 'hacker tools' alone isn't enough — you need behavioral detection. Think of these tools as the Swiss Army knife of Active Directory. Let's learn what's in the toolkit."
+      }
+    },
+    {
+      "block_id": "865e4305-8d2c-449b-bca9-0cd3993b28fc",
+      "type": "explanation",
+      "content": {
+        "text": "## The Active Directory Toolset Overview\n\nActive Directory tools fall into three categories:\n\n### 1. Microsoft Native Tools (Admin Tools)\nThese come with Windows Server or can be installed via RSAT (Remote Server Administration Tools) on Windows 10/11 workstations.\n\n**RSAT Installation (Windows 10/11):**\n```powershell\n# Install RSAT AD tools via PowerShell\nAdd-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0\n\n# Verify installation\nGet-WindowsCapability -Online | Where {$_.Name -like \"Rsat.ActiveDirectory*\"}\n```\n\n**Key native tools:**\n- **ADUC (Active Directory Users and Computers)**: GUI tool for managing users, groups, OUs\n- **ADAC (Active Directory Administrative Center)**: Modern GUI, PowerShell-backed\n- **ADSS (Active Directory Sites and Services)**: Manage replication topology\n- **GPMC (Group Policy Management Console)**: Create and manage Group Policy Objects\n- **ADSI Edit**: Low-level editor for AD attributes — the 'Registry Editor' of AD\n- **ldp.exe**: LDAP browser — shows raw LDAP queries and responses\n\n### 2. PowerShell AD Module\nThe ActiveDirectory PowerShell module provides 147+ cmdlets for managing every aspect of AD. It's the preferred tool for automation and bulk operations.\n\n```powershell\n# Verify module is available\nGet-Module ActiveDirectory -ListAvailable\n\n# Import if needed\nImport-Module ActiveDirectory\n\n# See all available cmdlets\nGet-Command -Module ActiveDirectory | Measure-Object  # 147 cmdlets\n```\n\n### 3. Third-Party and Security Tools\nTools used by both administrators AND attackers:\n- **BloodHound**: Attack path analysis and visualization\n- **AD Explorer**: Sysinternals tool for browsing AD like a file system\n- **ADRecon**: Automated AD information gathering\n- **Impacket**: Python library for AD protocol interactions (used in pentesting)\n- **PingCastle**: AD security assessment tool (legitimate, used by defenders)"
+      }
+    },
+    {
+      "block_id": "44465c71-ddca-4c7e-8f6f-18d27fd4325d",
+      "type": "explanation",
+      "content": {
+        "text": "## Active Directory Users and Computers (ADUC)\n\nADUC (dsa.msc) is THE classic GUI tool for AD management. It's been around since Windows 2000 and remains the most commonly used AD management interface.\n\n### Key ADUC Features\n\n**Navigating the interface:**\n- Left pane: Domain tree with OUs as folders\n- Right pane: Objects within the selected container\n- View menu: Enable 'Advanced Features' to see ALL objects including hidden ones\n\n**Critical: Enable Advanced Features**\nBy default, ADUC hides many important containers. Always enable:\nView → Advanced Features\n\nThis reveals:\n- CN=System (where AD-integrated DNS and Group Policy objects live)\n- CN=Program Data (app-specific data)\n- Security tab on objects (showing access control lists)\n- Attribute Editor tab (shows all LDAP attributes)\n\n### Managing Users in ADUC\n\n**Creating a user:**\n1. Right-click the target OU → New → User\n2. Enter the required fields: First name, Last name, User logon name (sAMAccountName)\n3. Set password and account options (must change at logon, etc.)\n\n**Key tabs on user properties:**\n- **General**: Display name, contact info\n- **Account**: Logon name, account options (enabled/disabled, unlock, expiry)\n- **Member Of**: Group memberships\n- **Profile**: Home folder, logon script paths\n- **Dial-in**: VPN/RAS permissions\n- **Attribute Editor** (requires Advanced Features): Shows ALL LDAP attributes — essential for troubleshooting and security review\n\n**Finding users with specific properties:**\n- Right-click domain → Find (or Ctrl+F)\n- Choose 'Custom Search' → Advanced for LDAP filter queries\n- Example LDAP filter for accounts not logged in 90 days: `(&(objectClass=user)(lastLogon<=<timestamp>))`\n\n### The Attribute Editor Tab\n\nThis is the most powerful (and often overlooked) feature. It shows the raw LDAP attributes:\n\n```\nAttribute Editor for user jsmith:\n  adminCount: (not set)           ← Set to 1 if ever was admin\n  badPwdCount: 0                   ← Failed login attempts\n  distinguishedName: CN=John Smith,OU=IT,DC=company,DC=local\n  lastLogon: 133234567890000000   ← AD timestamp format\n  lockoutTime: 0                   ← 0 means not locked\n  memberOf: CN=G_IT_Staff,...\n  objectSid: S-1-5-21-...\n  pwdLastSet: 133190000000000000\n  servicePrincipalName: (not set) ← Empty = not Kerberoastable\n  userAccountControl: 512          ← 512 = normal enabled account\n```\n\n**userAccountControl values (bitmask):**\n- 512 = Normal account, enabled\n- 514 = Normal account, DISABLED (512 + 2)\n- 65536 = Password never expires flag\n- 4194304 = Don't require preauth (ASREPRoastable!)"
+      }
+    },
+    {
+      "block_id": "772dd347-5d21-4ffe-92ee-1f9636b1121e",
+      "type": "explanation",
+      "content": {
+        "text": "## PowerShell Active Directory Module Deep Dive\n\nThe AD PowerShell module is essential for automation, bulk operations, and security auditing. Here are the most important cmdlets organized by function:\n\n### Discovery and Enumeration\n\n```powershell\n# ===== DOMAIN INFORMATION =====\nGet-ADDomain                          # Domain info, FSMO roles\nGet-ADForest                          # Forest info, all domains\nGet-ADDomainController -Filter *      # All DCs\nGet-ADOptionalFeature -Filter *       # Features like Recycle Bin\n\n# ===== FINDING OBJECTS =====\n# Get-ADUser, Get-ADGroup, Get-ADComputer, Get-ADObject, Get-ADOrganizationalUnit\n\n# Wildcard search by name\nGet-ADUser -Filter {Name -like \"*admin*\"}\n\n# LDAP filter (more flexible)\nGet-ADUser -LDAPFilter \"(&(objectClass=user)(adminCount=1))\"\n\n# Search specific OU\nGet-ADUser -Filter * -SearchBase \"OU=Finance,DC=company,DC=local\"\n\n# Get specific properties (default view shows only a subset!)\nGet-ADUser -Identity jsmith -Properties *\nGet-ADUser -Identity jsmith -Properties MemberOf, LastLogonDate, PasswordLastSet\n```\n\n### Common AD Object Properties\n\n```powershell\n# Properties NOT shown by default (must explicitly request):\n# LastLogonDate, PasswordLastSet, PasswordNeverExpires\n# MemberOf, ServicePrincipalName, adminCount\n# LockedOut, BadLogonCount, lastLogon\n\n# Example: Get everything for security audit\nGet-ADUser -Filter * -Properties LastLogonDate, PasswordLastSet, PasswordNeverExpires, \n           MemberOf, adminCount, Enabled, LockedOut |\n    Select Name, SamAccountName, Enabled, LockedOut, LastLogonDate, \n           PasswordLastSet, PasswordNeverExpires, adminCount\n```\n\n### Bulk Operations\n\n```powershell\n# ===== BULK USER OPERATIONS =====\n\n# Disable all users not logged in for 90+ days\n$cutoff = (Get-Date).AddDays(-90)\nGet-ADUser -Filter {Enabled -eq $true -and LastLogonDate -lt $cutoff} -Properties LastLogonDate |\n    ForEach-Object {\n        Disable-ADAccount -Identity $_.SamAccountName\n        Write-Host \"Disabled: $($_.Name) (last logon: $($_.LastLogonDate))\"\n    }\n\n# Bulk add users from CSV to a group\nImport-Csv users.csv | ForEach-Object {\n    Add-ADGroupMember -Identity \"G_VPN_Users\" -Members $_.Username\n    Write-Host \"Added $($_.Username) to VPN group\"\n}\n\n# Create multiple OUs from a list\n$departments = @(\"IT\", \"Finance\", \"HR\", \"Operations\", \"Legal\")\n$departments | ForEach-Object {\n    New-ADOrganizationalUnit -Name $_ -Path \"OU=Users,DC=company,DC=local\" -ProtectedFromAccidentalDeletion $true\n    Write-Host \"Created OU: $_\"\n}\n```\n\n### Security-Focused Queries\n\n```powershell\n# Find all users in privileged groups (recursive)\n$privilegedGroups = @(\"Domain Admins\",\"Enterprise Admins\",\"Schema Admins\",\"Administrators\")\nforeach ($group in $privilegedGroups) {\n    Write-Host \"\\n=== $group ===\"\n    Get-ADGroupMember -Identity $group -Recursive | Select Name, SamAccountName, objectClass\n}\n\n# Export full AD user inventory for security review\nGet-ADUser -Filter * -Properties * | \n    Select SamAccountName, Name, Enabled, LastLogonDate, PasswordLastSet, \n           PasswordNeverExpires, adminCount, Description |\n    Export-Csv -Path \"AD_User_Inventory_$(Get-Date -Format yyyyMMdd).csv\" -NoTypeInformation\n\n# Find computers that haven't checked in (potential rogue/offline machines)\nGet-ADComputer -Filter {Enabled -eq $true} -Properties LastLogonDate |\n    Where {$_.LastLogonDate -lt (Get-Date).AddDays(-30)} |\n    Select Name, LastLogonDate, OperatingSystem |\n    Sort LastLogonDate\n```"
+      }
+    },
+    {
+      "block_id": "f85d9993-08c8-4821-ab76-fdf5dd329b52",
+      "type": "explanation",
+      "content": {
+        "text": "## Attacker Tools: BloodHound and LDAP Enumeration\n\nUnderstanding how attackers enumerate AD helps defenders know what to detect and protect.\n\n### BloodHound: The Attack Path Analyzer\n\nBloodHound is an open-source tool that maps Active Directory environments to find attack paths from a low-privileged user to Domain Admin. It's used by:\n- **Red teams**: Find the quickest path to Domain Admin\n- **Blue teams/defenders**: Find attack paths BEFORE attackers do (same data, defensive use)\n- **Auditors**: Assess AD security posture\n\n**How BloodHound works:**\n1. **Collector (SharpHound)** runs as any domain user, collects LDAP data about users, groups, computers, sessions, and ACLs. Data collection takes minutes.\n2. **Data uploaded to Neo4j** (a graph database)\n3. **BloodHound GUI visualizes** relationships as a graph\n4. **Queries find attack paths**: 'Shortest path from UserX to Domain Admins'\n\n**Example BloodHound findings:**\n- 'User jsmith can reset password for svc_backup → svc_backup is member of Backup Operators → Backup Operators can log into DCs → Domain Compromise'\n- 'Computer WORKSTATION01 is AdminTo DC01 → Anyone who is local admin on WORKSTATION01 can dump DC credentials'\n\n**Running BloodHound collection (as any domain user):**\n```powershell\n# SharpHound - runs as any domain user\n.\\SharpHound.exe -c All --outputdirectory C:\\Temp\\bloodhound\n\n# Or using Python-based bloodhound (from Linux)\npython3 bloodhound-python -u jsmith -p 'password' -d company.local -c All\n```\n\n**Defensive use — The same SharpHound query tells defenders:**\n- Which users have over-privileged ACL rights\n- Where credential exposure is highest (admin logins on many workstations)\n- Dangerous group nesting paths\n- Accounts with sensitive delegation rights\n\n### LDAP Enumeration Tools\n\n**ldapdomaindump:**\n```bash\n# Dump all AD info to JSON/HTML files\npython3 ldapdomaindump.py -u 'COMPANY\\jsmith' -p 'password' ldap://192.168.1.10\n\n# Output files:\n# domain_users.html - All users with attributes\n# domain_groups.html - All groups and members  \n# domain_computers.html - All computer objects\n# domain_trusts.html - Forest trusts\n```\n\n**enum4linux-ng (from Linux):**\n```bash\n# Enumerate SMB/LDAP info from a Windows host\npython3 enum4linux-ng.py -A -u jsmith -p password company.local\n```\n\n**AD Explorer (Sysinternals - legitimate admin tool):**\n- GUI LDAP browser similar to Registry Editor\n- Can create offline snapshots of AD for analysis\n- Used legitimately by admins, also used by attackers for recon\n\n**ldp.exe (built-in Windows):**\n```\n# Connect: Connection → Connect (server: DC01, port: 389)\n# Bind: Connection → Bind (use Windows credentials)\n# Browse: View → Tree (enter DC=company,DC=local)\n# Search: Browse → Search (enter LDAP filters)\n```\n\n### Defender Note: Detecting AD Enumeration\n\nCommon detection signatures for AD enumeration:\n- Large number of LDAP queries from a single non-DC host\n- Querying all users, groups, and computers in rapid succession\n- SharpHound user agent strings in logs\n- Event ID 4662: Object access in AD (audit must be enabled)\n- Net commands: `net group \"domain admins\" /domain`"
+      }
+    },
+    {
+      "block_id": "92f7eb2e-0014-407a-887e-b36fbd7a471c",
+      "type": "diagram",
+      "content": {
+        "text": "## AD Tool Categories — Visual Map\n\n```\n                    [ACTIVE DIRECTORY TOOLS]\n                           |\n         +-----------------+------------------+\n         |                 |                  |\n   [GUI TOOLS]     [COMMAND LINE]      [SECURITY TOOLS]\n         |                 |                  |\n   +-----------+     +-----------+     +-----------+\n   | ADUC      |     | PowerShell|     | BloodHound|\n   | (dsa.msc) |     | AD Module |     | (offensive|\n   |           |     |           |     | & defensive)\n   | ADAC      |     | ldp.exe   |     | PingCastle|\n   |           |     | (raw LDAP)|     | (defense) |\n   | GPMC      |     |           |     |           |\n   |           |     | net.exe   |     | ADRecon   |\n   | ADSI Edit |     | (legacy)  |     | (audit)   |\n   | (low-level|     |           |     |           |\n   | attribute |     | dsquery   |     | Impacket  |\n   | editor)   |     | (query)   |     | (offensive)|\n   +-----------+     +-----------+     +-----------+\n```\n\n## BloodHound Attack Path Example\n\n```\nLOW-PRIVILEGE USER: jsmith\n         |\n         | MemberOf\n         v\n[G_HelpDesk Group]\n         |\n         | GenericAll permission (can reset passwords)\n         v\n[svc_mssql user account]\n         |\n         | MemberOf\n         v\n[SQL_Admins Group]\n         |\n         | AdminTo (local admin on)\n         v\n[SQL-SERVER-01 Computer]\n         |\n         | HasSession (admin has session on this machine)\n         v\n[DOMAIN ADMIN is logged in here!]\n         |\n         | Credential extraction via Mimikatz\n         v\n[DOMAIN COMPROMISE]\n\nBloodHound finds this entire path automatically!\n```\n\n## PowerShell vs GUI: When to Use Each\n\n```\n+---------------------------+------------------+------------------+\n| Task                      | GUI (ADUC)       | PowerShell       |\n+---------------------------+------------------+------------------+\n| Manage 1 user             | ✅ Faster        | ✅ Works too     |\n| Manage 1000 users         | ❌ Painful       | ✅ Bulk ops       |\n| Visualize OU structure    | ✅ Great         | ❌ Text only     |\n| Security audit queries    | ❌ Limited       | ✅ Powerful       |\n| Documentation/reporting   | ❌ Manual        | ✅ Export to CSV  |\n| Learning what exists      | ✅ Intuitive     | ✅ With practice  |\n| Automation/scripting      | ❌ Not possible  | ✅ Essential      |\n+---------------------------+------------------+------------------+\n```"
+      }
+    },
+    {
+      "block_id": "3a640c99-9150-45aa-98e3-3bd59e9eeb77",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-On Exercise: Build an AD Security Report\n\nUsing the PowerShell AD module, build a comprehensive security snapshot of an Active Directory environment. This is the kind of script a security analyst would run on Day 1 of an AD assessment.\n\n```powershell\n<#\n.SYNOPSIS\n    AD Security Quick Assessment\n.DESCRIPTION\n    Generates a security-focused snapshot of an Active Directory environment\n    Can run as any domain user (read-only)\n#>\n\nWrite-Host \"=== AD SECURITY QUICK ASSESSMENT ===\" -ForegroundColor Cyan\nWrite-Host \"Run date: $(Get-Date)\" \nWrite-Host \"Domain: $((Get-ADDomain).DNSRoot)\"\nWrite-Host \"\"\n\n# --- DOMAIN INFO ---\nWrite-Host \"[1] DOMAIN INFORMATION\" -ForegroundColor Yellow\n$domain = Get-ADDomain\nWrite-Host \"  Domain: $($domain.DNSRoot)\"\nWrite-Host \"  Forest: $($domain.Forest)\"\nWrite-Host \"  Functional Level: $($domain.DomainMode)\"\n$dcs = Get-ADDomainController -Filter *\nWrite-Host \"  Domain Controllers: $($dcs.Count)\"\n$dcs | ForEach-Object { Write-Host \"    - $($_.Name) ($($_.OperatingSystem))\" }\n\n# --- KRBTGT PASSWORD AGE ---\nWrite-Host \"\"\nWrite-Host \"[2] KRBTGT ACCOUNT\" -ForegroundColor Yellow\n$krbtgt = Get-ADUser krbtgt -Properties PasswordLastSet\n$krbtgtAge = ((Get-Date) - $krbtgt.PasswordLastSet).Days\nWrite-Host \"  Password last set: $($krbtgt.PasswordLastSet)\"\nif ($krbtgtAge -gt 180) {\n    Write-Host \"  Password age: $krbtgtAge days [WARNING - Should rotate!]\" -ForegroundColor Red\n} else {\n    Write-Host \"  Password age: $krbtgtAge days [OK]\" -ForegroundColor Green\n}\n\n# --- PRIVILEGED GROUPS ---\nWrite-Host \"\"\nWrite-Host \"[3] PRIVILEGED GROUP MEMBERSHIP\" -ForegroundColor Yellow\n$highPrivGroups = @(\"Domain Admins\", \"Enterprise Admins\", \"Schema Admins\", \"Administrators\")\nforeach ($group in $highPrivGroups) {\n    try {\n        $members = Get-ADGroupMember -Identity $group -Recursive\n        $count = $members.Count\n        $color = if ($count -gt 5) { \"Red\" } elseif ($count -gt 2) { \"Yellow\" } else { \"Green\" }\n        Write-Host \"  $group: $count members\" -ForegroundColor $color\n        if ($count -le 10) {\n            $members | ForEach-Object { Write-Host \"    - $($_.Name) ($($_.objectClass))\" }\n        }\n    } catch { Write-Host \"  $group: (Could not query)\" }\n}\n\n# --- HIGH RISK ACCOUNTS ---\nWrite-Host \"\"\nWrite-Host \"[4] HIGH-RISK ACCOUNT SETTINGS\" -ForegroundColor Yellow\n\n# Password never expires\n$neverExpire = Get-ADUser -Filter {PasswordNeverExpires -eq $true -and Enabled -eq $true} -Properties PasswordNeverExpires\nWrite-Host \"  Accounts with Password Never Expires: $($neverExpire.Count)\"\nif ($neverExpire.Count -gt 0) { Write-Host \"  [RISK] Review these accounts!\" -ForegroundColor Red }\n\n# Pre-auth disabled (ASREPRoastable)\n$asrep = Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true -and Enabled -eq $true} -Properties DoesNotRequirePreAuth\nWrite-Host \"  ASREPRoastable accounts: $($asrep.Count)\"\nif ($asrep.Count -gt 0) {\n    Write-Host \"  [CRITICAL] Enable Kerberos pre-auth on these!\" -ForegroundColor Red\n    $asrep | ForEach-Object { Write-Host \"    - $($_.SamAccountName)\" }\n}\n\n# Kerberoastable\n$kerberoast = Get-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName\nWrite-Host \"  Kerberoastable accounts: $($kerberoast.Count)\"\n\n# Stale accounts\n$cutoff = (Get-Date).AddDays(-90)\n$stale = Get-ADUser -Filter {Enabled -eq $true} -Properties LastLogonDate | Where {$_.LastLogonDate -lt $cutoff -or $_.LastLogonDate -eq $null}\nWrite-Host \"  Stale active accounts (90+ days no login): $($stale.Count)\"\nif ($stale.Count -gt 0) { Write-Host \"  [RISK] Review and disable stale accounts!\" -ForegroundColor Yellow }\n\n# Accounts not requiring password\n$noPass = Get-ADUser -Filter {PasswordNotRequired -eq $true -and Enabled -eq $true} -Properties PasswordNotRequired\nWrite-Host \"  Accounts with password not required: $($noPass.Count)\"\nif ($noPass.Count -gt 0) { Write-Host \"  [CRITICAL] These accounts have no password!\" -ForegroundColor Red }\n\nWrite-Host \"\"\nWrite-Host \"=== ASSESSMENT COMPLETE ===\"\nWrite-Host \"For full analysis, consider running PingCastle or BloodHound.\"\n```\n\n**What to look for in the results:**\n- KRBTGT password older than 180 days → Schedule rotation\n- More than 3-5 Domain Admins → Review and reduce\n- ANY ASREPRoastable accounts → Fix immediately\n- Kerberoastable accounts with weak passwords → Increase to 25+ char random passwords\n- Stale accounts still enabled → Disable or delete"
+      }
+    },
+    {
+      "block_id": "f700c5d4-ecac-4431-a62a-f0ce2d180a10",
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Scenario: BloodHound Finds What a 3-Month Audit Missed\n\n**The Situation:** A healthcare organization spent $80,000 on an Active Directory security audit from a consulting firm. The consultants delivered a 150-page report focused on Group Policy configurations, password policy, and patch compliance. It received a 'passing grade.'\n\n**Three weeks later:** An intern joined the IT department. During onboarding, they were added to the `G_IT_Helpdesk` group — standard procedure. The intern had no malicious intent, but a researcher ran BloodHound against the environment (with authorization) as part of a follow-up assessment.\n\n**BloodHound Found in 4 Minutes:**\n1. `G_IT_Helpdesk` → had `GenericWrite` permission on the `svc_antivirus` service account (old delegation, forgotten)\n2. `svc_antivirus` → member of `G_Server_Administrators`\n3. `G_Server_Administrators` → had `AdminTo` rights on all 47 servers including domain controllers\n\n**The math:** The intern, through an inherited forgotten ACL, had a 3-hop path to Domain Admin without ever knowing it existed.\n\n**Why the original audit missed it:** The consultants reviewed GROUP POLICY and USER ACCOUNTS. They didn't run BloodHound-style ACL analysis. The misconfigured permission was on an ACL, not visible in the standard AD Users and Computers view.\n\n**Remediation:**\n1. Remove the ACL granting `GenericWrite` on `svc_antivirus` to Help Desk\n2. Remove `svc_antivirus` from `G_Server_Administrators`\n3. Run BloodHound monthly as standard practice\n\n**The lesson:** AD security requires graph-based attack path analysis, not just point-in-time configuration review. BloodHound for defenders is not optional — it's essential."
+      }
+    },
+    {
+      "block_id": "5fa51a3d-869c-4f4b-a3dc-7de2ab0e6927",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Hook: The AD Toolbox\n\nRemember the AD tools with the 'GPS-BL' framework:\n\n**G** — **GUI tools** (ADUC, ADAC): The visual map. Good for seeing, not scaling.\n**P** — **PowerShell**: The autopilot. Automates everything, runs at scale.\n**S** — **Security tools** (BloodHound, PingCastle): The threat radar. Finds what you can't see manually.\n**B** — **Built-in tools** (ldp.exe, ADSI Edit): The engineer's toolkit. Low-level access for troubleshooting.\n**L** — **LDAP tools** (ldapdomaindump, enum4linux): The attacker lens. Shows what an attacker sees.\n\n**When to use each:**\n- **Daily admin work**: PowerShell + ADUC\n- **Troubleshooting attribute issues**: ADSI Edit + ldp.exe\n- **Security audit**: BloodHound + PingCastle\n- **Understanding attacker view**: ldapdomaindump + enum4linux\n- **Group Policy management**: GPMC\n\n**The dual-use reminder:** EVERY tool in the 'attacker' category can be run by any domain user. Detection must focus on BEHAVIOR (what queries, how many, how fast) not tool signatures alone."
+      }
+    },
+    {
+      "block_id": "f23024af-b3a5-4673-b1e2-85d29874b199",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: The Defender and the Attacker Use the Same Map\n\nThink about what you've learned in this lesson:\n\n1. **Both BloodHound and legitimate AD admin scripts use LDAP.** The same protocol that your IT team uses to manage 10,000 user accounts is used by attackers to map attack paths. What does this tell you about network-level blocking as a defense?\n\n2. **The intern attack path scenario:** A junior employee had Domain Admin access through 3 inherited permission hops they didn't know about. How do you discover and fix problems you don't know exist? What's your answer?\n\n3. **PowerShell's power is a double-edged sword.** The same script that generates your security report could be used by an attacker with a compromised domain account. How do you detect malicious use of legitimate tools? (Think: Script Block Logging, PowerShell logging, monitoring for large LDAP result sets from workstations)\n\n4. **ADSI Edit is described as 'the Registry Editor of AD.'** What's the danger of giving junior admins access to ADSI Edit with no restrictions? A single misconfigured attribute could break authentication for thousands of users.\n\n5. **If you were starting as a junior SOC analyst at a new company**, which tool would you run first to understand the AD security posture? (Most experienced practitioners would say: BloodHound + PingCastle, because they give you a risk-prioritized view in minutes rather than weeks of manual review.)\n\n**Final Thought:** The best security professionals aren't those who know the most tools — they're those who understand WHY each tool works, what data it accesses, and how to detect its misuse. Tools are just interfaces to the underlying AD data model."
+      }
+    },
+    {
+      "block_id": "7cd571e5-726b-4072-8c0d-2c46025602b0",
+      "type": "quiz",
+      "content": {
+        "text": "## Knowledge Check\n\n**Q1:** What does 'Enable Advanced Features' in ADUC reveal that is hidden by default?\nA) User passwords in recoverable format\nB) Hidden containers like CN=System, and extra tabs like Attribute Editor and Security\nC) The raw Kerberos ticket cache for each user\nD) Computer hardware inventory data\n\n**Answer: B** — Enabling Advanced Features in ADUC (View → Advanced Features) reveals hidden system containers, adds the 'Attribute Editor' tab (showing all LDAP attributes), and adds the 'Security' tab (showing ACLs/permissions). This is essential for security review and troubleshooting.\n\n---\n\n**Q2:** What makes BloodHound different from standard AD admin tools for security assessment?\nA) BloodHound requires Domain Admin rights to run\nB) BloodHound can only be used by attackers, not defenders\nC) BloodHound maps all relationships between AD objects as a graph and identifies chained attack paths that point-in-time reviews miss\nD) BloodHound only works on external facing systems, not internal AD\n\n**Answer: C** — BloodHound's power is in graph-based attack path analysis. It can identify multi-hop attack chains (like Help Desk → Service Account → Domain Admin) that traditional audits miss because they look at objects individually. Crucially, it runs as ANY domain user for data collection, making it valuable for defenders AND dangerous in attacker hands.\n\n---\n\n**Q3:** In the PowerShell AD module, why must you use `-Properties *` or specify specific property names to get fields like `LastLogonDate`?\nA) These properties are encrypted and require admin rights to access\nB) The default property set is limited to reduce network load — extra properties must be explicitly requested\nC) LastLogonDate only updates once per week, so it's excluded by default\nD) Microsoft hides these properties for privacy compliance reasons\n\n**Answer: B** — The AD PowerShell module returns only a default subset of attributes to optimize performance (AD objects can have hundreds of attributes). Security-relevant attributes like LastLogonDate, PasswordLastSet, PasswordNeverExpires, MemberOf, and adminCount must be explicitly requested with `-Properties`. This catches many security analysts by surprise!"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "b7267b25-f0b7-433a-baa8-36d3bfbbc3a2",
+      "type": "multiple_choice",
+      "question": "What is the purpose of enabling 'Advanced Features' in Active Directory Users and Computers (ADUC)?",
+      "options": [
+        "A) It enables additional security features that protect user accounts from attacks",
+        "B) It reveals hidden containers, adds the Attribute Editor tab showing all LDAP attributes, and adds the Security tab showing ACLs",
+        "C) It requires Domain Admin rights and enables PowerShell integration within the GUI",
+        "D) It enables multi-factor authentication for administrative actions"
+      ],
+      "correct_answer": "B",
+      "explanation": "Enabling Advanced Features (View → Advanced Features) in ADUC reveals hidden system containers like CN=System, enables the Attribute Editor tab which shows ALL LDAP attributes for objects (not just the common ones), and adds the Security tab showing the object's ACL permissions. This is essential for security review and troubleshooting, as these hidden details often reveal misconfigurations.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "da26e3d5-a676-4fbf-91a6-2ff011ca1513",
+      "type": "multiple_choice",
+      "question": "Which PowerShell command correctly retrieves a user's LastLogonDate and MemberOf properties?",
+      "options": [
+        "A) Get-ADUser -Identity jsmith",
+        "B) Get-ADUser -Identity jsmith -Properties LastLogonDate, MemberOf",
+        "C) Get-ADUserFull -Identity jsmith",
+        "D) Get-ADUser -Identity jsmith | Select-Object -ExpandProperty Extended"
+      ],
+      "correct_answer": "B",
+      "explanation": "The AD PowerShell module returns only a default subset of attributes. Properties like LastLogonDate, MemberOf, PasswordLastSet, PasswordNeverExpires, and adminCount are NOT included in the default view. You must explicitly request them using -Properties. Using -Properties * returns all attributes but is much slower. Best practice is to request only the specific properties you need.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "2876adb8-7da0-46e6-9082-6039d46c6c8e",
+      "type": "multiple_choice",
+      "question": "BloodHound collects data using SharpHound, which runs as any domain user. Why is this significant for security?",
+      "options": [
+        "A) It means only Domain Admins can detect BloodHound usage",
+        "B) Domain users can enumerate attack paths to Domain Admin without any special privileges, making low-privilege account compromise more dangerous",
+        "C) It means BloodHound data is inaccurate because standard users can't see all objects",
+        "D) Only IT department accounts can run BloodHound due to security restrictions"
+      ],
+      "correct_answer": "B",
+      "explanation": "BloodHound's SharpHound collector works with standard domain user privileges via LDAP and SMB queries that any user can make. This means any compromised account — even a low-privilege user — can enumerate the entire AD attack surface. Attackers don't need to be admins to discover the path to Domain Admin. This is why defenders should run BloodHound proactively to find these paths before attackers do.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "fe171345-46eb-42bc-aacb-d9a39544c1bd",
+      "type": "multiple_choice",
+      "question": "What is ADSI Edit primarily used for?",
+      "options": [
+        "A) Editing Active Directory Sites and Services replication topology",
+        "B) Running advanced BloodHound queries against the AD database",
+        "C) Directly editing low-level LDAP attributes not accessible through ADUC, including system attributes and schema objects",
+        "D) Managing Active Directory Certificate Services templates"
+      ],
+      "correct_answer": "C",
+      "explanation": "ADSI Edit is a low-level LDAP editor — often called 'the Registry Editor of Active Directory.' It allows direct editing of ALL LDAP attributes, including system attributes that aren't exposed through ADUC. It can edit any object in the directory including schema objects, partitions, and configuration. It's extremely powerful and dangerous — a single wrong edit can break authentication for the entire domain.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "6fe667da-d307-484e-a458-c4b8db4a14d4",
+      "type": "multiple_choice",
+      "question": "An attacker runs ldapdomaindump.py with stolen domain credentials. What information can they obtain?",
+      "options": [
+        "A) Encrypted password hashes for all domain users",
+        "B) Only basic domain controller information",
+        "C) Full enumeration of all users (with attributes), groups, computers, and trusts in the domain",
+        "D) Only information about the account they used to run the tool"
+      ],
+      "correct_answer": "C",
+      "explanation": "ldapdomaindump performs LDAP enumeration of the entire domain and outputs comprehensive HTML/JSON reports covering: all user accounts with attributes (creation date, last login, group memberships, admin status), all groups and their members, all computer accounts, and domain trust relationships. This gives an attacker a complete map of the organization. This enumeration uses legitimate LDAP queries that any domain user can make.",
+      "difficulty": 1
+    }
+  ]
+}
