@@ -1,0 +1,193 @@
+{
+  "lesson_id": "23121201-ca71-4be4-8013-db8e308beff9",
+  "domain": "blue_team",
+  "title": "Security Alerts and Incidents for Beginners",
+  "difficulty": 1,
+  "order_index": 32,
+  "prerequisites": [
+    "blue_team_31"
+  ],
+  "estimated_time": 40,
+  "concepts": [
+    "security alert",
+    "security incident",
+    "event",
+    "true positive",
+    "false positive",
+    "alert triage",
+    "severity",
+    "incident classification",
+    "incident lifecycle",
+    "escalation"
+  ],
+  "learning_objectives": [
+    "Distinguish between a security event, alert, and incident",
+    "Classify alerts as true positives, false positives, true negatives, and false negatives",
+    "Apply a structured triage process to evaluate incoming security alerts",
+    "Describe the stages of the incident response lifecycle",
+    "Explain severity classification and escalation procedures for security incidents"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "e906d169-fd8f-4ff9-bdd1-c9e73d1cc408",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Here's a challenge that every new SOC analyst faces: Not everything that looks suspicious is an attack. And not every attack LOOKS suspicious at first. Your job is to tell the difference — accurately and quickly — while 200 more alerts pile up behind you. This might sound overwhelming, but it's a learnable skill. In this lesson, we'll build a mental framework for thinking about security alerts that will serve you for your entire career. Whether you're a future SOC analyst, incident responder, or security engineer, understanding how to process alerts and identify real incidents is fundamental. Think of this as learning to read the 'vital signs' of a network — just like a nurse reads a patient's heart rate, you'll learn to interpret the signals a network sends."
+      }
+    },
+    {
+      "block_id": "36155eb6-5eda-4bea-a338-0cfba6cf1757",
+      "type": "explanation",
+      "content": {
+        "text": "## Events, Alerts, and Incidents: Know the Difference\n\nThese three terms are often used interchangeably by beginners, but they mean very different things in security operations. Getting this right is foundational.\n\n### Security Event\n\n**Definition:** Any observable occurrence in a system or network. Events are raw data.\n\nExamples of events:\n- User jsmith logged in at 09:03 AM\n- File C:\\Windows\\system32\\calc.exe was executed\n- Network packet from 192.168.1.100 to 8.8.8.8 on port 53\n- Failed login attempt for user admin\n\nKey characteristic: Events are **neutral** — they don't imply anything good or bad on their own. Your SIEM may collect millions of events per day.\n\n---\n\n### Security Alert\n\n**Definition:** A notification generated when events match a detection rule, suggesting potentially malicious or anomalous activity.\n\nAlerts are events that have been **filtered and flagged** by a detection system.\n\nExamples of alerts:\n- '10 failed login attempts from the same IP in 60 seconds'\n- 'PowerShell downloaded a file from the internet'\n- 'New scheduled task created at midnight'\n- 'Antivirus detected but could not quarantine a file'\n\nKey characteristic: Alerts are **hypotheses** — 'this might be a problem.' They need human evaluation to confirm or deny.\n\n---\n\n### Security Incident\n\n**Definition:** A confirmed or highly suspected violation of security policy, or an event that threatens the confidentiality, integrity, or availability of information.\n\nIncidents require action and formal response.\n\nExamples of incidents:\n- Confirmed ransomware infection on 3 workstations\n- Employee data exfiltrated to an unauthorized cloud storage\n- Phishing campaign successfully compromised 12 accounts\n- DDoS attack taking down the company website\n- Unauthorized access to the HR payroll database\n\nKey characteristic: Incidents are **confirmed problems** — they require the full incident response process.\n\n---\n\n### The Funnel Analogy\n\n```\nMillions of EVENTS\n       ↓  (filtered by detection rules)\nThousands of ALERTS\n       ↓  (triaged by analysts)\nHundreds of INVESTIGATIONS\n       ↓  (confirmed as real)\nTens of INCIDENTS\n       ↓  (most critical get)\nFull IR Response\n```\n\nThis funnel exists in every SOC. The art is making sure nothing important falls through the filter at each level."
+      }
+    },
+    {
+      "block_id": "ffc01297-a846-4a7e-8203-7e541f5a1c92",
+      "type": "explanation",
+      "content": {
+        "text": "## The Four Alert Outcomes: True/False, Positive/Negative\n\nWhen you evaluate an alert, there are four possible outcomes. Understanding these is critical for both day-to-day triage and for measuring detection quality.\n\n### True Positive (TP) ✅\n**Alert fired AND it's a real threat.**\n\nExample: Alert fires for 'mass file encryption detected' → Investigation confirms ransomware is running. Alert was correct.\n\nThis is what you want. More TPs = better detection.\n\n---\n\n### False Positive (FP) ❌\n**Alert fired BUT it's NOT a real threat.**\n\nExample: Alert fires for 'suspicious PowerShell execution' → Investigation reveals it's the IT admin running their monthly patch script. No threat.\n\nFalse positives are the bane of SOC existence. High FP rates cause:\n- Alert fatigue (analysts stop taking alerts seriously)\n- Wasted analyst time\n- Real threats hiding in the noise\n\n---\n\n### True Negative (TN) ✅\n**Alert did NOT fire AND there's no real threat.**\n\nExample: User downloaded a large file. No alert fired. Investigation would confirm it was a legitimate backup. Everything is fine.\n\nTrue negatives are the normal state — most activity is benign and doesn't generate alerts.\n\n---\n\n### False Negative (FN) 🚨 WORST CASE\n**Alert did NOT fire BUT there IS a real threat.**\n\nExample: Attacker uses a novel malware variant that isn't in the signature database. No alert fires. The attacker operates undetected for weeks.\n\nFalse negatives are the most dangerous outcome — you don't know what you don't know. Threat hunting exists specifically to find these.\n\n---\n\n### Detection Quality Matrix\n\n```\n                    ACTUAL STATE\n                  Real    |  Not Real\n                ----------+----------\n Alert fired  |   TRUE    |  FALSE   \n              | POSITIVE  | POSITIVE \n              |   (good!) |  (noise) \n              ----------+----------\n No alert     |   FALSE   |  TRUE    \n              | NEGATIVE  | NEGATIVE \n              | (DANGER!) | (normal) \n```\n\n### The Precision vs. Recall Tradeoff\n\nThis is a fundamental concept in detection engineering:\n\n**High Precision, Low Recall:** Very few false positives, but misses some real threats\n- Your SIEM only alerts on things it's very sure about\n- Analysts trust the alerts, but attackers may slip through\n\n**Low Precision, High Recall:** Catches almost everything, but lots of false positives\n- Your SIEM alerts on anything that looks even slightly unusual\n- Analysts get overwhelmed; alert fatigue sets in\n\n**The Goal:** Balance — catch the real threats (high recall on critical attack patterns) while minimizing false positives on routine activity (high precision for common alerts)."
+      }
+    },
+    {
+      "block_id": "9fc679c8-559a-4d2b-b2f3-3b85e5174932",
+      "type": "explanation",
+      "content": {
+        "text": "## Alert Triage: A Structured Process\n\nTriage is the systematic process of evaluating each alert to determine priority and next action. A good triage process is fast, consistent, and thorough enough to catch real threats.\n\n### The 5-Question Triage Framework\n\nFor each alert, ask these five questions in order:\n\n**Question 1: Is this alert technically valid?**\n- Does the data make sense? Correct IP format, valid username, realistic timestamp?\n- Is the detection rule known to fire on benign things?\n- Is there context missing that would change the assessment?\n\n**Question 2: Is this behavior normal for this user/system?**\n- Does this user typically run PowerShell? Is this outside business hours?\n- Has this system communicated with this destination before?\n- Is there a ticket or change request that explains this activity?\n- Check SIEM history: Same activity in the past? (Baselining)\n\n**Question 3: Is there corroborating evidence?**\n- Do other alerts from the same host/user support this being malicious?\n- Does EDR show additional suspicious activity on the same host?\n- Are there email logs showing a phishing attempt to this user recently?\n\n**Question 4: What is the potential impact?**\n- If this IS malicious, how bad is it? Data breach? Ransomware? Admin compromise?\n- Who/what could be affected?\n- What is the risk of taking action vs. not taking action?\n\n**Question 5: What action is appropriate?**\n- Close as false positive (with documentation)\n- Escalate to Tier 2 for deeper investigation\n- Take immediate containment action (if critical, active threat)\n- Request more information (from IT, from the user)\n\n---\n\n### Alert Triage Checklist Template\n\nWhen documenting your triage, capture:\n\n```\nAlert ID: SOC-2024-0142\nTime Received: 2024-01-15 14:23 UTC\nSeverity: HIGH\nAffected Asset: FINANCE-PC-047 (sarah.jones)\n\nInitial Assessment:\n  - Rule fired: Mass file modification with .encrypted extension\n  - Data validity: [✓] Valid host, [✓] Valid user, [✓] Valid timestamps\n\nContext Check:\n  - Normal behavior? No — first time seeing this pattern\n  - Business hours? 2 AM — outside normal hours\n  - Change ticket? None found\n  - EDR check: [action taken] Checked CrowdStrike\n    → Found: malware.exe running, parent process: email attachment\n    → Shadow copy deletion in process tree\n\nCorroborating Evidence:\n  - Email logs show suspicious attachment opened at 1:47 AM\n  - EDR shows vssadmin.exe Delete Shadows (ransomware indicator)\n\nImpact Assessment:\n  - CRITICAL — Finance workstation, potential data encryption\n  - Connected to FIN-FILESERVER-01 via SMB\n\nAction Taken:\n  - 14:28 UTC: Host isolated via EDR network contain\n  - 14:29 UTC: Escalated to Tier 2 (page out)\n  - 14:30 UTC: Evidence preserved (EDR forensic snapshot)\n\nClassification: TRUE POSITIVE — Active Ransomware\n```\n\n---\n\n### Triage Time Budgets\n\nTier 1 analysts typically have limited time per alert. Approximate budgets:\n\n- **Critical alerts**: No time limit — work until resolved or escalated\n- **High severity**: 15-20 minutes before escalating if unresolved  \n- **Medium severity**: 10-15 minutes\n- **Low severity**: 5-10 minutes\n\nIf you can't determine the answer in the time budget: escalate. Don't guess."
+      }
+    },
+    {
+      "block_id": "11f5277f-38a9-457f-aa15-ccaa7713b4f1",
+      "type": "diagram",
+      "content": {
+        "text": "## Security Incident Lifecycle — NIST Model\n\nThe National Institute of Standards and Technology (NIST) defines four phases of incident response:\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│                  INCIDENT RESPONSE LIFECYCLE                 │\n└─────────────────────────────────────────────────────────────┘\n\n[1. PREPARATION]\n  • Establish IR plan, playbooks, team roles\n  • Deploy security tools (SIEM, EDR, SOAR)\n  • Train analysts, run tabletop exercises\n  • Build threat intelligence capability\n       ↓ (ongoing - not just before incidents)\n\n[2. DETECTION & ANALYSIS]\n  • Monitor for security events and alerts\n  • Triage alerts to identify true incidents\n  • Analyze and characterize the incident:\n      - Attack vector? Initial access method?\n      - Affected systems and scope?\n      - Type of attack (malware, phishing, insider)?\n      - Indicators of Compromise (IOCs)\n       ↓ (incident confirmed)\n\n[3. CONTAINMENT, ERADICATION & RECOVERY]\n  Containment:\n  • Short-term: Isolate affected hosts, block IPs, disable accounts\n  • Long-term: Patch vulnerabilities, change credentials\n  \n  Eradication:\n  • Remove malware, close backdoors\n  • Verify clean state of all affected systems\n  \n  Recovery:\n  • Restore systems from clean backups\n  • Monitor closely for re-infection\n  • Gradual return to normal operations\n       ↓\n\n[4. POST-INCIDENT ACTIVITY]\n  • Lessons learned meeting (within 2 weeks)\n  • Root cause analysis documentation\n  • Update detection rules based on IOCs\n  • Improve processes to prevent recurrence\n  • Update IR playbooks\n       ↑ (feeds back into Preparation)\n```\n\n## Incident Severity Classification\n\n```\n+----------+--------+--------------------------------------------------+\n| Severity | Label  | Definition & Examples                            |\n+----------+--------+--------------------------------------------------+\n| P1       | CRIT.  | Active data breach, ransomware spreading,        |\n|          |        | domain controller compromise, CEO email hack     |\n|          |        | → Immediate escalation, 24/7 response, exec notif|\n+----------+--------+--------------------------------------------------+\n| P2       | HIGH   | Confirmed malware on single host, phishing       |\n|          |        | campaign hitting multiple users, data theft      |\n|          |        | suspected. → Tier 2 response within 1 hour       |\n+----------+--------+--------------------------------------------------+  \n| P3       | MEDIUM | Isolated suspicious behavior, unconfirmed IOC,   |\n|          |        | policy violation, vulnerability exploitation     |\n|          |        | attempted but failed. → Response within 4 hours  |\n+----------+--------+--------------------------------------------------+\n| P4       | LOW    | Non-critical policy violations, minor anomalies, |\n|          |        | informational findings. → Response within 24h    |\n+----------+--------+--------------------------------------------------+\n```"
+      }
+    },
+    {
+      "block_id": "0209a6f7-eac2-4801-8421-3e0a305a3fce",
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Scenario: The Same Alert, Three Different Outcomes\n\n**Alert:** 'User account logged in from two countries simultaneously'\n\nThis is the same alert type, but context completely changes the outcome:\n\n---\n\n**Scenario A — False Positive:**\n- User: cto@company.com\n- Locations: London, UK + Frankfurt, Germany\n- Time difference: 3 hours\n- Context check: CTO is at a conference in London. Company has European data center in Frankfurt that triggers SSO session for VPN access. Same session extended, not a new login.\n- Additional context: IT change ticket shows 'conference access configuration' for this week.\n- **Outcome: FALSE POSITIVE** — Close with documentation. Add exception to reduce future alerts for this pattern.\n\n---\n\n**Scenario B — True Positive:**\n- User: sarah.jones@company.com (Finance analyst)\n- Locations: New York, USA + Russia\n- Time difference: 12 minutes  \n- Context check: Sarah is at her desk in New York (building badge records confirm she badged in at 08:50 AM). The Russian login is 12 minutes after the US login.\n- Impossible travel — Sarah cannot be in both locations.\n- Check: Was Sarah's email targeted by a phishing campaign this week? YES — IT ticket shows she reported a phishing email 3 days ago but said she 'didn't click it.'\n- **Outcome: TRUE POSITIVE** — Compromised account. Disable account, escalate to Tier 2, investigate all activity from both sessions.\n\n---\n\n**Scenario C — Needs More Investigation:**\n- User: it.admin3@company.com\n- Locations: Chicago, USA + Canada (Toronto)\n- Time difference: 2 hours\n- Context check: No conference, no travel noted. But Chicago → Toronto is possible by plane in 1.5-2 hours.\n- IT admin accounts routinely access systems remotely.\n- No recent phishing reports for this user.\n- **Outcome: INVESTIGATE FURTHER** — Call the IT admin's cell number or manager to verify if they're traveling. Check if a ticket explains remote access from Canada. If no confirmation within 15 minutes, escalate.\n\n---\n\n**The lesson:** The SAME alert can be a false positive, true positive, or require more investigation depending on context. This is why automated blocking alone isn't enough — human judgment adds context that machines can't always have."
+      }
+    },
+    {
+      "block_id": "aa9021f3-a5b4-433d-a063-9c97cbd2f130",
+      "type": "simulation",
+      "content": {
+        "text": "## Interactive Simulation: Triage Practice Round\n\nYou receive these 4 alerts in your queue. Apply the 5-question triage framework. Work through each one:\n\n---\n\n**Alert 1 — Medium Severity**\n```\nRule: Large data transfer to cloud storage\nUser: james.wilson (Software Engineer)\nDetails: 4.2 GB uploaded to personal Dropbox\nTime: 5:47 PM (just after business hours)\nDevice: LAPTOP-DEV-0012 (James's assigned laptop)\n```\n\n**Your triage:**\n1. Valid? Yes — all data looks correct\n2. Normal? Software engineers often use cloud storage for backups. But 4.2 GB just after hours is notable. Check: Does James have access to sensitive data? (Check his AD groups → he's in G_Dev_Staff, NOT G_Finance or G_HR)\n3. Corroborating? Check if James gave notice recently (HR system says no). Any other anomalies from this device today? (No)\n4. Impact? If it's personal dev code, low risk. If it's customer data, HIGH risk.\n5. Action? Need more info. Check what files were uploaded (DLP agent shows file types: .js, .py, .md — looks like code). Verify with manager that it's personal project files.\n\n**Classification: LOW PRIORITY — Possible policy violation (personal cloud storage use), unlikely data breach. Document and send policy reminder.**\n\n---\n\n**Alert 2 — High Severity**\n```\nRule: Mimikatz detected by AV\nHost: HR-LAPTOP-023\nUser: linda.chen (HR Coordinator)\nFile: C:\\Users\\linda.chen\\Downloads\\tool.exe\nAV Action: Blocked and quarantined\nTime: 10:23 AM\n```\n\n**Your triage:**\n1. Valid? Yes — Mimikatz is a known credential dumping tool\n2. Normal? HR coordinators have NO reason to run credential dumping tools\n3. Corroborating? Check email — did Linda receive a phishing email? (Yes! Flagged phishing email at 10:19 AM with 'Payroll Update Required.docx' attachment containing macro)\n4. Impact? If Mimikatz ran successfully, credentials may be stolen. Linda has access to HR database with all employee SSNs and salary data!\n5. Action? Even though AV quarantined the file, Mimikatz can dump credentials before AV reacts. ESCALATE NOW. Isolate the host, change Linda's password, check what processes ran before quarantine.\n\n**Classification: TRUE POSITIVE — Phishing-led credential theft attempt. P2/HIGH incident.**\n\n---\n\n**Alert 3 — Low Severity**\n```\nRule: Failed login x3\nUser: mark.taylor\nIP: 192.168.10.55 (internal)\nTime: 9:02 AM Monday\n```\n\n**Your triage:**\n1. Valid? Yes\n2. Normal? Monday morning, 3 failures from internal IP. Classic 'forgot password after weekend'\n3. Corroborating? No other alerts from this user or IP\n4. Impact? Low — only 3 failures, internal IP, business hours\n5. Action? Close as likely false positive. Note: if mark.taylor has 50 failures across 50 different accounts = different story (password spray)\n\n**Classification: FALSE POSITIVE — Close with note.**\n\n---\n\n**Alert 4 — Critical**\n```\nRule: Domain Controller received RDP connection from non-admin host\nSource: WORKSTATION-047 (standard user workstation)\nUser: not determined (local admin account)\nTime: 02:34 AM Sunday\n```\n\n**Your triage:**\n1. Valid? Yes — DC receiving RDP from a workstation at 2 AM is highly unusual\n2. Normal? Domain Controllers should NEVER receive RDP connections from standard workstations. Only jump hosts / admin workstations should have this access\n3. Corroborating? Check WORKSTATION-047 — any other suspicious activity? (Yes: PowerShell script executed 30 min earlier from same workstation; looks like Invoke-Mimikatz from memory)\n4. Impact? CRITICAL — Domain Controller compromise = full domain compromise. Potentially every system, every user account, all data\n5. Action? IMMEDIATE escalation, page out Tier 2 AND Tier 3, potentially notify SOC manager. This is a P1.\n\n**Classification: TRUE POSITIVE — Active Domain Compromise attempt. P1/CRITICAL.**"
+      }
+    },
+    {
+      "block_id": "ebcd97ef-db7a-4039-a3a5-4974ba51895b",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-On: Alert Documentation with a Template\n\nGood documentation is a superpower in incident response. Future you (and your colleagues) will thank you. Here's a battle-tested alert documentation template in structured format.\n\n```markdown\n# Alert Investigation Report\n\n## Alert Summary\n- **Alert ID**: [Your SIEM alert ID]\n- **Rule Name**: [Name of the detection rule that fired]\n- **Severity**: [Critical/High/Medium/Low]\n- **Status**: [Investigating/Escalated/Closed]\n- **Analyst**: [Your name]\n\n## Timeline\n| Time (UTC) | Event |\n|------------|-------|\n| 14:23 | Alert received in queue |\n| 14:25 | Initial triage started |\n| 14:30 | EDR checked, suspicious process confirmed |\n| 14:31 | Host isolated via EDR |\n| 14:32 | Escalated to Tier 2 |\n\n## Affected Assets\n- **Host**: [Hostname and IP]\n- **User**: [Username, department, role]\n- **Asset Sensitivity**: [High/Medium/Low — does this host hold sensitive data?]\n\n## Evidence Collected\n1. [SIEM] Alert details: [paste relevant log snippets]\n2. [EDR] Process tree: [describe or paste process chain]\n3. [Email logs] [if applicable]\n4. [Network logs] [if applicable]\n\n## Analysis\n### Is this a True Positive or False Positive?\n- [Your reasoning — explain what you checked and what you found]\n\n### Attack Narrative (if TP)\n- [What happened, in chronological order]\n- [How did the attacker get in?]\n- [What did they do?]\n- [Did they spread?]\n\n## Indicators of Compromise (IOCs)\n- **File hashes**: [MD5/SHA256 of malicious files]\n- **IPs**: [Command and control IPs]\n- **Domains**: [Malicious domains contacted]\n- **User agents**: [If applicable]\n\n## Actions Taken\n- [ ] Host isolated\n- [ ] User password reset\n- [ ] IOCs blocked in firewall/proxy\n- [ ] Ticket created: [Ticket ID]\n- [ ] Escalated to: [Name/Tier]\n\n## Classification\n- **Outcome**: TRUE POSITIVE / FALSE POSITIVE\n- **Severity**: [P1/P2/P3/P4]\n- **Incident Type**: [Malware / Phishing / Insider Threat / Unauthorized Access / Other]\n\n## Recommendations\n- [What detection rule should be updated?]\n- [What control would have prevented this?]\n- [Any other follow-up needed?]\n```\n\n**Why documentation matters:**\n1. **Legal/compliance**: Incident reports are often required for regulatory compliance (GDPR, PCI-DSS, HIPAA)\n2. **Continuity**: If the incident spans multiple shifts, documentation lets the next analyst pick up exactly where you left off\n3. **Improvement**: Post-incident analysis needs detailed records to identify what worked and what didn't\n4. **Knowledge base**: Well-documented false positives help tune rules; well-documented TPs help train new analysts\n\n**Practice:** Take Alert 2 from the simulation above (Mimikatz/Linda.chen) and fill out this template completely."
+      }
+    },
+    {
+      "block_id": "ca6173b0-3613-4bb7-8385-e79d792b0d63",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Hook: Events, Alerts, Incidents — The Smoke/Fire/Firefighter Analogy\n\n**EVENT = Smoke detector sensor reading**\n- 'Temperature at sensor 4 is 73°F.' Just data. Nothing alarming — yet.\n- Millions of readings per day. Normal baseline.\n\n**ALERT = Smoke alarm going off**\n- 'Sensor 4 temperature suddenly jumped to 200°F in 10 seconds.'\n- Something triggered the alarm. Could be real fire — could be burned toast.\n- Someone needs to check.\n\n**INCIDENT = Confirmed fire**\n- Firefighter checks and confirms: 'There IS a fire in the kitchen.'\n- Now we don't just respond to the alarm — we have a confirmed emergency requiring a full response.\n\n---\n\n**True/False Positive Memory Hook: The Guard Dog**\n\n- **True Positive**: Dog barks → Intruder is really there → GOOD DOG\n- **False Positive**: Dog barks → It's just the mailman → Noisy dog, lots of false alarms\n- **True Negative**: Dog doesn't bark → No intruder → Everything is fine\n- **False Negative**: Dog doesn't bark → Intruder sneaks in → VERY BAD — this is the worst case\n\n---\n\n**The 5-Question Triage as a Checklist:**\n1. ✅ Valid data?\n2. ✅ Normal for this user/system?\n3. ✅ Other supporting evidence?\n4. ✅ Impact if real?\n5. ✅ Right action?\n\nWhen in doubt: escalate with your notes. It's always better to ask for help than to close a real incident."
+      }
+    },
+    {
+      "block_id": "ab7f1be1-8201-443c-ba48-ececd94b1383",
+      "type": "quiz",
+      "content": {
+        "text": "## Knowledge Check\n\n**Q1:** Your SIEM generates 1,000 alerts per day. Investigation reveals 950 are false positives, 40 are true positives, and 10 threats were present but generated no alert at all. What is the false negative count?\nA) 950\nB) 40  \nC) 10\nD) 0\n\n**Answer: C** — False negatives are threats that EXISTED but generated NO alert. In this scenario, 10 threats slipped through without triggering any detection rule. This is the most dangerous outcome — you don't know what you don't know. The 950 false positives are a problem (alert fatigue), but at least those 40 true positives were caught.\n\n---\n\n**Q2:** A security analyst closes an alert without investigation because they're overwhelmed with their queue. Later, it turns out this was active ransomware. What term describes this outcome?\nA) True positive\nB) False positive  \nC) False negative\nD) True negative\n\n**Answer: C** — The alert fired (the system correctly detected a problem) but the analyst effectively treated it as if no threat existed. The outcome of the alert is a False Negative from the response perspective — a real threat went unaddressed. This illustrates why alert fatigue is a security risk, not just an operational annoyance.\n\n---\n\n**Q3:** During triage, an analyst finds 'mass file encryption' activity at 2 AM. Checking context, they see this host runs a legitimate backup software that encrypts files to encrypted archive format — it runs every night at 2 AM. The analyst verifies this with IT. What is the correct classification?\nA) True Positive — encryption is always ransomware\nB) False Positive — the encryption is legitimate backup activity\nC) Needs more investigation — wait for 24 hours before closing\nD) True Negative — the alert should never have fired\n\n**Answer: B** — Context is everything. The same technical activity (mass file encryption) can be ransomware OR legitimate backup software. Verifying with IT and confirming the scheduled backup task is the correct approach. This is a false positive that should be documented AND used to tune the detection rule (add exception for the backup software process name to reduce future false alerts)."
+      }
+    },
+    {
+      "block_id": "2575b626-ff6a-4d33-aa56-989ad7bc687d",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: The Cost of Wrong Triage Decisions\n\nEvery triage decision has consequences — in both directions:\n\n**If you close a True Positive as False Positive:**\n- Real threat continues undetected\n- Attacker has more time to spread, steal data, establish persistence\n- You may be responsible for missing the alert if it becomes a major incident\n- Lesson: When in doubt, escalate. It's OK to be wrong — it's not OK to not try.\n\n**If you escalate every False Positive:**\n- Tier 2 gets overwhelmed with noise\n- Real incidents get lost in the escalation queue\n- Analysts lose trust in your judgment\n- Tier 2 may start ignoring your escalations\n- Lesson: Make your best assessment, document your reasoning clearly, and escalate with context (not just 'this alert fired').\n\n**Questions for self-reflection:**\n\n1. Think about a time you had to make a decision under time pressure with incomplete information. How did you decide? How would that skill apply to alert triage?\n\n2. In the simulation, Alert 4 (RDP to DC at 2 AM) was a P1 critical. What would the consequences have been if the analyst had closed it as a false positive ('Oh, it's just a maintenance window I wasn't told about')?\n\n3. The 5-question framework takes time — maybe 10-15 minutes per alert. But with 200 alerts in your queue, you can't spend 15 minutes on each one. How do you balance thoroughness with throughput? What shortcuts are acceptable, and which are dangerous?\n\n4. 'If in doubt, escalate' is a rule. But what's the cost of over-escalating? How do you build judgment over time to know when to escalate vs. close?\n\n**Key Insight:** Alert triage is a perishable skill — it improves with practice and degrades without it. The best analysts review their own decisions, ask 'was I right, and why?' and continuously calibrate their judgment. Your first 100 alert investigations are your education. Make the most of them."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "b2bc70af-8639-47fe-acd4-773a04128b25",
+      "type": "multiple_choice",
+      "question": "What is the correct sequence from most general to most specific in security monitoring terminology?",
+      "options": [
+        "A) Incident → Alert → Event",
+        "B) Alert → Event → Incident",
+        "C) Event → Alert → Incident",
+        "D) Event → Incident → Alert"
+      ],
+      "correct_answer": "C",
+      "explanation": "Events are raw, neutral observations (user logged in, file was modified). Alerts are generated when events match detection rules suggesting potential problems. Incidents are confirmed or highly suspected security violations requiring formal response. A SOC processes millions of events daily, generating thousands of alerts, of which a much smaller number become confirmed incidents.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "3c4f8eb5-9f8c-49f1-9bdf-b0a986218162",
+      "type": "multiple_choice",
+      "question": "Your SIEM alerts on 'admin account login at 2 AM.' Investigation reveals it's the IT team's scheduled maintenance window with a documented change ticket. How should this be classified?",
+      "options": [
+        "A) True Positive — admin logins at 2 AM are always suspicious",
+        "B) False Positive — this is expected, legitimate activity with documented authorization",
+        "C) False Negative — the alert should have fired earlier",
+        "D) True Negative — the system was correct not to alert"
+      ],
+      "correct_answer": "B",
+      "explanation": "A False Positive occurs when an alert fires but investigation confirms there is no actual threat. A legitimate, documented maintenance window explains the 2 AM admin login. This is a False Positive that should be documented and potentially used to tune the detection rule (add exception for change-window activities). The key is that context — the change ticket — transforms suspicious-looking activity into authorized activity.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "9fb1ef02-dc0d-47a6-a235-ebd0b3d0e3f4",
+      "type": "multiple_choice",
+      "question": "Which outcome in alert management is considered MOST dangerous from a security perspective?",
+      "options": [
+        "A) False Positive — alert fires when there is no real threat",
+        "B) True Negative — no alert fires when there is no threat",
+        "C) False Negative — no alert fires when there IS a real threat",
+        "D) True Positive — alert fires when there is a real threat"
+      ],
+      "correct_answer": "C",
+      "explanation": "False Negatives (threats present but not detected) are the most dangerous outcome because you have no knowledge of the threat. Attackers operate undetected, potentially for weeks. False Positives are operationally painful (alert fatigue) but at least don't hide threats. True Positives are what you want. True Negatives are the normal, benign state. Organizations use threat hunting specifically to find false negatives that automated detection missed.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "62203b18-a71d-46e7-a0c2-603f4f6d77ee",
+      "type": "multiple_choice",
+      "question": "In the NIST incident response lifecycle, what happens FIRST in the 'Post-Incident Activity' phase?",
+      "options": [
+        "A) Deploy new security tools to prevent similar incidents",
+        "B) Conduct a lessons learned meeting to review what happened and how to improve",
+        "C) Immediately begin investigating the next incident in the queue",
+        "D) Report the incident to law enforcement"
+      ],
+      "correct_answer": "B",
+      "explanation": "Post-incident activity begins with a lessons learned meeting (typically within 2 weeks of incident closure). This review covers: what happened, how it was detected, what worked well in response, what could be improved, and how to prevent recurrence. The insights from this meeting update playbooks, detection rules, and security controls. This feedback loop is essential for continuous improvement and is what separates mature security programs from immature ones.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "499e90ae-4307-4784-89eb-95b023dc0c2d",
+      "type": "multiple_choice",
+      "question": "A Tier 1 analyst sees an alert for 'PowerShell downloading file from internet.' They spend 8 minutes checking context and cannot determine if it's malicious or legitimate. What should they do?",
+      "options": [
+        "A) Close it as False Positive to keep the queue manageable",
+        "B) Escalate to Tier 2 with all findings documented so far",
+        "C) Wait another 30 minutes to gather more evidence before deciding",
+        "D) Block the PowerShell process remotely and close the alert"
+      ],
+      "correct_answer": "B",
+      "explanation": "When a Tier 1 analyst cannot resolve an alert within their time budget or skillset, the correct action is escalation to Tier 2 with all findings documented. 'When in doubt, escalate' is a SOC fundamental. Closing without resolution risks a real threat. Waiting longer without new investigative actions wastes time. Taking unilateral action (blocking PowerShell) without Tier 2 review could impact production systems unnecessarily.",
+      "difficulty": 1
+    }
+  ]
+}
