@@ -1,0 +1,197 @@
+{
+  "lesson_id": "95262c1e-0401-4abe-8bdb-22f13b70d4db",
+  "domain": "blue_team",
+  "title": "SIEM Basics: Splunk/ELK for Beginners",
+  "difficulty": 1,
+  "order_index": 33,
+  "prerequisites": [
+    "blue_team_31",
+    "blue_team_32"
+  ],
+  "estimated_time": 50,
+  "concepts": [
+    "SIEM",
+    "Splunk",
+    "ELK Stack",
+    "Elasticsearch",
+    "Kibana",
+    "log management",
+    "SPL",
+    "KQL",
+    "dashboards",
+    "correlation rules",
+    "detection",
+    "log ingestion",
+    "indexing"
+  ],
+  "learning_objectives": [
+    "Explain what a SIEM is and how it centralizes security monitoring",
+    "Describe the ELK Stack components: Elasticsearch, Logstash, Kibana, and Beats",
+    "Write basic Splunk SPL and Elasticsearch KQL queries to search security logs",
+    "Understand how SIEM correlation rules generate alerts from raw events",
+    "Navigate a SIEM dashboard to investigate security incidents"
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "3d7b3461-581c-4858-99f2-5ede1337b0c8",
+      "type": "mindset_coach",
+      "content": {
+        "text": "The SIEM is the analyst's command center. It's where all the security data flows together, where you search for threats, where alerts come from, and where investigations happen. Learning Splunk or ELK is one of the most career-impactful skills you can develop as a blue team professional. Here's the good news: you don't need to be a database expert or a programmer to use a SIEM effectively. The core skill is learning to ask the right questions in the SIEM's query language — and that's more like learning to speak a new dialect than learning a new language from scratch. Today you're going to write your first real security queries. By the end of this lesson, you'll be able to search logs, build basic detection rules, and navigate dashboards like a SOC analyst. Let's log in."
+      }
+    },
+    {
+      "block_id": "283e2e56-324e-4a9c-8901-f0aa1e853e3a",
+      "type": "explanation",
+      "content": {
+        "text": "## What Is a SIEM and Why Does It Exist?\n\nImagine a company with 5,000 computers, 50 servers, 20 network devices, and dozens of cloud services. Each of these generates logs — login records, file access events, network connections, error messages. Without a SIEM, this data is scattered across thousands of systems in different formats. Finding an attack is like searching for a needle in a thousand haystacks, in different languages, without any way to search across all of them simultaneously.\n\n**A SIEM solves this by:**\n\n1. **Collecting** logs from all sources into one central location\n2. **Normalizing** different log formats into a standard schema\n3. **Indexing** data so it can be searched instantly (even petabytes of logs)\n4. **Correlating** events across sources to find patterns\n5. **Alerting** analysts when correlation rules match suspicious patterns\n6. **Visualizing** data through dashboards for real-time monitoring\n7. **Retaining** logs for compliance and forensic investigation\n\n### The Core SIEM Value Proposition\n\nWithout SIEM:\n- An attacker logs into Server A, Server B, then Server C at 2 AM\n- The logs are on 3 different servers\n- Nobody looks at them\n- Attacker is undetected for weeks\n\nWith SIEM:\n- All three login events flow into the SIEM within seconds\n- Correlation rule: 'Same account accessing 3+ servers at night = alert'\n- Alert fires in under a minute\n- Analyst investigates and confirms intrusion\n\n### SIEM Market Players\n\n**Commercial:**\n- **Splunk**: Market leader, most feature-rich, most expensive, SPL query language\n- **Microsoft Sentinel**: Cloud-native, deep Microsoft integration, KQL query language\n- **IBM QRadar**: Enterprise focused, strong compliance features\n- **Exabeam**: UEBA (user behavior analytics) focused, ML-driven\n- **LogRhythm**: Analyst-friendly workflow, good for mid-market\n\n**Open Source / Community:**\n- **ELK Stack** (Elasticsearch + Logstash + Kibana + Beats): Most popular open source, highly flexible\n- **OSSIM/AlienVault**: Free community version of AT&T's SIEM\n- **Wazuh**: Security-focused SIEM built on ELK, good for smaller environments\n- **Graylog**: Simpler than ELK, easier to operate\n\n**Why learn both Splunk AND ELK?**\n- Enterprise jobs often use Splunk (highest paying)\n- MSSPs and smaller companies often use ELK (cost)\n- Understanding both makes you more employable\n- The concepts are transferable — if you know one, learning the other is much faster"
+      }
+    },
+    {
+      "block_id": "5ad32ce1-2aa2-42e7-b023-476f71ebfd4e",
+      "type": "explanation",
+      "content": {
+        "text": "## The ELK Stack: Architecture Deep Dive\n\nELK stands for Elasticsearch, Logstash, and Kibana. The modern version adds Beats (lightweight data shippers), making it 'Elastic Stack' or sometimes 'BELK.'\n\n### Component 1: Beats (Data Collection)\n\nBeats are lightweight agents that run on every endpoint and ship data to Logstash or directly to Elasticsearch.\n\n**Types of Beats:**\n- **Filebeat**: Ships log files (Windows Event Logs, Linux syslogs, application logs)\n- **Winlogbeat**: Windows-specific event log shipper (optimized for Windows Event IDs)\n- **Packetbeat**: Network packet analysis (DNS, HTTP, MySQL traffic)\n- **Metricbeat**: System metrics (CPU, memory, disk, process stats)\n- **Auditbeat**: Linux audit framework events (file integrity, user activity)\n\n**Filebeat configuration example:**\n```yaml\n# filebeat.yml - Ships Windows Security logs to Elasticsearch\nfilebeat.inputs:\n  - type: winlog\n    name: Security\n    event_id: 4624, 4625, 4634, 4648, 4776  # Authentication events\n    \noutput.elasticsearch:\n  hosts: [\"https://elasticsearch:9200\"]\n  username: \"filebeat_user\"\n  password: \"${ELASTIC_PASSWORD}\"\n  \nsetup.kibana:\n  host: \"https://kibana:5601\"\n```\n\n### Component 2: Logstash (Processing Pipeline)\n\nLogstash receives, processes (parses, enriches, filters), and routes log data.\n\n**Logstash pipeline concept:**\n```\n[INPUT] → [FILTER] → [OUTPUT]\n\nExample pipeline:\n  Input: Receive syslog from firewall (port 514)\n  Filter: Parse IP addresses, map to GeoIP, extract action field\n  Output: Send to Elasticsearch index \"firewall-logs-2024-01\"\n```\n\n**Logstash filter example (Grok for Apache logs):**\n```\nfilter {\n  grok {\n    match => { \"message\" => \"%{COMBINEDAPACHELOG}\" }\n  }\n  geoip {\n    source => \"clientip\"\n  }\n  date {\n    match => [ \"timestamp\", \"dd/MMM/yyyy:HH:mm:ss Z\" ]\n  }\n}\n```\n\n### Component 3: Elasticsearch (Storage & Search)\n\nElasticsearch is the search engine and data store at the heart of the ELK stack.\n\n**Key concepts:**\n- **Index**: Like a database table — where related logs are stored. Example: `winlogbeat-2024.01.15`\n- **Document**: A single log entry stored as JSON\n- **Shard**: How Elasticsearch splits data for performance and redundancy\n- **Mapping**: The schema defining data types for each field\n\n**Example Elasticsearch document (Windows logon event):**\n```json\n{\n  \"@timestamp\": \"2024-01-15T14:23:45.123Z\",\n  \"event.code\": \"4624\",\n  \"event.category\": \"authentication\",\n  \"event.outcome\": \"success\",\n  \"user.name\": \"jsmith\",\n  \"source.ip\": \"192.168.1.100\",\n  \"host.name\": \"WORKSTATION-047\",\n  \"winlog.logon.type\": \"3\",\n  \"message\": \"An account was successfully logged on.\"\n}\n```\n\n### Component 4: Kibana (Visualization & Analysis)\n\nKibana is the web UI for searching, analyzing, and visualizing data in Elasticsearch.\n\n**Key Kibana features:**\n- **Discover**: Ad-hoc search interface — where analysts spend most of their time\n- **Visualize**: Create charts, graphs, maps from your data\n- **Dashboard**: Combine visualizations into monitoring screens\n- **Alerts**: Create detection rules that trigger notifications\n- **SIEM app**: Built-in security-specific views (timeline, anomaly detection, detection rules)\n- **Lens**: Drag-and-drop visualization builder"
+      }
+    },
+    {
+      "block_id": "822fa642-2f9f-4bdd-bd22-b5abaa7a1f4b",
+      "type": "explanation",
+      "content": {
+        "text": "## Splunk: The Market Leader\n\nSplunk was built specifically for machine data analysis. It's the SIEM that most enterprise SOCs run, and SPL (Splunk Processing Language) is a critical skill for blue team careers.\n\n### Splunk Architecture\n\n```\n[Data Sources] → [Forwarders] → [Indexers] → [Search Heads]\n                 (collect)      (store)        (query/UI)\n```\n\n- **Universal Forwarder (UF)**: Lightweight agent on every monitored system, ships raw log data\n- **Indexer**: Receives, indexes, and stores data. Fast retrieval.\n- **Search Head**: Provides the search interface, runs queries, hosts dashboards\n- **License**: Splunk charges by daily data ingestion volume (GB/day) — this is why cost grows quickly\n\n### SPL — Splunk Processing Language\n\nSPL uses a pipe (`|`) syntax: you start with a search, then pipe the results through transformation commands.\n\n**Basic SPL structure:**\n```\nindex=windows EventCode=4625 | stats count by user | sort -count\n```\nTranslation: 'In the windows index, find all failed login events. Count them by username. Sort by count descending.'\n\n### Essential SPL Commands\n\n```splunk\n# ===== BASIC SEARCHING =====\n\n# Search for failed Windows logins (EventCode 4625)\nindex=windows EventCode=4625\n\n# Search in specific time range\nindex=windows EventCode=4625 earliest=-24h\n\n# Search with multiple conditions\nindex=windows EventCode=4625 user=\"jsmith\" src_ip=\"192.168.1.*\"\n\n# Free text search within a field\nindex=firewall action=blocked dest_port=445\n\n\n# ===== STATISTICS AND AGGREGATION =====\n\n# Count events by field value (finding most-failed users)\nindex=windows EventCode=4625\n| stats count as failed_logins by user\n| sort -failed_logins\n\n# Count unique source IPs per user (detecting credential stuffing)\nindex=windows EventCode=4625\n| stats dc(src_ip) as unique_ips, count as attempts by user\n| where unique_ips > 5\n| sort -attempts\n\n# Calculate failure ratio (detect accounts with many failures)\nindex=windows (EventCode=4624 OR EventCode=4625)\n| stats count(eval(EventCode=4625)) as failures, \n        count(eval(EventCode=4624)) as successes by user\n| eval fail_rate=round(failures/(failures+successes)*100, 1)\n| where fail_rate > 80 AND failures > 10\n| sort -fail_rate\n\n\n# ===== TIME-BASED ANALYSIS =====\n\n# Authentication pattern by hour (find off-hours logins)\nindex=windows EventCode=4624\n| eval hour=strftime(_time, \"%H\")\n| stats count by hour\n| sort hour\n\n# Find first and last login times for each user\nindex=windows EventCode=4624\n| stats min(_time) as first_login, max(_time) as last_login by user\n| eval first_login=strftime(first_login, \"%Y-%m-%d %H:%M:%S\")\n| eval last_login=strftime(last_login, \"%Y-%m-%d %H:%M:%S\")\n\n\n# ===== CORRELATION (JOIN) =====\n\n# Find users with failed logins who then succeeded\nindex=windows EventCode=4625\n| stats count as failures by user\n| join user [\n    search index=windows EventCode=4624\n    | stats count as successes by user\n  ]\n| where failures > 3 AND successes > 0\n| table user, failures, successes\n\n\n# ===== THREAT HUNTING QUERIES =====\n\n# Detect Mimikatz process injection (LSASS access)\nindex=windows EventCode=4663 ObjectName=\"*lsass*\"\n| stats count by SourceFileName, SourceProcessId, SubjectUserName\n\n# Detect encoded PowerShell (common malware technique)\nindex=windows (EventCode=4688 OR EventCode=1)\nProcess_Command_Line=\"*-enc*\" OR Process_Command_Line=\"*-EncodedCommand*\"\n| eval cmd_length=len(Process_Command_Line)\n| where cmd_length > 500\n| table _time, host, user, Process_Command_Line\n\n# Detect lateral movement via SMB\nindex=windows EventCode=5145 ShareName=\"*IPC*\" OR ShareName=\"*ADMIN$\"\n| where ObjectType=\"File\"\n| stats count by src_ip, dest_host\n| sort -count\n```"
+      }
+    },
+    {
+      "block_id": "10c2dff0-ac1d-4cac-a2e5-77c444765ded",
+      "type": "explanation",
+      "content": {
+        "text": "## Elasticsearch KQL — Kibana Query Language\n\nKQL is the query language used in Kibana (ELK Stack) and also in Microsoft Sentinel. If you learn KQL, it works in both!\n\n### KQL Basics\n\n```kql\n# === BASIC KQL SYNTAX ===\n\n# Simple field match\nevent.code: \"4625\"\n\n# Multiple values for same field (OR)\nevent.code: (\"4624\" or \"4625\")\n\n# AND conditions\nevent.code: \"4625\" and user.name: \"jsmith\"\n\n# Wildcard\nhost.name: FINANCE-*\n\n# Range\ndestination.port >= 1024 and destination.port <= 65535\n\n# Exists check (field has any value)\nuser.name: *\n\n# Negation\nnot source.ip: \"10.0.0.0/8\"\n\n\n# === SECURITY HUNTING EXAMPLES ===\n\n# Failed logins in the last day\nevent.code: \"4625\" and @timestamp > now-24h\n\n# Login from external IP (not RFC1918 private space)\nevent.code: \"4624\" and not source.ip: (\"10.0.0.0/8\" or \"172.16.0.0/12\" or \"192.168.0.0/16\")\n\n# PowerShell with encoded command\nprocess.command_line: (*-enc* or *EncodedCommand* or *-e \"*)\n\n# Multiple event types in one query\nevent.code: (\"4624\" or \"4625\" or \"4634\" or \"4648\")\n\n# High-privilege logon types (logon type 10 = RemoteInteractive = RDP)\nevent.code: \"4624\" and winlog.event_data.LogonType: \"10\"\n```\n\n### Microsoft Sentinel KQL\n\nMicrosoft Sentinel (Azure's SIEM) uses KQL (Kusto Query Language) — the same as Azure Monitor. This is a more powerful version:\n\n```kql\n// Failed logins followed by success (credential stuffing detection)\nlet failures = SecurityEvent\n    | where EventID == 4625\n    | where TimeGenerated > ago(1h)\n    | summarize FailureCount = count() by Account, Computer, IpAddress;\n\nlet successes = SecurityEvent\n    | where EventID == 4624\n    | where TimeGenerated > ago(1h);\n\nfailures\n| join kind=inner successes on Account\n| where FailureCount > 5\n| project Account, Computer, IpAddress, FailureCount\n| order by FailureCount desc\n\n// Detect process creation from unusual parents (Living off the Land detection)\nDeviceProcessEvents\n| where InitiatingProcessFileName in~ (\"winword.exe\", \"excel.exe\", \"outlook.exe\", \"powerpnt.exe\")\n| where FileName in~ (\"cmd.exe\", \"powershell.exe\", \"wscript.exe\", \"cscript.exe\", \"mshta.exe\")\n| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine\n| order by Timestamp desc\n\n// Rare parent-child process relationships (anomaly detection)\nDeviceProcessEvents\n| where TimeGenerated > ago(7d)\n| summarize count() by InitiatingProcessFileName, FileName\n| where count_ < 5  // Seen fewer than 5 times — potentially rare/suspicious\n| order by count_ asc\n```"
+      }
+    },
+    {
+      "block_id": "964638f4-662f-40af-9fb4-7c6a9e9dc0b2",
+      "type": "diagram",
+      "content": {
+        "text": "## ELK Stack Data Flow\n\n```\n[ENDPOINTS & SERVERS]\n  Windows computers → Winlogbeat agent\n  Linux servers → Filebeat agent\n  Network devices → Syslog → Logstash\n  Cloud (AWS/Azure) → API → Logstash\n         |\n         | Raw logs shipped (compressed, encrypted)\n         v\n[LOGSTASH - Processing Pipeline]\n  Parse: Extract fields from raw text (Grok patterns)\n  Enrich: Add GeoIP for IPs, threat intel lookups\n  Filter: Drop noisy/irrelevant events\n  Route: Send to different indices by log type\n         |\n         v\n[ELASTICSEARCH - Storage & Indexing]\n  Index: filebeat-windows-2024.01.15\n  Index: filebeat-linux-2024.01.15\n  Index: logstash-firewall-2024.01.15\n  \n  Each log = one JSON document\n  Instant full-text search across billions of records\n         |\n         v\n[KIBANA - Analysis & Visualization]\n  Discover: Search logs with KQL\n  Dashboard: Real-time monitoring screens\n  SIEM: Security-specific views, detection rules\n  Alerts: Automated notifications when rules match\n```\n\n## Splunk vs ELK: Side-by-Side\n\n```\n+----------------------+------------------+-------------------+\n| Feature              | Splunk           | ELK Stack         |\n+----------------------+------------------+-------------------+\n| Cost                 | Expensive        | Free (open source)|\n| Query Language       | SPL              | KQL/Lucene        |\n| Ease of Use          | Easier UI        | More complex setup|\n| Performance          | Excellent        | Excellent         |\n| Scalability          | Enterprise-grade | Highly scalable   |\n| Community            | Large            | Very large        |\n| Data Limit (default) | Licensed by GB   | Unlimited         |\n| Learning Curve       | Medium           | Steeper           |\n| Common in            | Enterprise SOCs  | MSSPs, startups   |\n| Certifications       | Splunk Core/SIEM | Elastic Certified |\n+----------------------+------------------+-------------------+\n```\n\n## SIEM Alert Rule Anatomy\n\n```\nDETECTION RULE: Multiple Failed Logins\n\n+----------------------------------+\n| Rule Name: Brute Force Detected  |\n| Severity: High                   |\n| MITRE ATT&CK: T1110 (Brute Force)|\n+----------------------------------+\n| QUERY:                           |\n|   EventCode = 4625               |\n|   Last 10 minutes                |\n|   Group by: user, src_ip         |\n| THRESHOLD:                       |\n|   count >= 10                    |\n+----------------------------------+\n| ACTIONS:                         |\n|   → Create SIEM alert            |\n|   → Send email to SOC queue      |\n|   → Trigger SOAR playbook        |\n+----------------------------------+\n| EXCEPTIONS:                      |\n|   Exclude: service accounts      |\n|   Exclude: known scanning IPs    |\n+----------------------------------+\n```"
+      }
+    },
+    {
+      "block_id": "435cdbe7-82ea-4795-ab2e-3f542a4c5366",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Hands-On: Build Your First Detection Rules\n\nLet's write detection rules for three common attack scenarios. For each, I'll provide both SPL (Splunk) and KQL (ELK/Sentinel) versions.\n\n---\n\n### Detection Rule 1: Password Spray Attack\n**Attack pattern:** Attacker tries one password against many different accounts (avoids lockout)\n**Detection logic:** Many failed logins from same IP, targeting many different usernames\n\n```splunk\n# SPLUNK SPL:\nindex=windows EventCode=4625 earliest=-10m\n| stats count as failures, dc(user) as unique_users by src_ip\n| where failures >= 20 AND unique_users >= 10\n| eval alert_detail=\"Source IP \".src_ip.\" tried \".failures.\" logins against \".unique_users.\" accounts\"\n| table _time, src_ip, failures, unique_users, alert_detail\n```\n\n```kql\n// ELASTICSEARCH KQL (in Kibana):\nevent.code: \"4625\"\n// Then in Kibana aggregations:\n// Group by: source.ip\n// Sub-group by: user.name (count distinct)\n// Filter: count > 20 AND distinct_users > 10\n\n// MICROSOFT SENTINEL KQL (more powerful):\nSecurityEvent\n| where EventID == 4625\n| where TimeGenerated > ago(10m)\n| summarize FailureCount = count(), TargetAccounts = dcount(Account) by IpAddress\n| where FailureCount >= 20 and TargetAccounts >= 10\n| extend AlertMessage = strcat(\"Password spray from \", IpAddress, \": \", tostring(FailureCount), \" attempts across \", tostring(TargetAccounts), \" accounts\")\n```\n\n---\n\n### Detection Rule 2: Impossible Travel\n**Attack pattern:** Account used from two geographically distant locations within a short time\n**Detection logic:** Same user authenticated from two different countries within 1 hour\n\n```splunk\n# SPLUNK SPL:\nindex=windows EventCode=4624 earliest=-1h\n| eval country=spath(geo_data, \"country_name\")\n| stats values(country) as countries, values(src_ip) as ips, count by user\n| where mvcount(countries) > 1\n| eval alert=\"Multiple countries: \".mvjoin(countries, \" + \")\n| table user, countries, ips, count, alert\n```\n\n```kql\n// SENTINEL KQL:\nSigninLogs\n| where TimeGenerated > ago(1h)\n| where ResultType == \"0\"  // Successful signins\n| summarize Countries=make_set(Location), IPs=make_set(IPAddress), count=count() by UserPrincipalName\n| where array_length(Countries) > 1\n| extend Alert = strcat(\"Impossible travel for \", UserPrincipalName, \": \", tostring(Countries))\n```\n\n---\n\n### Detection Rule 3: Suspicious PowerShell Execution\n**Attack pattern:** Malware uses PowerShell with encoded commands or downloads from internet\n**Detection logic:** PowerShell with -EncodedCommand or invoking web requests\n\n```splunk\n# SPLUNK SPL:\nindex=windows (EventCode=4688 OR source=sysmon EventCode=1)\n(Process_Command_Line=\"*-enc*\" OR Process_Command_Line=\"*IEX*\" OR \n Process_Command_Line=\"*Invoke-WebRequest*\" OR Process_Command_Line=\"*DownloadString*\")\n| eval cmd_length=len(Process_Command_Line)\n| table _time, host, user, ParentProcessName, Process_Command_Line, cmd_length\n| sort -cmd_length\n```\n\n```kql\n// ELK KQL:\nprocess.command_line: (*-EncodedCommand* or *IEX* or *Invoke-WebRequest* or *DownloadString*)\nand process.name: powershell.exe\n\n// SENTINEL KQL:\nDeviceProcessEvents\n| where FileName =~ \"powershell.exe\"\n| where ProcessCommandLine has_any (\"-EncodedCommand\", \"-enc\", \"IEX(\", \"Invoke-WebRequest\", \"DownloadString\")\n| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName\n| order by Timestamp desc\n```\n\n---\n\n### Practice Exercise\n\nWrite a detection rule for **Kerberoasting** — where an attacker requests many Kerberos service tickets in a short time. Event ID 4769 with Ticket Options 0x40810000 and EncryptionType 0x17 (RC4 — weak encryption often used in Kerberoasting).\n\n```splunk\n# YOUR TURN - Complete the Splunk query:\nindex=windows EventCode=4769 \n| where TicketOptions==\"0x40810000\" AND TicketEncryptionType==\"0x17\"\n| stats count as ticket_requests by user, src_ip\n| where ticket_requests > 5\n| sort -ticket_requests\n```\n\n**Check your understanding:** Why do we filter on EncryptionType 0x17 (RC4)? Because Kerberoasting tools request RC4-encrypted tickets (they're faster to crack than AES-256). Legitimate Kerberos requests typically use AES encryption."
+      }
+    },
+    {
+      "block_id": "58486d1c-6701-4c06-91db-f59cdbe443bc",
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Scenario: Finding an Attacker with Splunk\n\n**The situation:** A financial company's SIEM showed an unusual spike in Kerberos ticket requests. The Tier 2 analyst decided to investigate.\n\n**Step 1: Investigate the Kerberos spike**\n```splunk\nindex=windows EventCode=4769 TicketEncryptionType=0x17\n| timechart count span=5m\n```\nResult: Spike from 3 requests/5min to 847 requests/5min at 3:47 PM\n\n**Step 2: Find the source**\n```splunk\nindex=windows EventCode=4769 TicketEncryptionType=0x17 earliest=\"03/15/2024:15:40:00\" latest=\"03/15/2024:16:00:00\"\n| stats count by src_ip, user\n| sort -count\n```\nResult: 847 requests all from `10.44.23.55` by user `intern.temp`\n\n**Step 3: Check what else `10.44.23.55` did**\n```splunk\nindex=* src_ip=\"10.44.23.55\" earliest=-1h\n| stats count by EventCode, index\n| sort -count\n```\nResult: \n- EventCode 4624 (logon): 1 event — logged in at 3:44 PM\n- EventCode 4768 (TGT request): 1 event — got TGT at 3:44 PM\n- EventCode 4769 (service ticket): 847 events — Kerberoasting!\n\n**Step 4: Check the intern's account history**\n```splunk\nindex=windows user=\"intern.temp\" EventCode=4624 earliest=-30d\n| table _time, host, src_ip, LogonType\n```\nResult: First login ever from this account. Account was created 45 days ago but never used until today.\n\n**Step 5: Look for what data was stolen**\nAfter escalation to Tier 3, the team checked firewall logs:\n```splunk\nindex=firewall src_ip=\"10.44.23.55\" action=allowed earliest=\"03/15/2024:15:40:00\"\n| stats sum(bytes_out) as total_bytes by dest_ip, dest_port\n| where total_bytes > 1000000\n```\nResult: 14MB exfiltrated to external IP 91.234.x.x over HTTPS on port 443 at 4:12 PM.\n\n**Conclusion:** An attacker used a dormant intern account (likely obtained via previous credential stuffing or social engineering), Kerberoasted 847 service accounts, cracked some passwords, accessed the finance database, and exfiltrated data before being caught.\n\n**The SIEM made this investigation possible.** Without centralized logs, each of these steps would have required manually accessing different systems. With Splunk, the analyst traced the entire attack chain in under 45 minutes."
+      }
+    },
+    {
+      "block_id": "c841040d-41ad-4db9-afb4-6a7946d9ea63",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Hook: SIEM as a City Surveillance System\n\nThink of your organization's network as a city:\n\n**ENDPOINTS** = Buildings and businesses\n- Each generates activity logs: who came in, what they did, who left\n\n**BEATS/FORWARDERS** = Security cameras in each building\n- Constantly recording and sending footage to the command center\n\n**LOGSTASH** = The evidence processing lab\n- Takes raw footage, extracts important details, stamps it with location/time\n- Discards irrelevant footage (system noise), keeps the important stuff\n\n**ELASTICSEARCH** = The evidence warehouse\n- Archives EVERYTHING, organized so you can find it instantly\n- 'Show me all footage from Main Street on Tuesday between 2-4 PM' → instant results\n\n**KIBANA / SPLUNK** = The detective's workstation\n- The interface where investigators ask questions and see results\n- Real-time monitoring dashboards = live camera feeds\n- Alert rules = tripwires that automatically notify when something suspicious happens\n\n**SPL/KQL** = The detective's query language\n- 'Show me all suspicious vehicles (external IPs) that appeared within 5 minutes of a reported crime (failed login)'\n- The more fluently you speak the query language, the faster you solve cases\n\n**Remember the SPL pipe:** `search | transform | display`\n'Start with data → transform it → show the result'\n\n**Key Windows Event IDs to know:**\n- 4624 = Successful logon\n- 4625 = Failed logon  \n- 4648 = Logon with explicit credentials (suspicious!)\n- 4769 = Kerberos service ticket (Kerberoasting hunting)\n- 4688 = Process creation\n- 4663 = Object access"
+      }
+    },
+    {
+      "block_id": "78df373f-87be-4691-a875-69044aef52f9",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Your SIEM Learning Path\n\nYou've just gotten your first exposure to SIEM concepts. Here's what to think about as you continue learning:\n\n1. **The query language barrier.** SPL and KQL feel alien at first. Every analyst remembers their first few hours of fumbling with Splunk or ELK searches. The good news: once you understand the pipe concept (search → transform → display), everything else clicks. The syntax is learnable — the hard part is knowing WHAT to look for. That comes with experience.\n\n2. **Free practice resources:**\n   - **Splunk**: Free Splunk Enterprise trial; Splunk Attack Range (prebuilt lab); TryHackMe 'Splunk' rooms\n   - **ELK**: Free Elasticsearch cloud trial (14 days); HELK (Hunting ELK) Docker setup\n   - **SIEM practice datasets**: BOTS (Boss of the SOC) datasets from Splunk; Elastic's security datasets\n   - **Windows logs**: Set up your own Windows VM, enable audit logging, attack yourself, then search the logs\n\n3. **The most valuable skill isn't memorizing queries — it's knowing what to look for.** A senior analyst with average query skills who knows ALL the attacker techniques will always outperform a junior analyst with perfect query syntax who doesn't know what's suspicious. Study MITRE ATT&CK and practice mapping techniques to search queries.\n\n4. **Splunk vs ELK career question:** If you want to work at a large enterprise SOC or MSSP with big budgets, learn Splunk. If you're interested in startups, mid-market companies, or building your own lab, ELK is more practical. For Microsoft-heavy environments, Sentinel/KQL is increasingly important.\n\n5. **What would you investigate first?** If you had 1 hour of free time in a SIEM with all your organization's logs, what would you search for? This is actually a great interview question. Think about it now — your answer reveals your threat-hunting instinct."
+      }
+    },
+    {
+      "block_id": "0d5c2663-f63c-4adc-bcc0-5cd3b3b9e03a",
+      "type": "quiz",
+      "content": {
+        "text": "## Knowledge Check\n\n**Q1:** In the ELK Stack, what is the primary role of Logstash?\nA) Storing and indexing log data for fast search\nB) Providing the web UI for visualization and dashboard creation\nC) Processing incoming logs: parsing, enriching, filtering, and routing them to the right destination\nD) Shipping log files from endpoints to the central server\n\n**Answer: C** — Logstash is the processing pipeline. It receives raw logs, uses Grok patterns to parse them into structured fields, enriches data (GeoIP, threat intel lookups), filters out noise, and routes processed data to destinations like Elasticsearch. Elasticsearch handles storage, Kibana handles visualization, Beats handle shipping.\n\n---\n\n**Q2:** What does this Splunk query do?\n```\nindex=windows EventCode=4625 | stats count by src_ip | sort -count | head 10\n```\nA) Counts successful logins by source IP\nB) Finds the top 10 source IPs with the most failed login attempts\nC) Lists the 10 most recent failed login events\nD) Counts distinct users by source IP address\n\n**Answer: B** — Breaking it down: `EventCode=4625` filters to failed login events; `stats count by src_ip` counts failures per source IP; `sort -count` orders by highest count first; `head 10` returns only the top 10. This is a common first query for detecting brute force or password spray attacks.\n\n---\n\n**Q3:** Why do Kerberoasting detection rules specifically look for TicketEncryptionType 0x17 (RC4-HMAC)?\nA) RC4 is used exclusively by domain controller-to-domain controller communication\nB) Kerberoasting tools specifically request RC4-encrypted tickets because RC4 hashes are easier to crack offline than AES-256\nC) RC4 is the only encryption type that Windows Event Log records\nD) RC4 indicates the ticket was requested by an administrative account\n\n**Answer: B** — Kerberoasting tools (Rubeus, Impacket) request service tickets using RC4 encryption instead of AES because RC4-encrypted hashes are much faster to crack with tools like hashcat. Modern environments should use AES Kerberos encryption only. Seeing RC4 service ticket requests from non-standard accounts is a strong Kerberoasting indicator."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "9e34592f-e580-429d-b0db-2725106575aa",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of a SIEM in a security operations environment?",
+      "options": [
+        "A) To block malicious network traffic at the perimeter firewall",
+        "B) To centralize security log collection, normalize data, correlate events, and generate alerts for analyst review",
+        "C) To scan endpoints for malware and automatically quarantine infected systems",
+        "D) To manage user identities and access control policies"
+      ],
+      "correct_answer": "B",
+      "explanation": "A SIEM's core purpose is centralization and correlation. It collects logs from diverse sources (endpoints, network devices, cloud, applications), normalizes them into a standard format, correlates events across sources to find patterns, and generates alerts when detection rules match. Without a SIEM, security data is siloed across thousands of systems with no way to search or correlate across them.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "37879efa-756c-44d0-a088-5c29ac16aaf6",
+      "type": "multiple_choice",
+      "question": "In the ELK Stack, which component is responsible for collecting and shipping log files from endpoints?",
+      "options": [
+        "A) Elasticsearch",
+        "B) Kibana",
+        "C) Logstash",
+        "D) Beats (Filebeat/Winlogbeat)"
+      ],
+      "correct_answer": "D",
+      "explanation": "Beats are lightweight data shippers that run on endpoints and ship log data to Logstash or Elasticsearch. Winlogbeat is specifically designed for Windows Event Logs, Filebeat for text log files, Packetbeat for network traffic, etc. Logstash processes and transforms data (it also receives from Beats). Elasticsearch stores and indexes data. Kibana provides the visualization and search UI.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "87b39672-9ac3-4465-ad82-c75b84bf7f3a",
+      "type": "multiple_choice",
+      "question": "What does this Splunk query return: `index=windows EventCode=4624 | stats dc(src_ip) as unique_sources by user | where unique_sources > 5`",
+      "options": [
+        "A) Users who logged in more than 5 times from the same IP address",
+        "B) The 5 users with the most login events",
+        "C) Users who have logged in successfully from more than 5 different source IP addresses",
+        "D) All login events where the source IP has logged in as 5 different users"
+      ],
+      "correct_answer": "C",
+      "explanation": "Breaking down the query: EventCode=4624 filters to successful logons; `stats dc(src_ip)` counts DISTINCT (unique) source IPs for each user; `as unique_sources by user` names the column and groups by user; `where unique_sources > 5` keeps only users who logged in from more than 5 distinct IPs. This could detect credential sharing, compromised accounts used by multiple attackers, or VPN/proxy hopping.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "a7367702-199b-4f9c-a781-9617c36fe286",
+      "type": "multiple_choice",
+      "question": "A detection rule in your SIEM has a 95% false positive rate. What is the MOST appropriate action?",
+      "options": [
+        "A) Delete the rule to eliminate the noise — it's useless",
+        "B) Tune the rule by adding context filters (time of day, user role, known-good processes) to reduce false positives while maintaining true positive detection",
+        "C) Hire more analysts to investigate all alerts the rule generates",
+        "D) Change the severity from High to Low so it doesn't waste analyst time"
+      ],
+      "correct_answer": "B",
+      "explanation": "Detection rule tuning is an ongoing responsibility in every SOC. A 95% FP rate means the rule is detecting something real but without enough context. The solution is to add qualifiers: 'only alert if user is NOT in IT department AND it's outside business hours AND the process parent is unusual.' This reduces false positives while preserving the detection. Deleting the rule creates a detection gap. Lowering severity lets threats go unaddressed.",
+      "difficulty": 1
+    },
+    {
+      "question_id": "cde626a1-760f-45d1-a87b-df5ad586f711",
+      "type": "multiple_choice",
+      "question": "In Microsoft Sentinel (which uses KQL), what does this query find: `SecurityEvent | where EventID == 4625 | summarize FailCount = count() by Account | where FailCount > 50 | order by FailCount desc`?",
+      "options": [
+        "A) The 50 most recent failed login events across all accounts",
+        "B) Accounts that have had more than 50 failed login attempts, sorted by highest failure count",
+        "C) All accounts that failed to login exactly 50 times",
+        "D) Failed logins where the account doesn't exist in Active Directory"
+      ],
+      "correct_answer": "B",
+      "explanation": "This KQL query: filters to failed logon events (EventID 4625); groups them by account and counts failures (summarize FailCount = count() by Account); keeps only accounts with more than 50 failures (where FailCount > 50); and sorts by highest failure count (order by FailCount desc). This is a classic brute force/account lockout detection query. Accounts with very high failure counts are priority investigation targets.",
+      "difficulty": 1
+    }
+  ]
+}
