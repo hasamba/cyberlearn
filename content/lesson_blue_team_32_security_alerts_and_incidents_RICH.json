@@ -1,0 +1,213 @@
+{
+  "lesson_id": "e9f0a1b2-c3d4-5e6f-7a8b-9c0d1e2f3a4b",
+  "domain": "blue_team",
+  "title": "Security Alerts and Incidents for Beginners",
+  "difficulty": 1,
+  "order_index": 32,
+  "prerequisites": ["d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a"],
+  "concepts": [
+    "Understanding security alerts",
+    "True positive vs false positive",
+    "Alert triage methodology",
+    "Incident classification",
+    "Basic investigation workflow",
+    "Documentation best practices"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Distinguish between security events, alerts, and incidents",
+    "Apply systematic triage methodology to evaluate alerts",
+    "Correctly classify alerts as true positive, false positive, or benign true positive",
+    "Perform basic investigation using available context",
+    "Document findings following SOC best practices"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "alerts-001",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Here's a truth about SOC work: You'll see A LOT of alerts. Hundreds per shift. Most will be false alarms. Your superpower as an analyst is quickly separating the noise from the real threats.\n\nThis might sound overwhelming, but it's actually what makes the job interesting. Every alert is a mini-mystery. Is this a real attack or just normal activity that looks suspicious? Your investigation skills will grow with every alert you triage.\n\nThe analysts who succeed aren't the ones who know everything - they're the ones who ask good questions and follow the evidence. You don't need to be a genius; you need to be curious and methodical.\n\nBy the end of this lesson, you'll have a framework for handling any alert that lands in your queue. Let's build that foundation!"
+      },
+      "simplified_explanation": "Alerts are like a smoke detector going off. Sometimes it's a real fire (true positive), sometimes it's just burnt toast (false positive). Your job is figuring out which is which - fast.",
+      "memory_aids": [
+        "FBT = False positive, Benign true positive, True positive (incident)",
+        "WWWW = Who, What, When, Where (triage questions)",
+        "Alert → Triage → Decision → Document"
+      ],
+      "teach_like_im_10": "Imagine your house has super-sensitive alarms everywhere. Some go off when there's really a burglar, but some go off when the cat walks by or when you open the fridge. Your job is figuring out: Is it a real emergency or just a cat? You look at the cameras, check what triggered it, and decide if you need to call the police or just reset the alarm."
+    },
+    {
+      "block_id": "alerts-002",
+      "type": "explanation",
+      "content": {
+        "text": "## Events, Alerts, and Incidents: What's the Difference?\n\nThese terms get used interchangeably, but they mean different things:\n\n### Event\nAny observable occurrence in a system or network. Events are neutral - they're just things that happened.\n\n**Examples of events**:\n- User logged in\n- File was downloaded\n- Network connection established\n- Process started\n- Email sent\n\nOrganizations generate millions of events per day. Most are completely normal.\n\n### Alert\nAn event (or series of events) that a security system flagged as potentially suspicious. Alerts require human review.\n\n**Examples of alerts**:\n- Multiple failed login attempts (possible brute force)\n- Connection to known malicious IP (possible C2)\n- Unusual data transfer volume (possible exfiltration)\n- PowerShell execution with encoded command (possible malware)\n\n### Incident\nA confirmed security event that violates policy or threatens the organization. Incidents require response.\n\n**Examples of incidents**:\n- Confirmed malware infection\n- Unauthorized access to sensitive data\n- Ransomware attack\n- Data breach\n- Insider threat\n\n### The Flow\n\n```\nMillions of EVENTS\n       ↓\n    (Rules & Detection Logic)\n       ↓\nHundreds of ALERTS\n       ↓\n    (Triage & Investigation)\n       ↓\nFew actual INCIDENTS\n```\n\n**Key insight**: Not every alert is an incident. Not every event becomes an alert. Your triage determines which alerts become incidents requiring response."
+      },
+      "ascii_art": "EVENT → ALERT → INCIDENT FUNNEL\n\n   EVENTS (Millions/day)\n   ╔════════════════════════════╗\n   ║ Logins, file access, network║\n   ║ connections, processes,     ║\n   ║ emails, everything...       ║\n   ╚═══════════╦════════════════╝\n               ║ Detection Rules\n               ▼\n      ALERTS (Hundreds/day)\n      ╔═══════════════════╗\n      ║ Suspicious events  ║\n      ║ flagged for review ║\n      ╚════════╦══════════╝\n               ║ Triage\n               ▼\n    INCIDENTS (Few/day)\n    ╔════════════════╗\n    ║ Confirmed      ║\n    ║ threats        ║\n    ╚════════════════╝"
+    },
+    {
+      "block_id": "alerts-003",
+      "type": "explanation",
+      "content": {
+        "text": "## Alert Classification: The Three Outcomes\n\nEvery alert you triage will fall into one of three categories:\n\n### 1. False Positive (FP)\n\n**Definition**: The alert fired, but there's no actual security threat. The detection was wrong.\n\n**Examples**:\n- Alert: \"Suspicious outbound connection to foreign IP\"\n- Investigation: It's a legitimate cloud service (AWS EU region)\n- Verdict: False positive - normal business activity\n\n**Why false positives happen**:\n- Detection rules too broad\n- Legitimate software triggering security tools\n- Unusual but authorized business activity\n- New applications not whitelisted\n\n**What to do**: Close the alert, document why it was a false positive, consider tuning the detection rule.\n\n### 2. Benign True Positive (BTP)\n\n**Definition**: The alert correctly identified something that matches the detection logic, but it's authorized or not harmful.\n\n**Examples**:\n- Alert: \"Port scanning detected from internal host\"\n- Investigation: It's the IT team running authorized vulnerability scan\n- Verdict: Benign true positive - real scanning, but authorized\n\n**Why this matters**: The detection worked! It found what it was looking for. It's just that in this case, the activity was approved.\n\n**What to do**: Close the alert, document the authorized activity, possibly add an exception for recurring approved activities.\n\n### 3. True Positive - Incident (TP)\n\n**Definition**: The alert correctly identified a real security threat that requires response.\n\n**Examples**:\n- Alert: \"Malware detected on endpoint\"\n- Investigation: Confirmed malicious file, signs of execution\n- Verdict: True positive - real incident requiring response\n\n**What to do**: Escalate, begin incident response, contain the threat, investigate scope.\n\n### Classification Decision Tree\n\n```\nIs the detected activity real?\n├─ NO → FALSE POSITIVE (close with documentation)\n└─ YES → Is it authorized/expected/harmless?\n         ├─ YES → BENIGN TRUE POSITIVE (close with documentation)\n         └─ NO → TRUE POSITIVE / INCIDENT (escalate!)\n```"
+      },
+      "examples": [
+        {
+          "scenario": "False Positive Example",
+          "explanation": "Alert: 'Data exfiltration - large file upload to external site'. Investigation: Marketing team uploading campaign materials to approved partner portal. This is normal business activity, detection rule is too broad. Close as FP, consider tuning."
+        },
+        {
+          "scenario": "Benign True Positive Example",
+          "explanation": "Alert: 'Brute force attack - 100 failed logins in 5 minutes'. Investigation: Password change campaign caused mass lockouts as users forgot new passwords. Detection correctly identified many failed logins, but cause was benign. Close as BTP."
+        },
+        {
+          "scenario": "True Positive Example",
+          "explanation": "Alert: 'Suspicious PowerShell execution with encoded command'. Investigation: User didn't run this, command decodes to credential theft attempt, unknown external IP involved. This is a real attack. Escalate immediately, isolate endpoint, begin IR."
+        }
+      ]
+    },
+    {
+      "block_id": "alerts-004",
+      "type": "explanation",
+      "content": {
+        "text": "## The Triage Process: WWWW Framework\n\nWhen you receive an alert, don't panic. Follow a systematic approach using the WWWW framework:\n\n### W - WHO?\n\nIdentify the entities involved:\n- Which user account triggered this?\n- Is it a human user or service account?\n- What is their role? (Admin, regular user, contractor?)\n- Is this normal for them?\n\n**Example questions**:\n- \"This user normally works in accounting. Why are they accessing server admin tools?\"\n- \"This is a service account. Service accounts don't browse the internet.\"\n\n### W - WHAT?\n\nUnderstand what happened:\n- What action was taken?\n- What was accessed, modified, or executed?\n- What data was involved?\n- What's the severity if this is malicious?\n\n**Example questions**:\n- \"The file that executed - is it known malware? Check hash on VirusTotal.\"\n- \"What was downloaded? Customer data or marketing materials?\"\n\n### W - WHEN?\n\nEstablish the timeline:\n- When did this happen?\n- Is this during normal business hours?\n- Was there a pattern of events before/after?\n- How recently did this occur? (Still ongoing?)\n\n**Example questions**:\n- \"Login at 3 AM on Sunday? This user works 9-5 Monday-Friday.\"\n- \"This started 10 minutes ago and is still happening. Urgent!\"\n\n### W - WHERE?\n\nDetermine location and context:\n- Which system/endpoint is involved?\n- What's the source IP address?\n- What's the destination (if network-related)?\n- Is this an internal or external threat?\n\n**Example questions**:\n- \"Connection from Russia, but we have no Russian employees or offices.\"\n- \"This happened on the domain controller - our most critical system.\"\n\n### After WWWW: Make Your Decision\n\nOnce you've answered the WWWW questions, you should have enough context to decide:\n\n1. **Close as FP**: Clear explanation for why this isn't a threat\n2. **Close as BTP**: Confirmed authorized activity\n3. **Escalate**: You can't explain it, or it's confirmed malicious\n\n**When in doubt, escalate!** It's better to escalate something that turns out benign than to close something that's actually an attack."
+      }
+    },
+    {
+      "block_id": "alerts-005",
+      "type": "diagram",
+      "content": {
+        "text": "ALERT TRIAGE WORKFLOW\n\n┌─────────────────┐\n│   NEW ALERT     │\n│   Arrives in    │\n│     Queue       │\n└────────┬────────┘\n         │\n         ▼\n┌─────────────────┐\n│  INITIAL REVIEW │\n│  Read alert     │\n│  description    │\n└────────┬────────┘\n         │\n         ▼\n┌─────────────────────────────┐\n│      GATHER CONTEXT         │\n│  WHO? User/account involved │\n│  WHAT? Action taken         │\n│  WHEN? Timeline             │\n│  WHERE? System/network loc  │\n└────────────┬────────────────┘\n             │\n             ▼\n    ┌────────────────┐\n    │   CAN YOU      │\n    │   EXPLAIN IT?  │\n    └───────┬────────┘\n            │\n     ┌──────┴──────┐\n     │             │\n    YES           NO\n     │             │\n     ▼             ▼\n┌─────────┐   ┌──────────┐\n│Authorized│   │ ESCALATE │\n│Activity? │   │ to Tier 2│\n└────┬────┘   └──────────┘\n     │\n  ┌──┴──┐\n YES   NO\n  │     │\n  ▼     ▼\n┌────┐ ┌─────────┐\n│BTP │ │ESCALATE │\n│Close│ │Incident │\n└────┘ └─────────┘"
+      }
+    },
+    {
+      "block_id": "alerts-006",
+      "type": "real_world",
+      "content": {
+        "text": "## Real Alert Examples with Analysis\n\n### Alert Example 1: Failed Login Alert\n\n**Alert**: Multiple failed login attempts (15 in 2 minutes) for user 'jsmith'\n\n**Triage using WWWW**:\n- WHO: jsmith - Sales manager, been with company 3 years\n- WHAT: Failed RDP login attempts\n- WHEN: 8:45 AM Monday (start of workday)\n- WHERE: From jsmith's usual workstation IP\n\n**Investigation**: Called jsmith - he forgot his password after vacation and was trying to remember it.\n\n**Verdict**: Benign True Positive - real failed logins, but just a forgetful user\n\n**Action**: Close, reset password, no security incident\n\n---\n\n### Alert Example 2: Suspicious Process\n\n**Alert**: mimikatz.exe detected on finance server\n\n**Triage using WWWW**:\n- WHO: Process running as SYSTEM (high privilege)\n- WHAT: Known credential theft tool executed\n- WHEN: 2:30 AM Saturday\n- WHERE: FINANCESERVER01 - contains sensitive data\n\n**Investigation**: No authorized testing, no change window, tool is known attacker tool\n\n**Verdict**: TRUE POSITIVE - INCIDENT\n\n**Action**: ESCALATE IMMEDIATELY, isolate server, full incident response\n\n---\n\n### Alert Example 3: Data Transfer\n\n**Alert**: Large data transfer (50GB) to external cloud storage\n\n**Triage using WWWW**:\n- WHO: mwilson - Video production team lead\n- WHAT: Upload to Dropbox\n- WHEN: 3 PM Wednesday (normal hours)\n- WHERE: From mwilson's workstation to authorized cloud storage\n\n**Investigation**: Video team regularly uploads large media files. Checked with manager - this is approved marketing video delivery.\n\n**Verdict**: False Positive - legitimate business activity\n\n**Action**: Close, note that video team has DLP exception for large transfers"
+      },
+      "industry_examples": [
+        "Healthcare SOC correctly triages alert as false positive - medical device creating normal but unusual traffic pattern",
+        "Financial SOC catches true positive - insider attempting after-hours data access, prevents theft",
+        "Retail SOC identifies benign true positive - scheduled backup job triggering data movement alert"
+      ]
+    },
+    {
+      "block_id": "alerts-007",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Practice: Analyze These Alerts\n\nFor each alert, apply WWWW and decide: FP, BTP, or ESCALATE?\n\n### Alert A\n```\nAlert: Outbound connection to known C2 server\nSource: WORKSTATION-42\nUser: aperez\nTime: 11:30 AM Tuesday\nDestination: 185.220.101.42:443\nProcess: chrome.exe\n```\n\n**Think through WWWW**:\n- WHO: aperez - regular employee\n- WHAT: Chrome connecting to known bad IP\n- WHEN: Normal business hours\n- WHERE: User workstation to external\n\n**Decision**: ESCALATE - Connection to known C2 is serious, even from Chrome (could be compromised browser or malicious extension)\n\n---\n\n### Alert B\n```\nAlert: New local administrator account created\nHost: WEBSERVER-PROD-03\nAccount Created: 'backup_svc'\nCreated By: SYSTEM\nTime: 2:00 AM Sunday\n```\n\n**Think through WWWW**:\n- WHO: SYSTEM created account (could be automation or attacker)\n- WHAT: New admin account on production web server\n- WHEN: 2 AM Sunday (outside change windows?)\n- WHERE: Production web server - high value target\n\n**Decision**: ESCALATE - Unauthorized admin account on prod server is serious. Check with IT if this was planned.\n\n---\n\n### Alert C\n```\nAlert: Port scan detected\nSource: 10.1.50.25 (SCANNER-01)\nTargets: 10.1.10.0/24 subnet\nTime: 3:00 AM Saturday\nPorts: 22, 80, 443, 3389, 445\n```\n\n**Think through WWWW**:\n- WHO: SCANNER-01 - named like security scanning host\n- WHAT: Port scanning internal network\n- WHEN: 3 AM Saturday (common for scheduled scans)\n- WHERE: From internal scanner to internal subnet\n\n**Decision**: Check if this is authorized vulnerability scanning. If yes = BTP. If no = ESCALATE."
+      }
+    },
+    {
+      "block_id": "alerts-008",
+      "type": "explanation",
+      "content": {
+        "text": "## Documentation: Your Investigation Record\n\nEvery alert needs documentation, even (especially!) the ones you close. Good documentation:\n\n1. **Protects you**: Shows your reasoning was sound\n2. **Helps teammates**: Others can learn from your investigation\n3. **Enables metrics**: Track FP rates, find tuning opportunities\n4. **Supports audits**: Prove you're doing your job properly\n\n### What to Document\n\n**For EVERY alert**:\n- Alert ID and title\n- Your classification (FP/BTP/TP)\n- Your reasoning (WHY did you classify it this way?)\n- Actions taken\n- Timestamp of your analysis\n\n### Documentation Template\n\n```\nAlert ID: SIEM-2024-001234\nAlert: Multiple failed logins - possible brute force\nTime Received: 2024-01-15 08:30:00\nAnalyst: John Analyst\n\nInvestigation Summary:\n- WHO: User jsmith (Sales Manager)\n- WHAT: 15 failed RDP logins from corporate workstation\n- WHEN: 08:45 - 08:47 during normal work hours\n- WHERE: From 10.1.50.42 (jsmith's assigned workstation)\n\nAnalysis:\nContacted jsmith directly. User confirmed they forgot \npassword after returning from vacation. No evidence of \nmalicious activity. User was attempting legitimate login.\n\nClassification: Benign True Positive\nReason: Legitimate user activity, password forgotten\n\nActions Taken:\n1. Verified no successful malicious login\n2. Password reset provided to user\n3. Confirmed jsmith regained access\n\nRecommendation: None - normal user error\n\nClosed: 2024-01-15 08:52:00\n```\n\n### Common Documentation Mistakes\n\n**Too vague**: \"Looked into it, seems fine, closed\"\n- Problem: Doesn't explain your reasoning\n\n**Too brief**: \"FP\"\n- Problem: Provides no context for others\n\n**Missing escalation path**: \"Seems suspicious\"\n- Problem: Did you escalate? What happened next?\n\n**No timestamp**: When did you investigate?\n- Problem: Timeline matters for incident reconstruction"
+      }
+    },
+    {
+      "block_id": "alerts-009",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for Alert Handling\n\n### Alert Classification: FBT\n**F**alse Positive - Alert was wrong\n**B**enign True Positive - Alert was right, activity was authorized\n**T**rue Positive - Alert was right, it's an incident!\n\n### Triage Questions: WWWW\n**W**ho - User/account involved\n**W**hat - Action taken\n**W**hen - Timeline\n**W**here - System/location\n\n### Escalation Decision: CED\n**C**an I explain this activity?\n**E**xpected for this user/system?\n**D**angerous if it's real?\n\nIf you can't answer C and E clearly, or if D is yes → ESCALATE\n\n### Documentation Checklist: CARD\n**C**lassification (FP/BTP/TP)\n**A**nalysis summary\n**R**easoning\n**D**isposition (what you did)\n\n### When in Doubt Rule:\n\"Better to escalate and be wrong than close and miss an attack.\"\n\nTier 2 would rather review a false alarm than miss a real incident. Escalate!"
+      }
+    },
+    {
+      "block_id": "alerts-010",
+      "type": "quiz",
+      "content": {
+        "text": "Alert Handling Knowledge Check",
+        "questions": [
+          {
+            "question": "An alert fires for 'unusual login location' for a user who tells you they're traveling on vacation. What classification is this?",
+            "options": ["False Positive", "Benign True Positive", "True Positive"],
+            "correct": 1,
+            "explanation": "This is a Benign True Positive. The detection correctly identified an unusual location (it worked!), but the activity is authorized because the user is legitimately traveling."
+          },
+          {
+            "question": "What is the FIRST thing you should do when you receive a new alert?",
+            "options": ["Block the source IP", "Escalate to Tier 2", "Gather context using WWWW", "Call the affected user"],
+            "correct": 2,
+            "explanation": "Before taking any action, gather context using WWWW (Who, What, When, Where). This helps you understand what happened before making decisions about escalation or action."
+          },
+          {
+            "question": "Your documentation for a closed alert says only 'FP - closed'. What's wrong with this?",
+            "options": ["Nothing, it's fine", "Missing reasoning for the classification", "Should include screenshot", "Should be in all caps"],
+            "correct": 1,
+            "explanation": "Documentation must include your reasoning - WHY did you classify it as FP? What evidence led to that conclusion? Without reasoning, others can't learn from your analysis and you can't defend your decision."
+          }
+        ]
+      }
+    },
+    {
+      "block_id": "alerts-011",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Building Your Alert Handling Skills\n\n### Think About These Questions:\n\n1. **Pattern Recognition**: As you handle more alerts, you'll start recognizing patterns. False positives often look similar. What patterns have you noticed in examples so far?\n\n2. **Comfort with Uncertainty**: Sometimes you won't be 100% sure. That's okay! How comfortable are you with escalating when uncertain?\n\n3. **Speed vs Thoroughness**: There's pressure to handle alerts quickly, but also to be thorough. How will you balance these?\n\n4. **Documentation Discipline**: Writing good notes takes time. How will you make it a habit?\n\n### Your Growth Plan:\n\n**Week 1-2**: Focus on following the process exactly. Use WWWW for every alert.\n\n**Week 3-4**: Start recognizing common FP patterns. Note what indicators helped you decide.\n\n**Month 2**: You should be faster, but still following the process. Quality over speed.\n\n**Month 3+**: Patterns become automatic, you investigate more complex alerts.\n\n### Remember:\n\nEvery senior analyst started exactly where you are. They got better by handling thousands of alerts and learning from each one. Your confusion now is normal - it becomes intuition with experience."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "alerts-post-001",
+      "question": "What is the difference between a security event and a security alert?",
+      "options": [
+        "They are the same thing",
+        "An event is any occurrence; an alert is a flagged suspicious event requiring review",
+        "An alert is any occurrence; an event is confirmed malicious",
+        "Events are external; alerts are internal"
+      ],
+      "correct_answer": 1,
+      "explanation": "Events are neutral occurrences (logins, file access, etc.) - organizations generate millions daily. Alerts are events that security systems flagged as potentially suspicious, requiring human analysis. Not all events become alerts, and not all alerts become incidents.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "alerts-post-002",
+      "question": "An alert correctly detects port scanning, but investigation reveals it's the IT security team running an authorized vulnerability assessment. How should this be classified?",
+      "options": [
+        "False Positive",
+        "Benign True Positive",
+        "True Positive requiring incident response",
+        "Misconfigured alert"
+      ],
+      "correct_answer": 1,
+      "explanation": "This is a Benign True Positive (BTP). The detection worked correctly - it found real port scanning. However, the activity is authorized business activity, so it's not an incident. The 'benign' distinguishes it from a false positive where no scanning occurred.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "alerts-post-003",
+      "question": "During alert triage, you cannot determine if the activity is malicious or authorized. What should you do?",
+      "options": [
+        "Close as false positive since you can't prove it's malicious",
+        "Escalate to Tier 2 for further investigation",
+        "Ignore the alert and move to the next one",
+        "Block the source IP immediately"
+      ],
+      "correct_answer": 1,
+      "explanation": "When in doubt, escalate! It's better to escalate something that turns out benign than to close something that's actually an attack. Tier 2 analysts have more time and expertise for complex investigations. Never close an alert just because you can't figure it out.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "active_learning",
+    "reframe_limiting_beliefs",
+    "connect_to_what_i_know",
+    "multiple_memory_pathways",
+    "gamify_it",
+    "meta_learning",
+    "minimum_effective_dose",
+    "learning_sprint"
+  ],
+  "base_xp_reward": 125,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-01-15T10:00:00Z",
+  "author": "CyberLearn Platform",
+  "version": "1.0"
+}

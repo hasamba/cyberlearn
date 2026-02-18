@@ -1,0 +1,225 @@
+{
+  "lesson_id": "f0a1b2c3-d4e5-6f7a-8b9c-0d1e2f3a4b5c",
+  "domain": "blue_team",
+  "title": "SIEM Basics: Splunk and ELK for Beginners",
+  "difficulty": 1,
+  "order_index": 33,
+  "prerequisites": ["d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a"],
+  "concepts": [
+    "SIEM architecture and purpose",
+    "Log collection and ingestion",
+    "Basic search queries",
+    "Creating simple alerts",
+    "Understanding dashboards",
+    "Splunk vs ELK comparison"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Explain what a SIEM does and why organizations need one",
+    "Understand how logs flow from sources into a SIEM",
+    "Write basic search queries in Splunk SPL and ELK/KQL",
+    "Create simple detection alerts based on log patterns",
+    "Navigate SIEM dashboards and interpret visualizations"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "siem-001",
+      "type": "mindset_coach",
+      "content": {
+        "text": "The SIEM is your command center as a SOC analyst. It's where all the action happens - where logs from across your entire organization come together, where alerts get generated, and where you'll spend most of your time investigating.\n\nHere's the good news: You don't need to be a SIEM expert on day one. SIEM platforms are designed to be queried, and the basic searches are straightforward. Start with simple queries, and your skills will grow with every investigation.\n\nThink of SIEM like learning a new language. At first, the syntax feels foreign. But after writing hundreds of queries, it becomes second nature. Every analyst started exactly where you are now.\n\nThe two most common SIEM platforms are Splunk and ELK (Elastic Stack). We'll cover both so you're prepared for whatever you encounter. The concepts transfer between platforms - learn one well, and the others become easier."
+      },
+      "simplified_explanation": "SIEM is like a giant search engine for security logs. All the logs from firewalls, computers, servers, and applications flow into one place where you can search through them to find bad stuff.",
+      "memory_aids": [
+        "SIEM = Security Information & Event Management",
+        "SIEM is your security Google - search anything",
+        "Splunk uses SPL, Elastic uses KQL - both are just ways to search"
+      ],
+      "teach_like_im_10": "Imagine every computer, phone, and website in your school writes down everything it does in a diary. The SIEM is like a super librarian that collects ALL those diaries, organizes them, and lets you search through them. Want to know if anyone snuck onto a computer at midnight? Search the SIEM. Want to find all the times someone tried a wrong password? Search the SIEM!"
+    },
+    {
+      "block_id": "siem-002",
+      "type": "explanation",
+      "content": {
+        "text": "## What is a SIEM?\n\nSIEM stands for **Security Information and Event Management**. It's a platform that:\n\n1. **Collects** logs from all your security tools and systems\n2. **Normalizes** different log formats into a consistent structure\n3. **Correlates** events to find patterns and relationships\n4. **Alerts** when suspicious activity is detected\n5. **Stores** logs for investigation and compliance\n\n### Why Organizations Need SIEM\n\n**Without SIEM**:\n- Logs scattered across hundreds of systems\n- Different formats, impossible to correlate\n- Manual log review = slow and incomplete\n- No alerting = threats go undetected\n- Compliance audits = nightmare\n\n**With SIEM**:\n- Single pane of glass for all security data\n- Normalized logs = easy correlation\n- Real-time alerting on threats\n- Automated detection rules\n- Audit-ready log retention\n\n### SIEM Architecture\n\n```\n┌─────────────────────────────────────────────┐\n│              LOG SOURCES                     │\n│  Firewalls  Endpoints  Servers  Cloud  Apps │\n└─────────────────────┬───────────────────────┘\n                      │\n                      ▼\n┌─────────────────────────────────────────────┐\n│              DATA COLLECTION                 │\n│  Agents, Syslog, API, File, Forwarders     │\n└─────────────────────┬───────────────────────┘\n                      │\n                      ▼\n┌─────────────────────────────────────────────┐\n│              PARSING & NORMALIZATION         │\n│  Extract fields, standardize format         │\n└─────────────────────┬───────────────────────┘\n                      │\n                      ▼\n┌─────────────────────────────────────────────┐\n│              INDEXING & STORAGE              │\n│  Make data searchable, retain for X days    │\n└─────────────────────┬───────────────────────┘\n                      │\n         ┌────────────┼────────────┐\n         ▼            ▼            ▼\n   ┌──────────┐ ┌──────────┐ ┌──────────┐\n   │ SEARCH   │ │  ALERTS  │ │DASHBOARDS│\n   │ & Query  │ │ & Rules  │ │ & Reports│\n   └──────────┘ └──────────┘ └──────────┘\n```\n\n### Common SIEM Platforms\n\n**Splunk** - Industry leader, powerful but expensive\n**Microsoft Sentinel** - Cloud-native, Azure integration\n**Elastic Security (ELK)** - Open source option\n**IBM QRadar** - Enterprise-focused\n**Sumo Logic** - Cloud-based\n**Wazuh** - Free, open source\n**Graylog** - Open source alternative"
+      }
+    },
+    {
+      "block_id": "siem-003",
+      "type": "explanation",
+      "content": {
+        "text": "## Understanding Log Flow\n\nBefore you can search logs, you need to understand how they get into the SIEM.\n\n### Log Sources\n\n**Network Devices**:\n- Firewalls (allowed/blocked connections)\n- IDS/IPS (intrusion detection alerts)\n- Routers/Switches (network flow data)\n- Proxies (web traffic)\n- VPN (remote access)\n\n**Endpoints**:\n- Windows Event Logs (logins, processes, changes)\n- Linux Syslog (system activity)\n- EDR/Antivirus (threat detections)\n- Application logs\n\n**Servers**:\n- Web server access logs (Apache, Nginx, IIS)\n- Database logs (queries, errors)\n- Authentication servers (Active Directory, LDAP)\n- Email servers\n\n**Cloud**:\n- AWS CloudTrail, Azure Activity Logs, GCP Audit Logs\n- Office 365 / Google Workspace\n- Cloud application logs (Salesforce, Okta, etc.)\n\n### Collection Methods\n\n**Agent-based**: Small software on each system sends logs\n- Pros: Reliable, can add enrichment\n- Cons: Requires deployment/management\n\n**Syslog**: Systems send logs to central collector\n- Pros: Universal, no agents needed\n- Cons: UDP can lose data, limited enrichment\n\n**API**: SIEM pulls logs from cloud services\n- Pros: Works with cloud/SaaS\n- Cons: Rate limits, authentication complexity\n\n**File-based**: Read logs from files (tail -f style)\n- Pros: Works with legacy systems\n- Cons: Delay, file rotation issues\n\n### Log Format Example\n\n**Before normalization** (raw Windows Event):\n```xml\n<Event>\n  <System>\n    <EventID>4625</EventID>\n    <TimeCreated SystemTime=\"2024-01-15T10:30:22.123Z\"/>\n  </System>\n  <EventData>\n    <Data Name=\"TargetUserName\">jsmith</Data>\n    <Data Name=\"IpAddress\">192.168.1.100</Data>\n  </EventData>\n</Event>\n```\n\n**After normalization** (SIEM-friendly):\n```\ntimestamp: 2024-01-15T10:30:22.123Z\nevent_type: authentication_failure\nuser: jsmith\nsource_ip: 192.168.1.100\nevent_id: 4625\nhost: WORKSTATION-01\n```\n\nNormalization makes all logs searchable with consistent field names."
+      }
+    },
+    {
+      "block_id": "siem-004",
+      "type": "explanation",
+      "content": {
+        "text": "## Splunk Basics\n\nSplunk is the most common SIEM in enterprise environments. Let's learn the fundamentals.\n\n### Splunk Search Processing Language (SPL)\n\nSPL is how you query Splunk. It starts simple and can get complex.\n\n### Basic Search Structure\n\n```spl\nindex=main sourcetype=windows:security\n| search EventCode=4625\n| stats count by user\n```\n\n**Breaking it down**:\n- `index=main` - Which data store to search\n- `sourcetype=windows:security` - Type of log\n- `|` - Pipe, sends results to next command\n- `search EventCode=4625` - Filter for failed logins\n- `stats count by user` - Count results grouped by user\n\n### Essential SPL Commands\n\n**Searching**:\n```spl\n# Simple keyword search\nerror\n\n# Field search\nuser=\"jsmith\"\n\n# Multiple conditions (AND)\nuser=\"jsmith\" action=\"login\"\n\n# OR condition\nuser=\"jsmith\" OR user=\"asmith\"\n\n# NOT condition\nuser=\"jsmith\" NOT action=\"logout\"\n\n# Wildcard\nuser=\"*smith\"\n\n# Time range\nearliest=-24h latest=now\n```\n\n**Filtering**:\n```spl\n# Keep only specific fields\n| fields user, src_ip, action\n\n# Remove fields\n| fields - _raw, _time\n\n# Search within results\n| search status=failure\n\n# Filter by regex\n| regex user=\"admin.*\"\n```\n\n**Aggregating**:\n```spl\n# Count events\n| stats count\n\n# Count by field\n| stats count by user\n\n# Multiple aggregations\n| stats count, dc(src_ip) as unique_ips by user\n\n# Top values\n| top 10 user\n\n# Rare values\n| rare user\n```\n\n**Time-based**:\n```spl\n# Events over time\n| timechart count by user\n\n# Events per hour\n| timechart span=1h count\n```\n\n### Your First Splunk Searches\n\n```spl\n# 1. Find all failed logins today\nindex=main sourcetype=windows:security EventCode=4625\nearliest=-24h\n\n# 2. Count failed logins by user\nindex=main sourcetype=windows:security EventCode=4625\n| stats count by user\n| sort -count\n\n# 3. Find successful logins from unusual countries\nindex=main sourcetype=windows:security EventCode=4624\n| iplocation src_ip\n| search Country!=\"United States\"\n\n# 4. Timeline of authentication events\nindex=main sourcetype=windows:security EventCode=4624 OR EventCode=4625\n| timechart count by EventCode\n```"
+      },
+      "ascii_art": "SPLUNK QUERY FLOW\n\n┌────────────┐   ┌────────────┐   ┌────────────┐\n│   INDEX    │ → │   FILTER   │ → │ AGGREGATE  │\n│            │   │            │   │            │\n│ index=main │   │ search     │   │ stats      │\n│ sourcetype │   │ where      │   │ timechart  │\n│ earliest   │   │ regex      │   │ top        │\n└────────────┘   └────────────┘   └────────────┘\n       │               │               │\n       └───────────────┴───────────────┘\n                       │\n                       ▼\n              ┌────────────────┐\n              │    RESULTS     │\n              │  (visualize)   │\n              └────────────────┘"
+    },
+    {
+      "block_id": "siem-005",
+      "type": "explanation",
+      "content": {
+        "text": "## Elastic (ELK) Basics\n\nELK Stack (Elasticsearch, Logstash, Kibana) is an open-source alternative to Splunk.\n\n### ELK Components\n\n**Elasticsearch**: Search and storage engine\n**Logstash**: Log collection and parsing\n**Kibana**: Visualization interface\n**Beats**: Lightweight data shippers\n\n### Kibana Query Language (KQL)\n\nKQL is simpler than SPL but equally powerful for basic searches.\n\n### Basic KQL Syntax\n\n```kql\n# Simple search\nerror\n\n# Field search\nuser: \"jsmith\"\n\n# Multiple conditions (AND)\nuser: \"jsmith\" AND action: \"login\"\n\n# OR condition\nuser: \"jsmith\" OR user: \"asmith\"\n\n# NOT condition\nuser: \"jsmith\" AND NOT action: \"logout\"\n\n# Wildcard\nuser: *smith\n\n# Range (numbers)\nstatus_code >= 400\n\n# Exists\nuser: *\n```\n\n### Lucene Query Syntax (Alternative)\n\nElastic also supports Lucene syntax:\n\n```\n# Field search\nuser:jsmith\n\n# AND\nuser:jsmith AND status:failure\n\n# OR\nuser:jsmith OR user:asmith\n\n# Wildcard\nuser:*admin*\n\n# Range\nstatus_code:[400 TO 500]\n\n# Fuzzy\nuser:jsmith~\n```\n\n### Common ELK Searches\n\n```kql\n# 1. Find failed logins\nevent.code: 4625\n\n# 2. Failed logins for specific user\nevent.code: 4625 AND user.name: \"jsmith\"\n\n# 3. Authentication events in time range\nevent.category: \"authentication\" AND @timestamp >= \"2024-01-15\"\n\n# 4. Events from specific source\nsource.ip: 192.168.1.100\n\n# 5. Events NOT from internal network\nNOT source.ip: 10.0.0.0/8 AND NOT source.ip: 192.168.0.0/16\n```\n\n### SPL to KQL Translation\n\n| Splunk SPL | Elastic KQL |\n|------------|-------------|\n| `user=\"jsmith\"` | `user: \"jsmith\"` |\n| `user=\"*smith\"` | `user: *smith` |\n| `NOT action=\"logout\"` | `NOT action: \"logout\"` |\n| `action=\"login\" OR action=\"logout\"` | `action: \"login\" OR action: \"logout\"` |\n| `earliest=-24h` | Use Kibana time picker |"
+      }
+    },
+    {
+      "block_id": "siem-006",
+      "type": "real_world",
+      "content": {
+        "text": "## Practical SIEM Investigation Examples\n\n### Example 1: Investigating Failed Logins\n\n**Alert received**: Multiple failed login attempts for admin account\n\n**Splunk Investigation**:\n```spl\n# Step 1: Find the events\nindex=main sourcetype=windows:security EventCode=4625 user=\"admin\"\nearliest=-1h\n\n# Step 2: Count by source IP\nindex=main sourcetype=windows:security EventCode=4625 user=\"admin\"\n| stats count by src_ip\n| sort -count\n\n# Step 3: Check if any succeeded\nindex=main sourcetype=windows:security user=\"admin\"\n(EventCode=4624 OR EventCode=4625)\n| stats count by EventCode\n\n# Step 4: See timeline\nindex=main sourcetype=windows:security user=\"admin\" EventCode=4625\n| timechart span=5m count\n```\n\n**Findings**: 150 failed attempts from single external IP, no successes. Verdict: Brute force attack, add IP to blocklist.\n\n---\n\n### Example 2: Tracking Lateral Movement\n\n**Alert**: Unusual remote login activity\n\n**Splunk Investigation**:\n```spl\n# Step 1: Find RDP logins (type 10)\nindex=main sourcetype=windows:security EventCode=4624 LogonType=10\nearliest=-24h\n\n# Step 2: Find account hopping\nindex=main sourcetype=windows:security EventCode=4624 LogonType=10\n| stats dc(dest_host) as hosts_accessed by user\n| where hosts_accessed > 5\n\n# Step 3: Track specific user's movement\nindex=main sourcetype=windows:security EventCode=4624 user=\"suspicious_user\"\n| table _time, src_ip, dest_host, LogonType\n| sort _time\n```\n\n**Findings**: User \"svc_backup\" logged into 15 servers in 10 minutes. Service accounts don't RDP. Verdict: Compromised credentials, initiate IR.\n\n---\n\n### Example 3: Finding Data Exfiltration\n\n**Alert**: Large outbound data transfer\n\n**Splunk Investigation**:\n```spl\n# Step 1: Find large outbound transfers\nindex=main sourcetype=proxy action=allowed bytes_out>1000000\nearliest=-24h\n| stats sum(bytes_out) as total_bytes by src_ip, user\n| eval MB=round(total_bytes/1048576,2)\n| sort -MB\n\n# Step 2: Check destinations for suspicious user\nindex=main sourcetype=proxy user=\"flagged_user\"\n| stats sum(bytes_out) by dest_domain\n| sort -sum(bytes_out)\n\n# Step 3: Timeline of transfers\nindex=main sourcetype=proxy user=\"flagged_user\" bytes_out>100000\n| timechart span=1h sum(bytes_out)\n```\n\n**Findings**: 5GB uploaded to personal Dropbox over 2 hours. HR confirmed user is leaving company. Verdict: Potential data theft, escalate to management."
+      },
+      "industry_examples": [
+        "Financial SOC uses Splunk to correlate ATM transaction logs with network traffic, detecting card skimming operation",
+        "Healthcare organization uses ELK to monitor access to patient records, catching unauthorized access",
+        "Tech company uses SIEM dashboards to track developer access to production systems for compliance audits"
+      ]
+    },
+    {
+      "block_id": "siem-007",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Practice: Write These Queries\n\n### Exercise 1: Basic Searches\n\nWrite a Splunk query to find:\n- All Windows Security events from the last hour\n- Only authentication events (EventCode 4624 or 4625)\n\n**Answer**:\n```spl\nindex=main sourcetype=windows:security earliest=-1h\n(EventCode=4624 OR EventCode=4625)\n```\n\n### Exercise 2: Aggregation\n\nWrite a query to count failed logins (4625) by source IP, showing top 10:\n\n**Answer**:\n```spl\nindex=main sourcetype=windows:security EventCode=4625\n| stats count by src_ip\n| sort -count\n| head 10\n```\n\n### Exercise 3: Time Analysis\n\nWrite a query to show hourly login attempts over the past 24 hours:\n\n**Answer**:\n```spl\nindex=main sourcetype=windows:security EventCode=4624\nearliest=-24h\n| timechart span=1h count\n```\n\n### Exercise 4: Finding Anomalies\n\nWrite a query to find users who logged in from more than 3 different IPs today:\n\n**Answer**:\n```spl\nindex=main sourcetype=windows:security EventCode=4624\nearliest=-24h\n| stats dc(src_ip) as unique_ips by user\n| where unique_ips > 3\n| sort -unique_ips\n```\n\n### Common SPL Functions to Know:\n\n- `stats count` - Count events\n- `stats dc(field)` - Count distinct values\n- `stats values(field)` - List all values\n- `stats sum(field)` - Sum numeric field\n- `table` - Select specific fields to display\n- `sort` - Sort results (- for descending)\n- `head` - Limit results\n- `where` - Filter aggregated results\n- `eval` - Create calculated fields"
+      }
+    },
+    {
+      "block_id": "siem-008",
+      "type": "explanation",
+      "content": {
+        "text": "## Creating Simple Alerts\n\nAlerts automate detection. Instead of manually searching, the SIEM runs searches on a schedule and alerts when conditions are met.\n\n### Alert Components\n\n1. **Search query**: What to look for\n2. **Schedule**: How often to run (every 5 min, hourly, etc.)\n3. **Trigger condition**: When to alert (count > 10, etc.)\n4. **Actions**: What to do (email, ticket, webhook)\n\n### Example Alerts\n\n**Alert 1: Brute Force Detection**\n```spl\nindex=main sourcetype=windows:security EventCode=4625\nearliest=-5m\n| stats count by src_ip, user\n| where count > 10\n```\n- Schedule: Every 5 minutes\n- Trigger: Results found\n- Action: Create ticket, email SOC\n\n**Alert 2: After-Hours Login**\n```spl\nindex=main sourcetype=windows:security EventCode=4624\n| eval hour=strftime(_time, \"%H\")\n| where hour < 6 OR hour > 20\n| where user!=\"service*\"\n```\n- Schedule: Every 15 minutes\n- Trigger: Results found\n- Action: Email manager\n\n**Alert 3: Admin Account Usage**\n```spl\nindex=main sourcetype=windows:security EventCode=4624\nuser=\"Administrator\" OR user=\"admin\"\n| stats count by src_ip, dest_host\n```\n- Schedule: Every 15 minutes\n- Trigger: Any results\n- Action: Log for review\n\n### Alert Best Practices\n\n**DO**:\n- Start with high-confidence detections\n- Include enough context in alert\n- Test before deploying\n- Document what alert means and how to investigate\n\n**DON'T**:\n- Alert on everything (alert fatigue)\n- Create alerts without tuning\n- Forget to handle false positives\n- Leave alerts nobody responds to"
+      }
+    },
+    {
+      "block_id": "siem-009",
+      "type": "diagram",
+      "content": {
+        "text": "SIEM DASHBOARD LAYOUT EXAMPLE\n\n┌─────────────────────────────────────────────────────────┐\n│                    SOC DASHBOARD                         │\n├─────────────────────────────────────────────────────────┤\n│                                                          │\n│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │\n│  │ OPEN ALERTS  │ │ CRITICAL     │ │ AVG RESPONSE │     │\n│  │     147      │ │     12       │ │   15 min     │     │\n│  └──────────────┘ └──────────────┘ └──────────────┘     │\n│                                                          │\n│  ┌─────────────────────────────────────────────────┐    │\n│  │         ALERTS OVER TIME (24h)                   │    │\n│  │  ▃▅▇▅▃▂▁▁▁▂▃▅▆▇▅▃▂▁▁▁▂▃▄▅                       │    │\n│  │  └─────────────────────────────────────────────  │    │\n│  │  12am   6am    12pm    6pm    12am               │    │\n│  └─────────────────────────────────────────────────┘    │\n│                                                          │\n│  ┌────────────────────┐  ┌────────────────────────┐     │\n│  │ TOP ALERT SOURCES  │  │ ALERTS BY CATEGORY     │     │\n│  │                    │  │                        │     │\n│  │ Firewall    45%    │  │ ■■■■■ Auth (35)       │     │\n│  │ EDR         30%    │  │ ■■■■ Malware (28)     │     │\n│  │ Windows     15%    │  │ ■■■ Network (22)      │     │\n│  │ Cloud       10%    │  │ ■■ Policy (15)        │     │\n│  └────────────────────┘  └────────────────────────┘     │\n│                                                          │\n│  ┌─────────────────────────────────────────────────┐    │\n│  │              RECENT CRITICAL ALERTS              │    │\n│  │ Time     Source      Description                 │    │\n│  │ 10:42    EDR         Mimikatz detected           │    │\n│  │ 10:38    Firewall    C2 communication attempt   │    │\n│  │ 10:35    Windows     Admin account created       │    │\n│  └─────────────────────────────────────────────────┘    │\n└─────────────────────────────────────────────────────────┘"
+      }
+    },
+    {
+      "block_id": "siem-010",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for SIEM Concepts\n\n### SIEM Purpose: CICAS\n**C**ollect - Gather logs from everywhere\n**I**ngest - Parse and normalize\n**C**orrelate - Connect related events\n**A**lert - Notify on threats\n**S**tore - Retain for investigation\n\n### SPL Structure: SFC\n**S**ource - Where to look (index, sourcetype)\n**F**ilter - What to find (search, where)\n**C**alculate - What to compute (stats, table)\n\n### Common Windows Event IDs: 4-6-7-8\n**4**624 - Successful login (4=good, ends in 4)\n**4**625 - Failed login (4=bad intent, 5=fail)\n**4**672 - Admin rights (6-7-2 = 6+7-2 = admin)\n**4**688 - New process (688 sounds like 'create')\n\n### Query Building: Start Simple\n1. Start with just `error` or basic search\n2. Add filters one at a time\n3. Test each step before adding more\n4. Add aggregations last\n\n### Splunk vs ELK Key Differences:\n| Feature | Splunk | ELK |\n|---------|--------|-----|\n| Cost | Expensive | Free (open source) |\n| Query | SPL | KQL/Lucene |\n| Ease | Easier | Steeper learning |\n| Support | Commercial | Community |\n| Scale | Enterprise | Also enterprise |"
+      }
+    },
+    {
+      "block_id": "siem-011",
+      "type": "quiz",
+      "content": {
+        "text": "SIEM Knowledge Check",
+        "questions": [
+          {
+            "question": "What does SIEM stand for?",
+            "options": ["Security Information Event Manager", "Security Information and Event Management", "System Intrusion Event Monitor", "Security Incident Emergency Management"],
+            "correct": 1,
+            "explanation": "SIEM stands for Security Information and Event Management. It's a platform that collects, normalizes, correlates logs and alerts on security threats."
+          },
+          {
+            "question": "In Splunk SPL, what does the pipe symbol (|) do?",
+            "options": ["Starts a comment", "Sends output of one command to the next", "Creates an OR condition", "Ends the query"],
+            "correct": 1,
+            "explanation": "The pipe (|) sends the output of one command as input to the next command. This allows you to chain together search, filter, and aggregation commands."
+          },
+          {
+            "question": "Which command would you use to count events grouped by username in Splunk?",
+            "options": ["count by user", "stats count by user", "group count user", "aggregate user count"],
+            "correct": 1,
+            "explanation": "The 'stats count by user' command counts events and groups them by the user field. Stats is Splunk's primary aggregation command."
+          }
+        ]
+      }
+    },
+    {
+      "block_id": "siem-012",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Your SIEM Learning Path\n\n### Self-Assessment\n\n1. **Query Comfort Level**:\n   - Can you write a basic search query?\n   - Do you understand how to filter by field values?\n   - Can you count and group results?\n   \n   If no: Practice with the examples above, try variations.\n\n2. **Log Understanding**:\n   - Do you know what types of logs flow into a SIEM?\n   - Can you identify key fields in log data?\n   \n   If no: Review the log sources section, study common log formats.\n\n3. **Practical Application**:\n   - Given an alert, can you write a query to investigate?\n   - Can you think of what questions to ask the data?\n   \n   If no: Practice the investigation examples, think about WWWW.\n\n### Next Steps\n\n**Hands-on Practice**:\n- Set up Splunk Free or ELK locally\n- Import sample data (Boss of the SOC dataset is excellent)\n- Practice queries daily\n\n**Resources**:\n- Splunk Fundamentals 1 (free course + certification)\n- Elastic Training (free courses)\n- BOTS (Boss of the SOC) CTF datasets\n\n**Build Query Library**:\nStart collecting useful queries. Every analyst has a personal collection of go-to searches for common investigations."
+      }
+    },
+    {
+      "block_id": "siem-013",
+      "type": "video",
+      "content": {
+        "text": "Recommended Video Resources",
+        "videos": [
+          {
+            "title": "Splunk Tutorial for Beginners",
+            "url": "https://www.youtube.com/watch?v=0C7xMPaQK5c",
+            "description": "Introduction to Splunk interface and basic queries"
+          },
+          {
+            "title": "Getting Started with Elastic SIEM",
+            "url": "https://www.youtube.com/watch?v=OcKN5rRMvnY",
+            "description": "ELK Stack security monitoring basics"
+          }
+        ]
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "siem-post-001",
+      "question": "What is the primary purpose of log normalization in a SIEM?",
+      "options": [
+        "To compress logs and save storage",
+        "To convert different log formats into consistent, searchable structure",
+        "To encrypt logs for security",
+        "To delete duplicate log entries"
+      ],
+      "correct_answer": 1,
+      "explanation": "Normalization converts logs from different sources (firewalls, Windows, Linux, cloud) into a consistent format with standardized field names. This allows analysts to search across all data sources using the same query syntax.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "siem-post-002",
+      "question": "Which Splunk SPL query would find failed Windows logins in the last hour?",
+      "options": [
+        "search failed logins hour",
+        "index=main EventCode=4625 earliest=-1h",
+        "find EventCode:4625 time:1hour",
+        "get windows.security.failed_login"
+      ],
+      "correct_answer": 1,
+      "explanation": "The correct SPL syntax specifies the index, filters by EventCode 4625 (Windows failed login), and uses 'earliest=-1h' to limit to the last hour. SPL uses equals signs for field matching and specific time syntax.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "siem-post-003",
+      "question": "You need to count failed logins by username and find who has the most failures. Which SPL command structure is correct?",
+      "options": [
+        "count by user | sort",
+        "stats count by user | sort -count",
+        "group user count desc",
+        "aggregate(count) group(user) order(desc)"
+      ],
+      "correct_answer": 1,
+      "explanation": "The 'stats count by user' command counts events per user. The 'sort -count' (minus sign = descending) sorts by count with highest first. This is standard SPL aggregation syntax.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "active_learning",
+    "reframe_limiting_beliefs",
+    "connect_to_what_i_know",
+    "multiple_memory_pathways",
+    "gamify_it",
+    "meta_learning",
+    "minimum_effective_dose",
+    "learning_sprint"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": "siem_explorer",
+  "is_core_concept": true,
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-01-15T10:00:00Z",
+  "author": "CyberLearn Platform",
+  "version": "1.0"
+}

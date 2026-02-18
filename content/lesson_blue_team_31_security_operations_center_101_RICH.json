@@ -1,0 +1,248 @@
+{
+  "lesson_id": "d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a",
+  "domain": "blue_team",
+  "title": "Security Operations Center (SOC) 101",
+  "difficulty": 1,
+  "order_index": 31,
+  "prerequisites": [],
+  "concepts": [
+    "Security Operations Center purpose and mission",
+    "SOC team structure and roles",
+    "SOC analyst career progression",
+    "Core SOC tools and technologies",
+    "Day-to-day SOC operations",
+    "SOC metrics and KPIs"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand what a Security Operations Center is and why organizations need one",
+    "Identify the different roles and tiers within a SOC team",
+    "Recognize the core tools and technologies used in SOC operations",
+    "Describe the typical workflow of a SOC analyst",
+    "Understand career progression paths in SOC operations"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "soc101-001",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to the world of Security Operations Centers! If you've ever wondered where the action happens in cybersecurity defense, you've found it. The SOC is the nerve center of an organization's security - where analysts monitor, detect, and respond to threats in real-time.\n\nHere's an exciting truth: SOC analyst is one of the most accessible entry points into cybersecurity. You don't need years of experience or advanced certifications to start. What you need is curiosity, attention to detail, and a willingness to learn.\n\nEvery major company has a SOC or outsources to one. That means there are SOC analyst jobs everywhere - from tech giants to banks, hospitals to government agencies. As cyber threats increase, demand for SOC analysts continues to grow faster than supply.\n\nYou're about to learn the foundation of defensive security operations. This knowledge will serve you whether you stay in SOC work, move into incident response, threat hunting, or security engineering. Let's get started!"
+      },
+      "simplified_explanation": "The SOC is like a 24/7 security monitoring station for a company's digital world. SOC analysts watch screens, investigate alerts, and stop bad guys from stealing data or breaking things.",
+      "memory_aids": [
+        "SOC = Security's Operation Center (like mission control for cyber defense)",
+        "Think of SOC like a hospital ER - always staffed, handles emergencies, triages by severity",
+        "Tier 1-2-3 = First responder → Detective → Specialist"
+      ],
+      "teach_like_im_10": "Imagine your school has security cameras everywhere. The SOC is like a room where people watch ALL the cameras 24/7. When they see something weird - like someone trying to sneak in or break something - they investigate and call for help. SOC analysts are the people watching those cameras, but for computers instead of hallways!"
+    },
+    {
+      "block_id": "soc101-002",
+      "type": "explanation",
+      "content": {
+        "text": "## What is a Security Operations Center?\n\nA Security Operations Center (SOC) is a centralized facility where a team of security professionals monitors, detects, analyzes, and responds to cybersecurity incidents. Think of it as the command center for an organization's cyber defense.\n\n### The SOC Mission\n\nEvery SOC has three primary goals:\n\n1. **MONITOR**: Continuously watch all security systems, networks, and endpoints for suspicious activity\n2. **DETECT**: Identify potential security threats before they cause damage\n3. **RESPOND**: Take action to contain and remediate security incidents\n\n### Why Organizations Need a SOC\n\n**The Threat Reality**:\n- Cyberattacks happen 24/7/365 - attackers don't take holidays\n- Average time to detect a breach without a SOC: 280+ days\n- Average time with a mature SOC: Hours to days\n- Cost of breach without early detection: $4.45 million (2023 average)\n\n**Business Protection**:\n- Protects customer data and company reputation\n- Ensures regulatory compliance (HIPAA, PCI-DSS, GDPR)\n- Provides evidence and documentation for legal purposes\n- Enables rapid response to minimize damage\n\n### Types of SOC\n\n**Internal SOC**: Company has its own dedicated security team\n- Pros: Deep knowledge of environment, direct control\n- Cons: Expensive to build and staff 24/7\n\n**Managed SOC (MSSP)**: Outsourced to a security provider\n- Pros: Cost-effective, immediate capability\n- Cons: Less institutional knowledge, shared attention\n\n**Hybrid SOC**: Mix of internal and outsourced\n- Pros: Balance of expertise and cost\n- Cons: Requires good coordination\n\n### SOC Maturity Levels\n\n**Level 1 - Basic**: Reactive only, minimal tools, limited coverage\n**Level 2 - Managed**: 24/7 coverage, SIEM deployed, basic incident response\n**Level 3 - Optimized**: Proactive hunting, automation, intelligence integration\n**Level 4 - Advanced**: Predictive capabilities, AI/ML, continuous improvement"
+      },
+      "ascii_art": "SOC ARCHITECTURE\n\n┌──────────────────────────────────────┐\n│           SECURITY TOOLS             │\n│  Firewall  │  IDS/IPS  │  EDR/AV    │\n│  SIEM      │  SOAR     │  TI Feeds  │\n└──────────────┬───────────────────────┘\n               │\n               ▼\n┌──────────────────────────────────────┐\n│        SOC OPERATIONS CENTER         │\n│  ┌────────┐ ┌────────┐ ┌────────┐   │\n│  │ Tier 1 │ │ Tier 2 │ │ Tier 3 │   │\n│  │ Alert  │ │ Invest │ │ Hunt   │   │\n│  │ Triage │ │ -igate │ │ Respond│   │\n│  └────────┘ └────────┘ └────────┘   │\n│                                      │\n│  SOC Manager  │  IR Lead  │  Intel  │\n└──────────────────────────────────────┘"
+    },
+    {
+      "block_id": "soc101-003",
+      "type": "explanation",
+      "content": {
+        "text": "## SOC Team Structure and Roles\n\nA SOC is organized into tiers, each with increasing responsibility and expertise. Understanding this structure helps you see your career path.\n\n### Tier 1: SOC Analyst (Entry Level)\n\n**Also called**: Alert Analyst, L1 Analyst, Security Monitor\n\n**Primary responsibilities**:\n- Monitor SIEM dashboards and alert queues\n- Perform initial triage of security alerts\n- Determine if alerts are true positives or false positives\n- Escalate confirmed incidents to Tier 2\n- Document all actions and findings\n- Follow standard operating procedures (SOPs)\n\n**Skills needed**:\n- Basic understanding of networking (TCP/IP, DNS, HTTP)\n- Familiarity with Windows and Linux basics\n- Ability to read and interpret logs\n- Strong attention to detail\n- Good communication skills\n\n**Typical day**:\n- Review 50-200 alerts per shift\n- Close ~80% as false positives or low priority\n- Escalate ~20% for deeper investigation\n- Document everything in ticketing system\n\n### Tier 2: Security Analyst (Intermediate)\n\n**Also called**: L2 Analyst, Incident Handler, Security Investigator\n\n**Primary responsibilities**:\n- Deep-dive investigation of escalated alerts\n- Correlate events across multiple data sources\n- Determine scope and impact of incidents\n- Perform initial containment actions\n- Create and tune detection rules\n- Mentor Tier 1 analysts\n\n**Skills needed**:\n- All Tier 1 skills plus:\n- Advanced log analysis and correlation\n- Understanding of attack techniques (MITRE ATT&CK)\n- Scripting basics (Python, PowerShell)\n- Forensics fundamentals\n\n### Tier 3: Senior Analyst / Threat Hunter\n\n**Also called**: L3 Analyst, Hunt Team, Advanced Analyst\n\n**Primary responsibilities**:\n- Proactively hunt for undetected threats\n- Lead incident response for major incidents\n- Develop new detection capabilities\n- Perform malware analysis\n- Threat intelligence integration\n- Create SOC playbooks and procedures\n\n**Skills needed**:\n- Deep expertise in multiple security domains\n- Advanced scripting and automation\n- Malware analysis capabilities\n- Threat intelligence analysis\n- Leadership and mentoring\n\n### Other SOC Roles\n\n**SOC Manager**: Leads the team, manages resources, reports to leadership\n**Incident Response Lead**: Coordinates response to major incidents\n**Threat Intelligence Analyst**: Researches threats, provides context\n**Detection Engineer**: Builds and tunes detection rules\n**SIEM Administrator**: Maintains and optimizes SIEM platform"
+      },
+      "examples": [
+        {
+          "scenario": "Tier 1 Triage Example",
+          "explanation": "Alert fires: 'Multiple failed login attempts from external IP'. Tier 1 analyst checks source IP (known scanner on blocklist), verifies no successful logins, confirms firewall is blocking, documents findings, closes as 'blocked threat - no action needed'. Total time: 5 minutes."
+        },
+        {
+          "scenario": "Tier 2 Investigation Example",
+          "explanation": "Tier 1 escalates: 'Unusual PowerShell execution on accounting workstation'. Tier 2 investigates: Reviews process tree, checks command line arguments, examines network connections, contacts user, determines it was legitimate IT automation. Documents false positive, suggests tuning rule. Time: 45 minutes."
+        }
+      ]
+    },
+    {
+      "block_id": "soc101-004",
+      "type": "explanation",
+      "content": {
+        "text": "## Core SOC Tools and Technologies\n\nEvery SOC relies on a set of essential tools. You don't need to master all of these immediately, but understanding what they do is crucial.\n\n### SIEM (Security Information and Event Management)\n\n**What it does**: Collects, normalizes, and correlates logs from across the environment. This is the SOC analyst's primary workspace.\n\n**Popular SIEMs**:\n- Splunk (industry leader, expensive)\n- Microsoft Sentinel (cloud-native, growing fast)\n- IBM QRadar (enterprise-focused)\n- Elastic Security (open-source option)\n- Sumo Logic (cloud-based)\n\n**What you'll do with it**:\n- Query logs to investigate alerts\n- Create dashboards and visualizations\n- Build and tune detection rules\n- Generate reports\n\n### EDR (Endpoint Detection and Response)\n\n**What it does**: Monitors endpoints (laptops, servers) for malicious activity, provides visibility into process execution, file changes, and network connections.\n\n**Popular EDR tools**:\n- CrowdStrike Falcon\n- Microsoft Defender for Endpoint\n- SentinelOne\n- Carbon Black\n- Cortex XDR\n\n**What you'll do with it**:\n- Investigate endpoint alerts\n- Query endpoint telemetry\n- Isolate compromised machines\n- Collect forensic data\n\n### Ticketing System\n\n**What it does**: Tracks all alerts, investigations, and incidents. Creates audit trail of all SOC actions.\n\n**Popular options**:\n- ServiceNow\n- Jira\n- TheHive\n- RTIR\n\n**What you'll do with it**:\n- Document your investigations\n- Track incident status\n- Hand off work between shifts\n- Generate metrics\n\n### SOAR (Security Orchestration, Automation, and Response)\n\n**What it does**: Automates repetitive SOC tasks, orchestrates actions across tools, standardizes response procedures.\n\n**Popular SOAR platforms**:\n- Splunk SOAR (Phantom)\n- Microsoft Sentinel (built-in)\n- Palo Alto XSOAR\n- Swimlane\n\n**What you'll do with it**:\n- Execute automated playbooks\n- Enrich alerts with additional context\n- Automate containment actions\n\n### Threat Intelligence Platforms\n\n**What it does**: Provides context about threats - known bad IPs, malicious domains, attack techniques, threat actor information.\n\n**Popular platforms**:\n- MISP (open-source)\n- Recorded Future\n- Mandiant Advantage\n- AlienVault OTX (free)\n\n**What you'll do with it**:\n- Look up IOCs (Indicators of Compromise)\n- Understand threat context\n- Identify attack patterns"
+      }
+    },
+    {
+      "block_id": "soc101-005",
+      "type": "real_world",
+      "content": {
+        "text": "## A Day in the Life of a Tier 1 SOC Analyst\n\n**7:00 AM - Shift Handoff**\nArrive at SOC, get briefing from night shift. Three ongoing investigations, one escalated to Tier 2, overall quiet night. Review shift notes, check any alerts that came in during handoff.\n\n**7:30 AM - Dashboard Review**\nCheck SIEM dashboards for any critical alerts. Review overnight statistics: 127 alerts generated, 89 auto-closed by automation, 38 need human review.\n\n**8:00 AM - Alert Triage Begins**\nStart working through alert queue:\n\n*Alert 1*: Failed login brute force from Russia\n- Check: Source IP on threat intel (known scanner)\n- Check: Any successful logins? (No)\n- Action: Close as blocked threat, add IP to blocklist\n- Time: 3 minutes\n\n*Alert 2*: Suspicious PowerShell execution\n- Check: What command ran? (Encoded base64)\n- Check: Which user? (IT admin)\n- Check: Normal for this user? (Yes, IT automation)\n- Action: Close as false positive, note for tuning\n- Time: 8 minutes\n\n*Alert 3*: Data exfiltration suspected\n- Check: What data? (Large upload to cloud storage)\n- Check: What user? (Marketing employee)\n- Check: Where uploaded? (Unknown domain)\n- Action: ESCALATE to Tier 2, possible real incident\n- Time: 15 minutes\n\n**12:00 PM - Lunch Break**\nSOC coverage continues - another analyst covers\n\n**1:00 PM - Continue Triage**\nWork through remaining alerts, handle phone calls from employees reporting suspicious emails.\n\n**3:00 PM - Training**\n30-minute team training on new phishing technique observed in the wild.\n\n**4:00 PM - Documentation**\nComplete shift notes, ensure all tickets are updated, prepare handoff for evening shift.\n\n**5:00 PM - Shift End**\nBrief incoming analyst on pending items, any ongoing investigations."
+      },
+      "industry_examples": [
+        "Financial services SOC handling 10,000+ alerts daily across global operations",
+        "Healthcare SOC detecting ransomware within 15 minutes, preventing hospital shutdown",
+        "Retail SOC identifying point-of-sale malware before customer data theft"
+      ]
+    },
+    {
+      "block_id": "soc101-006",
+      "type": "diagram",
+      "content": {
+        "text": "SOC ALERT WORKFLOW\n\n┌─────────────────────────────────────────────────────────┐\n│                    SECURITY EVENTS                       │\n│  (Firewalls, IDS, EDR, Proxies, Cloud, Endpoints...)   │\n└─────────────────────────┬───────────────────────────────┘\n                          │\n                          ▼\n┌─────────────────────────────────────────────────────────┐\n│                         SIEM                             │\n│            Correlation Rules & Detection                 │\n└─────────────────────────┬───────────────────────────────┘\n                          │\n                          ▼\n                    ┌───────────┐\n                    │   ALERT   │\n                    │ Generated │\n                    └─────┬─────┘\n                          │\n                          ▼\n┌─────────────────────────────────────────────────────────┐\n│                    TIER 1 TRIAGE                         │\n│  Is this a real threat? True positive or false positive? │\n└───────────┬─────────────────────────────┬───────────────┘\n            │                             │\n      False Positive                True Positive\n            │                             │\n            ▼                             ▼\n     ┌──────────┐              ┌─────────────────┐\n     │  CLOSE   │              │    ESCALATE     │\n     │  Ticket  │              │    to Tier 2    │\n     └──────────┘              └────────┬────────┘\n                                        │\n                                        ▼\n                         ┌──────────────────────────┐\n                         │    TIER 2 INVESTIGATION   │\n                         │  Deep analysis, scoping   │\n                         └───────────┬──────────────┘\n                                     │\n                          ┌──────────┴──────────┐\n                    Minor Incident        Major Incident\n                          │                     │\n                          ▼                     ▼\n                   ┌────────────┐      ┌────────────────┐\n                   │  CONTAIN   │      │   ESCALATE     │\n                   │  & CLOSE   │      │  to Tier 3/IR  │\n                   └────────────┘      └────────────────┘"
+      }
+    },
+    {
+      "block_id": "soc101-007",
+      "type": "explanation",
+      "content": {
+        "text": "## SOC Career Progression\n\nThe SOC provides an excellent career launchpad. Here's how the progression typically works:\n\n### Entry Path: Getting Your First SOC Job\n\n**Education options**:\n- Bachelor's degree in cybersecurity, IT, or computer science\n- Associate's degree + certifications\n- Bootcamp + certifications\n- Self-study + certifications\n\n**Entry-level certifications** (pick 1-2):\n- CompTIA Security+ (most common requirement)\n- CompTIA CySA+ (analyst-focused)\n- Certified SOC Analyst (CSA) by EC-Council\n- Splunk Core Certified User\n\n**Experience substitutes**:\n- IT helpdesk (shows troubleshooting skills)\n- Home lab projects (shows initiative)\n- Internships\n- Capture The Flag competitions\n\n### Typical Career Timeline\n\n**Year 0-1: Tier 1 Analyst**\n- Learn the environment and tools\n- Master alert triage\n- Build foundational skills\n- Salary: $55,000-$75,000\n\n**Year 1-3: Tier 2 Analyst**\n- Lead investigations\n- Develop specialization\n- Earn advanced certifications (GCIH, CEH, CySA+)\n- Salary: $75,000-$100,000\n\n**Year 3-5: Tier 3 / Specialist**\n- Choose your path: hunting, IR, engineering\n- Expert-level certifications (GCIA, GCFA, OSCP)\n- May lead team or major initiatives\n- Salary: $100,000-$140,000\n\n**Year 5+: Leadership / Expert**\n- SOC Manager, IR Lead, Principal Analyst\n- Security architect, CISO path\n- Salary: $140,000-$200,000+\n\n### Beyond the SOC\n\nSOC experience opens doors to:\n\n**Incident Response**: Leading breach investigations\n**Threat Hunting**: Proactively finding hidden threats\n**Detection Engineering**: Building detection capabilities\n**Security Engineering**: Designing security architecture\n**Threat Intelligence**: Researching adversaries\n**Penetration Testing**: Switching to offense\n**Consulting**: Helping multiple organizations\n**Management**: Leading security teams\n\n### Keys to Advancement\n\n1. **Document your wins**: Keep a 'brag document' of incidents you handled\n2. **Continuous learning**: Threats evolve daily, so must you\n3. **Get certifications**: They open doors and validate skills\n4. **Build relationships**: Network within the security community\n5. **Specialize**: Become the expert in something specific\n6. **Teach others**: Mentoring builds leadership skills"
+      }
+    },
+    {
+      "block_id": "soc101-008",
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for SOC Concepts\n\n### The SOC Mission: PDR\n**P**rotect - **D**etect - **R**espond\n\n### Tier Responsibilities: TTH\n- **T**riage (Tier 1)\n- **Troubleshoot** (Tier 2)\n- **Hunt** (Tier 3)\n\n### Alert Triage Questions: WWWW\n- **W**ho did it? (User/account involved)\n- **W**hat happened? (Action taken)\n- **W**hen did it happen? (Timeline)\n- **W**here did it happen? (Source/destination)\n\n### SIEM Components: CINCA\n- **C**ollect (gather logs)\n- **I**ngest (parse and store)\n- **N**ormalize (standardize format)\n- **C**orrelate (connect events)\n- **A**lert (notify analysts)\n\n### Common SOC Tools: SETS\n- **S**IEM (log analysis)\n- **E**DR (endpoint visibility)\n- **T**icketing (documentation)\n- **S**OAR (automation)\n\n### Incident Classification: FBI\n- **F**alse positive (not a real threat)\n- **B**enign true positive (real but harmless)\n- **I**ncident (real threat requiring response)"
+      },
+      "examples": [
+        {
+          "scenario": "Using WWWW for Triage",
+          "explanation": "Alert: Suspicious login. WHO: admin account. WHAT: successful RDP login. WHEN: 3 AM Sunday. WHERE: from external IP in country where company has no offices. Conclusion: Likely compromised credentials - escalate immediately."
+        }
+      ]
+    },
+    {
+      "block_id": "soc101-009",
+      "type": "code_exercise",
+      "content": {
+        "text": "## Basic Log Analysis Exercise\n\nAs a SOC analyst, you'll read logs constantly. Here's a sample Windows Security log event:\n\n```\nEvent ID: 4625\nLog Name: Security\nSource: Microsoft-Windows-Security-Auditing\nTime: 2024-01-15 03:47:23\nUser: administrator\nSource IP: 185.220.101.42\nLogon Type: 10\nFailure Reason: Unknown user name or bad password\nWorkstation: FINANCE-DC01\n```\n\n### Analysis Questions:\n\n1. **What happened?** \n   - Event 4625 = Failed login attempt\n\n2. **What type of login?**\n   - Logon Type 10 = Remote Desktop (RDP)\n\n3. **Is this suspicious?**\n   - 3 AM login attempt? Suspicious timing\n   - Administrator account targeted? High-value target\n   - External IP? Check threat intel\n   - Domain controller (DC01)? Critical system\n\n4. **What would you do?**\n   - Check if there were multiple failed attempts (brute force?)\n   - Look for any successful logins from this IP\n   - Check threat intel on source IP\n   - If repeated attempts, consider blocking IP\n   - If successful login found, ESCALATE IMMEDIATELY\n\n### Common Windows Event IDs to Know:\n\n```\n4624 - Successful login\n4625 - Failed login\n4634 - Logoff\n4648 - Explicit credentials used (runas)\n4672 - Admin privileges assigned\n4688 - New process created\n4698 - Scheduled task created\n4720 - User account created\n4732 - User added to group\n7045 - Service installed\n```"
+      }
+    },
+    {
+      "block_id": "soc101-010",
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection: Your SOC Readiness\n\nTake a moment to assess where you stand and what you need to work on:\n\n### Self-Assessment Questions:\n\n1. **Networking Knowledge**\n   - Can you explain what happens when you visit a website? (DNS, TCP, HTTP)\n   - Do you understand IP addresses, ports, and protocols?\n   - Action if no: Study CompTIA Network+ or free networking courses\n\n2. **Operating System Familiarity**\n   - Have you used Windows in an enterprise setting?\n   - Can you navigate the Linux command line?\n   - Action if no: Set up home lab, practice basic administration\n\n3. **Log Reading Comfort**\n   - Can you read and interpret log entries?\n   - Do you know what to look for in different log types?\n   - Action if no: Practice with sample logs, study common log formats\n\n4. **Security Fundamentals**\n   - Do you understand common attack types (phishing, malware, ransomware)?\n   - Can you explain authentication vs authorization?\n   - Action if no: Study Security+ material\n\n5. **Soft Skills**\n   - Can you stay calm under pressure?\n   - Can you explain technical concepts to non-technical people?\n   - Can you work shift schedules?\n\n### Your Next Steps:\n\nBased on your answers, prioritize:\n1. Fill knowledge gaps first\n2. Get at least Security+ certification\n3. Build a home lab for hands-on practice\n4. Apply for Tier 1 positions\n5. Keep learning - never stop"
+      }
+    },
+    {
+      "block_id": "soc101-011",
+      "type": "quiz",
+      "content": {
+        "text": "Quick Knowledge Check",
+        "questions": [
+          {
+            "question": "What is the primary role of a Tier 1 SOC analyst?",
+            "options": ["Threat hunting", "Alert triage", "Malware analysis", "Security architecture"],
+            "correct": 1,
+            "explanation": "Tier 1 analysts focus on alert triage - reviewing alerts, determining if they're real threats, and escalating when necessary."
+          },
+          {
+            "question": "Which tool is considered the 'command center' for SOC operations?",
+            "options": ["EDR", "Firewall", "SIEM", "Ticketing system"],
+            "correct": 2,
+            "explanation": "The SIEM (Security Information and Event Management) collects and correlates logs from across the environment. It's where analysts spend most of their time investigating alerts."
+          },
+          {
+            "question": "What does 'false positive' mean in SOC context?",
+            "options": ["A real security incident", "An alert that is not a real threat", "A failed login attempt", "A blocked attack"],
+            "correct": 1,
+            "explanation": "A false positive is an alert that looks suspicious but isn't actually a security threat. Distinguishing false positives from true positives is a core SOC analyst skill."
+          }
+        ]
+      }
+    },
+    {
+      "block_id": "soc101-012",
+      "type": "video",
+      "content": {
+        "text": "Recommended Video Resources",
+        "videos": [
+          {
+            "title": "What is a SOC? (SANS)",
+            "url": "https://www.youtube.com/watch?v=QLh5pS1K1lg",
+            "description": "Overview of SOC operations from SANS Institute"
+          },
+          {
+            "title": "Day in the Life of a SOC Analyst",
+            "url": "https://www.youtube.com/watch?v=HrADEGSLm3c",
+            "description": "Real SOC analysts describe their daily work"
+          }
+        ]
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "soc101-post-001",
+      "question": "What are the three primary goals of a Security Operations Center?",
+      "options": [
+        "Attack, Exploit, Report",
+        "Monitor, Detect, Respond",
+        "Plan, Build, Test",
+        "Collect, Store, Archive"
+      ],
+      "correct_answer": 1,
+      "explanation": "The SOC's mission is to Monitor for threats, Detect security incidents, and Respond to contain and remediate them. This PDR framework guides all SOC operations.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "soc101-post-002",
+      "question": "A Tier 1 analyst receives an alert about failed login attempts. What should be their FIRST action?",
+      "options": [
+        "Block the source IP immediately",
+        "Call the affected user",
+        "Gather context: check who, what, when, where",
+        "Escalate to Tier 2"
+      ],
+      "correct_answer": 2,
+      "explanation": "Before taking any action, analysts must gather context using WWWW (Who, What, When, Where). This helps determine if the alert is a real threat, a false positive, or normal behavior before taking any action.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "soc101-post-003",
+      "question": "Which certification is most commonly required for entry-level SOC analyst positions?",
+      "options": [
+        "CISSP",
+        "CompTIA Security+",
+        "OSCP",
+        "CEH"
+      ],
+      "correct_answer": 1,
+      "explanation": "CompTIA Security+ is the most common requirement for entry-level SOC positions. It validates foundational security knowledge and is recognized across the industry. CISSP and OSCP are advanced certifications typically required for senior roles.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "soc101-post-004",
+      "question": "What is the average dwell time (time attackers remain undetected) for organizations without effective security monitoring?",
+      "options": [
+        "24 hours",
+        "30 days",
+        "280+ days",
+        "1 year"
+      ],
+      "correct_answer": 2,
+      "explanation": "Without effective monitoring, attackers can remain in an environment for 280+ days on average before detection. This is why SOC monitoring is critical - early detection dramatically reduces breach impact and cost.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "active_learning",
+    "reframe_limiting_beliefs",
+    "connect_to_what_i_know",
+    "multiple_memory_pathways",
+    "gamify_it",
+    "meta_learning",
+    "minimum_effective_dose",
+    "learning_sprint"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": "soc_initiate",
+  "is_core_concept": true,
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-01-15T10:00:00Z",
+  "author": "CyberLearn Platform",
+  "version": "1.0"
+}
