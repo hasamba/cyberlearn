@@ -4,10 +4,15 @@ Load all lessons from content directory into database
 
 import json
 import os
+import sys
 import sqlite3
 from uuid import UUID
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
+
+# Ensure project root is in path when running from scripts/ directory
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from utils.database import Database
 from models.lesson import Lesson
 
@@ -19,7 +24,7 @@ def auto_tag_lessons(db_path="cyberlearn.db"):
 
     try:
         # Get the Eric Zimmerman Tools tag
-        cursor.execute("SELECT tag_id FROM tags WHERE name = 'Package: Eric Zimmerman Tools'")
+        cursor.execute("SELECT id FROM tags WHERE name = 'Package: Eric Zimmerman Tools'")
         ez_tag = cursor.fetchone()
 
         if not ez_tag:
@@ -39,7 +44,7 @@ def auto_tag_lessons(db_path="cyberlearn.db"):
             return
 
         # Tag each lesson if not already tagged
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         tagged_count = 0
 
         for (lesson_id,) in ez_lessons:
