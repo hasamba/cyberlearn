@@ -1,0 +1,120 @@
+{
+  "lesson_id": "d9a1d01e-36e6-4d7f-bd2e-4f3a1f239abc",
+  "lesson_number": 684,
+  "domain": "cloud",
+  "title": "Cloud Security Fundamentals: AWS/Azure/GCP",
+  "difficulty": 1,
+  "order_index": 48,
+  "topics": [
+    "What is cloud security?",
+    "Shared responsibility model",
+    "Basic cloud security concepts"
+  ],
+  "prerequisites": [
+    "Fundamentals completed"
+  ],
+  "tags": [
+    "Career Path: Cloud Security Specialist",
+    "Career Path: Security Engineer"
+  ],
+  "estimated_time": "30-60 minutes",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to the exciting journey of Cloud Security Fundamentals! Today we're diving into the essentials of protecting information in the cloud. Let's keep an open mind and connect what you learn to real-world scenarios. Reframe limiting beliefs you may have about the complexity of cloud security—it's accessible for everyone when broken down into its core components. Let's get started!"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Cloud security involves a broad set of policies, technologies, applications, and controls used to protect virtualized IP, data, applications, services, and the associated infrastructure of cloud computing. It's crucial for protecting data in environments leveraging cloud services from platforms like AWS, Azure, and GCP.\n\n### Shared Responsibility Model\n\nCloud providers operate on a shared responsibility model. It's important to know what aspects of security you manage versus what is managed by the service provider:\n- **AWS:** AWS is responsible for protecting the infrastructure that runs all of the services offered in the AWS Cloud, but security in the cloud is the customer's responsibility.\n- **Azure:** Microsoft secures the physical hosts, networks, and data centers, while you control the secure access to your data and applications.\n- **GCP:** Google's responsibility is the infrastructure, including hardware and networking, but the security of data and identities falls on the customer.\n\nUnderstanding these roles is fundamental to developing a robust cloud strategy."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Teach Me Like I'm 10\n\nImagine the cloud as a big, safe playground where you can store your toys (data and applications). The people who build the playground (cloud providers like AWS, Azure, or GCP) make sure the jungle gym (infrastructure) is safe and sturdy. But, you need to make sure you lock up your toy box (manage your own security settings). This way, strangers can't come and take your favorite toys away!"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "#### Hands-On Practice: Setting Up a Secure S3 Bucket on AWS\n1. **Create a new S3 bucket:** Navigate to AWS S3 service and click on 'Create bucket'.\n2. **Public Access Settings:** Ensure the bucket settings are configured to block public access.\n3. **Enable Versioning:** In the bucket properties, enable versioning to keep multiple versions of an object.\n4. **Apply Bucket Policies:** Use the AWS policy generator to create a policy that only allows access to your IAM roles.\n\nMake sure to test your settings by attempting to access the bucket from an unauthorized user."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "### Case Study: Capital One Data Breach\nIn 2019, Capital One experienced a data breach affecting over 100 million customers due to a vulnerability in their AWS infrastructure. The attacker exploited a misconfigured web application firewall. This incident highlights the importance of shared responsibility—while AWS security was intact, the misconfiguration by Capital One led to the breach."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Use the mnemonic **CIA Cloud** to remember the basic principles of cloud security:\n- **C**onfidentiality: Ensure sensitive information is not disclosed to unauthorized individuals.\n- **I**ntegrity: Safeguard the accuracy and completeness of information.\n- **A**vailability: Ensure information and resources are available to authorized users when needed."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Think about how the shared responsibility model affects your cloud security strategy. How would you prioritize tasks to strengthen the security posture of your cloud environments based on this model? Consider potential gaps and the best practices to bridge them."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Congratulations on completing the Cloud Security Fundamentals! By understanding the shared responsibility model and basic cloud security concepts, you've taken a significant step toward securing cloud environments. Remember to 'connect_to_what_i_know' by applying these concepts to everyday challenges. Embrace 'active_learning' by continuously engaging with new scenarios and security measures. You're now better equipped in your path as a Cloud Security Specialist."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "question": "What is the main idea behind the shared responsibility model in cloud security?",
+      "options": [
+        "Cloud providers are fully responsible for customer data security.",
+        "Customers and cloud providers share different responsibilities for security.",
+        "Customers have no responsibility over cloud infrastructure security.",
+        "Security measures are optional in cloud environments."
+      ],
+      "correct_answer": 1,
+      "explanation": "The shared responsibility model outlines that while cloud providers manage the infrastructure security, customers are responsible for securing their data and applications in the cloud.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "q2",
+      "question": "Which of the following is NOT a basic principle of cloud security?",
+      "options": [
+        "Scalability",
+        "Confidentiality",
+        "Integrity",
+        "Availability"
+      ],
+      "correct_answer": 0,
+      "explanation": "Scalability is a feature of cloud computing but not a security principle. The primary security principles are Confidentiality, Integrity, and Availability.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "q3",
+      "question": "In a cloud environment, who is typically responsible for securing the virtual infrastructure?",
+      "options": [
+        "The customer",
+        "The cloud service provider",
+        "A third-party security company",
+        "The data owner"
+      ],
+      "correct_answer": 1,
+      "explanation": "In the cloud, the cloud service provider is responsible for securing the virtual infrastructure, while customers are responsible for securing their data and applications.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}

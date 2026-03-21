@@ -1,0 +1,121 @@
+{
+  "lesson_id": "430b25d2-3b9f-4a5a-bd8e-87e3b44f1b27",
+  "lesson_number": 669,
+  "domain": "linux",
+  "title": "Container Security: Docker & Kubernetes",
+  "difficulty": 2,
+  "order_index": 21,
+  "topics": [
+    "Container isolation and security",
+    "Image vulnerabilities",
+    "Kubernetes security basics"
+  ],
+  "prerequisites": [
+    "Linux basics",
+    "System internals"
+  ],
+  "tags": [
+    "Career Path: Security Engineer",
+    "Career Path: Cloud Security Specialist"
+  ],
+  "estimated_time": "30-60 minutes",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to 'Container Security: Docker & Kubernetes'. Approach this learning journey like a detective, piecing together clues to build a robust security profile for containers. Remember, every piece of knowledge can protect your future projects."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "In this lesson, we'll delve into the intricate world of container security, focusing on Docker and Kubernetes. These technologies have transformed development pipelines by introducing containerization, which brings unique security challenges. We'll cover how containers achieve isolation, the security implications of image vulnerabilities, and fundamental practices for securing Kubernetes environments, aiming to safeguard your deployments effectively."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Imagine a container as a secure lunchbox; no one else can access your food unless they have the key. Docker and Kubernetes ensure your applications remain isolated and secure from potential threats just like your beloved lunch. Always check your container images for unwelcome surprises, much like ensuring your packed lunch hasn't been tampered with."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Try this exercise to test your skills:\n\n1. Use Docker to scan a container image for vulnerabilities using a tool like 'Trivy'.\n2. Deploy a simple application on Kubernetes with minimal privileges and access.\n3. Apply a NetworkPolicy to ensure that your Kubernetes pods can only communicate with specific endpoints.\n\nSteps:\n1. Install Trivy, and run `trivy image [YOUR_IMAGE_NAME]`.\n2. Write and apply a Kubernetes YAML file for your application deployment.\n3. Create a NetworkPolicy YAML file and apply it with `kubectl apply -f [FILE_NAME]`."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Case Study: A large organization used Kubernetes for its applications but suffered a security breach due to a misconfigured container. Through this scenario, learn how they recovered by implementing stringent network policies and regular vulnerability scans, emphasizing the importance of continuous monitoring and security postures in dynamic environments."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "To remember key Docker security practices, use the acronym 'ICeS': **I**solate containers, **C**heck images, **e**nforce policies, **S**can regularly."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Reflect on the potential risks of neglecting container security in your deployments. How could a breach affect your application, and what measures can you implement to improve defenses against such risks? Consider how you could apply these concepts to your previous experience with Linux internals."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "As we wrap up this lesson, envision yourself monitoring a containerized environment like a skilled pilot overseeing a flight dashboard. Every alert presents an opportunity to optimize security. Keep honing these skills with 'minimum_effective_dose' repetitions to cement your learning."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "mq1",
+      "question": "Which practice helps ensure Docker container isolation?",
+      "options": [
+        "Mounting volumes in containers",
+        "Running containers as root",
+        "Using network namespaces",
+        "Accessing host kernel directly"
+      ],
+      "correct_answer": 2,
+      "explanation": "Network namespaces are a key aspect of ensuring that containers remain isolated from one another. This practice ensures that network traffic is segregated between containers.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "mq2",
+      "question": "What is a common vulnerability in container images?",
+      "options": [
+        "Lack of isolation",
+        "Unscanned images",
+        "Privilege escalation",
+        "Outdated base images"
+      ],
+      "correct_answer": 3,
+      "explanation": "Outdated base images can contain known vulnerabilities that can be exploited. It's critical to regularly update and scan images for security vulnerabilities.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "mq3",
+      "question": "Which Kubernetes feature restricts pod communication?",
+      "options": [
+        "ServiceAccount",
+        "Pod Security Policy",
+        "NetworkPolicy",
+        "PersistentVolumeClaim"
+      ],
+      "correct_answer": 2,
+      "explanation": "NetworkPolicy is used to control the network flow between pods in Kubernetes, effectively allowing you to apply network restrictions and manage pod communication.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}

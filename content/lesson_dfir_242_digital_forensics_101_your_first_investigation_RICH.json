@@ -1,0 +1,119 @@
+{
+  "lesson_id": "1f7c3e92-4c44-4a72-8482-9534c7f790db",
+  "lesson_number": 686,
+  "domain": "dfir",
+  "title": "Digital Forensics 101: Your First Investigation",
+  "difficulty": 1,
+  "order_index": 242,
+  "topics": [
+    "What is digital forensics?",
+    "Basic investigation workflow",
+    "Evidence handling basics"
+  ],
+  "prerequisites": [
+    "Fundamentals completed"
+  ],
+  "tags": [
+    "Career Path: DFIR Specialist"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to Digital Forensics 101! Imagine you're a detective in the digital world, uncovering hidden truths behind cybersecurity incidents. This lesson is about blending logic, creativity, and attention to detail to excel in digital forensics."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Digital forensics is like a digital autopsy, where we analyze electronic devices to uncover evidence of wrongdoing or to understand events leading to an incident. It involves a structured approach: identification, acquisition, analysis, and reporting. Understanding each step is crucial for a successful investigation.\n\n1. **What is digital forensics?** A critical field for investigating and analyzing digital data. It encompasses techniques and processes for recovering data that is often part of legal inquiries.\n\n2. **Basic investigation workflow:** The key steps include setting objectives, collecting and preserving data, analyzing data for relevant information, and compiling findings in a comprehensive report.\n\n3. **Evidence handling basics:** The fundamental principle is maintaining the integrity of the data. This involves proper documentation, using write blockers, and following chain-of-custody protocols."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Think of digital forensics like your favorite mystery story. You're piecing together clues from a jumble of digital breadcrumbs to solve the case. Remember, even simple actions like turning off a device can alter vital evidence. Therefore, it's essential to handle everything with care and precision."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Let's apply what you've learned! Use the following sample command to create a disk image for forensic analysis:\n\n```bash\n# Creating a disk image using dd\nsudo dd if=/dev/sdX of=/path/to/image.dd bs=4M status=progress\n```\nTry adapting this command to your own environment, ensuring you understand each parameter's role in the acquisition process."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Case Study: The Investigation of Company X Data Breach\n\nWhen Company X experienced a breach, a forensics team was deployed to uncover the means of the attack and what data was compromised. By examining logs, network traffic, and system images, they discovered the entry point and identified the attacker’s methods. Insights from this case reinforced the importance of regular security audits and robust incident response plans."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Use the acronym **COPE** to remember the digital forensics workflow:\n\n- **C**ollection: Gather the data.\n- **O**rganization: Keep data structured.\n- **P**reservation: Maintain data integrity.\n- **E**xamination: Analyze data carefully."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Reflect on how digital forensics is evolving with technology. Consider how advancements in encryption and cloud computing might challenge traditional forensics methods. How can forensics professionals stay ahead of these changes to effectively conduct investigations?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Congratulations on completing Digital Forensics 101! Remember, the goal is to combine analytical skills with innovative thinking. Digital forensics is about persistence, precision, and continual learning. Keep developing your skills and always stay curious!"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "question": "What is the first step in digital forensics?",
+      "options": [
+        "Analysis",
+        "Collection",
+        "Reporting",
+        "Identification"
+      ],
+      "correct_answer": 3,
+      "explanation": "The first step is Identification, which involves recognizing potential sources of evidence.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "q2",
+      "question": "Which tool can be used to create a disk image for analysis?",
+      "options": [
+        "Docker",
+        "dd",
+        "SSH",
+        "grep"
+      ],
+      "correct_answer": 1,
+      "explanation": "The 'dd' command is used to create disk images, which is essential for forensic analysis.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "q3",
+      "question": "Why is it important to use a write blocker during evidence acquisition?",
+      "options": [
+        "To speed up the acquisition process",
+        "To prevent loss of data",
+        "To ensure that data is not altered during acquisition",
+        "To avoid legal issues"
+      ],
+      "correct_answer": 2,
+      "explanation": "A write blocker prevents data from being modified during acquisition, maintaining its integrity.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "estimated_time": "30-60 minutes",
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}

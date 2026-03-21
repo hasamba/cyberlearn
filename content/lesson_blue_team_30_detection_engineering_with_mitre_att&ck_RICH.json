@@ -1,0 +1,122 @@
+{
+  "lesson_id": "9b1d02b7-adec-4821-92c8-1f0d5539ae34",
+  "lesson_number": 673,
+  "domain": "blue_team",
+  "title": "Detection Engineering with MITRE ATT&CK",
+  "difficulty": 2,
+  "order_index": 30,
+  "topics": [
+    "Building detection rules from TTPs",
+    "ATT&CK mapping methodology",
+    "Measuring detection coverage"
+  ],
+  "prerequisites": [
+    "Blue Team basics",
+    "MITRE ATT&CK fundamentals"
+  ],
+  "tags": [
+    "Career Path: SOC Analyst",
+    "Career Path: Blue Team Operator",
+    "Career Path: Threat Hunter"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to 'Detection Engineering with MITRE ATT&CK'. This lesson will equip you with the skills needed to enhance your detection capabilities using the MITRE ATT&CK framework. We will explore how to build effective detection rules, map out TTPs, and measure your detection coverage effectively. Remember, learning is a journey where 'active_learning' and 'connect_to_what_i_know' are your best companions."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Building Detection Rules from TTPs: Harnessing the power of MITRE ATT&CK starts with understanding TTPs — Tactics, Techniques, and Procedures. These are the building blocks of malicious behavior. In this section, we’ll delve into how to build robust detection rules to identify these behavioral patterns across your environments. By 'connecting_to_what_i_know' from basic cybersecurity principles, we can develop comprehensive detection capabilities.\n\n## ATT&CK Mapping Methodology: Mapping threats to the MITRE ATT&CK framework involves understanding the context and sequence of adversarial behaviors. We'll discuss the systematic approach to ATT&CK mapping, ensuring our detection strategies are both proactive and reactive. Utilizing 'multiple_memory_pathways', we can strengthen our understanding and application of this methodology.\n\n## Measuring Detection Coverage: It’s essential to continually measure and monitor your detection coverage to ensure gaps are closed promptly. This section will discuss metrics and performance indicators that help blue teams evaluate the effectiveness of their detection strategies. By employing the concept of 'minimum_effective_dose', we'll learn to achieve maximum coverage with optimal resource expenditure."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "### Teach Me Like I'm 10: Imagine playing a game where you need to spot the intruder. The MITRE ATT&CK framework is your special guidebook that tells you what tricks these intruders, called hackers, might use. By learning which tricks or tactics they like, we can make plans to catch them before they cause trouble. We'll learn to build alarms that alert us whenever a hacker uses a known trick, keeping our environment safe and sound without feeling like a chore. Think of it like 'gamify_it', where each tactic caught is a level up!"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "### Hands-On Practice: Let's write a detection rule using a sample dataset you would encounter in a SOC environment. Imagine we have logs from an endpoint that shows a sequence of operations:\n\n```yaml\ncondition:\n  selection:\n    EventID: 4688\n    CommandLine: '*powershell*'\n\n  condition: selection\n```\n\nThis rule triggers whenever PowerShell is detected in command line activity. In the exercise, you'll extend this rule to add more sophisticated conditions, crafting a robust detection mechanism."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Case Studies: Real-world application of MITRE ATT&CK in detection engineering has transformed blue team operations. In this section, we'll examine how Organization X successfully restructured its SOC using ATT&CK, improving its detection capability by 40%. Real examples and lessons learned will 'connect_to_what_i_know' and enhance our understanding of practical ATT&CK applications."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "### Mnemonic: Remember 'DARE'\n\n- **D**etect\n- **A**nalyze\n- **R**espond\n- **E**valuate\n\nThis DARE approach will help you remember the core process of detection engineering, leveraging 'memory_hooks' to solidify your understanding."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "### Critical Thinking: Reflect on your current detection strategies. Are there gaps where adversaries could easily bypass your defenses? How can you implement the methodologies learned today to close these gaps? Consider 'reframe_limiting_beliefs' about resource limitations — are there smarter ways to utilize existing tools and knowledge?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Congratulations on advancing your understanding of detection engineering with MITRE ATT&CK! You've learned key strategies to protect your environment more effectively. Remember, consistent 'active_learning' and 'meta_learning' are key to staying ahead of threat actors. Keep up the great work and apply your knowledge to real-world challenges."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "question": "What does TTP stand for in the context of MITRE ATT&CK?",
+      "options": [
+        "Techniques, Tips, Procedures",
+        "Tactics, Techniques, Procedures",
+        "Techniques, Technologies, Processes",
+        "Tactics, Tools, Protocols"
+      ],
+      "correct_answer": 1,
+      "explanation": "TTPs stand for Tactics, Techniques, and Procedures, which represent the behaviors and methods used by adversaries to achieve their goals.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "q2",
+      "question": "Which mnemonic helps to remember the core process of detection engineering?",
+      "options": [
+        "DARE",
+        "CAFE",
+        "SAFE",
+        "FIRE"
+      ],
+      "correct_answer": 0,
+      "explanation": "DARE stands for Detect, Analyze, Respond, and Evaluate, representing the essential steps in detection engineering.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "q3",
+      "question": "What is a primary benefit of applying MITRE ATT&CK in detection strategies?",
+      "options": [
+        "It simplifies network configurations.",
+        "It maps out detailed adversarial behaviors.",
+        "It guarantees zero breaches.",
+        "It reduces staff workload by half."
+      ],
+      "correct_answer": 1,
+      "explanation": "MITRE ATT&CK provides a comprehensive mapping of adversarial behaviors, which helps in developing effective detection and response strategies.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "estimated_time": "30-60 minutes",
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}

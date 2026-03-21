@@ -1,0 +1,118 @@
+{
+  "lesson_id": "7f6b4d2a-e3a9-4c5d-97ea-3ad96c2f60f8",
+  "lesson_number": 631,
+  "domain": "system",
+  "title": "Container Security: Docker & Containerd",
+  "difficulty": 2,
+  "order_index": 35,
+  "topics": [
+    "Implement secure container configurations",
+    "Analyze container escape techniques",
+    "Configure seccomp profiles for containers"
+  ],
+  "prerequisites": [],
+  "tags": [
+    "Career Path: Cloud Security",
+    "Career Path: Security Engineer"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome to the world of container security! Prepare to dive into the layers of Docker and containerd that form the building blocks of many modern applications. We're going to explore techniques to secure these platforms and learn why they're critical in protecting our systems. Let's start with a curious mindset and be ready to explore the depths of container security. Remember, 'reframe_limiting_beliefs' as your assumptions may be challenged today!"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Containers are an essential part of many IT infrastructures because they provide a lightweight method to deploy applications consistently across environments. However, with the flexibility of containers comes the responsibility to secure them effectively. In this section, we will delve into the following key areas:\n\n1. **Secure Container Configurations:** Learn how to use Docker security features such as namespaces, capabilities, and security options.\n2. **Container Escape Techniques:** Understand the risks of container escapes and how attackers can achieve them by exploiting file system vulnerabilities or misconfigurations in container engines.\n3. **Configuring Seccomp Profiles:** The 'Secure Computing Mode' (seccomp) can restrict system calls made by applications running in containers, reducing exposure to kernel-level attacks."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Alright, imagine containers are like Lego blocks. They're neat, stackable, and can build amazing structures. But just like your favorite Lego set, if a piece is missing or not locked properly, the whole thing could fall apart!\n\nSo, how do we make sure our Lego set is perfect? By checking every piece and fitting them right. That's what container security is about - ensuring each piece of technology (our container) is locked in just right to prevent any baddies from sneaking in.\nNever forget, the smallest piece (like a missing cap on our Docker) can make the structure weak. Our mantra today: `teach_like_im_10`."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "It's time to get hands-on with configuring seccomp profiles, which ensure your containers only use the necessary system calls.\n\n**Exercise:**\n1. Create a Docker container with a custom seccomp profile.\n2. Use the profile to restrict specific system calls, like `kill` to only trusted processes.\n3. Verify the restrictions by attempting a container breakout using a denied syscall.\n\nUse this example to start your seccomp profile:\n```json\n{\n    \"defaultAction\": \"SCMP_ACT_ERRNO\",\n    \"syscalls\": [\n        {\n            \"names\": [\"execve\"],\n            \"action\": \"SCMP_ACT_ALLOW\"\n        }\n    ]\n}\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Consider the historical Toyota Kata—a process improvement approach. It’s designed to help organizations develop a scientific mindset regarding process improvement. Similarly, container security involves continually improving processes to mitigate risks:\n\n**Case Study - Company XYZ:**\n- XYZ deployed their applications via Docker across multiple cloud environments.\n- Initial assessments showed regular occurrences of container escapes, largely due to inadequate seccomp configurations.\n- By deploying custom seccomp profiles tailored to each application's need, XYZ mitigated multiple potential escape paths and drastically reduced their attack surface."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Remember \"S.E.C.U.R.E\":\n\n- **S**: Setup seccomp profiles\n- **E**: Evaluate Namespace usage\n- **C**: Configure capabilities carefully\n- **U**: Understand escape mechanisms\n- **R**: Regularly update Docker\n- **E**: Examine logs and audits\n\nUse these `memory_hooks` to retain essential container security steps."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Reflect on the potential risks of a poorly configured container environment. How could a minor oversight in a seccomp profile potentially influence an organization's security framework globally? Utilize the concept of `active_learning` by simulating a real-world breach scenario and identify weaknesses you might have overlooked. Think about how you would apply these learnings to your security practice."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Congratulations on completing today's session on container security! You've learned the power of seccomp, detected escape attempts, and structured secure configurations. Embrace your newfound knowledge and allow it to fuel your journey in cloud security. Keep a mindset of 'learning_sprint'—small, consistent efforts build security experts. `Gamify_it` at your workplace by challenging colleagues to a container hardening competition!"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "1",
+      "question": "What is the primary purpose of a seccomp profile in Docker containers?",
+      "options": [
+        "To manage storage resources",
+        "To restrict kernel-level system calls",
+        "To enable communication between containers",
+        "To manage container networking"
+      ],
+      "correct_answer": 1,
+      "explanation": "Seccomp (Secure Computing Mode) profiles are designed to provide security by limiting the number and type of syscalls that an application can make to the kernel, thus reducing the surface area for potential attacks.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "2",
+      "question": "Which of these container escape techniques involves exploiting file system vulnerabilities?",
+      "options": [
+        "Namespace abuse",
+        "Command injection",
+        "Library injection",
+        "Path traversal"
+      ],
+      "correct_answer": 3,
+      "explanation": "Path traversal exploits vulnerabilities related to file access, such as accessing files outside of the intended directories, which can be used to escape container constraints.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "3",
+      "question": "Why is it important to configure capabilities carefully in container security?",
+      "options": [
+        "They increase network efficiency",
+        "They dictate permissions for resources",
+        "They control container size limitations",
+        "They improve container start times"
+      ],
+      "correct_answer": 1,
+      "explanation": "Capabilities in containers define what a process can do with its elevated privileges, which is crucial in preventing privilege escalation attacks by limiting operations to only those necessary for the application's functionality.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "estimated_time": "30-60 minutes",
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}
