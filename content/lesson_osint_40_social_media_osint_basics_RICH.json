@@ -1,0 +1,150 @@
+{
+  "lesson_id": "e176449b-d6c5-4476-b3ee-b86c9ee04d36",
+  "lesson_number": "692",
+  "domain": "osint",
+  "title": "Social Media OSINT Basics",
+  "difficulty": 1,
+  "order_index": 40,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "estimated_time": 45,
+  "tags": [
+    "Career Path: Security Engineer"
+  ],
+  "topics": "Twitter/LinkedIn/Facebook OSINT, Privacy settings analysis, Basic profile enumeration",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 📱 Your Social Media is an Open Book\n\nPeople share extraordinary amounts of personal and professional information on social media — often without realizing the security implications. Social media OSINT is the skill of systematically collecting and analyzing this information. In a pentest context, it's often used to map an organization's employees, find phishing targets, and discover technology stacks. This lesson shows you how to do it legally, ethically, and effectively."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Social Media OSINT Techniques\n\n### LinkedIn: The Corporate Directory\n\nLinkedIn is a goldmine for organizational OSINT because people voluntarily publish their professional details.\n\n**What you can find:**\n- Employee names and roles (maps organizational structure)\n- Technology stack (job posts say \"we use AWS, Python, and Splunk\")\n- Organizational hierarchy (who reports to whom)\n- Office locations\n- Contact information (sometimes direct email/phone)\n- Recent organizational changes (layoffs, new hires = timing intel)\n\n**Techniques:**\n```\n# Search for employees at a company:\nLinkedIn search: \"company:TargetCorp\"\n\n# Infer email format:\nIf you find John Smith (jsmith@targetcorp.com) and Jane Doe,\nJane is likely jdoe@targetcorp.com\n\n# Find IT/Security roles:\nsearch: \"site:linkedin.com TargetCorp CISO OR 'Head of Security'\"\n\n# Google can search LinkedIn (avoiding LinkedIn's rate limits):\nsite:linkedin.com/in \"TargetCorp\" \"Security Engineer\"\n```\n\n### Twitter/X: Real-Time Intelligence\n\nTwitter is valuable for real-time information and less-guarded personal sharing.\n\n**Advanced Twitter Search:**\n```\nfrom:targetperson keyword     - Posts by a person containing keyword\nto:targetperson               - Replies to a person  \nfrom:targetperson since:2023-01-01  - Posts after a date\nnear:\"New York\" within:10mi   - Geolocated posts\nlang:en from:targetperson     - Language filter\n```\n\n**Twitter OSINT Tools:**\n- Twint (offline Twitter scraping)\n- Advanced Twitter search: twitter.com/search-advanced\n- TweetDeck for monitoring\n\n**What to look for:**\n- Location data (many people check in or mention locations)\n- Complaints about work (reveals internal issues, software used)\n- Personal life details (useful for spear phishing pretexts)\n- Connection to other accounts\n\n### Facebook: Personal Intelligence\n\nFacebook has stricter privacy controls but still reveals information through:\n- Public posts and check-ins\n- Friends lists (if visible)\n- Likes and group memberships (reveals interests/affiliations)\n- Photos with metadata\n- Workplace and education (often public)\n\n**Facebook Graph Search (deprecated but alternatives exist):**\nUse site search: `site:facebook.com \"targetname\" \"targetcity\"`\n\n### Instagram: Visual Intelligence\n\nInstagram OSINT focuses on visual data:\n- Geotags on photos (reveal locations visited)\n- Metadata in photos (device info if not stripped)\n- Background details in photos (reveal workplace, home area)\n- Connected accounts\n- Follower/following analysis\n\n### Cross-Platform Intelligence\n\nThe most powerful OSINT combines information across platforms:\n\n```\nStep 1: Find real name on LinkedIn\nStep 2: Find Twitter handle from LinkedIn\nStep 3: Find Facebook profile from Twitter\nStep 4: Find Instagram from Facebook\nStep 5: Correlate location data across all platforms\nStep 6: Build complete profile\n\nResult: You know their employer, role, home neighborhood, daily routine,\n        family relationships, interests, and travel patterns\n```\n\n### Privacy Settings Analysis\n\nPart of defensive OSINT is auditing target organization employees' privacy settings:\n\n**Checklist for each major platform:**\n- Is the profile public or private?\n- Is location data enabled?\n- Are connected accounts visible?\n- Are check-ins and photos geotagged?\n- Is the friends/followers list public?\n- Are past posts visible to non-connections?\n\n### Tools for Social Media OSINT\n\n| Tool | Platform | Use |\n|------|---------|-----|\n| Sherlock | All | Find usernames across 300+ sites |\n| OSINT Framework | Multiple | Structured tool directory |\n| Maltego | Multiple | Visual relationship mapping |\n| SpiderFoot | Multiple | Automated OSINT collection |\n| TheHarvester | LinkedIn/Web | Email/name harvesting |\n\n```bash\n# Sherlock: find username across platforms\npip install sherlock-project\nsherlock johndoe123\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Teach Me Like I'm 10 🎈\n\nImagine you moved to a new town and you want to learn about your new neighbor. You don't need to talk to them! Just by walking around the neighborhood, you could:\n- See what car they drive\n- Notice they have a Boston Red Sox flag (probably from Boston)\n- See their mail slot says \"Dr. Johnson\" (they're a doctor)\n- Notice they leave for work at 7am every day\n- See their Facebook page is public and shows where they work\n\nThat's social media OSINT. People leave so many clues EVERYWHERE that you can build a complete picture of someone just from public info.\n\n**Why security pros care:** If a hacker can learn this much about an employee at your company, they can make a VERY convincing fake email to trick that person. \"Hi John, this is Mike from IT. I saw you posted about having trouble with the VPN — click here to fix it.\"\n\nUnderstanding what you share publicly is how you protect yourself."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## 🛠️ Hands-On: Username Reuse Investigation\n\n```bash\n# Step 1: Install Sherlock (in a safe environment)\npip install sherlock-project\n\n# Step 2: Search for your own username\nsherlock your_username\n\n# What Sherlock returns:\n[+] GitHub: https://github.com/your_username\n[+] Reddit: https://www.reddit.com/user/your_username\n[+] Twitter: https://twitter.com/your_username\n[-] Facebook: Not Found\n...\n\n# Step 3: Advanced Twitter search (no tools needed)\n# Go to: twitter.com/search-advanced\n# Try: from:youraccount\n# See all your public tweets with dates\n\n# Step 4: Google yourself across platforms\nsite:linkedin.com \"Your Name\" \"Your City\"\nsite:twitter.com \"Your Name\"\nsite:reddit.com \"Your Name\"\n\n# Step 5: Check if your email is in breach databases\n# haveibeenpwned.com\n# dehashed.com (some paid features)\n```\n\n**Reflection questions:**\n- Where does your username appear that you forgot about?\n- What profile information is public that you thought was private?\n- Could someone correlate your accounts to build a profile?"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## 🌍 Real-World Case: Social Media OSINT in APT Research\n\n**Operation Aurora (Google, 2009-2010):**\nResearchers analyzing the attack found that spear phishing targets were selected using OSINT from LinkedIn and other social media. The attackers targeted specific engineers based on:\n- Role (determined from LinkedIn)\n- Technical interests (determined from public GitHub/blog posts)\n- Connection to Google China operations (determined from social media)\n\nThey sent highly tailored spear phishing emails that referenced colleagues by name and current projects — all gathered from public OSINT.\n\n**How defenders used counter-OSINT:**\nAfter the attack, Google implemented:\n- Employee social media security training\n- Policies on what technical details can be posted publicly\n- Monitoring for organization mentions in social media\n- Periodic \"social media OSINT audits\" — what does your org's LinkedIn footprint reveal?\n\n**For pentesters:** LinkedIn is always in scope for phishing simulations. Finding a finance director who publicly discusses their controller's name and the accounting software they use is enough to craft a convincing Business Email Compromise (BEC) pretext."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## 🧠 Memory Aid: Social Media OSINT Targets - LIFE\n\n**L.I.F.E. of a target:**\n- **L**inkedIn: Professional identity (role, employer, tech stack, connections)\n- **I**nstagram: Visual life (locations, habits, relationships)\n- **F**acebook: Personal network (family, friends, groups, events)\n- **E**verywhere else: Username reuse (Sherlock finds the rest)\n\n**Sherlock command:** `sherlock <username>` — finds that username across 300+ platforms in seconds. Your most valuable social media OSINT tool."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## 🤔 Reflection: The Spear Phishing Target\n\nYou've been hired to conduct a social engineering assessment. Your target is Sarah Chen, the CFO of a mid-size company.\n\nFrom LinkedIn, you find:\n- Her name, photo, and job title\n- She reports to the CEO (also on LinkedIn)\n- Their accounting software is Sage (from a job post)\n\nFrom Twitter, you find:\n- She's at a conference in Las Vegas this week\n- She mentioned a \"system upgrade headache\"\n\nFrom Facebook (public profile):\n- Her assistant's name is Michael\n- She has two teenagers\n\n**Assignment:**\n1. Write a spear phishing email pretexting as Michael that references the conference and the \"system upgrade\"\n2. Identify three specific OSINT details that make this email more convincing\n3. Then write the defensive version: what security awareness training would help Sarah recognize this attack?\n\nThis exercise shows exactly how attackers think — and why defenders need to understand OSINT."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🚀 Social Media OSINT: Master the Digital Footprint!\n\nYou now understand how to systematically collect intelligence from LinkedIn, Twitter, Facebook, and Instagram, how to correlate information across platforms, and the tools that automate this process. Most importantly, you understand why this matters defensively — because attackers are already doing this against your organization's employees. Next: put it all together with a complete OSINT workflow on a target organization."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is LinkedIn particularly valuable for organizational OSINT?",
+      "options": [
+        "LinkedIn has no privacy settings",
+        "People voluntarily publish detailed professional information including roles, technologies, and org structure",
+        "LinkedIn data is always accurate",
+        "LinkedIn allows direct messaging without connection"
+      ],
+      "correct_answer": 1,
+      "explanation": "LinkedIn is designed for professional networking, so people voluntarily publish their job title, employer, responsibilities, technical skills, and connections — exactly the information attackers need for spear phishing and social engineering.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "d8c79742-686c-41e2-b0e1-5b3ed679a28c"
+    },
+    {
+      "question": "What does the Sherlock tool do?",
+      "options": [
+        "Analyzes malware behavior",
+        "Searches for a username across hundreds of platforms simultaneously",
+        "Cracks passwords using wordlists",
+        "Scans networks for open ports"
+      ],
+      "correct_answer": 1,
+      "explanation": "Sherlock is an OSINT tool that takes a username and checks its existence across 300+ websites and social platforms, revealing where that username is registered and helping correlate identities across platforms.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "435238ab-5b54-4c48-8880-b2d6e7a6653d"
+    },
+    {
+      "question": "From OSINT, you discover a CEO will be traveling to Tokyo next week (from social media). Why is this security-relevant?",
+      "options": [
+        "It's not security relevant",
+        "Attackers can time spear phishing or vishing attacks when executives are traveling and more likely to approve urgent requests quickly",
+        "It affects physical security but not cyber",
+        "Only relevant if the CEO is a public figure"
+      ],
+      "correct_answer": 1,
+      "explanation": "Travel information enables Business Email Compromise (BEC) timing attacks. Executives traveling are often jet-lagged, distracted, and more likely to approve urgent financial requests without proper verification. This is a documented attack vector.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "f66d69b4-80d3-4e7c-b8d4-fda6686c4429"
+    },
+    {
+      "question": "An employee's Instagram is set to private. Can you still gather OSINT about them?",
+      "options": [
+        "No, private accounts reveal nothing",
+        "Yes — their follower list (if visible), tagged photos by others, and interactions on public accounts still reveal information",
+        "Only if you send a follow request",
+        "Only through hacking"
+      ],
+      "correct_answer": 1,
+      "explanation": "Private accounts still leak intelligence: other people may tag them in public posts, their username may appear in public comments, they may have linked accounts, and public interactions on other accounts are visible.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "cb6c2402-be36-4ae7-ab8a-7940a2d779cd"
+    }
+  ],
+  "prerequisites": [
+    "OSINT Fundamentals"
+  ],
+  "concepts": [
+    "LinkedIn OSINT",
+    "Twitter/X Intelligence",
+    "Cross-Platform Correlation",
+    "Sherlock",
+    "Privacy Auditing"
+  ],
+  "learning_objectives": [
+    "Gather intelligence from LinkedIn profiles",
+    "Use advanced Twitter search for OSINT",
+    "Correlate identities across platforms",
+    "Audit your own social media privacy settings"
+  ],
+  "subtitle": "Your Profile is an Open Book"
+}

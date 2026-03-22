@@ -1,0 +1,150 @@
+{
+  "lesson_id": "420fc8d8-468b-446c-aa25-79730b50ce9f",
+  "lesson_number": "691",
+  "domain": "osint",
+  "title": "Google Dorking and Search Operators",
+  "difficulty": 1,
+  "order_index": 39,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "estimated_time": 45,
+  "tags": [
+    "Career Path: Security Engineer"
+  ],
+  "topics": "Advanced Google search, Finding exposed data, Practical search operators",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🔎 Finding What Google Doesn't Want You to Find\n\nGoogle indexes billions of pages — including files and data that organizations accidentally exposed to the internet. Google Dorking (also called Google Hacking) uses advanced search operators to find this exposed information. Security professionals use it to discover their own exposure. Attackers use it to find targets. After this lesson, you'll use it to audit your own organization's footprint."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Google Search Operators for OSINT\n\n### Basic Operators\n\n| Operator | Syntax | Example | Finds |\n|---------|--------|---------|-------|\n| site: | site:example.com | site:tesla.com | All indexed pages from a domain |\n| filetype: | filetype:pdf | filetype:xls | Specific file types |\n| intitle: | intitle:\"login\" | intitle:\"admin panel\" | Pages with keyword in title |\n| inurl: | inurl:admin | inurl:login.php | Pages with keyword in URL |\n| intext: | intext:\"password\" | intext:\"confidential\" | Pages containing text |\n| cache: | cache:example.com | | Google's cached version of a page |\n| \" \" | \"exact phrase\" | \"internal use only\" | Exact phrase matching |\n| - | term -exclude | python -monty | Exclude a term |\n| OR | term1 OR term2 | login OR signin | Either term |\n| * | wild*card | \"forgot * password\" | Wildcard matching |\n\n### The Google Hacking Database (GHDB)\n\nThe Exploit-DB maintains a database of \"dorks\" — search queries that find vulnerable or exposed content. Categories include:\n- Files containing passwords\n- Sensitive directories\n- Vulnerable servers\n- Error messages\n- Login pages\n\nVisit: `https://www.exploit-db.com/google-hacking-database`\n\n### Practical Dorking Examples\n\n**Finding exposed files:**\n```\nsite:example.com filetype:pdf \"confidential\"\nsite:example.com filetype:xls \"password\"\nsite:example.com filetype:env \"DB_PASSWORD\"\n```\n\n**Finding login panels:**\n```\nsite:example.com intitle:\"admin login\"\nsite:example.com inurl:/admin/login\nsite:example.com intitle:\"phpMyAdmin\"\n```\n\n**Finding configuration files:**\n```\nsite:example.com filetype:xml intext:\"database\"\nsite:example.com filetype:config\ninurl:\".git\" site:example.com\n```\n\n**Finding sensitive information in documents:**\n```\n\"username\" \"password\" filetype:xls site:example.com\n\"internal use only\" filetype:pdf site:example.com\n\"not for distribution\" filetype:doc\n```\n\n**Finding exposed cameras:**\n```\ninurl:\"/view/index.shtml\"\nintitle:\"Live View / - AXIS\"\ninurl:ViewerFrame?Mode=\n```\n\n**Finding exposed databases:**\n```\ninurl:phpmyadmin intitle:phpMyAdmin\nintitle:\"Welcome to\" \"phpMyAdmin\"\n```\n\n### GitHub Dorking (Bonus: secrets in code)\n\nGitHub has its own search operators for finding exposed credentials:\n```\norg:targetcompany password\norg:targetcompany api_key\norg:targetcompany secret\nfilename:.env DB_PASSWORD\nfilename:config.json \"api_key\"\n```\n\nGitHub also has a \"Code\" search tab that searches across all public repositories.\n\n### Shodan: The Search Engine for Devices\n\nShodan indexes internet-connected devices by banner (what they respond with on ports). Unlike Google, Shodan crawls IP addresses directly.\n\n```\n# Finding exposed systems (Shodan.io search examples):\norg:\"Target Company\" http.title:\"Dashboard\"\norg:\"Target Company\" port:22 openssh\nhostname:targetcompany.com\nnet:192.168.0.0/16  # (with actual target IP range)\n```\n\n### Ethical Boundaries\n\n**Legal:** Finding publicly indexed files that organizations accidentally exposed. Reporting these findings to the organization.\n\n**Gray area:** Systematically automating dorks against competitors without authorization.\n\n**Illegal:** Accessing or downloading data you find (just because it's indexed doesn't mean you're authorized to access the underlying system). Accessing private systems linked from exposed data."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Teach Me Like I'm 10 🎈\n\nImagine Google is like a giant library where the librarian (Googlebot) goes around and reads every book and puts it in a catalog. \n\nNormal searching is like asking the librarian: \"Do you have anything about dogs?\"\n\n**Google Dorking** is like asking very specific questions:\n- \"Show me only books from the Science section that have the word 'password' in the first page\"\n- \"Find all Excel spreadsheets about company finances\"\n- \"Find all pages that have an 'Admin Login' sign on them\"\n\nHere's the crazy part: sometimes companies accidentally put things in the library that they DIDN'T WANT THERE — like a file with all their employee passwords. The librarian (Google) indexed it anyway because it was publicly accessible. \n\nGoogle Dorking helps you find these \"oops\" moments — both to protect your own company and to understand what attackers can find."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## 🛠️ Hands-On: Audit Your Own Domain\n\n**Step 1: Basic site enumeration**\n```\nsite:yourcompany.com\n# How many pages does Google know about?\n# Are there any unexpected results?\n```\n\n**Step 2: Find exposed file types**\n```\nsite:yourcompany.com filetype:pdf\nsite:yourcompany.com filetype:xls OR filetype:xlsx\nsite:yourcompany.com filetype:doc OR filetype:docx\nsite:yourcompany.com filetype:txt\n```\n\n**Step 3: Search for sensitive content**\n```\nsite:yourcompany.com intext:\"confidential\"\nsite:yourcompany.com intext:\"internal use only\"  \nsite:yourcompany.com intitle:\"index of\"\n```\n\n**Step 4: Find admin panels**\n```\nsite:yourcompany.com intitle:\"login\"\nsite:yourcompany.com inurl:admin\nsite:yourcompany.com inurl:login\n```\n\n**Step 5: Check GitHub for leaked secrets**\n```\norg:yourcompany-github-org password\norg:yourcompany-github-org api_key\norg:yourcompany-github-org secret\n```\n\n**Document your findings:**\n- What did you expect to find? What surprised you?\n- Are any of these results a security concern?\n- What would you recommend to fix any exposures?"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## 🌍 Real-World Case: Exposing Thousands of Misconfigured Servers\n\n**Operation: the Misconfigured Config Files**\n\nSecurity researcher finds:\n```\nfiletype:env DB_PASSWORD site:*.com\n```\n\nReturns thousands of `.env` files — Laravel/PHP developer configuration files — accidentally pushed to web servers and indexed by Google. These files contained:\n- Database passwords\n- API keys (AWS, Stripe, SendGrid)\n- Secret app keys\n- SMTP credentials\n\n**Impact:** Researchers reported finding thousands of AWS credentials, S3 bucket keys, and payment processor secrets in a single afternoon of dorking.\n\n**The fix (that should have prevented this):**\n```\n# .htaccess (Apache) — block .env file access:\n<Files .env>\nOrder allow,deny\nDeny from all\n</Files>\n\n# Nginx:\nlocation ~ /\\.env {\n    deny all;\n}\n```\n\n**What this means for you:** Run `filetype:env site:yourcompany.com` right now. If anything returns, it's critical."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## 🧠 Memory Aid: Top 6 Dorks to Remember\n\n**FISTIC** dorks:\n- **F**iletype: find specific file formats (`filetype:pdf`)\n- **I**ntitle: search page titles (`intitle:\"admin\"`)\n- **S**ite: restrict to a domain (`site:example.com`)\n- **T**ext: search body content (`intext:\"password\"`)\n- **I**nurl: search in URLs (`inurl:/admin/`)\n- **C**ache: see cached versions (`cache:example.com`)\n\n**Power combo:** `site:target.com filetype:xls intext:\"password\"` — find spreadsheets containing \"password\" on a target domain."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## 🤔 Reflection: The Responsible Disclosure Question\n\nYou're running a dork against your company's domain and accidentally discover that a government contractor (different company, different domain, appeared in search results) has a publicly indexed directory containing what appear to be contract documents marked \"For Official Use Only.\"\n\n1. Are you legally allowed to VIEW this Google result? Download the files?\n2. Who do you notify? The contractor? CISA? Nobody?\n3. If you do notify them, how do you do it (email, phone, formal disclosure process)?\n4. If they ignore you, what are your options?\n\nResponsible disclosure is one of the most nuanced areas of security ethics. There's no clean universal answer — but thinking it through in advance means you won't freeze when it happens in real life."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🚀 You're Now a Search Operator Pro!\n\nGoogle Dorking is free, legal (when used on your own assets or authorized scope), and terrifyingly effective. Organizations expose data every day that they don't realize is public. Your job is to find it first. Practice these operators against domains you're authorized to test. Next: Social Media OSINT, where we trace human footprints across platforms."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "What does the Google search operator 'site:example.com filetype:pdf' do?",
+      "options": [
+        "Downloads all PDFs from example.com",
+        "Shows Google's indexed PDF files from the example.com domain",
+        "Searches for PDFs about example.com",
+        "Blocks PDFs from example.com"
+      ],
+      "correct_answer": 1,
+      "explanation": "The site: operator restricts results to a specific domain, and filetype: filters for a specific file format. Combined, it shows all PDF files from that domain that Google has indexed.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "dfe8a4f5-8aed-412e-ad0b-239217b36d46"
+    },
+    {
+      "question": "You find a .env file exposed on a company's website via Google Dorking. What should you do?",
+      "options": [
+        "Download all the credentials and use them to access their systems",
+        "Report the exposure to the company through responsible disclosure, without downloading the file",
+        "Post the findings on Twitter immediately",
+        "Ignore it, it's not your problem"
+      ],
+      "correct_answer": 1,
+      "explanation": "Accessing credentials without authorization is illegal even if they're accidentally exposed. Responsible disclosure means notifying the organization so they can fix it, without downloading or using the exposed data.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "96cfc8c2-a097-4bae-b09f-74afb0920ccf"
+    },
+    {
+      "question": "What does 'intitle:\"index of\"' typically find?",
+      "options": [
+        "Pages titled 'index'",
+        "Directory listings where web server file browsing is enabled, exposing all files in that directory",
+        "Google's own index",
+        "Error pages"
+      ],
+      "correct_answer": 1,
+      "explanation": "'Index of' is the default title Apache and nginx use when directory listing is enabled. This dork finds exposed directories where you can see all files — often accidentally exposed backups, logs, and config files.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "ab347ef3-6833-4095-bf50-76946dbe8afb"
+    },
+    {
+      "question": "What is Shodan used for in OSINT?",
+      "options": [
+        "Searching social media profiles",
+        "Indexing internet-connected devices by their banner responses to port scans",
+        "Finding Google Dorking databases",
+        "Translating OSINT reports"
+      ],
+      "correct_answer": 1,
+      "explanation": "Shodan crawls the internet and records what devices respond on various ports. It's used to find exposed cameras, industrial systems, databases, and servers that are directly internet-accessible.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "4b007e77-369e-4e16-8380-603b307a7b6f"
+    }
+  ],
+  "prerequisites": [
+    "OSINT Fundamentals"
+  ],
+  "concepts": [
+    "Google Operators",
+    "Google Hacking Database",
+    "Shodan",
+    "Dorking",
+    "Exposed Data Discovery"
+  ],
+  "learning_objectives": [
+    "Use advanced Google search operators",
+    "Find exposed files and login panels",
+    "Use Shodan for device intelligence",
+    "Apply responsible disclosure principles"
+  ],
+  "subtitle": "Finding What Google Forgot to Hide"
+}

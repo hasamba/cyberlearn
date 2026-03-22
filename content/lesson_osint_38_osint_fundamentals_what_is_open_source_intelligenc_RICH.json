@@ -1,0 +1,150 @@
+{
+  "lesson_id": "4fa5c57f-659d-41d3-903f-c0c05210835a",
+  "lesson_number": "690",
+  "domain": "osint",
+  "title": "OSINT Fundamentals: What is Open Source Intelligence?",
+  "difficulty": 1,
+  "order_index": 38,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "estimated_time": 45,
+  "tags": [
+    "Career Path: Security Engineer"
+  ],
+  "topics": "OSINT definition and ethics, Legal considerations, Basic OSINT workflow",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🌐 The Art of Finding What's Already There\n\nEverything you post online is a data point. Every company registration is public. Every job posting reveals technology stacks. Every LinkedIn profile maps an organization's structure. Open Source Intelligence (OSINT) is the discipline of collecting and analyzing information from publicly available sources — and it's one of the most powerful tools in a security professional's arsenal. The scary part: everything you'll learn here, attackers are already doing."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## What is OSINT?\n\nOSINT stands for **Open Source Intelligence** — intelligence gathered from publicly available, open sources. \"Open source\" here doesn't mean open-source software; it means information that anyone can access without breaking any laws or authorization controls.\n\n### Sources of OSINT\n\n| Category | Examples |\n|----------|---------|\n| Internet | Websites, social media, forums, blogs, pastes |\n| Government records | WHOIS, company registrations, court records, FOIA |\n| Academic | Research papers, patents, technical documentation |\n| Commercial | Data brokers, job listings, financial filings |\n| Physical | Street view imagery, satellite photos, building permits |\n| Media | News articles, press releases, podcasts |\n\n### Who Uses OSINT and Why?\n\n**Offensive Security (Pentesters/Red Teams):**\n- Reconnaissance before an engagement\n- Finding employee email formats\n- Discovering exposed credentials in breaches\n- Identifying technology stack from job postings\n\n**Defensive Security (Blue Teams/SOC):**\n- Threat intelligence on attacking IPs/domains\n- Tracking threat actor campaigns\n- Monitoring for mentions of the organization in dark web forums\n- Validating phishing domains\n\n**Investigations:**\n- Law enforcement: tracking suspects\n- Journalists: researching stories\n- HR/Legal: background research\n- Corporate: competitive intelligence\n\n**Personal Privacy (to protect yourself):**\n- Finding what information exists about you\n- Understanding your digital footprint\n- Hardening your online presence\n\n### Legal Considerations\n\n**OSINT is legal when you:**\n- Access publicly available information\n- Don't circumvent access controls\n- Don't use data in ways that violate privacy laws (GDPR, CCPA)\n- Have authorization in a professional context (pentest scope)\n\n**OSINT becomes illegal when you:**\n- Access computer systems without authorization (even to find public data inside)\n- Violate terms of service in ways that constitute computer fraud\n- Use information to stalk, harass, or discriminate\n- In some jurisdictions: aggregate data in ways that create privacy violations\n\n**Key law:** The Computer Fraud and Abuse Act (CFAA) in the US, and Computer Misuse Act in the UK, govern unauthorized access. OSINT from public sources doesn't require authorization — but some automated scraping might violate ToS.\n\n### The OSINT Cycle\n\nOSINT isn't just Googling. It's a structured process:\n\n```\n1. PLANNING\n   Define objective: \"What am I trying to find?\"\n   Define scope: \"What sources are in bounds?\"\n   Define requirements: \"What do I need to answer the question?\"\n\n2. COLLECTION  \n   Gather raw data from sources\n   Document EVERYTHING with source + timestamp\n\n3. PROCESSING\n   Filter noise from signal\n   Organize and correlate data\n   Identify gaps\n\n4. ANALYSIS\n   Interpret what the data means\n   Draw conclusions\n   Identify additional collection needs\n\n5. DISSEMINATION\n   Report findings clearly\n   Protect sources\n   Legal/ethical review\n```\n\n### OSINT Mindset\n\n**Think like the subject:** If you were this company/person, where would your information appear?\n\n**Start broad, go narrow:** Begin with Google, then specialized tools.\n\n**Document as you go:** Take screenshots with timestamps. Information disappears. URLs die.\n\n**Don't touch what you're not supposed to:** OSINT has a boundary. If you're finding yourself trying to log in, stop.\n\n**Operational Security (OPSEC):** Your searches leave traces. Use a dedicated browser profile, VPN, or Whonix for sensitive research to avoid alerting the subject."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Teach Me Like I'm 10 🎈\n\nImagine you're a detective, and someone asks you to find out everything you can about a mystery person — but you can ONLY use public information. No breaking into houses, no hacking, no sneaking around.\n\nYou could:\n- Google their name\n- Check if they have a Facebook, Twitter, or LinkedIn\n- Look up their old addresses in public records\n- Find their old forum posts\n- Check if their email was in any known hacked databases\n\nThat's **OSINT**! It's like being a detective who only uses the library, the internet, and public records.\n\nThe crazy part: most people have NO idea how much information about them is already public. OSINT experts can often find out where someone works, lives, who their friends are, what their hobbies are — all without ever breaking a law or hacking anything.\n\nThat's why understanding OSINT helps you protect yourself too!"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## 🛠️ Hands-On: Your Own OSINT Footprint\n\n**This exercise: research YOURSELF**\n\n```\nStep 1: Google yourself\n- Search: \"Your Full Name\"\n- Search: \"Your Full Name\" + your city\n- Search: \"Your Full Name\" + employer\n- Note what you find — is it what you expected?\n\nStep 2: Check email breach status\n- Go to: haveibeenpwned.com\n- Enter your email address(es)\n- What breaches appear? What data was exposed?\n\nStep 3: LinkedIn OSINT\n- Look at your own LinkedIn profile as if you were an attacker\n- What does it reveal? (employer, team size, technologies used, connections)\n- Could someone infer your email format from employee patterns?\n\nStep 4: WHOIS for your domain (if you have one)\n- whois yourdomain.com\n- Is your personal address/email exposed?\n- (This is why domain privacy protection exists)\n\nStep 5: Reverse image search\n- Take your profile photo\n- Upload to images.google.com or TinEye\n- Where else does this photo appear?\n```\n\n**Debrief questions:**\n- What surprised you most?\n- What would you change about your online presence?\n- If a malicious actor found this, what could they do with it?"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## 🌍 Real-World Case: The SolarWinds Supply Chain Attack - OSINT Clues\n\nMonths before the SolarWinds breach was publicly known, there were OSINT signals:\n\n**Job postings revealed the attack surface:**\n- SolarWinds job posts required experience with Orion platform architecture\n- Job descriptions revealed internal team structures\n\n**GitHub commits exposed credentials:**\n- Researchers using OSINT found SolarWinds' update server password (\"solarwinds123\") had been exposed on GitHub by an intern\n- This was reported via OSINT tools that monitor GitHub for credential exposure\n\n**Domain registration patterns:**\n- The attacker registered avsvmcloud[.]com months before the attack\n- Domain registration OSINT tools (like DNSdumpster) would have shown this registration\n\n**The lesson:** Proactive OSINT monitoring of your own organization's footprint — GitHub repos, job postings, domain registrations — can reveal security risks before attackers exploit them. Many companies now run continuous OSINT on themselves as part of their threat intelligence program."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## 🧠 Memory Aid: OSINT Sources - PRICE\n\n**P.R.I.C.E.** of OSINT sources:\n- **P**ublic records (WHOIS, company registrations, court records)\n- **R**esearch & academic (papers, patents, LinkedIn)\n- **I**nternet open sources (websites, forums, social media)\n- **C**ommercial databases (Shodan, Censys, data brokers)\n- **E**xposed data (breach databases, GitHub leaks, pastes)\n\n**OSINT Cycle = P.C.P.A.D:**\nPlan → Collect → Process → Analyze → Disseminate"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## 🤔 Reflection: The Ethics of OSINT\n\nA colleague asks you to run OSINT on a job candidate the company is considering hiring. They want to know \"everything\" about this person.\n\n1. What information can you legally and ethically collect?\n2. What are the GDPR/privacy implications in your jurisdiction?\n3. If you find the candidate's personal social media with controversial posts, do you report it? Should you?\n4. The candidate listed a gap year on their resume. Through OSINT, you find they were in a public criminal proceeding during that time. What do you do?\n\nOSINT capabilities put power in your hands. How you use that power — including knowing when NOT to use it — defines your professional ethics."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🚀 You're Thinking Like an Intelligence Analyst!\n\nOSINT is the foundation of all reconnaissance. Whether you're running a pentest, investigating a threat actor, or protecting your organization, the ability to find and analyze public information is indispensable. You now understand what OSINT is, its legal boundaries, the collection cycle, and how to think like an OSINT analyst. Next: Google Dorking, where you'll master advanced search operators to find information that basic searches miss."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Which of the following is a legitimate OSINT source?",
+      "options": [
+        "Hacking into a company's internal database",
+        "Reading publicly available company registration records",
+        "Accessing a private LinkedIn profile by guessing the URL",
+        "Intercepting network traffic without authorization"
+      ],
+      "correct_answer": 1,
+      "explanation": "Company registration records are public government documents — legitimate OSINT. The others involve unauthorized access, which is illegal regardless of the information sought.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "d43bbcfc-7cf8-46b9-82f3-abed494ab23c"
+    },
+    {
+      "question": "What does 'defanging' a URL mean in OSINT reporting?",
+      "options": [
+        "Removing the URL from the report",
+        "Replacing characters like '.' with '[.]' to prevent accidental clicks",
+        "Encrypting the URL",
+        "Shortening the URL for space"
+      ],
+      "correct_answer": 1,
+      "explanation": "Defanging (e.g., http://evil.com → hXXp://evil[.]com) is standard practice when sharing IOCs in reports to prevent accidental navigation to malicious URLs.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "c9dea7ac-7d14-4d49-b83d-13f628f5d2c1"
+    },
+    {
+      "question": "Why is OPSEC (Operational Security) important during OSINT research?",
+      "options": [
+        "It speeds up the research process",
+        "Your searches and visits may leave traces that alert the subject you're investigating",
+        "It's required by law for all OSINT activities",
+        "OPSEC only matters for physical surveillance"
+      ],
+      "correct_answer": 1,
+      "explanation": "When you visit a website, your IP may appear in server logs. LinkedIn shows who viewed profiles. Search engines log queries. Poor OPSEC during OSINT can alert the subject you're investigating.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "41d10822-b79c-4366-b263-5613afd811bd"
+    },
+    {
+      "question": "What is the FIRST step in the OSINT cycle?",
+      "options": [
+        "Collection",
+        "Planning",
+        "Analysis",
+        "Dissemination"
+      ],
+      "correct_answer": 1,
+      "explanation": "Planning defines the objective, scope, and requirements BEFORE any collection begins. Unstructured OSINT without planning produces noise, not intelligence.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "395927dd-af00-4cdd-a334-2a52f2f3cda9"
+    }
+  ],
+  "prerequisites": [
+    "Fundamentals completed"
+  ],
+  "concepts": [
+    "Open Source Intelligence",
+    "OSINT Ethics",
+    "Legal Boundaries",
+    "OSINT Cycle",
+    "Digital Footprint"
+  ],
+  "learning_objectives": [
+    "Define OSINT and its legitimate uses",
+    "Understand the legal framework for OSINT",
+    "Follow the OSINT collection cycle",
+    "Identify your own digital footprint"
+  ],
+  "subtitle": "The Art of Finding What is Already There"
+}

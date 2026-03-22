@@ -1,0 +1,151 @@
+{
+  "lesson_id": "bf212bc0-4db4-4b59-8d49-f3d8ff7cf7c1",
+  "lesson_number": "638",
+  "domain": "red_team",
+  "title": "Wi-Fi Penetration Testing",
+  "difficulty": 2,
+  "order_index": 31,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "estimated_time": 45,
+  "tags": [
+    "Career Path: Penetration Tester",
+    "Career Path: Red Team Operator"
+  ],
+  "topics": "Crack WPA2/WPA3 wireless networks, Deploy rogue access points, Perform wireless man-in-the-middle attacks",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🎯 Welcome, Wireless Warrior!\n\nWi-Fi is everywhere — in coffee shops, offices, homes. And where there's Wi-Fi, there's opportunity for a penetration tester. In this lesson, you'll learn how wireless networks actually work under the hood, and more importantly, how they fail. This knowledge is critical for any red teamer or penetration tester. Remember: understanding the attack is the first step to building the defense."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## How Wi-Fi Security Actually Works\n\nWi-Fi security has evolved through several generations, each trying to fix the failures of the last.\n\n### WEP (The Broken One)\nWired Equivalent Privacy (WEP) was the original Wi-Fi security standard. It uses RC4 encryption with a static key, and it's been completely broken since 2001. **Never use WEP.** It can be cracked in minutes with modern tools.\n\n### WPA2 (The Current Standard)\nWi-Fi Protected Access 2 uses AES-CCMP encryption. It has two modes:\n- **WPA2-Personal (PSK):** Uses a pre-shared key (your Wi-Fi password). Vulnerable to offline dictionary attacks.\n- **WPA2-Enterprise:** Uses RADIUS authentication with individual credentials. Much harder to attack.\n\n**The WPA2 Handshake Attack:**\nWhen a client connects to a WPA2 network, a 4-way handshake occurs. This handshake contains enough information to verify guesses at the password offline. An attacker captures this handshake and then runs a dictionary or brute-force attack against it — never touching the access point again.\n\n```\nAttack Flow:\n1. Put wireless card in monitor mode\n2. Capture the 4-way handshake (wait for client or force deauth)\n3. Run hashcat/aircrack-ng against captured handshake\n4. Success = plaintext password\n```\n\n### WPA3 (The New Standard)\nWPA3 uses Simultaneous Authentication of Equals (SAE), also known as Dragonfly handshake. This eliminates offline dictionary attacks against the handshake because each authentication attempt requires interaction with the access point. However, WPA3 transition mode (supporting both WPA2 and WPA3) can be downgraded.\n\n### Rogue Access Points (Evil Twin)\nA rogue AP mimics a legitimate network. Users connect thinking it's real:\n\n```\nAttacker creates: \"Starbucks_WiFi\" (no password or captured password)\nLegitimate AP:    \"Starbucks_WiFi\" (real network)\nTarget connects to rogue AP → all traffic flows through attacker\n```\n\n**Tools for this:** hostapd-wpe, airbase-ng, Karma attacks\n\n### Wireless MITM Attacks\nOnce a device connects to your rogue AP, you're the router. You can:\n- Capture credentials (HTTP, email protocols)\n- Inject malicious content into HTTP responses\n- Perform SSL stripping to downgrade HTTPS to HTTP\n- Capture NTLM hashes if Windows devices probe for corporate networks\n\n### Key Tools\n| Tool | Purpose |\n|------|---------|\n| airmon-ng | Enable monitor mode |\n| airodump-ng | Capture traffic and handshakes |\n| aireplay-ng | Send deauth packets |\n| aircrack-ng | Crack WPA2 handshakes |\n| hashcat | GPU-accelerated password cracking |\n| hostapd-wpe | Create rogue EAP access points |\n| bettercap | Network MITM framework |\n\n### Legal and Ethical Requirements\n**Always have written authorization.** Wireless signals bleed beyond physical boundaries. Attacking networks in adjacent offices or apartments is illegal without consent. Define the scope clearly: which BSSIDs/SSIDs are in scope."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Teach Me Like I'm 10 🎈\n\nImagine Wi-Fi is like a secret handshake between your phone and the router. \n\nWPA2 is like this: when your phone wants to join, it whispers a special coded message to the router. The router checks it. But here's the sneaky part — a bad guy can RECORD that whispered message. Then they go home and try millions of different passwords to see which one creates the same whisper. If they guess right — they have your password!\n\nWPA3 fixed this by making it so you HAVE to be there in real-time to check each guess. You can't record and go home.\n\nA rogue access point is like putting up a fake ATM machine. It looks exactly like the real one. But when you use it, all your info goes to the bad guy!"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "## 🛠️ Hands-On Exercise: Wireless Recon (Authorized Lab Only)\n\n**Setup:** You need a wireless card that supports monitor mode (e.g., Alfa AWUS036ACH) and a **personal test router you own**.\n\n```bash\n# Step 1: Check your wireless interfaces\niwconfig\n\n# Step 2: Enable monitor mode\nsudo airmon-ng start wlan0\n\n# Step 3: View all networks around you\nsudo airodump-ng wlan0mon\n\n# Step 4: Target your test network (replace with your BSSID/channel)\nsudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon\n\n# Step 5: Force a handshake (your own router only!)\nsudo aireplay-ng --deauth 5 -a AA:BB:CC:DD:EE:FF wlan0mon\n\n# Step 6: Crack with a wordlist\naircrack-ng capture-01.cap -w /usr/share/wordlists/rockyou.txt\n```\n\n**Expected output of airodump-ng:**\n```\n BSSID              PWR  Beacons    #Data  #/s  CH  MB   ENC  CIPHER AUTH ESSID\n AA:BB:CC:DD:EE:FF  -45       87       23    0   6  54e  WPA2 CCMP   PSK  TestNet\n```\n\n**What to observe:** How quickly does aircrack-ng test passwords? What's the difference between a 8-char password in rockyou.txt vs a random 12-char one?"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## 🌍 Real-World Case Study: Hotel Wi-Fi Attack\n\n**Incident:** DarkHotel APT (2014-present)\nSophisticated threat actors targeted hotel guests by compromising hotel Wi-Fi infrastructure. When executives connected to the \"Hotel_Business\" network, the attackers served fake software updates. Victims downloaded what they thought was an Adobe update — actually a backdoor.\n\n**Key Technique:** The attackers had access to the actual hotel network infrastructure, not just a rogue AP. They could intercept traffic from authenticated users.\n\n**What a pentester would report:**\n- Guest Wi-Fi network should be isolated from business systems\n- HTTPS everywhere prevents content injection (even if traffic is captured)\n- Certificate pinning in corporate apps prevents MITM\n- VPN mandate for all corporate devices on external networks\n\n**Lesson:** Wi-Fi attacks aren't just script kiddie stuff. Nation-state actors use these techniques. Your job as a pentester is to find these holes before the adversaries do."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## 🧠 Memory Aid: The Wi-Fi Attack Chain\n\n**W.H.A.C.K.** your way through wireless:\n- **W**atch (airodump-ng: scan and identify targets)\n- **H**andle (airmon-ng: set up monitor mode)  \n- **A**ttract (deauth attack: force clients to reconnect)\n- **C**apture (airodump-ng: grab the 4-way handshake)\n- **K**racking (aircrack-ng/hashcat: offline password attack)\n\n**WEP vs WPA2 vs WPA3:**\n- WEP = **W**holly **E**asily **P**wned\n- WPA2 = Weak against **P**assword **A**ttacks **2**\n- WPA3 = **W**hy **P**enetrate when **A**uthentication's **3**ight?"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## 🤔 Reflection: Ethics of Wireless Testing\n\nConsider: Your pentest engagement includes the client's office building. The Wi-Fi signals bleed into the parking lot. An employee working from their car connects to the corporate network. \n\n1. Is the parking lot \"in scope\" for wireless testing?\n2. You capture a handshake from a visitor who was never told about the pentest. What do you do with this data?\n3. You find that your client's \"Guest WiFi\" network is wide open and connects to the same subnet as corporate systems. How do you report this?\n\nWrite your answers — then discuss with a colleague. There are no perfectly clean answers in pentesting, but how you handle edge cases defines your professional reputation."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## 🚀 You're Now a Wireless Threat Thinker!\n\nYou understand the evolution from broken WEP to the more robust WPA3, how handshake captures lead to offline cracking, and how rogue APs can deceive even security-aware users. The tools exist. The techniques are documented. What separates ethical hackers from criminals is authorization, documentation, and purpose. Always carry your signed scope of work. Next step: practice in your home lab, then pursue the OSWP (OffSec Wireless Professional) certification to formalize these skills."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary vulnerability in WPA2-Personal that allows offline password attacks?",
+      "options": [
+        "The encryption algorithm is weak",
+        "The 4-way handshake can be captured and cracked offline",
+        "WPA2 uses a default password",
+        "Monitor mode disables WPA2 protection"
+      ],
+      "correct_answer": 1,
+      "explanation": "WPA2-Personal's 4-way handshake contains enough cryptographic material to verify password guesses offline, allowing attackers to capture it once and then run dictionary/brute-force attacks without further network interaction.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "1cf1377d-322c-4bb5-8906-7e6b98f8a1dc"
+    },
+    {
+      "question": "What key improvement does WPA3's SAE (Dragonfly) handshake provide over WPA2?",
+      "options": [
+        "Faster connection speeds",
+        "Eliminates offline dictionary attacks by requiring real-time interaction",
+        "Uses a shorter password",
+        "Disables monitor mode on client devices"
+      ],
+      "correct_answer": 1,
+      "explanation": "SAE requires each authentication attempt to interact with the access point in real-time, making offline dictionary attacks against the handshake impossible.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "6b89ce0e-ccde-486b-8e6e-240fd97a75de"
+    },
+    {
+      "question": "What is a 'rogue access point' in the context of wireless attacks?",
+      "options": [
+        "A misconfigured access point",
+        "A fake access point mimicking a legitimate network to intercept traffic",
+        "An access point with outdated firmware",
+        "An access point in a high-crime area"
+      ],
+      "correct_answer": 1,
+      "explanation": "A rogue AP (also called Evil Twin) impersonates a legitimate network. Users who connect have their traffic routed through the attacker, enabling credential capture and MITM attacks.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "f1aa3693-89bb-4b95-bc73-cb8896c47a5d"
+    },
+    {
+      "question": "Which command enables monitor mode on a wireless interface named wlan0?",
+      "options": [
+        "iwconfig wlan0 monitor",
+        "airmon-ng start wlan0",
+        "aircrack-ng --monitor wlan0",
+        "airodump-ng start wlan0"
+      ],
+      "correct_answer": 1,
+      "explanation": "airmon-ng start wlan0 enables monitor mode, creating a wlan0mon interface that can capture all wireless frames in range, not just those addressed to your device.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "318a008d-7e3b-4b7a-989b-f3082f80cac8"
+    }
+  ],
+  "prerequisites": [
+    "Networking Fundamentals",
+    "Basic Linux Commands"
+  ],
+  "concepts": [
+    "WPA2/WPA3",
+    "Monitor Mode",
+    "Deauthentication Attack",
+    "Evil Twin AP"
+  ],
+  "learning_objectives": [
+    "Understand WiFi security protocols",
+    "Perform a WPA2 handshake capture",
+    "Set up a rogue access point safely",
+    "Identify wireless attack mitigations"
+  ],
+  "subtitle": "From WEP to WPA3 — Wireless Networks Under the Microscope"
+}
