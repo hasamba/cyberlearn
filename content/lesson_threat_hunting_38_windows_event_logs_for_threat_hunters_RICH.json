@@ -1,0 +1,120 @@
+{
+  "lesson_id": "1f8b020c-95ef-4b4a-92b9-644243471a35",
+  "lesson_number": 702,
+  "domain": "threat_hunting",
+  "title": "Windows Event Logs for Threat Hunters",
+  "difficulty": 1,
+  "order_index": 38,
+  "topics": [
+    "Key Event IDs to monitor",
+    "Logon events (4624, 4625)",
+    "PowerShell logging basics"
+  ],
+  "prerequisites": [
+    "Threat Hunting 101: What is Threat Hunting?"
+  ],
+  "tags": [
+    "Career Path: Threat Hunter",
+    "Career Path: SOC Analyst"
+  ],
+  "estimated_time": "30-60 minutes",
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Welcome, budding threat hunters! Today we embark on a journey to uncover the secrets of Windows Event Logs. With the principles of \"connect_to_what_i_know\" and \"reframe_limiting_beliefs\", we'll demystify event IDs and transform logs into powerful threat indicators. Ready to unlock your potential?"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Windows Event Logs are critical tools for threat hunters. By concentrating on key Event IDs, such as logon events (4624 for successful logins and 4625 for failures), we can detect unauthorized access attempts. Remember: \"minimum_effective_dose\"—focus on the vital information to efficiently identify threats. Also, delve into PowerShell logging basics to catch script-based attacks. \"multiple_memory_pathways\" can aid in learning: visualize the process, then practice with real logs."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Imagine Event IDs as secret codes. When someone tries to log into a Windows system successfully (Event ID 4624), it's like receiving a gold star sticker. But if they fail (Event ID 4625), it's a red flag! Use \"teach_like_im_10\" to simplify: Event IDs are signals telling us who, what, and when activities happen on our network."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Time for \"active_learning\"! Using Windows Event Viewer, filter for Event IDs 4624 and 4625. Explore the log entries: who logged in, when, and from where. As a more advanced task, enable and analyze PowerShell logging. Share your findings with a partner."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "In a recent case, a SOC analyst noticed a spike in Event ID 4625. Using \"connect_to_what_i_know\", they traced it back to an unknown IP. Further investigation revealed a brute-force attack. Real-world threat hunting involves piecing together such puzzles."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Use \"memory_hooks\" to recall key logs: '46-24/25, logins alive/not alive'. Pair these numbers with a story, like 46 mighty soldiers (4624) and 25 failed warriors (4625). These hooks will help you instantly recall their meanings."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Engage in \"critical thinking\". Consider a scenario where you see repeated Event ID 4625 from a single host. How would you investigate? What tools and techniques could help verify whether it's a false alarm or a malicious attempt?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Great work today! You've developed a new layer of vigilance by understanding critical Event IDs and PowerShell logging. Remember, every log tells a story. Use \"learning_sprint\" to revisit today's insights and continue enhancing your threat-hunting skills."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "abc123de-456f-789g-h01i-234jklmnopqr",
+      "question": "What does Event ID 4624 signify in Windows Event Logs?",
+      "options": [
+        "A failed PowerShell script execution",
+        "A successful logon event",
+        "A system shutdown",
+        "A failed logon attempt"
+      ],
+      "correct_answer": 1,
+      "explanation": "Event ID 4624 signifies that a successful logon has occurred on the system.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "stu456vw-789x-012y-z34a-567bcrefgijk",
+      "question": "Which Event ID indicates a failed logon attempt?",
+      "options": [
+        "4624",
+        "4688",
+        "4625",
+        "4648"
+      ],
+      "correct_answer": 2,
+      "explanation": "Event ID 4625 is logged when a failed logon attempt occurs.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "lmn678op-901q-234r-567s-890tuvwxyabc",
+      "question": "Why is PowerShell logging important for threat hunters?",
+      "options": [
+        "It's the only way to detect physical intrusions.",
+        "It logs every application installation on the system.",
+        "It captures script execution details, aiding threat detection.",
+        "It provides performance metrics for system resources."
+      ],
+      "correct_answer": 2,
+      "explanation": "PowerShell logging captures detailed information about script executions, which is crucial for identifying potentially malicious actions.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}

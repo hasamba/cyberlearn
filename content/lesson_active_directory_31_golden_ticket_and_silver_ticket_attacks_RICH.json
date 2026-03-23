@@ -1,0 +1,119 @@
+{
+  "lesson_id": "af452b21-e52b-4d79-b543-0123abcd4567",
+  "lesson_number": 706,
+  "domain": "active_directory",
+  "title": "Golden Ticket and Silver Ticket Attacks",
+  "difficulty": 3,
+  "order_index": 31,
+  "topics": [
+    "Kerberos ticket attacks",
+    "Forging TGTs and TGSs",
+    "Detection and prevention"
+  ],
+  "prerequisites": [
+    "Kerberos Authentication"
+  ],
+  "tags": [
+    "Career Path: Red Team Operator"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "Approach this lesson as a cybersecurity detective unraveling the mysteries of one of the most sophisticated attacks on the Active Directory ecosystem. Embrace the 'active_learning' principle as you explore how attackers exploit the very mechanism meant to protect us."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Golden Ticket and Silver Ticket attacks are advanced techniques used by attackers to forge authentication tickets within an Active Directory environment. These attacks exploit the Kerberos authentication protocol by forging Ticket Granting Tickets (TGTs) and Ticket Granting Service (TGS) tickets. A Golden Ticket allows an attacker to generate a valid TGT with any SID, while a Silver Ticket targets TGS tickets to access specific services. Understanding these attacks requires a deep dive into the workings of Kerberos and Active Directory security. In this section, we will detail how these attacks are carried out and the underlying principles that make them possible, including potential defense mechanisms."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Imagine a magic key that can open any door in a school—this is like a Golden Ticket in cybersecurity, which can give an attacker access to anything in a network. A Silver Ticket might only open the science lab, but can still cause trouble. Recognizing these 'magic keys' helps us learn to protect them."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "### Hands-On Exercise: Generate a Silver Ticket\n\n#### Objective\nExplore and understand the generation of a Silver Ticket using the command line tool Mimikatz.\n\n#### Prerequisites\n- Access to a Windows machine with Mimikatz installed.\n- A basic understanding of Kerberos operations.\n\n#### Exercise\n1. Open the command prompt as an administrator.\n2. Use the following Mimikatz command to forge a service ticket:\n   \n   ```shell\n   mimikatz.exe 'kerberos::golden /user:target_user /domain:target_domain /sid:S-1-5-21-... /target:service /rc4:service_key /ticket:ticket_name.kirbi' exit\n   ```\n3. Observe the output and note how the session is authenticated against the service.\n\n#### Reflection\n- How does this exercise demonstrate the weakness exploited by Silver Tickets?\n- What might be some consequences of an undetected Silver Ticket attack?"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "In 2014, the Sony Pictures Entertainment breach revealed attackers using Golden Ticket attacks to maintain persistent access within their network. Despite lockdown measures, the attackers could create valid Kerberos tickets, enabling them to bypass authentication and elevate privileges. This case underscores the importance of robust detection mechanisms and constant network monitoring in defending against such sophisticated attacks."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Think 'Golden Door' and 'Silver Room': Golden Ticket opens all domains (like Admin rights), while Silver Tickets access a specific room (like a particular service). Remember: 'A golden glow opens the universe, a silver shield protects a single realm.'"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "Consider the implications of a Golden Ticket attack on your organization. What steps could be taken to mitigate the risk, and how would you approach the challenge of educating others in your organization on these risks? Reflect on the 'reframe_limiting_beliefs' principle to see these attacks not only as threats but as opportunities to bolster security."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "As you conclude this lesson, envision yourself as a 'cyber warrior' capable of defending against sophisticated threats. Apply 'connect_to_what_i_know' to link attack strategies to protection measures already familiar to you, ensuring a comprehensive understanding."
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "question": "What is a primary function of a Golden Ticket in Active Directory attacks?",
+      "options": [
+        "Generate fake DNS records",
+        "Create valid TGTs with any SID",
+        "Intercept traffic between servers",
+        "Obfuscate active directory schema changes"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Golden Ticket allows attackers to generate a valid Ticket Granting Ticket (TGT) with any SID, granting them near-unlimited access in an Active Directory environment.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "q2",
+      "question": "Which mitigation technique is recommended for countering Silver Ticket attacks?",
+      "options": [
+        "Disabling Kerberos authentication",
+        "Frequent password changes for service accounts",
+        "Implementing DNSSEC",
+        "Increasing network segmentation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Regularly changing passwords for service accounts helps invalidate any previously captured secrets that might be used in a Silver Ticket attack.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "q3",
+      "question": "Why is it critical to monitor for unusual Kerberos ticket activity within a network?",
+      "options": [
+        "It helps in reducing spam emails",
+        "It aids in identifying potential Silver and Golden Ticket attacks",
+        "It enhances user productivity by speeding up authentication",
+        "It ensures users are logging in from the correct IP address"
+      ],
+      "correct_answer": 1,
+      "explanation": "Monitoring Kerberos ticket activity is vital because unusual patterns or forged tickets can indicate ongoing Golden or Silver Ticket attacks, which require immediate attention.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "estimated_time": "30-60 minutes",
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks"
+  ]
+}
