@@ -1,0 +1,198 @@
+{
+  "lesson_id": "34cc9379-7f04-4fe3-9478-5d30a18a03ad",
+  "domain": "threat_hunting",
+  "title": "Hypothesis-Driven Threat Hunting for Beginners",
+  "subtitle": "Learn to think like an attacker to find what your tools miss",
+  "difficulty": 1,
+  "estimated_time": 45,
+  "order_index": 37,
+  "prerequisites": [],
+  "concepts": [
+    "What threat hunting is and why reactive security isn't enough",
+    "The hypothesis-driven hunting methodology",
+    "Using MITRE ATT&CK as a hunting framework",
+    "Formulating and testing hunting hypotheses",
+    "Basic hunting queries and data sources",
+    "Documenting hunting findings and converting them to detections"
+  ],
+  "learning_objectives": [
+    "Explain the difference between alert-driven and hypothesis-driven threat hunting",
+    "Create a basic threat hunting hypothesis using MITRE ATT&CK",
+    "Identify key data sources needed for endpoint and network hunting",
+    "Execute a simple hunting query to find suspicious PowerShell activity",
+    "Document hunting findings and convert them into detection rules"
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "tags": [
+    "Career Path: Threat Hunter",
+    "Career Path: SOC Analyst"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "fccf33c5-d5c2-418e-aef5-789b3b84b837",
+      "type": "explanation",
+      "title": "Introduction: Why Your Alerts Are Not Enough",
+      "content": {
+        "text": "## Why Your Alerts Are Not Enough\n\nImagine your home security system only goes off when someone breaks a window. Smart burglars know this — they find the unlocked back door instead. Your security alerts work the same way: they catch the noisy, obvious attacks. But sophisticated attackers move quietly, blending into normal traffic, using tools already on the system, staying just below the detection threshold.\n\n**Threat hunting** is the practice of proactively searching for attackers who are already inside your environment but haven't triggered any alerts. It's the difference between waiting for your smoke alarm to go off versus doing regular inspections for fire hazards.\n\n### The Three Security Postures\n\nThink of security like protecting a house:\n\n**Reactive** (most organizations): You call the fire department *after* the house is burning.\n- Wait for alerts\n- Respond to incidents\n- No proactive search\n\n**Preventive**: You install smoke detectors and lock your doors.\n- Firewalls, AV, EDR rules\n- Block known bad stuff\n- Still misses unknown threats\n\n**Proactive (Threat Hunting)**: You do a weekly walkthrough checking for gas leaks, frayed wires, and unlocked windows.\n- Actively look for things that shouldn't be there\n- Find attackers before they complete their mission\n- Turn findings into new detections\n\n### The Dwell Time Problem\n\nHere's a scary stat: the average attacker lives in a network for **over 200 days** before being detected. That's 200 days to:\n- Map the network\n- Steal credentials\n- Move laterally to critical systems\n- Exfiltrate data\n\nThreat hunting cuts that dwell time dramatically. By the time an alert fires, the attacker may already be done. Hunters find them during the planning and execution phases.\n\n### What Is Hypothesis-Driven Hunting?\n\nHypothesis-driven hunting means you start with an educated guess about what an attacker *might* be doing, then go looking for evidence of that activity.\n\nIt's like being a detective, not a security guard. A security guard waits for an alarm. A detective says: \"If I were a burglar who wanted to steal the crown jewels, I would need to disable the cameras first. Let me look for signs of camera tampering.\"\n\n**The hunting loop:**\n1. **Hypothesis**: \"I think attackers may be using PowerShell to run malware in memory\"\n2. **Data Collection**: Pull PowerShell logs, command line data\n3. **Analysis**: Look for encoded commands, downloads, or unusual parent processes\n4. **Finding**: Discover suspicious PowerShell running from Word.exe\n5. **Response/Detection**: Alert SOC, create detection rule for Word spawning PowerShell\n\nThis loop repeats. Each hunt either finds an attacker or produces a new detection rule — either outcome makes you more secure.\n\n### Why This Matters for Your Career\n\nOrganizations with mature security programs are desperately hiring hunters. A hunter who finds one advanced persistent threat (APT) that evaded all defenses for months is worth more than a hundred alert-response analysts. This skill is rare, high-value, and directly translates to stopping real breaches.\n\n### The Cost of Not Hunting\n\nLet's put numbers to this. The Ponemon Institute's 2023 Cost of a Data Breach report found:\n- Average breach cost: **$4.45 million**\n- Breaches identified by the security team: **$3.9M average cost**\n- Breaches identified by the attacker themselves (notification): **$5.9M average cost**\n\nOrganizations with mature threat hunting programs identify breaches faster (average 197 days vs 277 days for non-hunters), cutting breach costs by an average of $1.1 million.\n\nThe math is simple: a dedicated hunter costs $100-150K/year. Finding one major breach early saves 10x that.\n\n### Common Misconceptions About Threat Hunting\n\n**\"You need fancy tools\"** — False. You can hunt with basic SIEM queries, spreadsheets, and Windows Event Viewer if needed. Tools help, but methodology is what matters.\n\n**\"Hunting is for big enterprises\"** — False. Small organizations are actually easier to hunt because there's less noise and you can understand \"normal\" faster.\n\n**\"AI/ML will replace hunters\"** — Partially true for some detections, but adversaries adapt. A human hunter who understands attacker psychology finds things no model has been trained on yet.\n\n**\"You need a red team background\"** — Helpful but not required. Understanding how attacks work helps you hunt better, but you can start with ATT&CK as your guide without ever having run an exploitation tool.\n\n### The Three Types of Hunting\n\nHunters typically use three approaches, often in combination:\n\n**1. Intelligence-Driven**: Start with a specific threat intelligence report (\"APT29 is targeting energy companies using X\"). Hunt for that specific TTP.\n\n**2. Technique-Driven**: Pick a category from ATT&CK and systematically hunt for it. Good for building coverage over time.\n\n**3. Anomaly-Driven**: Use analytics to find statistical outliers, then investigate whether they're malicious. Requires good baseline data."
+      }
+    },
+    {
+      "block_id": "9069d6cc-a679-4a52-8d70-094f8906d5fd",
+      "type": "video",
+      "title": "Video: Introduction to Threat Hunting",
+      "content": {
+        "text": "https://www.youtube.com/watch?v=Ns4a4g-9Qew — SANS Institute introduction to threat hunting concepts, covering the hunting methodology, why it matters, and how to get started. This 20-minute overview explains the core concepts we cover in this lesson and provides real examples from the field."
+      }
+    },
+    {
+      "block_id": "5bc38132-2ee1-4b70-8467-f9452103111c",
+      "type": "explanation",
+      "title": "The Hypothesis Framework: Your Hunting Blueprint",
+      "content": {
+        "text": "## Building a Good Hunting Hypothesis\n\nA hypothesis is a testable question. In hunting, it follows this pattern:\n\n**\"[Threat Actor/TTP] may be [Action] by using [Technique], which would leave [Evidence] in [Data Source]\"**\n\n### Example Hypotheses\n\n**Weak hypothesis (too vague):**\n\"Attackers might be doing something bad with PowerShell.\"\n\n**Strong hypothesis (testable):**\n\"APT29-style actors may be establishing persistence by using PowerShell to create scheduled tasks, which would show PowerShell.exe creating entries in the Windows Task Scheduler registry key (HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache), visible in Sysmon Event ID 13.\"\n\nSee the difference? The strong hypothesis tells you:\n- **Who** (threat actor profile)\n- **What** (persistence via scheduled tasks)\n- **How** (PowerShell commands)\n- **Where to look** (registry key, Sysmon event)\n- **What to look for** (specific event IDs)\n\n### Where Do Hypotheses Come From?\n\n**1. Threat Intelligence Reports**\nRead reports about recent APT activity. If you learn that APT41 is targeting your industry using DLL sideloading, you have a hypothesis: \"APT41 may be using DLL sideloading in our environment.\"\n\n**2. MITRE ATT&CK Framework**\nThe ATT&CK framework is a knowledge base of adversary tactics and techniques. Pick a technique like T1059.001 (PowerShell) and ask: \"Is anyone using PowerShell in suspicious ways in our environment?\"\n\n**3. Security Anomalies**\nNotice something weird in a dashboard? A server that normally has 100 connections suddenly has 5,000? That's a hypothesis waiting to happen.\n\n**4. Crown Jewel Analysis**\nWhat are your most valuable assets? Where is your most sensitive data? Ask: \"If an attacker wanted to reach the finance database, what path would they take?\" Then hunt that path.\n\n**5. Past Incident Retrospective**\nAfter every incident, ask: \"Were there indicators we could have found earlier?\" Build hunting hypotheses from lessons learned.\n\n### The MITRE ATT&CK Connection\n\nMITRE ATT&CK organizes adversary behavior into:\n- **Tactics** (the goal): Initial Access, Persistence, Lateral Movement, etc.\n- **Techniques** (the how): Spearphishing, Scheduled Tasks, Pass-the-Hash\n- **Sub-techniques**: More specific versions (e.g., T1059.001 = PowerShell)\n\nFor each technique, ATT&CK tells you:\n- Which threat groups use it\n- How to detect it (data sources needed)\n- Examples from real incidents\n- Mitigation strategies\n\n**Hunting workflow with ATT&CK:**\n1. Pick a tactic relevant to your threat profile (e.g., \"Credential Access\")\n2. Browse techniques (e.g., T1003 - OS Credential Dumping)\n3. Look at data sources (Windows Security logs, Sysmon, EDR)\n4. Form hypothesis: \"Attackers may be dumping LSASS memory using Process Access events (Sysmon Event ID 10)\"\n5. Query your SIEM or EDR for Sysmon Event ID 10 targeting lsass.exe\n6. Analyze results and investigate anomalies"
+      }
+    },
+    {
+      "block_id": "7930cfb4-263b-469f-a3e6-15930fbd0d29",
+      "type": "diagram",
+      "title": "The Threat Hunting Cycle",
+      "content": {
+        "text": "## The Threat Hunting Cycle\n\n```\n        ┌─────────────────────────────────┐\n        │     THREAT INTELLIGENCE          │\n        │   (APT reports, ATT&CK, OSINT)   │\n        └───────────────┬─────────────────┘\n                        │\n                        ▼\n        ┌─────────────────────────────────┐\n        │         HYPOTHESIS               │\n        │  \"Attackers may be using X to    │\n        │   achieve Y, leaving evidence Z\" │\n        └───────────────┬─────────────────┘\n                        │\n                        ▼\n        ┌─────────────────────────────────┐\n        │       DATA COLLECTION            │\n        │  Logs → SIEM → EDR → Network    │\n        │  Sysmon, Windows Events, Zeek   │\n        └───────────────┬─────────────────┘\n                        │\n                        ▼\n        ┌─────────────────────────────────┐\n        │    INVESTIGATION & ANALYSIS      │\n        │  Query data → Baseline          │\n        │  anomalies → Follow evidence    │\n        └─────────┬──────────────┬────────┘\n                  │              │\n        ┌─────────▼──┐    ┌──────▼──────────┐\n        │  ATTACKER   │    │  NO ATTACKER    │\n        │   FOUND     │    │  FOUND          │\n        └─────────┬───┘    └──────┬──────────┘\n                  │               │\n        ┌─────────▼───┐    ┌──────▼──────────┐\n        │  INCIDENT   │    │  CREATE NEW     │\n        │  RESPONSE   │    │  DETECTION RULE │\n        └─────────────┘    └─────────────────┘\n                                  │\n                    ┌─────────────▼──────────┐\n                    │  REFINED HYPOTHESIS     │\n                    │  (Loop restarts)        │\n                    └────────────────────────┘\n```\n\n**Key Data Sources for Hunting:**\n\n| Data Source | What You Find | Tools |\n|-------------|---------------|-------|\n| Windows Event Logs | Authentication, process creation | Splunk, ELK, Sentinel |\n| Sysmon | Detailed process/network/file activity | Sysmon + SIEM |\n| EDR Telemetry | Full process tree, memory, behavior | CrowdStrike, SentinelOne |\n| DNS Logs | C2 beaconing, DGA domains | BIND logs, Infoblox |\n| Network Flow | Lateral movement, data exfil | Zeek, Darktrace |\n| Proxy Logs | Web-based C2, downloads | Zscaler, Bluecoat |\n\n**The Hunter's Mindset:**\n```\nAlert-Driven Analyst:        Hypothesis-Driven Hunter:\n  Wait → Alert fires          Think → Where would attacker be?\n  Triage alert                Form hypothesis\n  Investigate known IOC       Query for TTPs (not IOCs)\n  Close ticket                Find → escalate OR new detection\n```"
+      }
+    },
+    {
+      "block_id": "33d6ad02-c8d5-47ff-8eda-9cd59b395ea3",
+      "type": "memory_aid",
+      "title": "Memory Aid: PEAK Hunting Process",
+      "content": {
+        "text": "## Memory Aid: The PEAK Hunting Process\n\nRemember the hunting methodology with **PEAK**:\n\n🏔️ **P — Purpose (Hypothesis)**\nForm your hunting hypothesis before touching any data.\n\"Based on threat intel, attackers targeting our sector may be using...\"\n\n🏔️ **E — Evidence (Data Sources)**\nIdentify where the evidence would live.\nSysmon logs? Windows Event logs? Network traffic? EDR?\n\n🏔️ **A — Analysis (Query & Investigate)**\nQuery your data, baseline normal, spot anomalies.\nDig into anything suspicious. Follow the thread.\n\n🏔️ **K — Knowledge (Output)**\nEvery hunt produces knowledge:\n- Found attacker → Incident Response\n- Found nothing → New detection rule (or improved logging)\n- Found gap → Fix visibility blind spot\n\n---\n\n### PEAK in Practice:\n\n**P** — \"APT groups may be using T1059.001 PowerShell to download and execute payloads\"\n\n**E** — Windows Event 4104 (PowerShell ScriptBlock), Sysmon Event 1 (Process Create), EDR command line telemetry\n\n**A** — Query for PowerShell with:\n- Encoded commands (-EncodedCommand flag)\n- Downloads (WebClient, Invoke-WebRequest, IEX)\n- Base64 strings longer than 100 chars\n- PowerShell spawned from Office apps (winword.exe, excel.exe)\n\n**K** — Found suspicious PowerShell: escalate to IR\n        Found nothing: create detection rule for these patterns\n        Found no PowerShell logs: fix logging configuration!\n\n---\n\n### Quick Reference Card\n\n```\nPEAK = Purpose → Evidence → Analysis → Knowledge\nATT&CK = Tactics (goals) + Techniques (methods) + Sub-techniques\nHypothesis = Actor + Action + Artifact + Location\nHunt Output = Detection OR Response (never nothing!)\n```"
+      }
+    },
+    {
+      "block_id": "2db0f3b5-4bd6-41d7-99e4-e7955e311b01",
+      "type": "code_exercise",
+      "title": "Hands-On: Your First Hunting Query",
+      "content": {
+        "text": "## Hands-On: Your First Hunting Query\n\n**Objective:** Hunt for suspicious PowerShell activity using Windows Event Logs\n\n**Hypothesis:** Attackers may be using PowerShell with encoded commands to execute malicious code in memory, which would appear in Windows PowerShell event logs as Script Block Logging events (Event ID 4104).\n\n**Prerequisites:**\n- Access to a SIEM (Splunk, ELK) or Windows Event Viewer\n- PowerShell Script Block Logging enabled (Event ID 4104)\n- Or: Use the provided sample data below\n\n---\n\n### Step 1: Enable PowerShell Script Block Logging (Lab Setup)\n\n```powershell\n# Enable Script Block Logging (run as administrator)\n$path = \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\"\nNew-Item -Path $path -Force\nNew-ItemProperty -Path $path -Name \"EnableScriptBlockLogging\" -Value 1 -PropertyType DWORD -Force\n\n# Verify it's enabled\nGet-ItemProperty -Path $path\n```\n\n### Step 2: Hunt Query in Splunk SPL\n\n```splunk\n# Hunt for encoded PowerShell commands\nindex=windows EventCode=4104\n| search ScriptBlockText=\"*-EncodedCommand*\" OR ScriptBlockText=\"*-enc *\" OR ScriptBlockText=\"*FromBase64String*\"\n| table _time, ComputerName, UserID, ScriptBlockText\n| sort -_time\n```\n\n```splunk\n# Hunt for PowerShell downloading from internet\nindex=windows EventCode=4104\n| search ScriptBlockText=\"*WebClient*\" OR ScriptBlockText=\"*Invoke-WebRequest*\" OR ScriptBlockText=\"*DownloadString*\" OR ScriptBlockText=\"*IEX*\"\n| stats count by ComputerName, UserID, ScriptBlockText\n| sort -count\n```\n\n### Step 3: Hunt Query in KQL (Microsoft Sentinel)\n\n```kql\n// Hunt for encoded PowerShell in MDE DeviceProcessEvents\nDeviceProcessEvents\n| where FileName =~ \"powershell.exe\" or FileName =~ \"pwsh.exe\"\n| where ProcessCommandLine contains \"-EncodedCommand\"\n    or ProcessCommandLine contains \"-enc \"\n    or ProcessCommandLine contains \"FromBase64String\"\n| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName\n| order by Timestamp desc\n```\n\n### Step 4: Decode Suspicious Base64\n\n```powershell\n# If you find a suspicious encoded command, decode it:\n$encoded = \"JABzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAEkATwAuAE0AZQBtAG8AcgB5AFMAdAByAGUAYQBtACgALABbAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoACIASAA0AHMASQBBQQ==\"\n[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($encoded))\n\n# Expected output will show the actual PowerShell command\n```\n\n### Step 5: Analyze Results\n\n**Benign findings (tune out):**\n- Legitimate admin scripts that encode for transport\n- Software installers using PowerShell downloads from known CDNs\n- Configuration management tools (Ansible, Chef) using PowerShell\n\n**Suspicious findings (investigate):**\n- PowerShell spawned by: word.exe, excel.exe, outlook.exe, cmd.exe → user likely clicked malicious document\n- Downloads from: pastebin.com, raw.githubusercontent.com, strange IPs\n- IEX (Invoke-Expression) combined with download → classic fileless malware\n- Very long encoded strings (>500 chars)\n\n### Common Errors\n- **No results**: PowerShell Script Block Logging may not be enabled → Check policy\n- **Too many results**: Add filters for timeframe, specific users, or suspicious patterns only\n- **Encoded string won't decode**: Try both ASCII and Unicode encodings\n\n**Challenge:** Can you find encoded PowerShell used by legitimate tools vs malicious ones in your environment? Create a list of known-good patterns to exclude from future hunts."
+      }
+    },
+    {
+      "block_id": "d7f76143-c8db-4849-9d37-e6556a58be02",
+      "type": "real_world",
+      "title": "Case Study: The SolarWinds Hunt — How FireEye Found It",
+      "content": {
+        "text": "## Case Study: How Hypothesis-Driven Hunting Found SolarWinds\n\n### Background\n\nIn December 2020, FireEye (now Mandiant) discovered one of the most sophisticated supply chain attacks in history: the SolarWinds SUNBURST backdoor. While news reports focused on the initial compromise, what's less discussed is **how** threat hunters found it after months of the attacker being active.\n\n### The Attack\n\nThe Threat Actor (later attributed to APT29/Cozy Bear) compromised SolarWinds' build system and inserted malicious code into Orion updates — software used by 18,000+ organizations including US government agencies.\n\n**Timeline:**\n- October 2019: Initial access to SolarWinds build system\n- March 2020: Malicious updates released to customers  \n- June 2020: FireEye (a customer) begins hunting unusual behavior\n- December 2020: FireEye announces discovery\n\n### The Hunting Hypothesis That Found It\n\nFireEye's Red Team noticed that their own red team tools had been stolen. As they investigated the breach, they applied a key hunting technique:\n\n**Hypothesis**: \"The attacker gained access via a trusted software update. If so, a legitimate, signed process (SolarWinds Orion) may be making unusual network connections that we should baseline.\"\n\n**Data they queried:**\n- Network connections from SolarWinds Orion process\n- DNS queries from Orion to unusual domains\n- Comparison: normal Orion network behavior vs current\n\n**What they found:**\n- SolarWinds.BusinessLayerHost.exe making DNS requests to `*.avsvmcloud.com`\n- The DNS requests contained encoded information (the C2 check-in)\n- The domain used DGA (Domain Generation Algorithm) to appear legitimate\n\n### Why Traditional Detections Missed It\n\n1. **Signed and trusted**: The malware was inside a legitimate, signed SolarWinds binary. AV and EDR trusted it.\n2. **Time delay**: The malware waited 2 weeks after installation before activating — evading sandboxes that check for immediate C2.\n3. **Blending in**: It mimicked legitimate Orion network traffic patterns.\n4. **Low volume**: Only one DNS request per day — below alert thresholds.\n\n### The Key Hunting Lesson\n\nThe backdoor was found NOT because an alert fired, but because a hunter asked:\n\n**\"What is SolarWinds Orion normally supposed to do vs. what IS it actually doing?\"**\n\nThis is baseline analysis — comparing expected behavior against observed behavior. No IOC existed. No signature matched. Pure behavioral hunting found it.\n\n### How to Apply This\n\n1. **Know your normal**: Document what your critical software is supposed to do\n2. **Hunt deviations**: Any process making network connections it shouldn't\n3. **Focus on trusted processes**: Attackers abuse LOLBins and signed software\n4. **Look at DNS**: DNS-based C2 is incredibly common and often missed\n\n### Additional Examples\n\n- **APT32 (OceanLotus)**: Found by hunting for WMI subscriptions that persisted on executive laptops — no alert ever fired\n- **FIN6 (POS malware)**: Discovered during a hunt for unusual PowerShell connecting to Eastern European IPs during non-business hours\n- **NotPetya**: Could have been detected earlier by hunting for wmic.exe and psexec lateral movement patterns across the network\n\n**Your Turn:** What are 3 critical processes in your environment that you could baseline today? What would \"unusual behavior\" look like for each?"
+      }
+    },
+    {
+      "block_id": "03ce4501-b764-429e-a627-5c821be17ad6",
+      "type": "quiz",
+      "title": "Knowledge Check: Test Your Hunting Instincts",
+      "content": {
+        "text": "## Knowledge Check: Test Your Hunting Instincts\n\n**Challenge:** Test your understanding before moving forward!\n\n### Question 1: Scenario-Based\n\nYou're a threat hunter at a financial services company. Your threat intel feed reports that a ransomware group is actively targeting financial firms using T1047 (Windows Management Instrumentation) for lateral movement. What's the BEST first step?\n\nA) Wait for your EDR to alert on suspicious WMI activity  \nB) Form a hypothesis: \"Attackers may be using WMI to execute commands on remote systems, which would show up as WmiPrvSE.exe spawning unusual child processes in Sysmon Event ID 1\"  \nC) Block all WMI on the network immediately  \nD) Search Google for WMI detection rules and import them  \n\n**Think it through:** What's the defining difference between hunting and reactive security?\n\n### Question 2: Technical\n\nYou run a hunt and find PowerShell.exe spawned by winword.exe with a command line containing `-EncodedCommand`. What does this most likely indicate?\n\nA) A legitimate Microsoft Office automation script  \nB) A user running a PowerShell script from within a Word document — potentially a macro dropping malware  \nC) The Windows Update service downloading updates  \nD) A developer testing PowerShell from within Office  \n\n**Consider:** What would need to be true for Option A to be normal behavior?\n\n### Question 3: Application\n\nYou complete a 2-week hunt for T1053.005 (Scheduled Tasks) and find nothing suspicious. What's the CORRECT next action?\n\nA) Report to management that the environment is clean  \nB) Mark the hunt as completed with no findings and move on  \nC) Convert your hunting queries into detection rules and document what \"normal\" scheduled task behavior looks like in your environment  \nD) Expand the hunt scope to all ATT&CK techniques  \n\n**Discuss:** Why is \"finding nothing\" still a valuable outcome in threat hunting?"
+      }
+    },
+    {
+      "block_id": "87ca20c1-1809-425b-a1d8-a8518a00bbde",
+      "type": "simulation",
+      "title": "Lab: Hunt for Lateral Movement in a Simulated Environment",
+      "content": {
+        "text": "## Lab: Hunt for Lateral Movement\n\n**Scenario:** You are a threat hunter at Acme Corp. An anonymous tip suggests a competitor's espionage team may have accessed your network via a phishing email 3 weeks ago. Your SIEM has 30 days of logs. No alerts have fired.\n\n**Your Mission:** Develop and execute a hunting hypothesis to look for lateral movement activity.\n\n**Available Resources:**\n- Splunk SIEM with 30 days of Windows Event Logs\n- Sysmon data (Event IDs 1, 3, 7, 8, 10, 11, 13)\n- Network flow data (source/dest IP, ports, bytes)\n- EDR: CrowdStrike Falcon (process trees, command lines)\n\n---\n\n### Step 1: Choose Your ATT&CK Technique\n\nLook at MITRE ATT&CK Lateral Movement tactic. Common techniques include:\n- T1021.001: Remote Desktop Protocol (RDP)\n- T1021.002: SMB/Windows Admin Shares (psexec-style)\n- T1047: Windows Management Instrumentation (WMI)\n- T1028: Windows Remote Management (WinRM)\n\n**Choose T1021.002** (SMB lateral movement) for this exercise.\n\n### Step 2: Form Your Hypothesis\n\n*\"An attacker who gained initial access may be using SMB/Admin Shares (T1021.002) to move laterally, which would appear as net use commands, PsExec activity, or unusual connections to ADMIN$ or C$ shares, visible in Windows Event ID 4648 (explicit credential logon) and Sysmon Event ID 3 (network connections from psexec-like tools)\"*\n\n### Step 3: Execute Hunting Queries\n\n```splunk\n# Hunt for admin share connections (Event 5140 - network share accessed)\nindex=windows EventCode=5140 ShareName IN (\"ADMIN$\", \"C$\", \"IPC$\")\n| stats count by src_ip, dest_ip, UserName, ShareName\n| where count > 5\n| sort -count\n```\n\n```splunk\n# Hunt for PsExec indicators (service creation from temp paths)\nindex=windows EventCode=7045  \n| search ServiceFileName=\"*\\PSEXESVC*\" OR ServiceFileName=\"*\\temp\\*\" OR ServiceFileName=\"*\\AppData\\*\"\n| table _time, ComputerName, ServiceName, ServiceFileName, AccountName\n```\n\n```splunk\n# Hunt for unusual WMI execution\nindex=windows EventCode=4688 (NewProcessName=\"*wmiprvse*\" OR ParentProcessName=\"*wmiprvse*\")\n| search NOT NewProcessName=\"*svchost*\" NOT NewProcessName=\"*WmiApSrv*\"\n| table _time, ComputerName, NewProcessName, CommandLine, SubjectUserName\n```\n\n### Step 4: Analyze Results\n\n**Look for:**\n- One source IP connecting to multiple hosts within a short timeframe\n- Admin share access outside business hours\n- Service creation with suspicious names or paths\n- WMI spawning cmd.exe or PowerShell on remote systems\n\n**Correlate findings:**\n- Map the source IP to a specific workstation\n- Check if that workstation shows signs of compromise (unusual processes, new files)\n- Check if the user account was used at unusual times\n\n### Step 5: Document and Convert to Detection\n\n```splunk\n# Convert to detection alert\nindex=windows EventCode=5140 ShareName IN (\"ADMIN$\", \"C$\")\n| stats dc(dest_ip) as unique_targets by src_ip, span=1h\n| where unique_targets > 5\n| eval message=\"Potential lateral movement: \" . src_ip . \" connected to \" . unique_targets . \" admin shares in 1 hour\"\n| alert\n```\n\n**Debrief Questions:**\n- What evidence would you need to declare this a true positive vs false positive?\n- If you found lateral movement, what's your first call after confirming it?\n- How would you modify this hunt for WinRM lateral movement instead?\n\n**Bonus:** Build the hunt for T1021.001 (RDP lateral movement) using Windows Event ID 4624 Logon Type 10."
+      }
+    },
+    {
+      "block_id": "f5144932-0e5b-478f-bae5-6916cb889699",
+      "type": "reflection",
+      "title": "Reflection: Your Hunting Mindset",
+      "content": {
+        "text": "## Reflection: Your Hunting Mindset\n\n**Pause and Think:**\n\n### About the Content\n\n- What surprised you most about how the SolarWinds backdoor was found?\n- Which part of the PEAK methodology do you think is most often skipped by security teams?\n- What would prevent your organization from doing effective threat hunting right now?\n\n### About Your Learning\n\n- Did the detective analogy help clarify what threat hunting is? What other analogies might work?\n- Which hunting query made the most sense to you? Which was hardest to follow?\n- How is hypothesis-driven thinking different from how you currently approach security problems?\n\n### Application Planning\n\n- Name ONE ATT&CK technique you could hunt for in your current environment this week\n- What data source do you need to enable first before hunting?\n- Who on your team should learn this alongside you?\n\n### Next Steps\n\n- [ ] Enable PowerShell Script Block Logging in your lab environment\n- [ ] Pick one ATT&CK technique and write a hunting hypothesis using the template\n- [ ] Run your first hunting query in your SIEM\n- [ ] Read the MITRE ATT&CK technique page for T1059.001 (PowerShell)\n- [ ] Find and read one threat hunting blog post from a real security team\n\n**Journal Prompt:** Write 2-3 sentences: \"Before this lesson, I thought threat hunting was ___. Now I understand that ___. Next time I see ___, I will ___.\" "
+      }
+    },
+    {
+      "block_id": "e651bb21-e6eb-437c-a6f7-901b490c308b",
+      "type": "mindset_coach",
+      "title": "Mindset Coach: You Can Hunt",
+      "content": {
+        "text": "## Mindset Coach: You Can Hunt\n\n**Let's address the elephant in the room:**\n\nMany people hear \"threat hunting\" and immediately think: \"That's for experts. I need to know everything about malware, networks, and Windows internals before I can hunt.\"\n\nThat's not true. And that belief is holding you back.\n\n### The Reality\n\nYour first hunt doesn't need to find an APT29 campaign. It can be as simple as:\n- \"Which accounts logged in at 3 AM last week?\"\n- \"Are there any PowerShell scripts running from Temp folders?\"\n- \"Which workstations are making connections to unusual countries?\"\n\nThose are hunts. Basic ones. But hunts.\n\n### Reframe the Fear\n\n❌ \"I need to know everything before I can hunt\"\n✅ \"I can start with one technique and one query. Expertise comes from doing.\"\n\n❌ \"What if I don't find anything? Was it a waste?\"  \n✅ \"A hunt that finds nothing still proves your hypothesis was wrong OR improves your detections.\"\n\n❌ \"I'll miss the attacker anyway — they're too sophisticated\"\n✅ \"Most attackers use the same techniques repeatedly. ATT&CK documents 400+ of them. Pick one.\"\n\n### Celebrate What You Already Know\n\nYou now understand:\n- ✓ Why reactive security has a 200-day dwell time problem\n- ✓ What a hunting hypothesis looks like (and how to write one)\n- ✓ How MITRE ATT&CK provides ready-made hunting guidance\n- ✓ How to write basic SIEM queries for PowerShell and lateral movement\n- ✓ How SolarWinds was found through behavioral hunting (not signatures)\n\n**That's real hunter knowledge.**\n\n### Your First Hunt Checklist\n\n1. Pick ONE ATT&CK technique (start with T1059.001 PowerShell)\n2. Write your hypothesis (5 minutes)\n3. Identify your data source (Windows Event Log? SIEM? EDR?)\n4. Run ONE query\n5. Document what you found (even if nothing)\n6. Repeat next week with a new technique\n\n**You're already thinking like a hunter. Now go hunt something.** 🎯"
+      }
+    },
+    {
+      "block_id": "66c584a6-0951-42f9-b779-f093d9a5e42d",
+      "type": "explanation",
+      "title": "What's Next: Level Up Your Hunting",
+      "content": {
+        "text": "## What's Next: Level Up! 🎯\n\n**Congratulations!** You've completed Hypothesis-Driven Threat Hunting for Beginners. You now understand the core methodology, key data sources, and how to write your first hunting queries.\n\n### Skills You Unlocked\n- ✅ Hypothesis formulation using MITRE ATT&CK\n- ✅ Understanding of key hunting data sources\n- ✅ Basic SIEM hunting queries (Splunk SPL and KQL)\n- ✅ Converting hunt findings into detection rules\n- ✅ The hunter's mindset: proactive vs reactive\n\n### Next Lessons in the Threat Hunting Path\n\n**Hunting for Lateral Movement** — Deep dive into SMB, RDP, WMI, and PsExec hunting techniques with real EDR query examples.\n\n**Windows Event Logs for Threat Hunters** — Master the 20 event IDs every hunter needs to know. Learn to baseline normal authentication and spot credential attacks.\n\n**Network Traffic Analysis for Beginners** — Learn to read network flow data, identify C2 beaconing patterns, and hunt for data exfiltration.\n\n### Recommended Practice\n\n| This Week | This Month | This Quarter |\n|-----------|------------|--------------|\n| Enable PowerShell logging | Hunt one technique per week | Build a hunt library |\n| Write your first hypothesis | Baseline 5 critical processes | Create 10 detection rules |\n| Run one SIEM query | Read 2 threat intelligence reports | Do a tabletop hunting exercise |\n\n### Resources to Keep Learning\n\n- **MITRE ATT&CK Navigator**: https://mitre-attack.github.io/attack-navigator/ — visual tool to track what you've hunted\n- **ThreatHunting.net**: Community of hunters sharing techniques and queries\n- **Sigma rules**: https://github.com/SigmaHQ/sigma — pre-written detection rules to adapt for hunting\n- **SANS FOR508**: The definitive course for advanced threat hunting and DFIR\n\n**Keep Hunting!** 🚀"
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "c660e135-e12f-4a13-b438-578e67d7a306",
+      "question": "A financial company's SOC has had no major incidents for 6 months. The CISO says this proves their security controls are working and they don't need threat hunting. What's the strongest argument AGAINST this conclusion?",
+      "options": [
+        "More security tools should be purchased to improve detection",
+        "Sophisticated attackers can maintain access for months without triggering alerts, meaning 6 months of silence could indicate undetected intrusion rather than a clean environment",
+        "The SOC analysts aren't skilled enough to handle advanced threats",
+        "Threat hunting is too expensive and only matters for large enterprises"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "explanation": "The correct answer is B. The average attacker dwell time exceeds 200 days, meaning a 6-month period without alerts is entirely consistent with an attacker who has established quiet access and is conducting reconnaissance or exfiltration. Alert-driven security only catches noisy attacks. Sophisticated APTs specifically design their TTPs to stay below alert thresholds. Threat hunting is the proactive method to find these stealthy attackers."
+    },
+    {
+      "question_id": "1674aa5e-a5e2-4e71-a263-acb88c3b4624",
+      "question": "You're writing a hunting hypothesis and have the following: 'Attackers may be using PowerShell.' What is the MOST critical missing element that makes this an ineffective hunting hypothesis?",
+      "options": [
+        "It doesn't specify which attacker group is suspected",
+        "It doesn't specify what specific technique, what evidence would be created, and where to look for that evidence in specific data sources",
+        "PowerShell is too common to hunt effectively",
+        "The hypothesis needs to be approved by management first"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "explanation": "A strong hunting hypothesis must be testable and actionable. It needs to specify: (1) what specific technique is being used (e.g., encoded commands, download cradles), (2) what evidence/artifacts that technique would create, and (3) exactly where to look for that evidence (specific event IDs, SIEM index, EDR telemetry). Without these elements, you have no idea where to start querying or what a finding looks like."
+    },
+    {
+      "question_id": "45428bac-4296-4367-82d7-c0fd68e8ed53",
+      "question": "During a hunt for T1053.005 (Scheduled Tasks), you run queries and find no suspicious scheduled tasks. What is the BEST interpretation and next action?",
+      "options": [
+        "The environment is clean — close the hunt and move to the next technique",
+        "The hunt failed — scheduled task hunting never works",
+        "Document your findings, verify your logging was complete (scheduled task creation logs were actually captured), and convert your hunting query into an automated detection rule",
+        "Expand immediately to all 400+ ATT&CK techniques to find something"
+      ],
+      "correct_answer": 2,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "explanation": "A hunt that finds 'nothing' is still valuable but requires validation. First, you must verify your logging was adequate — were scheduled task creation events (Event ID 4698) actually being captured? If logging was complete, then convert your query to a detection rule so future malicious scheduled tasks will be automatically alerted on. Threat hunting produces two outcomes: incident response (attacker found) or improved detections (no attacker, but now you have automation). Neither outcome is 'the environment is clean' with 100% certainty."
+    },
+    {
+      "question_id": "aa1a8b51-b98a-43b9-a6f6-e405c66e06c7",
+      "question": "Why did traditional signature-based detection fail to catch the SolarWinds SUNBURST backdoor for months?",
+      "options": [
+        "The security tools were turned off",
+        "The malware was embedded in a legitimate, digitally-signed software update, used time delays before activating, and mimicked normal application behavior — there was no known-bad signature to match",
+        "The attackers bribed the security team",
+        "No logs were being collected from SolarWinds systems"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "explanation": "SUNBURST succeeded against signature-based detection for several reasons: (1) it was delivered via a legitimate, signed SolarWinds update — AV and EDR trusted it, (2) it waited 12-14 days before activating to evade sandbox analysis, (3) its C2 communication mimicked legitimate SolarWinds traffic patterns, and (4) no prior IOCs existed (zero-day supply chain attack). It was found through behavioral hunting: comparing expected vs actual network behavior of the SolarWinds process, not through any signature match."
+    }
+  ],
+  "lesson_number": 701
+}
