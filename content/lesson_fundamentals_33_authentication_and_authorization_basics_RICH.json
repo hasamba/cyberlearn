@@ -1,0 +1,153 @@
+{
+  "lesson_id": "6540572e-f88b-4805-bb7a-516d4de29ba1",
+  "lesson_number": "717",
+  "domain": "fundamentals",
+  "title": "Authentication and Authorization Basics",
+  "difficulty": 1,
+  "order_index": 33,
+  "prerequisites": [],
+  "concepts": [
+    "Authentication vs Authorization",
+    "MFA",
+    "SSO",
+    "OAuth 2.0",
+    "RBAC",
+    "ABAC"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Clearly differentiate authentication (who are you?) from authorization (what can you do?)",
+    "Explain the three authentication factors and why MFA matters",
+    "Understand how SSO works and its security tradeoffs",
+    "Describe OAuth 2.0 flows at a high level",
+    "Compare RBAC and ABAC access control models"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the difference between authentication and authorization?",
+      "options": [
+        "They are the same",
+        "Authentication verifies identity; authorization determines permissions",
+        "Authorization verifies identity; authentication grants access",
+        "Authentication is for users; authorization is for systems"
+      ],
+      "correct_answer": 1,
+      "explanation": "Authentication (AuthN) answers 'Who are you?' Authorization (AuthZ) answers 'What are you allowed to do?' — completely separate concerns.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "8f396c71-45d8-4ffd-b011-fc63c335ede7"
+    },
+    {
+      "question": "Which of the following is a 'something you have' authentication factor?",
+      "options": [
+        "Password",
+        "Fingerprint",
+        "TOTP app on your phone",
+        "Security question"
+      ],
+      "correct_answer": 2,
+      "explanation": "TOTP (Time-based One-Time Password) on your phone is 'something you have.' Password = 'something you know.' Fingerprint = 'something you are.'",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "c41ed140-cf81-48fe-9115-e8327ef05117"
+    },
+    {
+      "question": "What security risk does SSO introduce?",
+      "options": [
+        "Slower login times",
+        "Single point of compromise — one stolen credential grants access to all services",
+        "Weaker passwords",
+        "Lack of MFA support"
+      ],
+      "correct_answer": 1,
+      "explanation": "If the SSO provider is compromised, all linked services become accessible. This is why SSO must be protected with strong MFA.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "9defa2a0-47bb-4048-b4dd-a073a09d15bd"
+    },
+    {
+      "question": "In OAuth 2.0, what does the Access Token represent?",
+      "options": [
+        "The user's password",
+        "Permission granted to an application to act on behalf of the user",
+        "The user's session ID",
+        "The application's secret key"
+      ],
+      "correct_answer": 1,
+      "explanation": "An OAuth access token represents delegated authorization — the user grants an app permission to do specific things on their behalf without sharing their password.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "7b5cf92b-034f-4a17-b086-42cd4605735c"
+    },
+    {
+      "question": "What is Role-Based Access Control (RBAC)?",
+      "options": [
+        "Access based on time of day",
+        "Access granted based on a user's assigned role in an organization",
+        "Access based on the content of the request",
+        "Access determined by IP address"
+      ],
+      "correct_answer": 1,
+      "explanation": "RBAC assigns permissions to roles (e.g., 'Admin', 'Editor', 'Viewer'), and users inherit permissions through their role assignment.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "7bcc427d-f541-4ee5-b7bc-036076547a0b"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Authentication and authorization failures are in OWASP Top 10 every single year. 'Broken Access Control' was #1 in 2021. This is the foundation of application security — get it wrong and nothing else you build matters."
+    },
+    {
+      "type": "explanation",
+      "content": "## AuthN vs AuthZ — The Critical Distinction\n\n```\nAuthentication (AuthN): Who are you?\n→ Passport control at the airport\n→ 'Prove your identity'\n\nAuthorization (AuthZ): What can you do?\n→ TSA checking your ticket\n→ 'Prove you're allowed to be here'\n```\n\n**Authentication Factors (MFA = using 2+ of these):**\n1. **Something you know** — password, PIN, security question\n2. **Something you have** — phone (TOTP), hardware key (YubiKey), smart card\n3. **Something you are** — fingerprint, face ID, iris scan\n4. **Somewhere you are** — geolocation (4th factor, less common)\n\n**Why MFA matters:** Stolen passwords are everywhere. A second factor means a compromised password alone isn't enough.\n\n```\nAttack scenario:\n- Attacker buys credentials from dark web: user@company.com / password123\n- Without MFA: instant access\n- With TOTP MFA: attacker is blocked (doesn't have the phone)\n- Phishing-resistant MFA (FIDO2/WebAuthn): attacker blocked even with real-time phishing\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\n**Authentication vs Authorization:**\n- AuthN = checking your ID at the door of a club\n- AuthZ = checking if your wristband color lets you into the VIP section\n\n**SSO** = One 'master pass' that gets you into all the clubs in the city. Convenient but risky — lose it and you're locked out everywhere. Or if someone steals it, they get everywhere.\n\n**OAuth 2.0** = Imagine your bank gives your accountant a special key that ONLY opens the 'view transactions' drawer, not the 'transfer money' drawer. You didn't give them your master key — just a limited one for a specific job."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Testing Authentication\n\n```python\n# Testing password policies (use on your own systems!)\nimport requests\n\n# Test for username enumeration\n# (different error messages for valid vs invalid users is a vulnerability)\nresponse_valid = requests.post('https://example.com/login', \n    data={'username': 'admin', 'password': 'wrongpassword'})\nresponse_invalid = requests.post('https://example.com/login',\n    data={'username': 'notauser123xyz', 'password': 'wrongpassword'})\n\n# If response lengths differ → username enumeration vulnerability!\nprint(len(response_valid.text), len(response_invalid.text))\n\n# Check for missing brute-force protection\n# (legitimate: lockout after 5-10 failed attempts)\nfor i in range(10):\n    r = requests.post('https://example.com/login',\n        data={'username': 'admin', 'password': f'attempt{i}'})\n    print(f'Attempt {i}: {r.status_code}')\n    # If still 200 after 10 attempts → no lockout = vulnerability!\n```\n\n**Access Control Testing:**\n- Login as low-privilege user, grab your user ID\n- Try accessing another user's resource by changing the ID\n- If successful → Insecure Direct Object Reference (IDOR)"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: OAuth Misconfiguration Leads to Account Takeover\n\n**Common OAuth Bug: Open Redirect in Redirect URI**\n\n```\n# Attacker crafts this URL:\nhttps://api.example.com/oauth/authorize\n  ?client_id=legit_app\n  &redirect_uri=https://evil.com/steal  ← attacker controlled!\n  &response_type=code\n  &scope=read:all\n\n# If server doesn't validate redirect_uri against whitelist:\n# Auth code goes to evil.com → attacker exchanges for access token\n# → Full account compromise\n```\n\n**Defense:** Always validate redirect URIs against a strict allowlist. Never use regex matching (attackers will find bypasses). Use exact string comparison.\n\nThis class of bug has affected Google, Facebook, GitHub, and hundreds of enterprise apps."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: PAPA for Authentication Factors\n\n**P**assword = something you KNOW\n**A**pp (phone/TOTP) = something you HAVE\n**P**rint (fingerprint) = something you ARE\n**A**ddress (location) = somewhere you ARE\n\n**OAuth in one line:** 'I allow [App] to [scope] on my behalf' — the user delegates limited access without sharing credentials.\n\n**RBAC vs ABAC:**\n- **RBAC** = your job title determines access (Admin vs User vs Read-only)\n- **ABAC** = context determines access (time of day + location + clearance level + resource sensitivity)"
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Where AuthZ Breaks in Real Apps\n\nThe most common authorization failures:\n1. **IDOR** — `/api/invoices/1234` → change to `/api/invoices/1235` → see another user's invoice\n2. **Privilege escalation** — regular user accesses admin endpoints\n3. **Missing function-level access control** — admin endpoints not protected\n4. **JWT algorithm confusion** — accepting 'alg: none' in JWT tokens\n\n**Self-test questions:**\n- Does your app check authorization on every API call?\n- Are admin routes protected server-side (not just hidden in UI)?\n- Does changing a user ID in a request let you access other users' data?"
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Authentication without authorization is a hotel that checks your ID at the door but lets you into any room. Authorization without authentication is a hotel that has room keys but never checks who's holding them. You need both — correctly implemented."
+    }
+  ],
+  "tags": [
+    "authentication",
+    "authorization",
+    "MFA",
+    "SSO",
+    "OAuth",
+    "RBAC",
+    "IAM",
+    "fundamentals"
+  ]
+}

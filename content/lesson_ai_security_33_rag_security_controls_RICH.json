@@ -1,0 +1,135 @@
+{
+  "lesson_id": "d0e1f2a3-b4c5-6789-defa-890123456789",
+  "domain": "ai_security",
+  "title": "RAG Security Controls and Defense Implementation",
+  "difficulty": 3,
+  "order_index": 33,
+  "prerequisites": ["RAG Attack Techniques: Information Leakage and Poisoning"],
+  "concepts": ["input filtering", "output monitoring", "source provenance", "access control architecture", "content integrity", "secure RAG design"],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Implement document-level access control at the retrieval layer",
+    "Design ingestion pipelines with content integrity scanning",
+    "Build output monitoring to detect RAG-based exfiltration",
+    "Apply source citation and provenance tracking",
+    "Architect a secure end-to-end RAG system"
+  ],
+  "post_assessment": [
+    {
+      "question": "Where should access control filters be applied in a RAG pipeline?",
+      "options": ["Only in the UI layer", "At the vector database query level, filtering by user permissions before documents reach the LLM", "After the LLM generates a response", "Only for admin users"],
+      "correct": 1,
+      "explanation": "Access control must be applied at retrieval time — filtering which documents are fetched from the vector database based on user permissions. Post-retrieval filtering is insufficient because the LLM may have already processed restricted content."
+    },
+    {
+      "question": "What is source provenance in RAG security?",
+      "options": ["The IP address of the document uploader", "Tracking which documents contributed to each response, enabling audit and accountability", "The file format of ingested documents", "The geographic location of the vector database"],
+      "correct": 1,
+      "explanation": "Source provenance tracks which documents were retrieved and included in each LLM response, enabling auditing, detecting poisoning, and providing response attribution."
+    },
+    {
+      "question": "What should an ingestion pipeline scan for before adding a document to the knowledge base?",
+      "options": ["Grammar errors only", "Instruction-like patterns, PII, malicious links, and content policy violations", "File size", "Author name"],
+      "correct": 1,
+      "explanation": "Ingestion scanning should check for embedded instructions (prompt injection), PII that shouldn't be indexed, malicious URLs, and content policy violations before documents enter the knowledge base."
+    },
+    {
+      "question": "How does output monitoring help detect RAG poisoning?",
+      "options": ["It makes responses faster", "It detects anomalous response patterns — unusual content, unexpected source citations, or systematic information disclosure", "It improves grammar", "It reduces token costs"],
+      "correct": 1,
+      "explanation": "Output monitoring can catch signs of poisoning: responses citing unexpected sources, unusual content patterns, systematic disclosure of restricted categories, or instruction-following behavior from retrieved content."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget bolt-on security — RAG security controls must be designed into the architecture from the start",
+    "active": "Implement retrieval-time access control in a sample RAG application and verify it works with test queries",
+    "state": "Think like a security architect designing for zero trust — every component is untrusted until proven otherwise",
+    "teach": "Explain RAG access control as 'the librarian checks your library card before handing you the book, not after'",
+    "enter": "Before implementing controls, prioritize by attack risk: access control first, then ingestion scanning, then monitoring",
+    "review": "After implementing each control, run the relevant attack technique from lesson 32 to verify it's blocked",
+    "notes": "Create a RAG security design checklist: ingestion → storage → retrieval → context → output — check each layer",
+    "why": "Secure RAG design is a competitive differentiator — enterprises choosing AI platforms will prioritize security",
+    "emotion": "The confidence of deploying a RAG system knowing each attack vector has a specific countermeasure",
+    "speed": "Use existing security frameworks (LlamaIndex security modules, LangChain callbacks) instead of building from scratch"
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Defense Is Architecture, Not Afterthought",
+      "content": "The best RAG security doesn't come from patching — it comes from design. A system built with access control at the retrieval layer, ingestion scanning, provenance tracking, and output monitoring is fundamentally harder to attack than one with security bolted on afterward. This lesson translates the attack techniques you learned into specific, implementable controls.",
+      "icon": "🏗️"
+    },
+    {
+      "type": "explanation",
+      "title": "RAG Security Controls by Layer",
+      "content": "Each RAG layer requires specific security controls.",
+      "subsections": [
+        {
+          "title": "Ingestion Layer Controls",
+          "content": "- Content scanning: detect embedded instructions, PII, malicious URLs\n- Document hashing: SHA-256 hash each document at ingestion for integrity tracking\n- Source verification: allowlist trusted document sources; flag or reject unknown sources\n- Metadata enforcement: require author, classification, and date on all documents\n- Human review queue: flag documents with anomalous instruction-like patterns for review"
+        },
+        {
+          "title": "Retrieval Layer Controls",
+          "content": "- User-scoped queries: attach user permission filters to every vector database query\n- Document ACL: store permission metadata alongside embeddings; filter before returning results\n- Query logging: log all queries and retrieved document IDs for audit\n- Retrieval anomaly detection: alert on queries retrieving unusually sensitive documents or high volumes"
+        },
+        {
+          "title": "Output Layer Controls",
+          "content": "- Source citation: include retrieved document IDs/titles in every response\n- PII detection: scan responses for sensitive data patterns before delivery\n- Content policy: apply output content filters\n- Exfiltration monitoring: alert on responses that contain large volumes of knowledge base content\n- Response logging: store all responses with their source documents for audit trail"
+        }
+      ]
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: RAG Defense",
+      "content": "Going back to the library analogy — securing the smart assistant who reads from a filing cabinet.",
+      "subsections": [
+        {
+          "title": "The defenses",
+          "content": "Ingestion scanning: before any new file goes in the cabinet, a security guard reads it for hidden instructions or false information.\n\nAccess control at retrieval: the assistant checks your access badge before pulling any file from the cabinet — not after already reading it.\n\nProvenance tracking: every answer includes which files were used: 'Based on Q4 Budget Policy (HR-only document)' — so you'd know if restricted files were accessed.\n\nOutput monitoring: a supervisor reviews every answer for signs that the assistant was manipulated or is revealing things they shouldn't."
+        }
+      ]
+    },
+    {
+      "type": "code_exercise",
+      "title": "Implementing Retrieval-Time Access Control",
+      "description": "Add user permission filtering to a vector database query",
+      "code": "from typing import List\n\n# Example using LlamaIndex-style metadata filtering\n\ndef secure_retrieve(query: str, user: User, vector_store) -> List[Document]:\n    # Build permission filter from user's roles/groups\n    permitted_classifications = get_user_permitted_classifications(user)\n    \n    # Apply filter AT retrieval time — not after\n    metadata_filter = {\n        'classification': {'$in': permitted_classifications},\n        # Additional filters: department, project, etc.\n    }\n    \n    # Query with filter embedded — restricted docs never fetched\n    results = vector_store.similarity_search(\n        query=query,\n        k=5,\n        filter=metadata_filter  # <-- This is the key control\n    )\n    \n    # Audit log: query, user, retrieved doc IDs\n    audit_log(user.id, query, [doc.metadata['id'] for doc in results])\n    \n    return results\n\n# WRONG approach — access control after retrieval:\ndef insecure_retrieve(query, user, vector_store):\n    all_results = vector_store.similarity_search(query, k=5)\n    # LLM has already seen restricted content in context!\n    return [r for r in all_results if user_can_access(user, r)]",
+      "instructions": "1. Identify user permission attributes (roles, groups, clearance levels)\n2. Store permission metadata alongside document embeddings at ingestion\n3. Build permission filter objects for each user/query combination\n4. Pass filters to the vector store query — not as a post-processing step\n5. Log all retrievals with user ID and document IDs for audit",
+      "expected_outcome": "Restricted documents are never included in LLM context for unauthorized users. The key insight: filtering must happen before documents reach the LLM, not after."
+    },
+    {
+      "type": "real_world",
+      "title": "Microsoft Copilot for Microsoft 365 Security Architecture",
+      "scenario": "Microsoft's Copilot for M365 applies permissions from SharePoint and OneDrive at retrieval time. The system only retrieves documents the authenticated user already has permission to read. This was a deliberate architectural decision — early testing showed that without retrieval-time access control, users could receive information from documents they weren't supposed to access via semantic queries. Microsoft's architecture became the reference implementation for enterprise RAG access control.",
+      "key_lessons": [
+        "Retrieval-time access control is the industry-standard approach for enterprise RAG",
+        "Permission inheritance from existing document systems (SharePoint, Jira) is the practical implementation path",
+        "Even Microsoft needed explicit design focus to get this right",
+        "The existing permission model of your document system should be the source of truth for RAG ACLs"
+      ]
+    },
+    {
+      "type": "memory_aid",
+      "title": "Secure RAG Architecture: SIPA",
+      "mnemonic": "SIPA",
+      "explanation": "S=Scan ingestion (content integrity, instruction detection, PII, malicious URLs before any document enters KB), I=Identity-filtered retrieval (user permissions applied at query time, never post-retrieval), P=Provenance tracking (every response cites its source documents for auditability), A=Anomaly monitoring (alert on unusual retrieval patterns, high-volume responses, or restricted document access)."
+    },
+    {
+      "type": "reflection",
+      "title": "Designing Your Secure RAG",
+      "prompts": [
+        "If you were to build a RAG system for your organization today, which control from this lesson would you implement first?",
+        "How would source provenance change user trust in AI-generated responses?",
+        "What monitoring alerts would you set up to detect a RAG system under active attack?",
+        "How does the secure RAG architecture in this lesson compare to RAG systems you've seen deployed?"
+      ]
+    },
+    {
+      "type": "mindset_coach",
+      "title": "You Now Have the Full RAG Security Picture",
+      "content": "Over the last three lessons, you've learned RAG architecture, attack techniques, and now defenses. You understand the full threat model. You can threat model a RAG system, find its vulnerabilities, and design controls for each one. This end-to-end knowledge is rare — most practitioners know one piece. You know all three. Apply it.",
+      "icon": "✅"
+    }
+  ],
+  "tags": ["ai-security", "rag", "access-control", "ingestion-security", "output-monitoring", "enterprise-ai", "defense"]
+}

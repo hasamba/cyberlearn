@@ -1,0 +1,152 @@
+{
+  "lesson_id": "9b571318-8eb8-4549-aae3-1f2e299f5055",
+  "lesson_number": "714",
+  "domain": "fundamentals",
+  "title": "Cryptography Basics: Encryption vs Hashing",
+  "difficulty": 1,
+  "order_index": 30,
+  "prerequisites": [],
+  "concepts": [
+    "Symmetric encryption",
+    "Asymmetric encryption",
+    "Hashing",
+    "Digital signatures",
+    "TLS/SSL",
+    "PKI"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Differentiate between encryption (reversible) and hashing (one-way)",
+    "Explain symmetric vs asymmetric encryption with real examples",
+    "Understand how TLS uses both symmetric and asymmetric encryption",
+    "Describe digital signatures and certificate authorities",
+    "Identify common algorithms: AES, RSA, SHA-256, bcrypt"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the key difference between encryption and hashing?",
+      "options": [
+        "Encryption is slower",
+        "Encryption is reversible; hashing is one-way",
+        "Hashing uses longer keys",
+        "They are the same thing"
+      ],
+      "correct_answer": 1,
+      "explanation": "Encryption is designed to be reversed (decrypted). Hashing is a one-way function — you can't get the original data back from a hash.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "3f1eb148-52ba-46a9-b55d-8c5e28c719de"
+    },
+    {
+      "question": "Which algorithm is symmetric (same key for encrypt/decrypt)?",
+      "options": [
+        "RSA",
+        "AES",
+        "ECC",
+        "Diffie-Hellman"
+      ],
+      "correct_answer": 1,
+      "explanation": "AES (Advanced Encryption Standard) is symmetric — the same key encrypts and decrypts. RSA and ECC are asymmetric.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "7ec0e20e-94b8-4990-9ed6-3d7f32f44b49"
+    },
+    {
+      "question": "Why is MD5 no longer recommended for password storage?",
+      "options": [
+        "It's too slow",
+        "It produces collisions and can be cracked with rainbow tables",
+        "It requires too much memory",
+        "It's patented"
+      ],
+      "correct_answer": 1,
+      "explanation": "MD5 produces known collisions and its hashes can be cracked with precomputed rainbow tables. Use bcrypt, Argon2, or scrypt for passwords.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "deffcc16-dcac-4ec3-bfa2-ea1f03a55f00"
+    },
+    {
+      "question": "What is a digital signature used for?",
+      "options": [
+        "Encrypting sensitive data",
+        "Verifying authenticity and integrity of a message",
+        "Storing passwords securely",
+        "Generating random keys"
+      ],
+      "correct_answer": 1,
+      "explanation": "Digital signatures verify that a message came from the claimed sender (authenticity) and wasn't modified (integrity). They use asymmetric cryptography.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "42d2b543-3970-4e64-84c5-f877f2d96050"
+    },
+    {
+      "question": "In TLS, why is asymmetric encryption used first, then switched to symmetric?",
+      "options": [
+        "Asymmetric is more secure for all data",
+        "Symmetric encryption is too fast",
+        "Asymmetric securely exchanges a session key; symmetric is faster for bulk data",
+        "TLS only uses asymmetric encryption"
+      ],
+      "correct_answer": 2,
+      "explanation": "Asymmetric encryption (RSA/ECDH) safely exchanges a session key. Then symmetric encryption (AES) handles the actual data — it's much faster for large amounts.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "aa29260f-1fb8-4cf0-9816-7bb126150bf2"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Cryptography is the invisible force protecting everything from your password to your bank transfer. You don't need to be a mathematician to understand it — you need to understand WHEN to use what, and WHY some choices are catastrophically wrong."
+    },
+    {
+      "type": "explanation",
+      "content": "## Two Fundamental Operations\n\n### Encryption (Reversible)\nTransforms data so only authorized parties can read it.\n- **Symmetric:** Same key encrypts and decrypts (AES-256). Fast. Problem: key exchange.\n- **Asymmetric:** Public key encrypts, private key decrypts (RSA, ECC). Slow. Solves key exchange.\n\n### Hashing (One-Way)\nProduces a fixed-length fingerprint. You cannot reverse it.\n- **MD5** (128-bit) — broken, don't use for security\n- **SHA-1** — deprecated, avoid\n- **SHA-256 / SHA-3** — current standard for integrity\n- **bcrypt / Argon2** — designed for passwords (intentionally slow)\n\n```python\nimport hashlib\n# SHA-256 of a string\nhash = hashlib.sha256(b'password123').hexdigest()\nprint(hash)  # 8 million times faster to crack than bcrypt!\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\n**Encryption** = A lockbox. You lock something inside, give someone the key, they can unlock it.\n\n**Hashing** = A meat grinder. Put a cow in, get hamburger out. You can NEVER put the hamburger back together to get the cow.\n\n**Asymmetric encryption** = A magic mailbox:\n- Anyone can push mail IN through the slot (public key)\n- Only YOU have the key to OPEN it (private key)\n\n**Digital signature** = Wax seal:\n- You press your unique ring into wax (sign with private key)\n- Anyone can verify your ring's pattern matches (verify with public key)\n- If the wax is broken, the message was tampered with\n\n**TLS handshake simplified:** Two strangers meet, use asymmetric crypto to agree on a secret password, then use that password (symmetric) to talk privately for the rest of the session."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Cryptography in Practice\n\n```python\nimport hashlib\nimport base64\nfrom cryptography.fernet import Fernet\n\n# === HASHING ===\n# Wrong: MD5 for passwords\nweak = hashlib.md5(b'password').hexdigest()\nprint(f'MD5: {weak}')  # Crackable in seconds\n\n# Better: SHA-256 for data integrity\nintegrity = hashlib.sha256(b'important file content').hexdigest()\nprint(f'SHA-256: {integrity}')\n\n# Best: bcrypt for passwords (install: pip install bcrypt)\nimport bcrypt\npassword = b'mypassword'\nhashed = bcrypt.hashpw(password, bcrypt.gensalt())\nprint(f'bcrypt: {hashed}')\n\n# Verify\nprint(bcrypt.checkpw(password, hashed))  # True\n\n# === SYMMETRIC ENCRYPTION (AES via Fernet) ===\n# pip install cryptography\nkey = Fernet.generate_key()\ncipher = Fernet(key)\n\nencrypted = cipher.encrypt(b'Secret data')\ndecrypted = cipher.decrypt(encrypted)\nprint(f'Decrypted: {decrypted}')  # b'Secret data'\n```\n\n**Challenge:** What happens when you hash 'password' vs 'Password' vs 'password1'? Try it!"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: The Password Database Breach\n\n**2012 LinkedIn breach:** 6.5 million password hashes stolen. The company stored passwords as unsalted SHA-1 hashes.\n\n**The problem:**\n```\nSHA1('password123') = cbfdac6008f9cab4083784cbd1874f76618d2a97\n```\nEvery user with 'password123' had the IDENTICAL hash. Attackers pre-computed a massive table (rainbow table) mapping common passwords to their SHA-1 hashes. Crack one, crack millions instantly.\n\n**The fix:**\n```python\n# Salt: unique random data added before hashing\nimport bcrypt\n# bcrypt automatically adds a unique salt\nhashed = bcrypt.hashpw(b'password123', bcrypt.gensalt(rounds=12))\n# Even if two users have same password, hashes differ!\n```\n\nLesson: Never store plaintext passwords. Never use unsalted MD5/SHA1. Always use bcrypt, Argon2, or scrypt."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hooks\n\n**Symmetric vs Asymmetric:**\n- **Symmetric** = same = one key = like a house key (one key opens and locks)\n- **Asymmetric** = asymmetry = two different keys = like a public/private diary\n\n**Algorithm cheat sheet:**\n- **AES** = 'A Excellent Symmetric' (fast, secure, everywhere)\n- **RSA** = 'Really Slow Asymmetric' (slower, for key exchange/signatures)\n- **SHA-256** = 'Secure Hash Algorithm, 256 bits' (fingerprints/integrity)\n- **bcrypt** = 'b careful with passwords' (passwords only, intentionally slow)\n\n**One-liner rule:** Encrypt to PROTECT data in transit. Hash to VERIFY integrity. Sign to PROVE identity."
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Where Does This Show Up?\n\nThink about your daily digital life:\n- **HTTPS padlock** — TLS using both asymmetric + symmetric crypto\n- **Password 'forgot password'** — they can reset but not tell you the old one (hashed!)\n- **Git commits** — SHA-1/SHA-256 hashes verify code integrity\n- **WhatsApp end-to-end encryption** — asymmetric key exchange, symmetric messaging\n- **Code signing** — digital signatures on software you download\n\nWhere else do you encounter cryptography without realizing it?"
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Cryptography is the foundation everything else is built on. Get this wrong and nothing else matters — perfect firewalls, perfect code, perfect processes all fail if the crypto is broken. This is not advanced mathematics; it's understanding which tool does what job."
+    }
+  ],
+  "tags": [
+    "cryptography",
+    "encryption",
+    "hashing",
+    "TLS",
+    "AES",
+    "RSA",
+    "fundamentals"
+  ]
+}

@@ -89,7 +89,7 @@ def get_pending_lessons(status, count):
     with open(LESSON_IDEAS_CSV, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for r in reader:
-            if r.get('status', '').strip().lower() == 'planned':
+            if r.get('status', '').strip().lower() == 'idea':
                 planned.append(r)
     
     pending = []

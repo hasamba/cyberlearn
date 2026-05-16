@@ -1,0 +1,154 @@
+{
+  "lesson_id": "66217287-c4da-4a0c-9dde-26d9288932b7",
+  "lesson_number": "721",
+  "domain": "cloud",
+  "title": "Kubernetes Security Best Practices",
+  "difficulty": 3,
+  "order_index": 53,
+  "prerequisites": [
+    "Container Security: Docker & Kubernetes"
+  ],
+  "concepts": [
+    "Pod Security Standards",
+    "RBAC",
+    "Network policies",
+    "Admission controllers",
+    "Security contexts",
+    "etcd encryption"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Apply Pod Security Standards (restricted, baseline, privileged) to namespaces",
+    "Design Kubernetes RBAC with least-privilege roles and bindings",
+    "Implement NetworkPolicies to enable default-deny and microsegmentation",
+    "Use admission controllers (OPA Gatekeeper, Kyverno) to enforce policy",
+    "Configure security contexts and understand privileged container risks"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does a Kubernetes NetworkPolicy do by default when first applied?",
+      "options": [
+        "Allows all traffic",
+        "A NetworkPolicy only creates rules for pods it selects; other pods are unaffected",
+        "Blocks all traffic cluster-wide",
+        "Enables TLS for selected pods"
+      ],
+      "correct_answer": 1,
+      "explanation": "NetworkPolicies are additive and scoped — they only affect pods matching their podSelector. To get default-deny, you need a policy that selects all pods but allows nothing.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "2bbdcab0-ff2a-4a8e-8352-e475f3a64e62"
+    },
+    {
+      "question": "What is the risk of a pod running with privileged: true?",
+      "options": [
+        "The pod uses more CPU",
+        "The container effectively has root access to the host node",
+        "The pod can't access the network",
+        "Privileged pods are isolated from other pods"
+      ],
+      "correct_answer": 1,
+      "explanation": "A privileged container has full access to the host's kernel capabilities, devices, and namespaces — essentially root on the node. This enables container escape attacks.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "a97ab321-a23e-48ef-a5a6-a4fab832f490"
+    },
+    {
+      "question": "What is OPA Gatekeeper in Kubernetes?",
+      "options": [
+        "A network firewall for Kubernetes",
+        "An admission controller that enforces custom policies using Rego language",
+        "A container scanner",
+        "A secrets manager for Kubernetes"
+      ],
+      "correct_answer": 1,
+      "explanation": "OPA (Open Policy Agent) Gatekeeper is an admission webhook that evaluates requests against Rego policies, allowing custom security policies like 'no privileged containers' or 'require image signing'.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "c180ccc5-ed0f-4d0b-beb2-29cacc80ebc1"
+    },
+    {
+      "question": "In Kubernetes RBAC, what is the difference between a Role and a ClusterRole?",
+      "options": [
+        "Role is for admins; ClusterRole is for users",
+        "Role is namespaced; ClusterRole is cluster-wide",
+        "ClusterRole has more permissions than Role",
+        "They are identical"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Role applies within a single namespace. A ClusterRole applies cluster-wide and can also be bound to a specific namespace via RoleBinding.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "4888778d-a7fe-4064-aee3-f1b602d3bf23"
+    },
+    {
+      "question": "Which Kubernetes security context setting prevents privilege escalation within a container?",
+      "options": [
+        "runAsNonRoot: true",
+        "allowPrivilegeEscalation: false",
+        "seccompProfile: RuntimeDefault",
+        "readOnlyRootFilesystem: true"
+      ],
+      "correct_answer": 1,
+      "explanation": "allowPrivilegeEscalation: false prevents processes inside the container from gaining more privileges than their parent (e.g., via setuid binaries).",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question_id": "04f74023-98a0-42fd-b10e-2037910012c7"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Kubernetes defaults are set for convenience, not security. A fresh cluster is like an unlocked house — functional but wide open. Tesla's Kubernetes cluster was found exposed to the internet with no authentication. Cryptominers were running inside. This lesson closes those doors."
+    },
+    {
+      "type": "explanation",
+      "content": "## Kubernetes Security in 5 Layers\n\n```\nLayer 1: RBAC          → Who can do what in the cluster\nLayer 2: Network Policy → Which pods can talk to which pods\nLayer 3: Pod Security   → What a container can do on the host\nLayer 4: Secrets        → How credentials are handled\nLayer 5: Admission      → Policy enforcement at deploy time\n```\n\n### Layer 1: RBAC Design\n```yaml\n# Least privilege: app can only read its own secrets\napiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  namespace: production\n  name: app-reader\nrules:\n- apiGroups: [\"\"]\n  resources: [\"secrets\"]\n  resourceNames: [\"myapp-secrets\"]  # specific secret only!\n  verbs: [\"get\"]\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: app-reader-binding\n  namespace: production\nsubjects:\n- kind: ServiceAccount\n  name: myapp-sa\nroleRef:\n  kind: Role\n  name: app-reader\n  apiGroup: rbac.authorization.k8s.io\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nImagine Kubernetes as a big apartment building:\n- **Pods** = apartments\n- **Namespaces** = floors\n- **RBAC** = who has keys to which apartments/floors\n- **NetworkPolicies** = soundproofing between apartments (which ones can hear each other)\n- **SecurityContext** = rules inside each apartment (no gas stoves, no drilling into walls)\n- **Admission Controllers** = the building inspector who checks every renovation before it happens\n\n**The default problem:** By default, everyone can talk to everyone in the building. Apartment 3B can call apartment 7A at 3am. A hacker who gets into ANY apartment can potentially reach ALL the others.\n\n**NetworkPolicy** = putting locks on all the intercoms. Each apartment can only call the specific ones it needs to."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Kubernetes Security Configuration\n\n```yaml\n# === Default-Deny NetworkPolicy ===\n# Apply this to every namespace\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: default-deny-all\n  namespace: production\nspec:\n  podSelector: {}  # selects ALL pods\n  policyTypes:\n  - Ingress\n  - Egress\n  # No ingress/egress rules = deny all\n---\n# Then explicitly allow what's needed:\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: allow-frontend-to-backend\nspec:\n  podSelector:\n    matchLabels:\n      app: backend\n  ingress:\n  - from:\n    - podSelector:\n        matchLabels:\n          app: frontend\n    ports:\n    - port: 8080\n```\n\n```yaml\n# === Hardened Pod Security Context ===\napiVersion: v1\nkind: Pod\nspec:\n  securityContext:\n    runAsNonRoot: true\n    runAsUser: 1000\n    seccompProfile:\n      type: RuntimeDefault\n  containers:\n  - name: app\n    image: myapp:1.2.3@sha256:abc...\n    securityContext:\n      allowPrivilegeEscalation: false\n      readOnlyRootFilesystem: true\n      capabilities:\n        drop: [\"ALL\"]\n        add: [\"NET_BIND_SERVICE\"]  # only if needed\n    resources:  # Always set limits!\n      limits:\n        cpu: \"500m\"\n        memory: \"256Mi\"\n```\n\n```bash\n# Audit your cluster with kube-bench\ndocker run --pid=host --userns=host --net=host \\\n  -v /etc:/etc:ro -v /var:/var:ro \\\n  aquasec/kube-bench\n# Reports pass/fail for CIS Kubernetes Benchmark\n```"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: The Tesla Kubernetes Cryptojacking Attack\n\n**2018:** Researchers found Tesla's Kubernetes management console (Kubernetes Dashboard) exposed without authentication on the public internet.\n\nThe attackers:\n1. Logged into the unauthenticated dashboard\n2. Created pods running cryptomining software\n3. Configured the pods to use Tesla's compute resources\n4. Used their own mining pool server to stay stealthy\n5. Throttled CPU usage to avoid detection\n\n**Root causes:**\n- Dashboard exposed without authentication\n- No network policies restricting outbound traffic\n- No resource limits on pods\n- No admission controller to prevent suspicious workloads\n\n**The fix involves all 5 security layers** from this lesson — not just one."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: RASPA for K8s Security\n\n**R**BAC — who can do what (least privilege)\n**A**dmission — enforce policy at deploy time (Gatekeeper/Kyverno)\n**S**ecurityContext — restrict what containers can do\n**P**odSecurity — namespace-level policy standards\n**A**udit logs + NetworkPolicy — visibility and isolation\n\n**Critical settings to remember:**\n- `allowPrivilegeEscalation: false` (always)\n- `readOnlyRootFilesystem: true` (when possible)\n- `runAsNonRoot: true` (always)\n- `capabilities.drop: [\"ALL\"]` (then add back only what's needed)\n- `seccompProfile: RuntimeDefault` (syscall filtering)"
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Securing Your Cluster\n\nRun kube-bench or use `kubectl auth can-i --list` to audit your cluster:\n\n```bash\n# What can the default service account do?\nkubectl auth can-i --list --as=system:serviceaccount:default:default\n\n# Check for privilege escalation paths\nkubectl get rolebindings,clusterrolebindings -A -o json | \\\n  grep -A5 'cluster-admin'\n\n# Find pods running as root\nkubectl get pods -A -o json | \\\n  jq '.items[] | select(.spec.containers[].securityContext.runAsUser == 0 or .spec.securityContext.runAsUser == 0)'\n```\n\nFor each finding, ask: 'If this pod is compromised, what can the attacker reach from here?'"
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Kubernetes security is defense in depth — no single control stops everything, but layered controls force attackers to break through multiple barriers. Each layer you add reduces blast radius. The goal isn't 'unhackable' — it's 'contained, detectable, and recoverable.'"
+    }
+  ],
+  "tags": [
+    "kubernetes",
+    "container security",
+    "RBAC",
+    "NetworkPolicy",
+    "Pod Security",
+    "cloud security",
+    "DevSecOps"
+  ]
+}

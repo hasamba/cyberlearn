@@ -1,0 +1,141 @@
+{
+  "lesson_id": "e1f2a3b4-c5d6-7890-efab-901234567890",
+  "domain": "red_team",
+  "title": "Wi-Fi Penetration Testing",
+  "difficulty": 2,
+  "order_index": 31,
+  "prerequisites": [],
+  "concepts": ["WPA2/WPA3 cracking", "handshake capture", "aircrack-ng", "evil twin attacks", "rogue APs", "deauthentication attacks"],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Set up a wireless adapter in monitoring mode for Wi-Fi testing",
+    "Capture WPA2 handshakes and crack them offline",
+    "Execute deauthentication attacks to force handshake capture",
+    "Understand evil twin and rogue AP attack scenarios",
+    "Recognize WPA3 improvements and remaining wireless attack vectors"
+  ],
+  "post_assessment": [
+    {
+      "question": "What must you capture before cracking a WPA2 password offline?",
+      "options": ["The router's MAC address only", "The 4-way EAPOL handshake between a client and the access point", "A full data stream from one client", "The SSID broadcast packets"],
+      "correct": 1,
+      "explanation": "WPA2 cracking requires capturing the 4-way EAPOL handshake. This handshake contains the material needed to test password candidates offline."
+    },
+    {
+      "question": "What is the purpose of a deauthentication attack in Wi-Fi pentesting?",
+      "options": ["To permanently disconnect all devices", "To force clients to reconnect, generating a new handshake that the attacker can capture", "To change the network password", "To gain admin access to the router"],
+      "correct": 1,
+      "explanation": "Deauth attacks send fake disassociation frames to force devices off the network. When they reconnect, a new handshake is generated — which the attacker captures."
+    },
+    {
+      "question": "An evil twin attack works by:",
+      "options": ["Hacking the real access point", "Creating a rogue AP with the same SSID as the target, tricking clients into connecting", "Jamming all wireless signals", "Overloading the router with traffic"],
+      "correct": 1,
+      "explanation": "An evil twin AP mimics the legitimate network's SSID (and sometimes MAC). Clients may auto-connect to the stronger signal, routing all their traffic through the attacker."
+    },
+    {
+      "question": "Which aircrack-ng tool puts a wireless adapter into monitoring mode?",
+      "options": ["airodump-ng", "aireplay-ng", "airmon-ng", "aircrack-ng"],
+      "correct": 2,
+      "explanation": "airmon-ng enables monitor mode on a wireless interface, allowing you to passively capture all wireless traffic on a channel."
+    },
+    {
+      "question": "What security improvement does WPA3-SAE provide over WPA2-PSK?",
+      "options": ["Faster speeds", "Protection against offline dictionary attacks on captured handshakes", "More SSIDs per router", "Better range"],
+      "correct": 1,
+      "explanation": "WPA3 uses SAE (Simultaneous Authentication of Equals) which prevents offline dictionary attacks. Even if an attacker captures the exchange, they cannot brute-force the password offline like with WPA2."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget that Wi-Fi is 'just a network connection' — it's an over-the-air attack surface accessible from the parking lot",
+    "active": "Set up a test AP and adapter, capture a handshake, and crack it with aircrack-ng before finishing this lesson",
+    "state": "Approach each wireless engagement as if any employee's traffic could be intercepted from outside",
+    "teach": "Explain deauth attacks as 'forcibly kicking someone off Wi-Fi so you can watch them log back in'",
+    "enter": "Before wireless testing, verify you have explicit written authorization — wireless pentesting is legally sensitive",
+    "review": "After each capture, verify: did I get the full 4-way handshake? Partial captures waste cracking time",
+    "notes": "Document: BSSID, channel, encryption, clients, handshake captured (Y/N), crack result",
+    "why": "Wi-Fi pentesting is part of every physical red team engagement and many compliance assessments",
+    "emotion": "The thrill of cracking a WPA2 password from a captured handshake in under a minute",
+    "speed": "Use hashcat with GPU acceleration instead of aircrack-ng CPU for dramatically faster WPA2 cracking"
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Over-the-Air Means Over-the-Fence",
+      "content": "Wi-Fi signals don't respect walls or property lines. An attacker in a parking lot, a coffee shop next door, or a car on the street can intercept wireless traffic. This physical accessibility makes wireless security uniquely important — and wireless pentesting a critical skill for red teams. Every organization with Wi-Fi has an attack surface that extends beyond their physical perimeter.",
+      "icon": "📡"
+    },
+    {
+      "type": "explanation",
+      "title": "Wi-Fi Security Protocols",
+      "content": "Understanding what you're attacking is the first step.",
+      "subsections": [
+        {
+          "title": "WPA2-PSK (Most Common)",
+          "content": "Pre-Shared Key mode. All users share the same password. The 4-way EAPOL handshake ensures both sides know the password without transmitting it directly. Vulnerability: captured handshake can be cracked offline with dictionary/brute force attacks."
+        },
+        {
+          "title": "WPA2-Enterprise",
+          "content": "Uses RADIUS server and individual credentials (EAP). No shared password. Harder to attack but vulnerable to evil twin + fake RADIUS (credential harvesting)."
+        },
+        {
+          "title": "WPA3-SAE",
+          "content": "Simultaneous Authentication of Equals. Prevents offline dictionary attacks — even with a captured exchange, password can't be cracked offline. Also provides forward secrecy: past traffic can't be decrypted even if the password is later compromised."
+        }
+      ]
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Wi-Fi Hacking",
+      "content": "Imagine everyone at school passes notes to the teacher through the air instead of handing them directly.",
+      "subsections": [
+        {
+          "title": "The attacks",
+          "content": "Handshake capture: you wait until someone new walks in and says the secret password to the teacher. You write down exactly what they said.\n\nDeauth attack: you push someone out of the classroom so they have to walk back in and say the password again — you're listening this time.\n\nEvil twin: you sit outside the classroom door wearing a teacher costume. Students think you're the real teacher and give you their passwords.\n\nCracking: you take home the 'secret handshake' you wrote down and try every word in the dictionary until you find one that matches."
+        }
+      ]
+    },
+    {
+      "type": "code_exercise",
+      "title": "WPA2 Handshake Capture and Crack",
+      "description": "Full aircrack-ng workflow from monitoring to cracking",
+      "code": "# Step 1: Enable monitor mode\nsudo airmon-ng start wlan0\n# Interface becomes wlan0mon\n\n# Step 2: Scan for networks\nsudo airodump-ng wlan0mon\n# Note: BSSID, channel, and ESSID of target\n\n# Step 3: Target specific AP and capture\nsudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon\n# Wait for 4-way handshake... or force it:\n\n# Step 4: Deauth a client to force reconnection (separate terminal)\nsudo aireplay-ng -0 5 -a AA:BB:CC:DD:EE:FF -c 11:22:33:44:55:66 wlan0mon\n# -0 5 = send 5 deauth frames\n# -a = target AP BSSID\n# -c = target client MAC\n\n# Step 5: Verify handshake captured\n# airodump-ng will show \"WPA handshake: AA:BB:CC:DD:EE:FF\"\n\n# Step 6: Crack with dictionary\nsudo aircrack-ng -w /usr/share/wordlists/rockyou.txt capture-01.cap\n\n# Alternative: Crack with hashcat (GPU - much faster)\nhccapx_file=$(aircrack-ng capture-01.cap -J hashcat_file)\nhashcat -m 22000 hashcat_file.hc22000 rockyou.txt",
+      "instructions": "1. Ensure you have a compatible wireless adapter (Alfa AWUS036ACH recommended)\n2. Enable monitor mode with airmon-ng\n3. Scan and identify your test network\n4. Start targeted capture on the correct channel\n5. Use deauth to force a handshake if no clients are connecting\n6. Verify the handshake is captured before stopping\n7. Crack with aircrack-ng (CPU) or hashcat (GPU)",
+      "expected_outcome": "A captured .cap file containing the 4-way handshake, and a cracked password (if it's in your wordlist). Common weak passwords crack in seconds, strong passwords may resist dictionary attacks entirely."
+    },
+    {
+      "type": "real_world",
+      "title": "PMKID Attack: No Handshake Needed (2018)",
+      "scenario": "Security researcher Jens Steube (hashcat developer) discovered that WPA2 routers broadcast a PMKID value in the first message of the 4-way handshake. Unlike the traditional handshake attack, the PMKID can be captured without any connected clients — no deauth needed, no waiting. The PMKID is derived from the PSK and can be cracked offline, just like the full handshake. This reduced WPA2 attacks from 'wait for a handshake' to 'scan and go'.",
+      "key_lessons": [
+        "New attack techniques can make previously difficult attacks trivial",
+        "No connected clients required for PMKID — just scan the AP's beacon",
+        "Tools like hcxdumptool automate PMKID capture",
+        "WPA3-SAE is immune to PMKID attacks — another reason to migrate"
+      ]
+    },
+    {
+      "type": "memory_aid",
+      "title": "Wi-Fi Pentesting Workflow: MSCDC",
+      "mnemonic": "MSCDC",
+      "explanation": "M=Monitor mode (airmon-ng start wlan0), S=Scan networks (airodump-ng), C=Capture target (airodump-ng with BSSID/channel filter), D=Deauth clients (aireplay-ng -0), C=Crack handshake (aircrack-ng or hashcat). Follow this order, every time."
+    },
+    {
+      "type": "reflection",
+      "title": "Wireless Security in Your Environment",
+      "prompts": [
+        "Is your organization still using WPA2-PSK? When was the password last changed?",
+        "What would happen if an attacker cracked your corporate Wi-Fi password from the parking lot?",
+        "Could a rogue AP be set up near your office without anyone noticing?",
+        "How would you detect a deauthentication attack against your wireless network?"
+      ]
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Physical Meets Digital",
+      "content": "Wi-Fi pentesting sits at the intersection of physical and digital security. It's one of the most immediately impactful skills on a red team engagement. A cracked WPA2 password means internal network access — often bypassing firewalls, NAC, and VPN requirements entirely. The tools are free, the hardware is cheap, and the technique is reliable. Master this skill.",
+      "icon": "🔑"
+    }
+  ],
+  "tags": ["red-team", "wifi", "wpa2", "wpa3", "aircrack-ng", "evil-twin", "wireless-security", "Career Path: Red Team Operator"]
+}

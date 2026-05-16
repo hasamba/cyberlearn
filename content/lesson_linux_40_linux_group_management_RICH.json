@@ -1,0 +1,109 @@
+{
+  "lesson_id": "d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a",
+  "domain": "linux",
+  "title": "Linux Group Management",
+  "difficulty": 2,
+  "order_index": 40,
+  "prerequisites": ["Linux Account Management"],
+  "concepts": ["Group structure and types (primary vs supplementary)", "Group management commands", "/etc/group and /etc/gshadow files", "Group-based permission implications", "Security-relevant groups and group membership auditing"],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Create, modify, and delete groups using groupadd, groupmod, and groupdel commands",
+    "Understand primary vs supplementary groups and how they affect file access",
+    "Manage group membership using usermod -aG and gpasswd commands",
+    "Identify security-critical groups (wheel, sudo, docker, disk) and their privilege implications",
+    "Audit group memberships to find privilege escalation paths and security risks"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the difference between a user's primary group and their supplementary groups?",
+      "options": [
+        "Primary groups are for system users, supplementary groups are for regular users",
+        "The primary group is assigned at login and used for default file ownership; supplementary groups provide additional access rights",
+        "Primary groups can only be root, supplementary groups are any other group",
+        "There is no functional difference — they are interchangeable"
+      ],
+      "correct_answer": "The primary group is assigned at login and used for default file ownership; supplementary groups provide additional access rights",
+      "explanation": "Every user has exactly one primary group (set in /etc/passwd's GID field) that determines the default group ownership of files they create. Supplementary groups (listed in /etc/group) grant additional access rights. When checking file access, Linux checks both the primary group and all supplementary groups."
+    },
+    {
+      "question": "Why is membership in the 'docker' group equivalent to root access?",
+      "options": [
+        "Docker group members can install any software",
+        "Docker group members can run containers that mount the host filesystem, giving access to all files including /etc/shadow",
+        "Docker group members can execute any sudo command",
+        "Docker runs with setuid root, so group members inherit root"
+      ],
+      "correct_answer": "Docker group members can run containers that mount the host filesystem, giving access to all files including /etc/shadow",
+      "explanation": "Docker group members can create and run containers. A container can mount the host's root filesystem (e.g., `docker run -v /:/host ...`) giving the user full read/write access to every file on the host, including /etc/shadow and SSH keys. They can also run privileged containers with host PID namespaces, effectively granting root access without needing sudo."
+    },
+    {
+      "question": "Which command correctly adds an existing user to a supplementary group without removing them from their other groups?",
+      "options": [
+        "usermod -G groupname username",
+        "usermod -aG groupname username",
+        "groupmod -a username groupname",
+        "gpasswd -a groupname username"
+      ],
+      "correct_answer": "usermod -aG groupname username",
+      "explanation": "usermod -aG (append to Group) adds the user to the specified group without affecting their existing group memberships. Without -a, usermod -G REPLACES all supplementary groups with only the specified one. gpasswd -a username groupname also works but the syntax is different (username first, then group)."
+    },
+    {
+      "question": "In the /etc/group file, what does an empty field between the second and third colons indicate?",
+      "options": [
+        "The group has no members",
+        "The group has no password set (only members listed can use newgrp)",
+        "The group is disabled",
+        "The group has no GID assigned"
+      ],
+      "correct_answer": "The group has no password set (only members listed can use newgrp)",
+      "explanation": "The second field in /etc/group contains the group password (or 'x' if /etc/gshadow is used, or empty if no password). An empty or 'x' field means the group has no password, which means only users listed in the members field (or whose primary GID matches) can access the group via newgrp. Group passwords are rarely used in modern systems."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Curiosity", "Mind Mapping"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Groups: The Hidden Privilege Escalation Paths",
+      "content": "Most people think of groups as a way to share files. But in Linux, group membership is a web of privilege escalation paths. Membership in docker, lxd, wireshark, or even video groups can give you root access, capture sensitive traffic, or access restricted devices. During every security assessment, you should map group memberships — they're the easiest paths to privilege escalation that most defenders overlook. This lesson gives you the complete picture: how groups work, how to manage them, and most importantly, how to audit them for security risks."
+    },
+    {
+      "type": "explanation",
+      "title": "Linux Group Architecture and Management",
+      "content": "Linux groups are collections of users that share access rights. Every user has exactly one primary group and may belong to multiple supplementary groups.\n\n**Group files:**\n\n/etc/group format:\n`groupname:password:GID:member1,member2`\n- groupname: The group name\n- password: 'x' (hash in /etc/gshadow), empty (no password), or rarely a hash\n- GID: Numeric group ID (0=root, system groups <1000, user groups >=1000)\n- members: Comma-separated list of supplementary group members\n\n/etc/gshadow format:\n`groupname:password:admin1,admin2:member1,member2`\n- password: Encrypted group password (rarely used)\n- admins: Users who can manage group membership via gpasswd\n- members: Group members (mirrors /etc/group)\n\n**Group management commands:**\n- `groupadd groupname` — Create a new group\n- `groupadd -g 2000 groupname` — Create with specific GID\n- `groupmod -n newname oldname` — Rename a group\n- `groupmod -g 2001 groupname` — Change GID\n- `groupdel groupname` — Delete a group\n- `usermod -aG groupname username` — Add user to group\n- `gpasswd -a username groupname` — Add user to group\n- `gpasswd -d username groupname` — Remove user from group\n- `groups username` — List user's groups\n- `id username` — Show UID, primary GID, and all groups\n\n**Primary vs Supplementary:**\n- Primary group: Set in /etc/passwd (4th field), defines default group for new files\n- Supplementary groups: Listed in /etc/group, grant additional access\n- Use `newgrp groupname` to temporarily change your primary group\n- Use `sg groupname -c 'command'` to run a command with a different group\n\n**Important:** Changes to group membership take effect at next login. Use `su - username` to start a new session with updated groups."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Groups Are Like Club Memberships",
+      "content": "Imagine your school has different clubs: the Art Club, the Sports Club, the Computer Lab Club. Each club has special privileges — the Art Club can use the art room, the Sports Club can use the gym, and the Computer Lab Club can use the computers after hours.\n\nWhen you join the school, you get put in one main club (your primary group). This is like your default — when you create something new, it belongs to this club. But you can also join other clubs (supplementary groups) to get extra privileges.\n\nSome clubs are super powerful:\n- The 'Principal's Club' (wheel/sudo group) lets you make decisions that affect the whole school\n- The 'Key Master Club' (docker group) gives you a master key to every room — even the principal's office!\n- The 'Camera Club' (wireshark group) lets you watch what everyone is doing in the hallways\n\nThe dangerous thing? Most students don't realize how powerful these clubs are. They join the 'Key Master Club' because they need to use one specific tool, but now they have access to EVERYTHING. That's why security people always check who's in which club — it's the easiest way to find someone who has more power than they should."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Group Management and Security Audit Commands",
+      "content": "Practice group management and security auditing:\n\n# Group Creation and Management\nsudo groupadd -g 2010 security-team      # Create group with specific GID\nsudo groupadd devops                     # Create group with auto GID\nsudo groupmod -n sec-team security-team  # Rename group\nsudo groupdel devops                     # Delete group\n\n# Add users to groups\nsudo usermod -aG security-team analyst    # Add to supplementary group\nsudo usermod -aG docker,wireshark analyst  # Add to multiple groups\n\n# Remove user from group\nsudo gpasswd -d analyst docker           # Remove from specific group\n\n# View group information\ngroups analyst                           # List user's groups\nid analyst                               # Full UID/GID/group info\ngetent group security-team               # Show group details\ncat /etc/group | grep -E 'sudo|wheel|docker'  # Find security-critical groups\n\n# Security Audit: Find high-risk group memberships\n# Who's in the sudo/wheel group?\ngetent group sudo\ngrep '^wheel' /etc/group\n\n# Who's in the docker group? (Equivalent to root!)\ngetent group docker\n\n# Find all members of the lxd group (also equivalent to root)\ngetent group lxd\n\n# Check for users in multiple high-privilege groups\nfor user in $(cut -d: -f1 /etc/passwd); do\n  groups \"$user\" 2>/dev/null | grep -E 'sudo|docker|lxd|wheel|disk|wireshark'\ndone\n\n# Find groups with no members (potentially stale)\nawk -F: '$4 == \"\" && $3 >= 1000 {print $1\" (GID: \"$3\")\"}' /etc/group\n\n# List all groups a user belongs to (including primary)\nid -Gn analyst\n\n# Check group ownership of sensitive files\nfind /etc -group shadow -type f\nfind / -group docker -type f 2>/dev/null\n\n# Verify group changes take effect (need new login)\necho \"Current groups: $(groups)\"\nsu - analyst -c 'groups'",
+      "code": "# Group management\nsudo groupadd security-team\nsudo usermod -aG security-team analyst\n\n# Security audit\ngetent group sudo\ngetent group docker\ngetent group lxd\n\n# Find users in high-privilege groups\nfor user in $(cut -d: -f1 /etc/passwd); do\n  groups \"$user\" 2>/dev/null | grep -E 'sudo|docker|lxd|wheel'\ndone",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Group-Based Privilege Escalation Cases",
+      "content": "Group memberships are one of the most commonly overlooked privilege escalation vectors. Here are real-world examples from penetration testing engagements:\n\n**Case 1: Docker Group → Root**\nA junior developer was added to the 'docker' group so they could build container images. The pentest team exploited this:\n`docker run -v /:/host -it ubuntu chroot /host`\nThis gave them a root shell on the host. They could read /etc/shadow, add SSH keys to /root/.ssh/authorized_keys, and modify /etc/sudoers. **Fix:** Remove users from docker group. Use Docker rootless mode or Docker socket proxy instead.\n\n**Case 2: LXD Group → Root**\nA system administrator was in the 'lxd' group to manage LXC containers. The attacker built a custom container image and launched it with host filesystem access:\n`lxc init ubuntu:20.04 pwn -c security.privileged=true`\n`lxc config device add pwn host disk source=/ path=/host\n`lxc start pwn\n`lxc exec pwn -- /bin/bash`\nFull root access. **Fix:** Remove users from lxd group. Use LXD with proper RBAC.\n\n**Case 3: Disk Group → Read /etc/shadow**\nA monitoring user was in the 'disk' group to access raw disk devices for SMART monitoring. This group has read/write access to block devices, allowing the attacker to read the raw disk and extract /etc/shadow:\n`dd if=/dev/sda1 bs=1M | strings | grep -E '.*:\\$[0-9].*'`\n**Fix:** Use smartmontools with udev rules instead of disk group membership.\n\n**Case 4: Wireshark Group → Network Sniffing**\nA helpdesk user was in the 'wireshark' group to troubleshoot network issues. This group has access to packet capture capabilities, allowing the attacker to sniff all network traffic including credentials in cleartext protocols.\n**Fix:** Use dedicated capture accounts with time-limited access, or use port mirroring on a dedicated monitoring system."
+    },
+    {
+      "type": "memory_aid",
+      "title": "High-Risk Groups: DDLWSS Mnemonic",
+      "content": "**D**ocker — Full root access via container mount\n**D**isk — Read/write raw disk devices, extract /etc/shadow\n**L**XD — Root access via privileged containers\n**W**ireshark — Capture all network traffic\n**S**udo/Wheel — Execute any command as root\n**S**hadow — Read password hashes directly\n\n**Group management commands cheat sheet:**\n- `groupadd name` — Create group\n- `groupdel name` — Delete group\n- `usermod -aG group user` — Add user to group\n- `gpasswd -d user group` — Remove user from group\n- `groups user` — List user's groups\n- `id user` — Show all identity info\n- `getent group name` — Show group details\n- `newgrp group` — Temporarily change primary group\n\n**Key security principle:** Every group membership is a potential privilege escalation path. Apply least privilege — add users only to groups they absolutely need, and audit group memberships regularly."
+    },
+    {
+      "type": "reflection",
+      "title": "Group Security Audit Challenge",
+      "content": "Answer these questions based on what you've learned:\n\n1. You find a web developer in the 'docker' group. What's the risk, and what's a safer alternative?\n\n2. A system has a group called 'backup' (GID 34) with 5 members. What access does this group typically provide, and why is it potentially dangerous?\n\n3. You run `id analyst` and see: `uid=1001(analyst) gid=1001(analyst) groups=1001(analyst),27(sudo),994(wireshark)`. What two security concerns should you raise?\n\n4. How would you create a group called 'forensics', add three users to it, set up a shared directory with group ownership, and ensure new files in that directory inherit the group ownership?\n\nAnswers: (1) Docker group = root access. Safer alternatives: Docker rootless mode, Docker socket proxy, or use a CI/CD pipeline that builds images on a dedicated build server. (2) The backup group typically has read access to all files for backup purposes — members can read /etc/shadow, SSH keys, and any file on the system. (3) Two concerns: sudo membership means full root access, and wireshark membership means network traffic capture capability. Neither is typically needed for an analyst. (4) `groupadd forensics`, `usermod -aG forensics user1 user2 user3`, `mkdir /shared/forensics`, `chgrp forensics /shared/forensics`, `chmod 2775 /shared/forensics` (setgid bit ensures new files inherit group ownership)."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Groups Are Privilege Paths — Map Them",
+      "content": "You've now mastered both user and group management in Linux. The critical security insight: group memberships form a web of privilege escalation paths. Every group you're in expands your access — and attackers know this. During assessments, always enumerate group memberships and check each group's actual capabilities. The docker, lxd, disk, and sudo groups are obvious escalation paths, but custom groups with access to sensitive directories, cron jobs, or service configurations can be just as dangerous. Regular group audits, least-privilege assignments, and removing stale memberships are fundamental security hygiene."
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer", "Career Path: Security Engineer"]
+}

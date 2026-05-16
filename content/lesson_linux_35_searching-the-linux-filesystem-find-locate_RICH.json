@@ -1,0 +1,141 @@
+{
+  "lesson_id": "f6b8d0e1-5a7c-4f9b-d2c3-6e8f0a2b4d6e",
+  "domain": "linux",
+  "title": "Searching the Linux Filesystem (find, locate)",
+  "difficulty": 1,
+  "order_index": 35,
+  "prerequisites": ["Linux File Management Commands"],
+  "concepts": [
+    "find command syntax and operators",
+    "Search by name, type, size, and time",
+    "Permission-based searches",
+    "locate and updatedb",
+    "Complex find expressions with AND/OR",
+    "Executing commands on found files (-exec)",
+    "xargs for efficient batch processing",
+    "File search for security auditing"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Construct find commands to search by name, type, size, permissions, and time",
+    "Use locate for fast filename searches with updatedb",
+    "Apply -exec and xargs to perform actions on found files",
+    "Search for SUID/SGID files, world-writable directories, and modified files for security auditing",
+    "Combine find operators for complex security queries"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which command finds all SUID root files on the system?",
+      "options": [
+        "find / -user root -perm -4000",
+        "find / -suid root",
+        "locate -suid /",
+        "find / -perm /suid"
+      ],
+      "correct_answer": "A",
+      "explanation": "`-perm -4000` matches files where the SUID bit (4000 in octal) is set. The `-` prefix means 'at least these bits are set'. This is one of the most important security audit commands — SUID root binaries are common privilege escalation vectors."
+    },
+    {
+      "question": "What is the key difference between find and locate?",
+      "options": [
+        "find searches in real-time; locate uses a pre-built database",
+        "locate is slower but more accurate",
+        "find only searches by name; locate searches by all attributes",
+        "They are identical; locate is just an alias"
+      ],
+      "correct_answer": "A",
+      "explanation": "`find` traverses the filesystem in real-time (accurate but slow). `locate` queries a database built by `updatedb` (fast but may miss recent files or show deleted ones). Use find for accuracy; use locate for quick filename lookups."
+    },
+    {
+      "question": "Which find command finds files modified in the last 24 hours?",
+      "options": [
+        "find / -mtime 0",
+        "find / -mtime 1",
+        "find / -newer yesterday",
+        "find / -time 24h"
+      ],
+      "correct_answer": "A",
+      "explanation": "`-mtime 0` means 'modified less than 24 hours ago' (0 means the file's age in 24-hour periods rounds down to 0). `-mtime -1` also works and is more explicit. `-mtime 1` means 'modified between 24 and 48 hours ago'."
+    },
+    {
+      "question": "What does `find /var/log -name '*.log' -exec grep -l 'error' {} \\;` do?",
+      "options": [
+        "Finds all .log files in /var/log and searches each for 'error', printing matching filenames",
+        "Finds the word 'error' in /var/log and renames .log files",
+        "Creates error logs in /var/log",
+        "Deletes all .log files containing 'error'"
+      ],
+      "correct_answer": "A",
+      "explanation": "The command finds all .log files under /var/log, then runs `grep -l 'error'` on each found file (the `{}` is replaced by the filename). `-l` makes grep print only the filenames that contain matches. The `\\;` terminates the -exec command."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Chunking",
+    "Association",
+    "Visualization",
+    "Pattern Recognition",
+    "Analogies",
+    "Simplification",
+    "Progressive Disclosure",
+    "Feynman Technique"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Find: Your Most Powerful Discovery Tool",
+      "content": "In security, you're always looking for things — suspicious files, misconfigurations, recently changed files, world-writable directories. `find` is the command that does all of this.\n\nIt's not just about finding files by name. `find` can locate:\n- Files with SUID bits set (privilege escalation risk)\n- Files modified in the last hour (potential compromise indicators)\n- World-writable directories (attack surface)\n- Files owned by deleted users (orphaned access)\n- Files larger than expected (data exfiltration evidence)\n\nMaster `find` and you master filesystem auditing.",
+      "principle": "Pattern Recognition"
+    },
+    {
+      "type": "explanation",
+      "title": "The find Command: Full Syntax",
+      "content": "**Basic structure:**\n```\nfind [path] [tests] [actions]\n```\n\n**Search by name:**\n```bash\nfind / -name 'passwd'              # Exact name\nfind / -iname 'passwd'             # Case-insensitive\nfind /etc -name '*.conf'           # Wildcard\nfind /var -name 'log*' -type f    # Files starting with 'log'\n```\n\n**Search by type:**\n```bash\nfind / -type f    # Regular files\nfind / -type d    # Directories\nfind / -type l    # Symbolic links\nfind / -type b    # Block devices\nfind / -type s    # Sockets\n```\n\n**Search by size:**\n```bash\nfind / -size +100M           # Files larger than 100MB\nfind / -size -1k             # Files smaller than 1KB\nfind / -size 0               # Empty files\nfind / -empty                # Empty files or directories\n```\n\n**Search by time (CRITICAL for IR):**\n```bash\nfind / -mtime -1              # Modified in last 24 hours\nfind / -mtime -7              # Modified in last week\nfind / -atime -1              # Accessed in last 24 hours\nfind / -ctime -1              # Status changed in last 24 hours\nfind / -mmin -60              # Modified in last 60 minutes\nfind / -amin -30              # Accessed in last 30 minutes\n```\n\n**Search by permissions and ownership:**\n```bash\nfind / -perm -4000            # SUID files (setuid)\nfind / -perm -2000            # SGID files (setgid)\nfind / -perm -o+w             # World-writable files\nfind / -user root -type f     # Files owned by root\nfind / -nouser                # Files with no valid owner\nfind / -nogroup                # Files with no valid group\n```\n\n**Combining tests:**\n```bash\n# AND (default)\nfind / -name '*.sh' -type f -mtime -7\n\n# OR\nfind / \\( -name '*.sh' -o -name '*.py' \\) -type f\n\n# NOT\nfind /var/log -name '*.log' ! -name '*.gz'\n```"
+    },
+    {
+      "type": "explanation",
+      "title": "find and locate: Two Search Philosophies",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Imagine two ways to find a book in a library:\n\n**find** is like walking through every aisle, checking every shelf, looking at every book until you find what you need. It's slow but always accurate — you'll never find a book that was removed or miss one that was just added.\n\n**locate** is like checking the library's catalog card system. It's instant — you look up the book and it tells you exactly where it is. But the catalog only gets updated once a day (or whenever the librarian runs `updatedb`), so a book added 5 minutes ago won't be in the catalog yet, and a book removed yesterday might still be listed.\n\n**When to use which:**\n- **Use locate** when: You know the filename and need it fast. Good for 'where is that config file I worked on last week?'\n- **Use find** when: You need accuracy, especially for security work. 'Find all files modified in the last hour' — locate can't do this.\n- **Use find** always for: Forensics, incident response, security audits. Accuracy matters more than speed.\n\n```bash\n# locate examples\nlocate passwd.conf        # Find any file with 'passwd.conf' in the path\nlocate -i ssh_config     # Case-insensitive\nlocate -r 'log$'         # Regex: files ending in 'log'\n\n# Update the locate database\nsudo updatedb             # Usually runs daily via cron\n```"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Security Audit with find",
+      "content": "Practice real security audit commands using find.",
+      "language": "bash",
+      "starter_code": "# 1. Find all SUID root files on the system\n# 2. Find all world-writable directories\n# 3. Find files modified in the last 24 hours in /etc\n# 4. Find all files larger than 100MB\n# 5. Find all symbolic links in /etc\n# 6. Find files with no valid owner (orphaned)\n# 7. Find all .sh scripts that are world-executable\n# 8. Search for files named 'shadow' anywhere on the system",
+      "solution": "# 1. Find all SUID root files\nfind / -perm -4000 -user root -type f 2>/dev/null\n\n# 2. Find all world-writable directories\nfind / -type d -perm -o+w 2>/dev/null\n\n# 3. Find files modified in last 24 hours in /etc\nfind /etc -type f -mtime -1\n\n# 4. Find all files larger than 100MB\nfind / -type f -size +100M 2>/dev/null\n\n# 5. Find all symbolic links in /etc\nfind /etc -type l\n\n# 6. Find files with no valid owner\nfind / -nouser -o -nogroup 2>/dev/null\n\n# 7. Find .sh scripts that are world-executable\nfind / -name '*.sh' -type f -perm -o+x 2>/dev/null\n\n# 8. Find files named 'shadow'\nfind / -name 'shadow' -type f 2>/dev/null",
+      "hint": "Use '-perm -4000' for SUID, '-perm -o+w' for world-writable, '-mtime -N' for recent modifications, '-nouser' for orphaned files, '2>/dev/null' to suppress permission errors."
+    },
+    {
+      "type": "real_world",
+      "title": "find in Incident Response",
+      "content": "These are the `find` commands you'll actually use during incident response:\n\n**Quick compromise indicators:**\n```bash\n# Files modified in the last hour (what changed recently?)\nfind / -type f -mmin -60 -not -path '/proc/*' -not -path '/sys/*' 2>/dev/null\n\n# Files accessed in the last hour (what did the attacker read?)\nfind / -type f -amin -60 -not -path '/proc/*' -not -path '/sys/*' 2>/dev/null\n\n# New files created in /tmp (common drop location)\nfind /tmp -type f -mmin -60\n\n# SUID files that shouldn't be there\nfind / -perm -4000 -type f 2>/dev/null | diff - suid_baseline.txt\n```\n\n**Persistence hunting:**\n```bash\n# Find cron jobs (common persistence mechanism)\nfind /etc/cron* /var/spool/cron -type f 2>/dev/null\n\n# Find files with capabilities set (another escalation vector)\nfind / -type f -exec getcap {} \\; 2>/dev/null\n\n# Find SSH authorized_keys (backdoor access)\nfind / -name 'authorized_keys' -type f 2>/dev/null\n```\n\n**Data exfiltration detection:**\n```bash\n# Large files created recently (staged data?)\nfind / -type f -size +10M -mmin -1440 2>/dev/null\n\n# Archive files (attackers staging data before exfil)\nfind /tmp /var/tmp /dev/shm -name '*.zip' -o -name '*.tar*' -o -name '*.7z' 2>/dev/null\n```\n\n**Pro tip:** Run your SUID/world-writable find commands on a clean system and save the output as a baseline. During an incident, diff against the baseline to spot new attack surfaces.",
+      "scenario": "You're responding to a suspected compromise. The attacker reportedly gained access 2 hours ago. Write find commands to: (1) find files modified in the last 2 hours, (2) find new SUID files, (3) find files in common attacker staging directories."
+    },
+    {
+      "type": "memory_aid",
+      "title": "find Options — The TPTM Acronym",
+      "content": "Remember the four main find test categories with **TPTM**:\n\n- **T**ype — `-type f` (file), `-type d` (dir), `-type l` (link)\n- **P**ermissions — `-perm -4000` (SUID), `-perm -o+w` (world-writable)\n- **T**ime — `-mtime -7` (days), `-mmin -60` (minutes)\n- **M**etadata — `-user root`, `-nouser`, `-size +100M`, `-name '*.conf'\n\n**And the action options:**\n- `-exec command {} \\;` — Run command on each file (safe, one at a time)\n- `-exec command {} +` — Run command with multiple files (faster)\n- `-delete` — Delete found files (dangerous, use with caution!)\n- `-ls` — List found files in `ls -dils` format\n\n**The {} ;\\ vs {} + rule:**\n- `{} \\;` — One file per command invocation (safe for any command)\n- `{} +` — Multiple files per invocation (efficient but can break with some commands)",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "-exec and xargs: Acting on Found Files",
+      "content": "Finding files is only half the battle. You need to *do* something with them.\n\n**-exec: The built-in way**\n```bash\n# Basic -exec\nfind /var/log -name '*.log' -exec gzip {} \\;\n\n# With + (more efficient - passes multiple files at once)\nfind /var/log -name '*.log' -exec gzip {} +\n\n# Check each found file\nfind / -perm -4000 -exec ls -ld {} \\;\n\n# Run a security check on each SUID binary\nfind / -perm -4000 -type f -exec file {} \\;\n```\n\n**xargs: The powerful alternative**\n```bash\n# More efficient than -exec for most operations\nfind / -name '*.log' -print0 | xargs -0 ls -la\n\n# -print0 and -0 handle filenames with spaces\n# Without them: filenames like 'my file.log' break into 'my' and 'file.log'\n\n# Delete old log files\nfind /var/log -name '*.log.old' -print0 | xargs -0 rm -f\n\n# Count lines in all .conf files\nfind /etc -name '*.conf' -print0 | xargs -0 wc -l\n\n# Grep for a string in all found files\nfind /etc -name '*.conf' -print0 | xargs -0 grep -l 'PermitRootLogin'\n```\n\n**When to use which:**\n| Use -exec when | Use xargs when |\n|----------------|-----------------|\n| Running on few files | Running on many files |\n| Command doesn't support multiple args | Command handles multiple files efficiently |\n| You need per-file confirmation | You want maximum speed |\n| Simple one-liners | Complex pipelines |\n\n**⚠️ Always use -print0 / -0 for security:** Filenames can contain spaces, newlines, and other characters. `-print0` uses null bytes as delimiters, and `xargs -0` reads them. This prevents filename injection attacks."
+    },
+    {
+      "type": "reflection",
+      "title": "Find Mastery Self-Assessment",
+      "content": "Can you write these commands from memory?\n\n1. Find all files modified in the last 2 hours (excluding /proc and /sys)\n2. Find all world-writable directories not owned by root\n3. Find all SUID files and pipe them to `file` to check their types\n4. Find all `.conf` files in `/etc` that contain the word 'password'\n5. Find all files in `/tmp` that are larger than 1MB and were created in the last day\n\n**Practice exercise:** Create a baseline of your system's SUID files:\n```bash\nfind / -perm -4000 -type f 2>/dev/null | sort > ~/suid_baseline_$(date +%Y%m%d).txt\n```\n\nRe-run this monthly and diff against the baseline. Any new SUID files are worth investigating."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Build Your Audit Toolkit",
+      "content": "You've now learned the `find` command well enough to perform real security audits. The commands in this lesson aren't theoretical — they're the exact commands incident responders use on day one of an investigation.\n\n**Your security toolkit so far:**\n- `find / -perm -4000` — SUID audit\n- `find / -perm -o+w -type d` — World-writable directories\n- `find / -mtime -1` — Recently modified files\n- `find / -nouser` — Orphaned files\n- `find / -size +100M` — Unexpectedly large files\n\n**Next step:** Create a script that runs these commands and saves the output. Run it on a clean system to create a baseline. This is your first step toward **file integrity monitoring** — a core security control.",
+      "principle": "Feynman Technique"
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer", "Career Path: DFIR Specialist"]
+}

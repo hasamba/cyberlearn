@@ -1,0 +1,117 @@
+{
+  "lesson_id": "bc8f4f63-303f-44c6-9766-0f1849dedb31",
+  "domain": "fundamentals",
+  "title": "Python for Cybersecurity: Getting Started",
+  "difficulty": 1,
+  "order_index": 34,
+  "prerequisites": [],
+  "concepts": ["Python basics for security", "Network programming with sockets", "File manipulation", "Working with APIs", "Automating security tasks", "subprocess for system commands"],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Write Python scripts to automate basic security tasks",
+    "Use socket programming to make network connections and send data",
+    "Manipulate files and directories for log analysis",
+    "Make HTTP requests to interact with security APIs",
+    "Execute system commands from Python safely"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which Python module is used to make HTTP requests to web APIs?",
+      "options": ["urllib.request", "requests", "http.client", "Both requests and urllib.request work, but requests is standard practice"],
+      "correct": 3,
+      "explanation": "While urllib.request is built-in and works, the 'requests' library is the industry standard for HTTP in Python due to its simpler API. Both are valid but requests is preferred."
+    },
+    {
+      "question": "What does this Python code do: socket.socket(socket.AF_INET, socket.SOCK_STREAM)?",
+      "options": ["Creates a UDP socket", "Opens a file for network reading", "Creates a TCP socket (connection-oriented)", "Listens for incoming connections"],
+      "correct": 2,
+      "explanation": "AF_INET = IPv4 addressing, SOCK_STREAM = TCP (reliable, connection-oriented). This creates a standard TCP socket used for most network connections."
+    },
+    {
+      "question": "In Python, which is the safer way to run system commands when using user input?",
+      "options": ["os.system('nmap ' + user_input)", "subprocess.run(['nmap', user_input], capture_output=True)", "eval('nmap ' + user_input)", "exec('nmap ' + user_input)"],
+      "correct": 1,
+      "explanation": "subprocess.run with a list (not a string) prevents shell injection attacks. Each argument is a separate list item, so user input can't inject additional commands."
+    },
+    {
+      "question": "What Python function opens a file and automatically handles closing it?",
+      "options": ["file.open()", "with open() as f:", "try: f = open() finally: f.close()", "Both 'with open()' and the try/finally pattern, but 'with' is preferred"],
+      "correct": 3,
+      "explanation": "The 'with open() as f:' context manager is the Pythonic way to handle files — it guarantees the file is closed even if an exception occurs."
+    },
+    {
+      "question": "Which Python module contains tools for working with IP addresses and network ranges?",
+      "options": ["socket", "ipaddress", "network", "netaddr"],
+      "correct": 1,
+      "explanation": "The built-in 'ipaddress' module provides IPv4Network, IPv4Address, and related classes for working with IP addresses and subnets programmatically."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget needing to know all of Python — you only need the 20% used in 80% of security scripts.",
+    "active": "Open a Python terminal RIGHT NOW and type: import socket; socket.gethostbyname('google.com'). What do you get?",
+    "state": "You're a security professional who automates repetitive work, builds tools, and never does the same task manually twice.",
+    "teach": "Explain to a colleague why Python is the go-to language for security automation in 2 minutes.",
+    "enter": "Think about the most repetitive security task you do manually. Could it be automated in Python?",
+    "review": "Write a 5-line Python script from memory that reads a file and prints each line containing 'ERROR'.",
+    "notes": "Best practice: never use f-strings or string concatenation for shell commands. Use subprocess with lists.",
+    "vocabulary": "socket, subprocess, requests, JSON, regex, context manager, list comprehension, f-string",
+    "visualize": "Python is your security Swiss army knife. Each import adds a new blade for a specific job.",
+    "connect": "Connect to everything: every tool you use has a Python API or can be called from Python. Master this and you master automation."
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Security Automation Mindset",
+      "content": "Security professionals who can't code are limited to the tools someone else built. Security professionals who can code build exactly the tool they need for exactly the situation they're in. Python is the lingua franca of security automation — from 10-line log parsers to full-featured exploit frameworks. You don't need to be a software engineer. You need to automate tasks, process data, and talk to APIs. Python makes that accessible."
+    },
+    {
+      "type": "explanation",
+      "title": "Python Essentials You'll Actually Use",
+      "content": "You don't need a full Python course. You need these fundamentals:\n\n**Data structures:**\n```python\nhosts = ['10.0.0.1', '10.0.0.2']  # List\ncreds = {'user': 'admin', 'pass': 'p@ss'}  # Dictionary\nunique_ips = {'10.0.0.1', '10.0.0.2'}  # Set (no duplicates)\n```\n\n**File I/O:**\n```python\nwith open('hosts.txt', 'r') as f:\n    for line in f:\n        ip = line.strip()  # Remove newline\n```\n\n**String operations:**\n```python\nline = '10.0.0.1 open 80 http'\nparts = line.split()  # ['10.0.0.1', 'open', '80', 'http']\nif '80' in line:     # String contains\n    print(line)\n```\n\n**List comprehensions (Pythonic shortcut):**\n```python\nips = [line.strip() for line in open('hosts.txt') if line.strip()]\n```\n\n**Exception handling:**\n```python\ntry:\n    s.connect((host, port))\nexcept ConnectionRefusedError:\n    pass  # Port closed, move on\nexcept socket.timeout:\n    print(f'{host}:{port} timed out')\n```"
+    },
+    {
+      "type": "explanation",
+      "title": "Network Programming — Teach Me Like I'm 10",
+      "content": "A socket is like a telephone. You can:\n- **Call someone (client):** Connect to their IP and port\n- **Wait for calls (server):** Bind to a port and listen\n\nThe steps to make a TCP connection:\n1. Create a socket (the phone)\n2. Connect to an address and port (dial the number)\n3. Send data (speak into the phone)\n4. Receive data (listen)\n5. Close the socket (hang up)\n\nFor UDP (no connection needed):\n- Create a socket\n- Send data directly to an address\n- Receive responses\n\nThis is how every network security tool works underneath — Nmap, Netcat, Metasploit, your browser. They're all Python (or C) code doing exactly these socket operations."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Port Scanner — Your First Security Tool",
+      "language": "python",
+      "content": "#!/usr/bin/env python3\n# Simple TCP port scanner\n# Only use on systems you own or have permission to test!\n\nimport socket\nimport sys\nfrom concurrent.futures import ThreadPoolExecutor\n\ndef scan_port(host, port, timeout=1):\n    \"\"\"Returns True if port is open\"\"\"\n    try:\n        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        s.settimeout(timeout)\n        result = s.connect_ex((host, port))  # 0 = success (open)\n        s.close()\n        return result == 0\n    except socket.error:\n        return False\n\ndef scan_range(host, start_port, end_port, threads=100):\n    \"\"\"Scan a range of ports using thread pool\"\"\"\n    open_ports = []\n    \n    with ThreadPoolExecutor(max_workers=threads) as executor:\n        # Submit all port scans\n        futures = {\n            executor.submit(scan_port, host, port): port \n            for port in range(start_port, end_port + 1)\n        }\n        \n        # Collect results\n        for future, port in futures.items():\n            if future.result():\n                open_ports.append(port)\n    \n    return sorted(open_ports)\n\nif __name__ == '__main__':\n    target = sys.argv[1] if len(sys.argv) > 1 else '127.0.0.1'\n    \n    print(f'Scanning {target}...')\n    open_ports = scan_range(target, 1, 1024)\n    \n    if open_ports:\n        print(f'Open ports: {open_ports}')\n        # Try to grab service banner\n        for port in open_ports:\n            try:\n                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n                s.settimeout(2)\n                s.connect((target, port))\n                s.send(b'HEAD / HTTP/1.0\\r\\n\\r\\n')\n                banner = s.recv(1024).decode('utf-8', errors='ignore').split('\\n')[0]\n                print(f'  Port {port}: {banner[:50]}')\n                s.close()\n            except:\n                pass\n    else:\n        print('No open ports found in range 1-1024')"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Working with Security APIs",
+      "language": "python",
+      "content": "#!/usr/bin/env python3\n# Query VirusTotal and Shodan APIs for threat intelligence\n# Get free API keys from virustotal.com and shodan.io\n\nimport requests\nimport json\nimport os\n\n# --- VIRUSTOTAL: Check if a file hash is malicious ---\ndef check_hash_virustotal(file_hash, api_key=None):\n    api_key = api_key or os.environ.get('VT_API_KEY')\n    \n    url = f'https://www.virustotal.com/api/v3/files/{file_hash}'\n    headers = {'x-apikey': api_key}\n    \n    response = requests.get(url, headers=headers)\n    \n    if response.status_code == 200:\n        data = response.json()\n        stats = data['data']['attributes']['last_analysis_stats']\n        return {\n            'malicious': stats.get('malicious', 0),\n            'suspicious': stats.get('suspicious', 0),\n            'harmless': stats.get('harmless', 0),\n            'total': sum(stats.values())\n        }\n    elif response.status_code == 404:\n        return {'error': 'Hash not found in VirusTotal'}\n    else:\n        return {'error': f'API error: {response.status_code}'}\n\n# --- LOG ANALYSIS: Parse and filter log files ---\ndef analyze_auth_log(log_file='/var/log/auth.log'):\n    \"\"\"Find failed SSH login attempts\"\"\"\n    failed_logins = {}\n    \n    with open(log_file, 'r', errors='ignore') as f:\n        for line in f:\n            if 'Failed password' in line:\n                parts = line.split()\n                try:\n                    ip = parts[parts.index('from') + 1]\n                    user = parts[parts.index('for') + 1]\n                    key = f'{ip}:{user}'\n                    failed_logins[key] = failed_logins.get(key, 0) + 1\n                except (ValueError, IndexError):\n                    continue\n    \n    # Sort by attempt count\n    sorted_results = sorted(failed_logins.items(), key=lambda x: x[1], reverse=True)\n    return sorted_results[:20]  # Top 20 attackers\n\n# --- USAGE EXAMPLES ---\nif __name__ == '__main__':\n    # Check a hash\n    # result = check_hash_virustotal('44d88612fea8a8f36de82e1278abb02f')  # EICAR test\n    # print(json.dumps(result, indent=2))\n    \n    # Analyze auth logs (requires /var/log/auth.log access)\n    try:\n        attackers = analyze_auth_log()\n        print('Top SSH brute force sources:')\n        for attacker, count in attackers[:10]:\n            print(f'  {attacker}: {count} attempts')\n    except FileNotFoundError:\n        print('Auth log not found. Run on a Linux system with /var/log/auth.log')"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Running System Commands Safely",
+      "language": "python",
+      "content": "#!/usr/bin/env python3\n# Safe subprocess usage for security tools\n\nimport subprocess\nimport json\nimport xml.etree.ElementTree as ET\n\n# --- SAFE: Use list, not string ---\ndef run_nmap(target, ports='1-1000'):\n    \"\"\"Run nmap and parse output safely\"\"\"\n    # SAFE: arguments as list items (no shell injection possible)\n    cmd = ['nmap', '-sV', '-p', ports, '--open', '-oX', '-', target]\n    \n    result = subprocess.run(\n        cmd,\n        capture_output=True,\n        text=True,\n        timeout=300  # 5 minute timeout\n    )\n    \n    if result.returncode != 0:\n        return {'error': result.stderr}\n    \n    # Parse XML output\n    services = []\n    root = ET.fromstring(result.stdout)\n    for host in root.findall('host'):\n        for port in host.findall('ports/port'):\n            state = port.find('state').get('state')\n            if state == 'open':\n                service = port.find('service')\n                services.append({\n                    'port': port.get('portid'),\n                    'protocol': port.get('protocol'),\n                    'service': service.get('name', 'unknown') if service is not None else 'unknown',\n                    'version': service.get('product', '') if service is not None else ''\n                })\n    \n    return services\n\n# --- DANGEROUS: Don't do this ---\n# user_ip = input('Enter IP: ')\n# os.system('nmap ' + user_ip)  # Shell injection: '127.0.0.1; rm -rf /'\n# subprocess.run('nmap ' + user_ip, shell=True)  # Same problem\n\nif __name__ == '__main__':\n    print('Scanning localhost (demo only)...')\n    results = run_nmap('127.0.0.1', '80,443,22,8080')\n    for svc in results:\n        print(f\"  {svc['port']}/{svc['protocol']} - {svc['service']} {svc['version']}\")"
+    },
+    {
+      "type": "real_world",
+      "title": "Python in the Security Field",
+      "content": "Security tools written in Python (partial list):\n\n**Offense:** Impacket (AD attacks), Scapy (packet crafting), Volatility (memory forensics), pwntools (CTF/exploit dev)\n\n**Defense:** Yara-python (malware detection), Volatility (memory forensics), plaso/log2timeline (timeline analysis)\n\n**Integration:** Cortex XSOAR playbooks, Splunk custom commands, TheHive case management, MISP integration\n\n**Automation:** Every major security vendor (AWS, Splunk, CrowdStrike, VirusTotal) has a Python SDK or API you can script against.\n\n**Real example from a SOC:**\nA team had 5,000 suspicious IP indicators to check against internal logs. Manually: days. With Python: they built a script that read the IP list, queried Splunk's REST API, parsed results, and generated a report in 45 minutes. The script was reusable for every future investigation.\n\nThat's the power. Not just solving one problem — building a tool that solves the same problem permanently."
+    },
+    {
+      "type": "memory_aid",
+      "title": "The Security Python Toolkit — SFRA",
+      "content": "Four essential Python categories for security:\n\n**S — Sockets**\n`import socket` — network connections, port scanning, banner grabbing, raw packet work\n\n**F — File operations**\n`with open()` — log parsing, config file reading, hash file processing, report generation\n\n**R — Requests (HTTP)**\n`import requests` — API calls (VT, Shodan, MISP), web scraping, vulnerability checking\n\n**A — Automation (subprocess)**\n`import subprocess` — wrapping existing security tools, running nmap/john/hashcat programmatically\n\nMaster these four imports and you can automate 80% of common security tasks."
+    },
+    {
+      "type": "reflection",
+      "title": "Your First Python Security Project",
+      "content": "The best way to learn is to solve a real problem you have. Pick ONE of these as your first project:\n\n**Level 1 — Log Parser:** Write a script that reads /var/log/auth.log (or Windows Event Log XML export) and outputs a table of failed login attempts sorted by count.\n\n**Level 2 — Hash Checker:** Take a text file of SHA256 hashes and query VirusTotal's free API for each one. Output a CSV with hash, detection count, verdict.\n\n**Level 3 — Port Scanner:** Build the port scanner from this lesson. Add service banner grabbing. Add output to CSV.\n\n**Level 4 — Alert Enricher:** Take an IP address as input, query Shodan and VirusTotal, and print a summary of what's known about that IP.\n\nStart with Level 1. Finish it. Then go to Level 2. Building real tools beats reading tutorials every time."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Write Ugly Code That Works",
+      "content": "Your first security scripts will be messy. Functions will be too long. Variable names will be terrible. Error handling will be minimal. That's fine. The goal of your first 50 scripts is to solve real problems and learn by doing — not to write production-quality code.\n\nGet it working. Get it useful. Then refactor. The security field is full of beautifully designed tools that solve the wrong problem and ugly scripts that save hours of work every day. Be the ugly script writer who actually ships tools."
+    }
+  ],
+  "tags": ["Career Path: Security Engineer", "Built-In", "Priority 4 - Essential scripting"]
+}

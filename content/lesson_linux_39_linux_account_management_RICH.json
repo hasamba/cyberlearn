@@ -1,0 +1,109 @@
+{
+  "lesson_id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+  "domain": "linux",
+  "title": "Linux Account Management",
+  "difficulty": 2,
+  "order_index": 39,
+  "prerequisites": ["Linux Kernel, Operating System, and Distributions"],
+  "concepts": ["User account creation and management", "Password policies and shadow file", "su and sudo privilege escalation", "Account security and lockout", "User and group files (/etc/passwd, /etc/shadow)"],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Create, modify, and delete user accounts using useradd, usermod, and userdel commands",
+    "Understand the structure and security implications of /etc/passwd and /etc/shadow files",
+    "Configure and use sudo for controlled privilege escalation with proper least-privilege principles",
+    "Manage passwords using passwd, chage, and password policies",
+    "Identify insecure account configurations that could lead to privilege escalation"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does the 'x' in the second field of /etc/passwd indicate?",
+      "options": [
+        "The account is expired",
+        "The password is stored in /etc/shadow",
+        "The user has no password",
+        "The account is locked"
+      ],
+      "correct_answer": "The password is stored in /etc/shadow",
+      "explanation": "The 'x' in the password field of /etc/passwd indicates that the actual password hash is stored in /etc/shadow. This is the modern, secure approach — /etc/passwd must be world-readable for UID lookups, so storing hashes there would expose them to brute force attacks."
+    },
+    {
+      "question": "Which command creates a new user with a home directory and sets their default shell to /bin/bash?",
+      "options": [
+        "useradd -m -s /bin/bash username",
+        "adduser --home --shell /bin/bash username",
+        "usermod -m -s /bin/bash username",
+        "passwd --create -s /bin/bash username"
+      ],
+      "correct_answer": "useradd -m -s /bin/bash username",
+      "explanation": "useradd -m creates the home directory (/home/username) and -s /bin/bash sets the default shell. adduser is an interactive wrapper on Debian/Ubuntu that prompts for details. usermod modifies existing users. passwd only changes passwords."
+    },
+    {
+      "question": "In a sudoers file, what does the entry `%wheel ALL=(ALL) NOPASSWD: ALL` allow?",
+      "options": [
+        "Members of the wheel group can run any command as any user without a password",
+        "Only the wheel user can run commands without a password",
+        "All users can run wheel commands without authentication",
+        "The wheel group can only run password-related commands"
+      ],
+      "correct_answer": "Members of the wheel group can run any command as any user without a password",
+      "explanation": "The format is: who where=(as_who) commands. %wheel = members of the wheel group. ALL = on any host. (ALL) = as any user. NOPASSWD = without password prompt. ALL = all commands. This is a common but risky configuration — it allows full root access without any password."
+    },
+    {
+      "question": "How do you lock a user account without deleting it?",
+      "options": [
+        "userdel -l username",
+        "passwd -l username",
+        "usermod -L username",
+        "Both passwd -l and usermod -L work"
+      ],
+      "correct_answer": "Both passwd -l and usermod -L work",
+      "explanation": "Both passwd -l and usermod -L lock a user account by prepending '!' to the password hash in /etc/shadow. passwd -l is the traditional method, while usermod -L is equivalent. Either prevents password-based login while preserving the account for potential reactivation."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Curiosity", "Focus"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Account Management: Where Security Meets Daily Operations",
+      "content": "Every breach investigation starts with one question: which accounts did the attacker compromise? Account management is the foundation of Linux security — every file permission, every sudo rule, every login event ties back to user accounts. Understanding how accounts work isn't just sysadmin knowledge; it's essential for DFIR, privilege escalation, and security hardening. When you see a UID 0 account that shouldn't exist, or a user with NOPASSWD sudo access, or a stale account from an employee who left two years ago — that's a finding. This lesson gives you the complete picture of how Linux accounts work, how to manage them, and how to spot what's wrong."
+    },
+    {
+      "type": "explanation",
+      "title": "Linux Account Architecture: /etc/passwd and /etc/shadow",
+      "content": "Linux stores user account information in two critical files:\n\n**/etc/passwd** — World-readable, contains account metadata:\n```\nroot:x:0:0:root:/root:/bin/bash\nusername:x:1001:1001:Full Name:/home/username:/bin/bash\n```\nFields (colon-separated): username:password:UID:GID:GECOS:home_dir:shell\n- The 'x' password field means the hash is in /etc/shadow\n- UIDs: 0=root, 1-999=system accounts, 1000+=regular users\n- Shell of /sbin/nologin or /bin/false = no login allowed\n\n**/etc/shadow** — Root-readable only, contains password hashes:\n```\nroot:$6$salt$hash:19000:0:99999:7:::\nusername:!:19050:0:99999:7:::\n```\nFields: username:hash:last_change:min_age:max_age:warn:inactive:expire:reserved\n- Hash formats: $1$=MD5, $5$=SHA-256, $6$=SHA-512, $y$=yesrypt\n- '!' or '*' prefix = account locked\n- '!!' = password never set (on some systems)\n- Empty field = no password required (dangerous!)\n\n**Other critical files:**\n- /etc/group — Group definitions and membership\n- /etc/gshadow — Group passwords (rarely used)\n- /etc/skel/ — Template files copied to new users' home directories\n- /etc/default/useradd — Default settings for useradd\n- /etc/login.defs — Shadow password suite configuration (UID ranges, password policies)\n\n**Security implications:** Any UID 0 account has root privileges regardless of username. Multiple UID 0 accounts are a red flag. World-writable /etc/passwd is catastrophic. /etc/shadow must NEVER be world-readable."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: User Accounts Are Like School ID Cards",
+      "content": "Imagine a school where every student has an ID card. The ID card has:\n- Your name (username)\n- Your student number (UID — the number that actually matters)\n- Which homeroom you belong to (primary group/GID)\n- Your locker location (home directory)\n- Which doors you can open (shell — whether you can enter the school at all)\n\nThere's a special student number: 0. Anyone with student number 0 is basically the principal — they can go anywhere, do anything, and override all rules. The real principal is called 'root' and has student number 0. But if someone creates a new student called 'helper' and gives them student number 0, that 'helper' is just as powerful as the principal!\n\nThe ID card list (/etc/passwd) is posted on the school bulletin board — everyone can read it. But the list of passwords (/etc/shadow) is kept in the principal's office — only the principal can read it. This way, students can look up each other's student numbers without seeing anyone's password.\n\nsudo is like getting a special hall pass. Instead of giving every student a principal's ID card (dangerous!), sudo lets certain students run specific commands as if they were the principal — but only the commands they're approved for, and only after showing their own ID (typing their password)."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Linux Account Management Commands",
+      "content": "Practice user account creation, modification, and security checks:\n\n# User Creation\nsudo useradd -m -s /bin/bash -c 'Security Analyst' analyst\nsudo passwd analyst\n\n# User Modification\nsudo usermod -aG docker,wireshark analyst   # Add to groups\nsudo usermod -s /bin/zsh analyst              # Change shell\nsudo usermod -L analyst                       # Lock account\nsudo usermod -U analyst                       # Unlock account\nsudo usermod -e 2024-12-31 analyst             # Set expiration date\n\n# User Deletion\nsudo userdel analyst                  # Remove user, keep home dir\nsudo userdel -r analyst                # Remove user AND home dir\n\n# Password Management\nsudo passwd analyst                    # Set password interactively\nsudo passwd -l analyst                 # Lock account\nsudo passwd -u analyst                 # Unlock account\nsudo passwd -e analyst                 # Force password change on next login\n\n# Password Aging and Policies\nsudo chage -l analyst                  # View password aging info\nsudo chage -M 90 analyst                # Max password age 90 days\nsudo chage -m 7 analyst                 # Min password age 7 days\nsudo chage -W 14 analyst                # Warn 14 days before expiration\nsudo chage -I 30 analyst                # Inactive for 30 days then lock\n\n# Sudo Configuration\nsudo visudo                            # Edit sudoers file safely\n# Add specific command access:\n# analyst ALL=(ALL) /usr/bin/tcpdump, /usr/bin/wireshark\n# Add group access with no password (risky!):\n# %wheel ALL=(ALL) NOPASSWD: ALL\n\n# Security Audit Commands\nawk -F: '$3 == 0 {print $1}' /etc/passwd              # Find all UID 0 accounts\nawk -F: 'length($2) < 3 {print $1}' /etc/shadow          # Find accounts with weak/empty passwords\ngrep -v 'nologin\\|false' /etc/passwd | awk -F: '{print $1}'  # Find accounts with login shells\nlastlog -t 90                                           # Show recent logins\npasswd -S analyst                                       # Show password status\n\n# Check for users without passwords\nsudo awk -F: '$2 == \"\" {print $1\" has no password!\"}' /etc/shadow",
+      "code": "# Create a user with home dir and bash shell\nsudo useradd -m -s /bin/bash -c 'Security Analyst' analyst\nsudo passwd analyst\n\n# Add to groups\nsudo usermod -aG docker,wireshark analyst\n\n# Lock/unlock account\nsudo usermod -L analyst\nsudo usermod -U analyst\n\n# Security audit\nawk -F: '$3 == 0 {print $1}' /etc/passwd\nsudo awk -F: '$2 == \"\" {print $1}' /etc/shadow\n\n# Sudo configuration\nsudo visudo",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Privilege Escalation via Misconfigured Accounts",
+      "content": "During a penetration test, the red team discovered several account management vulnerabilities that led to full root access:\n\n**Finding 1: UID 0 Account**\nThe system had a 'backup' account with UID 0 in /etc/passwd:\n`backup:x:0:0:Backup Operator:/home/backup:/bin/bash`\nThis account had full root privileges. The team cracked its weak password using hashcat and gained root.\n\n**Finding 2: NOPASSWD sudo for ALL commands**\nA developer had this in /etc/sudoers:\n`developer ALL=(ALL) NOPASSWD: ALL`\nAfter compromising the developer account via phishing, the team ran `sudo su -` for instant root.\n\n**Finding 3: Sudo misconfiguration with GTFOBins**\nThe sudoers file allowed a monitoring user to run /usr/bin/find as root:\n`monitoring ALL=(root) /usr/bin/find`\nThe team exploited this with: `sudo find / -exec /bin/bash \\;`\n\n**Finding 4: Stale Account**\nAn account for an employee who left 18 months ago was still active with a never-expired password. The team found it through LDAP enumeration and cracked the password using a common wordlist.\n\n**Remediation:**\n1. Remove all non-root UID 0 accounts: `usermod -u 1999 backup`\n2. Replace NOPASSWD:ALL with specific command allowlists\n3. Audit sudo rules against GTFOBins (https://gtfobins.github.io/)\n4. Implement account expiration policies: `chage -E $(date -d '+90 days' +%Y-%m-%d) username`\n5. Audit all accounts quarterly: `lastlog | grep -v 'Never'`"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Account Management Commands: PALS Mnemonic",
+      "content": "**P** — Passwords: passwd, chage, /etc/shadow, /etc/login.defs\n**A** — Adding/Removing: useradd, usermod, userdel, adduser\n**L** — Lockout: passwd -l, usermod -L, chage -I, account expiration\n**S** — Sudo: visudo, /etc/sudoers, /etc/sudoers.d/, NOPASSWD\n\n**Key files to remember:**\n- /etc/passwd → Account info (world-readable)\n- /etc/shadow → Password hashes (root-only)\n- /etc/group → Group membership\n- /etc/sudoers → Sudo rules\n- /etc/sudoers.d/ → Drop-in sudo rules\n- /etc/login.defs → Password policy defaults\n- /etc/default/useradd → Default user creation settings\n\n**Critical security checks:**\n- `awk -F: '$3==0' /etc/passwd` — Find all root-equivalent accounts\n- `sudo awk -F: '$2==\"\"' /etc/shadow` — Find accounts without passwords\n- `grep -v 'nologin\\|false' /etc/passwd` — Find accounts with login shells\n- `sudo -l` — List current user's sudo privileges\n- `lastlog` — Show last login time for all accounts"
+    },
+    {
+      "type": "reflection",
+      "title": "Account Security Audit Challenge",
+      "content": "You're auditing a Linux server. Answer these questions based on what you've learned:\n\n1. You find this line in /etc/passwd: `admin:x:0:0:Administrator:/home/admin:/bin/bash`. What security risk does this pose, and how would you remediate it?\n\n2. A junior admin suggests deleting /etc/shadow to 'simplify things' since /etc/passwd already has the x field. What would happen, and why is this a terrible idea?\n\n3. You see this in /etc/sudoers: `%sudo ALL=(ALL) /usr/bin/vim`. How could this be exploited for privilege escalation?\n\n4. An account has '!!' in the password field of /etc/shadow. What does this mean, and is it a security risk?\n\n5. Why is NOPASSWD in sudoers dangerous even for limited commands?\n\nAnswers: (1) This is a second UID 0 account — anyone who compromises it gets root. Change the UID to a non-zero value. (2) Removing /etc/shadow would break password authentication entirely — the system expects hashes there. Also, if passwords were moved back to /etc/passwd, they'd be readable by all users. (3) Vim can execute shell commands (:!bash), so this grants full root access. Use rvim or editor restrictions instead. (4) '!!' means the password has never been set. This is safer than an empty password (which allows passwordless login) but the account can still be accessed via SSH keys or su. (5) NOPASSWD removes the authentication step — if an attacker gains access to the user's session (via XSS, compromised terminal, or unattended workstation), they can run sudo commands without any additional verification."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Accounts Are the Entry Points",
+      "content": "Every attack starts with account compromise — whether it's a weak password, a misconfigured sudo rule, or a stale account. The principles you've learned here apply everywhere: least privilege (minimal sudo access), defense in depth (shadow passwords, password policies), and regular auditing (checking for UID 0 accounts, stale users, and insecure configurations). In the next lesson, you'll learn about Linux group management, which is the companion to user management — together, they form the complete picture of Linux identity and access management. Remember: in security, accounts are the keys to the kingdom. Protect them, audit them, and never give more access than necessary."
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer", "Career Path: Security Engineer"]
+}

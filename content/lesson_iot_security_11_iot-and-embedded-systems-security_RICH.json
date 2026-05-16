@@ -1,0 +1,141 @@
+{
+  "lesson_id": "d4e6f8a0-2b3c-4d5e-9f1a-3c5e7b9d1f3a",
+  "domain": "iot_security",
+  "title": "IoT and Embedded Systems Security",
+  "difficulty": 2,
+  "order_index": 11,
+  "prerequisites": [],
+  "concepts": [
+    "IoT architecture and attack surface",
+    "Embedded system constraints and vulnerabilities",
+    "OT/ICS/SCADA security fundamentals",
+    "Firmware analysis and modification",
+    "Physical security for embedded devices",
+    "IoT communication protocols (MQTT, CoAP, Zigbee, BLE)",
+    "Default credentials and insecure services",
+    "IoT regulatory frameworks and standards"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Describe IoT architecture layers and their associated security challenges",
+    "Identify common vulnerabilities in embedded and IoT devices",
+    "Explain OT/ICS/SCADA security principles and IT/OT convergence risks",
+    "Assess physical security requirements for IoT deployments",
+    "Apply security frameworks (NIST 8259, ETSI EN 303 645) to IoT design"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary security challenge unique to IoT devices compared to traditional IT systems?",
+      "options": [
+        "They run faster processors",
+        "They often have limited processing power, memory, and cannot be patched easily",
+        "They use different networking cables",
+        "They require more electricity"
+      ],
+      "correct_answer": "B",
+      "explanation": "IoT devices typically have constrained resources (limited CPU, RAM, storage) and are often deployed in locations where patching is difficult or impossible. Many IoT devices run outdated firmware, lack secure boot mechanisms, and cannot receive security updates."
+    },
+    {
+      "question": "In a SCADA system, what is the role of a PLC (Programmable Logic Controller)?",
+      "options": [
+        "It serves as the central database server",
+        "It controls industrial processes by reading sensors and actuating equipment",
+        "It provides the user interface for operators",
+        "It manages network routing between OT and IT networks"
+      ],
+      "correct_answer": "B",
+      "explanation": "A PLC is a specialized computer that reads inputs from sensors, executes control logic, and drives outputs (actuators, valves, motors). It's the workhorse of industrial control systems, operating in real-time to control physical processes."
+    },
+    {
+      "question": "Which IoT communication protocol is designed for lightweight publish/subscribe messaging?",
+      "options": [
+        "HTTP/2",
+        "MQTT",
+        "FTP",
+        "SSH"
+      ],
+      "correct_answer": "B",
+      "explanation": "MQTT (Message Queuing Telemetry Transport) is a lightweight publish/subscribe protocol designed for IoT. It has minimal overhead (header as small as 2 bytes), supports QoS levels, and works well over unreliable networks. It's the most common IoT messaging protocol."
+    },
+    {
+      "question": "What is the primary risk of IT/OT network convergence without proper segmentation?",
+      "options": [
+        "Increased electricity costs",
+        "A compromise of the IT network can spread to OT systems controlling physical processes",
+        "Faster internet speeds for IoT devices",
+        "Reduced need for security personnel"
+      ],
+      "correct_answer": "B",
+      "explanation": "When IT and OT networks are connected without proper segmentation, malware or attackers who compromise the IT network can pivot to OT systems. This has led to real incidents like Triton/TRISYS (targeting safety instrumented systems) and the Ukraine power grid attacks."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Simplification",
+    "Analogies",
+    "Feynman Technique",
+    "Pattern Recognition",
+    "Progressive Disclosure",
+    "Teaching Others"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "When Cyber Meets Physical",
+      "content": "IoT security is where cybersecurity meets the physical world in the most direct way. A compromised web server leaks data. A compromised insulin pump kills someone.\n\nThis isn't hypothetical — researchers have demonstrated remote attacks on pacemakers, automobiles, industrial control systems, and home automation. The Mirai botnet took down major websites by compromising IoT cameras with default credentials.\n\nThe challenge is real: these devices often can't be patched, have limited processing power for security, and are deployed for 10-15 years. You're securing systems that control physical processes with the security budget of a $20 device.\n\nThis lesson teaches you to think about security in a world where the stakes are physical.",
+      "principle": "Association"
+    },
+    {
+      "type": "explanation",
+      "title": "IoT Architecture and Attack Surface",
+      "content": "**IoT architecture has four layers, each with distinct security challenges:**\n\n**Layer 1: Device/Edge**\n- Sensors, actuators, embedded controllers\n- Limited CPU, RAM, storage (often 256KB RAM, 1MB flash)\n- May run RTOS or bare-metal (no OS)\n- Attack vectors: Physical access, firmware extraction, JTAG/UART debug ports\n- Security challenges: No patching mechanism, hardcoded credentials, no encryption capability\n\n**Layer 2: Network/Communication**\n- Protocols: MQTT, CoAP, Zigbee, Z-Wave, BLE, LoRaWAN, NB-IoT\n- Gateways that bridge device networks to the internet\n- Attack vectors: Protocol exploitation, man-in-the-middle, replay attacks\n- Security challenges: Weak or no encryption, default MQTT topics, certificate management at scale\n\n**Layer 3: Cloud/Platform**\n- IoT platforms (AWS IoT Core, Azure IoT Hub, Google IoT Core)\n- Data processing, storage, analytics\n- Attack vectors: API abuse, cloud misconfiguration, tenant isolation failure\n- Security challenges: Identity management at scale, data privacy, multi-tenancy\n\n**Layer 4: Application/User**\n- Mobile apps, web dashboards, third-party integrations\n- Attack vectors: Insecure APIs, weak authentication, excessive permissions\n- Security challenges: Mobile app reverse engineering, insecure data storage\n\n**Common IoT vulnerabilities (OWASP IoT Top 10):**\n1. Weak, guessable, or hardcoded passwords\n2. Insecure network services\n3. Insecure ecosystem interfaces\n4. Lack of secure update mechanism\n5. Use of insecure or outdated components\n6. Insufficient privacy protection\n7. Insecure data transfer and storage\n8. Lack of device management\n9. Insecure default configuration\n10. Lack of physical hardening"
+    },
+    {
+      "type": "explanation",
+      "title": "OT/ICS/SCADA Security",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Imagine a city's water system. Sensors measure the water level in tanks. When the level gets too low, a pump turns on. When it gets too high, a valve opens. This whole system — sensors, controllers, pumps, valves — is an **Industrial Control System (ICS)**.\n\n**The hierarchy:**\n\n- **SCADA** (Supervisory Control And Data Acquisition) — The brain that monitors and controls everything spread over a large area (like a city's water system or power grid). It sees the big picture.\n\n- **ICS** (Industrial Control System) — The broader category that includes SCADA, DCS, and PLCs. Any system that controls industrial processes.\n\n- **PLC** (Programmable Logic Controller) — A rugged computer at each site that reads sensors and controls equipment. It's the hands that actually turn things on and off.\n\n- **HMI** (Human Machine Interface) — The screen where operators see what's happening and control the system. Like a dashboard for the factory.\n\n- **SIS** (Safety Instrumented System) — The emergency backup. If the main system fails, the SIS shuts everything down safely. **This should NEVER be connected to the internet.**\n\n**Why this matters for security:**\n- These systems control physical processes — water, electricity, manufacturing\n- They were designed for reliability, not security (many protocols have no authentication)\n- They run for 15-20+ years (patching is extremely difficult)\n- The Purdue Model segments these systems into layers, but IT/OT convergence is breaking those boundaries\n\n**Real attacks:**\n- **Stuxnet (2010)** — Destroyed Iranian centrifuges via PLC manipulation\n- **Ukraine Power Grid (2015, 2016)** — Remote substation control\n- **Triton/TRISYS (2017)** — Targeted SIS (safety systems!) at a petrochemical plant\n- **Colonial Pipeline (2021)** — Ransomware on IT network → pipeline shutdown"
+    },
+    {
+      "type": "code_exercise",
+      "title": "IoT Device Reconnaissance",
+      "content": "Practice identifying and assessing IoT device attack surfaces.",
+      "language": "bash",
+      "starter_code": "# 1. Scan for IoT devices on a local network\n# 2. Identify open ports on an IoT device\n# 3. Check for default credentials on a common IoT service\n# 4. Enumerate MQTT broker topics\n# 5. Analyze a firmware binary for strings",
+      "solution": "# 1. Scan for IoT devices on local network (nmap)\nnmap -sn 192.168.1.0/24 -oG iot_hosts.txt\n# IoT devices often have specific MAC OUI prefixes\n# Check: https://macvendors.com\n\n# 2. Identify open ports on an IoT device\nnmap -sV -p- 192.168.1.X\n# Common IoT ports:\n# 22 - SSH (often with default creds)\n# 80/443 - Web interface\n# 1883 - MQTT\n# 5683 - CoAP\n# 8080 - Alt web interface\n# 5555 - Android ADB (on smart devices)\n\n# 3. Check for default credentials on MQTT\nmosquitto_sub -h 192.168.1.X -t '#' -v\n# Many MQTT brokers have no authentication!\n\n# 4. Enumerate MQTT broker topics\nmosquitto_sub -h 192.168.1.X -t '#' -v --username admin --password admin\n# Check for sensitive topics: commands, credentials, telemetry\n\n# 5. Analyze firmware for strings\nstrings firmware.bin | grep -iE '(password|admin|root|key|secret|token|api_key|default)'\nbinwalk firmware.bin  # Extract filesystem\nbinwalk -e firmware.bin  # Extract and mount\n\n# Alternative: Quick IoT assessment with Shodan CLI\n# shodan host <ip>  # Check what's exposed",
+      "hint": "Use nmap for network scanning, mosquitto_sub for MQTT, binwalk for firmware analysis. Common IoT default credentials: admin/admin, root/root, admin/password."
+    },
+    {
+      "type": "real_world",
+      "title": "The Mirai Botnet and IoT Insecurity at Scale",
+      "content": "On October 21, 2016, major websites including Twitter, Netflix, Reddit, and GitHub went offline. The cause? A DDoS attack from the **Mirai botnet** — a network of ~600,000 compromised IoT devices.\n\n**How Mirai worked:**\n1. Scanned the internet for IoT devices (IP cameras, home routers, DVRs)\n2. Tried a table of 62 default username/password combinations (admin/admin, root/root, etc.)\n3. Infected devices that accepted default credentials\n4. Used infected devices to launch massive DDoS attacks\n\n**Why it was devastating:**\n- 600K+ devices = massive bandwidth\n- IoT devices are always on, always connected\n- Many couldn't be patched (no update mechanism)\n- Default credentials were hardcoded by manufacturers\n\n**Mirai source code was released** — leading to countless variants (Okiru, Sora, OMG, etc.) that continue to plague IoT devices.\n\n**Lessons learned:**\n1. **Default credentials kill** — Every IoT device shipped with admin/admin is a potential weapon\n2. **Patching is essential** — Devices without update mechanisms remain vulnerable forever\n3. **Segmentation matters** — IoT devices should not be on the same network as critical systems\n4. **Manufacturers must be held accountable** — Regulation (EU Cyber Resilience Act, ETSI EN 303 645, California IoT Law) is finally requiring security basics\n\n**Modern IoT botnets** have evolved beyond Mirai:\n- Mozi (P2P botnet, targets routers and IoT)\n- Meris (HTTP/2 Rapid Reset, 20M+ RPS)\n- Condi (targets ASUS routers specifically)\n\nThe fundamental problem remains: billions of IoT devices with inadequate security.",
+      "scenario": "You're consulting for a smart building company deploying 10,000 IoT sensors and controllers. Design a security architecture that prevents a Mirai-style compromise from affecting the building's critical OT systems."
+    },
+    {
+      "type": "memory_aid",
+      "title": "IoT Security Layers — The DPCA Mnemonic",
+      "content": "**DPCA** — The four IoT security domains:\n\n- **D**evice — Physical security, firmware integrity, secure boot, hardware roots of trust\n- **P**rotocol — Encryption in transit, authentication, protocol security (MQTT, CoAP, Zigbee)\n- **C**loud — API security, identity management, data protection, multi-tenancy isolation\n- **A**pplication — Secure coding, authentication, data privacy, third-party risk\n\n**For each domain, remember the top risk:**\n- **D**efault credentials (Device)\n- **P**laintext protocols (Protocol)\n- **C**onfiguration mistakes (Cloud)\n- **A**uthentication bypass (Application)\n\n**Purdue Model for OT (simplified):**\n- Level 0: Physical process (sensors, actuators)\n- Level 1: Local control (PLCs, RTUs)\n- Level 2: Supervisory (HMIs, SCADA)\n- Level 3: Site operations (historian, engineering workstations)\n- **DMZ** (Industrial DMZ — the ONLY place IT meets OT)\n- Level 4: Enterprise IT (business systems)\n- Level 5: Internet\n\n**Key rule:** IT and OT should NEVER directly connect. They communicate through the DMZ.",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "IoT Security Frameworks and Standards",
+      "content": "**NIST SP 800-183 (Networks of Things)**\nSix primitives for IoT: Sensor, Aggregator, Communication Channel, External Utility, Decision Trigger, Decision\n\n**NIST Core Cybersecurity Feature Baseline for IoT (NISTIR 8259)**\nSix features every IoT device should implement:\n1. **Asset Identification** — Device can identify itself\n2. **Device Configuration** — Secure default configuration\n3. **Data Protection** — Encrypt sensitive data at rest and in transit\n4. **Logical Access** — Authentication and authorization\n5. **Cybersecurity State Awareness** — Logging and monitoring\n6. **Cybersecurity Event Recovery** — Update and recovery mechanisms\n\n**ETSI EN 303 645 (Consumer IoT Security)**\nProvisions for consumer IoT:\n- No universal default passwords\n- Implement vulnerability disclosure policy\n- Keep software updated\n- Securely store credentials\n- Communicate securely\n- Minimize exposed attack surface\n- Ensure software integrity\n- Ensure personal data protection\n- Make systems resilient to outages\n- Monitor system telemetry data\n- Make it easy for consumers to delete personal data\n- Make installation and maintenance easy\n\n**Other frameworks:**\n- **IEC 62443** — Industrial automation security (the gold standard for OT)\n- **ISO 27001** — General ISMS (applies to IoT management)\n- **CIS Controls v8** — IoT-specific guidance in Control 14\n- **MITRE ATT&CK for ICS** — Tactics, techniques for OT attacks\n\n**Implementing these in practice:**\n```bash\n# Check if an IoT device meets NIST baseline:\n# 1. Does it have unique credentials (not admin/admin)?\n# 2. Can it be updated remotely?\n# 3. Does it encrypt communications?\n# 4. Can you disable unnecessary services?\n# 5. Does it log security events?\n# 6. Can you wipe it before disposal?\n```"
+    },
+    {
+      "type": "reflection",
+      "title": "IoT Security in Your Environment",
+      "content": "Consider your own environment (home, office, or lab):\n\n1. **Inventory:** How many IoT devices are on your network right now? (Cameras, thermostats, smart speakers, printers, TVs...)\n2. **Default credentials:** How many still use admin/admin or default passwords?\n3. **Segmentation:** Are IoT devices on a separate VLAN from your workstations?\n4. **Updates:** When did you last update the firmware on your router? Your smart devices?\n5. **Monitoring:** Can you detect if an IoT device starts making unusual outbound connections?\n\n**Practical exercise:** Run `nmap -sn` on your home network and count the IoT devices. For each one, check:\n- Default credentials changed?\n- Firmware up to date?\n- On a separate network/VLAN?\n- Unnecessary services disabled?\n\nThis exercise often reveals uncomfortable truths about our own IoT security posture."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Security at the Edge of the Network",
+      "content": "IoT security is fundamentally different from IT security because:\n\n1. **The stakes are physical** — hacked insulin pumps, SCADA systems, and cars can kill people\n2. **The devices are constrained** — you can't put endpoint protection on a sensor with 256KB RAM\n3. **The lifecycle is long** — devices deployed today may run for 15+ years\n4. **The scale is massive** — 75+ billion IoT devices by 2025\n\nThe security model that works is **defense in depth with network segmentation:**\n- Assume devices will be compromised\n- Segment them so compromise can't spread\n- Monitor for anomalous behavior\n- Have a recovery plan\n\nYou can't secure every $20 sensor. But you can ensure that when (not if) it's compromised, the blast radius is contained. That's the IoT security mindset.",
+      "principle": "Feynman Technique"
+    }
+  ],
+  "tags": ["Course: ISC2-CISSP", "Career Path: Security Engineer"]
+}

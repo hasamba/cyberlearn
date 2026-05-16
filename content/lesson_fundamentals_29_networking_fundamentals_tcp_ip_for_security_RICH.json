@@ -1,0 +1,151 @@
+{
+  "lesson_id": "fffdb655-9bff-4f2b-9014-f44081a0deb6",
+  "lesson_number": "713",
+  "domain": "fundamentals",
+  "title": "Networking Fundamentals: TCP/IP for Security",
+  "difficulty": 1,
+  "order_index": 29,
+  "prerequisites": [],
+  "concepts": [
+    "OSI model",
+    "TCP/IP stack",
+    "Common ports",
+    "IP addressing",
+    "TCP three-way handshake",
+    "Packet structure"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Explain the OSI and TCP/IP models and where security attacks occur at each layer",
+    "Describe the TCP three-way handshake and why it matters for security",
+    "Identify common ports and their associated protocols",
+    "Read a basic packet structure and understand headers",
+    "Explain the difference between TCP and UDP"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which layer of the OSI model does a firewall typically operate at?",
+      "options": [
+        "Layer 1 (Physical)",
+        "Layer 3-4 (Network/Transport)",
+        "Layer 7 (Application) only",
+        "Layer 2 (Data Link)"
+      ],
+      "correct_answer": 1,
+      "explanation": "Traditional firewalls operate at layers 3-4, filtering by IP and port. Modern WAFs operate at layer 7.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "531c1581-2713-456a-a92a-956a4e5cc88e"
+    },
+    {
+      "question": "What are the three steps of the TCP handshake?",
+      "options": [
+        "SYN, SYN-ACK, ACK",
+        "REQ, RES, ACK",
+        "HELLO, HELLO-ACK, READY",
+        "CONNECT, AUTH, CONFIRM"
+      ],
+      "correct_answer": 0,
+      "explanation": "TCP establishes connections with SYN (client initiates), SYN-ACK (server responds), ACK (client confirms). SYN floods exploit this.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "ce15144b-37a7-4757-b686-695ea95ced5e"
+    },
+    {
+      "question": "Which protocol is connectionless and has no handshake?",
+      "options": [
+        "TCP",
+        "UDP",
+        "HTTPS",
+        "SSH"
+      ],
+      "correct_answer": 1,
+      "explanation": "UDP (User Datagram Protocol) has no connection establishment — it just sends packets. Faster but unreliable.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "bef4c344-8c88-4f38-8831-6440d195a7d0"
+    },
+    {
+      "question": "Port 443 is used by which protocol?",
+      "options": [
+        "FTP",
+        "HTTPS",
+        "SSH",
+        "DNS"
+      ],
+      "correct_answer": 1,
+      "explanation": "HTTPS (HTTP Secure / TLS) uses port 443. HTTP uses 80, SSH uses 22, DNS uses 53.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "423b2395-c86f-4622-abe5-859b9e8ba156"
+    },
+    {
+      "question": "What is the purpose of a subnet mask?",
+      "options": [
+        "To encrypt network traffic",
+        "To identify which part of an IP address is the network vs host",
+        "To assign MAC addresses",
+        "To block incoming connections"
+      ],
+      "correct_answer": 1,
+      "explanation": "A subnet mask (e.g., 255.255.255.0) defines the boundary between the network portion and host portion of an IP address.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "89f24ac0-ebcc-48a6-8164-0915fdc4776a"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Networking is the battlefield. Every attack, every defense, every intrusion — it all happens over networks. You don't need to memorize the OSI model like a textbook. You need to understand it like a map of where attacks actually happen."
+    },
+    {
+      "type": "explanation",
+      "content": "## The OSI Model — Security Edition\n\nThe OSI model has 7 layers. Here's how security professionals actually think about them:\n\n| Layer | Name | What happens | Attack examples |\n|-------|------|-------------|----------------|\n| 7 | Application | HTTP, DNS, SMTP | SQL injection, XSS, phishing |\n| 6 | Presentation | Encryption, encoding | SSL stripping |\n| 5 | Session | Session management | Session hijacking |\n| 4 | Transport | TCP/UDP ports | SYN flood, port scanning |\n| 3 | Network | IP routing | IP spoofing, ICMP flood |\n| 2 | Data Link | MAC addresses | ARP spoofing |\n| 1 | Physical | Cables, WiFi | Physical tap, rogue AP |\n\nFor day-to-day security work, focus on layers 3, 4, and 7."
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nImagine sending a letter to a friend:\n1. You write the letter **(Application layer — your data)**\n2. You put it in an envelope **(Transport layer — TCP adds a 'from/to port')**\n3. You write the address **(Network layer — IP address)**\n4. The post office routes it **(Data Link — MAC addresses on local network)**\n5. It physically travels via trucks/planes **(Physical layer)**\n\nTCP is like certified mail — you get a confirmation it arrived. UDP is like a postcard — cheaper, faster, no confirmation.\n\n**The handshake:** Before TCP sends data, it 'knocks three times':\n- Client: 'SYN' (Hey, can we talk?)\n- Server: 'SYN-ACK' (Sure! You there?)\n- Client: 'ACK' (Yes! Let's go.)"
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Network Tools Basics\n\n```bash\n# Identify your IP address and network interfaces\nip addr show\n# or\nifconfig\n\n# Check routing table\nip route show\n\n# Test connectivity (ICMP)\nping -c 4 8.8.8.8\n\n# DNS lookup\nnslookup google.com\ndig google.com\n\n# Check open ports on localhost\nss -tuln\n# or\nnetstat -tuln\n\n# Capture packets (requires root)\ntcpdump -i eth0 -n port 80 -c 10\n\n# Scan a target (with permission!)\nnmap -sV -p 22,80,443 192.168.1.1\n```\n\n**Common ports to memorize:**\n- 21: FTP | 22: SSH | 23: Telnet | 25: SMTP\n- 53: DNS | 80: HTTP | 443: HTTPS\n- 3306: MySQL | 5432: PostgreSQL | 3389: RDP"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: SYN Flood DDoS\n\nA SYN flood exploits the TCP handshake:\n1. Attacker sends thousands of SYN packets with **spoofed source IPs**\n2. Server responds with SYN-ACK to the fake IPs (which never reply)\n3. Server keeps half-open connections in memory until timeout\n4. Server runs out of connection slots → legitimate users can't connect\n\n**Defense:** SYN cookies, rate limiting, firewalls with state tracking\n\nThis is why understanding the handshake matters — you can't defend against SYN floods without knowing why they work."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: Please Do Not Throw Sausage Pizza Away\n\nOSI layers 1→7: **P**hysical, **D**ata Link, **N**etwork, **T**ransport, **S**ession, **P**resentation, **A**pplication\n\nCommon ports — the magic numbers:\n- **22** — SSH (think: 22 is the age when you start keeping secrets)\n- **80** — HTTP (think: plain old web = 80s style, no encryption)\n- **443** — HTTPS (secure, like a vault combination)\n- **53** — DNS (the phonebook, 53 letters in the alphabet? no, just remember it)\n- **3389** — RDP (Remote Desktop, very hackable, very memorable)"
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Why This Matters for Security\n\nEvery security tool you'll ever use is built on these concepts:\n- **Nmap** scans ports (layer 4)\n- **Wireshark** captures packets (all layers)\n- **Firewalls** filter by IP and port (layers 3-4)\n- **WAFs** inspect application data (layer 7)\n- **IDS/IPS** analyze packets for attack patterns (layers 3-7)\n\nQuestion to ponder: When you browse to https://example.com, what happens at each OSI layer? Try to trace the journey from your keyboard to the server and back."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "You now have the mental model every security professional carries. Networks aren't magic — they're structured communication with predictable patterns. Attackers exploit those patterns. Defenders monitor them. Your job is to understand both sides."
+    }
+  ],
+  "tags": [
+    "networking",
+    "TCP/IP",
+    "OSI model",
+    "fundamentals",
+    "ports",
+    "protocols"
+  ]
+}

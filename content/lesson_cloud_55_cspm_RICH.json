@@ -1,0 +1,114 @@
+{
+  "lesson_id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+  "domain": "cloud",
+  "title": "Cloud Security Posture Management (CSPM)",
+  "difficulty": 2,
+  "order_index": 55,
+  "prerequisites": ["Cloud Security Fundamentals: AWS/Azure/GCP"],
+  "concepts": ["CSPM", "misconfigurations", "compliance monitoring", "CSPM tools", "remediation", "Prisma Cloud", "AWS Security Hub", "Defender for Cloud"],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand what CSPM is and why it matters",
+    "Identify common cloud misconfigurations CSPM detects",
+    "Compare major CSPM tools and their capabilities",
+    "Use native cloud CSPM tools (Security Hub, Defender for Cloud)",
+    "Implement continuous compliance monitoring"
+  ],
+  "tags": ["cspm", "misconfiguration", "compliance", "aws", "azure", "gcp", "Career Path: Cloud Security Specialist"],
+  "jim_kwik_principles": [
+    "Start with why: 99% of cloud security failures are due to misconfiguration — CSPM catches them",
+    "FAST: CSPM is the detective — it scans for what's broken before attackers find it",
+    "Active recall: Name 5 cloud misconfigurations CSPM would detect",
+    "Spaced repetition: Review CSPM findings in your environment weekly",
+    "Teach it: Explain CSPM to a cloud engineer who thinks infrastructure is secure by default",
+    "State: Think of CSPM as continuous security audit running 24/7",
+    "Visualization: CSPM as a security camera system covering your entire cloud estate",
+    "Association: CSPM = smoke detector for cloud — finds fires before they spread",
+    "Pattern recognition: Most CSPM findings cluster around: S3 public buckets, open security groups, missing encryption",
+    "Proactivity: CSPM shifts security left — catching misconfigs at deploy time, not breach time"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Misconfiguration Epidemic",
+      "content": "Gartner predicts that through 2025, 99% of cloud security failures will be the customer's fault — specifically misconfiguration. Not sophisticated hacks. Not zero-days. Just wrong settings. CSPM is the tool that automates the question 'what did we configure wrong?' so you can answer it before attackers do."
+    },
+    {
+      "type": "explanation",
+      "title": "What Is CSPM?",
+      "content": "**Cloud Security Posture Management (CSPM)** continuously monitors cloud infrastructure for misconfigurations, compliance violations, and security risks.\n\n**Core functions:**\n1. **Visibility** — Inventory all cloud assets across accounts/subscriptions/projects\n2. **Risk Assessment** — Evaluate each resource against security best practices\n3. **Compliance** — Map resources to frameworks (CIS, NIST, PCI-DSS, SOC 2, HIPAA)\n4. **Remediation** — Alert on findings, suggest or auto-remediate\n5. **Drift Detection** — Alert when secure configurations change\n\n**CSPM vs other tools:**\n| Tool | Focus |\n|------|-------|\n| CSPM | Cloud configuration/posture |\n| CWPP (Cloud Workload Protection) | Runtime security for VMs/containers |\n| CASB | SaaS app usage and data protection |\n| CIEM | Identity and permission analysis |\n\n**Why it matters:** A single misconfigured S3 bucket or security group can expose entire databases. CSPM catches these before they become breaches."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: CSPM",
+      "content": "Imagine you own 50 houses that you rent out. Each house has locks, alarms, and windows. But you can't visit each house every day to check if windows are locked.\n\nCSPM is like having an automated inspection service that checks every house, every day, and sends you a report: 'House 12 has an unlocked window. House 33 has a broken alarm. House 47 left the safe open.'\n\nInstead of waiting until someone gets robbed (breach), you get warnings in advance. Some CSPM tools will even lock the window for you automatically (auto-remediation).\n\nIn cloud terms: each house is a cloud resource (S3 bucket, security group, database). CSPM checks they're all configured securely."
+    },
+    {
+      "type": "explanation",
+      "title": "Common Misconfigurations CSPM Detects",
+      "content": "**S3/Storage:**\n- Public access not blocked at account level\n- Bucket ACLs allowing public read/write\n- No encryption at rest\n- Access logging disabled\n- Versioning disabled (no recovery from accidental deletion)\n\n**Identity and Access:**\n- Root account lacks MFA\n- Access keys older than 90 days not rotated\n- IAM users with admin permissions (should use roles)\n- Password policy too weak\n- Unused access keys/credentials not deleted\n\n**Network:**\n- Security groups with 0.0.0.0/0 on port 22 (SSH) or 3389 (RDP)\n- VPC without flow logs\n- Public-facing databases (RDS, MongoDB on public subnet)\n\n**Encryption:**\n- EBS volumes not encrypted\n- RDS instances not encrypted\n- CloudTrail logs not encrypted\n- Secrets in plaintext (not in Secrets Manager)\n\n**Logging/Monitoring:**\n- CloudTrail not enabled in all regions\n- CloudTrail log file validation disabled\n- Config rules not enabled\n- GuardDuty not enabled"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Native CSPM: AWS Security Hub",
+      "content": "```bash\n# Enable Security Hub\naws securityhub enable-security-hub --enable-default-standards\n\n# Check findings\naws securityhub get-findings \\\n  --filters '{\"SeverityLabel\":[{\"Value\":\"CRITICAL\",\"Comparison\":\"EQUALS\"}],\"RecordState\":[{\"Value\":\"ACTIVE\",\"Comparison\":\"EQUALS\"}]}' \\\n  --query 'Findings[].{Title:Title,Resource:Resources[0].Id,Severity:Severity.Label}'\n\n# List available standards\naws securityhub describe-standards\n\n# Check CIS AWS Foundations compliance\naws securityhub get-compliance-summary \\\n  --standards-subscription-arn arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0\n```\n\n**Python: Auto-remediation example (S3 public access block):**\n```python\nimport boto3\n\ndef remediate_s3_public_access(bucket_name):\n    s3 = boto3.client('s3')\n    \n    # Check current setting\n    try:\n        config = s3.get_public_access_block(Bucket=bucket_name)\n        pab = config['PublicAccessBlockConfiguration']\n        \n        if not all([pab.get('BlockPublicAcls'), pab.get('BlockPublicPolicy'),\n                    pab.get('IgnorePublicAcls'), pab.get('RestrictPublicBuckets')]):\n            print(f'[REMEDIATING] S3 bucket {bucket_name} has public access enabled')\n            \n            s3.put_public_access_block(\n                Bucket=bucket_name,\n                PublicAccessBlockConfiguration={\n                    'BlockPublicAcls': True,\n                    'IgnorePublicAcls': True,\n                    'BlockPublicPolicy': True,\n                    'RestrictPublicBuckets': True\n                }\n            )\n            print(f'[FIXED] Public access blocked on {bucket_name}')\n    except Exception as e:\n        print(f'Error: {e}')\n\n# Find all S3 buckets and remediate\ns3 = boto3.client('s3')\nbuckets = [b['Name'] for b in s3.list_buckets()['Buckets']]\nfor bucket in buckets:\n    remediate_s3_public_access(bucket)\n```"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Open-Source CSPM: Scout Suite and Prowler",
+      "content": "```bash\n# Scout Suite - Multi-cloud auditing\npip install scoutsuite\n\n# AWS scan\nscout aws --report-dir ./reports\n\n# Azure scan\nscout azure --tenant-id YOUR_TENANT_ID --report-dir ./reports\n\n# Open HTML report\nopen reports/scoutsuite-results/scoutsuite-report.html\n\n# Prowler - AWS security best practices\n# Install\npip install prowler\n\n# Run all checks\nprowler aws\n\n# Run specific check\nprowler aws --checks s3_bucket_public_access\n\n# Run CIS benchmark\nprowler aws --compliance cis_1.5_aws\n\n# Output to JSON for SIEM\nprowler aws --output-formats json --output-directory ./prowler-output\n\n# Quick wins: check for critical findings only\nprowler aws --severity critical high\n```\n\n**Automated daily scan with Lambda:**\n```python\n# Lambda function triggered daily by EventBridge\nimport subprocess\nimport boto3\n\ndef handler(event, context):\n    # Run prowler and upload results to S3\n    result = subprocess.run(\n        ['prowler', 'aws', '--severity', 'critical', '--output-formats', 'json'],\n        capture_output=True, text=True\n    )\n    \n    s3 = boto3.client('s3')\n    s3.put_object(\n        Bucket='security-reports',\n        Key=f'prowler/{context.aws_request_id}.json',\n        Body=result.stdout\n    )\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Misconfigurations That Made Headlines",
+      "content": "**Toyota (2023):** A misconfigured cloud environment exposed data of 2.15 million Toyota customers in Japan for 10 years. A database was set to public access — a misconfiguration a CSPM tool would have flagged immediately.\n\n**Twitch (2021):** A server misconfiguration led to the exposure of Twitch's entire source code, creator payout data, and internal security tools. A network security group misconfiguration was involved.\n\n**Facebook (2019):** Millions of Facebook user records were found in publicly accessible AWS S3 buckets belonging to third-party developers. CSPM with S3 public access monitoring would have caught this.\n\n**Capital One (2019):** An SSRF vulnerability combined with an over-permissive IAM role. AWS Security Hub and CSPM tools checking for overly permissive roles could have flagged the IAM misconfiguration."
+    },
+    {
+      "type": "memory_aid",
+      "title": "CSPM: What It Checks — SINELM",
+      "content": "**S** — Storage: Public buckets, unencrypted, no versioning, no logging\n**I** — Identity: Root MFA, old keys, weak password policy, unused credentials\n**N** — Network: Open SSH/RDP, public databases, no flow logs\n**E** — Encryption: Unencrypted volumes, databases, CloudTrail\n**L** — Logging: CloudTrail coverage, log validation, Config enabled\n**M** — Monitoring: GuardDuty, Security Hub, alerting configured\n\nRemember: **'Security Is Never Easy — Log Everything Meticulously'**"
+    },
+    {
+      "type": "reflection",
+      "title": "CSPM Findings Triage",
+      "content": "Your CSPM tool returns these findings. Prioritize them 1–5 (1 = most urgent):\n\nA. RDS database instance publicly accessible, no encryption at rest\nB. CloudTrail log file validation disabled in us-west-2\nC. IAM password policy doesn't require uppercase characters\nD. Security group allows 0.0.0.0/0 on port 22 (SSH) to 3 EC2 instances\nE. S3 bucket with access logging disabled (no sensitive data in bucket)\n\n**Reasoning:**\n1. **A** — Public RDS with no encryption = immediate data exposure risk. Attacker can access database directly.\n2. **D** — Open SSH to internet on 3 instances = active attack surface. Brute force, credential spray, exploit risk.\n3. **B** — CloudTrail validation disabled = can't detect log tampering. Compromises forensics capability.\n4. **C** — Weak password policy = easier credential compromise, but other MFA controls may mitigate.\n5. **E** — No access logging on non-sensitive bucket = low risk but reduces audit trail."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "CSPM Is Not Set-and-Forget",
+      "content": "CSPM tools generate findings continuously. The trap is: enable the tool, see 500 findings, feel overwhelmed, ignore it. Don't. Start with Critical severity. Fix the top 10. Then High. Build a remediation cadence — weekly for Critical, monthly for High, quarterly for Medium. CSPM value comes from the *process* of continuous improvement, not from the tool existing. The score doesn't matter — the trend does."
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "What does CSPM primarily monitor?",
+      "options": ["Network traffic for malware", "Cloud infrastructure configurations for misconfigurations and compliance gaps", "User behavior analytics", "Application code security"],
+      "correct": 1,
+      "explanation": "CSPM (Cloud Security Posture Management) continuously monitors cloud resource configurations against security best practices and compliance frameworks. It detects misconfigurations like public S3 buckets, open security groups, and missing encryption."
+    },
+    {
+      "question": "Which finding should be remediated first?",
+      "options": ["S3 bucket access logging disabled", "CloudTrail not enabled in all regions", "Root account has active access keys with no MFA", "IAM user password last changed 100 days ago"],
+      "correct": 2,
+      "explanation": "Root account with active access keys and no MFA is the highest-priority finding. Root has unrestricted access to everything. Active access keys mean it can be exploited programmatically. No MFA means only a password stands between attackers and total account compromise."
+    },
+    {
+      "question": "What is the difference between CSPM and CWPP?",
+      "options": ["CSPM is for Azure, CWPP is for AWS", "CSPM monitors cloud configurations, CWPP protects runtime workloads (VMs, containers)", "CSPM is free, CWPP requires licensing", "CSPM is reactive, CWPP is proactive"],
+      "correct": 1,
+      "explanation": "CSPM focuses on cloud configuration and compliance — finding misconfigurations before they're exploited. CWPP (Cloud Workload Protection Platform) focuses on runtime security — protecting running workloads from active attacks, malware, and runtime threats."
+    },
+    {
+      "question": "Which open-source tool is specifically designed for AWS security best practices auditing?",
+      "options": ["Nessus", "Prowler", "Wireshark", "Metasploit"],
+      "correct": 1,
+      "explanation": "Prowler is an open-source tool specifically designed to audit AWS environments against CIS Benchmarks, NIST, and other security frameworks. It checks hundreds of AWS security best practices and produces detailed findings reports."
+    },
+    {
+      "question": "A security group has inbound rule: Port 22, Source: 0.0.0.0/0. What does CSPM flag and why?",
+      "options": ["Port 22 is reserved for cloud management — CSPM blocks it automatically", "Allowing SSH from any IP (0.0.0.0/0) exposes the instance to internet-wide brute force and exploitation", "This is a compliance requirement for cloud instances", "CSPM ignores internal ports like SSH"],
+      "correct": 1,
+      "explanation": "0.0.0.0/0 means any IP on the internet can attempt SSH connections to the instance. This enables brute force attacks, credential stuffing, and exploitation of SSH vulnerabilities. CSPM flags this as high-severity — SSH should be restricted to known IP ranges or accessed via VPN/bastion host."
+    }
+  ]
+}

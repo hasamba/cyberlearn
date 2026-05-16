@@ -1,0 +1,110 @@
+{
+  "lesson_id": "bbfc40b5-0211-4440-807d-4987bee32c30",
+  "domain": "blue_team",
+  "title": "Ransomware Defense Strategies",
+  "difficulty": 2,
+  "order_index": 34,
+  "prerequisites": ["Blue Team Fundamentals"],
+  "concepts": ["Ransomware kill chain", "Prevention controls", "Backup strategies", "Incident response for ransomware", "EDR and behavioral detection", "Network segmentation", "Recovery validation"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Map the human-operated ransomware kill chain from initial access to encryption",
+    "Implement layered prevention controls that interrupt the kill chain at multiple stages",
+    "Design resilient backup strategies that survive ransomware attacks",
+    "Build a ransomware-specific incident response playbook",
+    "Validate recovery procedures before you need them"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which phase of the ransomware kill chain typically occurs BEFORE encryption and directly enables it?",
+      "options": ["Initial Access", "Lateral Movement and Privilege Escalation", "Data Exfiltration", "Persistence"],
+      "correct": 1,
+      "explanation": "Human-operated ransomware attackers spend days or weeks performing lateral movement and privilege escalation to gain domain admin before triggering encryption across the entire environment."
+    },
+    {
+      "question": "What is the 3-2-1 backup rule?",
+      "options": ["3 daily backups, 2 weekly, 1 monthly", "3 copies of data, on 2 different media types, with 1 offsite", "3 cloud providers, 2 on-prem, 1 air-gapped", "Back up 3 times daily with 2 verifications and 1 restore test"],
+      "correct": 1,
+      "explanation": "The 3-2-1 rule: keep 3 copies of data, stored on 2 different media types, with at least 1 copy stored offsite or air-gapped."
+    },
+    {
+      "question": "Which Windows feature do ransomware actors commonly disable or delete before encrypting?",
+      "options": ["Windows Firewall", "Volume Shadow Copies (VSS)", "Windows Defender definitions", "Active Directory recycle bin"],
+      "correct": 1,
+      "explanation": "Deleting Volume Shadow Copies (vssadmin delete shadows /all) prevents victims from using Windows' built-in previous versions to recover files without paying."
+    },
+    {
+      "question": "A user calls reporting files have been renamed to .locked extensions. What is your FIRST action?",
+      "options": ["Pay the ransom immediately to minimize downtime", "Isolate the affected system from the network", "Run a full antivirus scan on the endpoint", "Restore from backup immediately"],
+      "correct": 1,
+      "explanation": "Immediate network isolation stops the ransomware from spreading to other systems. Restoring from backup before containment means the clean restore may get re-encrypted."
+    },
+    {
+      "question": "What is 'double extortion' in modern ransomware?",
+      "options": ["Encrypting files twice with different keys", "Demanding two ransom payments at different times", "Exfiltrating data before encrypting, then threatening to publish it", "Attacking both primary and backup systems simultaneously"],
+      "correct": 2,
+      "explanation": "Double extortion means the ransomware group steals your data BEFORE encrypting it. Even if you restore from backup, they threaten to publish sensitive data unless you pay."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget the idea that antivirus alone stops ransomware — modern attacks bypass it entirely.",
+    "active": "Pull up your backup policy right now. When was the last restore test? Be honest.",
+    "state": "You are the defender who prevents a ransomware attack from becoming a business-ending event.",
+    "teach": "Explain the 3-2-1 backup rule to someone who's never heard it. Can you do it in 60 seconds?",
+    "enter": "Imagine it's 2 AM. Your SOC gets an alert. Files are being encrypted across the domain. What do you do first?",
+    "review": "List the 5 phases of the ransomware kill chain from memory after reading this lesson.",
+    "notes": "Mark: Shadow copy deletion = ransomware actor about to encrypt. This is your last warning sign.",
+    "vocabulary": "Kill chain, VSS deletion, double extortion, air-gap, RTO/RPO, immutable backup",
+    "visualize": "Picture a firehouse with multiple sprinklers. Each prevention control is a sprinkler. Ransomware needs to get through ALL of them.",
+    "connect": "Connect to AD security: most ransomware actors need domain admin. Protecting AD = protecting your backups."
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Ransomware Is a Business Problem, Not Just a Technical One",
+      "content": "Ransomware groups are organized crime. They have helpdesks. They have SLAs for decryption key delivery. They do market research to know what victims can afford to pay. Your job isn't just to deploy EDR — it's to make your organization a harder target than the next one. Ransomware defense is layered by design because no single control stops determined attackers. Let's build those layers."
+    },
+    {
+      "type": "explanation",
+      "title": "The Ransomware Kill Chain",
+      "content": "Modern human-operated ransomware follows a predictable progression. Interrupt any stage and you stop the attack.\n\n**Stage 1: Initial Access**\nPhishing emails, RDP brute force, VPN exploitation, buying access from Initial Access Brokers (IABs). Most victims have no idea they're compromised at this point.\n\n**Stage 2: Persistence and Reconnaissance**\nAttackers plant backdoors and start mapping the network. BloodHound runs. They find domain controllers, backup servers, and file shares.\n\n**Stage 3: Credential Theft and Lateral Movement**\nMimikatz, DCSync, pass-the-hash. Goal: get to domain admin. This phase takes days to weeks.\n\n**Stage 4: Data Exfiltration**\nBefore encrypting, they steal sensitive data for double extortion. Rclone, MEGAsync, or custom tools copy data to attacker-controlled storage.\n\n**Stage 5: VSS Deletion**\nThe warning shot. `vssadmin delete shadows /all`. This destroys Windows restore points — your last easy recovery option.\n\n**Stage 6: Encryption**\nDeployed via GPO, PsExec, or WMI across all domain-joined systems simultaneously. Hundreds of machines encrypted in minutes."
+    },
+    {
+      "type": "explanation",
+      "title": "Layered Defense: Interrupting the Kill Chain",
+      "content": "You don't need to stop every attack. You need to make attacks expensive enough that attackers move on.\n\n**Initial Access Controls:**\n- MFA on all remote access (VPN, RDP, email)\n- Email security with attachment sandboxing\n- Disable RDP on internet-facing hosts\n- Patch management (especially internet-facing services)\n\n**Lateral Movement Controls:**\n- Network segmentation (backup servers on isolated VLANs)\n- Least privilege — no user should have local admin everywhere\n- Credential Guard / LAPS for local admin passwords\n- Privileged Access Workstations for admin tasks\n\n**Pre-Encryption Detection:**\n- Monitor for `vssadmin delete shadows` — this is your last warning\n- Alert on mass file renaming (>100 files in 60 seconds)\n- Detect unusual use of tools like rclone, PsExec, Cobalt Strike\n\n**Backup Protection:**\n- Immutable backups (S3 Object Lock, Veeam immutability)\n- Air-gapped copies not accessible from domain\n- Backup server isolated from domain (don't domain-join it)"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Detecting Ransomware Precursors with PowerShell",
+      "language": "powershell",
+      "content": "# Monitor for VSS deletion attempts\n# This is often the last action before encryption\n\n# Search Windows Event Logs for vssadmin activity\nGet-WinEvent -FilterHashtable @{\n    LogName = 'Microsoft-Windows-VSS*'\n    Id = 8224  # VSS backup completed\n} | Select-Object TimeCreated, Message | Format-Table -AutoSize\n\n# Detect mass file rename/encryption via Sysmon Event ID 11 (FileCreate)\n# Look for >50 file extensions changed per minute per host\nGet-WinEvent -FilterHashtable @{\n    LogName = 'Microsoft-Windows-Sysmon/Operational'\n    Id = 11\n} -MaxEvents 1000 | Where-Object {\n    $_.Message -match '\\.(locked|encrypted|crypt|ransom)'\n} | Group-Object {$_.TimeCreated.Minute} | Where-Object {$_.Count -gt 50}\n\n# Check for suspicious network tools (Rclone exfiltration)\nGet-WinEvent -FilterHashtable @{\n    LogName = 'Microsoft-Windows-Sysmon/Operational'\n    Id = 1  # Process Create\n} | Where-Object {\n    $_.Message -match 'rclone|MEGAcmd|restic' -and\n    $_.Message -notmatch 'C:\\\\Program Files\\\\backup'\n} | Select-Object TimeCreated, Message\n\n# Sigma-style detection: Shadow copy deletion\n# In Splunk SPL:\n# source=WinEventLog:Security EventCode=4688 \n# CommandLine IN ('*vssadmin*delete*','*wmic*shadowcopy*delete*','*wbadmin*delete*')"
+    },
+    {
+      "type": "real_world",
+      "title": "HSE Ireland: What $100M Looks Like Without Backups",
+      "content": "In May 2021, the Irish Health Service Executive (HSE) was hit by Conti ransomware. Initial access: a phishing email 6 weeks earlier. The attackers spent those weeks mapping 2,000+ servers across the Irish national health system.\n\n**What they hit:**\n- Patient record systems taken offline\n- 100,000+ outpatient appointments cancelled\n- Cancer treatment and radiology services disrupted\n- Estimated €100M+ in recovery costs\n\n**What the post-incident review found:**\n- No EDR on 30% of servers\n- No network segmentation between clinical and admin networks\n- Backup servers domain-joined (attackers encrypted them too)\n- No tested incident response playbook\n\n**The conti gang released the decryption key for free** after international pressure. HSE still spent months recovering because their backups were either encrypted or untested.\n\n**Lesson:** The decryption key is not the recovery plan. Tested backups and a practiced playbook are."
+    },
+    {
+      "type": "explanation",
+      "title": "Backup Strategy That Survives Ransomware",
+      "content": "The 3-2-1-1-0 rule for ransomware-resilient backups:\n\n**3** — 3 copies of your data\n**2** — 2 different storage media types (disk + tape, or disk + cloud)\n**1** — 1 offsite copy\n**1** — 1 immutable/air-gapped copy (ransomware cannot modify it)\n**0** — 0 backup failures (verify every backup, every time)\n\n**What immutable means in practice:**\n- AWS S3 with Object Lock (WORM — Write Once Read Many)\n- Azure Blob immutability policies\n- Veeam SureBackup with immutable repositories\n- Offline tape copies (old school but effective)\n\n**Critical: test your restores.** Organizations routinely discover their backups are corrupted or incomplete during the incident itself. Run quarterly restore tests. Document the RTO (Recovery Time Objective) and RPO (Recovery Point Objective) for each system."
+    },
+    {
+      "type": "memory_aid",
+      "title": "The STOP-CONTAIN-RECOVER Ransomware Response",
+      "content": "When ransomware hits, your brain goes blank. Use this:\n\n**S — Stop the Spread**\nIsolate affected systems NOW. Pull network cables if needed. Disable affected AD accounts.\n\n**T — Tell Everyone**\nIT leadership, CISO, legal, PR. Ransomware is a business crisis, not just an IT problem.\n\n**O — Open the Playbook**\nYou wrote it before the incident. Follow it. Don't improvise.\n\n**P — Preserve Evidence**\nDon't reimage until forensics runs. You need to understand initial access to prevent reinfection.\n\n**C — Check Backups**\nAre they intact? When was the last successful backup? What's your clean recovery point?\n\n**O — Options Assessment**\nRestore from backup? Negotiate? Rebuild from scratch? Make this decision with leadership, legal, and insurance.\n\n**N — Notify**\nRegulatory notifications (GDPR 72 hours, HIPAA, etc.). Insurance claim. Law enforcement.\n\n**T — Test Before You Go Live**\nValidate restored systems are clean before reconnecting to production."
+    },
+    {
+      "type": "reflection",
+      "title": "Ransomware Readiness Assessment",
+      "content": "Score your organization (honest answers only):\n\n**MFA on all remote access:** Yes / Partial / No\n**Last backup restore test:** <30 days / 30-90 days / Never\n**Immutable/air-gapped backups:** Yes / Partial / No\n**Backup servers domain-joined:** No (good) / Yes (risk)\n**Ransomware IR playbook exists:** Yes, tested / Yes, untested / No\n**Network segmentation for servers:** Yes / Partial / No\n**EDR on all endpoints:** Yes / Partial / No\n\nAny \"No\" or \"Never\" is a gap that could turn a recoverable incident into a catastrophic one. Pick the highest-risk gap and propose one concrete action to close it this week."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "You Will Be Tested",
+      "content": "Ransomware isn't a matter of if, it's when. The organizations that recover in hours instead of weeks aren't necessarily the ones with the best technology — they're the ones who practiced. They ran tabletop exercises. They tested their backups. They had a call tree. When 2 AM came and files started getting encrypted, they already knew what to do.\n\nStart building muscle memory now, before you need it."
+    }
+  ],
+  "tags": ["Career Path: SOC Analyst", "Career Path: Blue Team Operator", "Built-In", "Priority 3 - Modern threats"]
+}

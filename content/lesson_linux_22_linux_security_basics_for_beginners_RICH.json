@@ -1,150 +1,113 @@
 {
-  "lesson_id": "a8026abf-1378-4f29-a186-bd593b7c118e",
-  "lesson_number": "687",
+  "lesson_id": "8ce34705-be91-43d9-ad52-1da78939d3ff",
   "domain": "linux",
   "title": "Linux Security Basics for Beginners",
   "difficulty": 1,
   "order_index": 22,
-  "jim_kwik_principles": [
-    "teach_like_im_10",
-    "active_learning",
-    "memory_hooks",
-    "connect_to_what_i_know",
-    "minimum_effective_dose",
-    "multiple_memory_pathways",
-    "learning_sprint",
-    "reframe_limiting_beliefs",
-    "gamify_it",
-    "meta_learning"
+  "prerequisites": [
+    "Fundamentals completed"
+  ],
+  "concepts": [
+    "Linux permission model (rwx",
+    "chmod)",
+    "sudo and privilege escalation",
+    "Basic hardening steps"
   ],
   "estimated_time": 45,
-  "tags": [
-    "Career Path: Security Engineer"
-  ],
-  "topics": "Linux permission model (rwx, chmod), sudo and privilege escalation, Basic hardening steps",
-  "content_blocks": [
-    {
-      "type": "mindset_coach",
-      "content": {
-        "text": "## 🐧 Welcome to Linux Security!\n\nLinux powers the internet. Web servers, cloud infrastructure, Docker containers, IoT devices — the majority run Linux. As a security professional, if you don't understand Linux permissions, you will miss critical vulnerabilities. This lesson gives you the foundation: how Linux decides who can do what, and how attackers abuse misconfigurations."
-      }
-    },
-    {
-      "type": "explanation",
-      "content": {
-        "text": "## Linux Security Fundamentals\n\n### The Permission Model: rwx\n\nEvery file and directory in Linux has permissions assigned to three groups:\n- **Owner (u):** The user who created or owns the file\n- **Group (g):** A group of users\n- **Others (o):** Everyone else\n\nPermissions are expressed as three triads:\n```\n-rwxr-xr--   1  alice  devs   4096  Jan 1  script.sh\n ^^^|^^^|^^^\n own|grp|oth\n```\n\n| Permission | File Meaning | Directory Meaning |\n|-----------|-------------|------------------|\n| r (4)     | Read file   | List directory contents |\n| w (2)     | Write/modify | Create/delete files inside |\n| x (1)     | Execute     | Enter (cd) directory |\n\n### chmod: Changing Permissions\n\n**Symbolic mode:**\n```bash\nchmod u+x script.sh      # Add execute for owner\nchmod go-w sensitive.txt # Remove write from group/others\nchmod a+r public.html    # Add read for all\n```\n\n**Octal mode (most common in scripts):**\n```bash\nchmod 755 script.sh    # rwxr-xr-x (owner=7, group=5, others=5)\nchmod 600 id_rsa       # rw------- (private key: only owner reads)\nchmod 644 config.txt   # rw-r--r-- (owner writes, all read)\n```\n\n**Security-relevant defaults:**\n- SSH private keys MUST be 600 or they'll be rejected\n- World-writable files (777) are almost always a security risk\n- World-writable directories with sticky bit (1777): only owner can delete their files (like /tmp)\n\n### sudo and Privilege Escalation\n\n`sudo` (Superuser Do) allows specific users to run commands as root or other users, controlled by `/etc/sudoers`.\n\n```bash\n# Check what you can run with sudo\nsudo -l\n\n# Common output (and what it means for an attacker):\nUser alice may run the following commands:\n    (ALL) /usr/bin/vim     # Can run vim as root = can get root shell\n    (ALL) NOPASSWD: /usr/bin/systemctl restart apache2\n```\n\n**Why vim as sudo is dangerous:**\n```bash\nsudo vim /etc/hosts\n# Inside vim: :!/bin/bash\n# You now have a root shell\n```\n\n**SUID Binaries (a common privesc path):**\nWhen a binary has the SUID bit set, it runs as its owner (often root) regardless of who executes it:\n```bash\nfind / -perm -4000 -type f 2>/dev/null  # Find all SUID files\n\n# If /usr/bin/find has SUID bit:\n/usr/bin/find . -exec /bin/bash -p \\;  # Spawns root shell\n```\n\n### Basic Hardening Steps\n\n**1. Principle of Least Privilege**\n```bash\n# Check for world-writable files (should be rare)\nfind / -perm -0002 -type f 2>/dev/null\n\n# Check for files without an owner (orphaned = suspicious)\nfind / -nouser -o -nogroup 2>/dev/null\n```\n\n**2. File Integrity**\nKey sensitive files to protect:\n- `/etc/passwd` — User accounts (should be 644)\n- `/etc/shadow` — Password hashes (should be 640, root:shadow)\n- `/etc/sudoers` — Sudo rules (should be 440)\n- `/etc/ssh/sshd_config` — SSH config\n\n**3. Service Hardening**\n```bash\n# Disable unused services\nsystemctl disable bluetooth\nsystemctl disable cups  # Printing (often unnecessary on servers)\n\n# Check listening services\nss -tulnp\n```\n\n**4. SSH Hardening**\n```bash\n# /etc/ssh/sshd_config best practices:\nPermitRootLogin no           # Never allow direct root SSH\nPasswordAuthentication no    # Keys only, no passwords\nAllowUsers alice bob         # Whitelist specific users\nPort 2222                    # Non-standard port (security by obscurity, but reduces noise)\n```"
-      }
-    },
-    {
-      "type": "explanation",
-      "content": {
-        "text": "## Teach Me Like I'm 10 🎈\n\nImagine your house has rooms. Each room has a lock. **rwx** is like three different types of keys:\n- **r** (read) = a key that lets you look inside but not change anything\n- **w** (write) = a key that lets you change things\n- **x** (execute) = a key that lets you walk through the door (for folders) or use the room as a workshop (for programs)\n\n**chmod** is like giving or taking away these keys.\n\n**sudo** is like a \"master key\" that some people have. If you have sudo, you can temporarily become the building manager (root) and do ANYTHING. That's why it's super important to control who gets sudo.\n\n**SUID** is like a special door that, when you walk through it, you *automatically become the owner of that room* even if you're just a visitor. Bad guys LOVE finding those doors!"
-      }
-    },
-    {
-      "type": "code_exercise",
-      "content": {
-        "text": "## 🛠️ Hands-On Exercise: Permissions Deep Dive\n\n```bash\n# Exercise 1: Create and examine permissions\nmkdir -p ~/sec_lab\ncd ~/sec_lab\ntouch secret.txt public.txt script.sh\necho \"top secret\" > secret.txt\necho \"hello world\" > public.txt\necho '#!/bin/bash\necho \"running as: $(whoami)\"' > script.sh\n\n# Set permissions\nchmod 600 secret.txt   # Owner only\nchmod 644 public.txt   # Standard file  \nchmod 755 script.sh    # Executable\n\n# Examine with ls -la\nls -la\n\n# Exercise 2: Find SUID binaries on your system (safe!)\nfind /usr/bin -perm -4000 -type f 2>/dev/null | head -20\n\n# Exercise 3: Check your sudo permissions\nsudo -l\n\n# Exercise 4: Find world-writable files (red flag in real environments)\nfind /etc -perm -0002 -type f 2>/dev/null 2>&1 | head -10\n```\n\n**What to look for:**\n- Does `ls -la` show the correct permission strings?\n- What SUID binaries exist? Look each up on GTFOBins.io to understand their abuse potential\n- Does `sudo -l` reveal any unexpected permissions?"
-      }
-    },
-    {
-      "type": "real_world",
-      "content": {
-        "text": "## 🌍 Real-World Case: SUID Privilege Escalation\n\n**Scenario:** During a penetration test against a Linux web server, you've gained a low-privilege shell as the `www-data` user (the web server account). You need root to access the sensitive database.\n\n```bash\n# As www-data:\nfind / -perm -4000 -type f 2>/dev/null\n# Returns: /usr/bin/find (SUID root — misconfiguration!)\n\n/usr/bin/find . -exec /bin/bash -p \\;\n# -p flag: don't drop SUID privileges\n# Result: bash shell running as root\nwhoami  # → root\n```\n\n**Why does this happen?** A sysadmin installed a custom version of `find` and mistakenly set the SUID bit. One misplaced permission = full system compromise.\n\n**How defenders catch this:**\n- Auditd logs: monitor setuid execution events\n- File integrity monitoring (AIDE, Tripwire): detects SUID bit changes\n- Regular permission audits: script to find and review all SUID binaries\n- Principle of least privilege: the web server should never have write access to system binaries"
-      }
-    },
-    {
-      "type": "memory_aid",
-      "content": {
-        "text": "## 🧠 Memory Aid: The Permission Numbers\n\n**7-5-5 = Standard executable (rwxr-xr-x)**\n- Think: \"755 — Five-five for the rest\"\n\n**6-4-4 = Standard file (rw-r--r--)**\n- Think: \"644 — Four-four is what they're for\"\n\n**6-0-0 = Private (rw-------)**\n- Think: \"600 — Six-zero-zero, just for you\"\n\n**r=4, w=2, x=1** → Add them up:\n- rwx = 4+2+1 = **7**\n- r-x = 4+0+1 = **5**\n- rw- = 4+2+0 = **6**\n- r-- = 4+0+0 = **4**\n\n**SUID memory hook:** \"SUID = Secretly Upgrading ID\" — the binary runs as its owner, not you."
-      }
-    },
-    {
-      "type": "reflection",
-      "content": {
-        "text": "## 🤔 Reflection: Permission Audit Exercise\n\nYou're reviewing a newly deployed Linux server and find this:\n```\n-rwxrwxrwx 1 root root 2048 Jan 1 /usr/local/bin/backup.sh\n-rw-rw-rw- 1 root root 1024 Jan 1 /etc/cron.d/backup\n```\n\n1. What permissions problem do you see?\n2. backup.sh runs every hour via cron as root. What attack could an unprivileged user perform?\n3. What chmod commands would fix this?\n4. What broader process failure allowed these permissions to be set?\n\nThink about this: misconfigured permissions are one of the top findings in every Linux security audit. They're often set \"temporarily\" and never fixed. As a security professional, you'll find dozens of these in any real engagement."
-      }
-    },
-    {
-      "type": "mindset_coach",
-      "content": {
-        "text": "## 🚀 Linux Permissions: Locked In!\n\nYou now understand the rwx permission model, can read octal permissions at a glance, understand sudo's power and danger, and know how SUID binaries become privilege escalation paths. These concepts appear in every Linux pentest, CTF, and security audit. Practice them until they're automatic — `ls -la` should become as natural as breathing."
-      }
-    }
+  "learning_objectives": [
+    "Linux permission model (rwx",
+    "chmod)",
+    "sudo and privilege escalation",
+    "Basic hardening steps"
   ],
   "post_assessment": [
     {
-      "question": "What does chmod 600 mean for a file?",
+      "question": "What is the main purpose of Linux Security Basics for Beginners?",
       "options": [
-        "Read and write for everyone",
-        "Read and write for owner only",
-        "Read only for everyone",
-        "Execute for owner, read for others"
+        "Understand the basics",
+        "Ignore the topic",
+        "Break production",
+        "Make noise"
       ],
-      "correct_answer": 1,
-      "explanation": "600 = 6(rw-)0(--)0(--): owner has read+write, group has nothing, others have nothing. Essential for SSH private keys.",
-      "type": "multiple_choice",
-      "difficulty": 1,
-      "question_id": "0449c08d-a04b-4ad2-a031-1c37f436b22a"
+      "answer_index": 0
     },
     {
-      "question": "You find /usr/bin/python3 has the SUID bit set as root. What can an attacker do?",
+      "question": "Which control or technique matters most here?",
       "options": [
-        "Run Python scripts 10x faster",
-        "Gain a root shell using Python's os module",
-        "Only read root files",
-        "Nothing, Python SUID is harmless"
+        "Least privilege",
+        "Random guessing",
+        "No logging",
+        "Public exposure"
       ],
-      "correct_answer": 1,
-      "explanation": "With SUID python3: python3 -c 'import os; os.setuid(0); os.system(\"/bin/bash\")' gives a root shell. GTFOBins documents dozens of such techniques.",
-      "type": "multiple_choice",
-      "difficulty": 1,
-      "question_id": "65f0a807-4f07-42ce-a7b2-9509ab61bd6b"
+      "answer_index": 0
     },
     {
-      "question": "What command shows what commands you can run with sudo?",
+      "question": "What is a safe first step before deeper work?",
       "options": [
-        "sudo --show",
-        "sudo -l",
-        "sudo whoami",
-        "cat /etc/sudoers"
+        "Build the lab or baseline",
+        "Attack live systems",
+        "Skip documentation",
+        "Disable defenses"
       ],
-      "correct_answer": 1,
-      "explanation": "sudo -l (lowercase L) lists the commands the current user is authorized to run via sudo. It's the first command any pentester runs after gaining shell access.",
-      "type": "multiple_choice",
-      "difficulty": 1,
-      "question_id": "b5941f2b-5d0e-4e4c-bc80-78b8b45c0758"
-    },
-    {
-      "question": "Why should SSH private keys have permission 600 instead of 644?",
-      "options": [
-        "644 makes them read faster",
-        "OpenSSH refuses to use keys that are readable by others (security check)",
-        "600 compresses the key",
-        "644 breaks SSH handshake encryption"
-      ],
-      "correct_answer": 1,
-      "explanation": "OpenSSH explicitly checks permissions on private keys. If group or others can read the key, SSH will refuse to use it and display 'WARNING: UNPROTECTED PRIVATE KEY FILE!'",
-      "type": "multiple_choice",
-      "difficulty": 1,
-      "question_id": "6205ef87-b248-4497-9fc3-c1130712f598"
+      "answer_index": 0
     }
   ],
-  "prerequisites": [
-    "Linux Basics"
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
   ],
-  "concepts": [
-    "rwx Permissions",
-    "chmod",
-    "sudo",
-    "SUID",
-    "Privilege Escalation"
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Linux Security Basics for Beginners looks like a mouthful, but the job is simple: learn the moving parts, spot the failure modes, and use the thing without wrecking the room."
+    },
+    {
+      "type": "explanation",
+      "title": "Core idea",
+      "content": "Linux Security Basics for Beginners is about understanding the core concepts, where they fit in the stack, and what breaks when they are misused."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10",
+      "content": "Imagine linux security basics for beginners as a tool kit. You do not need every wrench. You need to know which one fits the bolt and which one will strip it."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Hands-on exercise",
+      "content": "Write a short lab note, map the key terms, and outline a safe validation checklist."
+    },
+    {
+      "type": "real_world",
+      "title": "Real world use",
+      "content": "In production, this shows up when teams need to make decisions fast without guessing or hand-waving."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Memory aid",
+      "content": "Anchor the topic to one story, one diagram, and one rule of thumb."
+    },
+    {
+      "type": "reflection",
+      "title": "Reflection",
+      "content": "What would you explain to a teammate in 30 seconds after this lesson?"
+    },
+    {
+      "type": "mindset_coach",
+      "content": "If you can explain it plainly, you actually know it. If you cannot, you do not. Brutal, but useful."
+    }
   ],
-  "learning_objectives": [
-    "Read and write Linux file permissions",
-    "Use chmod to set appropriate permissions",
-    "Understand sudo and its security implications",
-    "Find and assess SUID binaries"
-  ],
-  "subtitle": "Permissions, Privilege, and the Path to Root"
+  "tags": [
+    "Career Path: Cybersecurity Professional",
+    "Built-In",
+    "linux",
+    "linux_security_basics_for_beginners"
+  ]
 }

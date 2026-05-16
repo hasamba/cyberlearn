@@ -1,0 +1,153 @@
+{
+  "lesson_id": "df83b085-314d-4a02-94cc-f7b952d5e5c6",
+  "lesson_number": "716",
+  "domain": "fundamentals",
+  "title": "DNS Security Fundamentals",
+  "difficulty": 2,
+  "order_index": 32,
+  "prerequisites": [
+    "Networking Fundamentals: TCP/IP for Security"
+  ],
+  "concepts": [
+    "DNS resolution",
+    "DNS record types",
+    "Cache poisoning",
+    "DNS tunneling",
+    "DNSSEC",
+    "DNS over HTTPS"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain the DNS resolution process from query to response",
+    "Identify common DNS record types (A, AAAA, MX, TXT, CNAME, NS)",
+    "Describe DNS cache poisoning and how Kaminsky's attack works",
+    "Explain how DNS tunneling works and how to detect it",
+    "Understand DNSSEC and DNS over HTTPS (DoH)"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which DNS record type maps a hostname to an IPv4 address?",
+      "options": [
+        "MX",
+        "CNAME",
+        "A",
+        "TXT"
+      ],
+      "correct_answer": 2,
+      "explanation": "The A (Address) record maps a hostname to an IPv4 address. AAAA maps to IPv6. MX is for mail servers. CNAME is an alias.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "e84c2d2a-f942-45d6-a57c-1686485e78bb"
+    },
+    {
+      "question": "What is DNS cache poisoning?",
+      "options": [
+        "Filling a DNS server's cache with malicious records",
+        "Encrypting DNS traffic",
+        "Blocking DNS queries",
+        "Filtering DNS responses"
+      ],
+      "correct_answer": 0,
+      "explanation": "DNS cache poisoning injects false DNS records into a resolver's cache, redirecting users to malicious servers.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "bf26de0d-ca63-4a5b-8930-e8dbee04adb3"
+    },
+    {
+      "question": "How does DNS tunneling bypass firewalls?",
+      "options": [
+        "It encrypts all traffic",
+        "It encodes data within DNS queries/responses",
+        "It uses a VPN connection",
+        "It exploits DNS server vulnerabilities"
+      ],
+      "correct_answer": 1,
+      "explanation": "DNS tunneling encodes arbitrary data (C2 commands, exfiltrated files) inside DNS query/response fields, bypassing firewalls that allow DNS traffic.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "6878edef-3580-4602-b685-eb43ffbbc0a3"
+    },
+    {
+      "question": "What does DNSSEC provide?",
+      "options": [
+        "Encryption of DNS queries",
+        "Authentication and integrity verification of DNS records",
+        "Blocking of malicious domains",
+        "Privacy for DNS lookups"
+      ],
+      "correct_answer": 1,
+      "explanation": "DNSSEC uses digital signatures to verify that DNS responses are authentic and haven't been tampered with. It does NOT encrypt queries.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "5b71b85b-ab5b-4448-beba-377be12accae"
+    },
+    {
+      "question": "Which indicator suggests DNS tunneling activity?",
+      "options": [
+        "Many A record queries to popular domains",
+        "High-volume queries with long, random-looking subdomains",
+        "PTR record queries",
+        "HTTPS over port 443 mixed with DNS"
+      ],
+      "correct_answer": 1,
+      "explanation": "DNS tunneling typically shows up as unusually long subdomains (encoding data), high query volume, and queries to unusual/new domains.",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question_id": "e46e5c05-0c5d-49e4-93b5-dc49e47d9da2"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "DNS is the internet's phonebook — and like all critical infrastructure, attackers go after it constantly. DNS tunneling is in almost every sophisticated APT toolkit. DNS cache poisoning has redirected millions of users to malicious sites. This isn't abstract theory; it's active battlefield."
+    },
+    {
+      "type": "explanation",
+      "content": "## How DNS Works (The Full Picture)\n\n```\nUser types: www.example.com\n\n1. Browser checks local cache → not found\n2. OS asks Recursive Resolver (usually ISP or 8.8.8.8)\n3. Resolver asks Root Servers → 'Ask .com TLD servers'\n4. Resolver asks .com TLD servers → 'Ask example.com NS servers'\n5. Resolver asks example.com NS servers → 'IP is 93.184.216.34'\n6. Resolver caches the answer (TTL: e.g., 3600 seconds)\n7. User's browser connects to 93.184.216.34\n```\n\n**Key DNS Record Types:**\n```\nA      → hostname to IPv4 (e.g., example.com → 93.184.216.34)\nAAAA   → hostname to IPv6\nCNAME  → alias (www.example.com → example.com)\nMX     → mail server (mail.example.com, priority 10)\nTXT    → text data (SPF, DKIM, domain verification)\nNS     → nameservers (ns1.example.com)\nPTR    → reverse lookup (IP → hostname)\nSOA    → zone authority info\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nDNS is like a phone book:\n- You know someone's name (example.com) but not their number (IP address)\n- You look it up in the phone book (DNS resolver)\n- The phone book says '93.184.216.34'\n- Now you can call them\n\n**Cache poisoning** = Imagine if an attacker replaced the real phone book entry for your bank with their own number. Every time you try to call your bank, you call the attacker instead!\n\n**DNS tunneling** = Imagine you can only pass notes through the phone book lookup system (DNS). You encode secret messages in 'phone book lookups' — 'What's the number for SECRETDATA.evil.com?' — and the other side reads the encoded message from the query."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: DNS Investigation\n\n```bash\n# Basic DNS lookup\nnslookup google.com\ndig google.com\n\n# Look up specific record types\ndig google.com MX     # Mail servers\ndig google.com TXT    # SPF/DKIM records\ndig google.com NS     # Nameservers\ndig -x 8.8.8.8        # Reverse lookup (PTR)\n\n# Check DNSSEC\ndig +dnssec cloudflare.com\n\n# DNS over HTTPS test\ncurl 'https://cloudflare-dns.com/dns-query?name=example.com&type=A' \\\n  -H 'accept: application/dns-json'\n\n# Hunt for long/suspicious subdomains (DNS tunneling indicator)\n# In Wireshark or Zeek logs, look for:\n# - Queries > 50 chars in hostname\n# - High-frequency queries to same domain\n# - Base64/hex-looking subdomains like:\n# dGhpcyBpcyBhIHRlc3Q=.evil-tunnel.com\n```"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: DNS Tunneling in APT Campaigns\n\nMalware like DNScat2 and Cobalt Strike use DNS for C2:\n\n```\n# Attacker's C2 server is dns.evil.com\n# Malware on victim's machine makes DNS queries like:\nVEXJOFMHCB9HM2DCOBGW4DBPEB3WK4DOTMFTGY3UMR5EANM.evil.com\n# That's base32-encoded command: 'whoami; hostname'\n\n# C2 server responds with TXT record:\n# base32(\"john; DESKTOP-ABC123\")\n```\n\n**Detection approach:**\n```bash\n# Zeek DNS log analysis\nzeek-cut query < dns.log | \\\n  awk '{print length($1), $1}' | \\\n  sort -nr | \\\n  head -20\n# Legitimate domains: short names\n# Tunneling: very long, encoded-looking subdomains\n```\n\nFirewall allows DNS (port 53) → attacker has a covert channel that bypasses most firewalls."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: DNS Record Types\n\n**'A' is for Address** (A record → IPv4)\n**'AAAA' is for Aaaaaaa that's a long address** (IPv6 = 4x A = 128 bits vs 32 bits)\n**'MX' is for Mail eXchange** (email)\n**'CNAME' is for Canonical NAME** (alias)\n**'TXT' is Text** (anything — SPF, DKIM, verification)\n**'NS' is NameServer** (who's authoritative)\n\n**The resolution process in one sentence:** Your computer asks a resolver, the resolver walks up the hierarchy (Root → TLD → Authoritative), caches the answer, and returns it."
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: DNS as an Attack Vector\n\nDNS is special because:\n1. Almost nothing blocks DNS traffic — it's treated as essential\n2. DNS queries can leave the network even on heavily firewalled systems\n3. DNS cache poisoning can silently redirect all users\n4. DNS is used for spam filtering (SPF, DKIM lookups) — attackers exploit misconfigured records\n\nCheck your organization's DNS health:\n- Does your domain have SPF records? (prevents email spoofing)\n- Does it have DMARC? (tells receivers what to do with failed SPF/DKIM)\n- Is DNSSEC enabled? (prevents poisoning)\n- Are you monitoring for DGA-like queries? (C2 detection)\n\nDNS is both a utility and a threat vector. Know both faces."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Next time your browser can't reach a site, your first instinct should be 'is this a DNS issue?' And next time you're analyzing an incident and can't figure out how malware phoned home, check the DNS logs. DNS tells stories that firewalls miss."
+    }
+  ],
+  "tags": [
+    "DNS",
+    "network security",
+    "DNS tunneling",
+    "cache poisoning",
+    "DNSSEC",
+    "fundamentals"
+  ]
+}

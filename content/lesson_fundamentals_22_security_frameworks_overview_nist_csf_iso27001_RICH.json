@@ -1,0 +1,132 @@
+{
+  "lesson_id": "4f008aa7-3ca7-4ae0-b79c-b8c0c210f7bb",
+  "domain": "fundamentals",
+  "title": "Security Frameworks Overview: NIST CSF and ISO 27001",
+  "difficulty": 2,
+  "order_index": 22,
+  "prerequisites": [],
+  "concepts": ["NIST CSF", "ISO 27001", "CIS Controls", "risk management", "security governance", "ISMS", "compliance"],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Understand NIST Cybersecurity Framework core functions and their purpose",
+    "Map security controls to ISO 27001 requirements",
+    "Apply CIS Controls for baseline security hardening",
+    "Differentiate compliance from actual security posture"
+  ],
+  "tags": ["Career Path: GRC Analyst", "Career Path: Security Engineer", "compliance", "governance", "Built-In"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Security frameworks get dismissed as 'checkbox compliance' — and sometimes that's fair. But used correctly, they are a shared language between security professionals, executives, auditors, and regulators. Knowing NIST CSF and ISO 27001 lets you walk into any boardroom or audit conversation and be understood. The frameworks didn't create good security — good security professionals created frameworks from what works."
+    },
+    {
+      "type": "explanation",
+      "title": "Why Frameworks Exist",
+      "content": "Cybersecurity is vast. Without a framework, every organization reinvents the wheel — and usually poorly. Frameworks provide:\n\n1. **Common vocabulary** — 'We follow NIST CSF' communicates your approach to partners and customers\n2. **Structure** — organize controls logically rather than ad hoc\n3. **Gap analysis** — identify what you're missing against a known baseline\n4. **Regulatory alignment** — many regulations (HIPAA, PCI DSS, NIS2) map to frameworks\n5. **Continuous improvement** — frameworks are iterative, not one-time\n\nKey insight: **Compliance ≠ Security.** You can check every box in a framework and still be breached. Frameworks are the floor, not the ceiling."
+    },
+    {
+      "type": "explanation",
+      "title": "NIST Cybersecurity Framework (CSF) 2.0",
+      "content": "The NIST CSF was developed with US critical infrastructure in mind but is now globally adopted. Version 2.0 (2024) added a sixth function.\n\n**The 6 Core Functions:**\n\n| Function | Goal |\n|----------|------|\n| **Govern (GV)** | Establish strategy, risk tolerance, accountability |\n| **Identify (ID)** | Understand assets, risks, and business context |\n| **Protect (PR)** | Implement safeguards to limit impact |\n| **Detect (DE)** | Identify cybersecurity events |\n| **Respond (RS)** | Take action on detected incidents |\n| **Recover (RC)** | Restore capabilities after incidents |\n\nEach function contains **Categories** (e.g., Asset Management, Identity Management) and **Subcategories** (specific outcomes).\n\nNIST CSF is **risk-based and outcome-focused** — it tells you *what* to achieve, not prescriptively *how*. This flexibility makes it applicable across industries and organization sizes."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: NIST CSF in a Restaurant",
+      "content": "Imagine you own a restaurant and want to prevent food poisoning:\n\n- **Govern:** Management decides food safety is a top priority and sets the budget\n- **Identify:** You list all ingredients, suppliers, and equipment that could cause contamination\n- **Protect:** You install refrigerators, train staff on handwashing, lock chemical storage\n- **Detect:** You install thermometers, monitor expiry dates, log temperature readings\n- **Respond:** If someone gets sick, you pull the batch, contact health authorities, issue refunds\n- **Recover:** You restock, retrain staff, update procedures to prevent recurrence\n\nSame logic, applied to cybersecurity."
+    },
+    {
+      "type": "explanation",
+      "title": "ISO 27001: The International Standard for ISMS",
+      "content": "ISO/IEC 27001 is an **internationally recognized standard** for establishing, implementing, and maintaining an **Information Security Management System (ISMS)**.\n\nKey characteristics:\n- **Certifiable:** Organizations can achieve ISO 27001 certification via third-party audit\n- **Risk-based:** Controls are selected based on your risk assessment, not a fixed checklist\n- **Annex A:** Contains 93 controls across 4 themes (Organizational, People, Physical, Technological)\n- **Plan-Do-Check-Act (PDCA):** Continuous improvement cycle\n\n**ISO 27001 vs NIST CSF:**\n| Feature | NIST CSF | ISO 27001 |\n|---------|----------|-----------|\n| Origin | US Government | International (ISO) |\n| Certification | No | Yes |\n| Prescriptiveness | Flexible/outcomes | More prescriptive |\n| Audit | Self-assessment | Third-party audit |\n| Cost | Free | Certification has fees |\n\nMany organizations use NIST CSF for internal governance and ISO 27001 for customer-facing certification."
+    },
+    {
+      "type": "explanation",
+      "title": "CIS Controls v8: Practical Implementation Guide",
+      "content": "The **CIS Critical Security Controls** (formerly SANS Top 20) are 18 prioritized controls with concrete implementation guidance.\n\nOrganized into 3 Implementation Groups (IGs):\n- **IG1:** Foundational cyber hygiene — small organizations with limited resources\n- **IG2:** IG1 + additional controls — medium organizations handling sensitive data\n- **IG3:** IG1+2 + advanced controls — organizations with mature security programs\n\n**Top 6 CIS Controls (Highest ROI):**\n1. Inventory and Control of Enterprise Assets\n2. Inventory and Control of Software Assets\n3. Data Protection\n4. Secure Configuration of Enterprise Assets\n5. Account Management\n6. Access Control Management\n\nCIS Controls map directly to NIST CSF and ISO 27001 — use them as the 'how' to implement framework requirements."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Using NIST CSF for a Gap Assessment",
+      "content": "A mid-size company wants to improve its security posture before a client audit. The CISO runs a NIST CSF gap assessment:\n\n1. **Identify:** Asset inventory is incomplete — 40% of assets unknown → HIGH gap\n2. **Protect:** MFA deployed on email but not VPN → MEDIUM gap\n3. **Detect:** SIEM deployed but no 24/7 monitoring → HIGH gap\n4. **Respond:** Incident response plan exists but hasn't been tested → MEDIUM gap\n5. **Recover:** Backups taken daily but recovery not tested → HIGH gap\n\nResults: The company prioritizes asset inventory, backup testing, and 24/7 monitoring. Three months later, they detect a ransomware precursor (credential dumping) because detection is now operational.\n\nThe framework didn't stop the attack — the improved detection did."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Framework Quick Reference",
+      "content": "**NIST CSF:** GV-ID-PR-DE-RS-RC → 'Governance Identifies Protects Detects Responds Recovers'\n\n**ISO 27001:** Risk-based ISMS → certifiable, auditable, international standard\n\n**CIS Controls:** 18 prioritized, practical controls → IG1 is the minimum viable baseline\n\n**Key distinction:**\n- NIST CSF = What outcomes to achieve\n- ISO 27001 = What to document and certify\n- CIS Controls = How to implement specific controls"
+    },
+    {
+      "type": "reflection",
+      "title": "Think About It",
+      "content": "A company passes their annual ISO 27001 surveillance audit with flying colors. Three weeks later they suffer a major ransomware attack.\n\nHow is this possible? What does this tell you about the relationship between certification/compliance and actual security? What would you do differently?"
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Which NIST CSF function was added in version 2.0?",
+      "options": [
+        "Protect",
+        "Govern",
+        "Identify",
+        "Recover"
+      ],
+      "correct": 1,
+      "explanation": "NIST CSF 2.0 added 'Govern' as the sixth function, recognizing that security strategy and risk tolerance must be established at the organizational level before the other functions can be effective."
+    },
+    {
+      "question": "A company wants to demonstrate security maturity to enterprise customers. Which framework is most appropriate?",
+      "options": [
+        "CIS Controls — it has the most specific technical guidance",
+        "NIST CSF — it's the most widely recognized in the US",
+        "ISO 27001 — it provides third-party certifiable validation",
+        "COBIT — it's designed for enterprise governance"
+      ],
+      "correct": 2,
+      "explanation": "ISO 27001 certification is recognized internationally and involves independent third-party auditing, making it the best choice for demonstrating security posture to customers and partners."
+    },
+    {
+      "question": "What is the key difference between CIS Implementation Group 1 (IG1) and IG3?",
+      "options": [
+        "IG1 is for large enterprises, IG3 is for small businesses",
+        "IG1 is basic cyber hygiene for resource-limited orgs; IG3 includes advanced controls for mature programs",
+        "IG1 covers only technical controls; IG3 includes governance",
+        "IG3 is NIST-specific while IG1 is ISO-specific"
+      ],
+      "correct": 1,
+      "explanation": "CIS IGs are tiered by organization size and security maturity. IG1 is the foundational minimum, while IG3 builds on all previous groups with advanced capabilities for mature security programs."
+    },
+    {
+      "question": "Organization X follows NIST CSF and maps all controls. They are then breached. What does this demonstrate?",
+      "options": [
+        "NIST CSF is an ineffective framework",
+        "Compliance with a framework does not guarantee security — implementation quality matters",
+        "The organization must not have fully implemented the framework",
+        "NIST CSF does not cover advanced threats"
+      ],
+      "correct": 1,
+      "explanation": "Frameworks define outcomes to achieve, not guarantees. Checkbox compliance without genuine implementation, testing, and continuous improvement provides a false sense of security."
+    },
+    {
+      "question": "Which component of ISO 27001 contains the specific security controls?",
+      "options": [
+        "The main body (Clauses 4-10)",
+        "Annex A",
+        "ISO 27002",
+        "The ISMS Policy Document"
+      ],
+      "correct": 1,
+      "explanation": "Annex A of ISO 27001 contains 93 controls across 4 themes. ISO 27002 provides implementation guidance for those controls, but Annex A is part of the standard itself."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget that frameworks are just paperwork — they are battle-tested security intelligence distilled into structure.",
+    "active": "Download the NIST CSF 2.0 quick start guide and do a quick self-assessment for an organization you know.",
+    "state": "Approach framework learning with a builder's mindset — you're learning how to construct a security program.",
+    "teach": "Explain the difference between NIST CSF and ISO 27001 to someone in a non-technical role.",
+    "enter": "Security frameworks are the common language of the industry — fluency in them opens doors.",
+    "review": "Revisit before any GRC, audit, or compliance-related work.",
+    "visualize": "Picture the 6 NIST CSF functions as a lifecycle wheel — Govern at the center, others rotating around it.",
+    "notes": "Create a mapping table: NIST CSF function → ISO 27001 domain → CIS Control.",
+    "optimism": "Frameworks give you a head start — you're building on decades of collective security knowledge.",
+    "wonder": "How do organizations prioritize which framework gaps to close first when resources are limited?"
+  }
+}

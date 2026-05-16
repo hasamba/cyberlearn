@@ -1,0 +1,111 @@
+{
+  "lesson_id": "b91c7c1b-df08-4f4c-8f86-fdc50958d187",
+  "domain": "blue_team",
+  "title": "Business Email Compromise (BEC) Detection",
+  "difficulty": 2,
+  "order_index": 35,
+  "prerequisites": ["Blue Team Fundamentals"],
+  "concepts": ["BEC attack patterns", "Email authentication (SPF, DKIM, DMARC)", "Detecting compromised accounts", "OAuth token abuse", "Inbox rule manipulation", "Account takeover indicators", "Microsoft 365 forensics"],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Identify the six major BEC attack patterns used against organizations",
+    "Implement and validate SPF, DKIM, and DMARC email authentication controls",
+    "Detect compromised O365/Gmail accounts through anomalous login and activity indicators",
+    "Identify malicious inbox rules created by attackers to intercept email",
+    "Build detection rules for OAuth token theft and app consent abuse"
+  ],
+  "post_assessment": [
+    {
+      "question": "An attacker creates an inbox rule that forwards all emails with 'invoice' or 'payment' in the subject to an external address. Which O365 audit log event would reveal this?",
+      "options": ["MailboxLogin", "New-InboxRule or Set-InboxRule", "Send-MailMessage", "AddMailboxPermission"],
+      "correct": 1,
+      "explanation": "New-InboxRule and Set-InboxRule events in the Unified Audit Log capture inbox rule creation/modification, including forwarding rules."
+    },
+    {
+      "question": "What does a DMARC policy of 'p=reject' do?",
+      "options": ["Rejects emails from known spam senders", "Instructs receiving servers to reject emails that fail SPF and DKIM alignment", "Prevents outbound emails from being marked as spam", "Quarantines all emails from unverified domains"],
+      "correct": 1,
+      "explanation": "DMARC p=reject tells receiving mail servers to reject (not deliver) messages from your domain that fail both SPF and DKIM alignment checks."
+    },
+    {
+      "question": "What is the typical attacker goal in a CEO Fraud BEC attack?",
+      "options": ["Installing ransomware on the executive's computer", "Convincing an employee to wire funds to an attacker-controlled account", "Stealing the CEO's corporate credentials", "Accessing merger and acquisition deal documents"],
+      "correct": 1,
+      "explanation": "CEO Fraud (also called Wire Fraud BEC) involves impersonating an executive to pressure a finance employee into making an unauthorized wire transfer."
+    },
+    {
+      "question": "An attacker has compromised a Microsoft 365 account. Which technique allows them to maintain persistent access even after the victim changes their password?",
+      "options": ["Using the victim's recovery email address", "OAuth app consent granted before password reset", "Cached Kerberos tickets", "NTLM hash in Windows credential manager"],
+      "correct": 1,
+      "explanation": "OAuth application tokens granted before a password reset often remain valid. Attackers register malicious OAuth apps and grant them mailbox access, which persists through password changes."
+    },
+    {
+      "question": "Which login anomaly is MOST indicative of compromised credentials via password spray?",
+      "options": ["Multiple failed logins from the same IP followed by success", "Many failed logins across many accounts from the same IP with small attempt counts per account", "Failed logins from a new device type", "Successful login from a new geographic location"],
+      "correct": 1,
+      "explanation": "Password spray tries one or two passwords across many accounts (to avoid lockout). The signature is many accounts with few failed attempts per account, all from the same source."
+    }
+  ],
+  "jim_kwik_principles": {
+    "forget": "Forget the idea that BEC is just a phishing problem — modern BEC bypasses spam filters entirely.",
+    "active": "Check your organization's DMARC record right now: dig TXT _dmarc.yourdomain.com",
+    "state": "You're a defender who needs to think like an attacker — where's the money, who controls it, and how would you reach them?",
+    "teach": "Explain the difference between SPF, DKIM, and DMARC to a non-technical person in 2 minutes.",
+    "enter": "Your CFO just forwarded an 'urgent' email from the CEO asking for a $250K wire. How do you evaluate this?",
+    "review": "List 4 types of BEC attacks and their targets from memory after this lesson.",
+    "notes": "Flag: Inbox forwarding rules + auto-delete rules = attacker covering their tracks. Both together = high confidence compromise.",
+    "vocabulary": "BEC, DMARC, SPF alignment, DKIM, OAuth consent grant, inbox rule, AiTM (Adversary-in-the-Middle)",
+    "visualize": "Picture email headers as a passport. SPF checks the issuing country, DKIM checks the signature, DMARC is the border control decision.",
+    "connect": "Connect BEC to identity security: password spray → account compromise → inbox rules → financial fraud. Every step has a detection opportunity."
+  },
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "BEC Is the #1 Financial Cybercrime",
+      "content": "BEC isn't glamorous. There's no ransomware, no system outage, no dramatic notification. Attackers impersonate your executives via email, and a finance employee wires $2M to a fraudulent account. By the time anyone realizes, the money is gone. The FBI reports BEC causes more financial losses than ransomware, healthcare breaches, and credit card fraud combined. And most of it is preventable with controls you can implement this week."
+    },
+    {
+      "type": "explanation",
+      "title": "The Six BEC Attack Types",
+      "content": "BEC attacks target specific relationships and processes within organizations:\n\n**1. CEO/Executive Fraud**\nAttacker impersonates a senior executive (email spoofing or compromised account) and pressures a finance employee to make an urgent wire transfer. Classic: fake CEO emails CFO with a 'confidential acquisition' wire request.\n\n**2. Vendor/Supplier Fraud**\nAttacker compromises or impersonates a trusted vendor and sends updated banking instructions. Your accounts payable team redirects legitimate invoices to attacker accounts.\n\n**3. Account Compromise**\nAttacker takes over a real internal email account and uses it to send fraudulent requests. Harder to detect because it comes from a legitimate account.\n\n**4. Attorney/Legal Impersonation**\nAttacker impersonates your outside counsel and pressures employees to wire funds related to pending litigation or deals.\n\n**5. W-2/HR Fraud**\nAttacker impersonates an executive requesting all employee W-2 tax forms. Used for identity theft and further fraud.\n\n**6. Real Estate Fraud**\nTargets home buyers and title companies. Attackers intercept email chains and provide fraudulent wiring instructions at closing."
+    },
+    {
+      "type": "explanation",
+      "title": "Email Authentication: SPF, DKIM, DMARC",
+      "content": "These three controls form the foundation of email anti-spoofing:\n\n**SPF (Sender Policy Framework)**\nA DNS TXT record listing IP addresses authorized to send email for your domain. Receiving servers check if the sending IP is in your SPF record.\n- Limitation: SPF checks the envelope sender, not the From: header a user sees.\n\n**DKIM (DomainKeys Identified Mail)**\nA cryptographic signature added to outbound emails, verified using a public key in DNS. Proves the email wasn't tampered with in transit.\n- If DKIM passes, the email content is authentic.\n\n**DMARC (Domain-based Message Authentication)**\nThe policy layer that tells receiving servers what to do when SPF and DKIM fail:\n- `p=none` — monitor only (don't block anything)\n- `p=quarantine` — send failures to spam\n- `p=reject` — reject failures entirely\n\nDMARC also requires **alignment**: the From: domain must match the SPF or DKIM domain. This closes the gap that SPF alone leaves open.\n\n**Best practice:** Start with `p=none` and a reporting address, review reports for 30 days, then move to `p=quarantine`, then `p=reject`."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Checking Email Authentication Records",
+      "language": "bash",
+      "content": "# Check SPF record\ndig TXT yourdomain.com | grep spf\n# Example good SPF: \"v=spf1 include:_spf.google.com ~all\"\n# ~all = softfail, -all = hardfail (better), +all = BAD (authorizes everything)\n\n# Check DKIM record (selector varies - common: google, selector1, default)\ndig TXT google._domainkey.yourdomain.com\n\n# Check DMARC record\ndig TXT _dmarc.yourdomain.com\n# Good: \"v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com; pct=100\"\n# Bad: \"v=DMARC1; p=none\" (monitoring only - no protection)\n\n# Use online tools for full analysis:\n# https://dmarcian.com/dmarc-inspector/\n# https://mxtoolbox.com/DMARC.aspx\n\n# PowerShell - Check O365 DMARC compliance for your tenant\nConnect-ExchangeOnline -UserPrincipalName admin@yourdomain.com\n\n# Review current DKIM signing config\nGet-DkimSigningConfig | Select-Object Domain, Enabled, Status\n\n# View DMARC reports (if configured) with an online DMARC analyzer\n# Aggregate reports (rua) show authentication summary\n# Forensic reports (ruf) show individual failures"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Detecting Compromised O365 Accounts",
+      "language": "powershell",
+      "content": "# Connect to Exchange Online and Microsoft Graph\nConnect-ExchangeOnline\nConnect-MgGraph -Scopes \"AuditLog.Read.All\",\"Directory.Read.All\"\n\n# 1. Find suspicious inbox rules (forwarding to external)\nGet-InboxRule -Mailbox user@company.com | \n    Where-Object {$_.ForwardTo -ne $null -or $_.ForwardAsAttachmentTo -ne $null -or $_.RedirectTo -ne $null} |\n    Select-Object Name, ForwardTo, DeleteMessage, Enabled\n\n# 2. Check for inbox rules in Unified Audit Log (last 90 days)\nSearch-UnifiedAuditLog -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) \\\n    -Operations \"New-InboxRule\",\"Set-InboxRule\" \\\n    -ResultSize 1000 |\n    Select-Object CreationDate, UserIds, Operations, AuditData |\n    Format-Table -AutoSize\n\n# 3. Look for impossible travel logins\nSearch-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) \\\n    -Operations MailboxLogin \\\n    -ResultSize 1000 |\n    ForEach-Object {\n        $data = $_.AuditData | ConvertFrom-Json\n        [PSCustomObject]@{\n            Time = $_.CreationDate\n            User = $_.UserIds\n            ClientIP = $data.ClientIPAddress\n            AppId = $data.ClientInfoString\n        }\n    } | Sort-Object User, Time | Format-Table -AutoSize\n\n# 4. Check OAuth app consent grants\nGet-MgServicePrincipal -All | Where-Object {\n    $_.AppOwnerOrganizationId -ne 'your-tenant-id'\n} | Select-Object DisplayName, AppId, ReplyUrls"
+    },
+    {
+      "type": "real_world",
+      "title": "The $121M Facebook and Google BEC",
+      "content": "Between 2013 and 2015, Lithuanian fraudster Evaldas Rimasauskas impersonated Quanta Computer (a legitimate supplier to both Facebook and Google) and sent fraudulent invoices for real services.\n\n**How it worked:**\n- Registered a company named 'Quanta Computer' in Lithuania\n- Sent fraudulent invoices on forged letterhead matching Quanta's real invoices\n- Both Facebook and Google paid — $98M and $23M respectively\n- Money was wired to Latvia, Cyprus, Slovakia, Lithuania, Hungary, and Hong Kong\n\n**What stopped it:** Eventually one of the banks flagged suspicious wire activity. Rimasauskas was extradited and pleaded guilty.\n\n**Both Facebook and Google recovered most of the money through the legal process.**\n\n**The lesson:** BEC works because it looks like legitimate business. The defense isn't just technical — it's process: callback verification on wire changes, dual-approval for large transfers, and vendor banking change verification via a known phone number (not from the email)."
+    },
+    {
+      "type": "memory_aid",
+      "title": "BEC Detection Checklist — The FLAIR Method",
+      "content": "When investigating a potential BEC incident, run through **FLAIR**:\n\n**F — Forwarding Rules**\nCheck all mailboxes for inbox rules that forward or delete emails matching financial keywords.\n\n**L — Login Anomalies**\nReview sign-in logs for impossible travel, unusual locations, new devices, and legacy auth.\n\n**A — App Consent Grants**\nCheck for OAuth apps with excessive permissions (Mail.ReadWrite, Mail.Send) granted without IT approval.\n\n**I — Identity Indicators**\nPassword changes, MFA changes, alternate email additions — attacker maintaining access.\n\n**R — Recent Wire/Payment Activity**\nCorrelate email compromise timeline with any unusual payment activity or vendor banking changes."
+    },
+    {
+      "type": "reflection",
+      "title": "Your Organization's BEC Exposure",
+      "content": "Think through these honestly:\n\n1. Can any employee in finance initiate a wire transfer without a second approval?\n\n2. Is your DMARC policy at `p=reject`? If not, attackers can spoof your domain perfectly.\n\n3. Does your vendor payment change process require phone verification to a known number?\n\n4. Do you have alerting on new inbox forwarding rules in O365/Google Workspace?\n\n5. How quickly could you detect an account compromise? Hours? Days?\n\nBEC defenses are split between technical controls (DMARC, alerts) and process controls (dual approvals, verbal verification). Both are required. Pick one gap you identified and propose a concrete fix."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Call That Saves $2 Million",
+      "content": "The simplest BEC control has nothing to do with technology: if an executive or vendor sends an 'urgent' request to change banking information or wire money, pick up the phone and call a known number. Not a number from the email — a number from your contacts, your vendor portal, or the phone book.\n\nThis one 30-second call has stopped hundreds of millions in BEC fraud. It's not a technical control. It's a habit. Train your finance team until it's automatic."
+    }
+  ],
+  "tags": ["Career Path: SOC Analyst", "Career Path: Blue Team Operator", "Built-In", "Priority 3 - Email security"]
+}

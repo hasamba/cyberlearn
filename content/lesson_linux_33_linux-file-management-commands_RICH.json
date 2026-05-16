@@ -1,0 +1,141 @@
+{
+  "lesson_id": "d4f6a8b9-3c5e-4d9f-b1a2-4e6f8c0d2e4a",
+  "domain": "linux",
+  "title": "Linux File Management Commands",
+  "difficulty": 1,
+  "order_index": 33,
+  "prerequisites": ["Linux Command History and Navigation"],
+  "concepts": [
+    "File operations: cp, mv, rm, mkdir, rmdir",
+    "File attributes and metadata",
+    "Wildcards and glob patterns",
+    "Directory management",
+    "File permissions and ownership",
+    "Inodes and hard/soft links",
+    "Hidden files and directories",
+    "Safe file deletion practices"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Perform file operations (copy, move, rename, delete) with confidence",
+    "Use wildcards and glob patterns to target multiple files",
+    "Understand file metadata, inodes, and links",
+    "Apply safe file management practices for security work",
+    "Manage file permissions and ownership for security"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does `cp -a source/ dest/` do differently from `cp -r source/ dest/`?",
+      "options": [
+        "-a is the same as -r, just shorter",
+        "-a preserves all attributes (ownership, timestamps, permissions) while -r doesn't",
+        "-a creates hard links instead of copying",
+        "-a only works on directories, not files"
+      ],
+      "correct_answer": "B",
+      "explanation": "`cp -a` (archive mode) preserves ownership, timestamps, permissions, and symlinks. It's equivalent to `-dR --preserve=all`. In forensics, `-a` is critical because it maintains evidence integrity by preserving all metadata."
+    },
+    {
+      "question": "Which glob pattern matches all files starting with 'log' and ending with '.txt'?",
+      "options": [
+        "log*.txt",
+        "log?.txt",
+        "log[.txt",
+        "log+.txt"
+      ],
+      "correct_answer": "A",
+      "explanation": "`log*.txt` matches 'log' followed by any characters (`*`) followed by '.txt'. `?` matches exactly one character. There is no `+` in standard glob (that's regex)."
+    },
+    {
+      "question": "What happens when you `rm -rf /` on a modern Linux system?",
+      " "options": [
+        "It deletes everything without question",
+        "It works but skips /proc and /sys",
+        "Most systems have --no-preserve-root as default, so it fails with a warning",
+        "It deletes everything including mounted filesystems"
+      ],
+      "correct_answer": "C",
+      "explanation": "Since coreutils 6.10 (2006), `rm -rf /` is blocked by `--no-preserve-root` default. You must explicitly pass `--no-preserve-root` to override this. This is a safety guard, but `rm -rf /*` bypasses it."
+    },
+    {
+      "question": "What is the difference between a hard link and a soft (symbolic) link?",
+      "options": [
+        "Hard links work across filesystems; soft links don't",
+        "Soft links point to a path; hard links point to the same inode",
+        "Hard links break when the original is deleted; soft links don't",
+        "Soft links are faster to resolve than hard links"
+      ],
+      "correct_answer": "B",
+      "explanation": "A hard link is another directory entry pointing to the same inode (same physical data). A symbolic link is a separate file containing a path. Hard links can't cross filesystems, and the data isn't deleted until all hard links are removed."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Chunking",
+    "Visualization",
+    "Association",
+    "Simplification",
+    "Teaching Others",
+    "Pattern Recognition",
+    "Elaborative Rehearsal",
+    "Feynman Technique"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "File Management: Where Security Begins",
+      "content": "Every security discipline — forensics, hardening, incident response — starts with understanding files. If you can't confidently copy, move, find, and verify files while preserving their metadata, you can't do forensics. If you don't understand permissions, you can't lock down a system.\n\nThis isn't basic IT — it's foundational security. Get this right, and everything built on top becomes easier.",
+      "principle": "Simplification"
+    },
+    {
+      "type": "explanation",
+      "title": "Core File Operations",
+      "content": "**Copy — cp**\n```bash\ncp file.txt backup.txt              # Basic copy\ncp -r directory/ backup_dir/        # Recursive (directory copy)\ncp -a directory/ backup_dir/        # Archive mode (preserves ALL attributes)\ncp -u file.txt dest/                # Update mode (only if source is newer)\ncp -p file.txt dest/                # Preserve mode, ownership, timestamps\n```\n\n**Move/Rename — mv**\n```bash\nmv oldname.txt newname.txt          # Rename file\nmv file.txt /different/dir/        # Move file\nmv dir1/ dir2/                      # Move entire directory\nmv -n file.txt dest/                # Don't overwrite existing (no-clobber)\nmv -b file.txt dest/                # Backup before overwriting\n```\n\n**Remove — rm**\n```bash\nrm file.txt                         # Delete file\nrm -r directory/                     # Delete directory recursively\nrm -i file.txt                      # Interactive (prompt before delete)\nrm -f file.txt                      # Force (ignore nonexistent files)\n```\n\n**Create directories — mkdir**\n```bash\nmkdir newdir                        # Create single directory\nmkdir -p path/to/nested/dir         # Create nested directories (no error if exists)\nmkdir -m 700 privatedir             # Create with specific permissions\n```\n\n**⚠️ Forensics-critical:** Always use `cp -a` when copying evidence. Regular `cp` changes timestamps, which destroys timeline evidence. A changed mtime can invalidate an entire forensic investigation."
+    },
+    {
+      "type": "explanation",
+      "title": "Wildcards and Glob Patterns",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Wildcards are like cheat codes for selecting files. Think of them as search patterns for filenames.\n\n**The Big Three:**\n\n- **`*`** = \"anything\" — matches any number of any characters\n  - `*.txt` → all files ending in .txt\n  - `log*` → all files starting with 'log'\n  - `*2024*` → all files containing '2024' somewhere\n\n- **`?`** = \"one thing\" — matches exactly one character\n  - `log?.txt` → log1.txt, log2.txt, logA.txt (but NOT log10.txt)\n  - `file???.dat` → fileABC.dat, file123.dat\n\n- **`[abc]`** = \"pick one of these\" — matches one character from the list\n  - `log[123].txt` → log1.txt, log2.txt, log3.txt\n  - `[Mm]akefile` → Makefile or makefile\n  - `file[!0-9].txt` → any file NOT starting with a digit\n\n**Glob tricks for security work:**\n```bash\n# Find all log files from January 2024\nls /var/log/*2024-01*\n\n# Find all hidden files (dotfiles — often config or malware)\nls -la .[!.]*\n\n# Find all scripts\nls *.sh *.py *.pl\n\n# Remove all files except important ones\nrm !(*important*|*.conf)\n```\n\n**⚠️ Danger zone:** `rm` with wildcards is unforgiving. Always test with `ls` first:\n```bash\n# SAFE: See what would be deleted\nls /tmp/old_logs_2023*\n# Then delete\nrm /tmp/old_logs_2023*\n```"
+    },
+    {
+      "type": "code_exercise",
+      "title": "File Operations Practice",
+      "content": "Create a practice directory structure and perform common operations.",
+      "language": "bash",
+      "starter_code": "# 1. Create a directory structure: /tmp/practice/{logs,configs,scripts}\n# 2. Create some test files in each directory\n# 3. Copy a file preserving all attributes\n# 4. Move a file from one directory to another\n# 5. Create a symbolic link and a hard link\n# 6. Use wildcards to list only .log files\n# 7. Check file metadata with stat\n# 8. Safely remove the entire practice directory",
+      "solution": "# 1. Create directory structure\nmkdir -p /tmp/practice/{logs,configs,scripts}\n\n# 2. Create test files\ntouch /tmp/practice/logs/{app,auth,system}.log\ntouch /tmp/practice/configs/{app,network,security}.conf\necho '#!/bin/bash' > /tmp/practice/scripts/backup.sh\n\n# 3. Copy preserving all attributes\ncp -a /tmp/practice/configs/app.conf /tmp/practice/configs/app.conf.bak\n\n# 4. Move a file\nmv /tmp/practice/logs/old.log /tmp/practice/logs/archive/ 2>/dev/null || mv /tmp/practice/logs/auth.log /tmp/practice/configs/\n\n# 5. Create links\nln -s /tmp/practice/configs/app.conf /tmp/practice/app_link    # Symbolic\nln /tmp/practice/configs/network.conf /tmp/practice/network_hard  # Hard\n\n# 6. List only .log files\nls /tmp/practice/logs/*.log\n\n# 7. Check metadata\nstat /tmp/practice/configs/app.conf\n\n# 8. Clean up\nrm -rf /tmp/practice",
+      "hint": "Use 'mkdir -p' for nested directories. Use 'cp -a' for preserving attributes. Use 'ln -s' for symlinks and 'ln' for hard links. Always test wildcards with 'ls' before 'rm'."
+    },
+    {
+      "type": "real_world",
+      "title": "File Management in Forensic Workflows",
+      "content": "In digital forensics, file management isn't just convenience — it's **evidence integrity**.\n\n**Golden Rule: Always use `cp -a` for evidence copies.**\n\n```bash\n# WRONG — destroys timestamp evidence\ncp suspect_drive/image.raw /evidence/\n\n# RIGHT — preserves all metadata\ncp -a suspect_drive/image.raw /evidence/\n\n# EVEN BETTER — create a verified copy\ncp -a source.raw evidence.raw && \n  md5sum source.raw > source.md5 &&\n  md5sum evidence.raw > evidence.md5 &&\n  diff source.md5 evidence.md5\n```\n\n**Forensic directory structure:**\n```bash\ncase_2024_001/\n├── evidence/           # Original copies (cp -a, verified hashes)\n├── working/           # Analysis copies (safe to modify)\n├── tools/             # Forensic tools used\n├── notes/             # Investigation notes\n└── report/            # Final reports\n```\n\n**Working with suspicious files:**\n```bash\n# Don't execute unknown files! Examine them first.\nfile suspicious_binary          # Identify file type\nstat suspicious_binary          # Check metadata\nstrings suspicious_binary | head # Extract readable strings\nmd5sum suspicious_binary         # Hash for identification\n\n# Copy to quarantine for analysis\ncp -a suspicious_binary /quarantine/$(md5sum suspicious_binary | cut -d' ' -f1)\n```",
+      "scenario": "You've received a USB drive as evidence. Describe the steps to create a forensically sound copy using file management commands, including hash verification."
+    },
+    {
+      "type": "memory_aid",
+      "title": "File Command Quick Reference — C-M-R-M",
+      "content": "**C-M-R-M** — The four fundamental file operations:\n\n- **C**opy (`cp`) — Duplicate. Use `-a` for forensics. Use `-r` for directories.\n- **M**ove (`mv`) — Relocate/Rename. Same command does both.\n- **R**emove (`rm`) — Delete. Use `-i` for safety. Use `-r` for directories. NEVER run `rm -rf /`.\n- **M**kdir (`mkdir`) — Create directories. Use `-p` for nested paths.\n\n**Safety mnemonic for rm:** \n**I-R-F** → **I**nteractive, **R**ecursive, **F**orce\n- `-i` = ask before deleting (safest)\n- `-r` = delete directories (needed for dirs)\n- `-f` = force, don't ask (dangerous)\n\n**Always combine:** `rm -ri` for safe interactive directory deletion.\n**Never combine:** `rm -rf` without thinking (the `-f` overrides `-i`).",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "Inodes, Links, and File Metadata",
+      "content": "Every file in Linux has an **inode** — a data structure that stores metadata:\n\n```\nInode contains:\n├── File type (regular, directory, symlink, etc.)\n├── Permissions (rwx for owner/group/other)\n├── Owner UID and GID\n├── Size in bytes\n├── Timestamps (atime, mtime, ctime)\n├── Link count (number of hard links)\n├── Pointers to data blocks on disk\n└── Extended attributes and ACLs\n```\n\n**Hard links vs symbolic links:**\n\n| Feature | Hard Link | Symbolic Link |\n|---------|-----------|---------------|\n| Points to | Inode number | Path string |\n| Cross filesystem? | No | Yes |\n| Survives original deletion? | Yes (data stays) | No (broken link) |\n| Created with | `ln` | `ln -s` |\n| Inode | Same as original | Different |\n\n```bash\n# Create links\nln original.txt hardlink.txt        # Hard link\nln -s original.txt symlink.txt      # Symbolic link\n\n# View inode numbers\nls -li\n# 1234567 -rw-r--r-- 2 user group ... original.txt\n# 1234567 -rw-r--r-- 2 user group ... hardlink.txt  (same inode!)\n# 1234568 lrwxrwxrwx 1 user group ... symlink.txt -> original.txt\n```\n\n**Security implications:**\n- Hard links can preserve deleted files (the data isn't freed until all links removed)\n- Attackers may create hard links to `/etc/shadow` to prevent its deletion\n- `find -type l` finds all symlinks — useful for detecting suspicious links\n- `stat` reveals full metadata including inode number"
+    },
+    {
+      "type": "reflection",
+      "title": "File Management Safety Check",
+      "content": "Before moving on, make sure you can answer:\n\n1. Why is `cp -a` critical in forensics but unnecessary for regular work?\n2. What does the `ls -li` output tell you that `ls -la` doesn't?\n3. If you create a hard link to a file and then delete the original, what happens to the data?\n4. What's the danger of `rm -rf` with a variable that might be empty? (`rm -rf $DIR/` when `$DIR` is empty becomes `rm -rf /`)\n5. How would you find all symbolic links on a system pointing to files in `/etc`?\n\n**Bonus:** Set up a practice script that creates files, copies them with `cp -a` and regular `cp`, then compares the metadata with `stat`. See the difference for yourself."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Precision Over Speed",
+      "content": "In file management, there's no undo button. One wrong `rm` command can destroy evidence, wipe configurations, or take down a system.\n\n**The habit that separates amateurs from professionals:** Always `ls` before `rm`. Every time.\n\n```bash\n# Amateur:\nrm -rf /var/log/app/*\n\n# Professional:\nls /var/log/app/*\n# (review output)\nrm -rf /var/log/app/*\n```\n\nThis takes 2 seconds. Recovering from a wrong deletion takes hours or is impossible.\n\nBuild this reflex now. It will save you someday.",
+      "principle": "Teaching Others"
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

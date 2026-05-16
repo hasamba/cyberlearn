@@ -1,0 +1,141 @@
+{
+  "lesson_id": "b2d4e5f6-1a3c-4b7e-9d8f-0e2a4c6b8d0f",
+  "domain": "linux",
+  "title": "Linux Terminals and Manual Pages",
+  "difficulty": 1,
+  "order_index": 31,
+  "prerequisites": ["Linux Kernel, Operating System, and Distributions"],
+  "concepts": [
+    "Terminal emulators and shells",
+    "TTY and PTY architecture",
+    "Shell types (bash, zsh, sh)",
+    "Man page navigation and sections",
+    "Info pages and --help flags",
+    "Command documentation hierarchy",
+    "Shell builtins vs external commands",
+    "Tab completion and history shortcuts"
+  ],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Navigate man pages efficiently using search and section filters",
+    "Distinguish between shell builtins, external commands, and aliases",
+    "Use info pages and --help for supplementary documentation",
+    "Understand TTY/PTY architecture for terminal security",
+    "Apply tab completion and keyboard shortcuts for productivity"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which man page section contains system administration commands?",
+      "options": [
+        "Section 1",
+        "Section 5",
+        "Section 8",
+        "Section 3"
+      ],
+      "correct_answer": "C",
+      "explanation": "Section 8 contains system administration commands (typically requiring root). Section 1 is user commands, Section 3 is library functions, and Section 5 is file formats."
+    },
+    {
+      "question": "What does the `type` command tell you about `cd`?",
+      "options": [
+        "It's an external binary in /usr/bin",
+        "It's a shell builtin",
+        "It's an alias",
+        "It's a kernel module"
+      ],
+      "correct_answer": "B",
+      "explanation": "`cd` is a shell builtin because changing directory must affect the shell's own process — an external command would run in a child process and the directory change wouldn't persist in the parent shell."
+    },
+    {
+      "question": "How do you search for man pages containing a keyword?",
+      "options": [
+        "man --search keyword",
+        "apropos keyword",
+        "man -k keyword",
+        "Both B and C"
+      ],
+      "correct_answer": "D",
+      "explanation": "Both `apropos` and `man -k` search the whatis database for man pages containing the keyword. They're functionally equivalent — `apropos` is the standalone command, `man -k` is the man page interface to the same function."
+    },
+    {
+      "question": "Why is understanding TTY/PTY important for security?",
+      "options": [
+        "It helps you choose a terminal emulator",
+        "PTYs are used by SSH and screen-sharing attacks leverage PTY behavior",
+        "TTY is an outdated concept with no security relevance",
+        "It only matters for GUI applications"
+      ],
+      "correct_answer": "B",
+      "explanation": "SSH sessions allocate PTYs, and PTY hijacking is a real attack vector. Understanding how terminals multiplex I/O helps you analyze SSH session stealing, screen/tmux security, and terminal injection attacks."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Chunking",
+    "Mnemonics",
+    "Teaching Others",
+    "Visualization",
+    "Simplification",
+    "Curiosity",
+    "Pattern Recognition",
+    "Progressive Disclosure"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "RTFM — But Know How to Read It",
+      "content": "The old insult \"RTFM\" assumes the manual is obvious. It's not — man pages are dense, structured for reference, not learning. This lesson teaches you to *actually* read man pages efficiently.\n\nIn security work, you'll constantly encounter unfamiliar tools. The people who can quickly extract what they need from documentation will always outperform those who memorize commands. This is a *learn-how-to-learn* skill.",
+      "principle": "Curiosity"
+    },
+    {
+      "type": "explanation",
+      "title": "Terminals, Shells, and TTY Architecture",
+      "content": "**Terminal ≠ Shell** — this distinction matters.\n\n- **Terminal emulator** — The graphical window (gnome-terminal, kitty, alacritty, xterm). It renders text and sends keystrokes.\n- **Shell** — The program that interprets your commands (bash, zsh, fish, dash). It's what runs inside the terminal.\n- **TTY/PTY** — The kernel interface. A physical terminal (old days) was a TTY. Today we use **pseudo-terminals (PTYs)** — a master/slave pair where the terminal emulator controls the master side and the shell runs on the slave side.\n\n```\nKeystroke → Terminal Emulator → PTY Master → PTY Slave → Shell → Fork/Exec → Output → PTY Slave → PTY Master → Terminal Emulator\n```\n\n**Security relevance:**\n- SSH sessions are PTYs — `sshd` holds the master side\n- `script` command records a PTY session (useful for forensics)\n- PTY injection can hijack terminal sessions\n- Container escapes sometimes exploit PTY handling\n\n**Common shells:**\n- **bash** — Default on most distros, feature-rich\n- **zsh** — Powerful plugins (oh-my-zsh), better completion\n- **dash** — Minimal, POSIX-compliant, fast (often /bin/sh)\n- **fish** — User-friendly, not POSIX-compliant"
+    },
+    {
+      "type": "explanation",
+      "title": "Man Pages: The Documentation System",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Man pages are like a library where every book has a specific section number.\n\nImagine the library has 9 sections:\n\n1. 🧑 **User Commands** — Things anyone can type (ls, cat, grep)\n2. 📋 **System Calls** — Requests to the kernel (open, read, write)\n3. 📚 **Library Functions** — Helper code for programmers (printf, malloc)\n4. 🎮 **Special Files** — Weird files in /dev (null, random, tty)\n5. 📄 **File Formats** — How config files are structured (passwd, fstab)\n6. 🎮 **Games** — (yes, this exists)\n7. 📎 **Miscellaneous** — Protocols, character sets\n8. 🔧 **System Admin** — Root commands (mount, iptables, systemctl)\n9. 👨‍💻 **Kernel Interfaces** — Internal kernel docs\n\nWhen you type `man 5 passwd`, you're saying: \"Show me section 5 (file format) of passwd.\" Without the number, you'd get section 1 (the command) instead."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Man Page Mastery",
+      "content": "Practice navigating man pages — this is a skill you'll use daily in security work.",
+      "language": "bash",
+      "starter_code": "# 1. Open the man page for chmod\n# 2. Search for 'recursive' within the man page\n# 3. Find which section contains 'passwd' file format\n# 4. View the man page for the passwd file format\n# 5. Find all man pages related to 'network'\n# 6. Check if 'cd' is a builtin, alias, or external command",
+      "solution": "# 1. Open the man page for chmod\nman chmod\n\n# 2. Search for 'recursive' within the man page\n# Inside man: type /recursive then Enter\n\n# 3. Find which section contains 'passwd' file format\nwhatis passwd\n# or: man -f passwd\n\n# 4. View the man page for the passwd file format\nman 5 passwd\n\n# 5. Find all man pages related to 'network'\napropos network\n# or: man -k network\n\n# 6. Check if 'cd' is a builtin, alias, or external command\ntype cd",
+      "hint": "Use 'man <command>' to open pages. Inside man, press '/' to search. Use 'apropos' or 'man -k' for keyword search. Use 'type' to check command classification."
+    },
+    {
+      "type": "real_world",
+      "title": "Man Pages in Incident Response",
+      "content": "You're investigating a compromised Linux server. You find an unfamiliar binary at `/usr/local/bin/xmrig`. Your first move should be checking what it does:\n\n```bash\n# Check if there's a man page\nman xmrig          # Likely no man page for malware!\n\n# Check what type of command it is\ntype xmrig         # Will show path if external\n\n# Check the binary itself\nfile /usr/local/bin/xmrig   # ELF? Script?\nstrings /usr/local/bin/xmrig | head -20\n```\n\nWhen legitimate tools are unfamiliar, man pages are your first reference:\n```bash\n# What does ss do again?\nman ss\n# Ah, it's the modern replacement for netstat\n\n# How do I use journalctl to find logs from a specific time?\nman journalctl\n# Search for 'since' → --since=\"2024-01-01 00:00:00\"\n```\n\n**Pro tip:** `man` pages are often more accurate than web searches for Linux tools, because they match the *installed version* on your system, not some random blog post about a different version.",
+      "scenario": "You find an unfamiliar process running on a server. Describe how you'd use man pages and documentation tools to identify what it does, its configuration, and whether it's legitimate."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Man Page Sections — The 123589 Mnemonic",
+      "content": "Remember the most important man page sections:\n\n**\"1-2-3-5-8-9\" → Think: \"123 Fine 89\"**\n\nOr more memorably:\n\n- **1** = **U**ser commands → **1 U**ser\n- **2** = **S**ystem calls → **2 S**yscalls  \n- **3** = **L**ibrary functions → **3 L**ibrary\n- **5** = **F**ile formats → **5 F**ormats\n- **8** = **A**dmin commands → **8 A**dmin\n- **9** = **K**ernel → **9 K**ernel\n\nThe ones you'll use most in security: **1** (commands), **5** (config files), **8** (admin tools). The others are mainly for developers.",
+      "technique": "mnemonic"
+    },
+    {
+      "type": "explanation",
+      "title": "Beyond Man: Info, --help, and Online Docs",
+      "content": "Man pages aren't the only documentation source:\n\n**`--help` flag** — Quick reference, often more readable than man:\n```bash\nss --help          # Quick usage summary\niptables --help    # Lists all tables and chains\n```\n\n**`info` pages** — GNU's hypertext documentation system. Deeper than man, but less commonly used:\n```bash\ninfo coreutils     # Comprehensive GNU coreutils docs\ninfo grep          # Often more detailed than man grep\n```\n\n**`tldr` pages** — Community-maintained simplified man pages with practical examples:\n```bash\n# Install: npm install -g tldr\ntldr tar            # Shows real-world examples\ntarl tar -czf archive.tar.gz folder/\n```\n\n**When to use what:**\n- Quick syntax reminder → `--help`\n- Complete reference → `man`\n- Deep GNU documentation → `info`\n- Practical examples → `tldr`\n- Version-specific → Man (matches your installed version!)\n- Web search → Last resort, verify against local docs\n\n**Security tip:** Always prefer local man pages over web results for security-sensitive operations. Web results may describe different versions with different behavior."
+    },
+    {
+      "type": "reflection",
+      "title": "Documentation as a Security Skill",
+      "content": "Think about these questions:\n\n1. Why is it safer to read the man page for `chmod` on your system versus Googling it?\n2. How would you find all commands related to network configuration on a system you've never used before?\n3. A colleague says `chmod 4755` on a binary. Can you quickly verify what the 4 means using only man pages?\n4. Why might `man 1 passwd` and `man 5 passwd` show completely different content?\n\nThe ability to rapidly find accurate documentation is a force multiplier. Build this habit now."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Documentation Habit",
+      "content": "Here's your takeaway from this lesson:\n\n**Every time you encounter an unfamiliar command, read its man page before Googling.**\n\nThis builds two skills simultaneously:\n1. You learn the specific command\n2. You build pattern recognition for how documentation is structured\n\nAfter 20-30 man pages, you'll start seeing the same structure (NAME, SYNOPSIS, DESCRIPTION, OPTIONS, EXAMPLES, SEE ALSO). This makes every *new* man page faster to scan.\n\n**Your challenge:** For the next week, before running any unfamiliar command, spend 60 seconds reading its man page. Timebox it — don't go down a rabbit hole. Just build the reflex.",
+      "principle": "Active Recall"
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

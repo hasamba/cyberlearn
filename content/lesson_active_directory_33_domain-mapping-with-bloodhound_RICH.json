@@ -1,0 +1,141 @@
+{
+  "lesson_id": "a1b3c5d7-9e0f-4a2b-8c4d-6e8f0a2b4c6d",
+  "domain": "active_directory",
+  "title": "Domain Mapping with BloodHound",
+  "difficulty": 3,
+  "order_index": 33,
+  "prerequisites": [],
+  "concepts": [
+    "BloodHound graph database",
+    "SharpHound data collection",
+    "Active Directory attack paths",
+    "Graph analysis methodology",
+    "Privilege escalation paths",
+    "Session and ACL edges",
+    "Node and edge types",
+    "Custom Cypher queries"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Deploy SharpHound to collect Active Directory data",
+    "Navigate BloodHound's GUI to visualize attack paths",
+    "Identify privilege escalation paths from standard user to Domain Admin",
+    "Write custom Cypher queries to find specific misconfigurations",
+    "Interpret BloodHound edge types and their security implications"
+  ],
+  "post_assessment": [
+    {
+      "question": "What type of database does BloodHound use to store AD relationship data?",
+      "options": [
+        "MySQL relational database",
+        "PostgreSQL with JSON",
+        "Neo4j graph database",
+        "SQLite flat file"
+      ],
+      "correct_answer": "C",
+      "explanation": "BloodHound uses Neo4j, a native graph database. This is why it can efficiently traverse multi-hop attack paths — graph databases are designed for relationship-heavy queries, unlike relational databases that struggle with recursive joins."
+    },
+    {
+      "question": "Which SharpHound collection method gathers the most data including session information?",
+      "options": [
+        "--collectionmethod Group",
+        "--collectionmethod DCOnly",
+        "--collectionmethod All",
+        "--collectionmethod Session"
+      ],
+      "correct_answer": "C",
+      "explanation": "`--collectionmethod All` collects everything: group memberships, sessions, ACLs, trusts, GPOs, and container relationships. `DCOnly` only queries the domain controller (no session data). `Group` collects only group memberships. `Session` only collects session data."
+    },
+    {
+      "question": "In BloodHound, what does a 'HasSession' edge represent?",
+      "options": [
+        "A user who is a member of a group",
+        "A user currently logged into a computer",
+        "A computer that trusts another domain",
+        "A user with admin rights on a computer"
+      ],
+      "correct_answer": "B",
+      "explanation": "HasSession means a user has an active or recent logon session on a computer. This is critical because if you compromise that computer, you can potentially extract the user's credentials from memory (LSASS) or hijack their session."
+    },
+    {
+      "question": "What Cypher query finds the shortest path from a specific user to Domain Admins?",
+      "options": [
+        "MATCH p=shortestPath((u:User)-[:MemberOf*1..]->(g:Group)) WHERE u.name='USER@DOMAIN' RETURN p",
+        "MATCH p=shortestPath((u:User {name:'USER@DOMAIN'})-[*1..]->(g:Group {name:'DOMAIN ADMINS@DOMAIN'})) RETURN p",
+        "SELECT * FROM paths WHERE source='USER' AND target='Domain Admins'",
+        "MATCH (u:User)-[r]->(g:Group) WHERE u='USER' RETURN r"
+      ],
+      "correct_answer": "B",
+      "explanation": "The correct Cypher query uses `shortestPath` with the variable-length relationship `[*1..]` to find any path from the specified user to the Domain Admins group. Option A only follows MemberOf edges, missing other attack paths. Option C is SQL, not Cypher."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Pattern Recognition",
+    "Analogies",
+    "Simplification",
+    "Feynman Technique",
+    "Mind Mapping",
+    "Teaching Others"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "See the Path, Own the Domain",
+      "content": "Active Directory is a web of trust relationships. A single user account, through a chain of group memberships, delegated permissions, and active sessions, can reach Domain Admin — and most admins don't even know the path exists.\n\nBloodHound makes these invisible paths visible. It's the difference between guessing where privilege escalation might work and *seeing* the exact 3-hop path from a helpdesk user to Domain Admin.\n\nThis lesson teaches you to map and analyze these paths — both as an attacker finding them and as a defender closing them.",
+      "principle": "Visualization"
+    },
+    {
+      "type": "explanation",
+      "title": "BloodHound Architecture and Data Model",
+      "content": "BloodHound consists of three components:\n\n**1. SharpHound (Collector)** — The data gathering tool\n- Runs on Windows (or via C# inline execution)\n- Queries AD via LDAP, RPC, and SAMR\n- Outputs JSON files that feed into Neo4j\n- Can run stealthy collection or aggressive enumeration\n\n**2. Neo4j (Database)** — The graph storage engine\n- Stores nodes (Users, Groups, Computers, Domains, GPOs, OUs)\n- Stores edges (MemberOf, HasSession, AdminTo, GenericAll, etc.)\n- Enables Cypher queries for path analysis\n\n**3. BloodHound GUI** — The visualization interface\n- Built-in queries for common attack paths\n- Interactive graph exploration\n- Custom Cypher query support\n- Node marking for tracking analysis\n\n**Node types:**\n| Node | Description |\n|------|-------------|\n| User | AD user account |\n| Group | Security group |\n| Computer | Domain-joined machine |\n| Domain | AD domain |\n| GPO | Group Policy Object |\n| OU | Organizational Unit |\n\n**Edge categories:**\n| Category | Examples | Risk Level |\n|----------|---------|------------|\n| Group Membership | MemberOf, AdminTo | High |\n| Session | HasSession, HasSIDHistory | Critical |\n| ACL | GenericAll, WriteDacl, WriteOwner | High |\n| Trust | TrustedBy, HasDomainAdmin | Critical |\n| Container | Contains, GPOLocalLink | Medium |"
+    },
+    {
+      "type": "explanation",
+      "title": "SharpHound Data Collection",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Think of SharpHound like a detective with a notebook, going through an office building and writing down:\n\n- **Who sits where** (which users are logged into which computers) — This is *sessions*\n- **Who's in which team** (group memberships) — This is *MemberOf*\n- **Who has keys to which rooms** (admin rights, delegated permissions) — This is *ACLs*\n- **Which departments trust each other** (domain trusts) — This is *trusts*\n\nAfter the detective finishes their notebook, they hand it to an analyst (BloodHound) who draws a big map showing how anyone can reach the boss's office through a chain of keys, team memberships, and logged-in sessions.\n\n**Basic collection:**\n```powershell\n# Standard collection (good balance of data vs. noise)\nSharpHound.exe --collectionmethod All --domain corp.local\n\n# Stealthy collection (fewer RPC calls, less detectable)\nSharpHound.exe --collectionmethod Stealth --domain corp.local\n\n# DC-only collection (no computer contact, queries only the DC)\nSharpHound.exe --collectionmethod DCOnly --domain corp.local\n```\n\n**After collection, import into BloodHound:**\n```bash\n# Start Neo4j\nneo4j console\n\n# Import the data\nbloodhound-import -p <password> *.json\n\n# Or use the BloodHound GUI: Upload the zip/json files\n```\n\n**Opsec considerations:**\n- `All` method is the loudest — it contacts every computer for session data\n- `DCOnly` is quietest — only queries the domain controller\n- Session collection generates significant network traffic\n- Consider running during business hours for accurate session data"
+    },
+    {
+      "type": "code_exercise",
+      "title": "BloodHound Collection and Analysis",
+      "content": "Practice the SharpHound collection and BloodHound analysis workflow.",
+      "language": "bash",
+      "starter_code": "# 1. Run SharpHound with DCOnly method (safe for testing)\n# 2. Import collected data into Neo4j\n# 3. Find the shortest path to Domain Admins\n# 4. List all users with AdminTo on any computer\n# 5. Find users with GenericAll rights on any object\n# 6. Identify computers where Domain Admins have sessions",
+      "solution": "# 1. Run SharpHound collection\nSharpHound.exe --collectionmethod DCOnly --domain corp.local --outputdir /tmp/bh_data\n\n# 2. Import into Neo4j (via BloodHound GUI or CLI)\n# In BloodHound GUI: Click Upload → select the zip file\n# Or via CLI:\nbloodhound-import -p neo4j_password /tmp/bh_data/*.json\n\n# 3. Shortest path to Domain Admins (Cypher)\nMATCH p=shortestPath((u:User)-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'}))\nWHERE u <> g\nRETURN p\n\n# 4. Users with AdminTo on any computer\nMATCH (u:User)-[:AdminTo]->(c:Computer)\nRETURN u.name, c.name\n\n# 5. Users with GenericAll rights\nMATCH (u:User)-[:GenericAll]->(t)\nRETURN u.name, t.name\n\n# 6. Domain Admin sessions on computers\nMATCH (g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})-[:MemberOf*1..]->(u:User)-[:HasSession]->(c:Computer)\nRETURN u.name, c.name",
+      "hint": "Use SharpHound.exe for collection. In BloodHound, use the built-in queries first (click the user icon, then 'Shortest Path to Domain Admins'). For custom queries, use the Cypher query box at the bottom."
+    },
+    {
+      "type": "real_world",
+      "title": "BloodHound in a Red Team Engagement",
+      "content": "You've gained initial access to a corporate network as a low-privileged user `SVC_BACKUP@CORP.LOCAL`. After running SharpHound and analyzing the data, BloodHound reveals:\n\n```\nSVC_BACKUP@CORP.LOCAL\n  → MemberOf: BACKUP_OPS (group)\n  → BACKUP_OPS has GenericAll on: SERVER01.CORP.LOCAL\n  → ADMIN_JSmith has HasSession on: SERVER01.CORP.LOCAL\n  → ADMIN_JSmith is MemberOf: DOMAIN ADMINS\n```\n\n**The attack path:**\n1. `SVC_BACKUP` → member of `BACKUP_OPS`\n2. `BACKUP_OPS` has `GenericAll` on `SERVER01` → can modify the computer object\nn3. `ADMIN_JSmith` has an active session on `SERVER01`\n4. `ADMIN_JSmith` is a Domain Admin\n\n**Exploitation path:**\n```\nStep 1: Use GenericAll on SERVER01 to add a Resource-based Constrained Delegation (RBCD)\nStep 2: Impersonate ADMIN_JSmith via the RBCD configuration\nStep 3: Gain Domain Admin privileges\n```\n\n**Defensive remediation:**\n- Remove GenericAll from BACKUP_OPS on SERVER01 (use specific permissions instead)\n- Implement tiered administration (Domain Admins should only log into tier 0 systems)\n- Monitor for RBCD modifications on computer objects\n- Enforce credential guard on SERVER01\n\nThis is why BloodHound is devastating — it reveals attack paths that are invisible to administrators.",
+      "scenario": "You're a blue team analyst who just received BloodHound data from a recent assessment. The data shows that the HELPDESK group has GenericAll rights on 47 computer objects, and Domain Admins have sessions on 12 of those computers. Describe the risk and the remediation plan."
+    },
+    {
+      "type": "memory_aid",
+      "title": "BloodHound Edge Types — The ACE Mnemonic",
+      "content": "Remember the critical BloodHound edge categories with **ACE**:\n\n- **A**dmin edges — `AdminTo`, `CanRDP`, `CanPSRemote`\n  - Direct admin access to computers. Compromise the computer → compromise the session.\n\n- **C**ontrol edges — `GenericAll`, `WriteDacl`, `WriteOwner`, `ForceChangePassword`\n  - ACL-based control over objects. Modify permissions → escalate.\n\n- **E**xecution edges — `HasSession`, `HasSIDHistory`, `MemberOf`\n  - Sessions provide credentials; SID history provides cross-domain trust; group membership provides inherited rights.\n\n**Most dangerous edges ranked:**\n1. `GenericAll` — Full control. Can do anything.\n2. `WriteDacl` — Can grant self any permission.\n3. `WriteOwner` — Can take ownership, then grant self any permission.\n4. `ForceChangePassword` — Can reset the target's password.\n5. `AdminTo` — Local admin on a computer with DA sessions.\n6. `HasSession` — Credentials in memory on the target.",
+      "technique": "acronym"
+    },
+    {
+      "type": "explanation",
+      "title": "Custom Cypher Queries for Deep Analysis",
+      "content": "BloodHound's built-in queries cover common scenarios, but real analysis requires custom Cypher.\n\n**Find all paths to Domain Admins from a specific user:**\n```cypher\nMATCH p=allShortestPaths((u:User {name:'SVC_BACKUP@CORP.LOCAL'})-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'}))\nRETURN p\n```\n\n**Find users who can reach DA through Kerberoastable accounts:**\n```cypher\nMATCH p=(u:User)-[*1..]->(k:User {hasspn:true})-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})\nRETURN DISTINCT u.name, k.name\n```\n\n**Find computers where Domain Admins have unnecessary sessions:**\n```cypher\nMATCH (g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})-[:MemberOf*1..]->(u:User)-[:HasSession]->(c:Computer)\nWHERE NOT c.name STARTS WITH 'DC'\nRETURN u.name, c.name\nORDER BY c.name\n```\n\n**Find paths from Domain Users to high-value targets:**\n```cypher\nMATCH p=shortestPath((u:User)-[*1..]->(t)\nWHERE u:User AND (\n  t:Group AND t.name CONTAINS 'ADMIN'\n  OR t:User AND t.admincount=true\n)\nRETURN p LIMIT 50\n```\n\n**Find overprivileged groups:**\n```cypher\nMATCH (g:Group)-[:GenericAll|WriteDacl|WriteOwner]->(t)\nRETURN g.name, type(t), t.name, labels(t)\nORDER BY g.name\n```\n\n**Blue team: Find all attack paths to a critical server:**\n```cypher\nMATCH p=shortestPath((u:User)-[*1..]->(c:Computer {name:'CRITICAL_SERVER.CORP.LOCAL'}))\nRETURN p\n```"
+    },
+    {
+      "type": "reflection",
+      "title": "Mapping Your Own Domain",
+      "content": "If you have access to a lab or test AD environment:\n\n1. Run SharpHound with `--collectionmethod All`\n2. Import into BloodHound\n3. Find the shortest path from a regular user to Domain Admin\n4. Identify the top 3 riskiest edges in the path\n5. Write remediation recommendations for each edge\n\n**Questions to consider:**\n- How many hops does the shortest path to DA take?\n- Which single edge removal would break the most paths?\n- Are there Domain Admin sessions on non-DC computers?\n- Which groups have the most dangerous ACL assignments?\n\n**Defensive exercise:** After finding paths, create a prioritized remediation plan:\n- Priority 1: Remove DA sessions from workstations\n- Priority 2: Fix GenericAll and WriteDacl over-permissions\n- Priority 3: Implement tiered administration\n- Priority 4: Review and reduce group memberships"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Graph Thinking for AD Security",
+      "content": "BloodHound changed the way we think about AD security. Before BloodHound, auditors checked individual permissions — 'Does this group have admin rights?' — but missed the *chains* of permissions that create attack paths.\n\n**Graph thinking** means:\n- Don't just look at individual permissions — look at **paths**\n- A single over-permission might be low risk in isolation, but **connected** to other permissions, it becomes critical\n- The shortest path isn't always the most realistic attack — consider **operational feasibility**\n- **Break the chain**, not the individual link. Removing one edge from a 5-hop path can eliminate the entire attack vector\n\nYour takeaway: When analyzing AD security, always ask 'What's the path?' not 'What's the permission?' A permission without a path to exploit it is a low priority. A permission that completes a path to DA is your top priority.",
+      "principle": "Mind Mapping"
+    }
+  ],
+  "tags": ["Course: SANS-SEC560", "Career Path: Pentester", "Career Path: Red Teamer"]
+}

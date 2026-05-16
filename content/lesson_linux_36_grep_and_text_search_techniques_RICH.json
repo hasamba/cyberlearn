@@ -1,0 +1,104 @@
+{
+  "lesson_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5e",
+  "domain": "linux",
+  "title": "Grep and Text Search Techniques",
+  "difficulty": 1,
+  "order_index": 36,
+  "prerequisites": ["Linux File Management Commands"],
+  "concepts": ["Regular expressions and pattern matching", "grep, egrep, and fgrep variants", "Piping and output filtering", "Search context and result formatting", "Practical text search workflows"],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Use grep to search for patterns in files and command output effectively",
+    "Apply basic and extended regular expressions with egrep for complex pattern matching",
+    "Chain grep with other commands using pipes for powerful text filtering workflows",
+    "Customize grep output with context lines, line numbers, and color highlighting",
+    "Distinguish between grep, egrep, and fgrep and know when to use each variant"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which grep flag displays 2 lines of context before and 3 lines after each match?",
+      "options": ["grep -B2 -A3 pattern file", "grep -C2,3 pattern file", "grep --before=2 --after=3 pattern file", "grep -B3 -A2 pattern file"],
+      "correct_answer": "grep -B2 -A3 pattern file",
+      "explanation": "The -B flag (Before) specifies lines before the match, and -A (After) specifies lines after. -B2 -A3 gives 2 lines before and 3 lines after each match."
+    },
+    {
+      "question": "What is the key difference between grep, egrep, and fgrep?",
+      "options": [
+        "grep uses basic regex, egrep uses extended regex, fgrep matches fixed strings with no regex",
+        "grep is faster, egrep is slower, fgrep is the fastest",
+        "They are identical commands with different names",
+        "grep searches files, egrep searches directories, fgrep searches networks"
+      ],
+      "correct_answer": "grep uses basic regex, egrep uses extended regex, fgrep matches fixed strings with no regex",
+      "explanation": "grep interprets basic regular expressions (BRE), egrep (or grep -E) interprets extended regular expressions (ERE) which support +, ?, |, () without escaping, and fgrep (grep -F) treats the pattern as a fixed string with no special regex meaning."
+    },
+    {
+      "question": "Which command finds all lines in /var/log/auth.log that contain 'Failed password' and displays line numbers?",
+      "options": [
+        "grep -n 'Failed password' /var/log/auth.log",
+        "grep --lines 'Failed password' /var/log/auth.log",
+        "grep -l 'Failed password' /var/log/auth.log",
+        "grep -c 'Failed password' /var/log/auth.log"
+      ],
+      "correct_answer": "grep -n 'Failed password' /var/log/auth.log",
+      "explanation": "The -n flag prefixes each matching line with its line number. -l lists only filenames, -c counts matches, and --lines is not a valid grep option."
+    },
+    {
+      "question": "How would you search recursively for 'TODO' in all Python files under the current directory?",
+      "options": [
+        "grep -r --include='*.py' 'TODO' .",
+        "grep -R 'TODO' *.py",
+        "grep --recursive 'TODO' ./*.py",
+        "find . -name '*.py' | grep 'TODO'"
+      ],
+      "correct_answer": "grep -r --include='*.py' 'TODO' .",
+      "explanation": "grep -r searches recursively, and --include='*.py' restricts the search to Python files only. The other options either don't search recursively, don't filter by extension, or misuse find/grep piping."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Curiosity", "Mind Mapping"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why grep Is Your Most-Used Security Tool",
+      "content": "Every security professional — from SOC analysts to red team operators — uses grep daily. It's not just a search command; it's the foundation of log analysis, artifact review, and data triage. When you're sifting through millions of log lines during an incident, grep is your fastest ally. Master it now, and you'll save hours on every investigation. Think of grep as your digital magnifying glass — the better you use it, the more hidden patterns you'll uncover. This lesson builds a skill you'll use every single day in cybersecurity."
+    },
+    {
+      "type": "explanation",
+      "title": "Understanding grep: The Global Regular Expression Print",
+      "content": "grep searches input lines for matches to a given pattern and prints the matching lines. Its name comes from the ed editor command g/re/p (global regular expression print). At its core, grep takes a PATTERN and one or more FILE arguments, then outputs every line containing that pattern.\n\nBasic usage:\n  grep 'error' /var/log/syslog\n  grep 'root' /etc/passwd\n\nCommon flags you should memorize:\n  -i  Ignore case (case-insensitive search)\n  -n  Print line numbers\n  -c  Count matching lines\n  -v  Invert match (show lines that DON'T match)\n  -r  Recursive search through directories\n  -w  Match whole words only\n  -l  List only filenames with matches\n  -A N  Show N lines After each match\n  -B N  Show N lines Before each match\n  -C N  Show N lines of Context (before and after)\n  --color  Highlight the matching text\n\ngrep uses Basic Regular Expressions (BRE) by default. This means characters like ., *, ^, $ work as metacharacters, but +, ?, |, () need to be escaped with backslashes. For extended regex support without escaping, use grep -E (equivalent to egrep). For literal string matching with no regex interpretation, use grep -F (equivalent to fgrep).\n\nIn security work, you'll frequently combine grep with other commands via pipes. For example, 'cat access.log | grep \"404\"' or 'ps aux | grep \"nginx\"'. This composability is what makes grep indispensable."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Pattern Hunting with grep",
+      "content": "Imagine you have a giant bookshelf with thousands of books, and you need to find every book that mentions 'dragon'. You could read every single page of every book — but that would take forever! grep is like a magical robot that reads through all the pages for you in seconds and puts a bright sticky note on every line where 'dragon' appears.\n\nHere's how it works:\n1. You tell grep WHAT to look for (the pattern, like 'dragon')\n2. You tell grep WHERE to look (which files)\n3. grep reads through everything and shows you every matching line\n\nSpecial tricks:\n- Use -i to make grep ignore whether letters are uppercase or DRAGONcase\n- Use -n to show page numbers (line numbers) so you can find things again\n- Use -v to do the OPPOSITE — show everything that DOESN'T have 'dragon'\n- Use -c to just count how many matches there are instead of showing them\n- Use --color to paint the matching word in bright red so it pops out\n\nThe coolest part? You can chain grep with other commands using pipes (|). Think of the pipe as a conveyor belt — it takes the output of one command and feeds it right into grep. Like: 'ls -la | grep secret' shows you only the files with 'secret' in their name!"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Hands-On: grep Pattern Matching Exercises",
+      "content": "Practice grep with these real-world security scenarios. Try each command on a Linux system:\n\n# 1. Find all failed SSH login attempts\nsudo grep 'Failed password' /var/log/auth.log\n\n# 2. Count how many failed logins occurred\ngrep -c 'Failed password' /var/log/auth.log\n\n# 3. Find failed logins with case-insensitive search (some logs use different casing)\ngrep -i 'failed password' /var/log/auth.log\n\n# 4. Find lines that do NOT contain 'Accepted' (filter out successful logins)\ngrep -v 'Accepted' /var/log/auth.log | grep 'ssh'\n\n# 5. Show line numbers and 2 lines of context for each error in syslog\ngrep -n -C2 'error' /var/log/syslog\n\n# 6. Recursively search all .conf files for 'PermitRootLogin'\ngrep -r --include='*.conf' 'PermitRootLogin' /etc/\n\n# 7. Search for IP addresses using basic regex (matching patterns like 192.168.x.x)\ngrep -E '[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}' /var/log/auth.log\n\n# 8. Find all unique IP addresses from SSH logs\ngrep 'sshd' /var/log/auth.log | grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | sort -u\n\n# 9. Show only filenames containing 'sudo' in log directory\ngrep -rl 'sudo' /var/log/\n\n# 10. Use fgrep to search for a literal string with special characters\ngrep -F 'C:\\Users\\Admin' evidence.txt",
+      "code": "# 1. Find all failed SSH login attempts\nsudo grep 'Failed password' /var/log/auth.log\n\n# 2. Count how many failed logins occurred\ngrep -c 'Failed password' /var/log/auth.log\n\n# 3. Find failed logins with case-insensitive search\ngrep -i 'failed password' /var/log/auth.log\n\n# 4. Find lines that do NOT contain 'Accepted'\ngrep -v 'Accepted' /var/log/auth.log | grep 'ssh'\n\n# 5. Show line numbers and 2 lines of context\ngrep -n -C2 'error' /var/log/syslog\n\n# 6. Recursively search .conf files\ngrep -r --include='*.conf' 'PermitRootLogin' /etc/\n\n# 7. Search for IP addresses with extended regex\ngrep -E '[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}' /var/log/auth.log\n\n# 8. Extract unique IP addresses from SSH logs\ngrep 'sshd' /var/log/auth.log | grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | sort -u\n\n# 9. List filenames containing 'sudo'\ngrep -rl 'sudo' /var/log/\n\n# 10. Literal string search with fgrep\ngrep -F 'C:\\Users\\Admin' evidence.txt",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Using grep for Incident Response",
+      "content": "During a real incident response at a mid-size company, the SOC team noticed unusual SSH activity. They needed to quickly answer: which IPs are brute-forcing SSH, which usernames are being targeted, and has any attacker successfully logged in?\n\nStep 1 — Identify brute force attempts:\n  grep 'Failed password' /var/log/auth.log | wc -l\n  # Result: 14,832 failed attempts in 24 hours — clear brute force\n\nStep 2 — Extract unique attacking IPs:\n  grep 'Failed password' /var/log/auth.log | grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | sort | uniq -c | sort -rn\n  # Result: Top attacker IP with 12,401 attempts: 203.0.113.50\n\nStep 3 — Find targeted usernames:\n  grep 'Failed password' /var/log/auth.log | grep -oP 'from .*? for \\K\\S+' | sort | uniq -c | sort -rn\n  # Result: root (8,200), admin (3,100), ubuntu (1,500), test (1,032)\n\nStep 4 — Check for successful compromise:\n  grep 'Accepted' /var/log/auth.log | grep '203.0.113.50'\n  # Result: Accepted password for ubuntu from 203.0.113.50 — COMPROMISE CONFIRMED\n\nThis four-command sequence, using only grep and basic pipes, gave the IR team everything they needed to confirm a brute force attack that escalated to a successful compromise. The entire analysis took under 60 seconds. This is why grep fluency is non-negotiable in security work."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Remembering grep Flags with the CRIME Mnemonic",
+      "content": "Use the mnemonic CRIME to remember the most critical grep flags:\n\n**C** — Context: -C N (show N lines around match), -A N (after), -B N (before)\n**R** — Recursive: -r (search directories recursively)\n**I** — Ignore case: -i (case-insensitive matching)\n**M** — Match control: -v (invert), -w (whole word), -l (filenames only), -c (count)\n**E** — Extended regex: -E (egrep, use + ? | () without escaping)\n\nBonus flags for security work:\n  -o  Only show the matching part (not the whole line) — great for extracting IPs, hashes\n  -n  Line numbers — essential for referencing findings\n  --include  File pattern filter — search only specific file types\n  --exclude-dir  Skip directories — avoid noise from .git, node_modules\n\nRemember: grep -Eino is your best friend for extracting IOCs from log files!"
+    },
+    {
+      "type": "reflection",
+      "title": "Check Your Understanding",
+      "content": "Take a moment to think through these questions before moving on:\n\n1. You need to find every .py file under /opt/app that contains the word 'password'. What single grep command would you use?\n\n2. A colleague runs 'grep ERROR application.log' and gets 500 matching lines. How would they narrow it down to only lines from today, assuming today's date appears at the start of each line in YYYY-MM-DD format?\n\n3. Why would you use grep -F instead of plain grep when searching for a string like 'user@domain.com' in a log file?\n\n4. You're looking for lines containing either 'ssh' OR 'telnet' in auth.log. Write two different commands that would work — one using grep -E and one using plain grep.\n\nWrite your answers down, then check: (1) grep -r --include='*.py' 'password' /opt/app, (2) grep ERROR application.log | grep '2024-01-15' (with today's date), (3) Because @ and . are regex metacharacters — -F treats them literally, (4) grep -E 'ssh|telnet' /var/log/auth.log OR grep 'ssh\\|telnet' /var/log/auth.log."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Here to Mastery",
+      "content": "You've learned the fundamentals of grep — but the real power comes from combining it with other tools. As you progress through your cybersecurity journey, you'll find yourself building pipelines like: 'cat access.log | grep -E \"(404|500)\" | grep -v \"favicon\" | awk \"{print $1}\" | sort | uniq -c | sort -rn | head -20'. This kind of composability is what makes the Linux command line a security professional's superpower. Practice grep daily — search through logs, filter command output, extract patterns. In the next lesson, you'll learn about environment variables and aliases, which will let you create custom shortcuts for your most-used grep commands. Keep building your muscle memory — every grep command you run makes you faster at the next incident."
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer", "Career Path: DFIR Specialist"]
+}

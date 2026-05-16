@@ -1,0 +1,141 @@
+{
+  "lesson_id": "e5a7c9d0-4f6b-4e8a-c1b2-5d7f9a3e5c7g",
+  "domain": "linux",
+  "title": "Linux Visual Editors (vi/vim)",
+  "difficulty": 1,
+  "order_index": 34,
+  "prerequisites": ["Linux File Management Commands"],
+  "concepts": [
+    "Vim modes: Normal, Insert, Command, Visual",
+    "Navigation in normal mode",
+    "Insert mode entry and exit",
+    "Search and replace operations",
+    "File management within vim",
+    "Vim configuration (.vimrc)",
+    "Syntax highlighting for security files",
+    "Vim as a forensic editing tool"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Navigate files efficiently using vim's normal mode commands",
+    "Switch between modes fluidly for editing workflows",
+    "Perform search and replace operations across files",
+    "Configure vim for security and productivity",
+    "Use vim to edit configuration files on remote servers"
+  ],
+  "post_assessment": [
+    {
+      "question": "How do you exit vim if you're stuck in normal mode?",
+      "options": [
+        "Ctrl+Alt+Del",
+        ":q and press Enter",
+        "exit",
+        "Ctrl+C"
+      ],
+      "correct_answer": "B",
+      "explanation": "In normal mode, type `:q` and press Enter to quit. If you have unsaved changes, use `:q!` to force quit without saving, or `:wq` to save and quit. This is the #1 vim question for a reason."
+    },
+    {
+      "question": "What is the fastest way to delete an entire line in vim?",
+      "options": [
+        "Press Delete key 80 times",
+        "dd",
+        "D",
+        "xdd"
+      ],
+      "correct_answer": "B",
+      "explanation": "`dd` deletes the current line (and stores it in the buffer for pasting). `D` deletes from cursor to end of line. `3dd` deletes 3 lines. This is one of the most-used vim commands."
+    },
+    {
+      "question": "How do you replace all occurrences of 'http' with 'https' in the current file?",
+      "options": [
+        ":s/http/https",
+        ":%s/http/https/g",
+        ":r http https",
+        ":replace http https"
+      ],
+      "correct_answer": "B",
+      "explanation": "`:%s/http/https/g` — `%` means entire file, `s` is substitute, `/g` means global (all occurrences on each line). Without `g`, it only replaces the first occurrence on each line."
+    },
+    {
+      "question": "Why is vim preferred over nano for security work on remote servers?",
+      "options": [
+        "It's prettier",
+        "It's guaranteed to be installed on virtually every Linux system",
+        "It has spell check",
+        "It's newer than nano"
+      ],
+      "correct_answer": "B",
+      "explanation": "Vi/vim is part of the POSIX standard and is available on virtually every Linux and Unix system. When you SSH into a minimal container, a compromised server, or an embedded device, vi will be there. nano might not be. This matters in incident response."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Chunking",
+    "Mnemonics",
+    "Visualization",
+    "Association",
+    "Teaching Others",
+    "Movement",
+    "Simplification",
+    "Feynman Technique"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Vim: The Editor That's Always There",
+      "content": "Yes, the vim jokes are real. Yes, people get stuck in it. But here's why you need to learn it:\n\nWhen you SSH into a compromised server at 2am during an incident, **vim will be there**. Not nano. Not VS Code. Not your fancy GUI editor. Vim.\n\nIt's not about preference — it's about reliability. Vim (or at least vi) is guaranteed to exist on every Unix-like system. That's why it's a security skill, not just an editor choice.\n\nWe'll focus on the 20% of vim that handles 80% of your needs. No plugins. No configs. Just survival and efficiency.",
+      "principle": "Association"
+    },
+    {
+      "type": "explanation",
+      "title": "Vim Modes: The Core Concept",
+      "content": "Vim has **modes** — and understanding them is the key to everything.\n\n**Normal Mode** (the default) — Navigation and commands\n- This is where you spend most of your time\n- Every keystroke is a command\n- Press `Esc` to get here from any other mode\n\n**Insert Mode** — Actually typing text\n- Enter with: `i` (before cursor), `a` (after cursor), `o` (new line below), `O` (new line above)\n- Exit with: `Esc`\n- You'll see `-- INSERT --` at the bottom\n\n**Command Mode** — File operations and search\n- Enter with: `:` from normal mode\n- Examples: `:w` (save), `:q` (quit), `:%s/old/new/g` (replace)\n- Press Enter to execute, Esc to cancel\n\n**Visual Mode** — Select text\n- Enter with: `v` (character), `V` (line), `Ctrl+v` (block)\n- Select text, then operate on it (d for delete, y for copy)\n\n```\nMode Flow:\n\n  Normal ←── Esc ──→ Insert\n    ↓                      ↑\n    :                  i/a/o/O\n    ↓                      │\n  Command              ────┘\n    \n  Normal ── v/V/Ctrl+v ──→ Visual\n```\n\n**The #1 beginner mistake:** Trying to type text while in normal mode. If letters are doing weird things instead of appearing, press `Esc` first."
+    },
+    {
+      "type": "explanation",
+      "title": "Essential Vim Commands",
+      "subtitle": "Teach Me Like I'm 10",
+      "content": "Think of vim like a video game controller. Each key is a button with a specific power.\n\n**Moving around (Normal Mode):**\n- `h` `j` `k` `l` — Left, Down, Up, Right (arrow keys work too, but hjkl is faster)\n- `w` — Jump to next **w**ord\n- `b` — Jump **b**ack one word\n- `0` — Jump to start of line\n- `$` — Jump to end of line\n- `gg` — Jump to top of file\n- `G` — Jump to bottom of file\n- `Ctrl+d` — Jump down half page\n- `Ctrl+u` — Jump up half page\n\n**Editing (Normal Mode):**\n- `dd` — **d**elete line (cuts it)\n- `yy` — **y**ank line (copies it)\n- `p` — **p**aste after cursor\n- `P` — **P**aste before cursor\n- `x` — Delete character under cursor\n- `u` — **U**ndo\n- `Ctrl+r` — Redo\n- `.` — Repeat last command (this is magic!)\n\n**Saving and Quiting (Command Mode):**\n- `:w` — **W**rite (save)\n- `:q` — **Q**uit\n- `:wq` or `ZZ` — Save and quit\n- `:q!` — Quit without saving (nuclear option)\n- `:x` — Save and quit (same as :wq if file changed)\n\n**Search (Normal Mode):**\n- `/pattern` — Search forward\n- `?pattern` — Search backward\n- `n` — Next match\n- `N` — Previous match"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Vim Survival Training",
+      "content": "Practice the essential vim workflow. Create and edit a configuration file.",
+      "language": "bash",
+      "starter_code": "# 1. Create and open a practice file\n# 2. Enter insert mode and type some config lines\n# 3. Save the file\n# 4. Search for a specific word\n# 5. Delete a line\n# 6. Undo the deletion\n# 7. Replace all occurrences of a word\n# 8. Save and quit",
+      "solution": "# 1. Create and open a practice file\nvim /tmp/practice_config.conf\n\n# Inside vim:\n# 2. Press 'i' to enter insert mode, type:\n# server_host=192.168.1.100\n# server_port=8080\n# log_level=debug\n# max_connections=100\n# enable_ssl=false\n\n# 3. Save: Press Esc, then type :w\n\n# 4. Search: Press Esc, type /debug, press Enter, press n for next\n\n# 5. Delete: Move to a line, press dd\n\n# 6. Undo: Press u\n\n# 7. Replace: Type :%s/debug/info/g\n\n# 8. Save and quit: Type :wq or ZZ",
+      "hint": "Press 'i' for insert mode. Press 'Esc' to return to normal mode. ':w' saves, ':q' quits, ':wq' does both. 'dd' deletes a line, 'u' undoes."
+    },
+    {
+      "type": "real_world",
+      "title": "Vim in Security Operations",
+      "content": "Vim isn't just an editor — it's a **remote editing survival tool** for security operations.\n\n**Editing firewall rules on a production server:**\n```bash\n# SSH into the server\nssh admin@firewall-prod\n\n# Edit iptables rules with vim\nsudo vim /etc/iptables/rules.v4\n\n# In vim:\n# /DROP          - search for DROP rules\n# yy             - copy a rule\n# p              - paste it\n# cw             - change the word (e.g., DROP to ACCEPT)\n# :w             - save\n# :!iptables-restore < /etc/iptables/rules.v4  - test the rules\n```\n\n**Editing SSH config during hardening:**\n```bash\nsudo vim /etc/ssh/sshd_config\n\n# Search for insecure settings\n/PermitRootLogin\n# Change 'yes' to 'no'\ncwyesto  no\n\n/PasswordAuthentication\ncwyes no\n\n# Save and restart\n:wq\nsudo systemctl restart sshd\n```\n\n**Forensic tip — read-only editing:**\n```bash\n# Open a file in read-only mode to prevent accidental changes\nvim -R /evidence/suspicious_config.conf\n# Or: view /evidence/suspicious_config.conf\n```\n\n**Searching logs interactively:**\n```bash\n# Open a log file and search for patterns\nvim /var/log/auth.log\n# /Failed password   - search for failed logins\n# n                  - next occurrence\n# :%s/Failed/FAILED/g - won't actually save (good for highlighting)\n```",
+      "scenario": "You need to edit /etc/ssh/sshd_config on a remote server to disable password authentication. You only have SSH access and vim is the only editor available. Walk through the steps."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Vim Survival — The IESC Mnemonic",
+      "content": "For the four modes, remember **IESC** (sounds like \"I ESCape\"):\n\n- **I**nsert mode — `i`, `a`, `o` to enter; `Esc` to leave\n- **E**x-Command mode — `:` to enter; `Enter` to execute\n- **S**elect (Visual) mode — `v`, `V`, `Ctrl+v` to enter\n- **C**ommand (Normal) mode — The default; everything starts here\n\n**Most critical commands to memorize:**\n\n| What | Key | Memory aid |\n|------|-----|-----------|\n| Insert | `i` | **I**nsert |\n| Save | `:w` | **W**rite |\n| Quit | `:q` | **Q**uit |\n| Delete line | `dd` | **D**elete **D**elete |\n| Copy line | `yy` | **Y**ank **Y**ank |\n| Paste | `p` | **P**ut |\n| Undo | `u` | **U**ndo |\n| Search | `/` | Slash forward |\n| Replace all | `:%s/old/new/g` | **S**ubstitute |\n| Save & quit | `:wq` or `ZZ` | **W**rite **Q**uit",
+      "technique": "mnemonic"
+    },
+    {
+      "type": "explanation",
+      "title": "Search and Replace: The Power Move",
+      "content": "Vim's search and replace is one of its most powerful features for config editing:\n\n**Basic patterns:**\n```vim\n/word              " Search forward for 'word'\n?word              " Search backward\nn                  " Next match\nN                  " Previous match\n```\n\n**Substitute command:**\n```vim\n:s/old/new/        " Replace first occurrence on current line\n:s/old/new/g       " Replace all occurrences on current line\n:%s/old/new/g      " Replace all occurrences in entire file\n:%s/old/new/gc     " Replace all with confirmation prompt\n:5,10s/old/new/g   " Replace in lines 5-10 only\n```\n\n**Regular expressions:**\n```vim\n:%s/192\\.168\\.1\\.\\d\\+/10.0.0.0/g    " Replace 192.168.1.X with 10.0.0.0\n:%s/^#\\s*//g                       " Remove leading # and spaces (uncomment)\n:%s/\\s*$//g                        " Remove trailing whitespace\n```\n\n**Security-specific examples:**\n```vim\n\" Disable root login\n:%s/PermitRootLogin yes/PermitRootLogin no/g\n\n\" Set SSH to port 2222\n:%s/^Port 22/Port 2222/g\n\n\" Remove world-readable permissions mention\n:%s/chmod 777/chmod 750/gc\n```\n\n**Pro tip:** Use `:set hlsearch` to highlight all matches, and `:set incsearch` to jump to matches as you type."
+    },
+    {
+      "type": "reflection",
+      "title": "Vim Readiness Check",
+      "content": "Can you answer these without looking?\n\n1. How do you enter insert mode? (3 different ways)\n2. How do you save and quit? (2 different ways)\n3. How do you delete 5 lines at once?\n4. How do you search for a word and replace it everywhere?\n5. How do you open a file in read-only mode?\n6. What does the `.` (dot) command do?\n7. How do you jump to line 42?\n\nIf you struggled with any of these, spend 10 minutes in `vimtutor` (it's built into vim — just type `vimtutor` in your terminal). It's the fastest way to build muscle memory.\n\n**Challenge:** Try editing your `.bashrc` or `.vimrc` entirely in vim. Real practice beats reading."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Survival to Efficiency",
+      "content": "You now know enough vim to survive any situation. But surviving isn't thriving — here's how to level up:\n\n**Week 1:** Use vim for every text edit. Force yourself. It will be slow. That's normal.\n\n**Week 2:** Start using `/` for search, `dd`/`yy`/`p` for cut/copy/paste, and `u` for undo.\n\n**Week 3:** Learn visual mode (`v`, `V`, `Ctrl+v`). It changes everything.\n\n**Week 4:** Add basic `.vimrc` settings (see below).\n\n**Minimal security `.vimrc`:**\n```vim\nset number          \" Show line numbers\nset hlsearch        \" Highlight search results\nset incsearch       \" Search as you type\nset tabstop=4       \" Consistent tabs\nset expandtab       \" Spaces instead of tabs\nsyntax on           \" Syntax highlighting\nset backupdir=/tmp  \" Don't leave backups in working dir\n```\n\nThe goal isn't to become a vim wizard. It's to be **reliable in any environment** — including that minimal Docker container with nothing but vi at 3am during an incident.",
+      "principle": "Progressive Disclosure"
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

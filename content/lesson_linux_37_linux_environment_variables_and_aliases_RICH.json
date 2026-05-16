@@ -1,0 +1,94 @@
+{
+  "lesson_id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7a",
+  "domain": "linux",
+  "title": "Linux Environment Variables and Aliases",
+  "difficulty": 1,
+  "order_index": 37,
+  "prerequisites": ["Linux Terminals and Manual Pages"],
+  "concepts": ["Shell environment variables and scope", "PATH and system-critical variables", "Shell aliases and functions", "Profile and rc configuration files", "Security implications of variable manipulation"],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Set, view, and unset environment variables using export, env, and unset commands",
+    "Understand the PATH variable and how it affects command resolution and security",
+    "Create persistent shell aliases in .bashrc and .bash_profile for common workflows",
+    "Distinguish between login shells, interactive shells, and their respective configuration files",
+    "Recognize security risks from PATH hijacking and environment variable manipulation"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which file is read and executed every time a new interactive bash shell is opened?",
+      "options": [".bash_profile", ".bashrc", ".profile", ".bash_logout"],
+      "correct_answer": ".bashrc",
+      "explanation": ".bashrc is sourced for every new interactive bash shell. .bash_profile and .profile are only read for login shells. .bash_logout is read when a login shell exits."
+    },
+    {
+      "question": "What happens if you add '/tmp' to the beginning of your PATH variable?",
+      "options": [
+        "Nothing significant — /tmp is just another directory",
+        "An attacker could place a malicious binary named 'ls' in /tmp and it would execute before the real ls",
+        "The system will prevent PATH modification for security",
+        "All commands will run faster because /tmp is on disk"
+      ],
+      "correct_answer": "An attacker could place a malicious binary named 'ls' in /tmp and it would execute before the real ls",
+      "explanation": "PATH is searched left-to-right. If /tmp comes before /bin, a user who places a malicious 'ls' in /tmp will have their fake ls executed before the real one. This is called PATH hijacking and is a common privilege escalation and persistence technique."
+    },
+    {
+      "question": "How do you make an environment variable available to child processes?",
+      "options": ["VAR=value", "set VAR=value", "export VAR=value", "env VAR=value"],
+      "correct_answer": "export VAR=value",
+      "explanation": "Without export, a variable is shell-local only — visible in the current shell but not inherited by child processes. export makes the variable part of the environment that child processes receive. set displays shell variables, and env runs a command with modified environment."
+    },
+    {
+      "question": "Which command shows all exported environment variables?",
+      "options": ["set", "env", "echo $*", "declare -f"],
+      "correct_answer": "env",
+      "explanation": "env (or printenv) displays all exported environment variables. set shows all shell variables (including non-exported ones). declare -f shows function definitions. echo $* shows script positional parameters."
+    }
+  ],
+  "jim_kwik_principles": ["Visualization", "Association", "Emotion", "Repetition", "Chunking", "Active Recall", "Spaced Repetition", "Mnemonics", "Teach Back", "Focus"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Environment Variables: The Invisible Wiring of Your System",
+      "content": "Every Linux system runs on environment variables — they're the invisible wiring that tells every program where to find things, who you are, and how to behave. Understanding them isn't optional for security work. When you're analyzing a compromised system, the environment variables often reveal how an attacker modified the system's behavior. PATH hijacking is one of the most common privilege escalation techniques. Shell aliases can hide malicious commands. Misconfigured variables leak secrets. This lesson gives you the mental model to see what's really happening under the hood."
+    },
+    {
+      "type": "explanation",
+      "title": "Understanding Environment Variables",
+      "content": "Environment variables are named values stored in the shell's memory that affect how programs run. Every process on Linux inherits a set of environment variables from its parent process. When you open a terminal, it inherits variables from the login process, and every command you run inherits them from that shell.\n\n**Viewing variables:**\n- `env` or `printenv` — show all exported environment variables\n- `echo $VAR` — show a specific variable's value\n- `set` — show ALL shell variables (exported and local)\n- `export` — show all exported variables (same as env)\n\n**Setting and exporting:**\n- `VAR=value` — set a local variable (not passed to child processes)\n- `export VAR=value` — set and export (child processes can see it)\n- `unset VAR` — remove a variable entirely\n\n**Critical system variables:**\n- `PATH` — colon-separated list of directories to search for commands\n- `HOME` — current user's home directory\n- `USER` — current username\n- `SHELL` — default shell\n- `PWD` — current working directory\n- `LANG` — locale and language settings\n- `LD_LIBRARY_PATH` — directories to search for shared libraries (security-sensitive!)\n- `PS1` — shell prompt definition\n\n**Variable scope:** Local variables (set without export) exist only in the current shell. Exported variables are inherited by child processes. This distinction matters — if you set JAVA_HOME without export, Java won't see it. Understanding scope is essential for debugging why programs can't find their configuration."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Environment Variables Are Like Name Tags",
+      "content": "Imagine every program on your computer wears a name tag when it starts working. These name tags say things like 'My home is /home/alex' or 'When I need to find a tool, I look in these rooms: /bin, /usr/bin, /usr/local/bin.'\n\nThese name tags are environment variables. The most important one is PATH — it's like a treasure map that tells the shell 'when someone types a command name, look in THESE folders to find it.'\n\nHere's the tricky part: the shell checks the folders in ORDER. If the first folder has a program called 'ls', it uses that one — even if the REAL 'ls' is in a different folder. That's why hackers sometimes put fake programs in folders that get checked first. It's like putting a fake 'exit' sign before the real exit!\n\nAliases are like nicknames. You can tell the shell 'when I type ll, I really mean ls -la.' It saves typing, but it can also be dangerous — someone else could change your alias so 'ls' secretly runs something malicious.\n\nConfiguration files (.bashrc, .bash_profile) are like your morning routine — they set up all your name tags and nicknames automatically every time you open a new terminal."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Hands-On: Working with Variables and Aliases",
+      "content": "Practice setting, viewing, and using environment variables and aliases:\n\n# View all environment variables\nenv | less\n\n# Check specific variables\necho $PATH\necho $HOME\necho $USER\necho $SHELL\n\n# Set a local variable (not visible to child processes)\nMY_SECRET=localonly\necho $MY_SECRET\nbash -c 'echo $MY_SECRET'  # Empty! Not inherited\n\n# Export a variable (visible to child processes)\nexport MY_CONFIG=/opt/app/config\nbash -c 'echo $MY_CONFIG'  # /opt/app/config\n\n# Unset a variable\nunset MY_CONFIG\necho $MY_CONFIG  # Empty\n\n# Add a directory to PATH (temporary, current shell only)\nexport PATH=\"/usr/local/bin:$PATH\"\n\n# Create aliases\nalias ll='ls -la'\nalias la='ls -a'\nalias grep='grep --color=auto'\nalias ..='cd ..'\nalias ports='ss -tulanp'\n\n# View all aliases\nalias\n\n# Remove an alias\nunalias ll\n\n# Make aliases persistent by adding to .bashrc\necho \"alias ll='ls -la'\" >> ~/.bashrc\necho \"alias ports='ss -tulanp'\" >> ~/.bashrc\n\n# Security: Check for suspicious aliases or PATH modifications\nalias  # Look for overridden commands like 'ls', 'cd', 'sudo'\necho $PATH  # Check for unusual directories like '.' or '/tmp'\n\n# View shell functions (aliases can also be functions)\ntype ls  # Shows if ls is an alias, function, or binary",
+      "code": "# View all environment variables\nenv | less\n\n# Check specific variables\necho $PATH\necho $HOME\necho $USER\necho $SHELL\n\n# Set and export a variable\nexport MY_CONFIG=/opt/app/config\nbash -c 'echo $MY_CONFIG'\n\n# Unset a variable\nunset MY_CONFIG\n\n# Add to PATH\nexport PATH=\"/usr/local/bin:$PATH\"\n\n# Create aliases\nalias ll='ls -la'\nalias la='ls -a'\nalias ports='ss -tulanp'\n\n# Make aliases persistent\necho \"alias ll='ls -la'\" >> ~/.bashrc\n\n# Security checks\nalias\necho $PATH",
+      "language": "bash"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: PATH Hijacking for Privilege Escalation",
+      "content": "During a penetration test, an analyst discovered a cron job running as root that executed a script with a relative path:\n\n  # /etc/crontab entry:\n  * * * * * root /opt/scripts/maintenance.sh\n\nInside the script, several commands were called without full paths:\n  #!/bin/bash\n  echo \"Running maintenance at $(date)\" >> /var/log/maintenance.log\n  find /tmp -type f -mtime +7 -delete\n  cp /opt/config/backup.tar.gz /backup/\n\nThe attacker noticed that 'find' was called without its full path. They checked the cron environment's PATH and found it included /usr/local/bin before /usr/bin. So they created a malicious 'find' executable:\n\n  echo '#!/bin/bash' > /usr/local/bin/find\n  echo 'cp /bin/bash /tmp/rootbash && chmod u+s /tmp/rootbash' >> /usr/local/bin/find\n  chmod +x /usr/local/bin/find\n\nNext time the cron job ran, it executed the attacker's 'find' instead of the real one, creating a setuid root bash shell.\n\n**Defense:** Always use full paths in scripts (especially cron jobs and SUID binaries). Set PATH explicitly in scripts: `PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin`. Audit cron jobs for relative paths."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Shell Config Files: Login vs Interactive Quick Reference",
+      "content": "**When does each config file load?**\n\n| File | Login Shell | Interactive Non-Login Shell |\n|---|---|---|\n| /etc/profile | ✓ | ✗ |\n| ~/.bash_profile | ✓ | ✗ |\n| ~/.bashrc | ✓* | ✓ |\n| ~/.profile | ✓** | ✗ |\n\n*~/.bashrc is typically sourced FROM ~/.bash_profile\n**~/.profile is read if ~/.bash_profile doesn't exist\n\n**Login shell:** Opens after SSH login, console login, or `su - user`. Reads /etc/profile → ~/.bash_profile (or ~/.profile).\n\n**Interactive non-login shell:** Opens a new terminal tab/window in a GUI. Reads ~/.bashrc only.\n\n**Security check:** Always inspect ~/.bashrc, ~/.bash_profile, and ~/.profile for suspicious aliases, PATH modifications, or commands that auto-run.\n\n**Mnemonic:** **P**rofile is for **P**ermanent (login), **rc** is for **R**epeated **C**onfig (every new shell)."
+    },
+    {
+      "type": "reflection",
+      "title": "Security Reflection: Environment Variable Risks",
+      "content": "Think about these scenarios:\n\n1. You're investigating a compromised server and find this in ~/.bashrc: `alias sudo='sudo -S < /tmp/.passwd_cache'`. What is this alias doing and what risk does it pose?\n\n2. A web application runs Python scripts using `subprocess.run(['python', script_path])`. How could an attacker exploit this if they can modify the PATH variable?\n\n3. You see `LD_LIBRARY_PATH=.` in a user's environment. Why is this dangerous?\n\n4. A shared server has a world-writable directory /opt/tools in the system PATH before /usr/bin. What attack does this enable?\n\nAnswers: (1) The alias captures sudo passwords by feeding them from a file — an attacker could read credentials. (2) If PATH is modified to include an attacker-controlled directory first, their malicious 'python' binary would execute instead of the real one. (3) LD_LIBRARY_PATH=. causes the loader to search the current directory for shared libraries first — an attacker can place a malicious .so file that gets loaded by privileged programs. (4) Anyone can place a malicious binary named 'ls', 'cat', or any common command in /opt/tools, and it will execute before the real one."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Variables Are Attack Surface",
+      "content": "Environment variables and aliases seem like convenience features, but they're actually a significant attack surface. PATH hijacking, LD_LIBRARY_PATH injection, and alias-based credential theft are all real techniques used in the wild. As a security professional, you need to both USE these features efficiently (creating aliases for your common commands, setting up your environment) and AUDIT them on systems you're investigating. Always check .bashrc, .bash_profile, and environment variables on compromised systems — attackers love hiding persistence mechanisms in places most people never look. In the next lesson, you'll learn about redirection and piping, which builds on these concepts to give you full control over command input and output."
+    }
+  ],
+  "tags": ["Course: SANS-SEC406", "Career Path: Blue Teamer"]
+}

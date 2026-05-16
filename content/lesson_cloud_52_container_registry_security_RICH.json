@@ -1,0 +1,154 @@
+{
+  "lesson_id": "57b4ba36-4fb6-4a09-91a6-4e2b54f95b8a",
+  "lesson_number": "720",
+  "domain": "cloud",
+  "title": "Container Registry Security",
+  "difficulty": 2,
+  "order_index": 52,
+  "prerequisites": [
+    "Container Security: Docker & Kubernetes"
+  ],
+  "concepts": [
+    "Image scanning",
+    "Container signing",
+    "Registry access control",
+    "Cosign",
+    "Harbor",
+    "ECR/ACR/GCR"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain vulnerabilities in container images and why scanning is essential",
+    "Implement image scanning with Trivy and AWS ECR scanning",
+    "Understand container image signing with Cosign and the Sigstore ecosystem",
+    "Configure registry access control policies",
+    "Evaluate private registry options: Harbor, ECR, GCR, ACR"
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is scanning a container image important?",
+      "options": [
+        "It makes images smaller",
+        "Base images often contain outdated OS packages with known CVEs",
+        "Scanning prevents runtime attacks",
+        "It speeds up image pulls"
+      ],
+      "correct_answer": 1,
+      "explanation": "Container images include OS base layers with packages that may have CVEs. Even if your application code is secure, the base image might not be.",
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "question_id": "83bc003c-4a17-4be2-8eeb-b07ed3b95f63"
+    },
+    {
+      "question": "What does container image signing (Cosign) provide?",
+      "options": [
+        "Encrypts the image contents",
+        "Verifies the image came from a trusted source and hasn't been tampered with",
+        "Speeds up image deployment",
+        "Prevents CVEs in the image"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cosign creates a cryptographic signature for the image. Consumers can verify the signature to ensure the image is from the expected publisher and unchanged.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "c46b4da1-7baf-4096-a882-0bcce263319d"
+    },
+    {
+      "question": "What is a 'distroless' container image?",
+      "options": [
+        "A container without a Dockerfile",
+        "A minimal base image containing only the application and its runtime, no OS shell or package manager",
+        "A container running without root",
+        "An image with no environment variables"
+      ],
+      "correct_answer": 1,
+      "explanation": "Distroless images (from Google) contain only the application and runtime. No bash, no package manager, no shell = dramatically reduced attack surface.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "cfb95b95-3428-4ba5-8da8-ecc83982b4b8"
+    },
+    {
+      "question": "What is the risk of using 'latest' tag in production?",
+      "options": [
+        "Images are larger with latest",
+        "No risk, latest is always the most secure",
+        "Unpredictable updates — a new image push can change behavior without notice",
+        "Latest images are not signed"
+      ],
+      "correct_answer": 2,
+      "explanation": "'latest' is a mutable tag. Someone pushing a new image updates 'latest' silently. Pin to specific SHA digests for reproducible, secure deployments.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "0e142817-b35d-4763-87b1-73da486378d0"
+    },
+    {
+      "question": "What is Harbor?",
+      "options": [
+        "A Kubernetes networking plugin",
+        "An open-source container registry with built-in security features (scanning, signing, RBAC)",
+        "A container runtime",
+        "A CI/CD pipeline tool"
+      ],
+      "correct_answer": 1,
+      "explanation": "Harbor is a CNCF open-source registry with Trivy-based scanning, Cosign signing, role-based access control, and image replication built in.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "8b3e961d-0324-460e-b63c-1aec99e18c8e"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Your application code might be perfectly secure. But if the container it runs in has a 3-year-old Ubuntu base with 47 CVEs, your security is only as good as the weakest layer. Container security starts at the registry, before runtime ever begins."
+    },
+    {
+      "type": "explanation",
+      "content": "## Container Image Security Layers\n\n```\nYour Dockerfile:\nFROM ubuntu:20.04          ← OS base layer (CVEs live here)\nRUN apt-get install nginx  ← Application layer\nCOPY ./app /app            ← Your code\nCMD [\"/app/start.sh\"]     ← Entry point\n```\n\nEach layer can introduce vulnerabilities:\n\n**Layer 1 — Base Image:** ubuntu:20.04 might have 200+ CVEs in its packages. Use minimal bases:\n- `alpine` — 5MB, minimal attack surface\n- `distroless` — no shell, no package manager\n- `scratch` — completely empty (Go static binaries)\n\n**Layer 2 — Dependencies:** node_modules, pip packages, apt packages\n\n**Layer 3 — Your Code:** Secrets baked in? Bad permissions?\n\n**The defense pipeline:**\n```\nCode Push → Build Image → Scan (Trivy/Snyk) → Sign (Cosign) → Push to Registry → Policy check on deploy\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nA container image is like a frozen pizza:\n- The pizza has multiple layers: crust, sauce, cheese, toppings\n- If the cheese factory had bacteria in it when they made the pizza, the frozen pizza is already bad — even if the toppings are fresh\n\n**Image scanning** = checking the pizza for contamination before you serve it to customers.\n\n**Image signing** = the pizza factory putting a tamper-evident seal on the box. You know it came from the trusted factory and nobody replaced the filling with something dangerous in transit.\n\n**Distroless images** = serving just the pizza ingredients, not the whole pizza box with instructions and coupons. Smaller surface area = less to go wrong."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: Image Scanning and Signing\n\n```bash\n# === Trivy - Container Image Scanning ===\n# Install Trivy\nbrew install trivy  # macOS\n\n# Scan an image\ntrivy image nginx:latest\n\n# Scan for CRITICAL/HIGH only\ntrivy image --severity CRITICAL,HIGH python:3.11\n\n# Scan in CI (fail build if critical vulns found)\ntrivy image --exit-code 1 --severity CRITICAL myapp:latest\n\n# === Better base images ===\n# BEFORE (vulnerable):\nFROM ubuntu:20.04\n\n# AFTER (minimal):\nFROM gcr.io/distroless/python3-debian11\n# or\nFROM alpine:3.19\n\n# === Container Signing with Cosign ===\n# Install Cosign\nbrew install cosign\n\n# Generate a key pair\ncosign generate-key-pair\n\n# Sign an image after build\ncosign sign --key cosign.key myregistry.io/myapp:latest\n\n# Verify before running\ncosign verify --key cosign.pub myregistry.io/myapp:latest\n\n# === Kubernetes admission policy (OPA Gatekeeper) ===\n# Reject any image not signed by our key\n# constrainttemplate.yaml example:\napiVersion: templates.gatekeeper.sh/v1beta1\nkind: ConstraintTemplate\nmetadata:\n  name: requireimagesigning\nspec:\n  crd:\n    spec:\n      names:\n        kind: RequireImageSigning\n```"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World: SolarWinds-Style Container Supply Chain Attack\n\nIn a hypothetical (but realistic) attack scenario:\n1. Attacker compromises a popular Node.js base image on Docker Hub\n2. Adds a cryptominer to the image, updates the `:latest` tag\n3. Thousands of companies pulling `:latest` in their CI/CD pipelines now deploy the cryptominer\n4. No one notices for weeks — it's just 'high CPU' alerts\n\n**Prevention:**\n```dockerfile\n# Pin by digest, not tag\nFROM node:20-alpine@sha256:7e4c6c8d81a3...\n# This NEVER changes, even if someone updates node:20-alpine\n```\n\n**Plus:** Configure your registry to:\n- Auto-scan all pulled images\n- Block deployments of images with CRITICAL CVEs\n- Enforce image signing via admission controllers\n- Alert on images pulled from public registries (should come from internal mirror)"
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: SCAN-SIGN-SLIM-PIN\n\n**4 rules for container image security:**\n- **SCAN** — every image, before every deployment (Trivy, Snyk)\n- **SIGN** — cryptographically sign your images (Cosign)\n- **SLIM** — use minimal base images (distroless, alpine)\n- **PIN** — pin to SHA digests, never 'latest'\n\n**Registry comparison:**\n- **ECR** = Amazon, integrated with IAM and GuardDuty\n- **ACR** = Azure, integrated with Azure AD\n- **GCR/Artifact Registry** = Google, integrated with GKE\n- **Harbor** = Self-hosted, open source, full-featured, cloud-agnostic"
+    },
+    {
+      "type": "reflection",
+      "content": "## Reflection: Your Registry Audit\n\nFor your current or next project:\n1. What's the base image? When was it last updated?\n2. Are you scanning images in CI before pushing?\n3. Are images signed? Is signing enforced at deploy?\n4. Does your Kubernetes cluster use an admission controller to enforce signing?\n5. How old are the images currently in production?\n\nRun `trivy image <your_current_prod_image>` right now. The results will either reassure you or give you a to-do list."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "Container security isn't a one-time action — it's an ongoing process. Images age. CVEs are discovered. Base images need updates. Build this into your pipeline today, and your container fleet stays secure without manual effort tomorrow."
+    }
+  ],
+  "tags": [
+    "container security",
+    "image scanning",
+    "Cosign",
+    "Harbor",
+    "ECR",
+    "DevSecOps",
+    "supply chain"
+  ]
+}

