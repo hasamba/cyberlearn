@@ -9,11 +9,31 @@ content_dir = base/'content'
 with ideas_path.open(newline='', encoding='utf-8') as f:
     rows = list(csv.DictReader(f))
 
-planned = [r for r in rows if r['status'] == 'idea']
+status = json.loads(status_path.read_text(encoding='utf-8'))
+completed = set(map(str, status.get('completed', [])))
+failed = set(map(str, status.get('failed', [])))
+
+planned = [
+    r for r in rows
+    if r['status'] == 'idea'
+    and str(r['lesson_number']) not in completed
+    and str(r['lesson_number']) not in failed
+]
 planned.sort(key=lambda r: (int(r['order_index']), int(r['lesson_number'])))
 selected = planned[:10]
 
-principles = ['ATTENTION', 'ACTIVE RECALL', 'CHUNKING', 'ELABORATION', 'DUAL CODING', 'CONCRETE EXAMPLES', 'STORYTELLING', 'HABITS', 'MOTIVATION', 'REVIEW']
+principles = [
+    'teach_like_im_10',
+    'active_learning',
+    'memory_hooks',
+    'connect_to_what_i_know',
+    'minimum_effective_dose',
+    'multiple_memory_pathways',
+    'learning_sprint',
+    'reframe_limiting_beliefs',
+    'gamify_it',
+    'meta_learning',
+]
 
 def slugify(s):
     s = s.lower()
@@ -111,7 +131,6 @@ with ideas_path.open('w', newline='', encoding='utf-8') as f:
     writer.writeheader()
     writer.writerows(rows)
 
-status = json.loads(status_path.read_text(encoding='utf-8'))
 for n in selected_nums:
     if str(n) not in status['completed']:
         status['completed'].append(str(n))
