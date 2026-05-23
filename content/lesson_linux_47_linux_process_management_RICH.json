@@ -1,0 +1,142 @@
+{
+  "lesson_id": "4ff510d6-1461-4e8c-a328-9e41b6303c2d",
+  "domain": "linux",
+  "title": "Linux Process Management (ps, top, kill)",
+  "difficulty": 2,
+  "order_index": 47,
+  "prerequisites": [
+    "Linux Resource Limits (ulimit)"
+  ],
+  "concepts": [
+    "Process states and lifecycle (running, sleeping, stopped, zombie)",
+    "ps command variants (BSD vs System V syntax)",
+    "Signal handling (SIGTERM, SIGKILL, SIGSTOP, SIGCONT)",
+    "Process priorities with nice and renice",
+    "Process monitoring with top, htop, and /proc filesystem",
+    "Orphan and zombie process management"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Interpret process states and identify anomalies (zombies, orphans, defunct processes)",
+    "Use ps, top, and htop to monitor and analyze running processes",
+    "Apply process signals correctly (SIGTERM vs SIGKILL) for process management",
+    "Adjust process priorities with nice and renice for resource optimization",
+    "Navigate /proc filesystem to extract detailed process information"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is a zombie process in Linux?",
+      "options": [
+        "A process that consumes excessive CPU resources",
+        "A child process that has terminated but whose parent hasn't called wait()",
+        "A process running with root privileges",
+        "A process in uninterruptible sleep state"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the key difference between SIGTERM and SIGKILL?",
+      "options": [
+        "SIGTERM is stronger than SIGKILL",
+        "SIGTERM allows the process to clean up and exit gracefully; SIGKILL terminates immediately without cleanup",
+        "SIGKILL can only be sent by root",
+        "There is no difference; they are interchangeable"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What does the 'nice' value range from, and what does a negative value indicate?",
+      "options": [
+        "0 to 100, negative means higher priority (more CPU time)",
+        "-20 to 19, negative means higher priority (more CPU time)",
+        "-20 to 19, negative means lower priority (less CPU time)",
+        "0 to 100, negative means lower priority"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which ps command shows all processes with full format output?",
+      "options": [
+        "ps -e",
+        "ps aux",
+        "ps -ef",
+        "ps -eLf"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In /proc/[pid]/status, what does 'State: S' indicate?",
+      "options": [
+        "The process is stopped",
+        "The process is sleeping (waiting for an event)",
+        "The process is a system process",
+        "The process has been signaled"
+      ],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Processes Are the Living System",
+      "content": "Everything happening on a Linux system is a process. As a security professional, understanding process management isn't optional — it's how you find the intruder hiding among the legitimate. When you can read process states fluently, anomalies stand out like a stranger in a family photo."
+    },
+    {
+      "type": "explanation",
+      "title": "Linux Process States and Lifecycle",
+      "content": "Linux processes follow a lifecycle: **Created** → **Ready** → **Running** → **Sleeping/Waiting** → **Stopped** → **Zombie** → **Reaped**. Key states for security: **R** (running/ready), **S** (interruptible sleep — normal), **D** (uninterruptible sleep — usually I/O), **Z** (zombie — dead but not reaped), **T** (stopped/traced). Zombies occur when a child dies before the parent calls wait(). Persistent zombies indicate a buggy or compromised parent. Use `ps aux` to list processes and `cat /proc/[pid]/status` for detailed state information."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Process States",
+      "content": "Think of processes like people in an office: Running = typing at their desk. Sleeping = waiting for coffee to brew. Stopped = told to pause by the boss. Zombie = finished their work but HR hasn't processed their exit paperwork, so they're still on the roster. A zombie takes no resources but fills up the roster — too many and no new employees can be hired."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Process Monitoring and Signal Handling",
+      "content": "```bash\n# List all processes (BSD syntax)\nps aux\n\n# Process tree view\nps axjf\n\n# Find specific processes\nps aux | grep -i nginx\npgrep -la nginx\n\n# Process details from /proc\ncat /proc/$(pgrep -x sshd | head -1)/status\nls -la /proc/$(pgrep -x sshd | head -1)/fd\n\n# Send signals\nkill -TERM 1234      # Graceful termination\nkill -9 1234          # Force kill (no cleanup)\nkill -STOP 1234       # Pause process\nkill -CONT 1234       # Resume process\n\n# Priority management\nnice -n 10 ./heavy_job     # Start with lower priority\nrenice -n 5 -p 1234        # Change priority of running process\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Detecting Malicious Processes",
+      "content": "During incident response, you run `ps aux` and notice: a process named 'kworker/dbus' running as UID 1001 (not root), using /tmp/.hidden/kworker. Legitimate kworkers are kernel threads (shown in [brackets] and owned by root). This is a classic malware disguise — naming after a kernel process but with wrong ownership and /tmp path. Process management knowledge turns this from invisible to obvious. Check: `ls -la /proc/[suspicious_pid]/exe` reveals the actual binary path."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Process States: RSDTZ",
+      "content": "**RSDTZ** — the five process states you must know:\n- **R**unning or Ready — actively executing or waiting for CPU\n- **S**leeping — waiting for event (normal, interruptible)\n- **D**isk sleep — uninterruptible, usually I/O (can't be killed!)\n- **T**raced/Stopped — paused by signal or debugger\n- **Z**ombie — dead child, parent hasn't reaped it\n\nZombies are harmless until they fill the process table. D-state processes can't be killed — even SIGKILL waits for I/O."
+    },
+    {
+      "type": "reflection",
+      "title": "Process Investigation Scenario",
+      "content": "You're investigating a Linux server and find:\n- 47 zombie processes owned by the web application\n- A process running as UID 0 named '[kworkcrs]' (note the typo)\n- A process with nice value -20 consuming 99% CPU\n\n1. What's causing the zombies and how do you fix it?\n2. Why is '[kworkcrs]' suspicious?\n3. What security concern does the nice -20 process raise?\n\nAnalyze before checking answers."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Master the Process Landscape",
+      "content": "Process fluency is a superpower. When you can read `ps aux` like a sentence, you spot malware that others miss. When you understand signals, you handle incidents cleanly. When you know /proc, you have X-ray vision into any process. These aren't just sysadmin skills — they're core security skills. Invest the practice time."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: DFIR Specialist",
+    "process-management",
+    "ps",
+    "top",
+    "kill",
+    "nice"
+  ]
+}

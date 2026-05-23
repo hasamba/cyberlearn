@@ -1,0 +1,140 @@
+{
+  "lesson_id": "c910bfbc-23f2-4012-b070-cc2b832177d1",
+  "domain": "red_team",
+  "title": "Situational Awareness with Seatbelt",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [],
+  "concepts": [
+    "Seatbelt architecture and output categories",
+    "GhostPack tool suite overview",
+    "Host enumeration from an attacker perspective",
+    "Security posture assessment through system configuration checks",
+    "Privilege context awareness and escalation paths",
+    "Operational security considerations for host recon"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Run Seatbelt to enumerate security-relevant host configurations",
+    "Interpret Seatbelt output to identify privilege escalation opportunities",
+    "Map system configuration findings to specific MITRE ATT&CK techniques",
+    "Apply OPSEC best practices when running host enumeration tools",
+    "Prioritize findings based on privilege context and engagement goals"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of Seatbelt in a red team engagement?",
+      "options": [
+        "Exploiting vulnerabilities to gain initial access",
+        "Enumerating security-relevant host configuration for situational awareness and escalation path discovery",
+        "Establishing persistent backdoor access",
+        "Performing network scanning across subnets"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which Seatbelt command enumerates non-standard Local Administrator passwords via LAPS?",
+      "options": [
+        "Seatbelt.exe -group=LDAP",
+        "Seatbelt.exe LAPSDump",
+        "Seatbelt.exe -group=security",
+        "Seatbelt.exe LAPS"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is a key OPSEC consideration when running Seatbelt?",
+      "options": [
+        "It always requires domain admin privileges",
+        "It generates significant disk writes that may trigger EDR alerts",
+        "It modifies system configurations during enumeration",
+        "It cannot run without internet connectivity"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which GhostPack tool is specifically designed for privilege escalation through service misconfigurations?",
+      "options": [
+        "Seatbelt.exe",
+        "Rubeus.exe",
+        "SharpUp.exe",
+        "SafetyKatz.exe"
+      ],
+      "correct": 2
+    },
+    {
+      "type": "text",
+      "question": "Why is running 'Seatbelt.exe -group=all' often a bad idea during a red team engagement?",
+      "options": [
+        "It takes too long and is too noisy, increasing detection risk while producing more data than you can act on",
+        "It requires domain admin privileges",
+        "It only works on Windows Server",
+        "It crashes on modern Windows versions"
+      ],
+      "correct": 0
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Enumerate Before You Escalate",
+      "content": "The difference between a junior pentester and an experienced red teamer? The junior runs exploits blindly. The experienced operator runs enumeration first, maps the terrain, and then picks the path of least resistance. Seatbelt is your terrain mapper — learn it thoroughly and you'll spend less time on failed escalation attempts."
+    },
+    {
+      "type": "explanation",
+      "title": "Seatbelt: Architecture and Output Groups",
+      "content": "Seatbelt is a C# host enumeration tool from GhostPack that checks security-relevant system configurations. It organizes output into groups: **BasicOS** (OS version, architecture, hotfixes), **Recon** (network interfaces, ARP, routes), **Security** (AV, AppLocker, LAPS, credential guard), **Misc** (Chrome history, RDP settings, interesting files), and **All**. Targeted groups minimize noise and detection risk. Key commands: `Seatbelt.exe -group=security` for security posture, `Seatbelt.exe AMSIProviders` for specific checks."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Seatbelt",
+      "content": "Imagine you're a burglar checking a house. Instead of running around trying every door, you first look: are there security cameras? Are the windows locked? Is there a dog? Seatbelt does exactly this for computers — it checks what defenses are up, what shortcuts exist, and where the easiest entry points are. No breaking in, just looking around carefully."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Seatbelt Commands for Common Scenarios",
+      "content": "```powershell\n# Quick security posture check\nSeatbelt.exe -group=security\n\n# Specific checks\nSeatbelt.exe AMSIProviders        # Anti-malware providers\nSeatbelt.exe AppLocker             # Application control policies\nSeatbelt.exe CredGuard             # Credential Guard status\nSeatbelt.exe LAPS                 # Local Admin Password Solution\nSeatbelt.exe Sysmon               # Sysmon configuration\n\n# Full enumeration (use sparingly — noisy!)\nSeatbelt.exe -group=all\n\n# Output to file for exfiltration\nSeatbelt.exe -group=security -outputfile=C:\\Temp\\recon.txt\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: From Seatbelt Output to Escalation Path",
+      "content": "During an engagement, Seatbelt reveals: (1) AppLocker is in audit mode (not enforcing), (2) LAPS is installed but the current user can read the password, (3) Sysmon is configured with a basic configuration, (4) AlwaysInstallElevated is set to 1. The operator immediately maps: finding #4 → MSI-based privilege escalation (T1542.001), finding #1 → unrestricted PowerShell execution, finding #2 → direct local admin access. Within 3 minutes of enumeration, the escalation path is clear. This is why enumeration beats blind exploitation."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Seatbelt Priority Checks: SAFE",
+      "content": "**SAFE** — the four Seatbelt checks you run first:\n- **S**ysmon — Is it watching? (detection risk)\n- **A**ppLocker — Is it blocking? (execution constraints)\n- **F**irewall/AV — What's running? (evasion needs)\n- **E**levated — Am I admin? (privilege context)\n\nRun SAFE before any other action on a new host."
+    },
+    {
+      "type": "reflection",
+      "title": "Scenario Analysis",
+      "content": "You land on a Windows 10 workstation in a corporate domain. Seatbelt shows Sysmon with EID 1 process creation logging, Windows Defender with AMP, and no AppLocker. Consider:\n1. What does the absence of AppLocker mean for your next move?\n2. How does Sysmon's process creation logging change your OPSEC?\n3. What Seatbelt group would you run next to find escalation paths?\n\nThink about detection vs. prevention implications."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Enumeration Mindset",
+      "content": "Good operators don't guess. They enumerate, map, and then act with precision. Every minute spent on Seatbelt saves ten minutes of failed exploitation. Make enumeration a reflex, not an afterthought. The target is always telling you its weaknesses — you just have to ask the right questions."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC560",
+    "Career Path: Red Teamer",
+    "Career Path: Pentester",
+    "seatbelt",
+    "ghostpack",
+    "host-enumeration",
+    "situational-awareness"
+  ]
+}

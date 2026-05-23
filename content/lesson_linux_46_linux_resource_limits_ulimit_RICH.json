@@ -1,0 +1,142 @@
+{
+  "lesson_id": "1f54173f-3608-4967-9b87-1a77cf511ad4",
+  "domain": "linux",
+  "title": "Linux Resource Limits (ulimit)",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [
+    "Linux Kernel, Operating System, and Distributions"
+  ],
+  "concepts": [
+    "ulimit soft and hard limits",
+    "/etc/security/limits.conf configuration",
+    "Resource types: CPU, memory, file descriptors, processes",
+    "DoS prevention through resource constraints",
+    "PAM-based limit enforcement",
+    "per-user and per-group limits"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Configure soft and hard resource limits using ulimit and /etc/security/limits.conf",
+    "Explain the difference between soft and hard limits and their security implications",
+    "Identify which resource types protect against specific DoS scenarios",
+    "Apply PAM-based limit enforcement for consistent security posture",
+    "Troubleshoot resource limit issues in production Linux environments"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the difference between a soft limit and a hard limit in Linux resource management?",
+      "options": [
+        "Soft limits are enforced by the kernel; hard limits are advisory only",
+        "Soft limits can be raised by unprivileged users up to the hard limit; hard limits require root to increase",
+        "Hard limits apply only to root; soft limits apply to all users",
+        "There is no functional difference; they are synonyms"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which file is the primary configuration for persistent resource limits enforced by PAM?",
+      "options": [
+        "/etc/limits.conf",
+        "/etc/security/limits.conf",
+        "/etc/sysctl.conf",
+        "/etc/bashrc"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "A web server is experiencing fork bombs from a vulnerable PHP script. Which ulimit resource type would most effectively mitigate this?",
+      "options": [
+        "RLIMIT_CPU",
+        "RLIMIT_NPROC",
+        "RLIMIT_FSIZE",
+        "RLIMIT_MEMLOCK"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "How does the 'nofile' limit type protect a system?",
+      "options": [
+        "It limits the number of user accounts",
+        "It restricts the number of simultaneously open file descriptors per process",
+        "It limits total disk space usage",
+        "It controls network socket timeout values"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What PAM module is responsible for enforcing limits.conf settings at login?",
+      "options": [
+        "pam_limits.so",
+        "pam_unix.so",
+        "pam_env.so",
+        "pam_nologin.so"
+      ],
+      "correct": 0
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Resource Limits Matter",
+      "content": "Think of resource limits as seatbelts for your Linux system. You don't put them on because you expect a crash — you put them on because a single失控 process can take down everything. As a blue teamer, mastering ulimit isn't optional; it's how you turn a potential DoS into a contained incident."
+    },
+    {
+      "type": "explanation",
+      "title": "Understanding Linux Resource Limits",
+      "content": "Linux enforces resource limits through the RLIMIT mechanism — kernel-enforced ceilings on what a process or user can consume. Two types exist: **soft limits** (the current enforced value, user-raisable up to the hard limit) and **hard limits** (the ceiling, root-only to increase). These cover CPU time, memory, open files, processes, and more. The `ulimit` shell builtin queries and sets these for the current session, while `/etc/security/limits.conf` provides persistent, PAM-enforced defaults."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Resource Limits",
+      "content": "Imagine a buffet where each person can take only 2 plates (soft limit) but the manager can allow up to 5 plates (hard limit). If someone tries to grab 6 plates, they're stopped. That's ulimit — it stops greedy programs from eating all the computer's food (memory, files, CPU) so everyone else can still eat."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Checking and Setting ulimit Values",
+      "content": "```bash\n# View all current soft limits\nulimit -a\n\n# View specific limits\nulimit -n    # max open files\nulimit -u    # max user processes\nulimit -v    # max virtual memory (KB)\n\n# Set soft limit for open files (current session only)\nulimit -Sn 4096\n\n# Set hard limit (requires root or previous higher hard limit)\nulimit -Hn 8192\n\n# View limits for a running process\nprlimit -n -p $(pgrep nginx | head -1)\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Preventing Fork Bomb DoS",
+      "content": "A fork bomb (`:(){ :|:& };:`) can spawn thousands of processes in seconds, exhausting PID space and memory. By setting `nproc` (max processes per user) in limits.conf, you contain the blast radius. A web server user with `nproc 512` can fork at most 512 processes — the bomb hits the ceiling and the kernel kills excess processes, leaving the system operational. Production systems should set nproc, nofile, and as (address space) limits for all service accounts."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Key Resource Types Mnemonic",
+      "content": "**CROFMN** — the resource types you must know:\n- **C**PU time (RLIMIT_CPU)\n- **R**SS/memory (RLIMIT_RSS)\n- **O**pen files (RLIMIT_NOFILE) — #1 cause of 'too many open files'\n- **F**ile size (RLIMIT_FSIZE)\n- **M**ax processes (RLIMIT_NPROC) — stops fork bombs\n- **N**ice priority (RLIMIT_NICE)\n\nThe most security-critical: NOFILE and NPROC."
+    },
+    {
+      "type": "reflection",
+      "title": "Check Your Understanding",
+      "content": "Consider a production server running nginx, PostgreSQL, and a Java application:\n1. Which service account needs the highest nofile limit and why?\n2. What happens if you set a hard limit lower than the current soft limit?\n3. Why might a developer complain after you add limits.conf entries?\n\nThink about the tradeoff between security and functionality."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Mindset: Limits as Defense in Depth",
+      "content": "Resource limits aren't your primary defense — they're your last line before a runaway process hits the kernel. Configure them for every service account, test thoroughly, and monitor. The 5 minutes you spend setting nproc and nofile beats the 5 hours of downtime from a fork bomb."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer",
+    "linux",
+    "ulimit",
+    "resource-limits",
+    "dos-prevention",
+    "system-hardening"
+  ]
+}

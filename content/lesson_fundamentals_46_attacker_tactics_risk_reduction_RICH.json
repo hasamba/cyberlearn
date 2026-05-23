@@ -1,0 +1,139 @@
+{
+  "lesson_id": "47cddb90-4c42-4909-ac77-48b3aa7c381b",
+  "domain": "fundamentals",
+  "title": "Attacker Tactics and Risk Reduction",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [],
+  "concepts": [
+    "MITRE ATT&CK framework overview",
+    "Tactics, Techniques, and Procedures (TTPs)",
+    "Threat modeling methodologies (STRIDE, PASTA, Diamond)",
+    "Risk assessment frameworks (NIST RMF, FAIR)",
+    "Defense-in-depth strategies",
+    "Mapping attacker behaviors to security controls"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Map adversary behaviors to MITRE ATT&CK tactics and techniques",
+    "Apply threat modeling methodologies to prioritize security investments",
+    "Conduct basic risk assessments using the FAIR model",
+    "Design defense-in-depth strategies aligned with likely attacker TTPs",
+    "Translate threat intelligence into actionable security control recommendations"
+  ],
+  "post_assessment": [
+    {
+      "question": "In the MITRE ATT&CK framework, what does 'Tactics' represent?",
+      "options": [
+        "Specific software tools attackers use",
+        "The tactical goals or objectives an adversary is trying to achieve",
+        "The order in which attacks always happen",
+        "The severity level of an attack"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which threat modeling methodology focuses on spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege?",
+      "options": [
+        "PASTA",
+        "STRIDE",
+        "Diamond Model",
+        "Kill Chain"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the primary benefit of mapping threat intelligence to ATT&CK techniques?",
+      "options": [
+        "It creates longer reports",
+        "It translates abstract threat data into specific, actionable defense requirements",
+        "It eliminates the need for security tools",
+        "It only works for nation-state adversaries"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In the FAIR risk model, what two factors determine Loss Event Frequency?",
+      "options": [
+        "Cost and revenue",
+        "Threat Event Frequency and Vulnerability (probability of successful attack)",
+        "Number of employees and annual budget",
+        "Compliance requirements and audit findings"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What does 'defense in depth' mean in practice?",
+      "options": [
+        "Using only the most expensive security products",
+        "Layering multiple security controls so that if one fails, others still protect the asset",
+        "Putting all security controls on the network perimeter",
+        "Relying on employee training as the primary defense"
+      ],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Think Like the Adversary",
+      "content": "You can't defend what you don't understand. The best defenders don't memorize tool outputs — they understand attacker motivations, constraints, and decision points. When you think like the adversary, every control becomes a question: 'How would I bypass this?' That's the mindset that turns knowledge into security."
+    },
+    {
+      "type": "explanation",
+      "title": "Understanding Attacker TTPs",
+      "content": "**TTPs — Tactics, Techniques, and Procedures** — describe *how* adversaries operate. **Tactics** are the adversary's goals (initial access, persistence, exfiltration). **Techniques** are *how* they achieve those goals (spearphishing, credential dumping, C2 over HTTPS). **Procedures** are the specific implementations (using Cobalt Strike with a specific malleable C2 profile). MITRE ATT&CK catalogs these across 14 enterprise tactics and 200+ techniques, giving defenders a shared vocabulary for describing adversary behavior."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: ATT&CK",
+      "content": "Imagine a burglar's playbook. Step 1: Break in (Initial Access). Step 2: Find valuables (Discovery). Step 3: Steal them (Exfiltration). MITRE ATT&CK is like a giant list of all the ways burglars do each step — picking locks, climbing through windows, using stolen keys. Defenders use this list to check: 'Do I have locks? Cameras? An alarm?' If a burglar method has no matching defense, you have a gap."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Mapping ATT&CK Techniques to Controls",
+      "content": "```\n# Example: Mapping T1078 (Valid Accounts) to defenses\nT1078 - Valid Accounts\n├── Tactic: Defense Evasion, Persistence, Privilege Escalation, Initial Access\n├── Techniques:\n│   ├── T1078.001 - Default Accounts\n│   ├── T1078.002 - Domain Accounts\n│   └── T1078.003 - Local Accounts\n├── Mitigations:\n│   ├── M1027 - Password Policies\n│   ├── M1013 - Application Developer Guidance\n│   ├── M1036 - Account Use Policies\n│   └── M1041 - Encrypt Sensitive Information\n└── Detections:\n    ├── DS0022 - Logon Session Creation\n    ├── DS0002 - Active Directory\n    └── DS0017 - Command Execution\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: From Threat Intel to Defense",
+      "content": "A financial services company receives CTI that APT38 targets their sector using: (1) spearphishing with macro-laden documents, (2) legitimate web services for C2, (3) credential dumping via Mimikatz, (4) data exfiltration over HTTPS. Mapping to ATT&CK: T1566.001 → T1071.001 → T1003.001 → T1041. The team prioritizes: email gateway hardening, macro blocking, endpoint detection for Mimikatz signatures, and outbound HTTPS inspection. Each ATT&CK technique drives a specific, measurable control improvement."
+    },
+    {
+      "type": "memory_aid",
+      "title": "STRIDE Threat Categories Mnemonic",
+      "content": "**STRIDE** — six threat categories:\n- **S**poofing — pretending to be someone else\n- **T**ampering — modifying data or code\n- **R**epudiation — denying actions you performed\n- **I**nformation Disclosure — leaking sensitive data\n- **D**enial of Service — making systems unavailable\n- **E**levation of Privilege — gaining unauthorized access levels\n\nEach maps to a security property it violates."
+    },
+    {
+      "type": "reflection",
+      "title": "Apply Your Knowledge",
+      "content": "Your organization is a mid-size SaaS company. Consider:\n1. Which 3 ATT&CK tactics are most likely to target you, and why?\n2. Using STRIDE, what are the top 2 threats to your authentication system?\n3. If you had budget for only 2 security controls, which ATT&CK techniques would you prioritize defending against?\n\nWrite your threat model before reviewing answers."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Theory to Practice",
+      "content": "Threat modeling without action is academic exercise. Risk assessment without prioritization is noise. The value chain is: understand the threat → model the risk → prioritize the investment → implement the control → validate the defense. If you're not completing this loop, you're just producing documents. Ship defenses, not just diagrams."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC501",
+    "Career Path: Security Engineer",
+    "Career Path: Threat Hunter",
+    "mitre-att&ck",
+    "threat-modeling",
+    "risk-assessment",
+    "defense-strategies"
+  ]
+}

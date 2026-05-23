@@ -1,0 +1,139 @@
+{
+  "lesson_id": "880ea62b-01fe-456c-affa-21150414e597",
+  "domain": "system",
+  "title": "Secure Design Principles",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [],
+  "concepts": [
+    "Defense in depth",
+    "Principle of least privilege",
+    "Separation of duties",
+    "Fail secure (fail closed)",
+    "Zero trust architecture",
+    "Security by design vs. security as afterthought"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Apply defense in depth by layering multiple security controls across architecture layers",
+    "Implement least privilege principles for user, service, and system accounts",
+    "Design separation of duties controls to prevent fraud and insider threats",
+    "Explain fail-secure design and its application in authentication and authorization systems",
+    "Articulate zero trust principles and how they differ from perimeter-based security"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the core principle of defense in depth?",
+      "options": [
+        "Use only the most expensive security product at the perimeter",
+        "Layer multiple security controls so that the failure of one does not result in complete compromise",
+        "Encrypt everything end-to-end",
+        "Disable all unused network ports"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which scenario best illustrates separation of duties?",
+      "options": [
+        "One person handles all financial transactions for efficiency",
+        "One person creates purchase orders and a different person approves payments",
+        "All admins share a single root account",
+        "Developers have full production access for faster deployments"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What does 'fail secure' (fail closed) mean in system design?",
+      "options": [
+        "The system automatically recovers from any failure",
+        "When a security control fails, access is denied by default rather than permitted",
+        "The system shuts down completely on any error",
+        "Failures are logged but access is always maintained"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which zero trust principle states 'never trust, always verify'?",
+      "options": [
+        "Assume breach and verify every request regardless of network location",
+        "Trust internal networks but verify external connections",
+        "Only verify requests from unknown IP addresses",
+        "Trust authenticated users completely within the perimeter"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Why is least privilege important for service accounts?",
+      "options": [
+        "Service accounts don't need any permissions",
+        "Compromised service accounts with excessive privileges become pivot points for lateral movement",
+        "Least privilege only applies to human users",
+        "Service accounts are always more secure than user accounts"
+      ],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Security Is Architecture, Not Product",
+      "content": "You can't bolt security onto a fundamentally insecure design. The principles in this lesson — least privilege, defense in depth, separation of duties — aren't features you buy. They're decisions you make at the architecture whiteboard. Learn them early, apply them always, and you'll build systems that fail safely instead of catastrophically."
+    },
+    {
+      "type": "explanation",
+      "title": "Core Secure Design Principles",
+      "content": "Secure design rests on five pillars: **Defense in Depth** — multiple layers of controls so no single failure is catastrophic. **Least Privilege** — grant minimum access required for the task. **Separation of Duties** — split critical functions across individuals to prevent fraud. **Fail Secure** — when controls fail, deny access by default. **Zero Trust** — verify every request regardless of network location. These aren't independent checkboxes — they interlock. Least privilege reduces blast radius, which complements defense in depth, which enables zero trust verification at every layer."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Secure Design",
+      "content": "Imagine a castle: moat (first defense), thick walls (second), guards at the gate (third), locked treasury inside (fourth). That's defense in depth — if one layer fails, others still protect you. Least privilege means the cook doesn't get keys to the treasury. Separation of duties means the person who opens the vault isn't the same person who counts the gold. Fail secure means if the lock breaks, the door stays shut. Zero trust means even the king needs to show ID."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Least Privilege: Service Account Configuration",
+      "content": "```yaml\n# BAD: Over-privileged service account\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: api-service\n---\n# Overly broad role\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  name: api-service-role\nrules:\n- apiGroups: [\"*\"]\n  resources: [\"*\"]\n  verbs: [\"*\"]        # ⚠ Everything everywhere!\n\n---\n# GOOD: Least privilege\napiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  name: api-service-role\n  namespace: production\nrules:\n- apiGroups: [\"\"]\n  resources: [\"configmaps\"]\n  verbs: [\"get\", \"list\"]  # Only read configmaps\n  resourceNames: [\"api-config\"]  # Only specific resource\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: When Least Privilege Fails",
+      "content": "The 2013 Target breach: attackers compromised an HVAC vendor's credentials that had excessive network access. The vendor account could reach point-of-sale systems — a textbook least privilege violation. Had the HVAC account been restricted to HVAC systems only (network segmentation = defense in depth + least privilege), 40 million credit cards wouldn't have been stolen. The breach cost Target $18.5M in settlements. A single principle violation, catastrophic consequences."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Secure Design Principles: DSFLZ",
+      "content": "**DSFLZ** — five principles that build secure systems:\n- **D**efense in Depth — layer your controls\n- **S**eparation of Duties — split critical functions\n- **F**ail Secure — deny by default when controls break\n- **L**east Privilege — minimum access, always\n- **Z**ero Trust — verify every request, everywhere\n\nRemember: **D**on't **S**kimp on **F**undamental **L**ayers of **Z**ero-trust security."
+    },
+    {
+      "type": "reflection",
+      "title": "Design Challenge",
+      "content": "Design access controls for a payment processing system:\n1. How would you implement separation of duties for payment approval?\n2. What does 'fail secure' look like when the auth server goes down?\n3. Where does defense in depth apply in the transaction flow?\n4. What's the minimum privilege set for the payment service account?\n\nThink about what happens at each point of failure."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Principles Over Products",
+      "content": "Vendors will sell you tools. Principles are free. A $500K SIEM without least privilege is an expensive alarm system on a door with no lock. Start with the principles — they'll tell you what products you actually need. The best security architecture is one where each principle reinforces the others, creating a system that's resilient even when individual controls fail."
+    }
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "defense-in-depth",
+    "least-privilege",
+    "separation-of-duties",
+    "zero-trust",
+    "secure-design"
+  ]
+}

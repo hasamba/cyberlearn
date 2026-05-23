@@ -1,0 +1,140 @@
+{
+  "lesson_id": "1a4e4f6b-85bb-4c0f-bb19-427b40d08a29",
+  "domain": "osint",
+  "title": "OSINT Note Taking and Report Writing",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [
+    "OSINT Tools: Hunchly and Obsidian"
+  ],
+  "concepts": [
+    "Structured note-taking methods (chronological, matrix, link analysis)",
+    "OSINT report formats and audiences",
+    "Intelligence product types (assessments, briefs, estimative)",
+    "Attribution and confidence levels in reporting",
+    "Hunchly and Obsidian for evidence capture",
+    "Legal and ethical considerations in OSINT reporting"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Apply structured note-taking methods to capture OSINT findings accurately and completely",
+    "Produce intelligence products tailored to different audiences (technical, executive, legal)",
+    "Maintain proper attribution and confidence levels in all OSINT reports",
+    "Use Hunchly and Obsidian to document and preserve digital evidence",
+    "Distinguish between intelligence briefs, assessments, and estimative products"
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is structured note-taking critical in OSINT investigations?",
+      "options": [
+        "It makes reports longer and more impressive",
+        "It ensures reproducibility, attribution, and chain of custody for findings",
+        "It replaces the need for source verification",
+        "Structured notes are only needed for legal cases"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which OSINT product type is best suited for informing executive leadership about emerging threats?",
+      "options": [
+        "Raw data dump with all URLs listed",
+        "Technical IOC list with full MITRE mapping",
+        "Strategic intelligence assessment with confidence levels",
+        "Full methodology documentation"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What does a 'confidence level' in an OSINT report indicate?",
+      "options": [
+        "How much the analyst enjoyed the research",
+        "The likelihood that the assessment is correct based on source reliability and corroboration",
+        "The number of pages in the report",
+        "The technical difficulty of the investigation"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which tool combination is specifically designed for capturing and preserving web-based OSINT evidence?",
+      "options": [
+        "Nmap and Wireshark",
+        "Hunchly and Obsidian",
+        "Metasploit and Burp Suite",
+        "Volatility and Plaso"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the primary risk of poor attribution in OSINT reporting?",
+      "options": [
+        "Reports become too short",
+        "Readers cannot verify claims or assess source reliability",
+        "Attribution is optional in most OSINT work",
+        "It makes the report look unprofessional"
+      ],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Your Notes Are Your Product",
+      "content": "In OSINT, if it isn't documented, it didn't happen. The best analyst in the world is worthless if their findings can't be verified, reproduced, or communicated. Note-taking isn't admin work — it's the foundation of every intelligence product you'll ever produce."
+    },
+    {
+      "type": "explanation",
+      "title": "Structured Note-Taking for OSINT",
+      "content": "Effective OSINT note-taking follows three principles: **attribution** (every claim links to a source), **chronology** (timestamped entries preserve the investigation sequence), and **corroboration** (multiple sources strengthen confidence). Use structured templates: a header with investigation metadata, a chronological findings log with source URLs, and a synthesis section for analysis. Tools like Obsidian enable linking findings across investigations, while Hunchly automatically captures web evidence with timestamps and screenshots."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: OSINT Notes",
+      "content": "Imagine being a detective who writes down every clue on sticky notes — but then loses half of them. That's what bad note-taking looks like. Good OSINT notes are like a detective's notebook: every clue has where you found it, when you found it, and how reliable it is. If someone else reads your notebook, they should be able to follow your footsteps exactly."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Obsidian Template for OSINT Notes",
+      "content": "```markdown\n# Investigation: {{title}}\n**Date:** {{date}}\n**Analyst:** {{analyst}}\n**Subject:** \n**Confidence Level:** Low / Medium / High\n\n## Findings Log\n\n### Finding 1 — {{timestamp}}\n- **Source URL:** \n- **Source Type:** Primary / Secondary / Tertiary\n- **Reliability:** A-F (per NATO scale)\n- **Summary:** \n- **Screenshots:** ![[screenshot_1.png]]\n- **Related Findings:** [[]]\n\n## Synthesis\n- **Key Assessment:** \n- **Confidence Rationale:** \n- **Gaps / Collection Needs:** \n\n## Recommendations\n1. \n2. \n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Report Types and Audiences",
+      "content": "A threat intelligence team discovers a new phishing campaign targeting their organization. Three products emerge: (1) **Technical IOC brief** for SOC — hashes, domains, IPs, MITRE mappings, 1 page. (2) **Tactical assessment** for IR team — attack chain, infrastructure timeline, actor attribution with confidence levels, 3-5 pages. (3) **Strategic brief** for CISO — business impact, risk assessment, recommended actions in executive language. Same investigation, three completely different products. The skill isn't just finding the intelligence — it's packaging it for the right consumer."
+    },
+    {
+      "type": "memory_aid",
+      "title": "OSINT Report Quality Checklist: ACE",
+      "content": "**ACE** — your quality gate for every OSINT product:\n- **A**ttribution: Every claim has a source\n- **C**onfidence: Every assessment has a confidence level\n- **E**xecution: The report drives action, not just information\n\nMissing any letter? The report isn't done."
+    },
+    {
+      "type": "reflection",
+      "title": "Practice Scenario",
+      "content": "You're tracking a social media account impersonating your company's CEO. Consider:\n1. What three pieces of metadata would you document first?\n2. How would you record confidence that this is a coordinated influence operation vs. a lone impersonator?\n3. What would your executive brief's first paragraph say vs. your technical IOC list?\n\nWrite your approach before reviewing the lesson materials."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Analyst's Reputation",
+      "content": "Your credibility is built report by report and destroyed in a single unsubstantiated claim. Always distinguish what you know from what you assess. 'We assess with moderate confidence' beats 'we know' when the evidence doesn't support certainty. Precision of language is precision of thought."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "report-writing",
+    "note-taking",
+    "intelligence-products",
+    "documentation"
+  ]
+}

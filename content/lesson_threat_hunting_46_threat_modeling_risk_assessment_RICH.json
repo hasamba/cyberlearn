@@ -1,0 +1,140 @@
+{
+  "lesson_id": "835b0f9d-3af6-493c-b4bb-93dc9bbc278a",
+  "domain": "threat_hunting",
+  "title": "Threat Modeling and Risk Assessment",
+  "difficulty": 2,
+  "order_index": 46,
+  "prerequisites": [
+    "Intelligence Cycle and Analytical Techniques"
+  ],
+  "concepts": [
+    "Threat modeling frameworks (STRIDE, PASTA, Diamond, Attack Trees)",
+    "Risk assessment methodologies (qualitative vs. quantitative)",
+    "Threat actor profiling and motivation analysis",
+    "Threat intelligence levels (strategic, operational, tactical)",
+    "Confidence and reliability scoring",
+    "Mapping threats to security controls"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Construct threat models using STRIDE and PASTA methodologies",
+    "Profile threat actors based on motivation, capability, and opportunity",
+    "Differentiate strategic, operational, and tactical threat intelligence",
+    "Apply confidence and reliability scoring to threat assessments",
+    "Map identified threats to prioritized security control recommendations"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the fundamental difference between STRIDE and PASTA threat modeling?",
+      "options": [
+        "STRIDE is only for software; PASTA is only for networks",
+        "STRIDE is threat-category focused (what could go wrong); PASTA is risk-centric (aligning threats to business impact)",
+        "STRIDE requires ATT&CK; PASTA does not",
+        "They are identical methodologies with different names"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which threat intelligence level would contain specific IP addresses and malware hashes?",
+      "options": [
+        "Strategic intelligence",
+        "Operational intelligence",
+        "Tactical intelligence",
+        "Executive intelligence"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "In the Diamond Model, what are the four core features?",
+      "options": [
+        "People, Process, Technology, Data",
+        "Adversary, Infrastructure, Capability, Victim",
+        "Threat, Vulnerability, Impact, Likelihood",
+        "Source, Reliability, Confidence, Validity"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What does a 'confidence level' in threat assessment indicate?",
+      "options": [
+        "The analyst's personal opinion",
+        "The reliability of the sources and corroboration of the intelligence",
+        "The severity of the threat",
+        "How recently the threat was discovered"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why is threat actor profiling important for threat modeling?",
+      "options": [
+        "It's only needed for nation-state threats",
+        "It helps prioritize defenses based on who is most likely to target you and how",
+        "It's required by compliance frameworks",
+        "It eliminates the need for vulnerability scanning"
+      ],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization - Create mental images of concepts",
+    "Association - Link new knowledge to existing knowledge",
+    "Emotion - Connect learning to personal significance",
+    "Repetition - Review at increasing intervals",
+    "Teach Others - Explain concepts to solidify understanding",
+    "Storytelling - Frame facts within narrative structures",
+    "Mnemonics - Use acronyms and memory devices",
+    "Chunking - Break complex topics into manageable segments",
+    "Active Recall - Test yourself rather than passive review",
+    "Spatial Memory - Use the method of loci for sequences"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Know Your Enemy, Know Yourself",
+      "content": "Threat modeling isn't about fear — it's about focus. Without it, you're defending everything equally, which means you're defending nothing well. Understanding who targets your industry, how they operate, and what they want lets you invest where it matters. It's the difference between bolting every door and guarding the one the burglar will actually use."
+    },
+    {
+      "type": "explanation",
+      "title": "Threat Modeling Methodologies",
+      "content": "**STRIDE** (Microsoft) categorizes threats by type: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege. It's systematic but doesn't inherently prioritize. **PASTA** (Risk Centric) aligns threats to business objectives across 7 stages: from defining assets through attack modeling to risk analysis. **Diamond Model** maps the adversarial relationship: Adversary ↔ Capability ↔ Infrastructure ↔ Victim. Choose STRIDE for system-level analysis, PASTA for business-aligned risk, Diamond for threat actor tracking."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Threat Modeling",
+      "content": "Think of your house. A threat model asks: Who might break in? (Burglars? Kids sneaking out?) How would they do it? (Through the window? The back door?) What would they steal? (TV? Jewelry?) And what can I do about it? (Alarm system? Better locks?) Threat modeling is just asking these questions about your digital house, but with frameworks that make sure you don't forget any doors or windows."
+    },
+    {
+      "type": "code_exercise",
+      "title": "STRIDE Analysis Template",
+      "content": "```markdown\n# STRIDE Threat Model: [System Name]\n\n## System Boundary\n- **Asset:** [What we're protecting]\n- **Trust Level:** [User, Admin, System]\n- **Entry Points:** [APIs, UI, Network]\n\n## Threat Analysis\n| STRIDE Category | Threat Scenario | Affected Asset | Mitigation |\n|---|---|---|---|\n| Spoofing | Attacker forges API token | User API | OAuth2 + mTLS |\n| Tampering | Modified config in transit | Config store | Integrity checks |\n| Repudiation | User denies destructive action | Audit logs | Immutable logging |\n| Info Disclosure | PII in error messages | User data | Sanitization layer |\n| DoS | API rate limit bypass | API gateway | Rate limiting |\n| Elevation | Regular user gains admin | RBAC system | Role validation |\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Threat Actor Profiling Drives Priorities",
+      "content": "A healthcare organization models threats and discovers: financially motivated ransomware operators (FIN7, Clop) target their sector most frequently, while nation-state actors (APT41) target medical research. The tactical intel (IOCs, TTPs) tells the SOC what to detect. The operational intel (campaign timelines, infrastructure churn) tells IR when to be on high alert. The strategic intel (shift from data theft to ransomware) tells the CISO where to invest budget. Each level serves a different decision-maker."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Threat Intelligence Levels: SOT",
+      "content": "**SOT** — the three levels of threat intelligence:\n- **S**trategic — Who and Why (threat actor motivations, sector trends, geopolitical context)\n- **O**perational — When and Where (campaign timelines, infrastructure, targeting patterns)\n- **T**actical — What and How (IOCs, hashes, domains, specific TTPs)\n\nStrategic informs leadership. Operational informs defenders. Tactical informs detectors."
+    },
+    {
+      "type": "reflection",
+      "title": "Build a Threat Model",
+      "content": "Your organization is a fintech startup with a web application, mobile app, and AWS backend:\n1. Using STRIDE, identify the top 2 threats per category\n2. Which threat actor type is most likely to target you? Why?\n3. Map one strategic, one operational, and one tactical intelligence need\n4. What single security investment would reduce the most risk?\n\nWrite your answers before moving on."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Threat Modeling Is Iterative",
+      "content": "Your first threat model will be wrong — and that's fine. The value isn't perfection; it's structured thinking. Update it when you get new intelligence, after incidents, and when your architecture changes. A threat model that's never updated is worse than no threat model — it creates false confidence. Treat it as a living document."
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR578",
+    "Career Path: Threat Hunter",
+    "threat-modeling",
+    "risk-assessment",
+    "threat-actors",
+    "threat-intelligence"
+  ]
+}
