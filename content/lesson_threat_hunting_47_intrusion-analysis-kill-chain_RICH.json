@@ -1,0 +1,163 @@
+{
+  "lesson_id": "a7e3b1c2-d4f5-4a8b-9c6d-e1f2a3b4c5d6",
+  "domain": "threat_hunting",
+  "title": "Intrusion Analysis and Kill Chain",
+  "difficulty": 2,
+  "order_index": 47,
+  "prerequisites": [],
+  "concepts": [
+    "Cyber Kill Chain",
+    "Intrusion kill chain phases",
+    "Multi-phase intrusion analysis",
+    "Indicator collection and correlation",
+    "Pivoting techniques",
+    "MITRE ATT&CK mapping",
+    "Reconnaissance indicators",
+    "Weaponization artifacts",
+    "Delivery and exploitation signatures",
+    "Command and control patterns"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand and apply the Cyber Kill Chain model to analyze multi-phase intrusions",
+    "Identify indicators at each stage of the kill chain from reconnaissance through actions on objectives",
+    "Correlate indicators across kill chain phases to build comprehensive intrusion timelines",
+    "Use pivoting techniques to expand investigations from initial indicators",
+    "Map kill chain observations to MITRE ATT&CK techniques for structured reporting"
+  ],
+  "post_assessment": [
+    {
+      "question": "During intrusion analysis, you discover a suspicious executable that contacts an external server every 4 hours. Which kill chain phase does this represent?",
+      "options": [
+        "Delivery",
+        "Command and Control",
+        "Installation",
+        "Reconnaissance"
+      ],
+      "correct": 1,
+      "explanation": "Regular beaconing to an external server is characteristic of the Command and Control (C2) phase, where the adversary maintains persistent communication with the compromised system."
+    },
+    {
+      "question": "An analyst finds a phishing email with a malicious attachment. What pivoting technique should they use FIRST to expand the investigation?",
+      "options": [
+        "Search for all emails from the same sender domain",
+        "Immediately image the recipient's hard drive",
+        "Block the sender at the mail gateway",
+        "Reset the recipient's password"
+      ],
+      "correct": 0,
+      "explanation": "Pivoting from the sender domain helps identify whether other employees received similar phishing emails, revealing the scope of the delivery phase before taking containment actions."
+    },
+    {
+      "question": "Which kill chain phase involves the adversary moving laterally within the network to find and access the target data?",
+      "options": [
+        "Installation",
+        "Actions on Objectives",
+        "Exploitation",
+        "The kill chain model does not cover lateral movement"
+      ],
+      "correct": 1,
+      "explanation": "Lateral movement and data access fall under Actions on Objectives — the final phase where the adversary achieves their goal, whether data exfiltration, destruction, or other outcomes."
+    },
+    {
+      "question": "What is the PRIMARY benefit of mapping intrusion findings to MITRE ATT&CK alongside the kill chain?",
+      "options": [
+        "ATT&CK replaces the kill chain entirely",
+        "ATT&CK provides granular technique IDs that the kill chain's higher-level phases lack",
+        "The kill chain is only for malware, ATT&CK covers all threats",
+        "ATT&CK is only used for reporting, not analysis"
+      ],
+      "correct": 1,
+      "explanation": "The kill chain provides a high-level narrative flow, while ATT&CK adds granular technique identification, enabling defenders to match specific adversary behaviors to known TTPs."
+    },
+    {
+      "question": "During analysis, you identify a malicious domain that resolved to IP 203.0.113.45. Which pivoting approach yields the MOST actionable intelligence?",
+      "options": [
+        "Block the IP at the firewall",
+        "Query passive DNS for all domains that resolved to that IP",
+        "Search the web for the domain name",
+        "Check if the domain uses HTTPS"
+      ],
+      "correct": 1,
+      "explanation": "Passive DNS pivoting reveals all domains that shared the same IP, often uncovering related infrastructure the adversary uses for other campaigns or phases."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Intrusion Analysis Matters",
+      "content": "Every breach tells a story. The kill chain gives you the chapters — from the first suspicious ping to the final exfiltrated byte. As a threat hunter, your job isn't just to spot one indicator; it's to read the whole narrative. Think of yourself as a digital detective piecing together a chain of evidence. Each indicator is a clue, and pivoting is how you follow the trail from one clue to the next. Master this, and you'll see intrusions before they become breaches.",
+      "duration_minutes": 3
+    },
+    {
+      "type": "explanation",
+      "title": "The Cyber Kill Chain Model",
+      "content": "Lockheed Martin's Cyber Kill Chain defines seven phases an adversary progresses through:\n\n1. **Reconnaissance** — Scanning, OSINT gathering, target profiling\n2. **Weaponization** — Coupling an exploit with a backdoor\n3. **Delivery** — Transmitting the weapon (email, USB, watering hole)\n4. **Exploitation** — Triggering the exploit on the victim\n5. **Installation** — Establishing persistence (RAT, backdoor)\n6. **Command and Control (C2)** — Establishing remote control channels\n7. **Actions on Objectives** — Achieving the adversary's goal (data theft, destruction)\n\nEach phase creates detectable artifacts. Your job: find them and chain them together.\n\nThe model is powerful because it gives defenders **multiple interception points**. You don't have to catch everything at delivery — you can disrupt at installation, C2, or even actions on objectives.",
+      "duration_minutes": 8
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Kill Chain",
+      "content": "Imagine a burglar trying to rob a house:\n\n1. **Reconnaissance** — The burglar walks by your house, looks at the windows, checks when you leave for work.\n2. **Weaponization** — They make a fake key that fits your lock.\n3. **Delivery** — They slide the fake key under your door, hidden inside a pizza menu.\n4. **Exploitation** — You pick up the pizza menu, and the fake key falls into your lock by itself.\n5. **Installation** — The burglar hides inside your closet.\n6. **Command and Control** — The burglar uses a walkie-talkie to tell their boss \"I'm in.\"\n7. **Actions on Objectives** — They steal your TV and leave.\n\nAt every step, the burglar leaves traces — footprints, a walkie-talkie signal, a pizza menu. That's what we hunt for!",
+      "duration_minutes": 5
+    },
+    {
+      "type": "code_exercise",
+      "title": "Mapping Indicators to Kill Chain Phases",
+      "content": "Given a set of intrusion indicators, map each to the correct kill chain phase:\n\n```python\nindicators = {\n    \"malware_hash_abc123\": None,         # Hint: What phase creates the malware?\n    \"phishing_email_from@example.com\": None,  # Hint: How does the weapon reach the victim?\n    \"c2_beacon_to_203.0.113.45\": None,  # Hint: What phase maintains control?\n    \"vuln_CVE-2023-1234\": None,         # Hint: What phase triggers the exploit?\n    \"exfil_10GB_to_external\": None,     # Hint: What's the final goal?\n    \"registry_run_key_added\": None,     # Hint: What phase ensures persistence?\n    \"nmap_scan_results.xml\": None,      # Hint: What phase gathers intel?\n}\n\n# Solution:\nkilling_chain_map = {\n    \"malware_hash_abc123\": \"Weaponization\",\n    \"phishing_email_from@example.com\": \"Delivery\",\n    \"c2_beacon_to_203.0.113.45\": \"Command and Control\",\n    \"vuln_CVE-2023-1234\": \"Exploitation\",\n    \"exfil_10GB_to_external\": \"Actions on Objectives\",\n    \"registry_run_key_added\": \"Installation\",\n    \"nmap_scan_results.xml\": \"Reconnaissance\",\n}\n```\n\n**Challenge:** Take 5 real IOCs from a threat report and map them to kill chain phases. Then check: are there gaps in the chain? Those gaps are detection blind spots.",
+      "duration_minutes": 10
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: SolarWinds Supply Chain Attack",
+      "content": "The SolarWinds attack (2020) is a textbook multi-phase intrusion:\n\n- **Reconnaissance:** Sunspot malware identified SolarWinds build environment\n- **Weaponization:** Inserted a backdoor (Sunburst) into Orion build process\n- **Delivery:** Legitimate Orion update distributed to ~18,000 organizations\n- **Exploitation:** Sunburst activated after a delay (avoiding sandboxes)\n- **Installation:** Created persistence via registry keys and scheduled tasks\n- **C2:** Used domain generation algorithms and legitimate cloud services (Azure, AWS) for blending\n- **Actions on Objectives:** Lateral movement, SAML token forgery, email exfiltration\n\n**Key insight:** The attackers were inside for **9+ months** before detection. The kill chain was complete — what failed was **detection at phases 5-7**. This is why hunting across the chain matters.\n\n**Pivoting opportunities:**\n- From the malicious update hash → all systems that installed it\n- From C2 domains → related infrastructure via passive DNS\n- From SAML token anomalies → identities that were compromised",
+      "duration_minutes": 8
+    },
+    {
+      "type": "memory_aid",
+      "title": "Kill Chain Phases Mnemonic: RWE-DICA",
+      "content": "Remember the 7 phases with **RWE-DICA**:\n\n- **R**econnaissance\n- **W**eaponization\n- **E**xploitation\n- **D**elivery\n- **I**nstallation\n- **C**ommand & Control\n- **A**ctions on Objectives\n\nOr think of it as a story: **R**ob **W**eaponizes **E**xploits, **D**elivers **I**nstallations, **C**ontrols **A**ctions.\n\n**Pivoting memory hook:** Think **S-P-I-V-O-T**:\n- **S**ame IP/infrastructure\n- **P**assive DNS history\n- **I**OC enrichment\n- **V**ictim overlap\n- **O**pen source intel\n- **T**ime correlation",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Kill Chain Gaps in Your Environment",
+      "content": "Think about your own organization's defenses:\n\n1. **Which kill chain phases do you have visibility into?** (Check your SIEM, EDR, network logs)\n2. **Where are your blind spots?** (Most organizations struggle with Delivery and Weaponization)\n3. **If an adversary reached Installation, how quickly would you detect C2?**\n4. **What pivoting tools do you have available?** (Passive DNS, threat intel platforms, sandbox analysis)\n\n**Write down:** One concrete detection gap you identified and one pivoting technique you could implement this week.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Indicators to Narratives",
+      "content": "The kill chain isn't just a framework — it's a storytelling tool. Every alert is a sentence fragment. The kill chain helps you assemble those fragments into a coherent narrative.\n\n**Your growth path:**\n- 🔰 Start by mapping individual IOCs to phases\n- 🎯 Progress to building full intrusion timelines\n- 🚀 Advance to predictive hunting — looking for phase 1-2 indicators before phase 7 happens\n\nThe analysts who stop breaches aren't the ones who see the most alerts. They're the ones who **connect the dots fastest**. The kill chain is your dot-connection framework. Own it.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Pivoting Techniques for Intrusion Analysis",
+      "content": "Pivoting transforms one indicator into many related indicators:\n\n**Infrastructure Pivoting:**\n- IP address → passive DNS → all domains resolving to that IP\n- SSL certificate hash → all servers sharing that certificate\n- WHOIS data → related registrations (email, org, nameserver)\n\n**Malware Pivoting:**\n- Hash → string extraction → C2 domains/IPs → related malware families\n- Mutex names → related samples\n- Compilation timestamps → cluster related malware\n\n**Victim Pivoting:**\n- Phishing email → sender domain → all recipients → compromised accounts\n- Initial access IP → geolocation, VPN/proxy indicators\n\n**Behavioral Pivoting:**\n- ATT&CK technique → known threat groups using that technique\n- C2 protocol → related implants using same protocol\n\n**Key rule:** Always pivot in BOTH directions — from the indicator outward (breadth) and from the indicator deeper (depth).",
+      "duration_minutes": 7
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR578",
+    "Career Path: Threat Hunter",
+    "Career Path: DFIR Specialist",
+    "kill-chain",
+    "intrusion-analysis",
+    "pivoting",
+    "indicator-collection",
+    "MITRE-ATT&CK"
+  ]
+}

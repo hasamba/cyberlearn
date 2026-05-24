@@ -1,0 +1,165 @@
+{
+  "lesson_id": "a3e9c7d8-f0a1-4b2c-3d4e-5f6a7b8c9d01",
+  "domain": "red_team",
+  "title": "Lateral Movement with Impacket",
+  "difficulty": 2,
+  "order_index": 48,
+  "prerequisites": [],
+  "concepts": [
+    "Impacket suite overview",
+    "psexec.py for remote execution",
+    "smbexec.py for SMB-based shells",
+    "wmiexec.py for WMI execution",
+    "Lateral movement techniques",
+    "Pass-the-hash with Impacket",
+    "SMB protocol exploitation",
+    "WMI protocol exploitation",
+    "Credential handling in Impacket",
+    "Detection and defense against Impacket"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Install and configure the Impacket toolkit for authorized security testing",
+    "Use psexec, smbexec, and wmiexec for remote command execution",
+    "Execute pass-the-hash attacks using Impacket tools",
+    "Understand the network artifacts each Impacket tool creates",
+    "Identify and detect Impacket-based lateral movement in logs"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which Impacket tool creates a Windows service for remote execution, making it noisier than alternatives?",
+      "options": [
+        "wmiexec.py",
+        "smbexec.py",
+        "psexec.py",
+        "secretsdump.py"
+      ],
+      "correct": 2,
+      "explanation": "psexec.py creates a Windows service (typically named with random characters), uploads an executable, starts the service, and then cleans up. This creates significant event log artifacts including service creation (Event ID 7045) and service control manager events."
+    },
+    {
+      "question": "Which Impacket tool is considered the stealthiest for lateral movement because it doesn't create services or scheduled tasks?",
+      "options": [
+        "psexec.py",
+        "atexec.py",
+        "wmiexec.py",
+        "smbexec.py"
+      ],
+      "correct": 2,
+      "explanation": "wmiexec.py uses WMI to execute commands and only creates a semi-interactive shell via WMI. It doesn't create services (like psexec) or scheduled tasks (like atexec), making it the stealthiest of the common Impacket lateral movement tools."
+    },
+    {
+      "question": "What Windows event log is MOST useful for detecting psexec.py lateral movement?",
+      "options": [
+        "Event ID 4624 (Successful Logon)",
+        "Event ID 7045 (Service Installation)",
+        "Event ID 4648 (Explicit Credential Logon)",
+        "Event ID 4720 (User Account Created)"
+      ],
+      "correct": 1,
+      "explanation": "psexec.py creates a Windows service for execution, which generates Event ID 7045 (A new service was installed in the system). This is a high-fidelity detection signal for psexec-based lateral movement."
+    },
+    {
+      "question": "How does Impacket handle pass-the-hash authentication?",
+      "options": [
+        "It cracks the hash first, then uses the plaintext password",
+        "It uses the NTLM hash directly in the authentication protocol without needing the plaintext",
+        "It brute-forces the hash against the target",
+        "It creates a Kerberos ticket from the hash"
+      ],
+      "correct": 1,
+      "explanation": "Impacket implements the NTLM authentication protocol directly, allowing it to use the NTLM hash (rather than the plaintext password) in the challenge-response exchange. This is pass-the-hash — no cracking needed."
+    },
+    {
+      "question": "Which command correctly uses smbexec.py with pass-the-hash for lateral movement?",
+      "options": [
+        "smbexec.py domain/user@target -hashes :NTLM_HASH",
+        "smbexec.py -u user -p password target",
+        "smbexec.py target --ntlm NTLM_HASH --user domain/user",
+        "smbexec.py domain/user:password@target --pth NTLM_HASH"
+      ],
+      "correct": 0,
+      "explanation": "The correct Impacket syntax for pass-the-hash is: smbexec.py domain/user@target -hashes :NTLM_HASH. The colon before the hash indicates LM hash is empty (common), and the NTLM hash follows."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Understanding the Adversary's Toolkit",
+      "content": "Impacket is one of the most-used tools in real intrusions — not because it's exotic, but because it works. Every red teamer and every adversary uses it. Understanding Impacket from the inside means you can detect it from the blue side. This isn't about attacking; it's about knowing what the attack looks like so you can catch it. Think of it as learning lockpicking so you can build better locks.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Impacket Suite Overview",
+      "content": "**Impacket** is a Python library for working with network protocols (SMB, MSRPC, NTLM, Kerberos, etc.) and a collection of scripts built on it.\n\n**Core Lateral Movement Tools:**\n\n| Tool | Method | Stealth | Speed |\n|------|--------|---------|-------|\n| psexec.py | Creates Windows service + uploads exe | Low | Fast |\n| smbexec.py | Creates service, executes via SMB | Low | Fast |\n| wmiexec.py | Uses WMI for remote execution | Medium | Medium |\n| atexec.py | Creates scheduled task | Medium | Fast |\n| dcomexec.py | Uses DCOM for execution | Medium | Medium |\n\n**Other Essential Tools:**\n- **secretsdump.py** — Dumps SAM, LSA secrets, NTDS.dit\n- **GetNPUsers.py** — Queries users with Kerberos Pre-Auth disabled\n- **GetUserSPNs.py** — Queries SPNs for Kerberoasting\n- **ticketer.py** — Creates Golden/Silver tickets\n- **wmiquery.py** — Interactive WQL queries\n- **smbclient.py** — SMB client for file operations\n\n**Authentication Options:**\n```bash\n# Password authentication\nimpacket-psexec domain/user:password@target\n\n# Pass-the-hash\nimpacket-psexec domain/user@target -hashes aad3b435b51404eeaad3b435b51404ee:NTLM_HASH\n\n# Kerberos authentication\nimpacket-psexec domain/user@target -k -no-pass\n\n# AES key authentication\nimpacket-psexec domain/user@target -aes256 AES_KEY\n```",
+      "duration_minutes": 10
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Impacket Lateral Movement",
+      "content": "Imagine you're in a building (the network) and you've gotten into one room (compromised one computer). Now you want to get into other rooms.\n\n**psexec** = You sneak through the door, build a secret passage (service), and walk through it. The problem? Building a passage makes noise and leaves a visible hole (service creation).\n\n**smbexec** = Similar to psexec but instead of building a full passage, you whisper commands through the keyhole (SMB). Still a bit noisy because you're creating a service.\n\n**wmiexec** = You use the building's intercom system (WMI) to talk to other rooms. No construction needed! Just quiet commands through the intercom. This is the stealthiest.\n\n**atexec** = You leave a note for the room's cleaning staff (scheduled task): \"At 3 AM, please open the door.\" The note gets picked up later. Medium stealth.\n\n**Pass-the-hash** = Instead of picking the lock (cracking a password), you just use a copy of the key that you found (the hash). The lock can't tell the difference!\n\n**Detection analogy:** The building security guard (blue team) checks for:\n- New construction (service creation events)\n- Intercom logs (WMI activity)\n- Notes left for staff (scheduled tasks)\n- People using copied keys (pass-the-hash patterns)",
+      "duration_minutes": 5
+    },
+    {
+      "type": "code_exercise",
+      "title": "Impacket Commands and Detection",
+      "content": "Match each Impacket tool to its detection method:\n\n```python\n# Impacket commands\ntools = {\n    \"psexec\": \"impacket-psexec domain/admin:Pass123@10.0.0.5\",\n    \"smbexec\": \"impacket-smbexec domain/admin:Pass123@10.0.0.5\",\n    \"wmiexec\": \"impacket-wmiexec domain/admin:Pass123@10.0.0.5\",\n    \"atexec\": \"impacket-atexec domain/admin:Pass123@10.0.0.5 'whoami'\",\n}\n\n# Detection signatures\ndetections = {\n    \"psexec\": [\n        \"Event ID 7045 - New service installation\",\n        \"Random service name (e.g., 'YFKNFg')\",\n        \"Service binary path in temp directory\",\n        \"Event ID 4624 Type 3 - SMB logon\"\n    ],\n    \"smbexec\": [\n        \"Event ID 7045 - New service installation\",\n        \"Service with %COMSPEC% in path\",\n        \"CMD.exe /Q /c redirecting output\",\n        \"SMB traffic on port 445\"\n    ],\n    \"wmiexec\": [\n        \"Event ID 4624 Type 3 - DCOM logon\",\n        \"WMI activity logs (Microsoft-Windows-WMI-Activity)\",\n        \"wmiprvse.exe spawning cmd.exe\",\n        \"No service creation events\"\n    ],\n    \"atexec\": [\n        \"Event ID 4698 - Scheduled task created\",\n        \"Task name starting with '\\\\\\\\\\__TMP__'\",\n        \"Event ID 4624 Type 3 - SMB logon\",\n        \"Scheduled task running cmd.exe\"\n    ]\n}\n\n# Challenge: Write a Splunk/Sigma detection rule for psexec\nsigma_rule = '''\ntitle: Impacket psexec Service Creation\ndetection:\n  selection:\n    EventID: 7045\n    ServiceName|re: '^[A-Z]{6,8}$'\n    ImagePath|contains: '\\\\\\\\temp\\\\'\n  condition: selection\nlevel: high\ntag: lateral-movement\n'''\n```\n\n**Challenge:** Write detection rules for wmiexec and atexec using the signatures above.",
+      "duration_minutes": 12
+    },
+    {
+      "type": "real_world",
+      "title": "Impacket in Real Incidents",
+      "content": "Impacket appears in numerous APT campaigns and ransomware operations:\n\n**Ryuk Ransomware (2018-2020):**\n- Used `psexec.py` for lateral movement after initial access\n- Deployed ransomware via SMB to multiple hosts simultaneously\n- Detection: Look for service creation with random 6-8 character names\n\n**Conti Ransomware:**\n- Used `secretsdump.py` to dump credentials\n- Used `wmiexec.py` for stealthy lateral movement\n- Used `GetUserSPNs.py` for Kerberoasting\n- Detection: Correlate DCOM logon events with credential access\n\n**APT29 (Cozy Bear):**\n- Custom Impacket-based tools for lateral movement\n- Used WMI for persistence and execution\n- Detection: WMI event subscription creation\n\n**Detection Best Practices:**\n1. **Service Creation Monitoring:** Alert on Event ID 7045 with random service names\n2. **WMI Process Spawning:** Alert on wmiprvse.exe spawning cmd.exe or powershell.exe\n3. **Scheduled Task Anomalies:** Monitor Event ID 4698 for tasks with unusual names or commands\n4. **Authentication Patterns:** Alert on multiple Type 3 logons from the same source in short timeframes\n5. **Network Indicators:** Monitor for SMB connections to administrative shares (ADMIN$, C$, IPC$)\n6. **Hash Authentication:** Detect NTLM authentications where the password isn't used (pass-the-hash indicator)\n\n**Defensive Tool Configuration:**\n```bash\n# Sysmon configuration for Impacket detection\n# Monitor for:\n- Service creation (Event ID 7045)\n- WMI activity (Event ID 19, 20, 21)\n- Scheduled task creation (Event ID 4698)\n- Process creation from wmiprvse.exe\n- Remote thread creation\n```",
+      "duration_minutes": 8
+    },
+    {
+      "type": "memory_aid",
+      "title": "Impacket Tools: P-W-A-S-D Mnemonic",
+      "content": "Remember the lateral movement tools with **P-W-A-S-D** (like gaming controls!):\n\n- **P**sexec — Creates service, uploads exe (noisy but reliable)\n- **W**miexec — Uses WMI, semi-interactive (stealthier)\n- **A**texec — Creates scheduled task (medium stealth)\n- **S**mbexec — Creates service via SMB (noisy)\n- **D**comexec — Uses DCOM (medium stealth)\n\n**Detection mnemonic — S-W-A-T:**\n- **S**ervices — psexec, smbexec (Event ID 7045)\n- **W**MI — wmiexec (WMI-Activity logs)\n- **A**t/scheduled — atexec (Event ID 4698)\n- **T**ype 3 logons — All Impacket (Event ID 4624)\n\n**Authentication formats:**\n- Password: `domain/user:password@target`\n- PTH: `-hashes LM:NTLM`\n- Kerberos: `-k -no-pass`\n- AES: `-aes256 KEY`",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Detecting Impacket in Your Environment",
+      "content": "Assess your detection capabilities for Impacket-based lateral movement:\n\n1. **Do you collect Event ID 7045 (Service Creation)?** This catches psexec and smbexec.\n2. **Do you monitor WMI activity?** This catches wmiexec and WMI persistence.\n3. **Do you audit scheduled task creation (Event ID 4698)?** This catches atexec.\n4. **Can you detect pass-the-hash?** Event ID 4624 with NTLM authentication from a hash.\n5. **Do you have Sysmon deployed?** Process creation logs are critical.\n\n**Write down:**\n- One detection gap you identified\n- A Sigma rule or alert you could implement this week\n- A hunting query for Impacket artifacts\n\n**Action item:** Deploy Sysmon with a configuration that monitors for service creation, WMI events, and scheduled task creation.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Red Teaches Blue",
+      "content": "Understanding Impacket from the attacker's perspective makes you a better defender. Every tool leaves artifacts — your job is to know what they look like and where to find them.\n\n**Your progression:**\n- 🔰 Know the Impacket tools and what each does\n- 🎯 Understand the detection artifacts each tool creates\n- 🚀 Build automated detection and hunting for Impacket patterns\n\nThe best defenders can think like attackers. They don't just react to alerts — they proactively hunt for the patterns they know adversaries use.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Pass-the-Hash and Credential Handling",
+      "content": "**Pass-the-Hash (PtH)** is the most common authentication method used with Impacket for lateral movement.\n\n**How PtH Works:**\n1. Attacker obtains NTLM hash (from secretsdump, Mimikatz, or hash dumping)\n2. Impacket uses the hash directly in NTLM challenge-response\n3. No password cracking needed — the hash IS the credential\n4. Works against any system accepting NTLM authentication\n\n**Impacket PtH Syntax:**\n```bash\n# Standard format: -hashes LM_HASH:NTLM_HASH\n# Empty LM hash (common):\nimpacket-psexec domain/admin@10.0.0.5 -hashes aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0\n\n# Shorthand (empty LM hash):\nimpacket-psexec domain/admin@10.0.0.5 -hashes :31d6cfe0d16ae931b73c59d7e0c089c0\n```\n\n**Other Impacket Credential Tools:**\n\n```bash\n# secretsdump.py - Dump all credentials\nimpacket-secretsdump domain/admin:password@10.0.0.5\nimpacket-secretsdump domain/admin@10.0.0.5 -hashes :NTLM_HASH\n\n# GetUserSPNs.py - Kerberoasting\nimpacket-GetUserSPNs domain/admin:password@10.0.0.5 -request\n\n# GetNPUsers.py - AS-REP Roasting\nimpacket-GetNPUsers domain/ -usersfile users.txt -format hashcat\n\n# ticketer.py - Golden Ticket creation\nimpacket-ticketer -domain domain.local -domain-sid S-1-5-21-... -nthash NTLM_HASH administrator\n```\n\n**Detection of PtH:**\n- Event ID 4624 with Logon Type 3 using NTLM\n- Same hash authenticating to multiple systems\n- No corresponding 4624 Type 2 (interactive) logon for the hash source\n- Lateral movement to systems the user hasn't accessed before\n- NTLM authentications where the user is known to use Kerberos normally",
+      "duration_minutes": 8
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC560",
+    "Career Path: Red Teamer",
+    "Career Path: Pentester",
+    "impacket",
+    "lateral-movement",
+    "pass-the-hash",
+    "psexec",
+    "wmiexec",
+    "smbexec",
+    "detection"
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "lesson_id": "c9a5d3e4-f6b7-4c8d-1e2a-3b4c5d6e7f80",
+  "domain": "fundamentals",
+  "title": "CIA Triad and Security Principles",
+  "difficulty": 2,
+  "order_index": 47,
+  "prerequisites": [],
+  "concepts": [
+    "Confidentiality",
+    "Integrity",
+    "Availability",
+    "Authenticity",
+    "Non-repudiation",
+    "Security controls",
+    "Defense in depth",
+    "Risk management basics",
+    "Threat vs vulnerability vs risk",
+    "Security governance"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Define and explain each component of the CIA Triad with real-world examples",
+    "Distinguish between authenticity and non-repudiation and explain their importance",
+    "Identify appropriate security controls for protecting each CIA component",
+    "Understand the relationship between threats, vulnerabilities, and risk",
+    "Apply defense-in-depth principles to design layered security architectures"
+  ],
+  "post_assessment": [
+    {
+      "question": "A hospital's patient records system is encrypted by ransomware. Which CIA component is MOST directly impacted?",
+      "options": [
+        "Confidentiality",
+        "Integrity",
+        "Availability",
+        "Authenticity"
+      ],
+      "correct": 2,
+      "explanation": "Ransomware encrypts data and demands payment, making the data inaccessible. This is a direct attack on Availability — the system and data cannot be accessed when needed."
+    },
+    {
+      "question": "Which security mechanism provides non-repudiation?",
+      "options": [
+        "Encryption at rest",
+        "Digital signatures with private keys",
+        "Firewall rules",
+        "Multi-factor authentication"
+      ],
+      "correct": 1,
+      "explanation": "Digital signatures using private keys provide non-repudiation because only the key holder could have created the signature, making it impossible to deny having signed the document."
+    },
+    {
+      "question": "An employee accesses a coworker's salary information they shouldn't see. Which CIA principle was violated?",
+      "options": [
+        "Integrity",
+        "Availability",
+        "Confidentiality",
+        "Non-repudiation"
+      ],
+      "correct": 2,
+      "explanation": "Confidentiality ensures data is accessible only to authorized individuals. Unauthorized access to sensitive data (salary information) is a confidentiality violation."
+    },
+    {
+      "question": "What is the relationship between threat, vulnerability, and risk?",
+      "options": [
+        "Risk = Threat + Vulnerability",
+        "Risk = Threat × Vulnerability × Impact",
+        "Vulnerability = Threat × Risk",
+        "Threat = Risk - Vulnerability"
+      ],
+      "correct": 1,
+      "explanation": "Risk is calculated as the product of the likelihood of a threat exploiting a vulnerability and the resulting impact. Risk = Threat × Vulnerability × Impact captures this relationship."
+    },
+    {
+      "question": "Using both a firewall and an intrusion detection system is an example of:",
+      "options": [
+        "Availability assurance",
+        "Defense in depth",
+        "Non-repudiation",
+        "Security through obscurity"
+      ],
+      "correct": 1,
+      "explanation": "Defense in depth uses multiple layers of security controls. A firewall blocks known bad traffic (perimeter), while an IDS monitors for suspicious patterns that get through (internal). Together they provide layered protection."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why the CIA Triad Matters",
+      "content": "Everything in cybersecurity comes back to three letters: C, I, A. Not the agency — the principles. Every breach, every control, every design decision ultimately serves one of these three goals. Master the triad, and you have a lens for evaluating ANY security scenario. It's the foundation everything else is built on. Don't just memorize definitions — internalize them so deeply that you instinctively ask: \"Which part of the triad does this affect?\"",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "The CIA Triad Defined",
+      "content": "**Confidentiality** — Information is accessible only to authorized parties.\n- Encryption, access controls, data classification\n- Violation example: Data breach exposing customer records\n\n**Integrity** — Information is accurate and unaltered.\n- Hashing, checksums, digital signatures, version control\n- Violation example: An attacker modifies a financial transaction amount\n\n**Availability** — Information and systems are accessible when needed.\n- Redundancy, backups, DDoS protection, disaster recovery\n- Violation example: Ransomware encrypting production databases\n\n**Beyond CIA — Two More Principles:**\n- **Authenticity** — Verifying identity; ensuring users and systems are who they claim to be\n- **Non-repudiation** — Providing proof of an action that cannot be denied; ensuring accountability\n\nThese five principles together form the foundation of information security. Every control, policy, and technology maps to one or more of them.",
+      "duration_minutes": 8
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The CIA Triad",
+      "content": "Imagine a secret diary:\n\n**Confidentiality** = A lock on the diary. Only you have the key. If someone else reads it without permission, confidentiality is broken.\n\n**Integrity** = A tamper-evident seal. If someone opens the diary, changes your words, and closes it, you'd never know — unless you have a way to detect changes. That's what integrity protects.\n\n**Availability** = The diary is always on your bookshelf when you need it. If your little brother hides it under his bed, you can't use it — availability is gone.\n\n**Authenticity** = Making sure it's really YOU writing in the diary, not someone pretending to be you.\n\n**Non-repudiation** = If you wrote something mean in the diary, you can't say \"That wasn't me!\" — because your signature proves it was.",
+      "duration_minutes": 4
+    },
+    {
+      "type": "code_exercise",
+      "title": "Mapping Incidents to CIA Triad Components",
+      "content": "For each incident below, identify which CIA component(s) are primarily affected:\n\n```\nIncident 1: WikiLeaks publishes classified military documents\n→ Primary: ___________\n\nIncident 2: Hacker changes bank transfer amount from $100 to $10,000\n→ Primary: ___________\n\nIncident 3: DDoS attack takes down an e-commerce site on Black Friday\n→ Primary: ___________\n\nIncident 4: Stuxnet modifies centrifuge speeds in a nuclear facility\n→ Primary: ___________\n\nIncident 5: Employee views HR salary database without authorization\n→ Primary: ___________\n\nIncident 6: Certificate authority compromised, issuing fraudulent certificates\n→ Primary: ___________\n```\n\n```python\n# Answers:\nanswers = {\n    \"Incident 1\": \"Confidentiality\",      # Classified data exposed\n    \"Incident 2\": \"Integrity\",             # Data modified\n    \"Incident 3\": \"Availability\",           # Service denied\n    \"Incident 4\": \"Integrity + Availability\", # Speeds modified, operations disrupted\n    \"Incident 5\": \"Confidentiality\",        # Unauthorized access\n    \"Incident 6\": \"Authenticity + Integrity\"  # Trust in certificates broken\n}\n```\n\n**Challenge:** Find a recent breach in the news and map it to CIA components. Which controls failed, and which ones could have prevented it?",
+      "duration_minutes": 10
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Equifax Breach (2017)",
+      "content": "The Equifax breach exposed personal data of 147 million people — a failure across ALL three CIA components:\n\n**Confidentiality Failure:**\n- Attackers exploited CVE-2017-5638 (Apache Struts vulnerability) to access PII\n- 147M SSNs, names, birth dates, addresses, and driver's license numbers exposed\n\n**Integrity Failure:**\n- Attackers could have modified credit data (potential, not confirmed)\n- The patch for the vulnerability had been available for 2 months but wasn't applied\n- Equifax couldn't verify data hadn't been altered\n\n**Availability Failure:**\n- Equifax's breach detection took 76 days\n- During incident response, customer-facing systems were disrupted\n\n**Controls that could have helped:**\n- **C:** Network segmentation, encryption of PII at rest\n- **I:** File integrity monitoring, digital signatures on data\n- **A:** Faster patching, WAF rules, intrusion detection\n\n**Key lesson:** A single vulnerability cascaded into a multi-dimensional failure. Defense in depth could have limited the blast radius.",
+      "duration_minutes": 7
+    },
+    {
+      "type": "memory_aid",
+      "title": "CIA Triad and Extensions: Quick Reference",
+      "content": "**CIA + AN mnemonic: \"CAN I be secure?\"**\n\n- **C**onfidentiality → Lock it up (encryption, access control)\n- **A**vailability → Keep it running (redundancy, backups)\n- **N**on-repudiation → Prove it happened (digital signatures)\n- **I**ntegrity → Keep it accurate (hashing, checksums)\n\n**Wait, that spells CANI... remember: \"CAN I?\"**\n\n**Controls by principle:**\n- **C**: Encryption, ACLs, classification, VPNs, NDA\n- **I**: Hashes, checksums, digital signatures, version control\n- **A**: Backups, redundancy, DDoS mitigation, load balancers\n- **A (Auth)**: MFA, certificates, biometrics\n- **N**: Digital signatures, audit logs, blockchain\n\n**Risk formula reminder:** Risk = Threat × Vulnerability × Impact\n\n- **Threat** = Who could attack? (hackers, insiders, nature)\n- **Vulnerability** = What's the weakness? (unpatched software, misconfig)\n- **Impact** = What do we lose? (money, reputation, compliance)",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Evaluating Your Environment's CIA Posture",
+      "content": "Think about an organization you're familiar with (yours or a well-known company):\n\n1. **Confidentiality:** What's the most sensitive data they hold? How is it protected? What would happen if it were exposed?\n2. **Integrity:** What data, if modified, would cause the most damage? Are there integrity checks in place?\n3. **Availability:** What's the maximum tolerable downtime? What's the recovery plan?\n\n**Write down:**\n- One control that protects each CIA component\n- One vulnerability that threatens each component\n- The single highest-risk scenario if multiple components fail simultaneously\n\nThis exercise builds your instinct for mapping real environments to the triad.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Theory to Practice",
+      "content": "The CIA Triad isn't abstract theory — it's a decision-making framework. Every time you:\n- Choose a control → Ask: \"Which component does this protect?\"\n- Analyze a breach → Ask: \"Which components failed?\"\n- Design a system → Ask: \"Am I covering all three?\"\n\n**Your progression:**\n- 🔰 Know the definitions and examples\n- 🎯 Map incidents to CIA components instinctively\n- 🚀 Design architectures that balance all three with appropriate trade-offs\n\nSecurity is always about trade-offs. Perfect confidentiality might hurt availability (encryption overhead). Perfect availability might hurt confidentiality (more access points). The art is finding the right balance for your specific context.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Defense in Depth and Security Controls",
+      "content": "Defense in depth applies the CIA Triad through **layered controls**:\n\n**Administrative Controls** (policies and procedures):\n- Security policies, training, background checks\n- Data classification and handling procedures\n- Incident response plans\n\n**Technical Controls** (technology-based):\n- Firewalls, IDS/IPS, encryption, access control lists\n- MFA, SIEM, endpoint protection\n- Data loss prevention (DLP) systems\n\n**Physical Controls** (tangible barriers):\n- Locks, badges, security guards\n- Environmental controls (HVAC, fire suppression)\n- Cable locks, safes, surveillance cameras\n\n**Mapping Controls to CIA:**\n\n| Control | C | I | A |\n|---------|---|---|---|\n| Encryption | ✅ | ✅ | — |\n| Hashing | — | ✅ | — |\n| Backups | — | ✅ | ✅ |\n| Firewall | ✅ | — | ✅ |\n| MFA | ✅ | — | — |\n| UPS/Generator | — | — | ✅ |\n\n**Key principle:** No single control is sufficient. Layer them so that if one fails, others still protect the asset. A firewall without backups doesn't protect availability. Encryption without integrity checking doesn't prevent tampering.",
+      "duration_minutes": 8
+    }
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "Career Path: GRC Analyst",
+    "CIA-triad",
+    "confidentiality",
+    "integrity",
+    "availability",
+    "security-principles",
+    "defense-in-depth"
+  ]
+}

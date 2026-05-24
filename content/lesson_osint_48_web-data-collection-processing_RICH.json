@@ -1,0 +1,163 @@
+{
+  "lesson_id": "f2d8a6b7-c9e0-4f1a-2b3c-4d5e6f7a8b90",
+  "domain": "osint",
+  "title": "Web Data Collection and Processing",
+  "difficulty": 2,
+  "order_index": 48,
+  "prerequisites": ["The OSINT Process and Methodology"],
+  "concepts": [
+    "Web scraping fundamentals",
+    "HTML parsing and data extraction",
+    "Instant Data Scraper tool",
+    "Automated data collection",
+    "APIs for structured data",
+    "Rate limiting and ethical scraping",
+    "Data cleaning and processing",
+    "Regular expressions for data parsing",
+    "Browser automation basics",
+    "Data storage and organization"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Use Instant Data Scraper and similar browser extensions for rapid data extraction",
+    "Write Python scripts using BeautifulSoup and Requests for web scraping",
+    "Apply ethical guidelines and rate limiting when collecting web data",
+    "Clean and process scraped data using regex and pandas",
+    "Store collected data in structured formats (CSV, JSON, databases)"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the PRIMARY ethical consideration when scraping web data?",
+      "options": [
+        "Using the fastest scraping tool available",
+        "Respecting robots.txt, rate limits, and terms of service",
+        "Scraping only from .gov domains",
+        "Avoiding JavaScript-heavy sites"
+      ],
+      "correct": 1,
+      "explanation": "Ethical scraping requires respecting robots.txt directives, implementing rate limits to avoid overwhelming servers, and complying with website terms of service. Violating these can be illegal and unethical."
+    },
+    {
+      "question": "Which Python library is specifically designed for parsing HTML and XML documents?",
+      "options": [
+        "requests",
+        "BeautifulSoup",
+        "pandas",
+        "selenium"
+      ],
+      "correct": 1,
+      "explanation": "BeautifulSoup is the standard Python library for parsing HTML/XML. It creates a parse tree that allows easy navigation and extraction of elements, attributes, and text from web pages."
+    },
+    {
+      "question": "What is Instant Data Scraper's key advantage for OSINT investigators?",
+      "options": [
+        "It bypasses all authentication",
+        "It automatically detects and extracts tabular data from web pages without coding",
+        "It stores data permanently in the cloud",
+        "It can scrape any website without rate limiting"
+      ],
+      "correct": 1,
+      "explanation": "Instant Data Scraper is a browser extension that automatically detects patterns in web pages and extracts tabular data without requiring any coding. This makes it ideal for quick OSINT data collection."
+    },
+    {
+      "question": "When scraping a website that returns HTTP 429, what should you do?",
+      "options": [
+        "Switch to a different IP address immediately",
+        "Add a longer delay between requests (respect the rate limit)",
+        "Send more requests to test the limit",
+        "Use a different user agent string"
+      ],
+      "correct": 1,
+      "explanation": "HTTP 429 (Too Many Requests) means you've exceeded the server's rate limit. The ethical and practical response is to increase the delay between requests. The response may include a Retry-After header indicating how long to wait."
+    },
+    {
+      "question": "Which technique is best for extracting email addresses from a large scraped text dataset?",
+      "options": [
+        "Manual reading and copy-paste",
+        "Regular expression pattern matching",
+        "Sorting alphabetically",
+        "Converting to lowercase"
+      ],
+      "correct": 1,
+      "explanation": "Regular expressions can efficiently match email patterns (e.g., [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}) across large datasets, extracting all matching strings automatically."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Data Collection as a Superpower",
+      "content": "The internet is the world's largest open-source intelligence database — if you know how to extract it. Web scraping transforms a researcher who manually copies data into an analyst who commands thousands of data points. But with great power comes great responsibility. Ethical scraping means respecting boundaries, rate limits, and legal frameworks. The best OSINT investigators collect data efficiently AND responsibly.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Web Scraping Fundamentals",
+      "content": "Web scraping is the automated extraction of data from web pages.\n\n**How the Web Works (for scrapers):**\n1. Your script sends an HTTP request to a server\n2. The server responds with HTML\n3. You parse the HTML to extract structured data\n\n**Key Python Libraries:**\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\nimport re\nimport csv\nimport time\n\n# Basic scraping workflow\nurl = 'https://example.com/data'\nheaders = {'User-Agent': 'OSINT-Research-Bot/1.0'}\nresponse = requests.get(url, headers=headers)\n\n# Respect rate limits\ntime.sleep(2)  # 2 seconds between requests\n\n# Parse HTML\nsoup = BeautifulSoup(response.text, 'html.parser')\n\n# Extract data\ntitles = soup.find_all('h2', class_='title')\nfor title in titles:\n    print(title.text.strip())\n```\n\n**HTTP Methods for Scraping:**\n- GET — Retrieve a page (most common)\n- POST — Submit form data\n- HEAD — Check if a page exists without downloading content\n\n**Common Challenges:**\n- **JavaScript rendering:** Content loaded by JS won't appear in initial HTML. Solutions: Selenium, Playwright, or find the underlying API.\n- **Anti-scraping measures:** CAPTCHAs, rate limiting, IP blocking. Solutions: Respect limits, use headers, add delays.\n- **Dynamic content:** Pagination, infinite scroll. Solution: Find the API endpoint the page calls.\n\n**Ethical Guidelines:**\n- Always check robots.txt first\n- Implement rate limiting (1-3 seconds between requests minimum)\n- Use a descriptive User-Agent\n- Don't overwhelm servers\n- Respect terms of service\n- Don't scrape personal data without authorization",
+      "duration_minutes": 10
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Web Scraping",
+      "content": "Imagine a giant library where all the books are web pages.\n\n**Manual research:** You walk to each shelf, open each book, and copy the info you need by hand. Slow!\n\n**Web scraping:** You send a robot assistant that:\n1. Goes to each shelf (requests a web page)\n2. Opens the book (downloads the HTML)\n3. Copies the specific pages you need (parses and extracts data)\n4. Puts it all in a neat folder (saves to CSV/JSON)\n\n**Instant Data Scraper** is like a magic magnifying glass — you point it at a table on a web page, and it automatically copies ALL the data into a spreadsheet. No coding needed!\n\n**The golden rules:**\n1. Don't send your robot too fast — give the library time to breathe (rate limiting)\n2. Check if the library allows robots (robots.txt)\n3. Only take what you need — don't copy the whole library\n4. Be honest about who you are (User-Agent header)",
+      "duration_minutes": 4
+    },
+    {
+      "type": "code_exercise",
+      "title": "Building an OSINT Data Collection Script",
+      "content": "Build a complete web scraping script for OSINT data collection:\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\nimport csv\nimport re\nimport time\nfrom datetime import datetime\n\nclass OSINTScraper:\n    def __init__(self, rate_limit=2):\n        self.session = requests.Session()\n        self.session.headers.update({\n            'User-Agent': 'OSINT-Research-Bot/1.0 (Educational)'\n        })\n        self.rate_limit = rate_limit\n        self.results = []\n    \n    def fetch_page(self, url):\n        \"\"\"Fetch a web page with rate limiting.\"\"\"\n        try:\n            time.sleep(self.rate_limit)\n            response = self.session.get(url, timeout=10)\n            response.raise_for_status()\n            return response\n        except requests.RequestException as e:\n            print(f\"Error fetching {url}: {e}\")\n            return None\n    \n    def extract_emails(self, text):\n        \"\"\"Extract email addresses from text.\"\"\"\n        email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'\n        return list(set(re.findall(email_pattern, text)))\n    \n    def extract_links(self, soup, base_url):\n        \"\"\"Extract all links from a page.\"\"\"\n        links = []\n        for a in soup.find_all('a', href=True):\n            link = a['href']\n            if link.startswith('/'):\n                link = base_url + link\n            links.append(link)\n        return links\n    \n    def save_to_csv(self, filename):\n        \"\"\"Save results to CSV.\"\"\"\n        if self.results:\n            with open(filename, 'w', newline='', encoding='utf-8') as f:\n                writer = csv.DictWriter(f, fieldnames=self.results[0].keys())\n                writer.writeheader()\n                writer.writerows(self.results)\n            print(f\"Saved {len(self.results)} records to {filename}\")\n\n# Usage:\nscraper = OSINTScraper(rate_limit=3)\n# page = scraper.fetch_page('https://example.com')\n# soup = BeautifulSoup(page.text, 'html.parser')\n# emails = scraper.extract_emails(page.text)\n# links = scraper.extract_links(soup, 'https://example.com')\n```\n\n**Challenge:** Modify this script to scrape a directory listing (like a business directory) and extract names, titles, and contact info. Add error handling for HTTP 429 responses.",
+      "duration_minutes": 12
+    },
+    {
+      "type": "real_world",
+      "title": "OSINT Data Collection in Practice",
+      "content": "Real-world OSINT data collection scenarios:\n\n**Scenario 1: Employee Enumeration**\nA security assessment needs to map an organization's employee exposure on LinkedIn.\n- Use Instant Data Scraper to extract employee names, titles, and departments from LinkedIn search results\n- Process and deduplicate the data\n- Identify high-value targets (executives, IT admins)\n\n**Scenario 2: Domain Infrastructure Mapping**\n- Scrape certificate transparency logs for subdomains\n- Extract DNS records from passive DNS services\n- Correlate IP addresses across multiple sources\n- Build a complete attack surface map\n\n**Scenario 3: Threat Intelligence Aggregation**\n- Scrape multiple threat intel blogs and advisory pages\n- Extract IOCs (IPs, domains, hashes) using regex\n- Deduplicate and normalize the data\n- Feed into a threat intelligence platform\n\n**Scenario 4: Forum Monitoring**\n- Set up a scraper to monitor dark web forums for mentions of your organization\n- Extract post content, author, and timestamp\n- Alert on new mentions of company names, products, or executives\n\n**Data Processing Pipeline:**\n1. **Collect** — Scrape raw data\n2. **Clean** — Remove HTML tags, normalize whitespace, fix encoding\n3. **Parse** — Extract structured fields (emails, URLs, dates)\n4. **Deduplicate** — Remove exact and near-duplicates\n5. **Enrich** — Add context (geolocation, threat scores, WHOIS data)\n6. **Store** — Save to CSV, JSON, or database for analysis",
+      "duration_minutes": 7
+    },
+    {
+      "type": "memory_aid",
+      "title": "Web Scraping Workflow: C-E-P-D-S",
+      "content": "Remember the OSINT scraping workflow with **C-E-P-D-S**:\n\n- **C**ollect — Fetch raw data from web pages\n- **E**xtract — Parse HTML, pull out relevant fields\n- **P**rocess — Clean, normalize, deduplicate\n- **D**eduplicate — Remove duplicates across sources\n- **S**tore — Save in structured format (CSV/JSON/DB)\n\n**Key libraries mnemonic: \"RBP\"**:\n- **R**equests — HTTP fetching\n- **B**eautifulSoup — HTML parsing\n- **P**andas — Data processing\n\n**Ethical scraping checklist — R-A-T-E-S:**\n- **R**obots.txt — Check it first\n- **A**uthentication — Don't bypass login walls\n- **T**hrottling — Rate limit your requests (2-3 sec minimum)\n- **E**rror handling — Handle 429, 403, 503 gracefully\n- **S**ource attribution — Document where data came from\n\n**Regex essentials for OSINT:**\n- Emails: `[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}`\n- IPs: `\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}`\n- URLs: `https?://[\\w\\.-]+(?:/[\\w\\./%-]*)?`\n- Phone numbers: `\\+?\\d[\\d\\s-]{7,}\\d`",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Planning a Data Collection Project",
+      "content": "Design an OSINT data collection project:\n\n1. **Target:** What website or data source are you collecting from?\n2. **Data needed:** What specific fields do you need? (names, emails, dates, URLs?)\n3. **Method:** Instant Data Scraper for quick tasks, or Python script for scale?\n4. **Rate limiting:** What delay will you use between requests?\n5. **Storage:** CSV, JSON, or database? How will you organize the data?\n6. **Ethics:** Have you checked robots.txt? Are you complying with ToS?\n\n**Write down:** A concrete plan for a data collection task you need to do this week. Include the source, target data, tool, rate limit, and storage format.\n\n**Action item:** Install the Instant Data Scraper browser extension and try extracting a table from a real website today.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Manual to Automated Intelligence",
+      "content": "The difference between a junior analyst and a senior OSINT practitioner isn't just knowledge — it's scale. Juniors manually click through pages. Seniors automate data collection and focus on analysis.\n\n**Your progression:**\n- 🔰 Use Instant Data Scraper for quick table extraction\n- 🎯 Write Python scripts for repeated collection tasks\n- 🚀 Build automated pipelines that collect, process, and alert\n\nThe goal isn't to collect MORE data — it's to collect BETTER data faster, so you spend your time analyzing instead of copy-pasting.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Instant Data Scraper and Advanced Techniques",
+      "content": "**Instant Data Scraper** is a Chrome/Firefox extension that auto-detects tabular data:\n\n**How to Use It:**\n1. Navigate to the target page with data\n2. Click the Instant Data Scraper extension\n3. It auto-detects tables/lists on the page\n4. Review the detected data in the side panel\n5. Click \"Try another table\" if it picked the wrong one\n6. Click \"Download CSV\" or \"Copy to clipboard\"\n\n**Advanced Features:**\n- **Pagination:** Click \"Locate next page link\" to scrape multiple pages\n- **Custom selectors:** Manually specify CSS selectors for precision\n- **Scheduling:** Some versions support automated periodic scraping\n\n**When to Use Each Tool:**\n\n| Tool | Best For | Speed | Skill Level |\n|------|----------|-------|-------------|\n| Instant Data Scraper | Quick table extraction | Fast | Low |\n| BeautifulSoup + Requests | Structured HTML scraping | Medium | Medium |\n| Selenium/Playwright | JavaScript-heavy sites | Slow | Medium |\n| API calls | Structured data access | Fast | Medium |\n| Scrapy framework | Large-scale crawling | Fast | High |\n\n**Finding Hidden APIs:**\nMany modern websites load data via APIs. Find them using:\n1. Open browser DevTools → Network tab\n2. Load the page and filter by XHR/Fetch\n3. Look for JSON responses containing your data\n4. The API endpoint is usually cleaner to scrape than HTML\n\n```python\n# Example: Using discovered API\napi_url = 'https://example.com/api/v1/users?page=1'\nresponse = requests.get(api_url, headers=headers)\ndata = response.json()  # Already structured!\nfor user in data['results']:\n    print(f\"{user['name']}: {user['email']}\")\n```",
+      "duration_minutes": 8
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "web-scraping",
+    "data-collection",
+    "beautifulsoup",
+    "instant-data-scraper",
+    "python",
+    "regex"
+  ]
+}

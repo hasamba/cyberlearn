@@ -1,0 +1,165 @@
+{
+  "lesson_id": "b4f0d8e9-a1b2-4c3d-4e5f-6a7b8c9d0e12",
+  "domain": "threat_hunting",
+  "title": "Domain Intelligence and Pivoting",
+  "difficulty": 2,
+  "order_index": 48,
+  "prerequisites": [],
+  "concepts": [
+    "Domain analysis fundamentals",
+    "WHOIS data and registration patterns",
+    "DNS intelligence and passive DNS",
+    "OSINT pivoting techniques",
+    "DomainTools and WHOIS analysis",
+    "Maltego for domain mapping",
+    "Infrastructure correlation",
+    "Domain reputation scoring",
+    "Subdomain enumeration",
+    "SSL/TLS certificate analysis"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Analyze domain registration data to identify threat actor infrastructure",
+    "Use passive DNS to pivot between domains, IPs, and infrastructure",
+    "Employ Maltego for visual domain intelligence and relationship mapping",
+    "Correlate WHOIS data patterns across multiple domains to identify campaigns",
+    "Apply subdomain enumeration and certificate analysis for infrastructure discovery"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary value of passive DNS databases for threat intelligence?",
+      "options": [
+        "They provide real-time DNS resolution",
+        "They store historical DNS records showing which domains resolved to which IPs over time",
+        "They block malicious domains",
+        "They provide SSL certificate information"
+      ],
+      "correct": 1,
+      "explanation": "Passive DNS databases store historical DNS resolution data, allowing analysts to see which domains resolved to which IP addresses in the past. This enables pivoting from a known-bad IP to discover all domains that have ever pointed to it, revealing related infrastructure."
+    },
+    {
+      "question": "When analyzing WHOIS data for threat intelligence, which pattern MOST strongly indicates shared infrastructure between domains?",
+      "options": [
+        "Domains registered in the same country",
+        "Identical registrant email, name server patterns, and close registration dates",
+        "Domains using the same TLD",
+        "Domains hosted on the same CDN"
+      ],
+      "correct": 1,
+      "explanation": "Shared WHOIS attributes — same registrant email, same name servers, and close registration dates — strongly suggest the same operator or threat group. While CDNs and country overlap are common across benign domains, matching registrant details and infrastructure patterns are more specific indicators."
+    },
+    {
+      "question": "Which technique allows you to discover additional infrastructure from a known-bad domain?",
+      "options": [
+        "DNS amplification",
+        "Pivoting through SSL certificate subject alternative names (SANs)",
+        "Zone transfer requests to authoritative servers",
+        "Reverse HTTP proxy analysis"
+      ],
+      "correct": 1,
+      "explanation": "SSL certificates often include Subject Alternative Names (SANs) listing all domains covered by the certificate. Querying certificate transparency logs for a known-bad domain's certificate reveals all other domains on the same certificate, exposing related infrastructure."
+    },
+    {
+      "question": "In Maltego, which transform would you use to discover all domains sharing the same name server as a target domain?",
+      "options": [
+        "To IP Address → DNS Name",
+        "To DNS Name → Name Server → Name Server to Domain",
+        "To Email Address from WHOIS",
+        "To MX Record → Domain"
+      ],
+      "correct": 1,
+      "explanation": "The correct Maltego pivot path is: Target Domain → Name Server(s) → All Domains using those Name Servers. This reveals infrastructure sharing, as threat actors often use the same name servers across their campaigns."
+    },
+    {
+      "question": "What is a 'domain generation algorithm' (DGA) and why is it relevant to domain intelligence?",
+      "options": [
+        "A tool for generating legitimate domain names",
+        "An algorithm used by malware to generate hundreds of potential C2 domains, making it harder to block them all",
+        "A DNS load balancing technique",
+        "A method for registering domains in bulk at discounted rates"
+      ],
+      "correct": 1,
+      "explanation": "DGAs are used by malware to algorithmically generate hundreds or thousands of potential domain names. The malware tries to resolve each one, and only the ones the attacker has registered will resolve. This makes blocking C2 infrastructure much harder, as you can't block all possible domains."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall",
+    "Spaced Repetition",
+    "Visualization",
+    "Association",
+    "Chunking",
+    "Mnemonics",
+    "Teach It Back",
+    "Emotional Connection",
+    "Simplify",
+    "Focus and Eliminate Distractions"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Domains Are the Skeleton Keys of Threat Intel",
+      "content": "A single domain can unlock an entire threat actor's infrastructure. From one domain, you pivot to its IP, its name servers, its registrant, its SSL certificates — and from each of those, you discover MORE domains. This isn't linear research; it's exponential discovery. One domain becomes ten, ten become a hundred. Master domain pivoting, and you'll map adversary infrastructure faster than any automated tool.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Domain Intelligence Fundamentals",
+      "content": "**Domain intelligence** is the analysis of domain registration, DNS, and infrastructure data to understand threat actor operations.\n\n**Key Data Sources:**\n\n**WHOIS Data:**\n- Registrant name, email, organization\n- Name servers\n- Registration and expiration dates\n- Registrar information\n- Privacy/proxy services (can be a red flag)\n\n**DNS Records:**\n- A records (IP addresses)\n- NS records (name servers)\n- MX records (mail servers)\n- TXT records (verification, SPF)\n- CNAME records (aliases)\n\n**Passive DNS:**\n- Historical resolution data\n- Shows which domains pointed to which IPs over time\n- Critical for tracking infrastructure changes\n\n**SSL/TLS Certificates:**\n- Subject Alternative Names (SANs) — all domains on a certificate\n- Issuer and validation level\n- Certificate transparency logs\n\n**Domain Reputation:**\n- Age of domain (newly registered = suspicious)\n- Popularity and traffic rank\n- Blacklist appearances\n- Malware association history\n\n**Pivoting Paths:**\n- Domain → IP → All domains resolving to that IP\n- Domain → Name Server → All domains using that NS\n- Domain → Registrant Email → All domains by same registrant\n- Domain → SSL Certificate → All domains on same cert\n- IP → Reverse DNS → Other domains → Repeat",
+      "duration_minutes": 10
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Domain Pivoting",
+      "content": "Imagine you're a detective tracking a criminal's hideout.\n\n**The domain** is like an address: \"evil-building.com\"\n\n**Step 1 — WHOIS:** You look up who registered the building. The form says: \"John Smith, email: badguy@protonmail.com, registered: Jan 15.\"\n\n**Step 2 — Pivot on email:** You search for ALL buildings registered by \"badguy@protonmail.com\" and find 5 more: evil-store.com, evil-shop.net, fake-bank.org...\n\n**Step 3 — Pivot on IP:** evil-building.com points to IP 203.0.113.45. You search: \"What OTHER domains point to 203.0.113.45?\" and find 3 more evil domains.\n\n**Step 4 — Pivot on name servers:** All these domains use ns1.evil-dns.com. You search for ALL domains using that name server and find 10 more!\n\n**Step 5 — Pivot on SSL:** The SSL certificate for evil-building.com also covers fake-bank.com and phish-login.com. Two more discovered!\n\nFrom ONE domain, you found 20+ related domains — the criminal's entire network of hideouts!",
+      "duration_minutes": 5
+    },
+    {
+      "type": "code_exercise",
+      "title": "Domain Intelligence with Python",
+      "content": "Build a domain intelligence gathering script:\n\n```python\nimport whois\nimport dns.resolver\nimport requests\nimport json\nfrom datetime import datetime\n\nclass DomainIntel:\n    def __init__(self, domain):\n        self.domain = domain\n        self.data = {}\n    \n    def get_whois(self):\n        \"\"\"Gather WHOIS information.\"\"\"\n        try:\n            w = whois.whois(self.domain)\n            self.data['whois'] = {\n                'registrar': w.registrar,\n                'name_servers': w.name_servers,\n                'creation_date': str(w.creation_date),\n                'expiration_date': str(w.expiration_date),\n                'emails': w.emails,\n                'org': w.org\n            }\n            return self.data['whois']\n        except Exception as e:\n            print(f\"WHOIS error: {e}\")\n            return None\n    \n    def get_dns_records(self):\n        \"\"\"Resolve DNS records.\"\"\"\n        record_types = ['A', 'AAAA', 'NS', 'MX', 'TXT']\n        self.data['dns'] = {}\n        for rtype in record_types:\n            try:\n                answers = dns.resolver.resolve(self.domain, rtype)\n                self.data['dns'][rtype] = [str(r) for r in answers]\n            except Exception:\n                self.data['dns'][rtype] = []\n        return self.data['dns']\n    \n    def check_passive_dns(self, ip):\n        \"\"\"Query passive DNS for domains resolving to an IP.\"\"\"\n        # Example using VirusTotal (API key required)\n        url = f'https://www.virustotal.com/vtapi/v2/domain/report'\n        # Returns domains that resolved to the same IP\n        pass  # Implementation depends on API\n    \n    def analyze(self):\n        \"\"\"Full domain analysis.\"\"\"\n        self.get_whois()\n        self.get_dns_records()\n        \n        # Calculate domain age\n        if self.data.get('whois', {}).get('creation_date'):\n            created = datetime.fromisoformat(\n                self.data['whois']['creation_date'].strip(\"'\")\n            )\n            age_days = (datetime.now() - created).days\n            self.data['domain_age_days'] = age_days\n            if age_days < 30:\n                print(f\"⚠️ Newly registered domain ({age_days} days old)\")\n        \n        return self.data\n\n# Usage:\n# intel = DomainIntel('example.com')\n# results = intel.analyze()\n# print(json.dumps(results, indent=2))\n```\n\n**Challenge:** Extend this script to:\n1. Pivot on name servers to find related domains\n2. Check certificate transparency logs (crt.sh)\n3. Flag suspicious patterns (new domains, privacy services, short registration periods)",
+      "duration_minutes": 12
+    },
+    {
+      "type": "real_world",
+      "title": "Domain Pivoting in APT Investigations",
+      "content": "Real APT investigations rely heavily on domain pivoting:\n\n**APT28 (Fancy Bear) Domain Infrastructure:**\n- Initial indicator: suspicious-domain.com\n- Pivot on WHOIS email → found 50+ domains registered with same email\n- Pivot on name servers → found 100+ domains using same NS infrastructure\n- Pivot on SSL certificates → identified phishing infrastructure targeting multiple organizations\n- Pattern: Domains mimicking legitimate military/government sites\n\n**Cobalt Strike Infrastructure Discovery:**\n- Start: One known Cobalt Strike domain\n- Check certificate transparency → find all certs issued for related domains\n- Check passive DNS → find all IPs the domain resolved to\n- Check reverse DNS on those IPs → find more domains\n- Check JA3/JA3S hashes → find servers with identical TLS configurations\n- Result: Map entire C2 infrastructure in hours\n\n**Phishing Campaign Detection:**\n- Monitor newly registered domains matching your organization's keywords\n- Check WHOIS privacy patterns (same proxy service across domains)\n- Check DNS patterns (same quick DNS services)\n- Pivot on MX records (same mail servers across phishing domains)\n\n**Tools for Domain Pivoting:**\n| Tool | Purpose |\n|------|----------|\n| DomainTools | WHOIS history, reverse WHOIS, domain profiling |\n| Maltego | Visual relationship mapping and pivoting |\n| crt.sh | Certificate transparency log search |\n| VirusTotal | Passive DNS, domain reputation |\n| SecurityTrails | DNS history, associated domains |\n| Shodan | Infrastructure analysis, port/service discovery |\n| Urlscan.io | Domain screenshots and technology fingerprinting |",
+      "duration_minutes": 8
+    },
+    {
+      "type": "memory_aid",
+      "title": "Domain Pivoting Paths: P-I-V-O-T-S",
+      "content": "Remember pivoting paths with **P-I-V-O-T-S**:\n\n- **P**assive DNS — Domain ↔ IP history\n- **I**P addresses — Reverse DNS, all domains on an IP\n- **V**isual mapping — Maltego transforms for relationships\n- **O**rganization/Registrant — WHOIS email → all domains\n- **T**ransport Layer (SSL) — Certificate SANs and CT logs\n- **S**ubdomains — DNS brute-force and enumeration\n\n**WHOIS red flags — N-A-S-T-Y:**\n- **N**ewly registered (< 30 days old)\n- **A**nonymous — Privacy/proxy services hiding registrant\n- **S**hort registration period (1 year)\n- **T**hreat-adjacent — Similar to known-bad domains\n- **Y**oung name servers — Newly created NS infrastructure\n\n**Maltego pivot paths — 5 key transforms:**\n1. Domain → IP Address\n2. Domain → Name Server → All NS domains\n3. Domain → WHOIS Email → All domains by email\n4. Domain → SSL Certificate → All SANs\n5. IP → Reverse DNS → Related domains",
+      "duration_minutes": 4
+    },
+    {
+      "type": "reflection",
+      "title": "Building Your Domain Intelligence Playbook",
+      "content": "Create a personal domain investigation playbook:\n\n1. **Starting point:** When you receive a suspicious domain, what's your FIRST pivot?\n2. **WHOIS analysis:** What registrant details do you check first?\n3. **DNS enumeration:** Which record types give you the most intelligence?\n4. **Passive DNS:** Which services do you have access to? (VirusTotal, SecurityTrails, etc.)\n5. **Certificate analysis:** How do you check crt.sh for related domains?\n\n**Write down:**\n- Your standard domain investigation workflow (step by step)\n- One new pivot technique you want to try this week\n- A list of tools/APIs you need to set up\n\n**Action item:** Create a Maltego graph for a known-bad domain and practice each of the 5 key transforms.",
+      "duration_minutes": 5
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From One Domain to an Empire",
+      "content": "The best threat intelligence analysts don't just find one bad domain — they find the infrastructure behind it. One indicator is a dot; pivoting connects the dots into a picture. That picture reveals the adversary's infrastructure, their campaigns, and sometimes their identity.\n\n**Your progression:**\n- 🔰 Understand DNS and WHOIS basics\n- 🎯 Execute multi-step pivoting to map infrastructure\n- 🚀 Automate domain intelligence collection and correlation\n\nEvery pivot is a multiplier. Start with one domain, and with the right pivots, you can map an entire adversary's operations. That's the power of domain intelligence.",
+      "duration_minutes": 2
+    },
+    {
+      "type": "explanation",
+      "title": "Maltego for Domain Intelligence",
+      "content": "**Maltego** is the leading visual pivoting tool for domain intelligence:\n\n**Setting Up a Domain Investigation:**\n1. Create a new graph\n2. Add a Domain entity → right-click for transforms\n\n**Key Transforms for Domain Pivoting:**\n\n| From Domain | Transform | Reveals |\n|-------------|-----------|---------|\n| Domain | To DNS Name → NS Record | Name servers |\n| Domain | To DNS Name → A Record | IP addresses |\n| Domain | To DNS Name → MX Record | Mail servers |\n| Domain | To Website | HTTP analysis |\n| Domain | To Email Address (WHOIS) | Registrant emails |\n| Domain | To Phrase (crt.sh) | SSL certificate SANs |\n| Domain | To Netblock | IP ranges |\n\n| From IP | Transform | Reveals |\n|---------|-----------|--------|\n| IP | To DNS Name (Reverse) | All domains on that IP |\n| IP | To Netblock | IP range owner |\n| IP | To Location | Geolocation |\n\n| From Email | Transform | Reveals |\n|-----------|-----------|--------|\n| Email | To Domain (WHOIS) | All domains by same registrant |\n| Email | To Person | Associated identities |\n\n**Practical Workflow:**\n1. Start with suspicious-domain.com\n2. Run: Domain → NS Record → Get all domains on same NS\n3. Run: Domain → A Record → IP → Reverse DNS → More domains\n4. Run: Domain → WHOIS Email → All domains by same email\n5. Run: Domain → crt.sh → All domains on same SSL cert\n6. Analyze: Look for patterns — naming conventions, registration dates, infrastructure overlap\n\n**Automation Tip:** Use Maltego's Machine functionality to run multiple transforms in sequence automatically, generating comprehensive infrastructure maps with a single click.",
+      "duration_minutes": 8
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR578",
+    "Career Path: Threat Hunter",
+    "Career Path: OSINT",
+    "domain-intelligence",
+    "OSINT",
+    "pivoting",
+    "Maltego",
+    "passive-DNS",
+    "WHOIS",
+    "threat-intelligence"
+  ]
+}
