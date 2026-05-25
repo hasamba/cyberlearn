@@ -1,0 +1,135 @@
+{
+  "lesson_number": "972",
+  "order_index": 50,
+  "domain": "osint",
+  "difficulty": 2,
+  "title": "Geolocation and Mapping",
+  "slug": "geolocation_and_mapping",
+  "lesson_id": "1ad00d04-beca-406a-86d1-323c80904024",
+  "module": "SEC497 Section 2",
+  "prerequisites": [
+    "Metadata Analysis for OSINT"
+  ],
+  "concepts": [
+    "GPS coordinates and formats",
+    "EXIF-based geolocation",
+    "Visual geolocation techniques",
+    "Google Earth Pro for OSINT",
+    "Sun position and shadow analysis",
+    "Map projection and coordinate systems",
+    "Geofencing and spatial analysis",
+    "Counter-geolocation OPSEC"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Extract and interpret GPS coordinates from image metadata",
+    "Apply visual geolocation techniques using landmarks, signage, and environmental clues",
+    "Use Google Earth Pro and mapping tools for location verification",
+    "Analyze shadows and sun position to estimate time and location",
+    "Understand counter-geolocation techniques for operational security"
+  ],
+  "post_assessment": [
+    {
+      "question": "What coordinate format does most mapping software use by default?",
+      "options": [
+        "Degrees, Minutes, Seconds (DMS)",
+        "Decimal Degrees (DD)",
+        "Universal Transverse Mercator (UTM)",
+        "Military Grid Reference System (MGRS)"
+      ],
+      "correct": 1,
+      "explanation": "Decimal Degrees (DD) is the standard format for most mapping APIs and software (e.g., 32.0853, 34.7818). DMS is common in EXIF data but must be converted for most tools."
+    },
+    {
+      "question": "Which technique uses shadow analysis to determine photo location?",
+      "options": [
+        "EXIF extraction",
+        "Shadow length and direction to estimate latitude, longitude, and time",
+        "Reverse image search",
+        "License plate analysis"
+      ],
+      "correct": 1,
+      "explanation": "Shadow analysis uses the length and direction of shadows to calculate the sun's position, which reveals approximate latitude and time of day. Combined with other clues, this can narrow down location significantly."
+    },
+    {
+      "question": "What is the primary OPSEC concern with geolocation in OSINT investigations?",
+      "options": [
+        "Slow internet speeds",
+        "Revealing the investigator's location through API requests, image uploads, and mapping tool usage",
+        "Inaccurate GPS coordinates",
+        "Too many search results"
+      ],
+      "correct": 1,
+      "explanation": "When conducting OSINT, your own geolocation can leak through EXIF data in uploaded images, IP-based API calls, and mapping service logs. Investigators must use VPNs and strip metadata to protect their location."
+    },
+    {
+      "question": "What is visual geolocation?",
+      "options": [
+        "Using GPS satellites to find locations",
+        "Determining a photo's location by analyzing visual elements (landmarks, signage, vegetation, architecture)",
+        "Checking IP address geolocation databases",
+        "Using satellite imagery to track vehicles"
+      ],
+      "correct": 1,
+      "explanation": "Visual geolocation uses observable elements in a photo or video — buildings, signs, license plates, vegetation, road markings, language — to determine where it was taken without relying on GPS metadata."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Every Photo Tells a Location",
+      "content": "A photo is a fingerprint of a place and time. The architecture reveals the region. The vegetation reveals the climate. The shadow angle reveals the time. The signage reveals the language. And if you're lucky, the EXIF data reveals the exact GPS coordinates.\n\nGeolocation is one of the most powerful OSINT skills because it turns any image or video into actionable intelligence. But it's also a double-edged sword — the same techniques that help you find others can help others find you."
+    },
+    {
+      "type": "explanation",
+      "title": "Geolocation Methods and Techniques",
+      "content": "**Method 1 — EXIF GPS Data:**\n- Extract coordinates directly from image metadata\n- Most reliable but often stripped by social media platforms\n- Use ExifTool: `exiftool -gpslatitude -gpslongitude image.jpg`\n\n**Method 2 — Visual Geolocation:**\n- **Landmarks and buildings:** Skyscrapers, monuments, distinctive architecture\n- **Language and signage:** Street signs, shop names, license plates\n- **Vegetation:** Palm trees (tropical), cacti (desert), deciduous trees (temperate)\n- **Infrastructure:** Road markings (yellow center lines = US/Canada), power line styles\n- **Vehicles:** Driving side (left vs right), car models, license plate formats\n- **Weather and sun:** Shadow direction and length reveal time and hemisphere\n\n**Method 3 — Shadow Analysis:**\n- Shadow direction indicates approximate time of day\n- Shadow length relative to object height reveals latitude\n- SunCalc.org calculates sun position for any date/time/location\n\n**Method 4 — Reverse Image Search:**\n- Google Images, Yandex, TinEye, Bing Visual Search\n- Yandex often best for Russian/Eastern European locations\n- Google best for Western locations\n\n**Method 5 — Mapping Tools:**\n- Google Earth Pro — Historical imagery, 3D terrain\n- OpenStreetMap — Open-source mapping with detailed features\n- Sentinel Hub — Satellite imagery with temporal comparison\n- Overpass Turbo — Query OSM data for specific features"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Visual Geolocation",
+      "content": "Imagine someone shows you a photo and says 'Where was this taken?' You don't need GPS — you can be a detective:\n\n- **The sun is on the left** → Morning, and the shadow points east, so we're in the Northern Hemisphere\n- **Cars drive on the left** → UK, Australia, Japan, India\n- **Signs are in Arabic** → Middle East or North Africa\n- **Palm trees and no mountains** → Tropical, flat terrain\n- **Yellow center lines on roads** → United States or Canada\n- **A red post box** → United Kingdom\n\nEach clue narrows it down. One clue might tell you the country. Two clues might tell you the city. Three clues might tell you the exact street.\n\nThat's visual geolocation — reading the environment like a detective reads a crime scene."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Geolocation Tools and Scripts",
+      "content": "```bash\n# === EXIF GPS Extraction ===\nexiftool -gpslatitude -gpslongitude -gpsaltitude photo.jpg\n\n# Batch extract GPS from all images\nexiftool -r -gpslatitude -gpslongitude -T /path/to/images/ > gps_data.tsv\n```\n\n```python\n# Python: GPS Extraction and Mapping\nfrom PIL import Image\nfrom PIL.ExifTags import TAGS, GPSTAGS\n\ndef get_gps_coords(image_path):\n    img = Image.open(image_path)\n    exif = img._getexif() or {}\n    \n    for tag_id, value in exif.items():\n        tag = TAGS.get(tag_id, tag_id)\n        if tag == 'GPSInfo':\n            gps = {}\n            for k, v in value.items():\n                gps[GPSTAGS.get(k, k)] = v\n            \n            def to_degrees(val):\n                d, m, s = val\n                return float(d) + float(m)/60 + float(s)/3600\n            \n            lat = to_degrees(gps['GPSLatitude'])\n            if gps['GPSLatitudeRef'] == 'S': lat = -lat\n            lon = to_degrees(gps['GPSLongitude'])\n            if gps['GPSLongitudeRef'] == 'W': lon = -lon\n            \n            return lat, lon\n    return None\n\ncoords = get_gps_coords('photo.jpg')\nif coords:\n    print(f'Google Maps: https://maps.google.com/?q={coords[0]},{coords[1]}')\n\n# Reverse Geocoding\nimport requests\ndef reverse_geocode(lat, lon):\n    url = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json'\n    resp = requests.get(url, headers={'User-Agent': 'OSINT-Research'})\n    return resp.json().get('display_name', 'Unknown location')\n\naddress = reverse_geocode(32.0853, 34.7818)\nprint(f'Location: {address}')\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Geolocation Investigations",
+      "content": "**Bellingcat — Downed MH17 Investigation:**\nBellingcat used visual geolocation to pinpoint the launch site of the Buk missile that shot down MH17. They analyzed terrain, road markings, and shadows in social media photos, cross-referencing with satellite imagery to identify the exact field in eastern Ukraine.\n\n**Russian Military Geolocation (2022):**\nOSINT researchers tracked Russian military positions using:\n- Background landmarks in soldiers' selfies\n- License plates and road signs visible in videos\n- Sun angles matching specific dates and locations\n- Architecture patterns matching specific Russian military bases\n\n**Kidnapping Case — Photo Geolocation:**\nA kidnapping victim sent a photo to their family. Despite having no GPS data (stripped by the messaging app), investigators used:\n- Window reflections showing a distinctive bridge\n- Shadows indicating mid-morning, Northern Hemisphere\n- Power line patterns matching a specific utility company's territory\n- A partially visible street sign\n\nThey narrowed the location to a 3-block area, leading to rescue.\n\n**Counter-geolocation lesson:** In 2019, US soldiers' fitness tracker data (Strava) revealed the layout of secret military bases in Afghanistan and Syria. The GPS heat maps showed jogging routes that outlined base perimeters. Geolocation works both ways."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Visual Geolocation: L.I.V.E.S.",
+      "content": "**L** — Language (signs, text, scripts)\n**I** — Infrastructure (roads, power lines, buildings)\n**V** — Vegetation (trees, plants, climate)\n**E** — Environment (shadows, sun, weather)\n**S** — Symbols (flags, post boxes, license plates)\n\nRead L.I.V.E.S. in every photo — each element is a geolocation clue."
+    },
+    {
+      "type": "reflection",
+      "title": "Geolocation Challenge",
+      "content": "Find a photo from social media (or use a practice image from Geoguessr) and try to determine its location using ONLY visual clues:\n\n1. What language/script is visible on signs?\n2. What side of the road do cars drive on?\n3. What does the vegetation tell you about climate?\n4. What direction do shadows point (and what time of day)?\n5. What infrastructure details can you identify (power lines, road markings)?\n\nNow check: Were you right? What clues did you miss?\n\n**OPSEC Check:** Before you post your next photo online, strip its metadata:\n```bash\nmat2 photo.jpg\n```\nAnd check — does it contain GPS coordinates you don't want shared?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Geolocation Is a Double-Edged Sword",
+      "content": "You now have the power to find locations from photos. Others have the same power to find yours.\n\n**Investigator OPSEC:**\n- Never upload images with GPS data to public tools\n- Use VPN when accessing mapping APIs\n- Be aware that reverse image searches leave traces\n- Consider that your search queries reveal what you're investigating\n\nThe most effective OSINT investigators are invisible. They find others while leaving no trace of their own location, identity, or intent. Master geolocation, but also master the art of not being geolocated."
+    }
+  ]
+}

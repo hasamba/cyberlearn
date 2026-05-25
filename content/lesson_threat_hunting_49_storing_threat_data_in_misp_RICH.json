@@ -1,0 +1,133 @@
+{
+  "lesson_number": "1231",
+  "order_index": 49,
+  "domain": "threat_hunting",
+  "difficulty": 2,
+  "title": "Storing Threat Data in MISP",
+  "slug": "storing_threat_data_in_misp",
+  "lesson_id": "d8a3e79a-235a-4d9d-8c8b-d1c82cb5d6f2",
+  "module": "FOR578 S4",
+  "prerequisites": [],
+  "concepts": [
+    "MISP architecture and data model",
+    "Event and attribute structure",
+    "Taxonomies and tags in MISP",
+    "Threat data sharing communities",
+    "MISP API for automation",
+    "Correlation engine",
+    "Galaxies and clusters",
+    "Feed management"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand MISP's data model of events, attributes, and objects",
+    "Structure threat intelligence data using MISP taxonomies and tags",
+    "Configure sharing groups and communities for controlled distribution",
+    "Use the MISP API for automated threat intelligence ingestion",
+    "Leverage MISP's correlation engine to connect related indicators"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary data structure in MISP for storing a threat intelligence incident?",
+      "options": [
+        "Indicator",
+        "Event",
+        "Attribute",
+        "Galaxy"
+      ],
+      "correct": 1,
+      "explanation": "An Event is the top-level container in MISP that groups related attributes (IOCs, context) together. Attributes belong to events, and objects group multiple related attributes within an event."
+    },
+    {
+      "question": "What is a MISP taxonomy used for?",
+      "options": [
+        "Storing malware samples",
+        "Classifying and tagging events with standardized labels (e.g., TLP, confidence levels)",
+        "Encrypting shared threat data",
+        "Managing user permissions"
+      ],
+      "correct": 1,
+      "explanation": "MISP taxonomies provide standardized classification tags like TLP (Traffic Light Protocol), confidence levels, threat actor categories, and MITRE ATT&CK mappings. They ensure consistent labeling across organizations."
+    },
+    {
+      "question": "Which MISP feature automatically finds relationships between different events based on shared indicators?",
+      "options": [
+        "Taxonomies",
+        "Correlation engine",
+        "Sighting system",
+        "Galaxies"
+      ],
+      "correct": 1,
+      "explanation": "MISP's correlation engine automatically detects when the same indicator (IP, domain, hash) appears in multiple events, revealing connections between seemingly separate incidents."
+    },
+    {
+      "question": "How does MISP control who can see specific threat intelligence?",
+      "options": [
+        "Firewall rules on the server",
+        "TLP markings and distribution levels (This Organization, This Community, Connected Communities, All Communities)",
+        "Password-protected ZIP files",
+        "Separate database instances per user"
+      ],
+      "correct": 1,
+      "explanation": "MISP uses distribution levels combined with TLP markings to control visibility. Events can be shared at organization, community, or global levels, and TLP tags further restrict who can redistribute the intelligence."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-FOR578",
+    "Career Path: Threat Hunter"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "MISP: Where Threat Intelligence Meets Community",
+      "content": "Threat intelligence without sharing is just threat data. MISP (Malware Information Sharing Platform) turns isolated IOCs into connected intelligence by letting organizations share, correlate, and enrich threat data together.\n\nThink of MISP as the GitHub of threat intelligence — but instead of code, you're version-controlling adversary behavior. The real power isn't just storing data; it's discovering that your IOCs connect to someone else's IOCs, revealing a campaign you'd never see alone."
+    },
+    {
+      "type": "explanation",
+      "title": "MISP Data Model: Events, Attributes, and Objects",
+      "content": "**Event (Top-Level Container):**\n- Represents a security incident, campaign, or intelligence report\n- Contains metadata: date, threat level, distribution, analysis state\n- Has an Event ID used for referencing and sharing\n- Can be tagged with taxonomies\n\n**Attribute (Individual IOCs):**\n- Belongs to an Event\n- Types: IP, domain, URL, hash, filename, email, mutex, registry key, etc.\n- Each attribute has a category (Payload delivery, Network activity, Artifacts, etc.)\n- Can have IDS flag (exportable to detection systems)\n- Can have a comment and first/last seen timestamps\n\n**Object (Grouped Attributes):**\n- Template-based grouping of related attributes\n- Examples: File object (filename + hash + size), Network connection (src IP + dst IP + port)\n- Provides context that individual attributes lack\n- Templates ensure consistent data structure\n\n**Relationships:**\n- Events can reference other events\n- Objects can have relationships (dropped-by, communicates-with, etc.)\n- The correlation engine discovers implicit relationships\n\n**Galaxies and Clusters:**\n- High-level knowledge: Threat actors, MITRE ATT&CK, ransomware families\n- Attach to events for context and classification\n- Maintained by the MISP project and community"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: MISP",
+      "content": "Imagine a giant shared notebook where everyone in your neighborhood writes down suspicious things they see. But it's not just random notes — it's organized:\n\n- Each **Event** is like one page about one incident ('Someone tried to break into my house')\n- Each **Attribute** is a specific detail ('The person wore a red hat', 'They drove a white van', 'License plate ABC-123')\n- **Taxonomies** are like colored stickers — red for 'don't share outside the neighborhood', yellow for 'be careful', green for 'share with everyone'\n- **Correlation** is the magic part — when your neighbor writes about a red hat too, MISP automatically draws a line connecting your two pages\n\nNow you both know: same red hat person. That's more powerful than either note alone."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Working with MISP: API and Data Management",
+      "content": "```python\n# MISP API - Creating and managing threat intelligence\nfrom pymisp import PyMISP, MISPEvent, MISPAttribute\n\n# Connect to MISP\nmisp = PyMISP('https://misp.example.com', 'YOUR_API_KEY', ssl=False)\n\n# Create a new event\nevent = MISPEvent()\nevent.info = 'APT28 Phishing Campaign - Q1 2026'\nevent.threat_level_id = 2  # 1=High, 2=Medium, 3=Low, 4=Undefined\nevent.analysis = 1  # 0=Initial, 1=Ongoing, 2=Complete\nevent.distribution = 0  # 0=Your Org, 1=Community, 2=Connected, 3=All\n\n# Add attributes (IOCs)\nevent.add_attribute('ip-dst', '185.220.101.34', category='Network activity', to_ids=True)\nevent.add_attribute('domain', 'secure-login-update.com', category='Payload delivery', to_ids=True)\nevent.add_attribute('url', 'https://secure-login-update.com/update', category='Payload delivery')\nevent.add_attribute('md5', 'd41d8cd98f00b204e9800998ecf8427e', category='Artifacts dropped', to_ids=True)\nevent.add_attribute('email-src', 'support@microsoft-security.com', category='Payload delivery')\n\n# Add tags (taxonomies)\nevent.add_tag('tlp:RED')  # Traffic Light Protocol\nevent.add_tag('misp-galaxy:threat-actor=\"APT28\"')\nevent.add_tag('misp-galaxy:mitre-attack-pattern=\"Spearphishing Link - T1566.002\"')\n\n# Push to MISP\nresult = misp.add_event(event)\nprint(f'Event created: {result[\"Event\"][\"id\"]}')\n\n# Search for related events\nrelated = misp.search('events', tags='APT28', limit=10)\n\n# Get correlations for an attribute\ncorrelations = misp.search('attributes', value='185.220.101.34')\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: MISP in Threat Intelligence Communities",
+      "content": "MISP powers some of the world's largest threat intelligence sharing communities:\n\n**CIRCL (Computer Incident Response Center Luxembourg):**\nThe creators of MISP operate one of the largest sharing communities, with over 10,000 organizations sharing threat data globally. CIRCL's community demonstrates MISP's core value — correlation across organizations reveals campaigns invisible to any single entity.\n\n**Financial ISACs:**\nBanking and financial institutions use MISP to share IOCs related to financial crime. When one bank detects a phishing campaign, all connected banks receive the indicators within minutes.\n\n**National CERTs:**\nMany national CERTs run MISP instances for cross-border threat intelligence sharing. When a campaign targets one country, MISP enables rapid distribution of IOCs to allied nations.\n\n**Success Story:** A mid-size company noticed unusual DNS queries in their logs. They uploaded the indicators to their MISP instance and discovered correlation with 12 other organizations' events — all part of an APT campaign targeting their sector. Without MISP, they would have treated it as isolated noise."
+    },
+    {
+      "type": "memory_aid",
+      "title": "MISP Structure: E.A.O.T.G.",
+      "content": "**E** — Events (top-level containers for incidents)\n**A** — Attributes (individual IOCs: IPs, domains, hashes)\n**O** — Objects (grouped, templated attribute collections)\n**T** — Taxonomies (standardized classification tags)\n**G** — Galaxies (high-level knowledge: threat actors, ATT&CK)\n\nE.A.O.T.G. — From individual data points to connected intelligence."
+    },
+    {
+      "type": "reflection",
+      "title": "Design Your MISP Event",
+      "content": "Imagine you've identified a phishing campaign targeting your organization. Design a MISP event:\n\n1. **Event:** What's the title? What threat level? What distribution?\n2. **Attributes:** List 5-8 IOCs you'd include (IPs, domains, hashes, email addresses)\n3. **Taxonomies:** What TLP level? What ATT&CK techniques?\n4. **Objects:** Would a File object or Network Connection object make sense?\n5. **Sharing:** Who should see this — your org only, your ISAC, or the broader community?\n\nWrite out your event structure. Think about what someone else would need to detect this campaign on their network."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Threat Intelligence Is a Team Sport",
+      "content": "The organizations that benefit most from MISP aren't the ones that just consume — they're the ones that share. Every IOC you contribute might be the piece that connects someone else's puzzle.\n\n**Your MISP action items:**\n- Start sharing even small observations — correlations need data\n- Use taxonomies consistently — mislabeled intelligence is useless\n- Set up automated feeds — stale intelligence is dangerous\n- Review correlations daily — that's where the magic happens\n- Respect TLP markings — trust is the foundation of sharing communities\n\nThe best threat intelligence platform is useless without a community. Be the community."
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "lesson_number": "898",
+  "order_index": 50,
+  "domain": "linux",
+  "difficulty": 2,
+  "title": "Python Package Management on Linux (pip, venv)",
+  "slug": "python_package_management_on_linux_pip_venv",
+  "lesson_id": "54484117-257e-4a70-8cbd-f895ec5bcb8c",
+  "module": "SEC406 Section 5",
+  "prerequisites": [
+    "Linux Kernel, Operating System, and Distributions"
+  ],
+  "concepts": [
+    "pip package manager",
+    "Virtual environments (venv, virtualenv)",
+    "requirements.txt and dependency pinning",
+    "pipenv and poetry for modern projects",
+    "Dependency conflicts and resolution",
+    "Package security and supply chain",
+    "PyPI and private package repositories",
+    "pip audit and vulnerability scanning"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Use pip to install, update, and manage Python packages",
+    "Create and manage virtual environments to isolate project dependencies",
+    "Generate and use requirements.txt for reproducible environments",
+    "Apply security best practices for Python package management",
+    "Understand supply chain risks in Python package ecosystems"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary security benefit of Python virtual environments?",
+      "options": [
+        "They encrypt your code",
+        "They isolate project dependencies, preventing conflicts and limiting blast radius of compromised packages",
+        "They make code run faster",
+        "They provide automatic vulnerability scanning"
+      ],
+      "correct": 1,
+      "explanation": "Virtual environments isolate each project's dependencies. If a package is compromised, the blast radius is limited to projects using that venv, not the entire system."
+    },
+    {
+      "question": "Which command audits installed Python packages for known vulnerabilities?",
+      "options": [
+        "pip check",
+        "pip audit",
+        "pip security",
+        "pip scan"
+      ],
+      "correct": 1,
+      "explanation": "pip-audit (installed as a separate tool) checks installed packages against known vulnerability databases (PyPI advisory, OSV). 'pip check' only verifies dependency compatibility, not security."
+    },
+    {
+      "question": "Why should you pin exact versions in requirements.txt for production?",
+      "options": [
+        "To make the file longer",
+        "To ensure reproducible builds and prevent unexpected breaking changes from dependency updates",
+        "Because pip doesn't support version ranges",
+        "To reduce download time"
+      ],
+      "correct": 1,
+      "explanation": "Pinned versions (package==1.2.3) ensure every install produces identical environments. Unpinned dependencies can pull different versions over time, introducing bugs or vulnerabilities."
+    },
+    {
+      "question": "What is a typosquatting attack in the context of Python packages?",
+      "options": [
+        "Using outdated packages",
+        "Uploading malicious packages with names similar to popular ones (e.g., 'reqeusts' instead of 'requests')",
+        "Installing packages from unofficial repositories",
+        "Running pip as root"
+      ],
+      "correct": 1,
+      "explanation": "Typosquatting attackers upload packages with names that are common typos of popular packages (e.g., 'reqeusts' for 'requests'). Users who mistype the install command unknowingly install malicious code."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Package Management Is Supply Chain Management",
+      "content": "Every Python package you install is a piece of someone else's code running in your environment. That's convenient — and terrifying. Supply chain attacks through PyPI are real and growing.\n\nPackage management isn't just about 'pip install.' It's about controlling your supply chain: knowing what you're running, where it came from, and whether it's safe. Treat every package install as a security decision."
+    },
+    {
+      "type": "explanation",
+      "title": "Python Package Management Ecosystem",
+      "content": "**pip — The Standard Installer:**\n- Installs packages from PyPI (Python Package Index)\n- Resolves dependencies automatically\n- Supports version pinning and constraints\n\n**Virtual Environments:**\n- `venv` — Built-in Python virtual environment (Python 3.3+)\n- `virtualenv` — Third-party, more features, faster\n- `conda` — Anaconda's environment manager (data science)\n- Each venv has its own Python interpreter and site-packages\n\n**Modern Package Managers:**\n- `pipenv` — Combines pip + virtualenv + Pipfile\n- `poetry` — Full dependency management with pyproject.toml\n- `uv` — Ultra-fast Rust-based pip replacement\n\n**Key Files:**\n- `requirements.txt` — Pinned dependency list (pip install -r)\n- `Pipfile` / `Pipfile.lock` — pipenv's dependency specification\n- `pyproject.toml` — Modern Python project configuration\n- `setup.py` / `setup.cfg` — Legacy package configuration\n\n**Security Tools:**\n- `pip-audit` — Check for known vulnerabilities\n- `safety` — Security vulnerability scanner\n- `pipdeptree` — Visualize dependency tree\n- `bandit` — Security linter for Python code"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Virtual Environments",
+      "content": "Imagine you have different Lego sets, and each set needs specific pieces that don't work together. If you dump all pieces into one box, the castle pieces mix with the spaceship pieces and everything breaks.\n\nA virtual environment is like having a separate box for each Lego set. When you're building a castle, you only open the castle box. When you're building a spaceship, you open the spaceship box. The pieces never mix.\n\nIn Python:\n- Project A needs Django 3.x\n- Project B needs Django 4.x\n- If both share one Python installation, they fight over which Django version is installed.\n- Virtual environments give each project its own box with its own Django version.\n\nNo fights. No broken pieces. Just clean, isolated environments."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Python Package Management Workflow",
+      "content": "```bash\n# === Virtual Environment Setup ===\n\n# Create a virtual environment\npython3 -m venv ~/projects/myproject/.venv\n\n# Activate it\nsource ~/projects/myproject/.venv/bin/activate\n\n# Verify you're in the venv\nwhich python  # Should show .venv/bin/python\npip --version  # Should show .venv path\n\n# === Package Installation ===\npip install requests==2.31.0\npip install flask==3.0.0\npip install python-dotenv==1.0.0\n\n# Install with hash verification (supply chain security!)\npip install --require-hashes -r requirements.txt\n\n# === Dependency Management ===\npip freeze > requirements.txt\npip install -r requirements.txt\npip check\npipdeptree\n\n# === Security Auditing ===\npip install pip-audit\npip-audit\npip-audit -r requirements.txt\n\n# === Package Maintenance ===\npip list --outdated\npip install --upgrade requests\npip uninstall requests\n\n# === Pipenv (Modern Alternative) ===\npipenv install requests\npipenv shell\npipenv check\n\n# === Poetry (Full Project Management) ===\npoetry init\npoetry add requests\npoetry install\npoetry run python app.py\n```\n\n**Security-hardened requirements.txt:**\n```\nrequests==2.31.0 \\\n    --hash=sha256:942c5a758f98d790ea041c6a692519920e549b827937c0\nflask==3.0.0 \\\n    --hash=sha256:21128f3e8c9744a0a0e82537a0dde35c8a3afc1237d\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Python Supply Chain Attacks",
+      "content": "**Typosquatting Attack (2023):**\nAn attacker uploaded packages with names mimicking popular ones:\n- `reqeusts` (instead of `requests`) — 41K downloads before removal\n- `python3-openai` (instead of `openai`) — stole API keys\n- `coloram` (instead of `colorama`)\n\n**Dependency Confusion (2021, Alex Birsan):**\nOrganizations used internal package names (e.g., `company-internal-utils`). Attackers uploaded packages with the same names to PyPI. Because pip defaults to checking PyPI first, it installed the malicious external package instead of the internal one.\n\nAffected: Apple, Microsoft, PayPal, Netflix, and others.\n\n**PyPI Malicious Packages (Ongoing):**\n- `pymafka` — Disguised as kafka client, contained infostealer\n- `easygui-dev` — Malicious fork of legitimate easygui\n- `pymod` — Cryptominer disguised as utility\n\n**Defense:**\n```bash\n# Always verify package names before installing\npip install requests  # Double-check spelling!\n\n# Use hash verification for production\npip install --require-hashes -r requirements.txt\n\n# Pin exact versions\nrequests==2.31.0  # Not requests>=2.31.0\n\n# Scan regularly\npip-audit\nsafety check\n```"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Package Security: S.A.F.E. Install",
+      "content": "**S** — Scan (pip-audit, safety check)\n**A** — Authenticate (verify package name, check maintainer)\n**F** — Freeze (pin exact versions in requirements.txt)\n**E** — Environments (use venv for isolation)\n\nS.A.F.E. installations only. No blind `pip install` in production."
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Python Environment",
+      "content": "Check your current Python environment:\n\n```bash\npip list | wc -l           # How many packages?\npip list --outdated        # Any outdated?\npip-audit                  # Any vulnerabilities?\npipdeptree                 # What depends on what?\n```\n\nAnswer these questions:\n1. Do you use virtual environments for every project?\n2. Are your requirements.txt files pinned to exact versions?\n3. When did you last run pip-audit?\n4. Do you verify package names before installing?\n5. Do you use `--require-hashes` in production?\n\nIf you answered 'no' to more than one, you have supply chain work to do."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Your Supply Chain Is Your Attack Surface",
+      "content": "The average Python project has 50+ transitive dependencies. Each one is a potential attack vector. Package management isn't a chore — it's security work.\n\n**Action items:**\n1. Use virtual environments for EVERY project\n2. Pin exact versions in requirements.txt\n3. Run pip-audit before deploying\n4. Use `--require-hashes` in production\n5. Review dependency trees regularly (pipdeptree)\n6. Subscribe to security advisories for critical packages\n\nEvery `pip install` is a trust decision. Make it consciously."
+    }
+  ]
+}

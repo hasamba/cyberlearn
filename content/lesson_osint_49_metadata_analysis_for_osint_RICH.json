@@ -1,0 +1,136 @@
+{
+  "lesson_number": "971",
+  "order_index": 49,
+  "domain": "osint",
+  "difficulty": 2,
+  "title": "Metadata Analysis for OSINT",
+  "slug": "metadata_analysis_for_osint",
+  "lesson_id": "08171797-2790-4681-8520-5d0d4978e609",
+  "module": "SEC497 Section 2",
+  "prerequisites": [
+    "The OSINT Process and Methodology"
+  ],
+  "concepts": [
+    "File metadata and EXIF data",
+    "Document metadata (Office, PDF)",
+    "Image EXIF and GPS coordinates",
+    "Metadata extraction tools (ExifTool, FOCA, Mat2)",
+    "OPSEC implications of metadata",
+    "Metadata stripping and privacy",
+    "Steganography basics",
+    "Metadata in forensic investigations"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Extract and analyze metadata from images, documents, and other file types",
+    "Identify privacy risks from metadata leakage in shared files",
+    "Use ExifTool, FOCA, and Mat2 for metadata extraction and removal",
+    "Understand how metadata aids OSINT investigations and forensic analysis",
+    "Apply metadata OPSEC practices to protect operational security"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which tool is considered the gold standard for extracting metadata from virtually any file type?",
+      "options": [
+        "FOCA",
+        "ExifTool",
+        "Metagoofil",
+        "Mat2"
+      ],
+      "correct": 1,
+      "explanation": "ExifTool by Phil Harvey supports over 25,000 tags across hundreds of file types, making it the most comprehensive metadata extraction tool available."
+    },
+    {
+      "question": "A photo posted online contains GPS coordinates in its EXIF data. What does this reveal?",
+      "options": [
+        "Only the camera model used",
+        "The exact location where the photo was taken",
+        "The date the photo was uploaded",
+        "The editing software used"
+      ],
+      "correct": 1,
+      "explanation": "GPS coordinates in EXIF data pinpoint the exact geographic location where the photo was captured — a critical OSINT data point and a serious OPSEC risk."
+    },
+    {
+      "question": "What is the primary difference between FOCA and ExifTool?",
+      "options": [
+        "FOCA only works on Linux",
+        "FOCA specializes in document metadata and hidden information extraction from Office/PDF files",
+        "ExifTool cannot extract GPS data",
+        "FOCA is a network scanner"
+      ],
+      "correct": 1,
+      "explanation": "FOCA focuses specifically on document metadata (Office, PDF, OpenOffice) and can extract hidden data like usernames, network paths, and printer info that ExifTool may not parse as effectively."
+    },
+    {
+      "question": "Which tool removes metadata from files to protect privacy?",
+      "options": [
+        "ExifTool",
+        "FOCA",
+        "Metagoofil",
+        "Mat2"
+      ],
+      "correct": 3,
+      "explanation": "Mat2 (Metadata Anonymisation Toolkit 2) specifically removes metadata from files while preserving their visual/format quality. It's the go-to tool for OPSEC metadata stripping."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "Career Path: DFIR Specialist"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Metadata: The Hidden Story",
+      "content": "Every file tells two stories — the one you see, and the one hidden in its metadata. A photo of a sunset? The EXIF data might reveal the GPS coordinates of exactly where you stood. A resume PDF? The metadata might contain your username, the path to your Documents folder, and the exact time you last edited it.\n\nFor OSINT investigators, metadata is gold. For targets, it's a liability. This lesson teaches you to see what others miss — and to protect yourself from the same exposure."
+    },
+    {
+      "type": "explanation",
+      "title": "Types of Metadata and Their OSINT Value",
+      "content": "**Image Metadata (EXIF):**\n- GPS coordinates (latitude/longitude/altitude)\n- Camera make/model and serial number\n- Date/time of capture\n- Software used for editing\n- Thumbnail of original image (even after cropping!)\n\n**Document Metadata (Office/PDF):**\n- Author name and username\n- Organization/company name\n- Last modified by\n- Creation and modification timestamps\n- File system paths (reveals computer name, directory structure)\n- Printer information\n- Revision history and comments\n\n**Audio/Video Metadata:**\n- Recording device\n- Codec information\n- Duration and bit rate\n- GPS coordinates (some cameras)\n\n**OSINT Attack Surface:**\n- Identify the person who created a document\n- Link multiple documents to the same author\n- Locate where a photo was taken\n- Determine if an image has been edited\n- Discover internal network paths and computer names"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Metadata",
+      "content": "Think of a letter you wrote to someone. The letter itself is the content — what you wrote. But the envelope also has information: the return address, the postmark showing where it was sent from, the date it was mailed.\n\nMetadata is like that envelope information, but for digital files. When you take a photo with your phone, the phone secretly writes on the 'envelope':\n- Where you were (GPS)\n- When you took it (timestamp)\n- What camera you used\n- Whether you edited it\n\nMost people don't know this envelope information exists. But someone who knows how to read envelopes can learn a LOT about you — without you ever knowing they looked."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Hands-On: Metadata Extraction with ExifTool",
+      "content": "```bash\n# Install ExifTool\nsudo apt install libimage-exiftool-perl\n\n# Extract ALL metadata from a file\nexiftool photo.jpg\n\n# Extract GPS coordinates specifically\nexiftool -gpslatitude -gpslongitude photo.jpg\n\n# Extract metadata from a PDF\nexiftool document.pdf\n\n# Extract author info from Office documents\nexiftool -Author -LastModifiedBy -Company report.docx\n\n# Find all files with GPS data in a directory\nexiftool -r -gpslatitude -gpslongitude -T . | grep -v '^-$'\n\n# Strip all metadata (OPSEC!)\nexiftool -all= photo.jpg -o cleaned_photo.jpg\n\n# Recursive metadata extraction\nexiftool -r -csv /path/to/directory/ > metadata_report.csv\n\n# Compare original vs modified timestamps to detect editing\nexiftool -ModifyDate -CreateDate suspicious_image.jpg\n\n# Extract preview/thumbnail image (may show original before cropping)\nexiftool -b -ThumbnailImage photo.jpg > thumbnail.jpg\nexiftool -b -PreviewImage photo.jpg > preview.jpg\n```\n\n**Python alternative for bulk analysis:**\n```python\nfrom PIL import Image\nfrom PIL.ExifTags import TAGS, GPSTAGS\nimport os\n\ndef extract_gps(image_path):\n    img = Image.open(image_path)\n    exif = img._getexif() or {}\n    for tag_id, value in exif.items():\n        tag = TAGS.get(tag_id, tag_id)\n        if tag == 'GPSInfo':\n            gps = {}\n            for k, v in value.items():\n                gps[GPSTAGS.get(k, k)] = v\n            return gps\n    return None\n\nfor root, dirs, files in os.walk('/path/to/images'):\n    for f in files:\n        if f.lower().endswith(('.jpg', '.jpeg', '.tiff')):\n            gps = extract_gps(os.path.join(root, f))\n            if gps:\n                print(f'{f}: {gps}')\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Metadata Intelligence Cases",
+      "content": "**Case 1 — John McAfee's Location (2012):**\nVice Magazine published a photo of McAfee with metadata still intact. The EXIF GPS coordinates revealed his exact location in Guatemala, leading to his arrest. Vice deleted the photo — but the internet never forgets.\n\n**Case 2 — Russian Soldiers on Social Media (2014-2022):**\nOSINT researchers tracked Russian military deployments by analyzing EXIF data in soldiers' social media photos. GPS coordinates and timestamps proved Russian forces were operating inside Ukraine, contradicting official denials.\n\n**Case 3 — Bellingcat Investigations:**\nBellingcat regularly uses document metadata to verify authenticity. In the MH17 investigation, they proved a Russian military memo was created on a Russian military computer by analyzing the document's internal metadata (author, template paths, creation timestamps).\n\n**Case 4 — Corporate Espionage via Metadata:**\nA penetration tester was hired to assess a company's security. They downloaded public documents from the company website, extracted metadata revealing internal usernames, server paths (\\\\\\\\CORP-FS01\\\\Shares\\\\...), and software versions — all used to craft targeted phishing attacks."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Metadata Types: D.O.C.S.",
+      "content": "**D** — Device data (camera model, phone type, serial numbers)\n**O** — Origin data (author, username, organization, computer name)\n**C** — Coordinates (GPS latitude/longitude — the most dangerous)\n**S** — Stamps (creation date, modification date, edit history)\n\nRemember D.O.C.S. — because metadata **documents** things you didn't intend to share."
+    },
+    {
+      "type": "reflection",
+      "title": "Check Your Own Metadata Footprint",
+      "content": "Before investigating others, check your own exposure:\n\n1. Find 3 photos you've recently shared online\n2. Run `exiftool` on each one\n3. Check for: GPS data, camera model, editing software, timestamps\n\nAsk yourself:\n- Does this reveal where I live/work?\n- Does this link my real identity to accounts?\n- Could this help someone social-engineer me?\n\nNow strip the metadata:\n```bash\nmat2 photo.jpg   # Strips metadata in-place\n```\n\nGoing forward, make metadata stripping part of your workflow. OPSEC starts with your own files."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Metadata Is a Two-Way Street",
+      "content": "You now know how to extract metadata for investigations. But remember: the same techniques can be used against you. Every document you create, every photo you share, every file you upload carries your digital fingerprint.\n\n**Your OPSEC checklist:**\n- Strip metadata before sharing any file (`mat2` or `exiftool -all=`)\n- Disable GPS tagging on your phone camera when OPSEC matters\n- Use generic usernames on documents\n- Check what your social media reveals through metadata\n\nThe best OSINT investigator is one who leaves no metadata trail of their own. Hunt well, but stay hidden."
+    }
+  ]
+}

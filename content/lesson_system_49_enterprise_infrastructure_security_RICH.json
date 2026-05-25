@@ -1,0 +1,133 @@
+{
+  "lesson_number": "1311",
+  "order_index": 49,
+  "domain": "system",
+  "difficulty": 1,
+  "title": "Enterprise Infrastructure Security",
+  "slug": "enterprise_infrastructure_security",
+  "lesson_id": "7565e9c9-c676-4264-86bb-e6efe1a408fd",
+  "module": "Sec+ D3",
+  "prerequisites": [],
+  "concepts": [
+    "Network segmentation and VLANs",
+    "DMZ architecture",
+    "VPN types and protocols",
+    "Jump servers and bastion hosts",
+    "Secure protocol selection",
+    "Network zoning",
+    "Proxy and reverse proxy",
+    "Load balancer security"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Design secure network architecture using segmentation, DMZs, and zoning",
+    "Select appropriate VPN protocols for different enterprise scenarios",
+    "Configure jump servers and bastion hosts for secure administrative access",
+    "Distinguish between secure and insecure network protocols",
+    "Understand the role of proxies, load balancers, and firewalls in defense-in-depth"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of a DMZ in network architecture?",
+      "options": [
+        "To store encrypted passwords",
+        "To isolate publicly accessible services from the internal network",
+        "To accelerate network traffic",
+        "To block all incoming traffic"
+      ],
+      "correct": 1,
+      "explanation": "A DMZ (Demilitarized Zone) places public-facing services (web, email, DNS) in an isolated network segment. If compromised, attackers cannot reach the internal network directly."
+    },
+    {
+      "question": "Which VPN protocol provides the best balance of security and performance for modern enterprise use?",
+      "options": [
+        "PPTP",
+        "L2TP/IPsec",
+        "WireGuard",
+        "SSTP"
+      ],
+      "correct": 2,
+      "explanation": "WireGuard offers modern cryptography, minimal codebase (easier audit), and excellent performance. While IPsec remains widely deployed, WireGuard is increasingly the preferred choice for new implementations."
+    },
+    {
+      "question": "What is a jump server used for?",
+      "options": [
+        "Load balancing web traffic",
+        "Providing a single, audited access point for administrative connections to internal systems",
+        "Encrypting network traffic between offices",
+        "Filtering malicious URLs"
+      ],
+      "correct": 1,
+      "explanation": "A jump server (bastion host) is a hardened server that acts as the only authorized path for admin access to internal systems. All admin sessions are proxied through it, providing audit trails and limiting attack surface."
+    },
+    {
+      "question": "Which protocol should replace Telnet for remote administration?",
+      "options": [
+        "FTP",
+        "SSH",
+        "SNMP v2",
+        "HTTP"
+      ],
+      "correct": 1,
+      "explanation": "SSH (Secure Shell) encrypts all traffic including authentication, while Telnet transmits everything in plaintext. Always use SSH for remote command-line access."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: CompTIA-Security+",
+    "Career Path: Security Engineer"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Network Architecture Is Security Architecture",
+      "content": "A flat network is a compromised network waiting to happen. If every device can reach every other device, one compromise means total compromise. Enterprise infrastructure security starts with the network design — segmentation, zones, and controlled access paths.\n\nThink of it like a building: you don't put the lobby, the server room, and the CEO's office on the same hallway with no doors. Network architecture is your digital building design."
+    },
+    {
+      "type": "explanation",
+      "title": "Network Segmentation and Zoning",
+      "content": "**Network Segmentation:**\nDivide the network into isolated zones, each with specific security policies:\n\n- **Internal Zone** — Corporate workstations, trusted devices\n- **DMZ** — Public-facing services (web, email, DNS)\n- **Restricted Zone** — Critical servers, databases, SCADA systems\n- **Guest Zone** — Untrusted devices, BYOD, visitor access\n- **Management Zone** — Admin interfaces, jump servers, monitoring\n\n**DMZ Architecture:**\n```\nInternet → External Firewall → DMZ (Web, Mail, DNS) → Internal Firewall → Internal Network\n```\n\n**VLANs for Segmentation:**\n- VLAN 10 — Management (10.10.10.0/24)\n- VLAN 20 — Servers (10.10.20.0/24)\n- VLAN 30 — Workstations (10.10.30.0/24)\n- VLAN 40 — Guest (10.10.40.0/24)\n- VLAN 50 — IoT (10.10.50.0/24)\n\n**Key Principles:**\n1. Default deny between zones (only allow explicitly permitted traffic)\n2. Management traffic on separate VLAN\n3. IoT devices on isolated VLAN with internet-only access\n4. Server-to-server traffic on backend VLAN, no internet access"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Network Zones",
+      "content": "Imagine a castle:\n\n- **The moat** = The external firewall. First line of defense.\n- **The courtyard** = The DMZ. Visitors and merchants can come here, but they can't get into the castle itself.\n- **The castle walls** = The internal firewall. Protects the inside.\n- **The throne room** = The restricted zone. Only the king and trusted advisors.\n- **The guard house** = The management zone. Guards watch everything from here.\n\nIf an attacker gets into the courtyard (DMZ), they still can't enter the castle (internal network). And if they somehow get inside, they still can't reach the throne room (restricted zone).\n\nEach wall they hit slows them down and alerts the guards. That's defense-in-depth."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Secure Infrastructure Configuration Examples",
+      "content": "```bash\n# === Jump Server (Bastion Host) Setup ===\n\n# Hardened SSH configuration on jump server\n# /etc/ssh/sshd_config\nPort 2222                          # Non-standard port\nPermitRootLogin no                  # No root login\nPasswordAuthentication no           # Key-based auth only\nMaxAuthTries 3                      # Limit attempts\nAllowUsers admin@10.10.10.0/24     # Restrict source IPs\n\n# Firewall rules - only SSH inbound, restricted outbound\nsudo ufw default deny incoming\nsudo ufw default deny outgoing\nsudo ufw allow in 2222/tcp from 10.10.10.0/24  # Admin VLAN only\nsudo ufw allow out 22/tcp to 10.10.20.0/24    # SSH to servers\nsudo ufw allow out 443/tcp                     # HTTPS for updates\nsudo ufw enable\n\n# === VPN Configuration (WireGuard) ===\n\n# /etc/wireguard/wg0.conf\n[Interface]\nPrivateKey = <server_private_key>\nAddress = 10.10.99.1/24\nListenPort = 51820\n\n[Peer]\nPublicKey = <client_public_key>\nAllowedIPs = 10.10.99.2/32\n\n# Enable IP forwarding\necho 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf\nsysctl -p\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Target Breach — Segmentation Failure",
+      "content": "**Target Breach (2013) — 110M records stolen:**\n\nThe Target breach is the textbook example of segmentation failure:\n\n1. Attacker compromised an HVAC vendor (Fazio Mechanical) via phishing\n2. Used vendor credentials to access Target's **vendor management system**\n3. Because of poor segmentation, moved laterally from vendor systems to **POS systems**\n4. Installed malware on 1,800 point-of-sale devices\n5. Exfiltrated 40M credit card numbers and 70M customer records\n\n**What went wrong:**\n- Vendor network had connectivity to POS network (no segmentation)\n- No network zone isolation between HVAC management and retail systems\n- Lateral movement was unimpeded — no internal firewalls\n- No jump server for vendor access\n\n**How segmentation would have helped:**\n```\nHVAC Vendor → Vendor Portal (DMZ) → FIREWALL DENY → POS Network\n                                    ↕ (monitored, restricted)\n                               Vendor Management\n```\n\nWith proper segmentation, the attacker would have been trapped in the vendor management zone with no path to the POS systems. The entire $162M breach could have been prevented by network segmentation."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Infrastructure Security: S.D.J.V.P.",
+      "content": "**S** — Segmentation (divide network into zones)\n**D** — DMZ (isolate public services)\n**J** — Jump servers (controlled admin access)\n**V** — VPN (encrypted tunnels between zones/sites)\n**P** — Protocols (use SSH, HTTPS, DNS-over-HTTPS — never Telnet, HTTP, FTP)\n\nSecure Design: Just Verify, Protect, Segment — S.D.J.V.P."
+    },
+    {
+      "type": "reflection",
+      "title": "Map Your Network Zones",
+      "content": "Draw a network diagram (on paper or in a tool) of your current (or ideal) enterprise network:\n\n1. Where is the DMZ?\n2. How many internal zones do you have?\n3. Is there a dedicated management VLAN?\n4. Where are the jump servers?\n5. Can IoT devices reach the server VLAN?\n6. Are VPN connections properly segmented?\n\n**The test:** If an attacker compromises a workstation in the guest VLAN, can they reach:\n- The server VLAN? (They shouldn't)\n- The management VLAN? (They definitely shouldn't)\n- The internet? (They should, through a proxy)\n\nIf any answer surprises you, you have segmentation work to do."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Design for Failure",
+      "content": "The assumption in enterprise security isn't 'will we be compromised?' — it's 'when we're compromised, how bad will it be?'\n\nSegmentation, jump servers, and secure protocols don't prevent breaches. They limit blast radius. They buy time. They create audit trails.\n\nA flat network means one compromise = total compromise. A segmented network means one compromise = one zone compromise, with alarms going off in every other zone.\n\nDesign your infrastructure assuming the perimeter will be breached. Then make sure the next wall is just as strong."
+    }
+  ]
+}

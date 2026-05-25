@@ -1,0 +1,136 @@
+{
+  "lesson_number": "895",
+  "order_index": 49,
+  "domain": "linux",
+  "difficulty": 2,
+  "title": "Linux Services and Systemd",
+  "slug": "linux_services_and_systemd",
+  "lesson_id": "9bf5597c-32d5-48c7-8c34-457966faa9dd",
+  "module": "SEC406 Section 4",
+  "prerequisites": [
+    "Linux Process Management (ps, top, kill)"
+  ],
+  "concepts": [
+    "systemd architecture and components",
+    "systemctl service management",
+    "Unit files (service, timer, socket, target)",
+    "systemd targets vs runlevels",
+    "Service hardening with systemd security directives",
+    "Init systems: systemd vs sysvinit",
+    "Journalctl and systemd logging",
+    "Service dependency management"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Explain systemd architecture and its role as the modern Linux init system",
+    "Use systemctl to start, stop, enable, disable, and check status of services",
+    "Create and modify systemd unit files for custom services",
+    "Apply systemd security hardening directives to limit service capabilities",
+    "Understand the transition from sysvinit to systemd and its security implications"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which systemctl command ensures a service starts automatically at boot?",
+      "options": [
+        "systemctl start sshd",
+        "systemctl enable sshd",
+        "systemctl mask sshd",
+        "systemctl reload sshd"
+      ],
+      "correct": 1,
+      "explanation": "'enable' creates a symlink in the appropriate target directory so the service starts at boot. 'start' only runs it immediately without boot persistence."
+    },
+    {
+      "question": "Which systemd unit type replaces the concept of runlevels?",
+      "options": [
+        "service units",
+        "target units",
+        "socket units",
+        "mount units"
+      ],
+      "correct": 1,
+      "explanation": "Target units group units and replace sysvinit runlevels. For example, graphical.target replaces runlevel 5, and multi-user.target replaces runlevel 3."
+    },
+    {
+      "question": "What does PrivateTmp=yes do in a systemd service unit?",
+      "options": [
+        "Encrypts /tmp contents",
+        "Creates a private /tmp namespace isolated from other services",
+        "Prevents the service from using /tmp entirely",
+        "Mounts /tmp in RAM only"
+      ],
+      "correct": 1,
+      "explanation": "PrivateTmp=yes creates a separate /tmp and /var/tmp namespace for the service, preventing it from seeing or modifying other services' temporary files — a key hardening measure."
+    },
+    {
+      "question": "Which command shows all failed systemd units on a system?",
+      "options": [
+        "systemctl list-units --all",
+        "systemctl --failed",
+        "systemctl list-services --broken",
+        "journalctl -p err"
+      ],
+      "correct": 1,
+      "explanation": "'systemctl --failed' (or 'systemctl list-units --state=failed') specifically shows only units that have failed, making it efficient for troubleshooting."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association",
+    "Visualization",
+    "Emotion",
+    "Repetition",
+    "Simplification",
+    "Storytelling",
+    "Chunking",
+    "Imagination",
+    "Active Recall",
+    "Teaching Others"
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Systemd: Your Linux Control Center",
+      "content": "Systemd is the gatekeeper of your Linux system. Every service that runs, every timer that fires, every log that gets written — systemd manages it all. For a security professional, understanding systemd isn't optional. It's how you harden services, hunt for persistence mechanisms, and control what starts on boot.\n\nDon't let the systemd controversy distract you. Whether you love it or hate it, it runs most production Linux systems. Master it, and you control the machine."
+    },
+    {
+      "type": "explanation",
+      "title": "Systemd Architecture Overview",
+      "content": "Systemd replaced the old sysvinit system and manages the entire userspace of a Linux system:\n\n**Core Components:**\n- **systemd** — The init process (PID 1) that starts everything else\n- **systemctl** — Command-line tool to manage services and units\n- **journalctl** — Log viewer for systemd journal\n- **logind** — Manages user sessions and seats\n- **resolved** — DNS resolution service\n- **networkd** — Network configuration management\n\n**Unit Types:**\n- `.service` — Daemons and services (sshd, nginx, cron)\n- `.target` — Group of units (replaces runlevels)\n- `.timer` — Scheduled activation (replaces cron for many)\n- `.socket` — IPC socket activation\n- `.mount` / `.automount` — Filesystem mounts\n- `.path` — Path-based activation (inotify)\n\n**Unit File Locations (priority order):**\n1. `/etc/systemd/system/` — Administrator customizations (highest)\n2. `/run/systemd/system/` — Runtime units\n3. `/usr/lib/systemd/system/` — Package-installed units (lowest)\n\nHigher priority paths override lower ones — this is how you customize without modifying vendor files."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Systemd vs Old Init",
+      "content": "Imagine a school principal who has to start every class every morning:\n\n**Old way (sysvinit):** The principal walks down the hallway, knocks on each classroom door one by one. Door 1, wait... Door 2, wait... Door 30. Slow! And if Door 15 is stuck, everything behind it waits.\n\n**New way (systemd):** The principal sends a message to ALL classrooms at once: 'Start!' Every teacher starts their class simultaneously. Faster, smarter, and if one class has a problem, the others keep going.\n\nThat's why systemd replaced sysvinit. It starts services in parallel instead of sequentially, manages dependencies smartly, and gives you tools (systemctl) to control everything from one place."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Service Management with systemctl",
+      "content": "Master these essential systemctl commands:\n\n```bash\n# Service lifecycle management\nsudo systemctl start sshd          # Start now\nsudo systemctl stop sshd           # Stop now\nsudo systemctl restart sshd        # Restart now\nsudo systemctl reload sshd         # Reload config without stopping\nsudo systemctl enable sshd         # Start on boot\nsudo systemctl disable sshd        # Don't start on boot\nsudo systemctl mask sshd           # Prevent start by any means\n\n# Status and inspection\nsystemctl status sshd              # Check service status\nsystemctl is-active sshd           # Is it running?\nsystemctl is-enabled sshd          # Will it start on boot?\nsystemctl list-units --type=service          # All active services\nsystemctl list-units --type=service --all    # All services including inactive\nsystemctl --failed                           # Failed services only\n\n# Unit file management\nsystemctl cat sshd                 # Show the effective unit file\nsystemctl edit sshd                 # Create override file (safe edit)\nsystemctl edit --full sshd          # Edit full unit file\nsystemctl daemon-reload            # Reload after unit file changes\n\n# Dependencies\nsystemctl list-dependencies sshd              # What sshd depends on\nsystemctl list-dependencies sshd --reverse    # What depends on sshd\n```\n\n**Pro tip:** Always use `systemctl edit sshd` instead of editing the unit file directly. It creates an override in `/etc/systemd/system/sshd.service.d/` that won't be overwritten by package updates."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Attacker Abuse of Systemd Timers",
+      "content": "APT groups like APT29 and Turla have been observed using **systemd timers** for persistence instead of traditional cron jobs:\n\n**Why?**\n- Systemd timers are less commonly checked by defenders focused on crontab\n- They blend in with legitimate system timers\n- They can be configured with `RandomizedDelaySec` to avoid regular beaconing patterns\n- Unit files can be placed in user directories (`~/.config/systemd/user/`) requiring no root\n\n**Detection:**\n```bash\n# Check all timers (system and user)\nsystemctl list-units --type=timer --all\n\n# Look for unusual timers in user directories\nfind /home -name '*.timer' -path '*/systemd/*'\nfind /root/.config/systemd/user/ -name '*.timer'\n\n# Check for timers with suspicious OnCalendar or randomized delays\nsystemctl cat <suspicious-timer>\n```\n\n**Hardening:** Restrict which users can create systemd user units via `~/.config/systemd/user/` by setting loginctl inhibit or using polkit rules. Monitor for new timer unit files in user directories."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Systemd Service Hardening: S.A.F.E. Service",
+      "content": "**S** — Sandboxing (`PrivateTmp=yes`, `ProtectSystem=strict`)\n**A** — Account restrictions (`User=`, `Group=`, `DynamicUser=yes`)\n**F** — Filesystem limits (`ReadWritePaths=`, `InaccessiblePaths=`)\n**E** — Execution control (`CapabilityBoundingSet=`, `NoNewPrivileges=yes`)\n\nA S.A.F.E. service is a contained service. Each directive shrinks the blast radius if the service is compromised."
+    },
+    {
+      "type": "reflection",
+      "title": "Harden Your Own Services",
+      "content": "Pick a service running on your Linux machine (or a VM). Check its current unit file:\n\n```bash\nsystemctl cat <service>\n```\n\nNow answer:\n1. Does it run as root? (Check `User=` directive — if missing, it runs as root!)\n2. Does it have a private /tmp? (Check `PrivateTmp=`)\n3. Can it see the full filesystem? (Check `ProtectSystem=`)\n4. Can it gain new capabilities? (Check `NoNewPrivileges=`)\n\nWrite an override file using `systemctl edit <service>` that applies S.A.F.E. hardening. Test that the service still works after your changes. This is real-world blue team work."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Systemd Is Your Security Swiss Army Knife",
+      "content": "Most sysadmins only use systemctl to start/stop services. But systemd's security directives are a goldmine for hardening:\n\n- `PrivateDevices=yes` — No access to /dev devices\n- `ProtectKernelTunables=yes` — Can't modify kernel parameters\n- `ProtectHome=yes` — Can't access /home\n- `RestrictSUIDSGID=yes` — Can't create setuid binaries\n- `SystemCallFilter=` — Restrict available syscalls\n\nThese are **free security**. They cost nothing to implement, don't require kernel patches, and dramatically reduce the impact of service compromise.\n\nThe attacker who exploits your web server and finds they can't access /home, can't create SUID binaries, can't load kernel modules? They'll wish they picked an easier target."
+    }
+  ]
+}
