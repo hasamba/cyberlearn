@@ -1,0 +1,165 @@
+{
+  "lesson_id": "0f22bf50-9ac2-4a52-b009-ea2d4ee0b82c",
+  "domain": "linux",
+  "title": "Installing Open-Source Software from Source",
+  "difficulty": 2,
+  "order_index": 52,
+  "prerequisites": [
+    "Linux Package Management (apt, yum, dnf)"
+  ],
+  "concepts": [
+    "Source code compilation basics",
+    "The configure-make-make install workflow",
+    "Build dependencies and dev packages",
+    "Common compilation errors and troubleshooting",
+    "Makefile structure and targets",
+    "CMake and alternative build systems",
+    "Installing to custom prefixes",
+    "Security implications of source installs",
+    "Managing source-installed software",
+    "Reproducible builds and verification"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Explain when and why installing from source is necessary versus using package managers",
+    "Execute the standard configure-make-make install workflow to build software from source",
+    "Resolve common build dependency issues and compilation errors",
+    "Install software to custom prefixes for isolation and management",
+    "Assess the security implications of source installations and verify software integrity"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary reason to install software from source instead of using a package manager?",
+      "options": [
+        "Source installs always run faster than packaged versions",
+        "The software is not available in your distribution's repositories",
+        "Package managers cannot install security updates",
+        "Source installs are more secure than package installs"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "1e561f29-0589-48d2-be13-b9786e63b289",
+      "explanation": "The most common reason to install from source is that the software is not available in your distribution's package repositories, or you need a specific version or compile-time option not provided by the package."
+    },
+    {
+      "question": "What does the `./configure` step typically do in a source build?",
+      "options": [
+        "Compiles the source code into object files",
+        "Detects system capabilities, libraries, and generates a Makefile tailored to your system",
+        "Installs the compiled binaries to system directories",
+        "Downloads the source code from the internet"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "492dcbcf-9c3a-4080-bb98-01f504ce7d7e",
+      "explanation": "The configure script checks your system for required libraries, headers, and capabilities, then generates a Makefile customized for your specific environment. It's the detection and preparation phase."
+    },
+    {
+      "question": "You compile software with `./configure && make && sudo make install`. Later you want to uninstall it. What's the problem?",
+      "options": [
+        "You cannot uninstall source-compiled software",
+        "The `make install` step did not track files, making clean uninstallation difficult",
+        "You need to run `make uninstall` before `make install`",
+        "Source installs are automatically removed by the package manager"
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "74600d2a-b879-488c-bde4-d9eae2079bab",
+      "explanation": "Unlike package managers that track every installed file, `make install` copies files to system directories without tracking. Without a `make uninstall` target or checkinstall, removing the software cleanly is very difficult."
+    },
+    {
+      "question": "Which flag allows you to install source-compiled software to a custom directory (e.g., /opt/myapp)?",
+      "options": [
+        "--install=/opt/myapp",
+        "--prefix=/opt/myapp",
+        "--target=/opt/myapp",
+        "--output=/opt/myapp"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "852a2efd-c82e-4d82-9780-17bebfe35419",
+      "explanation": "The --prefix flag sets the installation root directory. Files will be installed to /opt/myapp/bin/, /opt/myapp/lib/, /opt/myapp/etc/, etc. This keeps source-installed software isolated from system packages."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## When Packages Are Not Enough\n\nPackage managers cover 95% of what you need. But that remaining 5%? That is when you need to build from source. Maybe it is a cutting-edge security tool that has not been packaged yet. Maybe you need a specific compile-time option. Maybe you are on an air-gapped system.\n\nBuilding from source is a core Linux skill. It demystifies how software actually gets made, teaches you about system dependencies, and gives you the power to customize your tools.\n\n**Your mission**: Learn the configure-make-install workflow, understand the security implications, and know when to build from source vs. when to stick with packages."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## The Source Build Workflow\n\n### Why Build from Source?\n\n| Reason | Example |\n|--------|---------|\n| Not in repositories | New security tool (e.g., custom YARA rules engine) |\n| Need specific version | Older version for compatibility |\n| Custom compile options | Enable/disable features at build time |\n| Security verification | Verify source code before compiling |\n| Learning | Understanding how software works |\n\n### The Standard Workflow: configure - make - make install\n\n```bash\n# 1. Download and extract source\nwget https://example.com/software-1.0.tar.gz\ntar -xzf software-1.0.tar.gz\ncd software-1.0/\n\n# 2. Configure - detect system, prepare Makefile\n./configure --prefix=/usr/local\n\n# 3. Compile - build the software\nmake\n\n# 4. Test (optional but recommended)\nmake check\n\n# 5. Install - copy files to system directories\nsudo make install\n```\n\n### What Each Step Does\n\n**./configure**\n- Runs a shell script that probes your system\n- Checks for required libraries, headers, and tools\n- Detects CPU architecture and OS features\n- Generates a Makefile tailored to your system\n- Accepts options like `--prefix`, `--enable-feature`, `--with-library`\n\n**make**\n- Reads the Makefile generated by configure\n- Compiles source code (.c files) into object files (.o)\n- Links object files into executables and libraries\n- Uses parallel jobs: `make -j$(nproc)` for faster builds\n\n**make install**\n- Copies compiled binaries, libraries, and docs to system directories\n- Default location: /usr/local/\n- Can be customized with --prefix\n- **Warning**: Does not track installed files by default\n\n### Verify Integrity Before Building\n\n```bash\n# Download checksum file\ngpg --verify software-1.0.tar.gz.sig software-1.0.tar.gz\n\n# Or verify SHA256\nsha256sum -c software-1.0.tar.gz.sha256\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Build Dependencies: The Compilation Prerequisites\n\n### Common Build Dependencies\n\nBefore compiling, you need the **development packages** (-dev or -devel):\n\n```bash\n# Debian/Ubuntu - install build essentials\nsudo apt install build-essential\n\n# Common dev packages\nsudo apt install libssl-dev      # OpenSSL development headers\nsudo apt install libcurl4-openssl-dev  # cURL headers\nsudo apt install libxml2-dev      # XML library headers\nsudo apt install python3-dev     # Python headers\n\n# RHEL/Fedora - install build essentials\nsudo dnf groupinstall \"Development Tools\"\n\n# Common dev packages\nsudo dnf install openssl-devel\ncurl-devel\nlibxml2-devel\npython3-devel\n```\n\n### Resolving Missing Dependencies\n\nWhen `./configure` fails with missing dependencies:\n\n```bash\n# Common error:\n# configure: error: libssl not found\n\n# Solution 1: Install the dev package\nsudo apt install libssl-dev     # Debian\nsudo dnf install openssl-devel  # RHEL\n\n# Solution 2: Use apt-file to find which package provides a file\nsudo apt install apt-file\napt-file update\napt-file search openssl/ssl.h\n# Result: libssl-dev\n```\n\n### Common Compilation Errors\n\n| Error | Cause | Solution |\n|-------|-------|----------|\n| `configure: error: no acceptable C compiler` | Missing compiler | Install build-essential / Development Tools |\n| `fatal error: xyz.h: No such file` | Missing dev headers | Install -dev / -devel package |\n| `cannot find -lxyz` | Missing library | Install library dev package |\n| `undefined reference to` | Linker error, missing library | Check LDFLAGS, install correct library |\n| `Permission denied` during install | Need root | Use sudo or install to home directory |\n\n### Installing to a Custom Prefix\n\n```bash\n# Install to /opt/myapp (keeps it separate from system packages)\n./configure --prefix=/opt/myapp\nmake -j$(nproc)\nsudo make install\n\n# Now binaries are in /opt/myapp/bin/\n# Add to PATH:\nexport PATH=/opt/myapp/bin:$PATH\n\n# Libraries in /opt/myapp/lib/\n# Add to library path:\nexport LD_LIBRARY_PATH=/opt/myapp/lib:$LD_LIBRARY_PATH\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Alternative Build Systems and Management\n\n### CMake: The Modern Alternative\n\nMany projects use CMake instead of autoconf:\n\n```bash\n# CMake build workflow\nmkdir build && cd build\ncmake -DCMAKE_INSTALL_PREFIX=/opt/myapp ..\nmake -j$(nproc)\nsudo make install\n```\n\n### Managing Source-Installed Software\n\n**The Problem**: `make install` does not track files. Uninstalling is messy.\n\n**Solutions:**\n\n**1. checkinstall** - Creates a package from source install:\n```bash\nsudo apt install checkinstall    # Debian\n\n./configure --prefix=/usr/local\nmake\nsudo checkinstall                # Creates .deb package\n\n# Now you can:\ndpkg -l | grep myapp             # See it listed\ndpkg -r myapp                    # Clean uninstall\n```\n\n**2. Install to custom prefix** - Easy cleanup:\n```bash\n./configure --prefix=/opt/myapp-1.0\nmake && sudo make install\n\n# To uninstall, just remove the directory:\nsudo rm -rf /opt/myapp-1.0\n```\n\n**3. Stow** - Manage packages in /usr/local/stow:\n```bash\nsudo apt install stow\n\n./configure --prefix=/usr/local/stow/myapp-1.0\nmake && sudo make install\ncd /usr/local/stow\nsudo stow myapp-1.0        # Create symlinks\nsudo stow -D myapp-1.0      # Remove symlinks\n```\n\n### Security Considerations\n\n| Risk | Mitigation |\n|------|------------|\n| Compromised source code | Verify GPG signatures and checksums |\n| No automatic security updates | Monitor upstream for security patches |\n| File conflicts with packages | Use custom prefix (--prefix) |\n| Missing dependencies | Install only from verified repositories |\n| Compiler exploits | Review source, use trusted compilers |\n\n### Reproducible Builds\n\n```bash\n# Verify a build is reproducible\n# 1. Build once, record hash\nmake clean && make\nsha256sum binary > /tmp/build1.sha\n\n# 2. Build again\nmake clean && make\nsha256sum binary > /tmp/build2.sha\n\n# 3. Compare\ndiff /tmp/build1.sha /tmp/build2.sha\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World: Building Security Tools from Source\n\n### Case Study: Compiling Volociraptor from Source\n\nVelociraptor is a DFIR tool often needed at a specific version or with custom options:\n\n```bash\n# Install Go (if not available via package manager)\nwget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz\ntar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz\nexport PATH=$PATH:/usr/local/go/bin\n\n# Clone and build Velociraptor\ngit clone https://github.com/Velocidex/velociraptor.git\ncd velociraptor\ngit checkout v0.7.0        # Pin to specific version\nmake\n\n# Binary is now in the output directory\n./output/velociraptor --version\n```\n\n### Security Incident: Malicious Code in Source\n\nIn 2021, the **ua-parser-js** npm package was compromised when the maintainer's account was hacked. The attacker added code to download and execute cryptocurrency miners.\n\n**Lessons for source builds:**\n1. **Verify signatures** - Always check GPG signatures when available\n2. **Pin versions** - Use specific tags/commits, not `master`\n3. **Review diffs** - When updating, check what changed\n4. **Monitor upstream** - Subscribe to security advisories\n5. **Use SCA tools** - Software Composition Analysis catches known vulnerabilities\n\n### Practical Tip: Keep a Build Log\n\n```bash\n#!/bin/bash\n# build_log.sh - Record everything about your source builds\n\nSOFTWARE=\"myapp-1.0\"\nDATE=$(date +%Y%m%d)\nLOG=\"/var/log/source-builds/${SOFTWARE}_${DATE}.log\"\n\necho \"=== Build: $SOFTWARE ===\" | tee $LOG\necho \"Date: $DATE\" | tee -a $LOG\necho \"Host: $(hostname)\" | tee -a $LOG\necho \"OS: $(cat /etc/os-release | grep PRETTY_NAME)\" | tee -a $LOG\n\n./configure --prefix=/opt/$SOFTWARE 2>&1 | tee -a $LOG\nmake -j$(nproc) 2>&1 | tee -a $LOG\nsudo make install 2>&1 | tee -a $LOG\n\necho \"Build complete. Log saved to $LOG\"\n```"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for Source Builds\n\n### The Build Sequence - **CMI**\n\n**C**onfigure - Detect system, generate Makefile\n**M**ake - Compile source into binaries\n**I**nstall - Copy binaries to system directories\n\n### Common Options\n\n```\n./configure --prefix=/opt/app    # Custom install location\nmake -j$(nproc)                   # Parallel compilation\nmake check                        # Run tests\nsudo make install                 # Install to system\n```\n\n### Dependency Resolution - **DLL**\n\n**D**ev packages - Need -dev (Debian) or -devel (RHEL) packages\n**L**ibraries - Missing library? apt-file search / dnf provides\n**L**inker errors - Usually missing -l flags or library paths\n\n### Security Checklist - **VPMR**\n\n**V**erify - Check GPG signatures and checksums\n**P**in - Use specific version tags, not latest\n**M**onitor - Watch upstream for security advisories\n**R**eview - Audit source code for suspicious content\n\n### Management Tools - **SCI**\n\n**S**tow - Manage symlinks for clean installs\n**C**heckinstall - Create real packages from source\n**I**solated prefix - Use --prefix=/opt/app for easy cleanup"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: You run `./configure` and get the error `configure: error: no acceptable C compiler found`. What should you install?\n\nA) gcc only\nB) build-essential (Debian) or Development Tools (RHEL)\nC) cmake\nD) The software is not compatible with your system\n\n**Answer**: B - The build-essential package (Debian/Ubuntu) or Development Tools group (RHEL/Fedora) includes the compiler plus essential build tools like make.\n\n**Question 2**: Why is installing to a custom prefix (like /opt/myapp) preferred over installing to /usr/local?\n\nA) Software runs faster from /opt\nB) It keeps source-installed software isolated from system packages, making cleanup easier\nC) /usr/local is read-only\nD) Package managers only scan /opt for conflicts\n\n**Answer**: B - A custom prefix lets you completely remove the software by deleting one directory, and avoids conflicts with system-managed packages.\n\n**Question 3**: What does `checkinstall` do that `make install` does not?\n\nA) Compiles the software faster\nB) Creates a proper system package (.deb or .rpm) that can be managed and uninstalled cleanly\nC) Runs tests before installing\nD) Downloads missing dependencies automatically\n\n**Answer**: B - checkinstall intercepts make install to track every file installed and creates a proper package that can be managed through the system package manager."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **When to source-build**: Think about your current environment. What tools do you use that required building from source? Could any of them be replaced with packaged versions?\n\n2. **Security tradeoff**: Source installs do not get automatic security updates. How would you track and update source-installed software in a production environment?\n\n3. **Dependency hell**: Have you ever spent hours resolving build dependencies? What strategies would you use to prevent this in the future?\n\n4. **Verification mindset**: If you downloaded a security tool's source code and the checksum did not match, what would you do? What are the possible explanations?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## You Can Build Anything Now\n\nBuilding from source is a rite of passage in Linux. It teaches you how software actually works under the hood, and gives you the power to customize tools to your exact needs.\n\n**What you have gained:**\n- The complete configure-make-install workflow\n- Dependency resolution skills for build environments\n- Security awareness around source installations\n- Management techniques (checkinstall, stow, custom prefixes)\n\n**Your next steps:**\n- Try building a tool from source this week (YARA, Velociraptor, or Volatility)\n- Use checkinstall to create a proper package instead of raw make install\n- Set up a build log system to track your source installations\n\n**Remember**: With great power comes great responsibility. Always verify checksums, pin versions, and monitor for security updates on source-installed software."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "source-compilation",
+    "make",
+    "cmake",
+    "build-dependencies",
+    "linux-administration"
+  ]
+}

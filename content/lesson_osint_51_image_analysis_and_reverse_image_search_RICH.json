@@ -1,0 +1,167 @@
+{
+  "lesson_id": "f65086ed-4a42-4203-aba2-afd3968a2f85",
+  "domain": "osint",
+  "title": "Image Analysis and Reverse Image Search",
+  "difficulty": 2,
+  "order_index": 51,
+  "prerequisites": [
+    "The OSINT Process and Methodology"
+  ],
+  "concepts": [
+    "Image metadata and EXIF data",
+    "Reverse image search engines",
+    "Google Images reverse search",
+    "TinEye reverse image search",
+    "Yandex reverse image search",
+    "Image forensic analysis techniques",
+    "Geolocation from images",
+    "Steganography detection",
+    "Image provenance and chain of custody",
+    "Social media image intelligence"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Extract and analyze EXIF metadata from images to identify camera, location, and timestamp information",
+    "Use reverse image search across multiple engines (Google, TinEye, Yandex) to find image origins and modifications",
+    "Apply image geolocation techniques using visual clues, landmarks, and environmental indicators",
+    "Detect image manipulation and deepfakes through forensic analysis",
+    "Conduct systematic image-based OSINT investigations following legal and ethical guidelines"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which piece of EXIF metadata is most valuable for geolocating an image?",
+      "options": [
+        "Camera make and model",
+        "GPS coordinates (latitude and longitude)",
+        "File size and format",
+        "Image resolution"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "1bc0ccff-5843-4cfd-b496-8321ecab6a93",
+      "explanation": "GPS coordinates embedded in EXIF data provide the exact location where a photo was taken, making them extremely valuable for geolocation — if the photographer didn't strip them."
+    },
+    {
+      "question": "What is the key advantage of using Yandex for reverse image search in OSINT investigations?",
+      "options": [
+        "Yandex has better facial recognition than any other engine",
+        "Yandex indexes images from Russian-speaking internet and CIS countries that other engines miss",
+        "Yandex is the only engine that respects privacy",
+        "Yandex searches are always faster than Google"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "3516c1e1-1d09-4d94-83d4-1b5419514963",
+      "explanation": "Yandex's image index covers Russian and CIS-region web content that Google and Bing may not have indexed, making it essential for investigations involving Eastern European content."
+    },
+    {
+      "question": "A reverse image search returns no results. What does this most likely indicate?",
+      "options": [
+        "The image is definitely original and has never been published online",
+        "The image may be new, from a less-indexed platform, or has been heavily modified",
+        "The search engine is broken",
+        "The image contains hidden data via steganography"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "e7c3a0a6-e296-4202-9838-cbcdada80294",
+      "explanation": "No reverse image results doesn't prove originality. The image could be from social media with restricted access, a less-indexed regional platform, or could have been cropped, filtered, or modified enough to evade matching."
+    },
+    {
+      "question": "An investigator finds a photo claiming to show a protest in a specific city. Reverse image search reveals the photo was originally taken 3 years ago in a different country. What type of disinformation is this?",
+      "options": [
+        "Deepfake",
+        "Steganographic manipulation",
+        "Contextual manipulation (recontextualized image)",
+        "EXIF spoofing"
+      ],
+      "correct_answer": 2,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "bab11e16-0979-48fa-bcdb-2546d36596ee",
+      "explanation": "This is contextual manipulation — a real, unmodified image presented with false context (wrong time, wrong location). It's one of the most common disinformation techniques because the image itself is authentic."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Your Eyes Are Now a Search Engine\n\nEvery image tells a story — and most images tell **more** than their creator intended. EXIF metadata reveals when and where a photo was taken. Reverse image search can trace a picture across the entire internet. Visual clues in the background can pinpoint a location down to the building.\n\nThis is **image OSINT** — one of the most powerful investigative techniques available. Journalists use it to debunk fake news. Intelligence analysts use it to verify claims. Security researchers use it to track threat actors.\n\n**Your mission**: Learn to see what others miss in every image."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## EXIF Data: The Hidden Story in Every Photo\n\n### What Is EXIF?\n\n**Exchangeable Image File Format (EXIF)** metadata is embedded in image files by cameras and smartphones. It can include:\n\n| EXIF Field | What It Reveals | Investigative Value |\n|------------|:---:|:---:|\n| GPS coordinates | Exact location | 🟥 Critical |\n| Date/Time | When photo was taken | 🟥 Critical |\n| Camera make/model | Device type | 🟨 Medium |\n| Software used | Editing history | 🟨 Medium |\n| Image dimensions | Original size | 🟩 Low |\n| ISO/Exposure | Shooting conditions | 🟩 Low |\n\n### Extracting EXIF\n\n**Online tools:**\n- Jeffrey's EXIF Viewer (exif-viewer.com)\n- ExifData (exifdata.com)\n- FotoForensics (fotoforensics.com)\n\n**Command-line:**\n```bash\n# Install ExifTool\nsudo apt install libimage-exiftool-perl\n\n# Extract all metadata\nexiftool image.jpg\n\n# Extract only GPS data\nexiftool -gps:all image.jpg\n\n# Strip EXIF data before sharing\nexiftool -all= image.jpg\n```\n\n**Critical point**: Social media platforms typically strip EXIF data from uploaded images, but some don't. Always check. Even without EXIF, the image itself contains visual intelligence."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Reverse Image Search: Finding the Source\n\n### The Three Essential Engines\n\n**1. Google Images** (images.google.com)\n- Largest index of western web content\n- Good for finding mainstream media, stock photos, popular content\n- Upload image or paste URL → \"Search by image\"\n- Best for: Broad coverage, popular images\n\n**2. TinEye** (tineye.com)\n- **Oldest** reverse image search engine\n- Focuses on finding the **original source** and modification history\n- Sort results by \"Oldest\" to find first appearance\n- Best for: Finding the earliest upload, tracing image lineage\n\n**3. Yandex** (yandex.com/images)\n- **Best for facial recognition and matching**\n- Superior coverage of Russian and CIS-region content\n- Often finds matches that Google and TinEye miss\n- Best for: Faces, Eastern European content, newer images\n\n### Effective Reverse Image Search Workflow\n\n```\n1. Start with Google Images → broadest coverage\n   └─ Found the source? Done.\n   └─ No match? Continue.\n\n2. Try TinEye → focus on oldest appearance\n   └─ Sort by \"Oldest\" to find original upload\n   └─ Check for cropped/modified versions\n\n3. Try Yandex → different index, better face matching\n   └─ Often finds matches others miss\n   └─ Check Russian/CIS sources\n\n4. Still nothing? Try Bing Visual Search\n   └─ Different index, sometimes useful\n```\n\n### Pro Tips\n\n- **Crop before searching**: Isolate the key element (a face, a building, a logo)\n- **Try multiple crops**: Different parts of the image may match different sources\n- **Check image resolution**: Higher-res crops improve matching\n- **Search the URL**: If the image is already online, search by URL first\n- **Save search results**: Screenshots or bookmarks — results change over time"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Image Geolocation: Finding Where a Photo Was Taken\n\n### Visual Clues to Look For\n\n**Infrastructure & Architecture:**\n- Road markings, signage language, and traffic patterns\n- Building styles, roof shapes, construction materials\n- Utility poles, electrical systems (voltage levels vary by country)\n- License plate formats and colors\n\n**Natural Environment:**\n- Vegetation types (palm trees ≠ northern Europe)\n- Sun angle and shadow direction (hemisphere indicator)\n- Terrain features (mountains, coastlines, desert)\n- Weather conditions and seasonal indicators\n\n**Cultural Markers:**\n- Language on signs, menus, storefronts\n- Currency visible in photos\n- Clothing styles and cultural dress\n- Vehicle makes and models (regional distributions)\n\n### Geolocation Methodology\n\n```\nStep 1: Extract EXIF → GPS coordinates (if available)\n         └─ Available? → Verify with Google Maps. Done.\n         └─ Not available? → Continue.\n\nStep 2: Reverse image search\n         └─ Found exact match? → Check source context.\n         └─ No match? → Continue.\n\nStep 3: Visual analysis\n         └─ Identify language → narrows country\n         └─ Identify landmarks → narrows city\n         └─ Identify business names → Google Maps search\n\nStep 4: Corroborate\n         └─ Cross-reference with weather data\n         └─ Compare with satellite imagery\n         └─ Verify with local knowledge sources\n```\n\n### Tools for Geolocation\n\n| Tool | Purpose | URL |\n|------|---------|-----|\n| Google Maps/Earth | Verify locations, satellite view | maps.google.com |\n| SunCalc | Determine sun position by time/location | suncalc.org |\n| Overpass Turbo | Query OpenStreetMap data | overpass-turbo.eu |\n| Mapillary | Street-level imagery | mapillary.com |\n| Weather History | Verify conditions | wunderground.com |"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World: Bellingcat's Image Verification\n\n### Case Study: Geolocating Chemical Attack Images\n\nIn 2017, Bellingcat investigators used image analysis to verify the location of a chemical attack in Syria:\n\n1. **EXIF stripped**: Social media platform removed metadata → No GPS coordinates\n2. **Visual analysis**: Identified distinctive buildings, mountain ridges, and road patterns\n3. **Satellite comparison**: Matched building layouts and terrain features to Google Earth imagery\n4. **Sun angle verification**: Used SunCalc to confirm the time of day matched shadow directions\n5. **Geolocation confirmed**: Specific coordinates verified to within meters\n\n### Common Image-Based Disinformation Techniques\n\n| Technique | How It Works | How to Detect |\n|-----------|-------------|--------------|\n| Recontextualized image | Real photo, wrong time/place | Reverse image search finds original |\n| Cropped manipulation | Part of image removed to change meaning | Reverse search finds full image |\n| Composite image | Multiple images combined | Inconsistent lighting, shadows, perspective |\n| Deepfake | AI-generated fake face/video | Artifacts around face, inconsistent blink patterns |\n| EXIF spoofing | Fake metadata added to image | Metadata inconsistencies, tool detection |\n\n### Forensic Analysis with FotoForensics\n\n```\nError Level Analysis (ELA):\n- Highlights areas that have been resaved differently\n- Consistent ELA = likely unmodified\n- Patches with different ELA levels = potential manipulation\n\nMetadata Analysis:\n- Check for editing software in EXIF\n- Verify timestamps for consistency\n- Look for missing metadata that should be present\n\nJPEG Compression Analysis:\n- Different compression levels indicate different source regions\n- Useful for detecting composites\n```"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for Image OSINT\n\n### Reverse Image Search — **GYT**\n\n**G**oogle Images first → broadest coverage, western web\n**Y**andex next → different index, facial matching, CIS region\n**T**inEye last → oldest appearance, modification tracking\n\n### EXIF Analysis — **GWACS**\n\n**G**PS → Where was it taken? (Gold mine if present)\n**W**hen → Date/time original\n**A**ltered → Editing software detected?\n**C**amera → Make/model reveals device type\n**S**ize → Original dimensions vs. modified\n\n### Geolocation Clues — **SIGN**\n\n**S**igns → Language, text, business names\n**I**nfrastructure → Roads, buildings, power lines\n**G**eography → Terrain, vegetation, sun angle\n**N**umbers → License plates, phone numbers, currency\n\n### The Verification Mantra\n\n> \"Never trust a single source. Always corroborate with at least one additional method.\"\n>\n> EXIF → Reverse Search → Visual Analysis → Corroboration"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: You find an image on Twitter that appears to show a natural disaster. EXIF data has been stripped. What should your FIRST step be?\n\nA) Assume the image is authentic since it came from Twitter\nB) Perform a reverse image search to find the original source\nC) Check the Twitter account's follower count to verify credibility\nD) Download the image and enhance it with Photoshop\n\n**Answer**: B — Reverse image search is the fastest way to verify if the image is original, recontextualized, or manipulated.\n\n**Question 2**: A TinEye search finds 47 results for an image, with the oldest dating to 2018. The image is being shared as \"taken yesterday.\" What type of manipulation is this?\n\nA) Deepfake\nB) Steganographic hiding\nC) Recontextualized image (real photo, wrong time)\nD) EXIF spoofing\n\n**Answer**: C — The image is real (not fabricated), but it's being presented with false context (old image claimed as recent). TinEye's \"Oldest\" sort found the proof.\n\n**Question 3**: Which reverse image search engine is most likely to find matches for images originally posted on VKontakte (Russian social media)?\n\nA) Google Images\nB) Bing Visual Search\nC) TinEye\nD) Yandex\n\n**Answer**: D — Yandex indexes Russian-language platforms like VKontakte far more thoroughly than western search engines."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **Ethics check**: When is it ethical to extract and analyze EXIF data from public images? What about from private communications? Where do you draw the line?\n\n2. **Your practice**: Take a photo from a news article and run it through all three reverse image search engines. What different results do you get? Why?\n\n3. **Geolocation challenge**: Find an image on social media showing an outdoor scene (no EXIF). Can you identify the location using only visual clues?\n\n4. **Deepfake awareness**: How would you approach verifying an image that shows a politician making a controversial statement? What specific checks would you perform?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Your Images Will Never Look the Same\n\nAfter this lesson, you won't be able to look at any image without automatically checking for EXIF data, visual geolocation clues, and potential manipulation signs. That's a superpower.\n\n**What you've gained:**\n- EXIF extraction and analysis skills\n- Reverse image search mastery across three engines\n- Geolocation techniques using visual analysis\n- Disinformation detection through image verification\n\n**Your next steps:**\n- Install ExifTool on your analysis machine\n- Practice reverse image search daily — it takes 5 minutes per image\n- Try the geolocation challenge on r/WhereIsThis on Reddit\n\n**Remember**: In OSINT, the image is never just an image. It's a data source, a timeline marker, a location indicator, and potentially, a lie detector."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "image-osint",
+    "reverse-image-search",
+    "exif-analysis",
+    "geolocation",
+    "tineye",
+    "image-forensics",
+    "disinformation-detection"
+  ]
+}

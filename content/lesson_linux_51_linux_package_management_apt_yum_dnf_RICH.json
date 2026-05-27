@@ -1,0 +1,167 @@
+{
+  "lesson_id": "5684fcd1-a54c-4835-a75f-835c4a9fa7be",
+  "domain": "linux",
+  "title": "Linux Package Management (apt, yum, dnf)",
+  "difficulty": 2,
+  "order_index": 51,
+  "prerequisites": [
+    "Linux Kernel, Operating System, and Distributions"
+  ],
+  "concepts": [
+    "Package management concepts and benefits",
+    "APT (Advanced Package Tool) and dpkg",
+    "YUM (Yellowdog Updater Modified)",
+    "DNF (Dandified YUM)",
+    "Zypper for openSUSE",
+    "Package repositories and mirrors",
+    "Dependency resolution",
+    "Security updates and patching",
+    "Repository configuration and GPG keys",
+    "Package verification and integrity"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Explain the purpose and benefits of package managers compared to installing software from source",
+    "Use apt/dpkg to install, remove, update, and query packages on Debian-based systems",
+    "Use yum/dnf to manage packages on RHEL-based systems",
+    "Configure package repositories and understand repository priorities",
+    "Apply security patches and manage system updates in enterprise environments"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary advantage of using a package manager over compiling software from source?",
+      "options": [
+        "Compiled software always runs faster",
+        "Package managers automatically handle dependencies, updates, and verification",
+        "Source compilation is more secure than package management",
+        "Package managers only work with open-source software"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "a632852d-5617-4a27-9d8a-126febaf193c",
+      "explanation": "Package managers resolve dependencies automatically, verify package integrity with GPG keys, and provide a centralized update mechanism. This eliminates the dependency hell problem."
+    },
+    {
+      "question": "On a Debian-based system, which command installs a package and all its dependencies?",
+      "options": [
+        "dpkg -i package.deb",
+        "apt install package",
+        "apt-get build-dep package",
+        "dpkg --resolve-deps package.deb"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "86105f9c-e597-450f-9166-05641413a066",
+      "explanation": "apt install resolves and installs all dependencies automatically. dpkg -i only installs the single .deb file and will fail if dependencies are missing."
+    },
+    {
+      "question": "You need to apply all available security updates on a RHEL 8 server. What is the correct command?",
+      "options": [
+        "yum update --security",
+        "dnf updateinfo install security",
+        "dnf upgrade --security",
+        "yum patch --security"
+      ],
+      "correct_answer": 2,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "24f22649-cf85-4ba2-af12-8dfaeda36698",
+      "explanation": "On RHEL 8+, dnf is the package manager. `dnf upgrade --security` installs only security-related updates. `dnf updateinfo install security` lists available security updates but doesn't install them."
+    },
+    {
+      "question": "What file configures APT repositories on a Debian system?",
+      "options": [
+        "/etc/apt/repos.list",
+        "/etc/apt/sources.list (and /etc/apt/sources.list.d/*.list)",
+        "/etc/yum.repos.d/*.repo",
+        "/etc/dpkg/repositories.conf"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "1c585a8e-6a5e-479a-80cd-332fbe08b5af",
+      "explanation": "APT uses /etc/apt/sources.list and .list files under /etc/apt/sources.list.d/ for repository configuration. RHEL systems use /etc/yum.repos.d/*.repo."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Package Management: Your Linux Superpower\n\nEvery Linux system you'll ever administer — from a tiny Raspberry Pi to a massive enterprise server farm — relies on package management. This isn't just about installing software. It's about **security, stability, and control**.\n\nA misconfigured package repository can introduce malware. An unpatched system is a compromised system. Understanding package managers deeply is what separates someone who can `apt install nginx` from someone who can confidently manage enterprise Linux infrastructure.\n\n**Your mission**: Master the three major package management families so you can work on any Linux distribution with confidence."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Why Package Managers Matter\n\n### The Problem Package Managers Solve\n\nWithout a package manager, installing software on Linux means:\n1. Finding and downloading source code\n2. Manually resolving every dependency (and their dependencies...)\n3. Compiling with the right flags\n4. Installing files across the filesystem with no tracking\n5. Manually checking for updates and security patches\n\nThis is **dependency hell**, and it's a security nightmare.\n\n### What Package Managers Provide\n\n| Feature | Benefit |\n|---------|----------|\n| **Dependency resolution** | Automatically installs required libraries |\n| **Integrity verification** | GPG-signed packages ensure authenticity |\n| **Centralized updates** | One command to patch everything |\n| **Clean removal** | Track every file — uninstall cleanly |\n| **Version control** | Pin to specific versions, manage upgrades |\n| **Repository management** | Trusted, verified software sources |\n\n### The Three Major Families\n\n| Family | Low-Level Tool | High-Level Tool | Distributions |\n|--------|:---:|:---:|:---:|\n| Debian | dpkg | apt | Ubuntu, Debian, Kali, Mint |\n| Red Hat | rpm | yum/dnf | RHEL, CentOS, Fedora, Rocky |\n| SUSE | rpm | zypper | openSUSE, SLES |\n\n**Low-level tools** handle individual packages. **High-level tools** resolve dependencies and manage repositories."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## APT: The Debian Package Manager\n\n### Core Commands\n\n```bash\n# Update package lists (always run before installing)\nsudo apt update\n\n# Install a package with all dependencies\nsudo apt install nginx\n\n# Remove a package (keeps config files)\nsudo apt remove nginx\n\n# Remove a package AND its config files\nsudo apt purge nginx\n\n# Upgrade all packages to newest available version\nsudo apt upgrade\n\n# Full upgrade (may remove packages to resolve conflicts)\nsudo apt full-upgrade\n\n# Search for packages\napt search \"web server\"\n\n# Show package details\napt show nginx\n\n# List installed packages\napt list --installed\n\n# List upgradable packages\napt list --upgradable\n\n# Clean downloaded package caches\nsudo apt clean\nsudo apt autoclean    # Only remove obsolete caches\n```\n\n### Repository Configuration\n\nAPT repositories are configured in `/etc/apt/sources.list` and `/etc/apt/sources.list.d/`:\n\n```bash\n# Format: deb [options] url distribution component1 component2\n\ndeb http://deb.debian.org/debian bookworm main contrib non-free-firmware\ndeb http://security.debian.org/debian-security bookworm-security main\ndeb http://deb.debian.org/debian bookworm-updates main\n```\n\n### GPG Key Management\n\n```bash\n# Add a repository GPG key\nsudo apt-key add keyfile.asc          # Deprecated but common\n# Modern approach:\ncurl -fsSL https://example.com/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/example.gpg\n\n# Verify package integrity\napt-cache policy nginx\n```\n\n### Security-Focused Operations\n\n```bash\n# Check for security updates only\nsudo apt upgrade --dry-run | grep -i security\n\n# Install only security updates\nsudo unattended-upgrade -v\n\n# Audit installed packages for vulnerabilities\nsudo apt list --upgradable | grep -i security\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## DNF/YUM: The Red Hat Package Manager\n\n### Evolution: YUM → DNF\n\n- **YUM** (Yellowdog Updater Modified) — RHEL 5, 6, 7\n- **DNF** (Dandified YUM) — RHEL 8+, Fedora 18+\n- DNF is faster, has better dependency resolution, and uses libsolv\n- Commands are nearly identical — just replace `yum` with `dnf`\n\n### Core DNF Commands\n\n```bash\n# Install a package\nsudo dnf install nginx\n\n# Remove a package\nsudo dnf remove nginx\n\n# Update all packages\nsudo dnf upgrade\n\n# Install only security updates\nsudo dnf upgrade --security\n\n# Search packages\ndnf search \"web server\"\n\n# Show package info\ndnf info nginx\n\n# List installed packages\ndnf list --installed\n\n# Find which package provides a command\ndnf provides */bin/ss\n# or\ndnf whatprovides /usr/sbin/ss\n\n# Clean cache\nsudo dnf clean all\n\n# Download a package without installing\ndnf download nginx\n```\n\n### Repository Management\n\n```ini\n# /etc/yum.repos.d/nginx.repo\n[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/$releasever/$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\n```\n\n### DNF Performance Tips\n\n```bash\n# Use parallel downloads (in /etc/dnf/dnf.conf)\nmax_parallel_downloads=10\n\n# Fastest mirror selection\nsudo dnf makecache --timer\n\n# View transaction history\ndnf history\n\n# Undo a transaction\ndnf history undo <transaction-id>\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World: Package Management for Security\n\n### Case Study: Equifax Breach — The Patch That Wasn't Applied\n\nThe **Equifax breach (2017)** exposed 147 million records. The root cause? **An unpatched Apache Struts vulnerability (CVE-2017-5639)** that had a patch available for **two months** before the attack.\n\nA proper package management and patching process would have:\n1. Identified the vulnerable package (`struts2-core`)\n2. Pulled the security update from the repository\n3. Applied it during a maintenance window\n\n```bash\n# What should have been done:\n# On a system with proper package management:\nsudo apt update && sudo apt upgrade libstruts2-java\n# Or on RHEL:\nsudo dnf upgrade --security\n```\n\n### Enterprise Patching Best Practices\n\n1. **Automate security updates** — Use unattended-upgrades (Debian) or dnf-automatic (RHEL)\n2. **Test before deploying** — Stage updates in a test environment first\n3. **Prioritize by severity** — Critical/High CVEs get patched immediately\n4. **Audit regularly** — Know what's installed and what's vulnerable\n5. **Use vulnerability scanners** — Tools like OpenSCAP, Trivy, or Snyk\n\n### Forensic Tip\n\nWhen investigating a compromised Linux system, check package history:\n\n```bash\n# Debian — check dpkg log\ncat /var/log/dpkg.log | grep -i install\ncat /var/log/apt/history.log\n\n# RHEL — check dnf history\ndnf history list\ndnf history info <id>\n\n# Check for recently modified packages (potential tampering)\nrpm -qa --last | head -20\n```\n\nPackage logs are **forensic gold** — they show exactly what was installed, upgraded, or removed, and when."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for Package Management\n\n### The Three Families — **DRZ**\n\n**D**ebian → **dpkg** (low) + **apt** (high)\n**R**HEL → **rpm** (low) + **dnf** (high)\n**Z**ypper → **rpm** (low) + **zypper** (high)\n\n### APT vs DNF Cheat Sheet\n\n| Action | APT | DNF |\n|--------|:---:|:---:|\n| Install | apt install | dnf install |\n| Remove | apt remove | dnf remove |\n| Update all | apt upgrade | dnf upgrade |\n| Search | apt search | dnf search |\n| Info | apt show | dnf info |\n| Security only | — | dnf upgrade --security |\n| What provides | apt-file search | dnf provides |\n\n### Key File Locations\n\n- **APT repos**: `/etc/apt/sources.list` + `/etc/apt/sources.list.d/`\n- **DNF repos**: `/etc/yum.repos.d/*.repo`\n- **APT logs**: `/var/log/apt/history.log`\n- **DNF logs**: `/var/log/dnf.log`\n- **dpkg log**: `/var/log/dpkg.log`\n\n### Security Update Mantra\n\n> \"Update lists, then upgrade. Security first, always in a hurry.\"\n> \n> `apt update && apt upgrade --dry-run | grep security`\n> `dnf upgrade --security --downloadonly`"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: You run `dpkg -i myapp.deb` but it fails due to missing dependencies. What should you do?\n\nA) Download each dependency .deb file manually and install them\nB) Run `apt --fix-broken install` to resolve dependencies\nC) Reboot the system and try again\nD) Use `rpm -i` instead\n\n**Answer**: B — `apt --fix-broken install` resolves dependency issues after a failed dpkg installation.\n\n**Question 2**: On a RHEL 9 system, which command finds which package provides the `ss` command?\n\nA) apt-file search ss\nB) dnf provides */ss\nC) yum whatprovides ss\nD) Both B and C\n\n**Answer**: D — On RHEL 9, `dnf provides` is the primary command, but `yum whatprovides` still works as an alias.\n\n**Question 3**: What is the difference between `apt remove` and `apt purge`?\n\nA) `remove` deletes everything; `purge` keeps config files\nB) `remove` keeps config files; `purge` deletes config files too\nC) They do the same thing\nD) `purge` only works on system packages\n\n**Answer**: B — `remove` uninstalls the package but preserves configuration files. `purge` removes everything including configuration files."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **Your environment**: Which package manager does your primary Linux system use? When did you last run security updates?\n\n2. **Dependency hell**: Have you ever encountered a situation where a package update broke other software? How would you use version pinning to prevent this?\n\n3. **Security mindset**: If you were responsible for patching 500 Linux servers, how would you approach it? What tooling would you use to automate the process?\n\n4. **Forensic value**: Package logs reveal what was installed and when. How could an attacker try to hide their tracks by manipulating package logs? How would you detect this?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## You've Got Package Management Mastery\n\nPackage management is one of those fundamentals that pays dividends forever. Every Linux system you touch — from a container to a bare-metal server — depends on it.\n\n**What you've gained:**\n- Fluency in APT, DNF, and the package management model\n- Security-focused patching commands\n- Forensic awareness of package logs\n\n**Next steps:**\n- Set up unattended-upgrades on your personal systems\n- Practice `dnf provides` and `apt-file search` — they'll save you hours\n- In the next lesson, you'll learn to build software from source when packages aren't available\n\n**Remember**: An unpatched system is a compromised system. Patch early, patch often, but patch smart — always test first."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer",
+    "linux-package-management",
+    "apt",
+    "dnf",
+    "yum",
+    "patching",
+    "security-updates"
+  ]
+}

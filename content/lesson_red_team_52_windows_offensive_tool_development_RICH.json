@@ -1,0 +1,164 @@
+{
+  "lesson_id": "b1fec8a1-1e8c-4b12-a645-543a82edd8fc",
+  "domain": "red_team",
+  "title": "Windows Offensive Tool Development",
+  "difficulty": 3,
+  "order_index": 52,
+  "prerequisites": [],
+  "concepts": [
+    "Windows internals for offensive development",
+    "Win32 API fundamentals",
+    "Process manipulation APIs",
+    "Memory management and injection",
+    "Handle and token manipulation",
+    "Windows API error handling",
+    "Offensive C programming patterns",
+    "Compiler and linker configurations",
+    "Evasion-aware development",
+    "Tool development OPSEC considerations"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand Windows internals relevant to offensive tool development including process, memory, and token structures",
+    "Use core Win32 APIs for process creation, manipulation, and token operations",
+    "Develop basic offensive tools in C that interact with Windows system structures",
+    "Apply OPSEC considerations when developing offensive tools to minimize detection",
+    "Set up a Windows development environment with Visual Studio or MinGW for offensive tool creation"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary advantage of developing custom offensive tools rather than using off-the-shelf frameworks?",
+      "options": [
+        "Custom tools are always faster than frameworks",
+        "Custom tools have unique signatures that evade detection systems looking for known tool patterns",
+        "Custom tools do not require Windows API knowledge",
+        "Off-the-shelf frameworks cannot perform process injection"
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "c71f17b6-2f82-4b48-8b69-daa16d512fd8",
+      "explanation": "EDR systems detect known tool patterns (Cobalt Strike beacons, Meterpreter payloads, etc.). Custom tools lack these known signatures, making them harder to detect through pattern matching. This is the primary operational advantage."
+    },
+    {
+      "question": "Which Windows API function is used to create a new process with specified attributes?",
+      "options": [
+        "OpenProcess()",
+        "CreateProcessA()",
+        "VirtualAlloc()",
+        "WriteProcessMemory()"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "4fad9e7f-f223-42d9-b40e-d5662cda8bd4",
+      "explanation": "CreateProcessA (or CreateProcessW for Unicode) is the primary API for creating new processes with full control over creation flags, environment, and handles."
+    },
+    {
+      "question": "What is the purpose of the STARTUPINFO structure in CreateProcess()?",
+      "options": [
+        "It specifies the process priority level",
+        "It controls how the new process window is created (size, position, handles)",
+        "It defines the security descriptor for the new process",
+        "It allocates memory for the process heap"
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "bc01061f-d7b7-4b24-8e9f-d4f03d61906b",
+      "explanation": "STARTUPINFO controls window creation properties including position, size, standard handles, and display flags. It is critical for offensive development because redirected handles enable covert I/O."
+    },
+    {
+      "question": "In offensive tool development, why should you avoid calling commonly-monitored APIs directly?",
+      "options": [
+        "They are slower than indirect calls",
+        "EDR products hook these APIs, and direct calls are easily detected",
+        "Windows does not allow direct API calls from unsigned binaries",
+        "They only work in user mode"
+      ],
+      "correct_answer": 1,
+      "difficulty": 3,
+      "type": "multiple_choice",
+      "question_id": "0e790a67-200e-4f16-b8c0-d9b3b6827099",
+      "explanation": "EDR products place hooks on commonly-abused APIs like CreateRemoteThread, VirtualAllocEx, and WriteProcessMemory. Calling these directly triggers detection. Offensive developers use indirect syscalls, API unhooking, or alternative code paths to avoid hooks."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Welcome to the Offensive Development Path\n\nThis is where you stop using other people's tools and start understanding how they work under the hood. Every Cobalt Strike beacon, every Meterpreter payload, every custom implant - they all start here: **the Windows API**.\n\nUnderstanding Windows internals for offensive development does not make you a better attacker. It makes you a better defender. You cannot detect what you do not understand.\n\n**Your mission**: Learn to read, write, and think in the language that Windows offensive tools speak. When you finish this lesson, you will understand what happens inside every process injection, every token manipulation, and every evasion technique.\n\n**Important**: All techniques are presented for authorized red team operations and defensive understanding only."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Windows Architecture for Offensive Developers\n\n### Key Windows Concepts\n\n**Processes and Threads**\n- Every running program is a process with its own virtual memory space\n- Each process contains one or more threads of execution\n- Processes are isolated - one process cannot directly access another's memory\n- This isolation is what makes process injection challenging and interesting\n\n**Handles and Objects**\n- Windows uses handles to reference system objects (processes, files, tokens)\n- Handles are process-specific - a handle in one process means nothing in another\n- DuplicateHandle() can copy handles between processes (used by many offensive tools)\n\n**Access Tokens**\n- Every process has a primary token that defines its security context\n- Tokens contain SIDs, privileges, and group memberships\n- Impersonation tokens allow a thread to temporarily run as a different user\n- Token manipulation is the foundation of privilege escalation\n\n**Virtual Memory**\n- Each process gets its own virtual address space (4GB on 32-bit, 128TB on 64-bit)\n- VirtualAlloc(), VirtualProtect() manage memory regions\n- Memory regions have attributes: committed, reserved, free\n- Page protections: PAGE_EXECUTE_READWRITE (RWX) is monitored by EDR\n\n### The Win32 API Layers\n\n```\nYour Tool (C Code)\n      |\n      v\nWin32 API (kernel32.dll, advapi32.dll, etc.)\n      |\n      v\nNTAPI (ntdll.dll) - Undocumented but essential\n      |\n      v\nKernel Mode (ntoskrnl.exe)\n      |\n      v\nHardware\n```\n\n**Why this matters for offensive development:**\n- Win32 API: Documented, easy to use, heavily monitored\n- NTAPI: Less documented, less monitored, more powerful\n- Direct syscalls: Bypass API hooks entirely"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Core Win32 APIs for Offensive Development\n\n### Process Creation and Manipulation\n\n```c\n#include <windows.h>\n#include <stdio.h>\n\n// Basic process creation\nint create_process(const char* program) {\n    STARTUPINFOA si = {0};\n    PROCESS_INFORMATION pi = {0};\n    si.cb = sizeof(si);\n    \n    // Create a new process\n    if (!CreateProcessA(\n        NULL,               // Application name\n        (LPSTR)program,     // Command line\n        NULL,               // Process security attributes\n        NULL,               // Thread security attributes\n        FALSE,              // Inherit handles\n        0,                  // Creation flags\n        NULL,               // Environment\n        NULL,               // Current directory\n        &si,               // Startup info\n        &pi               // Process info\n    )) {\n        printf(\"CreateProcess failed: %d\\n\", GetLastError());\n        return 1;\n    }\n    \n    printf(\"Process created: PID=%d\\n\", pi.dwProcessId);\n    \n    // Wait for process to complete\n    WaitForSingleObject(pi.hProcess, INFINITE);\n    \n    // Clean up handles\n    CloseHandle(pi.hProcess);\n    CloseHandle(pi.hThread);\n    return 0;\n}\n```\n\n### Memory Operations\n\n```c\n// Allocate memory in a process (local)\nLPVOID mem = VirtualAlloc(\n    NULL,                    // Let system choose address\n    4096,                    // Size\n    MEM_COMMIT | MEM_RESERVE, // Allocation type\n    PAGE_EXECUTE_READWRITE   // Protection (RWX - monitored!)\n);\n\n// Allocate memory in another process (remote)\nHANDLE hProcess = OpenProcess(\n    PROCESS_ALL_ACCESS,      // Access rights\n    FALSE,                  // Inherit\n    targetPid               // Target PID\n);\n\nLPVOID remoteMem = VirtualAllocEx(\n    hProcess,                // Target process\n    NULL,                    // Address (let system choose)\n    4096,                    // Size\n    MEM_COMMIT | MEM_RESERVE,\n    PAGE_EXECUTE_READWRITE  // RWX - heavily monitored!\n);\n```\n\n### Token Manipulation\n\n```c\n// Open a process token\nHANDLE hToken;\nif (OpenProcessToken(\n    GetCurrentProcess(),    // Process handle\n    TOKEN_ALL_ACCESS,       // Desired access\n    &hToken                // Token handle\n)) {\n    printf(\"Got process token\\n\");\n}\n\n// Get token information\nDWORD size = 0;\nGetTokenInformation(hToken, TokenPrivileges, NULL, 0, &size);\n// Allocate buffer and call again with proper size\n```\n\n### Error Handling\n\n```c\n// Every Win32 API call should be followed by error checking\nif (!SomeApiCall(params)) {\n    DWORD error = GetLastError();\n    LPSTR msg = NULL;\n    FormatMessageA(\n        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,\n        NULL, error, 0, (LPSTR)&msg, 0, NULL\n    );\n    printf(\"Error %d: %s\\n\", error, msg);\n    LocalFree(msg);\n}\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Development Environment and OPSEC\n\n### Setting Up a Development Environment\n\n**Visual Studio (Recommended):**\n- Community Edition is free for open-source and learning\n- Best debugging experience\n- Built-in Windows SDK headers and libraries\n- CMake support for cross-platform projects\n\n**MinGW-w64 (Alternative):**\n```bash\n# Install on Linux (for cross-compiling Windows binaries)\nsudo apt install mingw-w64\n\n# Compile a Windows executable from Linux\nx86_64-w64-mingw32-gcc -o tool.exe tool.c -ladvapi32 -lkernel32\n\n# Compile with no console window\nx86_64-w64-mingw32-gcc -o tool.exe tool.c -mwindows\n```\n\n### Compiler Options for Offensive Development\n\n```makefile\n# MinGW Makefile example\nCC = x86_64-w64-mingw32-gcc\nCFLAGS = -O2 -Wall -Werror\nLDFLAGS = -ladvapi32 -lkernel32 -luser32\n\n# Strip symbols (smaller binary, less analysis surface)\n# -s flag strips debug symbols\n\n# Static linking (no DLL dependencies, but larger binary)\n# -static flag\n\ntool.exe: tool.c\n\t$(CC) $(CFLAGS) -s -o $@ $< $(LDFLAGS)\n```\n\n### OPSEC Considerations for Tool Development\n\n| Consideration | Poor OPSEC | Good OPSEC |\n|--------------|-----------|-----------|\n| API calls | Direct calls to known APIs | Indirect calls, dynamic resolution |\n| Strings | Hardcoded strings in binary | Encrypted/obfuscated strings |\n| Memory | RWX pages | RX + RW pages separately |\n| Network | Direct C2 connection | Domain fronting, proxy aware |\n| Artifacts | Default compiler output | Custom compilation, symbol stripping |\n| IOCs | Known patterns | Unique per-operation |\n\n### String Obfuscation Example\n\n```c\n// Poor: Plaintext strings visible in binary\nchar* cmd = \"cmd.exe\";\n\n// Better: XOR-encrypted strings\ndecrypt_string(encrypted_cmd, key, buffer, sizeof(buffer));\n\n// Best: Generated at runtime, never stored in binary\nvoid build_command(wchar_t* buf, int len) {\n    // Build string from individual chars\n    buf[0] = L'c'; buf[1] = L'm'; buf[2] = L'd';\n    buf[3] = L'.'; buf[4] = L'e'; buf[5] = L'x'; buf[6] = L'e';\n    buf[7] = L'\\0';\n}\n```\n\n### Dynamic API Resolution\n\n```c\n// Poor: Direct API call (hooked by EDR)\nCreateRemoteThread(hProcess, ...);\n\n// Better: Dynamic resolution\ntypedef HANDLE (WINAPI* pCreateRemoteThread)(\n    HANDLE, LPSECURITY_ATTRIBUTES, SIZE_T,\n    LPTHREAD_START_ROUTINE, LPVOID, DWORD, LPDWORD\n);\n\nHMODULE hKernel32 = LoadLibraryA(\"kernel32.dll\");\npCreateRemoteThread fCreateRemoteThread = \n    (pCreateRemoteThread)GetProcAddress(hKernel32, \"CreateRemoteThread\");\n\nif (fCreateRemoteThread) {\n    fCreateRemoteThread(hProcess, ...);\n}\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World: How Attackers Develop Custom Tools\n\n### Case Study: APT29 Tool Development\n\nAPT29 (Cozy Bear) is known for developing sophisticated custom tools. Analysis of their malware reveals:\n\n**Development Practices Observed:**\n1. **Custom crypto implementations** rather than using standard libraries\n2. **Dynamic API resolution** to avoid import table analysis\n3. **Environment keying** - malware only runs on specific targets\n4. **Multi-stage payloads** - initial loader is clean, second stage is encrypted\n5. **Anti-analysis checks** - VM detection, debug checks, timing checks\n\n**What defenders can learn from this:**\n- Custom tools leave different artifacts than off-the-shelf frameworks\n- Dynamic API resolution still requires resolving function addresses\n- Environment keying means the malware may not run in your sandbox\n- Multi-stage payloads require analyzing all stages\n\n### OPSEC Failures in Custom Tool Development\n\n**Example 1: Hardcoded C2 Infrastructure**\n- A custom implant had the C2 server IP hardcoded\n- Network defenders blocked the IP, rendering the entire campaign useless\n- Lesson: Use DNS resolution, domain fronting, or config-at-runtime\n\n**Example 2: Compiler Watermarking**\n- The Rich Header in a PE file contains compiler information\n- Defenders used Rich Header to link multiple malware families to the same developer\n- Lesson: Strip Rich Headers using tools like `strip-rich` or custom compilation\n\n**Example 3: Unique Build Artifacts**\n- Each compiled binary had unique timestamps and PE section names\n- Defenders created detection rules based on these patterns\n- Lesson: Standardize build environments or randomize build artifacts\n\n### Defensive Application\n\nUnderstanding offensive tool development helps you:\n\n1. **Write better YARA rules** based on tool compilation patterns\n2. **Detect API resolution techniques** in memory forensics\n3. **Understand malware behavior** from API call patterns\n4. **Improve detection engineering** by knowing what attackers try to avoid\n5. **Develop better threat intelligence** by linking tools to developers"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for Windows Offensive Development\n\n### Win32 API Categories - **PHAT-M**\n\n**P**rocess APIs - CreateProcess, OpenProcess, TerminateProcess\n**H**andle APIs - DuplicateHandle, CloseHandle\n**A**ccess Tokens - OpenProcessToken, DuplicateTokenEx, AdjustTokenPrivileges\n**T**hread APIs - CreateThread, CreateRemoteThread, SuspendThread\n**M**emory APIs - VirtualAlloc, VirtualProtect, WriteProcessMemory\n\n### Process Injection Steps - **ORVAW**\n\n**O**pen - OpenProcess() to get a handle\n**R**eserve/Allocate - VirtualAllocEx() in target\n**V**erify - Check allocation succeeded\n**W**rite - WriteProcessMemory() to inject code\n**A**ctivate - CreateRemoteThread() to execute\n\nWait, that spells ORVAW... let me fix:\n\n### Process Injection - **OARW**\n\n**O**pen the target process\n**A**llocate memory in the target\n**R**ite (Write) shellcode to allocated memory\n**W**ake (Execute) the shellcode via remote thread\n\n### OPSEC Checklist - **SAND**\n\n**S**trings - Encrypt or build at runtime, never plaintext\n**A**PIs - Dynamic resolution, avoid direct calls\n**N**etwork - Domain fronting, proxy awareness\n**D**eploy - Strip symbols, randomize artifacts"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: What is the main reason offensive developers use dynamic API resolution (GetProcAddress) instead of direct API calls?\n\nA) It makes the code run faster\nB) It hides API imports from static analysis and avoids EDR hooks on imported functions\nC) It is required by Windows for 64-bit processes\nD) It allows calling Linux APIs from Windows\n\n**Answer**: B - Dynamic API resolution removes API calls from the import table (visible in static analysis) and can bypass EDR hooks that monitor specific imported functions.\n\n**Question 2**: Why is VirtualAllocEx with PAGE_EXECUTE_READWRITE (RWX) a detection indicator?\n\nA) RWX memory is illegal in Windows\nB) Legitimate applications rarely allocate memory that is simultaneously writable and executable; this pattern is characteristic of shellcode injection\nC) RWX memory is slower than separate RX and RW regions\nD) Windows blocks RWX allocation in newer versions\n\n**Answer**: B - Legitimate applications typically allocate memory as writable (for data) or executable (for code), but rarely both at the same time. RWX allocation is a strong indicator of shellcode injection.\n\n**Question 3**: What does the Rich Header in a PE file reveal to defenders?\n\nA) The encryption key used to protect the payload\nB) Compiler information that can link multiple binaries to the same development environment\nC) The C2 server address\nD) The antivirus products that scanned the file\n\n**Answer**: B - The Rich Header contains compiler information (Visual Studio version, build tools used) that can be used to link multiple malware samples to the same developer or build environment."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **Defender perspective**: If you understand how offensive tools are developed, how does that change your detection strategy? What specific behaviors would you monitor?\n\n2. **OPSEC mindset**: Think about a tool you have written or used. What artifacts does it leave on disk, in memory, and on the network? How could each artifact be used for detection?\n\n3. **Ethics boundary**: Custom offensive tools are more effective than off-the-shelf frameworks. What ethical guidelines should govern their development and use? When is custom tool development justified?\n\n4. **Detection opportunity**: Every evasion technique creates a new detection opportunity. For example, dynamic API resolution is detectable through import table analysis and runtime monitoring. What other evasion techniques create detection side effects?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## You Are Now Thinking Like a Tool Developer\n\nUnderstanding how offensive tools are built is not just an offensive skill. It is the foundation of effective detection. Every evasion technique has a side effect. Every custom tool leaves artifacts. The better you understand the development process, the better you can detect and defend against it.\n\n**What you have gained:**\n- Windows API knowledge for process, memory, and token manipulation\n- OPSEC considerations for tool development\n- Understanding of detection side effects from evasion techniques\n- Development environment setup skills\n\n**Your next steps:**\n- Set up a Windows development environment (VM recommended)\n- Write a basic process creation tool in C using CreateProcessA\n- Analyze an open-source offensive tool (like Sliver) to understand its API patterns\n- Practice reading PE headers with CFF Explorer or pestudio\n\n**Remember**: The goal is not to become a malware developer. The goal is to understand how tools work so you can detect them. Every evasion has a signature. Every technique leaves a trace."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC670",
+    "Career Path: Red Teamer",
+    "windows-internals",
+    "win32-api",
+    "offensive-development",
+    "process-injection",
+    "token-manipulation",
+    "tool-development"
+  ]
+}

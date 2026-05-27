@@ -1,0 +1,164 @@
+{
+  "lesson_id": "53ac00f7-8623-4a47-97bc-4694f42bf9a7",
+  "domain": "threat_hunting",
+  "title": "YARA Rules for Tactical Intelligence",
+  "difficulty": 2,
+  "order_index": 51,
+  "prerequisites": [],
+  "concepts": [
+    "YARA rule structure and syntax",
+    "String matching patterns (text, hex, regex)",
+    "File type identification with YARA",
+    "IOC extraction and signature creation",
+    "YARA rule performance optimization",
+    "YARA modules (PE, ELF, math, hash)",
+    "Rule quality and false positive reduction",
+    "YARA in automated pipelines",
+    "Tactical intelligence dissemination",
+    "Community YARA rule repositories"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Write YARA rules with text strings, hexadecimal patterns, and regular expressions to detect malicious artifacts",
+    "Use YARA modules (PE, ELF, math, hash) to create more precise and efficient detection rules",
+    "Optimize YARA rules for performance and low false positive rates",
+    "Integrate YARA into threat intelligence workflows for tactical dissemination",
+    "Extract IOCs from malware samples and create YARA signatures for detection"
+  ],
+  "post_assessment": [
+    {
+      "question": "In a YARA rule, what does the `condition` section define?",
+      "options": [
+        "The metadata about the rule author",
+        "The logic that determines when the rule matches",
+        "The strings to search for in files",
+        "The file types the rule should scan"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "55d2327b-2a47-46a5-816d-c399a78c92d7",
+      "explanation": "The condition section contains the Boolean logic that determines whether the rule triggers a match. It references strings and modules defined elsewhere in the rule."
+    },
+    {
+      "question": "Which YARA syntax is used to match a hexadecimal byte pattern?",
+      "options": [
+        "$s1 = \"hello world\"",
+        "$s1 = { 4D 5A 90 00 }",
+        "$s1 = /hello.*world/",
+        "$s1 = \"hello\" nocase wide"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "15688f3d-1e32-4ea6-8e79-4551ae049b30",
+      "explanation": "Hex strings in YARA are defined using curly braces with space-separated hex bytes, like { 4D 5A 90 00 }. This is particularly useful for matching binary patterns like file headers."
+    },
+    {
+      "question": "What is the primary benefit of using YARA modules (like the PE module) in rules?",
+      "options": [
+        "They make rules run faster regardless of complexity",
+        "They allow detection based on file structure and metadata rather than just raw string matching",
+        "They automatically remove false positives",
+        "They replace the need for string definitions"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "448d8f0b-c38f-44ea-a222-3c7eef3dcc2f",
+      "explanation": "YARA modules allow inspection of structured data — like PE headers, imphash values, or section characteristics — enabling more precise detection that targets file structure rather than raw bytes."
+    },
+    {
+      "question": "You need to write a YARA rule that matches files containing either 'password' (case-insensitive) OR 'passwd' (case-insensitive). Which condition is correct?",
+      "options": [
+        "condition: $s1 and $s2",
+        "condition: $s1 or $s2",
+        "condition: any of ($s1, $s2)",
+        "condition: 2 of ($s*)"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "a65889d3-463e-429d-a0d2-2e87a1a04874",
+      "explanation": "Since we need either string to match (not both), the OR logical operator is correct. 'any of' would also work if both strings were in the same set, but the direct 'or' between two specific strings is most explicit."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## YARA: The Pattern Language of Threat Intelligence\n\nYARA is called the **\"pattern matching Swiss Army knife\"** for malware researchers. It's the tool that lets you describe what malicious code looks like — and then find it everywhere.\n\nWhen you write a YARA rule, you're translating your threat intelligence into actionable detection. You're taking what you know about a threat actor's tools, techniques, and artifacts, and turning that knowledge into a precise pattern that can scan millions of files.\n\n**Your mission**: Learn to write YARA rules that are precise, fast, and useful — rules that find the bad stuff without drowning you in false positives."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## YARA Rule Structure\n\n### The Three Sections\n\nEvery YARA rule has three sections:\n\n```yara\nrule SuspiciousPowerShell {\n    meta:\n        author = \"Your Name\"\n        description = \"Detects suspicious PowerShell execution patterns\"\n        date = \"2024-01-15\"\n        severity = \"high\"\n        reference = \"https://attack.mitre.org/techniques/T1059/001/\"\n    \n    strings:\n        $s1 = \"-enc\" nocase\n        $s2 = \"-encodedcommand\" nocase\n        $s3 = \"FromBase64String\" nocase\n        $s4 = \"IEX\" nocase\n        $s5 = \"Invoke-Expression\" nocase\n        $hex1 = { 4D 5A }           // MZ header (PE file)\n    \n    condition:\n        $hex1 and (2 of ($s1, $s2, $s3, $s4, $s5))\n}\n```\n\n### String Types\n\n| Type | Syntax | Use Case |\n|------|--------|----------|\n| Text | `$s1 = \"malware\"` | Readable strings in files |\n| Text (case-insensitive) | `$s1 = \"malware\" nocase` | Case variations |\n| Text (wide/UTF-16) | `$s1 = \"malware\" wide` | Windows Unicode strings |\n| Hex | `$s1 = { 4D 5A 90 00 }` | Binary patterns, file headers |\n| Regex | `$s1 = /https?:\\/\\/[a-z]+\\.evil\\.com/` | Complex string patterns |\n\n### Useful String Modifiers\n\n```yara\n// Case-insensitive\n$s1 = \"password\" nocase\n\n// Wide (UTF-16LE) — common in Windows binaries\n$s2 = \"password\" wide\n\n// Both wide and nocase\n$s3 = \"password\" wide nocase\n\n// Full word match (no partial matches)\n$s4 = \"cmd\" fullword\n\n// XOR — matches strings XOR'd with single byte keys\n$s5 = \"malware\" xor\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## YARA Conditions: The Logic Engine\n\n### Basic Conditions\n\n```yara\n// Single string match\ncondition: $s1\n\n// AND logic — both must match\ncondition: $s1 and $s2\n\n// OR logic — either matches\ncondition: $s1 or $s2\n\n// Any of a set\ncondition: any of ($s1, $s2, $s3)\n\n// N of a set — at least 2 must match\ncondition: 2 of ($s1, $s2, $s3, $s4)\n\n// All strings in the rule\ncondition: all of them\n\n// Any string defined in the rule\ncondition: any of them\n\n// Wildcard — any string starting with $s\ncondition: any of ($s*)\n```\n\n### File Size and Type Conditions\n\n```yara\n// File size limits (performance optimization)\ncondition:\n    filesize < 5MB and\n    any of them\n\n// PE file type check\ncondition:\n    pe.is_pe and\n    any of them\n\n// Match only DLLs\ncondition:\n    pe.is_pe and\n    pe.characteristics & pe.DLL\n```\n\n### Using YARA Modules\n\n```yara\nimport \"pe\"\nimport \"math\"\nimport \"hash\"\n\nrule SuspiciousPE {\n    strings:\n        $s1 = \"suspicious_function\"\n    \n    condition:\n        pe.is_pe and\n        pe.number_of_sections > 8 and           // Many sections (possible packing)\n        math.entropy(pe.sections[0].raw_offset,\n                     pe.sections[0].raw_size) > 7.0 and  // High entropy (possibly encrypted)\n        $s1\n}\n```\n\n### Advanced Conditions\n\n```yara\n// For loop over PE sections\ncondition:\n    pe.is_pe and\n    for any i in (0..pe.number_of_sections-1) :\n        (math.entropy(pe.sections[i].raw_offset,\n                      pe.sections[i].raw_size) > 7.5)\n\n// String offset conditions\ncondition:\n    $s1 at 0 and          // $s1 must be at offset 0\n    $s2 in (100..200)     // $s2 must be between offsets 100-200\n\n// Match count\ncondition:\n    #s1 > 3               // $s1 must appear more than 3 times\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Writing Effective YARA Rules for Threat Intelligence\n\n### From IOC to YARA Rule: The Process\n\n1. **Extract unique identifiers** from malware analysis:\n   - Strings, function names, API calls\n   - Byte patterns from code sections\n   - File metadata (compile time, imphash)\n\n2. **Determine rule scope**:\n   - **Broad**: Detects a malware family (e.g., all Cobalt Strike beacons)\n   - **Specific**: Detects a specific variant (e.g., Cobalt Strike beacon with custom XOR key)\n\n3. **Balance sensitivity vs. specificity**:\n   - Too broad → false positive flood\n   - Too narrow → variants slip through\n\n### Example: Detecting Cobalt Strike Beacon\n\n```yara\nimport \"pe\"\n\nrule Cobalt_Strike_Beacon_Generic {\n    meta:\n        author = \"Threat Intel Team\"\n        description = \"Detects Cobalt Strike beacon DLL\"\n        severity = \"critical\"\n        reference = \"https://attack.mitre.org/software/S0154/\"\n        tlp = \"WHITE\"\n    \n    strings:\n        // Beacon configuration strings\n        $s1 = \"%s as\" wide\n        $s2 = \"beacon.dll\" wide nocase\n        \n        // Common Cobalt Strike byte patterns\n        $cs_jumper = { 48 8B C4 57 48 [2] 48 [2] 0F B6 }\n        $cs_header = { 00 01 00 01 00 05 00 00 }\n        \n        // Beacon metadata magic bytes\n        $beacon_meta = { 00 00 00 00 00 00 00 [2] 00 01 00 01 }\n    \n    condition:\n        pe.is_pe and\n        pe.characteristics & pe.DLL and\n        (any of ($s*) or any of ($cs_*, $beacon_meta))\n}\n```\n\n### Reducing False Positives\n\n```yara\n// BAD: Too generic — matches any file containing 'password'\nrule Generic_Password {\n    strings:\n        $s1 = \"password\"\n    condition:\n        $s1\n}\n\n// GOOD: Specific context reduces FP rate\nrule Suspicious_Credential_Theft {\n    meta:\n        author = \"Threat Intel Team\"\n        description = \"Detects credential theft patterns in PE files\"\n    \n    strings:\n        $s1 = \"password\" wide nocase\n        $s2 = \"credential\" wide nocase\n        $s3 = \"mimikatz\" wide nocase\n        $s4 = \"lsadump\" wide nocase\n        $s5 = \"sekurlsa\" wide nocase\n    \n    condition:\n        pe.is_pe and\n        uint16(0) == 0x5A4D and\n        filesize < 10MB and\n        2 of ($s*)\n}\n```"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World: YARA in Incident Response\n\n### Case Study: Detecting SolarWinds SUNBURST\n\nWhen the SolarWinds supply chain attack was discovered in December 2020, FireEye and Microsoft released YARA rules that enabled rapid detection across enterprise environments.\n\n```yara\n// Simplified version of SUNBURST detection\nrule SUNBURST_Backdoor {\n    meta:\n        author = \"Threat Intelligence\"\n        description = \"Detects SUNBURST backdoor in SolarWinds\"\n        severity = \"critical\"\n        reference = \"CVE-2020-10148\"\n    \n    strings:\n        $s1 = \"SolarWinds.Orion.Core.BusinessLayer.dll\" wide\n        $s2 = \"orion Improvement\" wide nocase\n        $s3 = \"swdev.msvcrt.ftd\" wide\n        \n        // Unique byte pattern from SUNBURST initialization\n        $init = { 48 89 5C 24 [2] 48 [2] 48 89 4C 24 }\n    \n    condition:\n        pe.is_pe and\n        $s1 and\n        (any of ($s2, $s3) or $init)\n}\n```\n\n### YARA in Automated Pipelines\n\n**Scanning endpoints:**\n```bash\n# Scan a directory\nyara -r rules/ /path/to/scan/\n\n# Scan with specific rule file\nyara -s -m cobalt_strike.yar /malware/samples/\n\n# Output as JSON for SIEM integration\nyara -r -m --print-json rules/ /path/\n```\n\n**Integration with Velociraptor:**\n```yaml\n# Velociraptor YARA scan artifact\nname: Custom.YARA.Scan\nsources:\n  - query: |\n      SELECT * FROM yara(path=rules, files=glob(globs='/usr/bin/*'))\n```\n\n**CI/CD Pipeline:**\n```bash\n# Scan build artifacts before deployment\nyara -r security_rules/ dist/\nif [ $? -ne 0 ]; then\n    echo \"SECURITY: YARA match found in build artifacts\"\n    exit 1\nfi\n```\n\n### Community YARA Repositories\n\n| Repository | Focus |\n|------------|-------|\n| yara-rules (GitHub) | General purpose, malware families |\n| Elastic Security YARA | Endpoint detection rules |\n| FireEye YARA | APT-specific signatures |\n| Fluorochrome | Cobalt Strike detection |\n| Samir ThreatYARA | Ransomware families |"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for YARA\n\n### YARA Rule Structure — **MScC**\n\n**M**eta — Who wrote it, what it detects, severity, references\n**S**trings — What patterns to look for\n**C**ondition — When the rule matches (the logic)\n\n### String Types — **THReX**\n\n**T**ext — `$s1 = \"malware\"`\n**H**ex — `$s1 = { 4D 5A 90 00 }`\n**Re**gex — `$s1 = /https?:\\/\\/.*\\.evil\\.com/`\ne**X**tras — `nocase`, `wide`, `fullword`, `xor`\n\n### Condition Logic — **OANF**\n\n**O**R — `$s1 or $s2` (any match)\n**A**nd — `$s1 and $s2` (both match)\n**N** of — `2 of ($s*)` (at least 2)\n**F**ile checks — `pe.is_pe`, `filesize < 5MB`\n\n### Optimization Tips\n\n1. **Always limit filesize** — `filesize < 10MB`\n2. **Use `fullword`** when possible — reduces FP\n3. **Start conditions with cheap checks** — file type before string matching\n4. **Avoid overly broad regex** — can cause exponential backtracking\n5. **Tag your rules** — `rule Malware : APT29` for categorization"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: What does the `wide` modifier do in a YARA string definition?\n\nA) Makes the string match across multiple files\nB) Matches UTF-16LE encoded strings (common in Windows binaries)\nC) Makes the string match broader patterns\nD) Doubles the search speed\n\n**Answer**: B — The `wide` modifier searches for the string encoded in UTF-16LE, which is the native string format in Windows PE files.\n\n**Question 2**: You want a YARA rule to match PE files with high entropy in the first section. Which module and function do you use?\n\nA) `math.entropy(0, filesize)`\nB) `pe.entropy(pe.sections[0])`\nC) `math.entropy(pe.sections[0].raw_offset, pe.sections[0].raw_size)`\nD) `hash.entropy(pe.sections[0])`\n\n**Answer**: C — The math module's entropy function takes offset and size parameters. For a PE section, you pass the section's raw_offset and raw_size.\n\n**Question 3**: Why is it important to add `filesize < 10MB` to a YARA rule's condition?\n\nA) To ensure only small malware is detected\nB) To improve performance by skipping large files that are unlikely to be the target\nC) To reduce the number of strings in the rule\nD) It's a mandatory YARA syntax requirement\n\n**Answer**: B — File size limits prevent YARA from wasting time scanning very large files that are unlikely to be the target malware, significantly improving scan performance."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **Your detection strategy**: If you had to write a YARA rule to detect a new malware variant, what would be your first step? How would you balance specificity vs. coverage?\n\n2. **False positive management**: You deploy a YARA rule and it generates 500 alerts in the first hour. How do you determine which are true positives? How do you refine the rule?\n\n3. **Threat intelligence loop**: How does YARA bridge the gap between strategic intelligence (\"APT29 targets our sector\") and tactical detection (\"scan for these specific patterns\")?\n\n4. **Rule sharing**: What considerations should you make before sharing YARA rules publicly? What about TLP levels in rule metadata?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## You Can Now Write Detection Rules\n\nYARA is where threat intelligence becomes operational. Strategic reports are interesting reading, but YARA rules are **actionable** — they scan files and find threats.\n\n**What you've gained:**\n- YARA rule syntax and structure mastery\n- String types, conditions, and modules\n- Performance optimization techniques\n- Integration into IR and hunting workflows\n\n**Your next steps:**\n- Write 5 YARA rules this week targeting threats relevant to your environment\n- Test them against both malware samples and benign files to calibrate FP rates\n- Contribute a rule to an open-source YARA repository\n\n**Remember**: The best YARA rule isn't the one that catches everything — it's the one that catches what matters without drowning you in noise."
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR578",
+    "Career Path: Threat Hunter",
+    "Career Path: Malware Analyst",
+    "yara",
+    "detection-rules",
+    "ioc",
+    "threat-intelligence",
+    "signature-creation"
+  ]
+}

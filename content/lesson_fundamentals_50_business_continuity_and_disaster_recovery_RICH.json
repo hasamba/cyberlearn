@@ -1,0 +1,167 @@
+{
+  "lesson_id": "f619d86f-7f90-4297-abe2-7ee8c9e8f6eb",
+  "domain": "fundamentals",
+  "title": "Business Continuity and Disaster Recovery",
+  "difficulty": 2,
+  "order_index": 50,
+  "prerequisites": [
+    "Risk Management Frameworks"
+  ],
+  "concepts": [
+    "Business Continuity Planning (BCP)",
+    "Disaster Recovery Planning (DRP)",
+    "Recovery Time Objective (RTO)",
+    "Recovery Point Objective (RPO)",
+    "Business Impact Analysis (BIA)",
+    "Continuity strategies and tiers",
+    "Emergency response and crisis management",
+    "Testing and maintenance of BCP/DRP",
+    "Regulatory and compliance requirements",
+    "Cloud-based disaster recovery"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Distinguish between Business Continuity Planning and Disaster Recovery Planning and explain when each applies",
+    "Conduct a Business Impact Analysis to identify critical business functions and calculate RTO/RPO values",
+    "Design continuity strategies including hot/warm/cold sites and cloud-based recovery",
+    "Develop and test disaster recovery procedures for different threat scenarios",
+    "Understand regulatory requirements (ISO 22301, NIST SP 800-34) for BCP/DRP programs"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary difference between a Business Continuity Plan and a Disaster Recovery Plan?",
+      "options": [
+        "BCP focuses on technology recovery; DRP focuses on business operations",
+        "BCP keeps the business running during disruption; DRP restores IT systems after a disaster",
+        "BCP is for natural disasters; DRP is for cyber attacks",
+        "There is no meaningful difference — they are interchangeable terms"
+      ],
+      "correct_answer": 1,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "479c95ee-bd09-42c3-a598-430ff0477baa",
+      "explanation": "BCP addresses overall business operations continuity during disruption, while DRP specifically focuses on restoring IT infrastructure and systems after a catastrophic event."
+    },
+    {
+      "question": "A company determines that its order processing system can be down for a maximum of 4 hours before causing unacceptable financial loss. This defines the:",
+      "options": [
+        "Recovery Point Objective (RPO)",
+        "Maximum Tolerable Downtime (MTD)",
+        "Recovery Time Objective (RTO)",
+        "Business Impact Analysis (BIA)"
+      ],
+      "correct_answer": 2,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "3929b2e2-23ce-4210-8076-1ac7193d4943",
+      "explanation": "RTO is the maximum acceptable time to restore a system after disruption. It's derived from the Business Impact Analysis and represents the deadline for recovery."
+    },
+    {
+      "question": "In a Business Impact Analysis, what does RPO measure?",
+      "options": [
+        "The maximum time a system can be unavailable",
+        "The maximum acceptable data loss measured in time",
+        "The cost of recovery per hour of downtime",
+        "The frequency of backup testing"
+      ],
+      "correct_answer": 1,
+      "difficulty": 2,
+      "type": "multiple_choice",
+      "question_id": "59eb354e-5be5-43b2-ad44-c79837d424e5",
+      "explanation": "RPO (Recovery Point Objective) defines the maximum acceptable amount of data loss, measured in time. If RPO is 1 hour, you need backups at least every hour — any data created between backups could be lost."
+    },
+    {
+      "question": "Which disaster recovery site configuration provides the fastest recovery time but is the most expensive?",
+      "options": [
+        "Cold site",
+        "Warm site",
+        "Hot site",
+        "Mobile site"
+      ],
+      "correct_answer": 2,
+      "difficulty": 1,
+      "type": "multiple_choice",
+      "question_id": "638892f2-1e13-4950-bfd1-da3f803708e1",
+      "explanation": "A hot site is a fully operational duplicate facility with real-time data replication. It provides near-instant failover but at the highest cost since all systems run in parallel."
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## Why Business Continuity Matters to You\n\nOrganizations don't fail because disasters happen. They fail because they didn't prepare for them. **Business Continuity and Disaster Recovery (BCP/DRP)** is the discipline that keeps organizations alive when everything goes wrong.\n\nWhether it's a ransomware attack encrypting your databases, a flood destroying your data center, or a pandemic forcing everyone remote — the organizations that survive are the ones that planned.\n\n**Your mission this lesson**: Learn to think about failure before it happens, and design systems that can recover from anything."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## BCP vs DRP: Two Sides of Survival\n\n### Business Continuity Planning (BCP)\n\n**BCP** ensures the business continues to operate during and after a disruption. It covers:\n- Which business functions are critical\n- How to maintain operations with reduced capacity\n- Who makes decisions during a crisis\n- Communication plans for stakeholders\n\n**Scope**: The entire organization — people, processes, facilities, technology.\n\n### Disaster Recovery Planning (DRP)\n\n**DRP** is a subset of BCP focused specifically on restoring IT systems and data after a disaster. It covers:\n- Infrastructure recovery procedures\n- Data backup and restoration\n- System failover processes\n- Technical recovery priorities\n\n**Scope**: Technology infrastructure and data.\n\n### The Relationship\n\n```\n┌─────────────────────────────────┐\n│     Business Continuity Plan      │\n│  ┌───────────────────────────┐   │\n│  │  Disaster Recovery Plan    │   │\n│  │  (IT-focused subset)       │   │\n│  └───────────────────────────┘   │\n│                                  │\n│  Also covers:                    │\n│  • Emergency response            │\n│  • Crisis communications         │\n│  • Alternate work locations       │\n│  • Supply chain continuity        │\n└─────────────────────────────────┘\n```\n\n**Key insight**: DRP without BCP means your servers come back up but your people don't know what to do. BCP without DRP means your people have a plan but no systems to work with."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Business Impact Analysis (BIA): The Foundation\n\nThe **BIA** is the most critical document in continuity planning. It answers the question: *What happens if this function stops?*\n\n### BIA Process\n\n1. **Identify business functions** — List every process the organization performs\n2. **Assess criticality** — Rate each function on impact if disrupted\n3. **Determine maximum tolerable downtime (MTD)** — How long can this function be down before the organization faces unacceptable consequences?\n4. **Calculate RTO and RPO**:\n   - **RTO** (Recovery Time Objective): Target time to restore the function\n   - **RPO** (Recovery Point Objective): Maximum acceptable data loss (measured in time)\n5. **Identify dependencies** — What other systems, vendors, and people does this function rely on?\n\n### Critical Relationships\n\n```\nMTD (Maximum Tolerable Downtime)\n  └── RTO must be < MTD\n        └── RPO must be ≤ RTO\n\nExample:\n  MTD = 8 hours (organization fails if down longer)\n  RTO = 4 hours (target: restore in 4 hours)\n  RPO = 1 hour (lose no more than 1 hour of data)\n```\n\n### BIA Priority Matrix\n\n| Function | Impact if Down | MTD | RTO | RPO | Priority |\n|----------|:---:|:---:|:---:|:---:|:---:|\n| Order processing | Critical | 4h | 2h | 15min | P1 |\n| Email | High | 8h | 4h | 1h | P2 |\n| HR portal | Low | 72h | 24h | 4h | P3 |\n| Dev environment | Low | 1 week | 48h | 12h | P4 |"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "## Recovery Strategies: Hot, Warm, Cold, and Cloud\n\n### Traditional Recovery Sites\n\n**Hot Site** 🟥\n- Full replica of production, running in parallel\n- Real-time data replication\n- Recovery time: Minutes to 1 hour\n- Cost: Highest (duplicate everything)\n\n**Warm Site** 🟨\n- Hardware and infrastructure ready, but data must be restored\n- Periodic data replication (daily/weekly)\n- Recovery time: Hours to 1 day\n- Cost: Medium\n\n**Cold Site** 🟦\n- Empty facility with power and cooling only\n- Everything must be installed and configured\n- Recovery time: Days to weeks\n- Cost: Lowest\n\n### Cloud-Based DR Strategies\n\nModern organizations increasingly use cloud for DR:\n\n**Pilot Light** — Minimal core infrastructure always running in cloud; scale up during disaster\n**Warm Standby** — Scaled-down version of production running in cloud; scale up during disaster\n**Multi-Region Active-Active** — Full production running in multiple regions simultaneously\n\n| Strategy | Recovery Time | Cost | Complexity |\n|----------|:---:|:---:|:---:|\n| Cold Site | Days | Low | Low |\n| Warm Site | Hours | Medium | Medium |\n| Hot Site | Minutes | High | High |\n| Cloud Pilot Light | Hours | Low | Medium |\n| Cloud Warm Standby | Minutes | Medium | Medium |\n| Multi-Region Active-Active | Seconds | High | High |"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "## Real-World Case Study: Maersk Ransomware Recovery\n\n### The Attack\nIn June 2017, the NotPetya ransomware attack hit **Maersk**, the world's largest container shipping company. Within minutes, the malware destroyed data across 4,000 servers and 2,500 PCs in 600 locations worldwide.\n\n### The Impact\n- **49,000 laptops and printers** destroyed\n- All business applications down\n- Container terminals at 17 ports completely paralyzed\n- **Estimated loss: $300 million**\n\n### The Recovery\nMaersk had a single surviving domain controller in Ghana that had been offline during the attack due to a power outage. This one server — **the last domain controller on earth with Maersk's Active Directory** — became the foundation for rebuilding.\n\n**What they did right:**\n- Executed emergency communications plan immediately\n- Rebuilt from the surviving DC and backups\n- Had cyber insurance that covered the massive recovery cost\n\n**What they could have done better:**\n- Backups were on the same network and got encrypted too\n- No air-gapped or immutable backup strategy\n- DR testing had not included a full domain destruction scenario\n\n### Lessons for BCP/DRP\n1. **Assume total destruction scenarios** — not just individual system failures\n2. **Air-gap critical backups** — if backups are on the same network, they're not really backups\n3. **Test for worst-case scenarios** — not just the comfortable failures\n4. **Geographic diversity matters** — Maersk survived because of a server in Ghana"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "## Memory Aids for BCP/DRP\n\n### The Continuity Alphabet — **BCDRA**\n\n**B** — **BIA first** — Business Impact Analysis drives everything else\n**C** — **Communications plan** — Who calls whom, in what order\n**D** — **DRP for technology** — Specific IT recovery procedures\n**R** — **RTO < MTD** — Recovery target must fit within maximum downtime\n**A** — **Always test** — Untested plans are fantasy documents\n\n### Key Metrics Mnemonic — **R²M**\n\n**R**TO — Recovery Time Objective (how fast must we restore?)\n**R**PO — Recovery Point Objective (how much data can we lose?)\n**M**TD — Maximum Tolerable Downtime (the absolute deadline)\n\n### Relationship Formula\n\n```\nRPO ≤ RTO < MTD\n```\n\nIf your data loss window (RPO) is bigger than your recovery time (RTO), you'll recover the system but with unacceptable data loss.\nIf your recovery time (RTO) is bigger than your maximum tolerable downtime (MTD), you'll fail before recovery completes.\n\n### Site Types — **HCW**\n**H**ot = Minutes (duplicate everything)\n**C**old = Days (empty building)\n**W**arm = Hours (hardware ready, data must be restored)"
+      }
+    },
+    {
+      "type": "quiz",
+      "content": {
+        "text": "## Quick Knowledge Check\n\n**Question 1**: A company backs up its database every 6 hours. What is the RPO?\n\nA) 6 hours — that's the maximum data loss window\nB) 0 hours — backups mean no data loss\nC) It depends on the RTO\nD) Cannot be determined from backup frequency alone\n\n**Answer**: A — RPO is the maximum acceptable data loss, and if you back up every 6 hours, you could lose up to 6 hours of data.\n\n**Question 2**: Which BCP/DRP activity should happen FIRST?\n\nA) Select a hot site vendor\nB) Conduct a Business Impact Analysis\nC) Write the disaster recovery plan\nD) Test the plan\n\n**Answer**: B — The BIA identifies critical functions and their requirements, which then drives every other decision.\n\n**Question 3**: A company's MTD for email is 24 hours and they set an RTO of 4 hours. What's wrong with this?\n\nA) Nothing — RTO should be less than MTD, and 4 < 24 ✓\nB) RTO should always equal MTD\nC) RTO should be greater than MTD\nD) MTD only applies to physical disasters, not email\n\n**Answer**: A — This is correct. RTO (4h) is less than MTD (24h), which is the proper relationship."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "## Reflection Questions\n\n1. **Assess your organization**: Does your current company have a tested BCP/DRP? When was the last time it was exercised? What gaps do you think exist?\n\n2. **RTO/RPO thinking**: If your organization's primary web application went down right now, what would the RTO be? What's the RPO? How long would it actually take to recover?\n\n3. **The backup paradox**: Many organizations discover that their backups don't work only when they need them. Why do you think this happens, and how would you prevent it?\n\n4. **Cloud DR**: Does your organization leverage cloud for disaster recovery? What's the gap between your current capability and a cloud-based pilot light or warm standby approach?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "## You're Now Thinking About Resilience\n\nMost people in cybersecurity focus on prevention — stopping attacks before they happen. That's important, but **resilience** is about surviving when prevention fails. Because it will.\n\n**What you've gained:**\n- A framework for thinking about organizational survival\n- The language of continuity: BIA, RTO, RPO, MTD\n- Recovery strategy options from cold sites to cloud active-active\n\n**Your next steps:**\n- Find your organization's BIA document and review it\n- Ask when the last DR test was conducted\n- Identify the gap between stated RTOs and actual recovery capability\n\nRemember: **A disaster recovery plan that hasn't been tested isn't a plan — it's a wish list.**"
+      }
+    }
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "Career Path: GRC Analyst",
+    "business-continuity",
+    "disaster-recovery",
+    "BIA",
+    "RTO",
+    "RPO",
+    "ISO-22301"
+  ]
+}
