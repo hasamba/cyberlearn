@@ -1,0 +1,255 @@
+{
+  "lesson_id": "8ea46f74-1f85-40f7-8915-86451309f7a5",
+  "domain": "linux",
+  "title": "SSH Key Management and Authentication",
+  "subtitle": "Key-Based SSH Authentication for Secure Access",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 54,
+  "prerequisites": [
+    "SSH Fundamentals and Configuration"
+  ],
+  "learning_objectives": [
+    "Generate SSH key pairs using ssh-keygen with appropriate algorithms",
+    "Configure authorized_keys for key-based authentication",
+    "Manage SSH key passphrases and key rotation",
+    "Implement key-based authentication best practices for enterprise environments"
+  ],
+  "concepts": [
+    "SSH key generation (ssh-keygen)",
+    "public/private keys",
+    "authorized_keys",
+    "key-based auth",
+    "passphrase management",
+    "key rotation"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "8b82e152-dd2d-4106-a935-b1af2a4d1ca7",
+      "type": "mindset_coach",
+      "title": "Keys Over Passwords: The SSH Security Upgrade",
+      "content": {
+        "text": "SSH key authentication eliminates the weakest link in remote access: passwords. A properly generated SSH key pair provides authentication that can't be brute-forced, can't be phished, and can be individually revoked without affecting other users. This lesson covers everything from key generation to enterprise key management."
+      },
+      "simplified_explanation": "SSH keys = unbreakable passwords that never travel over the network. Once you switch from passwords to keys, brute-force attacks become impossible.",
+      "memory_aids": [
+        "Keys > Passwords: can't be guessed, can't be phished, can be revoked individually",
+        "ssh-keygen is your new best friend"
+      ],
+      "real_world_connection": "GitHub, AWS, and every major cloud provider have deprecated password-based SSH access. Key-based auth is the industry standard.",
+      "reflection_prompt": "Are you still typing SSH passwords? That's the vulnerability this lesson eliminates.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "1a664b96-23f5-4d3e-ac7b-a3108b472fbe",
+      "type": "explanation",
+      "title": "SSH Key Cryptography and Generation",
+      "content": {
+        "text": "SSH keys use asymmetric cryptography: a private key stays on your machine, and a public key goes to the server. When you connect, the server sends a challenge encrypted with your public key — only your private key can decrypt it. Generate keys with `ssh-keygen -t ed25519 -C 'comment'` (Ed25519 is recommended for speed and security) or `ssh-keygen -t rsa -b 4096` (RSA with 4096 bits for compatibility). Always set a strong passphrase on your private key — without it, anyone who steals the key file can use it immediately."
+      },
+      "simplified_explanation": "SSH keys = two halves of a lock. Private key = your half (never share). Public key = server's half (safe to share). Ed25519 = best choice. Always add a passphrase.",
+      "memory_aids": [
+        "Private key = never share, never leave your machine",
+        "Public key = safe to put on any server",
+        "Ed25519 = fast + secure, RSA-4096 = compatible + secure",
+        "Passphrase protects key if stolen"
+      ],
+      "real_world_connection": "An employee's laptop is stolen. If their SSH private key has a passphrase, the thief can't use it. Without a passphrase, every server with that key in authorized_keys is compromised.",
+      "reflection_prompt": "Do your SSH keys have passphrases? If not, stop what you're doing and add them.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "f2c52f6b-7ff6-474b-8482-6e6611886f03",
+      "type": "explanation",
+      "title": "SSH Keys: Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine two magic boxes. You have one (private key) and the server has the other (public key). Your box can create messages that only the server's box can read, and vice versa. When you want to log in, the server sends you a secret challenge using your public box. Only your private box can solve it. The magic? Even if someone sees the public box, they can't solve the challenge — only you can. And the challenge changes every time, so recording it doesn't help anyone."
+      },
+      "simplified_explanation": "Two magic boxes: yours (private, never share) and the server's (public, safe to share). Server sends a puzzle only your box can solve. Password = shared secret. Keys = puzzle only you can solve.",
+      "memory_aids": [
+        "Password = one secret both people know",
+        "Key = puzzle only you can solve"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "3ab7565d-f964-419f-bf4d-9d66293b4a8e",
+      "type": "code_exercise",
+      "title": "SSH Key Setup Lab",
+      "content": {
+        "text": "Generate, configure, and deploy SSH keys:\n\n```bash\n# Generate Ed25519 key (recommended)\nssh-keygen -t ed25519 -C 'admin@workstation' -f ~/.ssh/id_ed25519_work\n\n# Generate RSA key (for legacy compatibility)\nssh-keygen -t rsa -b 4096 -C 'admin@workstation' -f ~/.ssh/id_rsa_work\n\n# Copy public key to server\nssh-copy-id -i ~/.ssh/id_ed25519_work.pub admin@server\n\n# Verify authorized_keys on server\ncat ~/.ssh/authorized_keys\n\n# Configure key in ~/.ssh/config\nHost workserver\n    HostName 10.0.0.10\n    User admin\n    IdentityFile ~/.ssh/id_ed25519_work\n    IdentitiesOnly yes\n\n# Test connection\nssh workserver\n\n# Key rotation: generate new key, deploy, remove old key\nssh-keygen -t ed25519 -C 'admin@workstation-2026' -f ~/.ssh/id_ed25519_work_new\nssh-copy-id -i ~/.ssh/id_ed25519_work_new.pub admin@server\n# After verifying new key works, remove old key from authorized_keys\n```\n\nBest practice: Rotate keys annually. Never share private keys. Use different keys for different servers/environments."
+      },
+      "simplified_explanation": "Generate key → Copy public key to server → Configure client → Test → Rotate regularly. Simple, powerful, secure.",
+      "memory_aids": [
+        "Generate → Copy → Configure → Test → Rotate",
+        "Different keys per environment"
+      ],
+      "real_world_connection": "Enterprise environments use SSH certificate authorities (Vault SSH, Teleport) to manage key lifetimes and automate rotation. But understanding manual key management is the foundation.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "6fdef727-5cfb-41eb-8e23-9bff2749d8ac",
+      "type": "real_world",
+      "title": "SSH Key Incidents and Best Practices",
+      "content": {
+        "text": "In 2019, a researcher discovered thousands of private SSH keys hardcoded in public GitHub repositories — some with access to production infrastructure at major companies. In another incident, a former employee's SSH key remained in authorized_keys for months after termination, allowing unauthorized access. The solution: centralized key management, regular key rotation, and authorized_keys hygiene. Tools like Teleport, Vault SSH, and LinkedIn's SSH certificate authority automate these practices at scale."
+      },
+      "simplified_explanation": "Private keys on GitHub = instant compromise. Stale keys in authorized_keys = backdoor. Automate key management or suffer the consequences.",
+      "memory_aids": [
+        "GitHub key leaks: thousands of private keys exposed",
+        "Stale keys = backdoor for terminated employees",
+        "Automate key rotation or it won't happen"
+      ],
+      "real_world_connection": "At Uber in 2016, attackers found SSH keys in a private GitHub repo and used them to access production infrastructure. Key management is infrastructure security.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "bfdff044-cb0c-4b06-9aa7-15403ae7715d",
+      "type": "memory_aid",
+      "title": "Key Takeaways: SSH Key Management",
+      "content": {
+        "text": "1. Ed25519 is the recommended algorithm (faster, more secure); RSA-4096 for compatibility.\n2. Always set a passphrase on private keys — stolen key without passphrase = instant compromise.\n3. authorized_keys on the server controls which keys can authenticate.\n4. ~/.ssh/config manages multiple keys and connection shortcuts.\n5. Rotate keys annually at minimum; use SSH certificates for enterprise.\n6. Never share private keys; use different keys per environment.\n7. Remove keys from authorized_keys when employees leave or keys are rotated.\n8. Scan for private keys in code repositories (git-secrets, trufflehog)."
+      },
+      "simplified_explanation": "Ed25519 + passphrase + rotation + per-environment keys = SSH key security done right.",
+      "memory_aids": [
+        "Ed25519 > RSA",
+        "Passphrase always",
+        "Rotate annually",
+        "Different key per env"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "8cf6deb2-1154-447b-ace7-d749b1ec87ae",
+      "type": "reflection",
+      "title": "Reflect on Your SSH Key Hygiene",
+      "content": {
+        "text": "Audit your own SSH keys. When was the last time you rotated them? Do they all have passphrases? Are there stale authorized_keys entries on your servers? Do you use different keys for different environments?"
+      },
+      "simplified_explanation": "Check your keys right now. Last rotation date? Passphrases? Per-environment separation?",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "When did you last rotate your SSH keys? If you can't remember, it's been too long.",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "ee6c8ae8-40cf-4cf6-a006-0aa2fb00c655",
+      "type": "mindset_coach",
+      "title": "Keys Are Just the Beginning",
+      "content": {
+        "text": "You've mastered SSH key generation, deployment, and management. Key-based auth is the foundation — but there's more. In the next lesson, you'll learn about SSH Agent and Key Forwarding, which lets you use keys across multi-hop connections securely. Keep building."
+      },
+      "simplified_explanation": "Key management done. Next: SSH Agent and forwarding for multi-hop connections.",
+      "memory_aids": [
+        "Keys = foundation → Agent = convenience → Forwarding = multi-hop"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "a8d3f205",
+      "type": "multiple_choice",
+      "question": "Which SSH key algorithm is currently recommended for new key generation?",
+      "options": [
+        "RSA-2048",
+        "DSA",
+        "Ed25519",
+        "ECDSA-P256"
+      ],
+      "correct_answer": 2,
+      "explanation": "Ed25519 is recommended for new key generation because it's faster, more secure (resistant to side-channel attacks), and produces shorter keys than RSA. RSA-4096 is still acceptable for compatibility.",
+      "difficulty": 2,
+      "memory_aid": "Ed25519 = modern standard, RSA-4096 = compatibility fallback",
+      "points": 10
+    },
+    {
+      "question_id": "c5115bd4",
+      "type": "multiple_choice",
+      "question": "Why should you always set a passphrase on your SSH private key?",
+      "options": [
+        "It's required by SSH protocol",
+        "If the key file is stolen, the passphrase prevents immediate use",
+        "It improves SSH connection speed",
+        "It allows the key to work on multiple servers"
+      ],
+      "correct_answer": 1,
+      "explanation": "A passphrase encrypts the private key on disk. If someone steals the key file, they still need the passphrase to use it. Without a passphrase, a stolen private key grants immediate access to all servers where it's authorized.",
+      "difficulty": 1,
+      "memory_aid": "No passphrase = stolen key = instant access everywhere",
+      "points": 10
+    },
+    {
+      "question_id": "5359e807",
+      "type": "multiple_choice",
+      "question": "What is the purpose of the ~/.ssh/authorized_keys file on a server?",
+      "options": [
+        "It stores the server's private key",
+        "It lists public keys that are permitted to authenticate to that user account",
+        "It stores SSH connection shortcuts",
+        "It configures the SSH daemon settings"
+      ],
+      "correct_answer": 1,
+      "explanation": "authorized_keys contains the public keys of users who are allowed to authenticate to that account. When a client connects with a private key, the server checks if the corresponding public key is in authorized_keys.",
+      "difficulty": 2,
+      "memory_aid": "authorized_keys = 'who can log in' list on the server",
+      "points": 10
+    },
+    {
+      "question_id": "71523e6d",
+      "type": "multiple_choice",
+      "question": "What is the recommended minimum frequency for SSH key rotation?",
+      "options": [
+        "Weekly",
+        "Monthly",
+        "Annually",
+        "Never — keys don't need rotation"
+      ],
+      "correct_answer": 2,
+      "explanation": "Annual key rotation is the minimum recommended frequency. In high-security environments, rotation should be more frequent. SSH certificates can automate this with built-in expiration.",
+      "difficulty": 2,
+      "memory_aid": "Rotate keys annually at minimum, more often in high-security environments",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer"
+  ]
+}

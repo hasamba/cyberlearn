@@ -1,0 +1,251 @@
+{
+  "lesson_id": "922fe069-2c76-46da-a4c2-895820c9856d",
+  "domain": "fundamentals",
+  "title": "Data Lifecycle Management",
+  "subtitle": "From Creation to Destruction: Managing Data Responsibly",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 53,
+  "prerequisites": [
+    "Information and Asset Classification"
+  ],
+  "learning_objectives": [
+    "Understand the six phases of the data lifecycle",
+    "Implement data retention policies aligned with regulatory requirements",
+    "Apply appropriate destruction and disposal methods for different media",
+    "Design data lifecycle governance frameworks"
+  ],
+  "concepts": [
+    "Data collection",
+    "storage",
+    "use",
+    "sharing",
+    "archiving",
+    "destruction",
+    "retention policies"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "1a6c8e83-338f-4fd8-9945-a7cf6e54f85b",
+      "type": "mindset_coach",
+      "title": "Data Has a Lifespan — Manage It",
+      "content": {
+        "text": "Every piece of data is born, lives, and must eventually die. Data Lifecycle Management isn't just about storage — it's about controlling data from creation through disposal. Ignore any phase and you face breaches, compliance failures, or wasted resources. This lesson covers the complete journey of data through your organization."
+      },
+      "simplified_explanation": "Data is like a person: it's born, it lives, it works, it retires, and eventually it must be properly laid to rest. Skip any stage and things get messy.",
+      "memory_aids": [
+        "Data Lifecycle = Birth → Use → Death",
+        "Unmanaged data = unmanaged risk"
+      ],
+      "real_world_connection": "GDPR requires organizations to delete personal data when it's no longer needed. Keeping it 'just in case' isn't just wasteful — it's illegal.",
+      "reflection_prompt": "How much data does your organization keep 'just in case' that has no retention policy?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "94117f35-81cf-4b42-b9b6-f83734ceffc5",
+      "type": "explanation",
+      "title": "The Six Phases of Data Lifecycle",
+      "content": {
+        "text": "The data lifecycle has six phases: 1) Creation/Collection — data enters the organization; 2) Storage — data is persisted in appropriate systems; 3) Use — data is processed, analyzed, and accessed; 4) Sharing — data is distributed to authorized parties; 5) Archival — data is moved to long-term, often lower-cost storage; 6) Destruction — data is securely and irreversibly destroyed. Each phase has different controls, risks, and regulatory requirements."
+      },
+      "simplified_explanation": "1) Create → 2) Store → 3) Use → 4) Share → 5) Archive → 6) Destroy. Every phase needs different security controls.",
+      "memory_aids": [
+        "Create-Store-Use-Share-Archive-Destroy",
+        "CSUSA-D mnemonic: Can't Stop Using Social Apps, Destroy them"
+      ],
+      "real_world_connection": "The average cost of a data breach involving data that should have been destroyed but wasn't is 30% higher because regulators impose additional penalties for failure to dispose of data properly.",
+      "reflection_prompt": "Which phase is your organization weakest in?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "857efa44-1220-4498-b52f-f6ae14b49ae1",
+      "type": "explanation",
+      "title": "Data Lifecycle: Teach Me Like I'm 10",
+      "content": {
+        "text": "Think of data like library books. First, the book arrives (Creation). Then it goes on the shelf (Storage). People borrow and read it (Use). The library lends it to other branches (Sharing). When nobody reads it anymore, it goes to the basement (Archival). When it's too old or damaged, it's shredded (Destruction). Every book has a policy: how long to keep it, who can read it, and when to throw it away."
+      },
+      "simplified_explanation": "Data lifecycle = library book lifecycle. Arrive → Shelf → Read → Lend → Basement → Shred.",
+      "memory_aids": [
+        "Library book metaphor: Create=arrive, Store=shelf, Use=read, Share=lend, Archive=basement, Destroy=shred"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d98a2c01-205e-48a6-91ee-071693d14505",
+      "type": "code_exercise",
+      "title": "Design a Data Retention Policy",
+      "content": {
+        "text": "Create a data retention policy template:\n\n| Data Type | Classification | Retention Period | Storage | Destruction Method |\n|-----------|---------------|-----------------|---------|-------------------|\n| Customer PII | Restricted | 3 years after relationship ends | Encrypted DB | Cryptographic erase |\n| Employee Records | Confidential | 7 years after termination | Encrypted archive | Degaussing + shredding |\n| Marketing Materials | Public | 2 years | Cloud storage | Standard delete |\n| Financial Records | Confidential | 7 years | Encrypted backup | Physical shredding |\n| Security Logs | Confidential | 1 year (real-time), 7 years (archive) | SIEM + cold storage | Cryptographic erase |\n\nThen write pseudocode for an automated retention enforcement engine:\n```python\ndef enforce_retention(data_store):\n    for record in data_store:\n        if record.age > record.retention_period:\n            if record.classification in ['Restricted', 'Confidential']:\n                secure_destroy(record)\n                audit_log(f'Securely destroyed: {record.id}')\n            else:\n                standard_delete(record)\n                audit_log(f'Deleted: {record.id}')\n```"
+      },
+      "simplified_explanation": "Build a table that says 'this type of data lives this long, is stored here, and dies this way.' Then automate the cleanup.",
+      "memory_aids": [
+        "Retention table: What → How long → Where → How to destroy",
+        "Higher classification = more secure destruction"
+      ],
+      "real_world_connection": "Every major compliance framework (GDPR, HIPAA, PCI-DSS, SOX) requires documented retention policies with enforcement.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "b6afa940-c94a-46f9-b896-980592077d54",
+      "type": "real_world",
+      "title": "When Data Destruction Fails",
+      "content": {
+        "text": "In 2019, a major healthcare provider sold old hard drives on eBay without properly wiping them. A journalist bought them and recovered patient records for 1.5 million people. The fine was $2.3 million — but the reputational damage was incalculable. In another case, a government agency decommissioned servers but left data on SAN snapshots. The new tenant of the data center accessed the snapshots and found classified information. Proper data destruction isn't optional — it's a regulatory and ethical requirement."
+      },
+      "simplified_explanation": "Selling old hard drives without wiping them = giving away your data. The fines and damage are enormous.",
+      "memory_aids": [
+        "Healthcare eBay: 1.5M records, $2.3M fine",
+        "Decommissioned ≠ Destroyed",
+        "If data still exists, it's still at risk"
+      ],
+      "real_world_connection": "NIST SP 800-88 provides detailed guidance on media sanitization: Clear (overwrite), Purge (degauss/crypto erase), Destroy (shred/disintegrate).",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "eb0e09dc-1265-4e53-931b-1d9916c8531f",
+      "type": "memory_aid",
+      "title": "Key Takeaways: Data Lifecycle Management",
+      "content": {
+        "text": "1. Six phases: Create → Store → Use → Share → Archive → Destroy.\n2. Each phase has different controls and risks.\n3. Retention policies must align with legal/regulatory requirements.\n4. Destruction must match classification: Restricted data requires cryptographic erase or physical destruction.\n5. NIST SP 800-88 defines three sanitization levels: Clear, Purge, Destroy.\n6. Keeping data beyond its retention period increases breach surface and regulatory risk.\n7. Automation is essential — manual retention enforcement always has gaps."
+      },
+      "simplified_explanation": "CSUSA-D: Create, Store, Use, Share, Archive, Destroy. Each phase = different controls. Destroy properly or pay the price.",
+      "memory_aids": [
+        "CSUSA-D lifecycle",
+        "NIST 800-88: Clear, Purge, Destroy",
+        "Over-retention = over-risk"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "d274062e-e59f-4619-84ba-7a6e779afffa",
+      "type": "reflection",
+      "title": "Reflect on Data Lifecycle",
+      "content": {
+        "text": "Review your organization's data lifecycle practices. Is there a retention policy? Is it enforced? How is data destroyed when it's no longer needed? Most organizations have policies but fail at enforcement."
+      },
+      "simplified_explanation": "Got a retention policy? Great. Is it actually enforced? That's the real question.",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "What data in your organization is past its retention period right now?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "2709639c-77e4-44a1-bc70-f6b8f903fa5a",
+      "type": "mindset_coach",
+      "title": "Lifecycle Mastery Achieved",
+      "content": {
+        "text": "You now understand the full journey of data through an organization. From creation to destruction, every phase needs controls, policies, and enforcement. This isn't bureaucracy — it's risk management. In the next lesson, you'll learn about Data Protection Controls: the specific mechanisms that secure data at each lifecycle phase."
+      },
+      "simplified_explanation": "Data lifecycle = birth to death. Every phase needs controls. Next: the specific controls at each phase.",
+      "memory_aids": [
+        "Lifecycle complete → Controls next"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "2b98c7d4",
+      "type": "multiple_choice",
+      "question": "What are the six phases of the data lifecycle in order?",
+      "options": [
+        "Create, Use, Store, Share, Archive, Destroy",
+        "Create, Store, Use, Share, Archive, Destroy",
+        "Collect, Process, Store, Share, Archive, Delete",
+        "Create, Store, Process, Distribute, Archive, Purge"
+      ],
+      "correct_answer": 1,
+      "explanation": "The data lifecycle phases are: Create/Collect, Store, Use, Share, Archive, Destroy (CSUSA-D). Each phase has different security controls and regulatory requirements.",
+      "difficulty": 1,
+      "memory_aid": "CSUSA-D: Create, Store, Use, Share, Archive, Destroy",
+      "points": 10
+    },
+    {
+      "question_id": "71a2952e",
+      "type": "multiple_choice",
+      "question": "According to NIST SP 800-88, what are the three levels of media sanitization?",
+      "options": [
+        "Format, Wipe, Shred",
+        "Clear, Purge, Destroy",
+        "Erase, Overwrite, Degauss",
+        "Delete, Sanitize, Incinerate"
+      ],
+      "correct_answer": 1,
+      "explanation": "NIST SP 800-88 defines: Clear (overwrite data), Purge (degaussing or cryptographic erase for higher protection), Destroy (physical destruction for the highest assurance).",
+      "difficulty": 2,
+      "memory_aid": "Clear → Purge → Destroy = increasing sanitization assurance",
+      "points": 10
+    },
+    {
+      "question_id": "16349275",
+      "type": "multiple_choice",
+      "question": "Why is keeping data beyond its required retention period a risk?",
+      "options": [
+        "It has no risk — more data is always better",
+        "It increases the attack surface and may violate privacy regulations like GDPR",
+        "It only affects storage costs, not security",
+        "Retention periods are optional recommendations"
+      ],
+      "correct_answer": 1,
+      "explanation": "Over-retention increases breach surface (more data to protect), violates data minimization principles in GDPR and other privacy laws, and increases discovery costs in litigation.",
+      "difficulty": 2,
+      "memory_aid": "More data stored = more data at risk = more regulatory exposure",
+      "points": 10
+    },
+    {
+      "question_id": "03774061",
+      "type": "multiple_choice",
+      "question": "What destruction method is appropriate for Restricted classification data?",
+      "options": [
+        "Standard file deletion",
+        "Emptying the recycle bin",
+        "Cryptographic erase or physical destruction",
+        "Quick format of the drive"
+      ],
+      "correct_answer": 2,
+      "explanation": "Restricted data requires the highest assurance of destruction. Cryptographic erase (destroying the encryption key) or physical destruction (shredding, disintegration) ensure data cannot be recovered.",
+      "difficulty": 2,
+      "memory_aid": "Restricted data = Purge or Destroy level (NIST 800-88)",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer"
+  ]
+}

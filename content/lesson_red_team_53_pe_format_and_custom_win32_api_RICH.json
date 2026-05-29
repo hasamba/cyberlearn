@@ -1,0 +1,247 @@
+{
+  "lesson_id": "75eb935c-b54b-4fa9-8229-9f18e8ef33bd",
+  "domain": "red_team",
+  "title": "PE Format and Custom Win32 API",
+  "subtitle": "Understanding PE Internals and Win32 API for Offensive Development",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 53,
+  "prerequisites": [
+    "Windows Offensive Tool Development"
+  ],
+  "learning_objectives": [
+    "Understand PE (Portable Executable) file format structure and headers",
+    "Parse PE headers programmatically for offensive tool development",
+    "Use Win32 API calls for process manipulation and injection",
+    "Implement DLL injection techniques using PE knowledge"
+  ],
+  "concepts": [
+    "PE headers",
+    "Win32 API creation",
+    "process injection",
+    "DLL injection"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a9a3d671-4d39-4028-a0af-186306624dc4",
+      "type": "mindset_coach",
+      "title": "The PE Format: Windows Internals for Operators",
+      "content": {
+        "text": "Every Windows executable follows the PE (Portable Executable) format. Understanding PE structure is like having X-ray vision — you can see exactly how a binary is constructed, where it loads in memory, and how to manipulate it. For offensive developers, this knowledge is foundational: every shellcode loader, every injector, every evasion technique starts with understanding PE internals."
+      },
+      "simplified_explanation": "PE format is the DNA of every Windows program. Learn to read the DNA and you can modify the organism.",
+      "memory_aids": [
+        "PE = Portable Executable = Windows binary DNA",
+        "Know PE = know how Windows loads and runs code"
+      ],
+      "real_world_connection": "EDR products parse PE headers to detect suspicious executables. Attackers manipulate PE headers to evade detection. It's a cat-and-mouse game at the format level.",
+      "reflection_prompt": "Why would understanding how Windows loads executables help you evade security products?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "67e665a8-0dac-46cc-84a2-ed37cbb2d9b0",
+      "type": "explanation",
+      "title": "PE Format Deep Dive: Headers and Sections",
+      "content": {
+        "text": "The PE format consists of several key structures: DOS Header (starts with MZ signature), PE Header (contains machine type, number of sections, timestamp), Optional Header (image base, entry point, subsystem), and Section Headers (.text for code, .data for initialized data, .rdata for read-only data, .rsrc for resources). The Entry Point in the Optional Header tells Windows where execution begins. Understanding ImageBase and ASLR (Address Space Layout Randomization) is critical — ASLR randomizes the ImageBase at load time, making hardcoded addresses unreliable."
+      },
+      "simplified_explanation": "A PE file is like a book: DOS Header = cover page, PE Header = table of contents, Sections = chapters. Entry Point = page 1 of the story. ASLR = shuffles all the page numbers.",
+      "memory_aids": [
+        "MZ = DOS Header signature",
+        "Entry Point = where code starts executing",
+        "ASLR = randomized load addresses"
+      ],
+      "real_world_connection": "When you see 'MZ' at the start of a file, you know it's a Windows executable. Many fileless attacks construct PE structures in memory without ever writing to disk.",
+      "reflection_prompt": "If ASLR randomizes load addresses, how do DLLs call functions in other DLLs?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "282ff212-21ee-4009-af5d-fcc561e60104",
+      "type": "explanation",
+      "title": "PE Format: Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine a PE file is like a lunchbox. The outside label (DOS Header) says 'this is a lunchbox.' Inside the lid (PE Header) is a note saying what's inside and where each compartment is. The compartments (Sections) hold different foods: .text is the main meal (code), .data is the snacks (variables), .rsrc is the napkin (resources). The Entry Point is like a sticky note saying 'start eating here!' When Windows opens the lunchbox, it reads the label, checks the compartments, and starts at the sticky note."
+      },
+      "simplified_explanation": "PE file = lunchbox. DOS Header = label. PE Header = contents note. Sections = food compartments. Entry Point = 'start here' sticky note.",
+      "memory_aids": [
+        "Lunchbox metaphor: label → contents note → compartments → sticky note for where to start"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "da45d036-5bd7-483c-af4a-cc1e93aa8c12",
+      "type": "code_exercise",
+      "title": "PE Parser: Hands-On Lab",
+      "content": {
+        "text": "Write a C program that parses PE headers and extracts key information:\n\n```c\n#include <windows.h>\n#include <stdio.h>\n\nint main(int argc, char* argv[]) {\n    FILE* f = fopen(argv[1], \"rb\");\n    IMAGE_DOS_HEADER dosHeader;\n    fread(&dosHeader, sizeof(dosHeader), 1, f);\n    \n    // Verify MZ signature\n    if (dosHeader.e_magic != IMAGE_DOS_SIGNATURE) {\n        printf(\"Not a valid PE file!\\n\");\n        return 1;\n    }\n    \n    // Seek to PE header\n    fseek(f, dosHeader.e_lfanew, SEEK_SET);\n    IMAGE_NT_HEADERS ntHeaders;\n    fread(&ntHeaders, sizeof(ntHeaders), 1, f);\n    \n    printf(\"Machine: %x\\n\", ntHeaders.FileHeader.Machine);\n    printf(\"Sections: %d\\n\", ntHeaders.FileHeader.NumberOfSections);\n    printf(\"Entry Point: 0x%x\\n\", ntHeaders.OptionalHeader.AddressOfEntryPoint);\n    printf(\"Image Base: 0x%llx\\n\", ntHeaders.OptionalHeader.ImageBase);\n    \n    fclose(f);\n    return 0;\n}\n```\n\nCompile with: `cl pe_parser.c` or `gcc pe_parser.c -o pe_parser.exe`\n\nThen analyze a real executable: `pe_parser.exe C:\\Windows\\notepad.exe`"
+      },
+      "simplified_explanation": "Build a tool that reads the 'lunchbox label' of any Windows executable and tells you what's inside.",
+      "memory_aids": [
+        "Read MZ → seek to e_lfanew → read PE Header → extract Entry Point and ImageBase"
+      ],
+      "real_world_connection": "Malware analysts and EDR products use PE parsing daily. This is the same technique, just from the offensive side.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "8f666255-837a-40e3-9358-b8beb1b7d642",
+      "type": "real_world",
+      "title": "PE Manipulation in Offensive Operations",
+      "content": {
+        "text": "Offensive operators manipulate PE structures for several purposes: modifying the Entry Point to redirect execution, adding new sections to inject code, changing the subsystem field, and manipulating import tables to load additional DLLs. Process hollowing creates a legitimate PE process, then unmaps its memory and replaces it with malicious code. DLL injection uses WriteProcessMemory and CreateRemoteThread to load a DLL into another process. These techniques all require understanding PE internals at a deep level."
+      },
+      "simplified_explanation": "Modify the lunchbox: change where the sticky note points, add a new compartment with your own food, or swap the entire meal while keeping the same lunchbox.",
+      "memory_aids": [
+        "Process hollowing = swap the meal, keep the lunchbox",
+        "DLL injection = add your own compartment to someone else's lunchbox"
+      ],
+      "real_world_connection": "Cobalt Strike, Brute Ratel, and other C2 frameworks manipulate PE structures for injection and evasion. Understanding what they do helps you both use and detect these techniques.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "3a64cae8-9ef0-4f77-8ef4-dae844a18edd",
+      "type": "memory_aid",
+      "title": "Key Takeaways: PE Format and Win32 API",
+      "content": {
+        "text": "1. PE format: DOS Header (MZ) → PE Header → Optional Header → Sections\n2. Entry Point (AddressOfEntryPoint) tells Windows where to start executing.\n3. ASLR randomizes ImageBase — use RVA calculations, not hardcoded addresses.\n4. Win32 API functions: OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread — the injection quartet.\n5. Process hollowing manipulates a legitimate PE in memory — the process looks clean on disk.\n6. DLL injection adds code to another process's address space.\n7. Import Address Table (IAT) is where API function addresses are resolved at runtime — hooking target for EDR."
+      },
+      "simplified_explanation": "PE = MZ header + PE header + sections. Entry Point = start. ASLR = randomization. Injection quartet = OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread.",
+      "memory_aids": [
+        "MZ → PE → Optional → Sections → Entry Point",
+        "Injection quartet: Open → Alloc → Write → CreateThread",
+        "ASLR means: never hardcode addresses"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "003668e3-ce5a-495e-b148-604f6a77cd07",
+      "type": "reflection",
+      "title": "Reflect on PE Knowledge",
+      "content": {
+        "text": "Understanding PE format changes how you see every Windows binary. Open any .exe in a hex editor and you can now identify the MZ header, find the Entry Point, and understand how Windows will load it. This knowledge is the foundation for injection, evasion, and anti-forensics."
+      },
+      "simplified_explanation": "Every .exe is now readable to you. You see the structure behind the binary.",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "Open notepad.exe in a hex editor. Can you find the MZ signature and the PE offset? Try it.",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "3e0aa102-8eba-4a15-b917-ed910883a8c0",
+      "type": "mindset_coach",
+      "title": "PE Mastery Opens Doors",
+      "content": {
+        "text": "You've just learned the binary anatomy of every Windows program. This isn't just theory — it's the operating system's contract with every executable. From here, process injection, shellcode loading, and evasion all build on this foundation. The next lesson on Advanced Process Injection Techniques will put this PE knowledge to work."
+      },
+      "simplified_explanation": "PE knowledge = the key to every Windows binary. Next up: using that key for injection.",
+      "memory_aids": [
+        "PE = foundation → Injection = application"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "2391031a",
+      "type": "multiple_choice",
+      "question": "What is the significance of the 'MZ' signature in a PE file?",
+      "options": [
+        "It indicates the file is compressed",
+        "It marks the beginning of the DOS Header, identifying the file as a Windows executable",
+        "It represents the entry point address",
+        "It indicates the file uses ASLR"
+      ],
+      "correct_answer": 1,
+      "explanation": "The 'MZ' signature (0x5A4D) at offset 0 identifies the DOS Header. Every valid Windows executable starts with these bytes, named after Mark Zbikowski who designed the format.",
+      "difficulty": 2,
+      "memory_aid": "MZ = Mark Zbikowski = 'This is a Windows EXE'",
+      "points": 10
+    },
+    {
+      "question_id": "bb0249be",
+      "type": "multiple_choice",
+      "question": "What does the AddressOfEntryPoint field in the PE Optional Header specify?",
+      "options": [
+        "The file size on disk",
+        "The RVA where execution begins when the PE is loaded",
+        "The base address of the PE in memory",
+        "The number of sections in the PE"
+      ],
+      "correct_answer": 1,
+      "explanation": "AddressOfEntryPoint is a Relative Virtual Address (RVA) that tells Windows where to start executing code after loading the PE. It's the instruction pointer's initial value.",
+      "difficulty": 3,
+      "memory_aid": "Entry Point = RVA of first instruction",
+      "points": 10
+    },
+    {
+      "question_id": "6fffc0f5",
+      "type": "multiple_choice",
+      "question": "Which Win32 API function is used to write data into another process's memory space?",
+      "options": [
+        "VirtualAllocEx",
+        "CreateRemoteThread",
+        "WriteProcessMemory",
+        "OpenProcess"
+      ],
+      "correct_answer": 2,
+      "explanation": "WriteProcessMemory writes data to the memory space of a specified process. The typical injection sequence is: OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread.",
+      "difficulty": 3,
+      "memory_aid": "Injection quartet: Open → Alloc → Write → CreateThread",
+      "points": 10
+    },
+    {
+      "question_id": "871f3407",
+      "type": "multiple_choice",
+      "question": "How does ASLR affect PE-based exploitation?",
+      "options": [
+        "It has no effect on exploitation",
+        "It randomizes the ImageBase at load time, making hardcoded memory addresses unreliable",
+        "It encrypts the PE headers",
+        "It removes the entry point from the PE"
+      ],
+      "correct_answer": 1,
+      "explanation": "ASLR (Address Space Layout Randomization) randomizes where executables are loaded in memory (ImageBase). This means hardcoded addresses will fail — you must use RVA calculations and resolve addresses dynamically.",
+      "difficulty": 3,
+      "memory_aid": "ASLR = random base = no hardcoding addresses",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: SANS-SEC670",
+    "Career Path: Red Teamer"
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "lesson_id": "c3dbde03-a910-4ef9-a2b5-8c6b5d6f84f5",
+  "domain": "red_team",
+  "title": "Advanced Process Injection Techniques",
+  "subtitle": "DLL Injection, Thread Hijacking, and Reflective Loading",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 54,
+  "prerequisites": [
+    "PE Format and Custom Win32 API"
+  ],
+  "learning_objectives": [
+    "Implement DLL injection using CreateRemoteThread and LoadLibrary",
+    "Understand and apply process hollowing techniques",
+    "Execute reflective DLL injection without disk writes",
+    "Apply anti-detection strategies for injection techniques"
+  ],
+  "concepts": [
+    "Process injection",
+    "thread injection",
+    "reflective DLL",
+    "code injection"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "ceb3f353-0a94-4db5-9312-e169b3eefb32",
+      "type": "mindset_coach",
+      "title": "Process Injection: Living Off the Land",
+      "content": {
+        "text": "Process injection is the art of executing code in the context of another process. Why? Because legitimate processes have trust — they're whitelisted by EDR, they have network access, they run with useful privileges. By injecting into them, you inherit their legitimacy. This lesson covers the core injection techniques that every offensive operator must master."
+      },
+      "simplified_explanation": "Process injection = hiding your code inside a legitimate program. The security tools see the legitimate program, not your code.",
+      "memory_aids": [
+        "Inject into legitimate process = inherit legitimacy",
+        "DLL injection = simplest, most detected technique",
+        "Reflective loading = most evasive"
+      ],
+      "real_world_connection": "Every major APT and C2 framework uses process injection. Cobalt Strike, Brute Ratel, Sliver — they all inject. EDR products are designed to detect injection. The game is: inject in ways EDR doesn't expect.",
+      "reflection_prompt": "If you were an EDR product, what would you monitor to detect process injection?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "269c2501-dd10-4b08-8c53-5b4517d7a84c",
+      "type": "explanation",
+      "title": "DLL Injection: The Classic Technique",
+      "content": {
+        "text": "DLL injection forces a target process to load a DLL of your choosing. The classic sequence: OpenProcess() gets a handle to the target, VirtualAllocEx() allocates memory in the target's address space, WriteProcessMemory() writes the DLL path, and CreateRemoteThread() calls LoadLibrary() with that path. This is the most well-known injection technique and therefore the most detected. EDR products hook CreateRemoteThread and monitor for cross-process memory writes. However, understanding it is essential because every advanced technique builds on these concepts."
+      },
+      "simplified_explanation": "DLL Injection in 4 steps: 1) Open the target process, 2) Allocate memory in it, 3) Write your DLL path, 4) Create a thread to load the DLL. Simple but noisy.",
+      "memory_aids": [
+        "OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread",
+        "Classic = detected = learn it first, then evolve"
+      ],
+      "real_world_connection": "DLL injection is taught first not because it's the best technique, but because it establishes the fundamental concepts. Real operators use evolutions of this technique.",
+      "reflection_prompt": "Why would an attacker choose DLL injection over other techniques despite it being well-detected?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "78093595-7e45-4fae-99ce-a40f7598e813",
+      "type": "explanation",
+      "title": "Process Injection: Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine you want to sneak into a building. The front door has a guard (EDR). DLL injection is like putting on a delivery uniform (a legitimate process) and walking in carrying a package (your DLL). The guard sees 'delivery person' and waves you through. Process hollowing is like taking over someone's body — you create a legitimate-looking person, remove what's inside, and put yourself in their place. Reflective injection is like being invisible — you're inside the building but there's no record of you ever entering through any door."
+      },
+      "simplified_explanation": "DLL injection = deliver a package in a uniform. Hollowing = replace the contents of a legitimate person. Reflective = be invisible inside the building.",
+      "memory_aids": [
+        "DLL = package delivery",
+        "Hollowing = body takeover",
+        "Reflective = ghost mode"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "9ffe3332-538d-4694-8a13-84fa9738cce1",
+      "type": "code_exercise",
+      "title": "DLL Injection: Implementation Lab",
+      "content": {
+        "text": "Implement a basic DLL injection in C:\n\n```c\n#include <windows.h>\n#include <stdio.h>\n\nint main(int argc, char* argv[]) {\n    if (argc < 3) {\n        printf(\"Usage: injector.exe <PID> <DLL_PATH>\\n\");\n        return 1;\n    }\n    \n    DWORD pid = atoi(argv[1]);\n    char* dllPath = argv[2];\n    \n    // Step 1: Open target process\n    HANDLE hProcess = OpenProcess(\n        PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | \n        PROCESS_VM_WRITE, FALSE, pid);\n    if (!hProcess) { printf(\"OpenProcess failed\\n\"); return 1; }\n    \n    // Step 2: Allocate memory in target\n    SIZE_T pathLen = strlen(dllPath) + 1;\n    LPVOID remoteBuf = VirtualAllocEx(hProcess, NULL, pathLen,\n        MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);\n    if (!remoteBuf) { printf(\"VirtualAllocEx failed\\n\"); return 1; }\n    \n    // Step 3: Write DLL path to target\n    if (!WriteProcessMemory(hProcess, remoteBuf, dllPath, \n        pathLen, NULL)) { printf(\"WriteProcessMemory failed\\n\"); return 1; }\n    \n    // Step 4: Create remote thread to call LoadLibrary\n    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,\n        (LPTHREAD_START_ROUTINE)LoadLibraryA, remoteBuf, 0, NULL);\n    if (!hThread) { printf(\"CreateRemoteThread failed\\n\"); return 1; }\n    \n    WaitForSingleObject(hThread, INFINITE);\n    printf(\"DLL injected successfully!\\n\");\n    \n    VirtualFreeEx(hProcess, remoteBuf, 0, MEM_RELEASE);\n    CloseHandle(hThread);\n    CloseHandle(hProcess);\n    return 0;\n}\n```\n\nCreate a simple DLL to inject:\n```c\n// payload.dll\n#include <windows.h>\nBOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved) {\n    if (reason == DLL_PROCESS_ATTACH) {\n        MessageBoxA(NULL, \"Injected!\", \"Success\", MB_OK);\n    }\n    return TRUE;\n}\n```\n\n⚠️ Use only in authorized lab environments."
+      },
+      "simplified_explanation": "4 API calls = DLL injection. Open → Alloc → Write → Thread. Simple, effective, and the foundation for understanding all injection.",
+      "memory_aids": [
+        "Injection quartet: OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread"
+      ],
+      "real_world_connection": "This exact technique is used by every major malware family. Understanding it is necessary for both offensive operations and detection engineering.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "4545add2-4e33-4550-8abc-8afeb87cdfaf",
+      "type": "real_world",
+      "title": "Injection Techniques in the Wild",
+      "content": {
+        "text": "APT29 (Cozy Bear) uses reflective DLL injection into svchost.exe for persistence. FIN7 uses process hollowing to run shellcode inside legitimate Windows processes. Lazarus Group uses DLL side-loading combined with injection for initial access. On the defense side, EDR products monitor for CreateRemoteThread calls, cross-process memory writes, and unexpected module loads. The evolution: attackers move from DLL injection (detected) to process hollowing (less detected) to reflective injection (stealthy) to module stomping (overwriting legitimate DLLs in memory). Each evolution reduces detectability."
+      },
+      "simplified_explanation": "DLL injection → Process hollowing → Reflective loading → Module stomping. Each step is stealthier than the last.",
+      "memory_aids": [
+        "DLL injection = noisy, detected",
+        "Process hollowing = less noisy",
+        "Reflective loading = no disk write, stealthy",
+        "Module stomping = overwrite legitimate DLLs"
+      ],
+      "real_world_connection": "The cat-and-mouse game continues: EDR detects the classic techniques, so operators evolve. Understanding the fundamentals lets you understand and adapt to both sides.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "937e4a47-9401-4384-b1e6-b899634d9fc6",
+      "type": "memory_aid",
+      "title": "Key Takeaways: Process Injection",
+      "content": {
+        "text": "1. DLL Injection: OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread (4 API calls).\n2. Process Hollowing: Create process suspended → unmap memory → write shellcode → resume thread.\n3. Reflective DLL Injection: Load DLL from memory without LoadLibrary — no disk write, no module entry.\n4. Module stomping: overwrite a legitimate DLL's memory — appears as a legitimate module.\n5. EDR detects: cross-process memory writes, CreateRemoteThread, unexpected module loads.\n6. Evolution: Classic → Hollowing → Reflective → Stomping (increasing stealth).\n7. Always test injection techniques in isolated lab environments only."
+      },
+      "simplified_explanation": "Classic DLL injection is detected. Real operators use hollowing, reflective loading, or module stomping. Know the fundamentals, then evolve.",
+      "memory_aids": [
+        "4-step injection: Open → Alloc → Write → Thread",
+        "Evolution: DLL → Hollow → Reflective → Stomp",
+        "EDR detection: cross-process writes, remote threads, unexpected modules"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "188f6ccc-1713-4262-8503-811db9a1cc9e",
+      "type": "reflection",
+      "title": "Reflect on Injection Techniques",
+      "content": {
+        "text": "From a defensive perspective, which injection technique would be hardest to detect and why? From an offensive perspective, what trade-offs do you make when choosing between simplicity and stealth?"
+      },
+      "simplified_explanation": "Think like both attacker and defender. Which technique wins in stealth? Which wins in simplicity?",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "If you were building an EDR product, what would you monitor to catch each injection technique?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "a58fcdbd-925a-4168-83a7-6476c53577d1",
+      "type": "mindset_coach",
+      "title": "Injection Fundamentals Secured",
+      "content": {
+        "text": "You've mastered the core injection techniques from DLL injection to reflective loading. These are the building blocks of every C2 framework and every evasion technique. The next level is combining these techniques with OPSEC considerations and EDR bypass strategies."
+      },
+      "simplified_explanation": "Injection fundamentals done. Classic → Hollow → Reflective → Stomp. Now you can read any injection technique and understand what it's doing.",
+      "memory_aids": [
+        "Fundamentals complete. Evolution path clear. Application next."
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "24c37208",
+      "type": "multiple_choice",
+      "question": "What is the correct sequence of API calls for classic DLL injection?",
+      "options": [
+        "VirtualAllocEx → OpenProcess → CreateRemoteThread → WriteProcessMemory",
+        "OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread",
+        "CreateRemoteThread → WriteProcessMemory → VirtualAllocEx → OpenProcess",
+        "WriteProcessMemory → OpenProcess → VirtualAllocEx → CreateRemoteThread"
+      ],
+      "correct_answer": 1,
+      "explanation": "The correct sequence is: OpenProcess (get handle) → VirtualAllocEx (allocate memory in target) → WriteProcessMemory (write DLL path) → CreateRemoteThread (execute LoadLibrary).",
+      "difficulty": 3,
+      "memory_aid": "Injection quartet: Open → Alloc → Write → Thread",
+      "points": 10
+    },
+    {
+      "question_id": "b130b7ac",
+      "type": "multiple_choice",
+      "question": "What makes reflective DLL injection stealthier than classic DLL injection?",
+      "options": [
+        "It uses a different API sequence",
+        "It loads the DLL from memory without calling LoadLibrary, so no module entry is created in the PEB",
+        "It injects into kernel space instead of user space",
+        "It uses PowerShell instead of C"
+      ],
+      "correct_answer": 1,
+      "explanation": "Reflective DLL injection loads the DLL entirely from memory without calling LoadLibrary. This means no entry is created in the Process Environment Block (PEB), so the injected DLL doesn't appear in module listings.",
+      "difficulty": 3,
+      "memory_aid": "Reflective = no LoadLibrary = no PEB entry = invisible to module enumeration",
+      "points": 10
+    },
+    {
+      "question_id": "6bfc251b",
+      "type": "multiple_choice",
+      "question": "In process hollowing, what happens to the legitimate process's code?",
+      "options": [
+        "It is preserved and runs alongside the injected code",
+        "It is unmapped from memory and replaced with malicious code",
+        "It is encrypted and stored in a backup",
+        "It remains in memory but execution is redirected"
+      ],
+      "correct_answer": 1,
+      "explanation": "Process hollowing creates a legitimate process in a suspended state, unmaps its legitimate code from memory, writes malicious code in its place, and then resumes the thread. The process appears legitimate on disk but runs malicious code in memory.",
+      "difficulty": 3,
+      "memory_aid": "Hollowing = empty the legitimate process, fill with malicious code, resume",
+      "points": 10
+    },
+    {
+      "question_id": "85812620",
+      "type": "multiple_choice",
+      "question": "Which injection technique involves overwriting a legitimate DLL's memory space?",
+      "options": [
+        "Classic DLL injection",
+        "Process hollowing",
+        "Module stomping",
+        "Reflective DLL injection"
+      ],
+      "correct_answer": 2,
+      "explanation": "Module stomping overwrites the memory of a legitimate, loaded DLL with malicious code. This is particularly stealthy because the module appears legitimate in process listings — it has a valid PEB entry and appears to be a trusted module.",
+      "difficulty": 3,
+      "memory_aid": "Module stomping = overwrite legitimate DLL = looks real = stealthy",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: SANS-SEC670",
+    "Career Path: Red Teamer"
+  ]
+}

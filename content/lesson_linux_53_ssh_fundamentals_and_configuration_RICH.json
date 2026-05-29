@@ -1,0 +1,252 @@
+{
+  "lesson_id": "0697e13b-f6fb-4fea-a929-2a71912b8e98",
+  "domain": "linux",
+  "title": "SSH Fundamentals and Configuration",
+  "subtitle": "Secure Remote Access for Linux Administrators",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 53,
+  "prerequisites": [
+    "Linux Kernel, Operating System, and Distributions"
+  ],
+  "learning_objectives": [
+    "Understand the SSH protocol architecture and the client-server model",
+    "Configure sshd for secure remote access with best-practice settings",
+    "Manage SSH client configuration files for connection efficiency",
+    "Apply security hardening techniques to SSH deployments"
+  ],
+  "concepts": [
+    "SSH protocol",
+    "ssh client",
+    "sshd server",
+    "/etc/ssh/sshd_config",
+    "client config (~/.ssh/config)",
+    "security best practices"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "8da10752-b75b-4a29-9efc-123bedb1a427",
+      "type": "mindset_coach",
+      "title": "SSH: Your Secure Tunnel to Anywhere",
+      "content": {
+        "text": "SSH is the Swiss Army knife of Linux administration. Every time you connect to a remote server, transfer a file securely, or tunnel traffic through a firewall — SSH is doing the heavy lifting. Mastering SSH isn't optional for security professionals; it's fundamental. This lesson covers the protocol that underpins virtually all secure Linux administration."
+      },
+      "simplified_explanation": "SSH is like a private, encrypted phone line between you and any computer. Nobody can listen in, and you can be sure you're talking to the right machine.",
+      "memory_aids": [
+        "SSH = Secure SHell = encrypted remote access",
+        "If you administer Linux, you use SSH. Period."
+      ],
+      "real_world_connection": "Every penetration tester, SOC analyst, and sysadmin uses SSH daily. A misconfigured SSH server is one of the most common initial access vectors in real breaches.",
+      "reflection_prompt": "How many times today have you used SSH or an SSH-based tool without realizing it?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "db865a33-38e7-41b7-8747-af804e1a4f5c",
+      "type": "explanation",
+      "title": "SSH Protocol Architecture",
+      "content": {
+        "text": "SSH (Secure Shell) operates on a client-server model over TCP port 22. The protocol has three layers: the Transport Layer (key exchange, server authentication, encryption), the Authentication Layer (password, public key, host-based, keyboard-interactive), and the Connection Layer (channels for shells, file transfer, port forwarding). During connection, the client and server negotiate encryption algorithms, exchange keys via Diffie-Hellman, and establish a secure tunnel before any authentication happens."
+      },
+      "simplified_explanation": "SSH works in three steps: 1) Shake hands and agree on encryption (Transport), 2) Prove who you are (Authentication), 3) Send commands securely (Connection).",
+      "memory_aids": [
+        "Transport = encryption setup",
+        "Authentication = who are you?",
+        "Connection = what can you do?"
+      ],
+      "real_world_connection": "When you type `ssh user@server`, the entire handshake — algorithm negotiation, key exchange, authentication — happens in under a second before you even see a password prompt.",
+      "reflection_prompt": "Why does SSH negotiate encryption BEFORE authentication rather than after?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a9156900-bf13-4486-8e4c-3c5147c8b444",
+      "type": "explanation",
+      "title": "SSH: Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine you want to send a secret message to your friend across the room. You could shout it (anyone can hear) or you could write it in a code only you and your friend understand. SSH is that secret code system. First, you and your friend agree on a code (key exchange). Then, you prove you're really you (authentication). Finally, you send messages in the code so nobody else can read them (encrypted channel). Even if someone intercepts the message, they just see gibberish."
+      },
+      "simplified_explanation": "SSH = agree on secret code + prove who you are + talk in secret code. If someone intercepts, they get nonsense.",
+      "memory_aids": [
+        "SSH handshake = agree on code, prove identity, then talk privately"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "5e7fdfd4-b43b-42d2-a848-9d96971ed5f5",
+      "type": "code_exercise",
+      "title": "Hardening SSH: Configuration Lab",
+      "content": {
+        "text": "Create a hardened sshd_config that: (1) Disables password authentication, (2) Disables root login, (3) Limits to key-based auth only, (4) Changes the default port, (5) Limits max auth attempts. Then write a client-side ~/.ssh/config that sets up connection shortcuts for three different servers with different key files.\n\n```bash\n# /etc/ssh/sshd_config hardening\nPort 2222\nPermitRootLogin no\nMaxAuthTries 3\nPasswordAuthentication no\nPubkeyAuthentication yes\nAllowUsers admin@10.0.0.*\n```\n\n```bash\n# ~/.ssh/config\nHost webserver\n    HostName 10.0.0.10\n    User admin\n    IdentityFile ~/.ssh/id_webserver\n    Port 2222\n\nHost dbserver\n    HostName 10.0.0.20\n    User dbadmin\n    IdentityFile ~/.ssh/id_dbserver\n    Port 2222\n```"
+      },
+      "simplified_explanation": "Build a secure SSH server config and a client config that saves you from typing long commands every time.",
+      "memory_aids": [
+        "No root login, no passwords, use keys only",
+        "Client config = shortcuts for SSH connections"
+      ],
+      "real_world_connection": "Every hardened Linux server in production uses these exact configurations. CIS Benchmarks and STIG profiles mandate disabling password auth and root login over SSH.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "97e5dbe7-7156-43b0-bc63-26384022ad92",
+      "type": "real_world",
+      "title": "SSH in Real Attacks and Defense",
+      "content": {
+        "text": "Attackers constantly scan for SSH servers on port 22 with weak passwords. Botnets like Mirai brute-force default credentials. In 2024, the xz/liblzma backdoor was inserted into OpenSSH's build pipeline — nearly compromising every SSH server on Linux. On the defensive side, SSH tunneling is used to bypass firewalls (both by attackers for pivoting and by admins for secure access). Understanding SSH configuration is both offensive and defensive knowledge."
+      },
+      "simplified_explanation": "SSH is a top target for attackers AND a top tool for defenders. Know both sides.",
+      "memory_aids": [
+        "Mirai = SSH brute force botnet",
+        "xz backdoor = nearly compromised all Linux SSH",
+        "SSH tunneling = double-edged sword"
+      ],
+      "real_world_connection": "When you see `PermitRootLogin yes` and `PasswordAuthentication yes` on an internet-facing server, that's a breach waiting to happen. Change both immediately.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "924044d2-f131-4b37-9bd5-31d56e0199da",
+      "type": "memory_aid",
+      "title": "Key Takeaways: SSH Fundamentals",
+      "content": {
+        "text": "1. SSH has three protocol layers: Transport (encryption), Authentication (identity), Connection (channels).\n2. Default port 22, but changing it reduces automated scan noise.\n3. Always disable PasswordAuthentication and PermitRootLogin in production.\n4. Use ~/.ssh/config for connection shortcuts and key management.\n5. SSH supports tunneling, file transfer (SCP/SFTP), and port forwarding.\n6. The xz backdoor incident showed that supply chain attacks target SSH infrastructure.\n7. Key-based auth is more secure than passwords because private keys never travel over the network."
+      },
+      "simplified_explanation": "SSH = encrypted tunnel + key auth + no root = secure remote access.",
+      "memory_aids": [
+        "3 layers: Transport, Auth, Connection",
+        "Disable: password auth, root login",
+        "Enable: key auth, specific users"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "018877e6-c8b5-4e4b-a501-e447c8673349",
+      "type": "reflection",
+      "title": "Reflect on Your SSH Usage",
+      "content": {
+        "text": "Review your own SSH configuration. Are you still using password authentication? Is root login enabled? Do you have a client config file set up? Most Linux professionals discover they've been using SSH insecurely for years. Now you know better."
+      },
+      "simplified_explanation": "Check your SSH config right now. Is it hardened? If not, fix it.",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "What three changes would make your SSH setup more secure? Write them down.",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "86d90ef6-8d93-42ca-9cab-d85a025b92a1",
+      "type": "mindset_coach",
+      "title": "SSH Mastery Continues",
+      "content": {
+        "text": "You've built the foundation — protocol architecture, server hardening, and client configuration. In the next lessons, you'll dive deeper into SSH key management and agent forwarding. Each layer of SSH knowledge makes you more effective and more secure. Keep building."
+      },
+      "simplified_explanation": "You now understand the SSH handshake and how to configure it securely. Next up: keys and agents.",
+      "memory_aids": [
+        "Foundation done: protocol + config. Next: keys + agents."
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "fb6df699",
+      "type": "multiple_choice",
+      "question": "Which SSH protocol layer handles key exchange and encryption negotiation?",
+      "options": [
+        "Authentication Layer",
+        "Connection Layer",
+        "Transport Layer",
+        "Application Layer"
+      ],
+      "correct_answer": 2,
+      "explanation": "The Transport Layer handles the initial key exchange, algorithm negotiation, and establishing the encrypted tunnel before authentication occurs.",
+      "difficulty": 2,
+      "memory_aid": "Transport = tunnel setup, Authentication = identity proof, Connection = channels",
+      "points": 10
+    },
+    {
+      "question_id": "b422f989",
+      "type": "multiple_choice",
+      "question": "What is the most important SSH hardening step for an internet-facing server?",
+      "options": [
+        "Change the default port to 2222",
+        "Disable PasswordAuthentication and PermitRootLogin",
+        "Install fail2ban",
+        "Use SSH protocol version 1"
+      ],
+      "correct_answer": 1,
+      "explanation": "Disabling password authentication eliminates brute-force attacks entirely. Disabling root login prevents direct root compromise. Port changes and fail2ban are defense-in-depth, not primary controls.",
+      "difficulty": 2,
+      "memory_aid": "No passwords + no root = no easy brute force",
+      "points": 10
+    },
+    {
+      "question_id": "3c568487",
+      "type": "multiple_choice",
+      "question": "What does the ~/.ssh/config file primarily enable?",
+      "options": [
+        "Server-side authentication configuration",
+        "Client-side connection shortcuts and per-host settings",
+        "SSH key generation parameters",
+        "Firewall rule management for SSH"
+      ],
+      "correct_answer": 1,
+      "explanation": "The client-side SSH config file allows you to define host aliases, specify key files, set ports, and configure per-host settings — eliminating the need to type long SSH commands.",
+      "difficulty": 1,
+      "memory_aid": "~/.ssh/config = SSH shortcuts for lazy (efficient) admins",
+      "points": 10
+    },
+    {
+      "question_id": "4130ad95",
+      "type": "multiple_choice",
+      "question": "During an SSH connection, which happens FIRST?",
+      "options": [
+        "Password authentication",
+        "Key exchange and encryption negotiation",
+        "Channel allocation for shell",
+        "User authorization"
+      ],
+      "correct_answer": 1,
+      "explanation": "SSH establishes an encrypted tunnel via key exchange BEFORE any authentication occurs. This ensures credentials are never sent in cleartext.",
+      "difficulty": 2,
+      "memory_aid": "Encryption first, then authentication — never the other way around",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer"
+  ]
+}

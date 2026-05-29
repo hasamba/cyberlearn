@@ -1,0 +1,250 @@
+{
+  "lesson_id": "e9883a05-303a-409c-a653-bde8e8c31d8f",
+  "domain": "fundamentals",
+  "title": "Information and Asset Classification",
+  "subtitle": "Mastering Data Classification for Security",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 52,
+  "prerequisites": [
+    "Cybersecurity Fundamentals"
+  ],
+  "learning_objectives": [
+    "Understand data classification levels and their role in information security",
+    "Implement asset inventory and labeling practices",
+    "Define handling requirements for different classification levels",
+    "Explain ownership responsibilities and accountability for data assets"
+  ],
+  "concepts": [
+    "Data classification",
+    "asset inventory",
+    "labeling",
+    "handling requirements",
+    "ownership"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "e73e7a56-5948-4e1d-8b64-242f00cfe820",
+      "type": "mindset_coach",
+      "title": "Why Classification Changes Everything",
+      "content": {
+        "text": "You can't protect what you don't know you have. Information and asset classification is the foundation of every security program — without it, you're guessing at controls instead of applying them strategically. This lesson gives you the vocabulary and framework that every security professional needs."
+      },
+      "simplified_explanation": "Imagine trying to guard a museum without knowing which paintings are priceless originals and which are posters. Classification tells you what matters most so you can protect it accordingly.",
+      "memory_aids": [
+        "Classification = knowing what to protect and how much",
+        "No classification = no prioritization = wasted effort"
+      ],
+      "real_world_connection": "After a breach, investigators always ask: 'Was this data classified?' If the answer is no, the organization often faces higher fines because they couldn't demonstrate due diligence.",
+      "reflection_prompt": "Think about your own organization — do you know where the most sensitive data lives?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "7317539c-98f8-4221-82e5-c30e15835dff",
+      "type": "explanation",
+      "title": "Classification Levels and Frameworks",
+      "content": {
+        "text": "Organizations typically classify data into levels: Public, Internal, Confidential, and Restricted (or similar labels like Unclassified, Sensitive But Unclassified, Secret, Top Secret in government). Each level defines who can access the data, how it should be stored, how it can be transmitted, and when it should be destroyed. The key frameworks driving classification include NIST SP 800-60, ISO 27001 Annex A, and the CISSP CBK which emphasizes classification as a core Domain 2 concept."
+      },
+      "simplified_explanation": "Public = anyone can see. Internal = employees only. Confidential = need-to-know. Restricted = top secret, serious consequences if leaked.",
+      "memory_aids": [
+        "P-I-C-R: Public, Internal, Confidential, Restricted",
+        "Higher classification = tighter controls = fewer people with access"
+      ],
+      "real_world_connection": "A hospital might classify patient records as Restricted, billing data as Confidential, internal policies as Internal, and parking information as Public.",
+      "reflection_prompt": "What classification level would you assign to your company's source code?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d68cb81b-8e74-45e0-a5c2-d36edf77f824",
+      "type": "explanation",
+      "title": "Asset Inventory and Ownership",
+      "content": {
+        "text": "Asset inventory is the process of cataloging all information assets — databases, documents, emails, source code, configs. Every asset needs an owner who is accountable for its classification, handling, and lifecycle. Ownership is not the same as custody: the owner decides policy, custodians enforce it. This distinction is critical in CISSP Domain 2 and in real incident response."
+      },
+      "simplified_explanation": "An asset owner is like the person who decides the rules for borrowing a book. The librarian (custodian) enforces those rules. The owner decides, the custodian does.",
+      "memory_aids": [
+        "Owner decides = Custodian enforces",
+        "No owner = No accountability = Chaos"
+      ],
+      "real_world_connection": "During a data breach investigation, the first question is 'Who owns this data?' If nobody knows, remediation takes 3x longer on average.",
+      "reflection_prompt": "Can you identify the data owner for the last project you worked on?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e2196268-fe8e-4233-b9a3-b275c98b05a3",
+      "type": "code_exercise",
+      "title": "Classify and Label: Hands-On Exercise",
+      "content": {
+        "text": "Create a simple data classification policy template. Define four classification levels, specify handling rules for each (storage, transmission, disposal), and assign ownership criteria. Then write a Python script that scans a directory and flags files missing classification labels based on filename patterns.\n\n```python\nimport os\nimport re\n\ndef scan_for_unlabeled(directory):\n    \"\"\"Flag files without classification labels.\"\"\"\n    classification_labels = ['PUBLIC', 'INTERNAL', 'CONFIDENTIAL', 'RESTRICTED']\n    unlabeled = []\n    for root, dirs, files in os.walk(directory):\n        for filename in files:\n            has_label = any(label in filename.upper() for label in classification_labels)\n            if not has_label:\n                unlabeled.append(os.path.join(root, filename))\n    return unlabeled\n\n# Run scan\nunlabeled = scan_for_unlabeled('/data')\nprint(f'Found {len(unlabeled)} unlabeled files:')\nfor f in unlabeled[:10]:\n    print(f'  {f}')\n```"
+      },
+      "simplified_explanation": "Build a mini-classification policy and a tool that finds unlabeled files — like a digital label checker.",
+      "memory_aids": [
+        "Policy first, tool second",
+        "If it's not labeled, it's not classified"
+      ],
+      "real_world_connection": "Many organizations use DLP tools that check for classification labels (like Microsoft Information Protection labels) before allowing files to be sent externally.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d42423c0-59e6-4c29-ad86-4b590aca6e04",
+      "type": "real_world",
+      "title": "Classification Failures and Their Consequences",
+      "content": {
+        "text": "In 2017, Equifax failed to properly classify and patch a critical Apache Struts vulnerability in their data systems. Unpatched because it wasn't classified as high-risk, it led to the exposure of 147 million records. Proper classification of the system and the data it held would have prioritized the patch. Another example: the UK Ministry of Defence accidentally published classified submarine locations in a Freedom of Information response because the data wasn't properly labeled."
+      },
+      "simplified_explanation": "When data isn't classified correctly, people make bad decisions — like leaving the vault open because nobody marked it as important.",
+      "memory_aids": [
+        "Equifax: 147M records exposed because a system wasn't classified as critical",
+        "Unlabeled data = uncontrolled data"
+      ],
+      "real_world_connection": "GDPR fines increase significantly when organizations cannot demonstrate they classified and protected personal data appropriately.",
+      "reflection_prompt": "What would happen in your organization if a critical system was misclassified as 'Internal' instead of 'Restricted'?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "6c23e903-7b5f-44cf-8758-a203209b6c16",
+      "type": "memory_aid",
+      "title": "Key Takeaways: Information and Asset Classification",
+      "content": {
+        "text": "1. Classification assigns value and sensitivity to data — without it, protection is random.\n2. Standard levels: Public → Internal → Confidential → Restricted.\n3. Every asset needs an owner who is accountable for classification decisions.\n4. Handling requirements (storage, transmission, disposal) are defined per classification level.\n5. Labeling makes classification visible — unlabeled data is uncontrolled data.\n6. Owners decide policy; custodians enforce it.\n7. Misclassification leads to under-protection or over-protection — both are costly."
+      },
+      "simplified_explanation": "Classify → Label → Control → Audit. Skip any step and your security program has a blind spot.",
+      "memory_aids": [
+        "P-I-C-R levels of classification",
+        "Owner decides, Custodian enforces",
+        "No label = no control"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "d96f4f95-ada5-45b6-beac-0e0ab175e74d",
+      "type": "reflection",
+      "title": "Reflect on Classification Practices",
+      "content": {
+        "text": "Consider your current or past organization. Were data assets properly classified? Were handling requirements clearly defined? Could you identify the owner of critical data? Think about what gaps you've seen and how proper classification could have prevented incidents."
+      },
+      "simplified_explanation": "Look around your digital workspace — how much data is floating around without a label or an owner?",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "List three data types in your organization and assign them classification levels. Who should own each?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "f2e5e4ce-cf32-4b81-beef-0fc23efb97d4",
+      "type": "mindset_coach",
+      "title": "Your Classification Journey",
+      "content": {
+        "text": "You've just built the mental framework that separates professional security programs from amateur ones. Classification isn't glamorous, but it's the difference between targeted protection and throwing darts blindfolded. Every audit, every incident response, every risk assessment starts with 'What data do we have and how sensitive is it?' Now you know."
+      },
+      "simplified_explanation": "You now speak the language of data protection — and that's the language every organization needs.",
+      "memory_aids": [
+        "Classification is the foundation — everything else builds on it"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "4e09943b",
+      "type": "multiple_choice",
+      "question": "Which classification level would typically be assigned to publicly available marketing materials?",
+      "options": [
+        "Restricted",
+        "Confidential",
+        "Internal",
+        "Public"
+      ],
+      "correct_answer": 3,
+      "explanation": "Public classification is for information that can be freely shared with anyone. Marketing materials are designed for public consumption.",
+      "difficulty": 1,
+      "memory_aid": "Public = anyone, anytime, anywhere",
+      "points": 10
+    },
+    {
+      "question_id": "c307e845",
+      "type": "multiple_choice",
+      "question": "What is the key difference between a data owner and a data custodian?",
+      "options": [
+        "The owner stores the data; the custodian creates it",
+        "The owner defines classification and policy; the custodian enforces controls",
+        "The custodian owns the data; the owner manages access",
+        "There is no difference — they are the same role"
+      ],
+      "correct_answer": 1,
+      "explanation": "The data owner is accountable for classification decisions and policy. The custodian implements and enforces the technical controls that support those policies.",
+      "difficulty": 2,
+      "memory_aid": "Owner decides, Custodian enforces",
+      "points": 10
+    },
+    {
+      "question_id": "09c5c5de",
+      "type": "multiple_choice",
+      "question": "Why is labeling important in data classification?",
+      "options": [
+        "It makes data look more professional",
+        "Labels enable automated enforcement of handling rules and DLP controls",
+        "Labels are only needed for physical documents",
+        "Labeling is optional for digital assets"
+      ],
+      "correct_answer": 1,
+      "explanation": "Labels (metadata tags like Microsoft Information Protection labels) enable automated tools like DLP and rights management to enforce handling rules consistently.",
+      "difficulty": 2,
+      "memory_aid": "No label = no control = no enforcement",
+      "points": 10
+    },
+    {
+      "question_id": "31213341",
+      "type": "multiple_choice",
+      "question": "An organization fails to classify a database containing customer PII. What is the most likely consequence?",
+      "options": [
+        "No impact — the database is still protected by default controls",
+        "Under-protection leading to breach, regulatory fines, and delayed incident response",
+        "Over-protection that blocks legitimate business processes",
+        "Automatic classification by the database management system"
+      ],
+      "correct_answer": 1,
+      "explanation": "Without classification, PII databases may not receive appropriate controls (encryption, access restrictions, monitoring). This leads to breaches, regulatory violations (GDPR, CCPA), and slower incident response because nobody knows the data's sensitivity.",
+      "difficulty": 2,
+      "memory_aid": "Unlabeled PII = uncontrolled PII = breach + fines",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "Career Path: GRC Analyst"
+  ]
+}

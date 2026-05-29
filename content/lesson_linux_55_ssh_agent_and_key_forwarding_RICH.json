@@ -1,0 +1,253 @@
+{
+  "lesson_id": "1a786be2-f33a-4efe-a455-a94bbcf3bd01",
+  "domain": "linux",
+  "title": "SSH Agent and Key Forwarding",
+  "subtitle": "Secure Multi-Hop SSH Connections and Agent Management",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 55,
+  "prerequisites": [
+    "SSH Key Management and Authentication"
+  ],
+  "learning_objectives": [
+    "Configure and manage ssh-agent for key caching and authentication",
+    "Implement SSH agent forwarding for multi-hop connections securely",
+    "Understand security implications of agent forwarding and mitigate risks",
+    "Design bastion host architectures with SSH key management"
+  ],
+  "concepts": [
+    "ssh-agent",
+    "agent forwarding",
+    "ForwardAgent",
+    "security implications",
+    "key management",
+    "bastion/jump hosts"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a0308c84-99ac-4bc9-9565-1777c46ce37c",
+      "type": "mindset_coach",
+      "title": "SSH Agent: Your Key Vault in Memory",
+      "content": {
+        "text": "SSH agent solves a critical problem: typing your passphrase every time you connect is painful, but storing unencrypted private keys on disk is dangerous. The agent caches decrypted keys in memory so you authenticate once per session, then connect freely. But with this convenience comes risk — agent forwarding can be abused by a compromised server to use your keys. This lesson teaches you to use the agent effectively while understanding and mitigating its risks."
+      },
+      "simplified_explanation": "SSH agent = in-memory key vault. Authenticate once, connect many times. But be careful with forwarding — it can be a double-edged sword.",
+      "memory_aids": [
+        "ssh-agent = one passphrase, many connections",
+        "Forwarding = convenient but risky if the server is compromised"
+      ],
+      "real_world_connection": "Every sysadmin uses ssh-agent daily. Every security professional who uses agent forwarding without understanding the risks is one compromised bastion host away from a key compromise.",
+      "reflection_prompt": "Do you use ssh-agent? Have you ever forwarded it without thinking about the security implications?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e2b10472-d213-4a7f-86ba-a8753491b295",
+      "type": "explanation",
+      "title": "SSH Agent Architecture and Configuration",
+      "content": {
+        "text": "ssh-agent is a daemon that holds decrypted private keys in memory. You add keys with `ssh-add`, and the agent responds to authentication challenges on your behalf. The agent communicates with SSH clients via a Unix domain socket (SSH_AUTH_SOCK). Key lifetime can be limited with `ssh-add -t 3600` (1 hour). Multiple agents can run simultaneously — each SSH session gets its own agent. The agent never writes keys to disk; they exist only in RAM and are lost when the agent process terminates."
+      },
+      "simplified_explanation": "ssh-agent holds your keys in RAM. You unlock once with your passphrase, and it handles all future authentications. Keys never touch disk.",
+      "memory_aids": [
+        "ssh-agent = keys in RAM, never on disk",
+        "ssh-add = load key into agent",
+        "SSH_AUTH_SOCK = the communication channel"
+      ],
+      "real_world_connection": "Without ssh-agent, you'd type your 40-character passphrase every time you SSH to a server. With the agent, you type it once per login session.",
+      "reflection_prompt": "What happens to your SSH agent keys when your workstation reboots?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "1b769d9f-9625-4639-b169-6821bcab8c17",
+      "type": "explanation",
+      "title": "SSH Agent Forwarding: Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine you have a special key that opens your house and your office. The key stays in your pocket (agent). When you walk to your office through the lobby (bastion host), you don't want to leave a copy of your key at the front desk. Instead, you tell the front desk 'when you need to verify I'm me, ask my pocket' (agent forwarding). The front desk sends a challenge to your pocket, your pocket solves it, and the office door opens. But here's the danger: if the front desk is compromised, someone could ask your pocket to open other doors too."
+      },
+      "simplified_explanation": "Agent forwarding = the server asks YOUR agent to authenticate, so your key never leaves your machine. But if the server is compromised, they can ask your agent to authenticate anywhere.",
+      "memory_aids": [
+        "Forwarding = server borrows your agent's ability",
+        "Compromised server = attacker can borrow it too"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "834a8386-88b7-4e6a-b334-2fe5029f4726",
+      "type": "code_exercise",
+      "title": "SSH Agent Configuration Lab",
+      "content": {
+        "text": "Configure ssh-agent and agent forwarding:\n\n```bash\n# Start ssh-agent and set environment\neval \"$(ssh-agent -s)\"\n# Agent PID: 12345\n\n# Add your keys with passphrase\nssh-add ~/.ssh/id_ed25519_work\n# Enter passphrase for key...\n# Identity added\n\n# Set key lifetime (1 hour)\nssh-add -t 3600 ~/.ssh/id_ed25519_work\n\n# List loaded keys\nssh-add -l\n# 256 SHA256:xxxx... admin@workstation (ED25519)\n\n# Configure agent forwarding in ~/.ssh/config\nHost bastion\n    HostName 10.0.0.5\n    User admin\n    ForwardAgent yes\n\nHost production\n    HostName 10.0.1.10\n    User admin\n    ProxyJump bastion\n    # NOTE: No ForwardAgent here — use ProxyJump instead\n\n# SSH to bastion and check forwarded agent\nssh bastion\n# On bastion: echo $SSH_AUTH_SOCK\n# /tmp/ssh-XXXXXXXXXX/agent.12345\n\n# SSH from bastion to production using forwarded agent\nssh production\n# This works because the agent is forwarded\n```\n\n⚠️ SECURITY: ForwardAgent yes should ONLY be used on trusted bastion hosts. Prefer ProxyJump over agent forwarding when possible."
+      },
+      "simplified_explanation": "Start agent → Add keys → Set lifetime → Configure forwarding or ProxyJump. ProxyJump is safer than agent forwarding.",
+      "memory_aids": [
+        "ssh-agent → ssh-add → ForwardAgent or ProxyJump",
+        "ProxyJump > ForwardAgent for security"
+      ],
+      "real_world_connection": "ProxyJump (-J) is the modern, safer alternative to agent forwarding. It creates a direct SSH tunnel through the bastion without exposing your agent socket.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e5387007-ed06-4dbf-8e46-fc2e7e100a1e",
+      "type": "real_world",
+      "title": "Agent Forwarding Gone Wrong",
+      "content": {
+        "text": "In 2016, a penetration tester was conducting an engagement and left ForwardAgent enabled on a compromised server. The red team discovered the forwarded agent socket and used it to pivot to other servers — accessing systems the pentester was authorized for but the attacker wasn't. The fix: always use ProxyJump instead of ForwardAgent when possible, and never forward agents to untrusted hosts. If you must use ForwardAgent, limit it to specific trusted bastions and set key lifetimes with ssh-add -t."
+      },
+      "simplified_explanation": "Left ForwardAgent on a compromised server = attacker pivots everywhere your keys can go. ProxyJump eliminates this risk.",
+      "memory_aids": [
+        "ForwardAgent on compromised server = keys stolen from RAM",
+        "ProxyJump = no agent socket exposed = safer"
+      ],
+      "real_world_connection": "The golden rule: if you don't trust the server completely, don't forward your agent to it. Period.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "b02bbc55-6fc0-473a-bd42-21c62bf68cf8",
+      "type": "memory_aid",
+      "title": "Key Takeaways: SSH Agent and Forwarding",
+      "content": {
+        "text": "1. ssh-agent caches decrypted keys in RAM — authenticate once per session.\n2. ssh-add loads keys; ssh-add -l lists them; ssh-add -t sets lifetime.\n3. Agent forwarding (ForwardAgent yes) lets a remote server use your local agent.\n4. Agent forwarding is risky: a compromised server can abuse the forwarded socket.\n5. ProxyJump (-J) is the safer alternative — tunnels through bastion without exposing agent.\n6. Never forward agents to untrusted hosts.\n7. Set key lifetimes (ssh-add -t) to limit the window of exposure.\n8. The agent socket (SSH_AUTH_SOCK) is the communication channel — protect it."
+      },
+      "simplified_explanation": "Agent = convenience. Forwarding = risk. ProxyJump = safer alternative. Never forward to untrusted hosts.",
+      "memory_aids": [
+        "Agent: load once, use many",
+        "Forwarding: convenient but risky",
+        "ProxyJump > ForwardAgent",
+        "Never forward to untrusted hosts"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "269056db-e7ed-4352-8758-36752dcf0b7d",
+      "type": "reflection",
+      "title": "Reflect on Agent Security",
+      "content": {
+        "text": "Review your SSH configuration. Do you use ForwardAgent? Where? Are there safer alternatives using ProxyJump? Set key lifetimes on your agent to limit exposure windows."
+      },
+      "simplified_explanation": "Check your SSH config right now. Replace ForwardAgent with ProxyJump wherever possible.",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "Which of your SSH connections use ForwardAgent that could be switched to ProxyJump?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "cc22d91e-54d3-43fe-889d-587ad631a9f3",
+      "type": "mindset_coach",
+      "title": "Agent Mastery Achieved",
+      "content": {
+        "text": "You've mastered the SSH agent — from basic key caching to secure multi-hop architectures. The key insight: convenience and security are trade-offs, and ProxyJump gives you both. Use the agent wisely, forward carefully, and always prefer ProxyJump over raw agent forwarding."
+      },
+      "simplified_explanation": "Agent mastered. Use it wisely. Prefer ProxyJump. Your SSH workflow is now professional-grade.",
+      "memory_aids": [
+        "Agent mastery complete. Security + convenience = ProxyJump."
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "e2eedfe5",
+      "type": "multiple_choice",
+      "question": "What is the primary security risk of SSH agent forwarding?",
+      "options": [
+        "It slows down SSH connections",
+        "A compromised server can use the forwarded agent socket to authenticate to other servers",
+        "It stores your private key on the remote server's disk",
+        "It prevents you from using key-based authentication"
+      ],
+      "correct_answer": 1,
+      "explanation": "When you forward your agent to a remote server, the server can communicate with your local agent via the forwarded socket. If the server is compromised, an attacker can abuse this socket to authenticate to any server where your keys are authorized — without ever seeing the private key itself.",
+      "difficulty": 2,
+      "memory_aid": "Forwarded agent = remote server can ask your agent to authenticate anywhere",
+      "points": 10
+    },
+    {
+      "question_id": "3fdac6e7",
+      "type": "multiple_choice",
+      "question": "What is the safer alternative to agent forwarding for accessing servers through a bastion host?",
+      "options": [
+        "Copying your private key to the bastion",
+        "Using SSH ProxyJump (-J)",
+        "Disabling SSH key authentication entirely",
+        "Using password authentication instead"
+      ],
+      "correct_answer": 1,
+      "explanation": "ProxyJump (-J) creates a direct SSH tunnel through the bastion host without exposing your agent socket. The bastion only sees encrypted SSH traffic, and your keys stay on your local machine.",
+      "difficulty": 2,
+      "memory_aid": "ProxyJump = tunnel through bastion, no agent exposure",
+      "points": 10
+    },
+    {
+      "question_id": "50768484",
+      "type": "multiple_choice",
+      "question": "What does ssh-add -t 3600 accomplish?",
+      "options": [
+        "Adds a key with a 3600-bit key size",
+        "Sets the key to expire from the agent after 1 hour (3600 seconds)",
+        "Creates a backup of the key every 3600 seconds",
+        "Limits the SSH connection to 3600 seconds"
+      ],
+      "correct_answer": 1,
+      "explanation": "ssh-add -t sets a lifetime for the key in the agent. After 3600 seconds (1 hour), the key is automatically removed from the agent, limiting the exposure window if the agent socket is compromised.",
+      "difficulty": 2,
+      "memory_aid": "ssh-add -t = time limit = key auto-expires from agent",
+      "points": 10
+    },
+    {
+      "question_id": "0ebc69f9",
+      "type": "multiple_choice",
+      "question": "Where does ssh-agent store decrypted private keys?",
+      "options": [
+        "On disk in ~/.ssh/agent-keys/",
+        "In the SSH_AUTH_SOCK file",
+        "In RAM (memory only) — keys are never written to disk",
+        "In the system keychain"
+      ],
+      "correct_answer": 2,
+      "explanation": "ssh-agent stores decrypted keys only in RAM. They are never written to disk. When the agent process terminates (logout, reboot), the keys are gone. This is why you need to ssh-add after every reboot.",
+      "difficulty": 1,
+      "memory_aid": "Agent keys = RAM only = gone on reboot",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: Security Engineer"
+  ]
+}

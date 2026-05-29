@@ -1,0 +1,250 @@
+{
+  "lesson_id": "c989aa0c-82c5-4d15-963b-05b2d698bca8",
+  "domain": "fundamentals",
+  "title": "Data Protection Controls",
+  "subtitle": "Securing Data at Rest, in Transit, and in Use",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 54,
+  "prerequisites": [
+    "Data Lifecycle Management"
+  ],
+  "learning_objectives": [
+    "Implement encryption controls for data at rest and in transit",
+    "Configure Data Loss Prevention (DLP) solutions for data exfiltration prevention",
+    "Apply data protection controls across different states: rest, transit, and use",
+    "Design defense-in-depth data protection strategies"
+  ],
+  "concepts": [
+    "Data at rest protection",
+    "data in transit",
+    "data in use",
+    "DLP",
+    "encryption controls"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a7eaa257-896f-4e1e-b31d-b97e0daf33b6",
+      "type": "mindset_coach",
+      "title": "Protect Data in Every State",
+      "content": {
+        "text": "Data exists in three states: at rest (stored), in transit (moving), and in use (being processed). Each state has different vulnerabilities and requires different controls. This lesson covers the specific mechanisms that protect data across all three states — because a chain is only as strong as its weakest link."
+      },
+      "simplified_explanation": "Data has three lives: sleeping (at rest), traveling (in transit), and working (in use). Protect all three or you're not really protected.",
+      "memory_aids": [
+        "Three states: Rest, Transit, Use",
+        "Protect all three or protect nothing"
+      ],
+      "real_world_connection": "Organizations that encrypt data at rest but not in transit (or vice versa) are like houses with a vault door but no lock on the back door. Encryption must cover all states.",
+      "reflection_prompt": "Which of the three data states is your organization weakest in?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "978232ac-224e-43f8-a3ae-f9e523b27e82",
+      "type": "explanation",
+      "title": "Data at Rest: Encryption and Access Controls",
+      "content": {
+        "text": "Data at rest includes databases, file systems, backups, and portable media. Protection mechanisms include: Full Disk Encryption (BitLocker, LUKS) for endpoints, Transparent Data Encryption (TDE) for databases, Object-level encryption for cloud storage (AWS S3 SSE, Azure Storage Service Encryption), and Hardware-level encryption (Self-Encrypting Drives). Access controls complement encryption: RBAC, MFA, and file permissions ensure only authorized users can decrypt and access data. Key management is critical — encrypted data is only as secure as its encryption keys."
+      },
+      "simplified_explanation": "Data at rest = sleeping data. Lock it with encryption, guard it with access controls, protect the keys like crown jewels.",
+      "memory_aids": [
+        "Data at rest: FDE + TDE + Object encryption + RBAC + Key management",
+        "Encrypted data = only as secure as the keys"
+      ],
+      "real_world_connection": "BitLocker with TPM protects laptops. S3 SSE-KMS protects cloud objects. TDE protects databases. Each is encryption at rest — but for different storage types.",
+      "reflection_prompt": "If an attacker steals an encrypted hard drive but also gets the encryption key, what happens?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "59b1274c-d44c-4266-a78e-a13bc82a8b18",
+      "type": "explanation",
+      "title": "Data Protection Controls: Teach Me Like I'm 10",
+      "content": {
+        "text": "Think of data like money in different situations. At rest = money in a safe (encrypt the safe). In transit = money in an armored truck (encrypt the truck's route). In use = money being counted at the bank (count it inside a private room). DLP = security cameras watching every door — if money starts moving toward the exit, the alarm goes off. Encryption = lock on the safe. Access control = who has the key. Key management = where you hide the spare key."
+      },
+      "simplified_explanation": "Safe = encryption at rest. Armored truck = encryption in transit. Private room = encryption in use. Security cameras = DLP. Key management = hiding the spare key really well.",
+      "memory_aids": [
+        "Money metaphor: safe, armored truck, private room, cameras, spare key"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "1ffbc21c-89d9-439c-8db0-61ef7a42e7de",
+      "type": "code_exercise",
+      "title": "Data Protection Controls Matrix",
+      "content": {
+        "text": "Build a comprehensive data protection controls matrix:\n\n| State | Threat | Control | Implementation |\n|-------|--------|---------|---------------|\n| At Rest | Unauthorized access | Encryption (AES-256) | BitLocker, LUKS, TDE, S3 SSE-KMS |\n| At Rest | Key compromise | Key management | AWS KMS, Azure Key Vault, HashiCorp Vault |\n| At Rest | Insider threat | Access control (RBAC) | IAM policies, file permissions |\n| In Transit | Eavesdropping | Encryption (TLS 1.3) | HTTPS, SFTP, VPN |\n| In Transit | MITM attack | Certificate pinning | HSTS, HPKP |\n| In Transit | Data exfiltration | DLP | Microsoft DLP, Forcepoint, Zscaler |\n| In Use | Memory scraping | Memory encryption | Intel SGX, AMD SEV |\n| In Use | Unauthorized copy | DRM/IRM | Azure IRM, Adobe Experience Manager |\n| In Use | Screen capture | Watermarking | Dynamic watermarks, session recording |\n\nPython pseudocode for DLP rule:\n```python\ndef check_data_exfiltration(action, data_classification, destination):\n    if data_classification in ['Restricted', 'Confidential']:\n        if destination == 'external':\n            return BLOCK_AND_ALERT\n        if action == 'copy' and destination == 'usb':\n            return BLOCK_AND_ALERT\n        if action == 'email' and 'attachment' in action:\n            return QUARANTINE_AND_REVIEW\n    return ALLOW\n```"
+      },
+      "simplified_explanation": "Build a table: data state → threat → control → implementation. Then write DLP rules that block bad actions and alert on sensitive data movement.",
+      "memory_aids": [
+        "Rest: encrypt + key management + RBAC",
+        "Transit: TLS + pinning + DLP",
+        "Use: memory encryption + DRM + watermarks"
+      ],
+      "real_world_connection": "Every compliance framework (PCI-DSS, HIPAA, SOC 2) requires encryption at rest and in transit. DLP is required for data classification enforcement.",
+      "reflection_prompt": "",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "58c32167-0693-4440-8e08-b0c5e8200021",
+      "type": "real_world",
+      "title": "When Data Protection Controls Fail",
+      "content": {
+        "text": "In 2019, Capital One experienced a data breach exposing 100M+ records. The data was encrypted at rest, but the attacker exploited a misconfigured WAF to access the encryption keys through an IAM role. Encryption at rest means nothing if the keys are accessible. In 2017, Equifax had data in transit encrypted with TLS, but attackers exploited an unpatched Apache Struts vulnerability before the encryption layer, accessing data in use. The lesson: controls must cover ALL three states, and encryption keys must be protected as rigorously as the data itself."
+      },
+      "simplified_explanation": "Capital One: encrypted data + exposed keys = 100M records breached. Equifax: TLS + unpatched app = data stolen in use. Protect all states or fail.",
+      "memory_aids": [
+        "Capital One: encrypted data ≠ protected if keys are exposed",
+        "Equifax: TLS doesn't help if the app is vulnerable",
+        "All three states must be protected"
+      ],
+      "real_world_connection": "Defense in depth means protecting data in every state. A single gap — exposed keys, unpatched software, missing DLP — can undo all other controls.",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "1d222c31-c71a-4e3d-9185-cd17bf158004",
+      "type": "memory_aid",
+      "title": "Key Takeaways: Data Protection Controls",
+      "content": {
+        "text": "1. Data has three states: at rest, in transit, in use — protect all three.\n2. At rest: AES-256 encryption, key management (KMS/Vault), RBAC.\n3. In transit: TLS 1.3, certificate pinning, VPNs.\n4. In use: memory encryption (SGX/SEV), DRM, watermarks.\n5. DLP monitors and blocks unauthorized data movement.\n6. Encryption keys are as valuable as the data they protect.\n7. Key management (rotation, storage, access) is a separate discipline.\n8. Defense in depth: never rely on a single control."
+      },
+      "simplified_explanation": "Rest = encrypt + keys + access. Transit = TLS + pinning. Use = memory encryption + DRM. DLP = watch everything. Keys = crown jewels.",
+      "memory_aids": [
+        "Three states: Rest, Transit, Use",
+        "Encryption + Key management = data protection",
+        "DLP = the security camera watching data move"
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "5ef1dd4b-2628-47b2-b75f-d0fe63af4769",
+      "type": "reflection",
+      "title": "Reflect on Data Protection Gaps",
+      "content": {
+        "text": "Map your organization's data protection across all three states. Where are the gaps? Most organizations encrypt at rest and in transit but have almost no controls for data in use. Is that true for you?"
+      },
+      "simplified_explanation": "Most orgs protect rest + transit, forget in use. What about yours?",
+      "memory_aids": [],
+      "real_world_connection": "",
+      "reflection_prompt": "Which data state has the weakest protection in your environment? Why?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "0b58903c-6e3c-4656-8e5e-bda9877e3d1e",
+      "type": "mindset_coach",
+      "title": "Controls Complete, Coverage Complete",
+      "content": {
+        "text": "You've now covered data protection across all three states. From BitLocker to TLS to memory encryption, from key management to DLP — you have the full picture. The next step is applying these controls to real architectures and ensuring they work together as a defense-in-depth strategy."
+      },
+      "simplified_explanation": "Three states protected. All controls mapped. Next: applying them in real architectures.",
+      "memory_aids": [
+        "Data protection complete. Next: architecture application."
+      ],
+      "real_world_connection": "",
+      "reflection_prompt": "",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "a536d54d",
+      "type": "multiple_choice",
+      "question": "What are the three states of data that require protection controls?",
+      "options": [
+        "Encrypted, decrypted, and compressed",
+        "At rest, in transit, and in use",
+        "Public, private, and hybrid",
+        "Structured, unstructured, and semi-structured"
+      ],
+      "correct_answer": 1,
+      "explanation": "Data exists in three states: at rest (stored on media), in transit (moving across networks), and in use (being processed in memory). Each state requires different protection mechanisms.",
+      "difficulty": 1,
+      "memory_aid": "Rest (stored), Transit (moving), Use (processing)",
+      "points": 10
+    },
+    {
+      "question_id": "2f9ad610",
+      "type": "multiple_choice",
+      "question": "Why is key management as important as encryption itself?",
+      "options": [
+        "Because keys are smaller than data and easier to store",
+        "Because if encryption keys are compromised, encrypted data can be decrypted",
+        "Because keys are required for network connectivity",
+        "Because regulations require key management but not encryption"
+      ],
+      "correct_answer": 1,
+      "explanation": "Encryption is only as strong as the protection of its keys. If an attacker obtains the encryption key, the encryption is effectively useless — they can decrypt all data protected by that key.",
+      "difficulty": 2,
+      "memory_aid": "Encrypted data = only as secure as the keys protecting it",
+      "points": 10
+    },
+    {
+      "question_id": "590feba2",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of Data Loss Prevention (DLP)?",
+      "options": [
+        "To encrypt data at rest",
+        "To monitor and prevent unauthorized data movement and exfiltration",
+        "To manage encryption keys",
+        "To compress data for storage efficiency"
+      ],
+      "correct_answer": 1,
+      "explanation": "DLP monitors data movement across endpoints, networks, and cloud services to detect and prevent unauthorized data exfiltration. It enforces policies based on data classification, content inspection, and context.",
+      "difficulty": 2,
+      "memory_aid": "DLP = the security camera watching where data goes",
+      "points": 10
+    },
+    {
+      "question_id": "3f466481",
+      "type": "multiple_choice",
+      "question": "Which technology protects data in use by creating isolated execution environments?",
+      "options": [
+        "TLS 1.3",
+        "BitLocker",
+        "Intel SGX (Software Guard Extensions)",
+        "AWS S3 SSE-KMS"
+      ],
+      "correct_answer": 2,
+      "explanation": "Intel SGX creates isolated enclaves in memory where code and data can be processed without the OS or hypervisor being able to access it. This protects data while it's being used (processed), which is the hardest state to protect.",
+      "difficulty": 2,
+      "memory_aid": "SGX = isolated memory enclave = data in use protection",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 125,
+  "is_core_concept": false,
+  "created_at": "2026-05-29T12:30:00",
+  "updated_at": "2026-05-29T12:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0",
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer"
+  ]
+}
