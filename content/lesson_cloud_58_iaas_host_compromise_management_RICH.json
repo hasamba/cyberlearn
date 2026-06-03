@@ -1,0 +1,300 @@
+{
+  "lesson_id": "f7a2b8c3-4d5e-4f6a-9b1c-8d3e7f2a5c6d",
+  "domain": "cloud",
+  "title": "Cloud IaaS Host Compromise Management",
+  "subtitle": "Investigate and respond to compromised cloud virtual machines: forensic acquisition, impact assessment, and containment strategies for IaaS environments",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 58,
+  "prerequisites": [
+    "Defining and Scoping Cloud Attacks"
+  ],
+  "learning_objectives": [
+    "Identify common IaaS compromise vectors including metadata service abuse, SSRF, and credential exposure",
+    "Execute forensic acquisition of cloud VM snapshots and volatile memory preservation",
+    "Assess blast radius and lateral movement risk in multi-tenant cloud environments",
+    "Apply cloud-specific containment strategies that preserve forensic evidence",
+    "Identify policy gaps and network misconfigurations that enabled the compromise"
+  ],
+  "concepts": [
+    "IaaS compromise vectors (metadata service, SSRF, credential spray)",
+    "Cloud VM forensic acquisition (snapshot, memory dump, disk copy)",
+    "Shared responsibility model implications for incident response",
+    "Cloud-specific evidence preservation (API logs, flow logs, CloudTrail)",
+    "Lateral movement in cloud environments (IAM role chaining, VPC peering)",
+    "Containment strategies (security group isolation, snapshot preservation)",
+    "Policy gap analysis and remediation",
+    "Cloud forensic timeline reconstruction"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-e5f6-7890-abcd-ef0123456789",
+      "type": "mindset_coach",
+      "title": "Cloud Incidents Are Different",
+      "content": {
+        "text": "When a cloud VM gets compromised, the rules change. You can't just pull the plug — that VM might be part of an auto-scaling group, and its metadata service could have already handed over IAM credentials to an attacker. The blast radius in cloud is often larger because of role chaining and API access. But here's the advantage: cloud gives you snapshot capabilities, comprehensive API logs, and network flow data that on-prem environments can only dream of. This lesson teaches you to leverage those advantages while understanding the unique risks."
+      },
+      "simplified_explanation": "Cloud host compromise is like a break-in at an apartment building — the intruder might have keys to other units (IAM roles), and you need different tools than a house break-in.",
+      "memory_aids": {
+        "acronym": "SNAPP — Snapshot, Network logs, API logs, Preserve, Prioritize",
+        "visual_metaphor": "Cloud forensics is like investigating a crime in a hotel — you have camera footage everywhere (API logs), but the attacker might have cloned the master key (IAM credentials)"
+      },
+      "real_world_connection": "The Capital One breach (2019) started from an SSRF attack on an EC2 instance that accessed the metadata service, yielding IAM role credentials that accessed 100M+ customer records.",
+      "reflection_prompt": "How does the shared responsibility model change your incident response playbook compared to on-premises?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "b2c3d4e5-f6a7-8901-bcde-f01234567890",
+      "type": "explanation",
+      "title": "IaaS Compromise Vectors",
+      "content": {
+        "text": "Cloud VMs get compromised through vectors that are unique to or amplified by cloud environments:\n\n**1. Metadata Service Abuse (IMDS)**\n- AWS: `http://169.254.169.254/latest/meta-data/` returns IAM role credentials\n- Azure: `http://169.254.169.254/metadata/instance?api-version=2021-02-01`\n- GCP: `http://metadata.google.internal/computeMetadata/v1/`\n- SSRF vulnerabilities let attackers query these endpoints and steal temporary credentials\n- IMDSv2 (AWS) adds session token requirement, but many workloads still use v1\n\n**2. Credential Exposure**\n- Hardcoded credentials in code pushed to GitHub\n- `.env` files or `credentials` files leaked via misconfigured S3 buckets\n- Over-permissive IAM roles attached to compromised instances\n- Long-lived access keys instead of temporary STS tokens\n\n**3. Network Misconfigurations**\n- Security groups allowing 0.0.0.0/0 on SSH/RDP (port 22, 3389)\n- Public-facing admin panels without authentication\n- VPC peering without proper route tables enabling lateral movement\n- Missing VPC flow logs preventing visibility\n\n**4. Supply Chain Compromise**\n- Malicious container images from public registries\n- Compromised CI/CD pipelines deploying tampered artifacts\n- Third-party integrations with excessive permissions"
+      },
+      "simplified_explanation": "Attackers love cloud VMs because: metadata services leak credentials via SSRF, IAM roles can be chained for lateral movement, and misconfigured security groups expose everything.",
+      "memory_aids": {
+        "acronym": "MICSS — Metadata, IAM roles, Credential exposure, Security groups, Supply chain",
+        "visual_metaphor": "Metadata service is like a hotel safe that gives out master keys to anyone who knows the room number"
+      },
+      "real_world_connection": "Capital One, TeamTNT, and countless crypto-mining campaigns all start with metadata service abuse on cloud VMs.",
+      "reflection_prompt": "Why is IMDSv2 not a complete defense against metadata service attacks?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c3d4e5f6-a7b8-9012-cdef-012345678901",
+      "type": "explanation",
+      "title": "Cloud Forensic Acquisition",
+      "content": {
+        "text": "When a cloud VM is compromised, evidence preservation must happen immediately and through cloud-specific APIs:\n\n**Step 1: Preserve Volatile State**\n```bash\n# AWS: Create snapshots of all attached EBS volumes\naws ec2 create-snapshots --instance-specification InstanceId=i-1234567890abcdef0 \\\n  --description \"Forensic snapshot: $(date +%Y%m%d_%H%M%S)\" \\\n  --tag-specifications 'ResourceType=snapshot,Tags=[{Key=Incident,Value=IR-2024-001}]'\n\n# Azure: Create a VM snapshot\naz snapshot create --resource-group rg-forensics --name snap-ir-001 \\\n  --source /subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/disks/{disk}\n\n# GCP: Create a disk snapshot\ngcloud compute disks snapshot disk-1 --zone=us-central1-a \\\n  --snapshot-names=snap-ir-001 --description=\"Forensic snapshot\"\n```\n\n**Step 2: Capture Memory (if possible)**\n- AWS: Use EC2 System Manager (SSM) to run forensic scripts\n- For memory: `LiME` or `AVML` on the live instance before isolation\n- Some orgs freeze the instance rather than terminate\n\n**Step 3: Preserve Logs**\n```bash\n# AWS: Immediately enable logging if not already\naws cloudtrail start-logging --name trail-name\naws ec2 enable-flow-logs --resource-ids vpc-12345678 \\\n  --resource-type VPC --traffic-type ALL\n\n# Export CloudTrail events for the timeline\naws cloudtrail lookup-events --start-time 2024-01-01T00:00:00Z\n```\n\n**Step 4: Isolate, Don't Terminate**\n- Change security group to deny-all (preserve the instance)\n- Detach from auto-scaling groups\n- Preserve network interfaces for forensic analysis\n\n**Critical rule:** Never terminate a compromised instance in cloud. Isolate it, snapshot it, then investigate."
+      },
+      "simplified_explanation": "Don't turn off the compromised VM! Snapshot everything (disk, memory), enable all logging, isolate with security groups, then investigate the snapshot.",
+      "memory_aids": {
+        "acronym": "SILE — Snapshot, Isolate, Log, Examine",
+        "visual_metaphor": "Think of it as quarantining a patient — you don't kill them, you isolate and study"
+      },
+      "real_world_connection": "Azure's Forensic VM approach: create a forensic VM in a separate resource group, attach the compromised disk as a data volume, and analyze offline.",
+      "reflection_prompt": "Why is it better to isolate a compromised VM rather than terminate it? What evidence could be lost?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d4e5f6a7-b8c9-0123-def0-123456789012",
+      "type": "explanation",
+      "title": "Blast Radius Assessment in Cloud",
+      "content": {
+        "text": "In cloud environments, a single compromised VM can be an entry point to the entire organization. Assessing blast radius means understanding what the attacker could access:\n\n**IAM Role Chain Analysis:**\n- What IAM role was attached to the compromised instance?\n- What permissions does that role have? (often overly permissive)\n- Can it access other resources? S3 buckets, RDS instances, other EC2 instances?\n- Can it assume other roles? (role chaining for privilege escalation)\n\n```bash\n# Check what the instance role can do\naws iam get-role-policy --role-name CompromisedInstanceRole\naws iam list-attached-role-policies --role-name CompromisedInstanceRole\naws iam list-role-tags --role-name CompromisedInstanceRole\n\n# Check if the role can assume other roles\naws iam list-policies-granting-service-access \\\n  --role-name CompromisedInstanceRole\n```\n\n**Network Reachability:**\n- What VPC/subnet was the instance in?\n- What security groups and NACLs apply?\n- Is VPC peering or Transit Gateway connecting to other VPCs?\n- Can the instance reach production databases, other accounts?\n\n**Data Exposure Assessment:**\n- Were any S3 buckets accessible?\n- Did the role have read/write access to databases?\n- Were secrets in environment variables or parameter store?\n- Is there CloudTrail evidence of data exfiltration?\n\n**API Activity Analysis:**\n```bash\n# Look for suspicious API calls from the compromised role\naws cloudtrail lookup-events \\\n  --lookup-attributes AttributeKey=RoleName,AttributeValue=CompromisedInstanceRole \\\n  --start-time 2024-01-15T00:00:00Z\n```\n\n**Key question:** Did the attacker pivot from the VM to the cloud control plane?"
+      },
+      "simplified_explanation": "Blast radius = how far the attacker could go from the compromised VM. Check IAM role permissions, network access, and data exposure. In cloud, one VM can reach everything.",
+      "memory_aids": {
+        "acronym": "RIND — Role permissions, Infrastructure access, Network reach, Data exposure",
+        "visual_metaphor": "Think of blast radius like a fire — IAM role is the fuel, network connectivity is the oxygen, and data is what burns"
+      },
+      "real_world_connection": "In the TeamTNT campaign, compromised EC2 instances used their IAM roles to enumerate all S3 buckets in the account, exfiltrate credentials, and launch crypto-mining instances.",
+      "reflection_prompt": "Why is role chaining particularly dangerous in cloud environments? How does it differ from on-prem lateral movement?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e5f6a7b8-c9d0-1234-ef01-234567890123",
+      "type": "code_exercise",
+      "title": "Cloud Forensic Response Script",
+      "content": {
+        "text": "Below is a Python script that automates the initial forensic preservation steps for a compromised AWS EC2 instance:\n\n```python\nimport boto3\nimport json\nfrom datetime import datetime\n\nclass CloudForensicResponder:\n    def __init__(self, instance_id, region='us-east-1'):\n        self.instance_id = instance_id\n        self.region = region\n        self.ec2 = boto3.client('ec2', region_name=region)\n        self.iam = boto3.client('iam')\n        self.cloudtrail = boto3.client('cloudtrail', region_name=region)\n        self.timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')\n        self.incident_id = f'IR-{self.timestamp}'\n    \n    def isolate_instance(self):\n        \"\"\"Replace instance security group with deny-all\"\"\"\n        # Create isolation security group\n        sg = self.ec2.create_security_group(\n            GroupName=f'forensic-isolation-{self.timestamp}',\n            Description=f'Forensic isolation group for {self.incident_id}',\n            VpcId=self._get_instance_vpc()\n        )\n        # No inbound rules = deny all inbound\n        # Modify instance to use only this SG\n        self.ec2.modify_instance_attribute(\n            InstanceId=self.instance_id,\n            Groups=[sg['GroupId']]\n        )\n        print(f'✅ Instance {self.instance_id} isolated with SG {sg[\"GroupId\"]}')\n        return sg['GroupId']\n    \n    def snapshot_disks(self):\n        \"\"\"Create forensic snapshots of all attached volumes\"\"\"\n        instance = self.ec2.describe_instances(\n            InstanceIds=[self.instance_id]\n        )['Reservations'][0]['Instances'][0]\n        \n        snapshots = []\n        for device in instance['BlockDeviceMappings']:\n            vol_id = device['Ebs']['VolumeId']\n            snap = self.ec2.create_snapshot(\n                VolumeId=vol_id,\n                Description=f'Forensic: {self.incident_id} - {vol_id}',\n                TagSpecifications=[{\n                    'ResourceType': 'snapshot',\n                    'Tags': [\n                        {'Key': 'IncidentId', 'Value': self.incident_id},\n                        {'Key': 'OriginalVolume', 'Value': vol_id},\n                        {'Key': 'Forensic', 'Value': 'true'}\n                    ]\n                }]\n            )\n            snapshots.append(snap['SnapshotId'])\n            print(f'📸 Snapshot created: {snap[\"SnapshotId\"]}')\n        \n        return snapshots\n    \n    def check_iam_blast_radius(self):\n        \"\"\"Analyze what the instance's IAM role can access\"\"\"\n        instance = self.ec2.describe_instances(\n            InstanceIds=[self.instance_id]\n        )['Reservations'][0]['Instances'][0]\n        \n        profile = instance.get('IamInstanceProfile', {})\n        if not profile:\n            print('⚠️ No IAM instance profile attached')\n            return None\n        \n        # Get role details\n        role_name = profile['Arn'].split('/')[-1]\n        print(f'🔑 Instance role: {role_name}')\n        \n        # List all policies attached to the role\n        policies = self.iam.list_attached_role_policies(\n            RoleName=role_name\n        )\n        for policy in policies['AttachedPolicies']:\n            print(f'  📋 Policy: {policy[\"PolicyName\"]}')\n        \n        return role_name\n    \n    def _get_instance_vpc(self):\n        instance = self.ec2.describe_instances(\n            InstanceIds=[self.instance_id]\n        )['Reservations'][0]['Instances'][0]\n        return instance['VpcId']\n\n# Usage:\n# responder = CloudForensicResponder('i-0abc123def456789')\n# responder.isolate_instance()\n# responder.snapshot_disks()\n# responder.check_iam_blast_radius()\n```\n\n**Challenge:** Extend the script to also check CloudTrail for API calls made by the instance's IAM role in the last 24 hours.",
+        "language": "python",
+        "starter_code": "import boto3\nfrom datetime import datetime, timedelta\n\nclass CloudForensicResponder:\n    def __init__(self, instance_id, region='us-east-1'):\n        self.instance_id = instance_id\n        self.region = region\n        self.ec2 = boto3.client('ec2', region_name=region)\n        self.iam = boto3.client('iam')\n        self.timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')\n    \n    def check_cloudtrail_activity(self, role_name, hours=24):\n        \"\"\"Check CloudTrail for API calls made by the compromised role\"\"\"\n        # TODO: Implement CloudTrail lookup for suspicious activity\n        pass\n\n# Challenge: Implement the method and test it",
+        "solution": "import boto3\nfrom datetime import datetime, timedelta\n\ndef check_cloudtrail_activity(self, role_name, hours=24):\n    \"\"\"Check CloudTrail for API calls made by the compromised role\"\"\"\n    start_time = datetime.utcnow() - timedelta(hours=hours)\n    \n    events = self.cloudtrail.lookup_events(\n        LookupAttributes=[{\n            'AttributeKey': 'RoleName',\n            'AttributeValue': role_name\n        }],\n        StartTime=start_time\n    )\n    \n    suspicious_events = []\n    high_risk_actions = [\n        'iam:CreateUser', 'iam:CreateAccessKey', 'iam:AttachUserPolicy',\n        's3:GetObject', 'rds:DescribeDBInstances',\n        'ec2:RunInstances', 'sts:AssumeRole'\n    ]\n    \n    for event in events['Events']:\n        if any(action in event.get('EventName', '') for action in [a.split(':')[1] for a in high_risk_actions]):\n            suspicious_events.append({\n                'time': event['EventTime'],\n                'action': event['EventName'],\n                'source_ip': event.get('SourceIpAddress', 'unknown')\n            })\n    \n    return suspicious_events"
+      },
+      "simplified_explanation": "This script isolates a compromised EC2 instance, snapshots its disks for forensics, and checks what IAM permissions the instance had — the three critical first steps.",
+      "memory_aids": {
+        "acronym": "ISR — Isolate, Snapshot, Review (IAM blast radius)",
+        "visual_metaphor": "The script is your emergency response team: first officer contains the scene (isolate), then forensics photographs everything (snapshot), then detective reviews what was accessible (IAM review)"
+      },
+      "real_world_connection": "AWS Incident Response guides recommend this exact workflow: isolate, snapshot, then analyze. Automation saves critical minutes during active breaches.",
+      "reflection_prompt": "What would happen if you terminated the instance instead of isolating it? What evidence would be lost?",
+      "is_interactive": true,
+      "xp_reward": 30
+    },
+    {
+      "block_id": "f6a7b8c9-d0e1-2345-f012-345678901234",
+      "type": "real_world",
+      "title": "Case Studies: Cloud Host Compromises",
+      "content": {
+        "text": "**Case 1: Capital One (2019)**\n- SSRF vulnerability in a WAF-configured EC2 instance\n- Attacker accessed IMDSv1, obtained IAM role credentials\n- Role had S3 read access to 100M+ customer records\n- **Key failures:** Overly permissive IAM role, no IMDSv2, no S3 access monitoring\n- **Remediation:** IMDSv2 enforcement, least-privilege IAM roles, S3 access logging\n\n**Case 2: TeamTNT Crypto-mining Campaign (2021)**\n- Targeted misconfigured Docker API endpoints exposed publicly\n- Used IMDS to grab AWS credentials\n- Enumerated S3 buckets, launched additional mining instances\n- **Key failures:** Exposed Docker API (2375/tcp), overly broad IAM permissions\n- **Remediation:** Never expose Docker API without auth, restrict IAM roles\n\n**Case 3: Azure VM Compromise via Managed Identity**\n- Attacker gained code execution on Azure VM via web app vulnerability\n- VM's Managed Identity had Contributor role on the subscription\n- Attacker created new VMs, accessed Key Vault, exfiltrated secrets\n- **Key failures:** Overly permissive managed identity, no conditional access\n- **Remediation:** Least-privilege managed identities, PIM for just-in-time access\n\n**Common patterns across all cases:**\n1. Initial access through application vulnerability\n2. Metadata service or managed identity for credential theft\n3. Overly permissive IAM enabling lateral movement\n4. Insufficient monitoring of API calls\n5. No network segmentation between tiers"
+      },
+      "simplified_explanation": "Every major cloud breach follows the same pattern: app vulnerability → metadata service → IAM credentials → lateral movement. Defense: least privilege, IMDSv2, monitor everything.",
+      "memory_aids": {
+        "acronym": "ALMOS — App vulnerability, Lateral movement via IAM, Metadata service, Overprivileged roles, Segmentation missing",
+        "visual_metaphor": "Cloud breaches are like water damage — find one crack (vulnerability), water spreads through connected pipes (IAM roles) to flood the whole building"
+      },
+      "real_world_connection": "These aren't theoretical — every pattern above has been exploited in real breaches affecting millions of records.",
+      "reflection_prompt": "What single control would have prevented the most damage in each case study?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a7b8c9d0-e1f2-3456-0123-456789012345",
+      "type": "memory_aid",
+      "title": "Cloud IaaS Compromise Response Cheat Sheet",
+      "content": {
+        "text": "**First 15 Minutes — SILE Method:**\n\n```\n1. SNAPSHOT all disks (don't terminate!)\n2. ISOLATE with deny-all security group\n3. LOG everything — enable CloudTrail, VPC flow logs, guard duty\n4. EXAMINE IAM blast radius — what could the attacker access?\n```\n\n**Forensic Preservation Checklist:**\n- [ ] EBS/disk snapshots of all volumes\n- [ ] Memory dump if possible (SSM RunCommand)\n- [ ] VPC Flow Logs enabled and exported\n- [ ] CloudTrail events exported for timeline\n- [ ] IAM role policies documented\n- [ ] Network ACLs and Security Groups saved\n- [ ] Instance metadata and user data captured\n- [ ] S3 access logs reviewed\n\n**Containment vs. Observation Decision:**\n| Situation | Action |\n|-----------|--------|\n| Active data exfiltration | Isolate immediately |\n| Crypto-mining detected | Isolate + preserve |\n| Reconnaissance only | Observe briefly, then isolate |\n| Ransomware detonating | Isolate immediately |\n| Dormant backdoor | Observe, then isolate on schedule |\n\n**Common Cloud IR Mistakes:**\n- ❌ Terminating instances (destroys volatile evidence)\n- ❌ Revoking credentials without isolating (attacker may have alternate access)\n- ❌ Ignoring IMDS as credential source\n- ❌ Forgetting cross-account role assumption paths\n- ❌ Not checking for crypto-mining in other regions"
+      },
+      "simplified_explanation": "Snapshot, Isolate, Log, Examine. Never terminate. Check IAM blast radius first — that's where the real damage spreads.",
+      "memory_aids": {
+        "acronym": "SILE — Snapshot, Isolate, Log, Examine",
+        "visual_metaphor": "Think of it as a biohazard: quarantine (isolate), take photos (snapshot), record everything (log), then investigate (examine)"
+      },
+      "real_world_connection": "Print this cheat sheet. Every minute matters in cloud IR — having the steps memorized means faster response.",
+      "reflection_prompt": "Why should you never revoke IAM credentials as the first step in cloud IR?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b8c9d0e1-f2a3-4567-1234-567890123456",
+      "type": "reflection",
+      "title": "Cloud vs. On-Prem IR: Key Differences",
+      "content": {
+        "text": "Reflect on how cloud incident response fundamentally differs from on-premises:\n\n**Advantages of Cloud IR:**\n- Instant snapshot capabilities — no need for physical disk imaging\n- Comprehensive API logging (CloudTrail, CloudTrail Lake)\n- Network flow logs available by default\n- Easy isolation through security groups\n- Cross-region visibility from a single console\n\n**Challenges of Cloud IR:**\n- Shared responsibility — you don't control the hypervisor\n- Ephemeral instances (auto-scaling may replace compromised host)\n- Metadata service provides instant credential access\n- Cross-account/cross-region complexity\n- Limited volatile memory acquisition options\n- Attacker may have API access beyond the VM itself\n\n**Key Questions for Your Organization:**\n1. Do you have CloudTrail enabled in all regions?\n2. Are VPC Flow Logs turned on for all VPCs?\n3. Is IMDSv2 required on all EC2 instances?\n4. Do you have an automated isolation playbook?\n5. Can you quickly identify the blast radius of any IAM role?\n6. Is there a forensic AMI/VM image ready to deploy?\n\n**Build your cloud IR kit:**\n- Pre-built forensic AMI/VM image\n- Automated snapshot and isolation scripts\n- CloudTrail Lake or centralized SIEM\n- Pre-configured deny-all security groups\n- IAM role permission audit scripts"
+      },
+      "simplified_explanation": "Cloud IR gives you amazing visibility (API logs, snapshots) but also new risks (metadata services, IAM chaining). Prepare your cloud IR kit before you need it.",
+      "memory_aids": {
+        "acronym": "PICK — Prepare forensic images, Isolate playbooks, CloudTrail always on, Know your blast radius",
+        "visual_metaphor": "Cloud IR is like having surveillance cameras everywhere (API logs) — but the intruder might have stolen the master key (IAM role)"
+      },
+      "real_world_connection": "Organizations with pre-built cloud IR playbooks respond in minutes instead of hours. The difference between snapshot and terminate is the difference between evidence and oblivion.",
+      "reflection_prompt": "What's one cloud IR capability you don't have today that would make the biggest impact on your response time?",
+      "is_interactive": false,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": [
+    {
+      "question_id": "pre_q1",
+      "type": "multiple_choice",
+      "question": "What is the first thing you should do when you discover a compromised cloud VM?",
+      "options": [
+        "Terminate the instance immediately to stop the attack",
+        "Snapshot all disks and isolate the instance",
+        "Revoke all IAM credentials in the account",
+        "Reboot the instance to disrupt the attacker"
+      ],
+      "correct_answer": 1,
+      "explanation": "Always snapshot first, then isolate. Terminating destroys volatile evidence. Revoking credentials may trigger attacker countermeasures before you've contained network access.",
+      "difficulty": 1,
+      "memory_aid": "SILE: Snapshot, Isolate, Log, Examine — never terminate first"
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the primary risk of an SSRF vulnerability on a cloud VM with access to the metadata service?",
+      "options": [
+        "The attacker can modify the VM's operating system files",
+        "The attacker can obtain IAM role credentials and potentially access other cloud resources",
+        "The SSRF will crash the application server",
+        "The metadata service will rate-limit requests, blocking the attack"
+      ],
+      "correct_answer": 1,
+      "explanation": "SSRF allows attackers to query the instance metadata service (169.254.169.254), which returns temporary IAM credentials. With those credentials, the attacker can access any cloud resource the role permits — often far beyond the initial VM.",
+      "difficulty": 2,
+      "memory_aid": "SSRF + IMDS = IAM credentials = cloud-wide access",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why should you isolate a compromised cloud VM rather than terminate it?",
+      "options": [
+        "Termination triggers additional security alerts",
+        "Isolation preserves volatile evidence while preventing further access; termination destroys the running state",
+        "Cloud providers charge for terminated instances",
+        "Terminated instances cannot be investigated even from snapshots"
+      ],
+      "correct_answer": 1,
+      "explanation": "Isolation (changing security groups to deny-all) preserves the running state for forensic analysis while cutting off attacker access. Termination destroys volatile evidence like memory contents and running processes.",
+      "difficulty": 1,
+      "memory_aid": "Isolate to preserve, terminate to destroy evidence",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "In assessing the blast radius of a compromised cloud VM, which of the following is the MOST critical to check first?",
+      "options": [
+        "The VM's disk usage and memory consumption",
+        "The IAM role attached to the instance and its permissions",
+        "The operating system version running on the VM",
+        "The number of users who have SSH access to the instance"
+      ],
+      "correct_answer": 1,
+      "explanation": "The IAM role attached to a cloud VM determines what cloud resources the attacker can access. An over-permissive role can allow lateral movement across S3 buckets, databases, other VMs, and even other AWS accounts via role chaining.",
+      "difficulty": 2,
+      "memory_aid": "Blast radius starts with IAM — check what the role can reach",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "How does IMDSv2 improve security over IMDSv1?",
+      "options": [
+        "It encrypts metadata responses with TLS",
+        "It requires a session token obtained via PUT request, preventing SSRF from directly reading metadata",
+        "It blocks all access from containerized workloads",
+        "It limits metadata to only instance type information"
+      ],
+      "correct_answer": 1,
+      "explanation": "IMDSv2 requires a session token obtained via a PUT request to /latest/api/token, which must be included in subsequent metadata requests. Simple SSRF exploits that only make GET requests cannot obtain the token, preventing direct credential theft.",
+      "difficulty": 3,
+      "memory_aid": "IMDSv2 = PUT before GET, tokens required, SSRF blocked",
+      "points": 10
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "Which cloud logging source is MOST critical for reconstructing the timeline of actions taken by an attacker who compromised a VM's IAM role?",
+      "options": [
+        "Application logs on the VM itself",
+        "CloudTrail API audit logs",
+        "Web server access logs",
+        "DNS query logs from the VPC"
+      ],
+      "correct_answer": 1,
+      "explanation": "CloudTrail records all API calls made using IAM credentials, including which role made the call, what action was taken, and what resources were accessed. This is the primary source for reconstructing what the attacker did after obtaining the VM's IAM credentials.",
+      "difficulty": 2,
+      "memory_aid": "CloudTrail = the camera footage of your cloud environment",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 0.7,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": "cloud_iaas_compromise_ir",
+  "is_core_concept": true,
+  "created_at": "2026-06-02T14:30:00+03:00",
+  "updated_at": "2026-06-02T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": [
+    "Course: SANS-LDR553",
+    "Career Path: Blue Teamer",
+    "Career Path: Cloud Security",
+    "cloud-ir",
+    "iaas",
+    "forensics",
+    "AWS",
+    "IMDS",
+    "incident-response"
+  ]
+}
