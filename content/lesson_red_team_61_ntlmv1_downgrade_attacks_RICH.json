@@ -1,0 +1,197 @@
+{
+  "lesson_id": "151ee13d-cac1-4e64-a32e-1ae2c1266825",
+  "domain": "red_team",
+  "title": "NTLMv1 Downgrade Attacks",
+  "difficulty": 3,
+  "order_index": 61,
+  "prerequisites": [],
+  "concepts": [
+    "NTLM downgrade",
+    "authentication attacks",
+    "relay attacks",
+    "credential theft"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "bda8c6f7-8063-48b2-99d9-84d433a1d4ad",
+      "type": "mindset_coach",
+      "content": {
+        "text": "NTLMv1 Downgrade Attacks sounds straightforward until you try to secure it in the real world. Then the details start charging rent."
+      },
+      "simplified_explanation": "This lesson is about ntlmv1 downgrade attacks. You will learn what it is, where it fails, and how to defend it without pretending theory is enough.",
+      "memory_aids": [
+        "red_team lesson: basics first",
+        "Defend the obvious paths before the clever ones",
+        "Map the system before you trust it"
+      ]
+    },
+    {
+      "block_id": "4c89d82e-e0c0-4e29-9d6c-905ac8487c5a",
+      "type": "explanation",
+      "title": "Core concept",
+      "content": {
+        "text": "NTLMv1 Downgrade Attacks focuses on NTLM downgrade. The point is to understand the moving parts, the trust boundaries, and the easy mistakes that create real risk."
+      },
+      "simplified_explanation": "NTLMv1 Downgrade Attacks is mainly about understanding NTLM downgrade and where things go wrong.",
+      "memory_aids": [
+        "Name the parts",
+        "Find the trust boundary",
+        "Test the defaults"
+      ]
+    },
+    {
+      "block_id": "810985e0-4e77-46f3-aad7-8324a6c458b9",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10",
+      "content": {
+        "text": "Imagine a system where the obvious thing is rarely the safe thing."
+      },
+      "simplified_explanation": "Imagine a system where the obvious thing is rarely the safe thing.",
+      "memory_aids": [
+        "If a kid can explain it, you probably understand it",
+        "Simple picture, same risk",
+        "Talk in objects and actions"
+      ]
+    },
+    {
+      "block_id": "fd68c268-28a6-4a09-9fd1-a88dc5576ecd",
+      "type": "code_exercise",
+      "title": "Hands-on check",
+      "content": {
+        "text": "Practice idea: take a small lab or sample environment and inspect the settings, logs, or artifacts related to NTLMv1 Downgrade Attacks. Write down what is trusted, what is exposed, and what would fail first."
+      },
+      "simplified_explanation": "Look at a real sample, not just notes. Check settings, logs, and exposure.",
+      "memory_aids": [
+        "Inspect before acting",
+        "Log what you found",
+        "Change one thing at a time"
+      ]
+    },
+    {
+      "block_id": "a603eeda-0e29-4ccb-a30a-7d1fee307d05",
+      "type": "real_world",
+      "title": "Why this matters",
+      "content": {
+        "text": "In production, failures around NTLMv1 Downgrade Attacks tend to show up as ntlm downgrade and then spread into bigger incidents when nobody is watching the edges."
+      },
+      "simplified_explanation": "Real systems fail at the edges first, then the damage spreads.",
+      "memory_aids": [
+        "Small failure, big blast radius",
+        "Edges fail first",
+        "Defaults are a trap"
+      ]
+    },
+    {
+      "block_id": "d0baef40-d842-4f6f-919a-f1df2763c861",
+      "type": "memory_aid",
+      "title": "Memory hook",
+      "content": {
+        "text": "Quick hook for NTLMv1 Downgrade Attacks: learn the parts, map the trust, check the defaults, then look for the easiest attacker path."
+      },
+      "simplified_explanation": "Parts, trust, defaults, attack path.",
+      "memory_aids": [
+        "Parts",
+        "Trust",
+        "Defaults",
+        "Attack path"
+      ]
+    },
+    {
+      "block_id": "9fe7038e-07ba-4ee3-ae5d-9a62a7aefd7a",
+      "type": "reflection",
+      "title": "Think it through",
+      "content": {
+        "text": "If you had to secure NTLMv1 Downgrade Attacks tomorrow with only one hour, what would you inspect first and why?"
+      },
+      "simplified_explanation": "Pick the first thing you would inspect and explain why.",
+      "memory_aids": [
+        "Start with the biggest risk",
+        "Explain your choice",
+        "Keep it practical"
+      ]
+    },
+    {
+      "block_id": "3266a4a6-46e3-4427-a330-7ddaa74d4f8e",
+      "type": "mindset_coach",
+      "content": {
+        "text": "Don't chase cleverness before you have the basics. That is how people waste time and call it expertise."
+      },
+      "simplified_explanation": "Basics first. Clever later.",
+      "memory_aids": [
+        "Basics before cleverness",
+        "Validate before celebrating",
+        "Simple beats noisy"
+      ]
+    }
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "NTLM downgrade",
+    "authentication attacks",
+    "relay attacks",
+    "credential theft"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "b71ae827-ead2-438d-b32a-c056b3f32a40",
+      "type": "multiple_choice",
+      "question": "What is the safest first move when working on NTLMv1 Downgrade Attacks?",
+      "options": [
+        "Guess quickly",
+        "Map the system and its trust boundaries",
+        "Skip straight to exploitation",
+        "Ignore logs"
+      ],
+      "correct_answer": 1,
+      "explanation": "You need a map before you make claims.",
+      "difficulty": 1,
+      "points": 10
+    },
+    {
+      "question_id": "2d15cce6-9106-4ab0-9706-a85a73ee2a1a",
+      "type": "multiple_choice",
+      "question": "Which approach best fits NTLMv1 Downgrade Attacks in a real environment?",
+      "options": [
+        "Noise and speed",
+        "Careful scope, validation, and notes",
+        "Random tool use",
+        "Assume defaults are safe"
+      ],
+      "correct_answer": 1,
+      "explanation": "Real work needs discipline and repeatability.",
+      "difficulty": 2,
+      "points": 10
+    },
+    {
+      "question_id": "b0053386-e632-4bac-8e38-8f5d1ee79b74",
+      "type": "multiple_choice",
+      "question": "What is the main value of studying NTLMv1 Downgrade Attacks?",
+      "options": [
+        "Buzzwords",
+        "Understanding repeatable failure modes",
+        "Making slides look good",
+        "Avoiding hands-on practice"
+      ],
+      "correct_answer": 1,
+      "explanation": "Security value comes from repeatable understanding.",
+      "difficulty": 1,
+      "points": 10
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "tags": [
+    "Course: SANS-SEC699",
+    "Career Path: Red Teamer"
+  ]
+}
