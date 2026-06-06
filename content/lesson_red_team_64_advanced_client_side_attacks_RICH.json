@@ -1,0 +1,131 @@
+{
+  "lesson_id": "83fbf265-1ffa-407e-b2b5-37ba8dda1531",
+  "domain": "red_team",
+  "title": "Advanced Client-Side Attacks",
+  "difficulty": 3,
+  "order_index": 64,
+  "prerequisites": [],
+  "concepts": [
+    "HTML smuggling",
+    "VBA macros",
+    "HTA attacks",
+    "browser exploitation",
+    "staged payloads"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Explain the core purpose of Advanced Client-Side Attacks",
+    "Identify common failure modes in red_team",
+    "Choose a first defensive action that reduces risk"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "ce2775a0-35b2-447e-b514-809fdade8fb2",
+      "question": "What is the best first step when reviewing Advanced Client-Side Attacks?",
+      "options": [
+        "Start with the easiest attacker path and map trust boundaries",
+        "Buy a new product before understanding the current setup",
+        "Ignore defaults because they are vendor-supplied",
+        "Wait for an incident to reveal the problem"
+      ],
+      "correct_answer": 0,
+      "type": "multiple_choice",
+      "difficulty": 1,
+      "explanation": "Good security work starts by understanding assets, boundaries, and obvious failure paths."
+    },
+    {
+      "question_id": "872e401b-1528-4788-9e45-4c1571b4ae34",
+      "question": "Which statement about Advanced Client-Side Attacks is most accurate?",
+      "options": [
+        "If the feature works, the security problem is solved",
+        "Security depends on assumptions, permissions, and validation",
+        "Only external attackers matter",
+        "Monitoring is optional when a system is internal"
+      ],
+      "correct_answer": 1,
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "explanation": "Working functionality does not prove the design is safe under abuse."
+    },
+    {
+      "question_id": "3be4d9f1-d0d8-4294-b9e0-3381388442db",
+      "question": "What evidence helps most during an incident tied to Advanced Client-Side Attacks?",
+      "options": [
+        "Version history, access logs, and configuration changes",
+        "A marketing screenshot",
+        "A random guess from chat",
+        "Only the final user complaint"
+      ],
+      "correct_answer": 0,
+      "type": "multiple_choice",
+      "difficulty": 2,
+      "explanation": "You need evidence that separates design flaws from operator mistakes or drift."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "minimum_effective_dose",
+    "multiple_memory_pathways",
+    "learning_sprint",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "meta_learning"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "This lesson is practical, not ceremonial. Advanced Client-Side Attacks only matters if you can use it when the pressure is real."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Advanced Client-Side Attacks sits inside the red_team domain. The job is to understand the threat model, the trust boundaries, and the controls that actually change outcomes."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "Teach Me Like I'm 10: imagine the system as a room with doors, notes, and keys. If a stranger can guess the key, copy the note, or walk through the wrong door, the design is weak."
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "Build a tiny lab or tabletop exercise. Map assets, list trust boundaries, then test the easiest failure path first. Write down what breaks and why."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "Real world example: teams usually fail here because defaults stay in place, logging is thin, and nobody revisits the assumptions after launch. That is where incidents start."
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "Short memory hook: inventory first, then trust boundaries, then least privilege, then monitoring. Skip the order and you usually earn a mess."
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "What assumption in this lesson would be the easiest for an attacker to abuse in your own environment?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "If this feels too simple, good. Most bad security starts with one simple thing nobody bothered to check."
+      }
+    }
+  ],
+  "tags": [
+    "Course: OffSec-PEN300",
+    "Career Path: Red Teamer"
+  ]
+}
