@@ -1,0 +1,171 @@
+{
+  "lesson_id": "f2b9d4a8-1e3c-4f67-b8a2-7d3e5c9f1a4b",
+  "domain": "cloud",
+  "title": "Cloud Shared Responsibility Model",
+  "difficulty": 2,
+  "order_index": 66,
+  "prerequisites": [],
+  "concepts": [
+    "Shared responsibility model across IaaS, PaaS, SaaS",
+    "Cloud Service Provider (CSP) responsibilities",
+    "Customer security responsibilities",
+    "Security boundary definitions",
+    "Cloud compliance and accountability",
+    "Data ownership and sovereignty",
+    "Shared responsibility in multi-cloud environments",
+    "Common misconfigurations from responsibility gaps"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Explain the shared responsibility model and how responsibilities shift across IaaS, PaaS, and SaaS",
+    "Identify which security controls are the CSP's responsibility vs. the customer's for each cloud service type",
+    "Recognize common security failures caused by responsibility gaps and misconfigurations",
+    "Apply the shared responsibility model to real-world cloud architecture decisions"
+  ],
+  "post_assessment": [
+    {
+      "question": "In a SaaS model, who is primarily responsible for managing user access and data classification?",
+      "options": [
+        "The cloud service provider",
+        "The customer",
+        "Both equally",
+        "It depends on the specific SaaS vendor"
+      ],
+      "correct": 1,
+      "explanation": "Even in SaaS, the customer retains responsibility for user access management, data classification, and compliance. The CSP manages the infrastructure and application layer."
+    },
+    {
+      "question": "Which type of cloud service gives the customer the MOST security responsibility?",
+      "options": [
+        "SaaS",
+        "PaaS",
+        "IaaS",
+        "FaaS (Function as a Service)"
+      ],
+      "correct": 2,
+      "explanation": "IaaS gives customers the most control — and therefore the most responsibility. You manage the OS, runtime, application, and data. The CSP only manages the physical infrastructure."
+    },
+    {
+      "question": "A company migrates to AWS and assumes AWS handles all security. Their S3 bucket is exposed. What went wrong?",
+      "options": [
+        "AWS failed to secure the bucket",
+        "The company misunderstood the shared responsibility model — S3 access control is the customer's responsibility",
+        "The bucket was in the wrong region",
+        "The company needed a more expensive AWS support plan"
+      ],
+      "correct": 1,
+      "explanation": "AWS secures the infrastructure, but the customer configures bucket policies and access control. S3 buckets are private by default now, but the customer must manage their policies."
+    },
+    {
+      "question": "Which security domain is ALWAYS the customer's responsibility, regardless of cloud service model?",
+      "options": [
+        "Physical server security",
+        "Network infrastructure",
+        "Data classification and access management",
+        "Operating system patching"
+      ],
+      "correct": 2,
+      "explanation": "Data classification and access management are always the customer's responsibility. No cloud model takes ownership of your data governance decisions."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link the shared responsibility model to renting an apartment: the landlord handles the building structure (CSP), you handle locks, alarms, and who gets keys (customer)."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the classic pyramid diagram — physical infrastructure at bottom (CSP), data at top (customer), with the line shifting based on IaaS/PaaS/SaaS."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break responsibilities into three chunks: CSP always handles, Customer always handles, and The Shifting Middle (depends on model)."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember the Capital One breach: a misconfigured firewall in an IaaS environment. The CSP's infrastructure was fine — it was the customer's responsibility that failed."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice drawing the responsibility boundaries for IaaS, PaaS, and SaaS until the shifts feel automatic."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the weight: a shared responsibility gap is how most cloud breaches happen. It's not theory — it's where real attacks succeed."
+    },
+    {
+      "principle": "Senses",
+      "application": "Use color coding: green for CSP responsibilities, red for customer, yellow for shared. Visual contrast makes boundaries memorable."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain the model to a non-technical colleague using the apartment analogy. If they get it, you've internalized it."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'PAD' for always-customer responsibilities: Privacy, Access, Data."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Pick a real cloud service (e.g., Azure SQL Database) and map every security control to CSP or customer responsibility. Hands-on mapping beats passive reading."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Most Misunderstood Model in Cloud Security",
+      "content": "The shared responsibility model isn't just a diagram — it's the fundamental contract between you and your cloud provider. Get it wrong, and you have security gaps. Most cloud breaches aren't caused by CSP failures. They're caused by customers who didn't understand where the CSP's responsibility ends and theirs begins.\n\nThis lesson gives you the mental model to never make that mistake.",
+      "coaching_tip": "Don't memorize the diagram. Understand WHY the line shifts. Once you get the logic, you can apply it to any cloud service."
+    },
+    {
+      "type": "explanation",
+      "title": "The Shared Responsibility Model: Core Concepts",
+      "content": "**The fundamental principle:** Cloud providers secure the infrastructure; customers secure everything they put on it.\n\n**Responsibility across service models:**\n\n| Layer | IaaS | PaaS | SaaS |\n|-------|------|------|------|\n| Physical/Network | CSP | CSP | CSP |\n| Host OS | Customer | CSP | CSP |\n| Application | Customer | Shared | CSP |\n| Data | Customer | Customer | Customer |\n| Identity/Access | Customer | Customer | Customer |\n\n**The shift:** As you move from IaaS → PaaS → SaaS, the CSP takes on more infrastructure responsibility, but the customer ALWAYS owns:\n- Data classification and protection\n- Identity and access management\n- Endpoint protection\n- Compliance requirements\n\n**Common misconception:** 'We're in the cloud, so cloud security handles everything.' Wrong. The cloud secures the cloud. You secure what you put IN the cloud.",
+      "key_takeaway": "The customer ALWAYS owns data, identity, and compliance — regardless of the cloud model."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Apartment Building",
+      "content": "Think of cloud computing like an apartment building:\n\n**IaaS (Raw Apartment):** You rent an empty apartment. The landlord provides the building, walls, plumbing, and electricity (infrastructure). You bring ALL your own stuff — furniture, locks, alarm system, curtains. If someone breaks in because you used a cheap lock, that's on you.\n\n**PaaS (Furnished Apartment):** The landlord provides furniture, appliances, and basic maintenance. You just bring your personal stuff and put it on the shelves. The landlord fixes the fridge. But if you leave the door unlocked, that's still your problem.\n\n**SaaS (Hotel Room):** Everything is provided — furniture, cleaning, maintenance. You just bring yourself and your suitcase. But you're still responsible for locking your suitcase, not sharing your room key, and choosing what to leave in the safe.\n\n**The constant:** In all three, YOU decide who gets a key, YOU protect your valuables, and YOU follow the rules. The building owner never takes that over.",
+      "key_takeaway": "No matter how much the cloud provider handles, data, access, and compliance are always yours."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Mapping Responsibilities to Cloud Services",
+      "content": "```python\n# Shared responsibility mapper for common cloud services\n\nclass ResponsibilityMapper:\n    \"\"\"Maps security controls to CSP or customer responsibility.\"\"\"\n    \n    CATEGORIES = [\n        \"Physical Security\",\n        \"Network Infrastructure\", \n        \"Host OS\",\n        \"Runtime/Application\",\n        \"Data/Content\",\n        \"Identity/Access\",\n        \"Compliance\"\n    ]\n    \n    # Responsibility assignments per model\n    # 'CSP' = cloud provider, 'Customer' = you, 'Shared' = both\n    RESPONSIBILITY_MAP = {\n        \"IaaS\": {\n            \"Physical Security\": \"CSP\",\n            \"Network Infrastructure\": \"CSP\",\n            \"Host OS\": \"Customer\",\n            \"Runtime/Application\": \"Customer\",\n            \"Data/Content\": \"Customer\",\n            \"Identity/Access\": \"Customer\",\n            \"Compliance\": \"Customer\"\n        },\n        \"PaaS\": {\n            \"Physical Security\": \"CSP\",\n            \"Network Infrastructure\": \"CSP\",\n            \"Host OS\": \"CSP\",\n            \"Runtime/Application\": \"Shared\",\n            \"Data/Content\": \"Customer\",\n            \"Identity/Access\": \"Customer\",\n            \"Compliance\": \"Customer\"\n        },\n        \"SaaS\": {\n            \"Physical Security\": \"CSP\",\n            \"Network Infrastructure\": \"CSP\",\n            \"Host OS\": \"CSP\",\n            \"Runtime/Application\": \"CSP\",\n            \"Data/Content\": \"Customer\",\n            \"Identity/Access\": \"Customer\",\n            \"Compliance\": \"Customer\"\n        }\n    }\n    \n    def get_responsibility(self, service_model: str, category: str) -> str:\n        model = service_model.upper()\n        if model not in self.RESPONSIBILITY_MAP:\n            return \"Unknown service model\"\n        if category not in self.CATEGORIES:\n            return \"Unknown category\"\n        return self.RESPONSIBILITY_MAP[model][category]\n    \n    def get_customer_responsibilities(self, service_model: str) -> list:\n        \"\"\"Return all categories where customer is responsible.\"\"\"\n        model = service_model.upper()\n        return [cat for cat, resp in self.RESPONSIBILITY_MAP[model].items() \n                if resp == \"Customer\"]\n    \n    def get_gap_analysis(self, service_model: str) -> dict:\n        \"\"\"Identify responsibility gaps — shared areas needing clarification.\"\"\"\n        model = service_model.upper()\n        gaps = {cat: resp for cat, resp in self.RESPONSIBILITY_MAP[model].items() \n                if resp == \"Shared\"}\n        return {\"model\": model, \"shared_areas\": gaps}\n\n# Usage\nmapper = ResponsibilityMapper()\nprint(\"IaaS customer responsibilities:\")\nfor r in mapper.get_customer_responsibilities(\"IaaS\"):\n    print(f\"  - {r}\")\n\nprint(\"\\nPaaS shared areas (potential gaps):\")\ngaps = mapper.get_gap_analysis(\"PaaS\")\nfor area, resp in gaps[\"shared_areas\"].items():\n    print(f\"  - {area}: {resp}\")\n```\n\n**Challenge:** Add a method that identifies which security controls are MOST commonly misconfigured for each service model based on real-world breach data.",
+      "difficulty": "beginner",
+      "hint": "Look at the 'Shared' categories — these are where responsibility is unclear and misconfigurations happen most."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Case: When Shared Responsibility Fails",
+      "content": "**Capital One Breach (2019):**\nAn attacker exploited a misconfigured WAF (Web Application Firewall) on an EC2 instance to gain access to S3 buckets containing 100+ million customer records.\n\n**Responsibility breakdown:**\n- AWS: Infrastructure was secure. No AWS vulnerability was exploited.\n- Capital One: Misconfigured the WAF/EC2 role permissions. The IAM role was overly permissive.\n- The gap: Capital One assumed their cloud configuration was secure because they were 'on AWS.'\n\n**Other notable examples:**\n- **Adobe (2019):** Exposed S3 bucket with customer data — customer's bucket policy was misconfigured\n- **Deep Root Analytics (2017):** 198 million voter records exposed — default S3 permissions were too open\n- **Uber (2017):** Exposed S3 bucket used for backup storage — access controls weren't properly set\n\n**The pattern:** Every one of these was a CUSTOMER responsibility failure. The CSP's infrastructure worked exactly as designed. The customers didn't understand their side of the model.",
+      "source": "Based on publicly reported cloud security incidents"
+    },
+    {
+      "type": "explanation",
+      "title": "Provider-Specific Shared Responsibility Nuances",
+      "content": "Each cloud provider has subtle differences in their shared responsibility models:\n\n**AWS:**\n- 'Security OF the cloud' (AWS) vs 'Security IN the cloud' (Customer)\n- Customer responsible for: IAM, security groups, NACLs, S3 bucket policies, encryption settings\n- Shared: Threat detection (GuardDuty requires customer to enable and configure)\n\n**Azure:**\n- More granular breakdown by service type\n- Customer responsible for: Identity (Entra ID), data classification, client and endpoint security\n- Azure handles: Physical, network, host infrastructure\n- Key nuance: Azure Active Directory (Entra ID) is shared — Azure runs it, but you configure policies\n\n**GCP:**\n- Emphasizes 'shared fate' rather than 'shared responsibility'\n- GCP provides more default security features (e.g., VPC Service Controls)\n- Customer responsible for: Data access, IAM policies, workload configuration\n\n**Multi-cloud gotcha:** When you run across multiple providers, YOU are responsible for the gaps between their models. No single CSP covers everything.",
+      "key_takeaway": "Know your provider's specific model — the devil is in the details of where shared boundaries fall."
+    },
+    {
+      "type": "memory_aid",
+      "title": "PAD: Always Customer Responsibilities",
+      "content": "Remember what's ALWAYS the customer's responsibility with **PAD**:\n\n🔒 **P** — Privacy (data classification, encryption decisions, data residency)\n🔑 **A** — Access (identity management, MFA, role-based access control)\n📊 **D** — Data (what data you store, who can see it, how it's protected)\n\n**No matter what cloud model you use — IaaS, PaaS, or SaaS — PAD is yours.**\n\n**Visual anchor:** Imagine a PADlock on your data. The cloud provider builds the building, but you hold the key.\n\n**Extension:** For IaaS specifically, add 'SO' (System and OS) → you get **PAD-SO** (Pads of responsibility). In IaaS, you're also responsible for the OS and runtime.",
+      "visual_cue": "Draw a padlock with P-A-D letters on it, sitting on top of a cloud icon. The cloud holds the infrastructure; the padlock secures what matters."
+    },
+    {
+      "type": "reflection",
+      "title": "Your Cloud Responsibility Audit",
+      "content": "Take a moment to map your own organization's cloud usage:\n\n1. **Which cloud service models do you use?** (IaaS: EC2/VMs, PaaS: RDS/Cloud SQL, SaaS: Office 365/Salesforce)\n2. **For each service, who configures these controls?**\n   - Identity and access management\n   - Data encryption\n   - Network security groups/firewall rules\n   - Logging and monitoring\n   - Backup and disaster recovery\n3. **Where are the gaps?** Are there controls where nobody is clearly responsible?\n4. **When was the last time you reviewed your cloud security posture?**\n5. **Do you have documentation mapping CSP vs. customer responsibilities for each service?**\n\n**The uncomfortable truth:** Most organizations have at least one critical control that falls in the 'shared' zone where nobody takes clear ownership. Find it before an attacker does.",
+      "reflection_prompt": "List three cloud services your organization uses and identify at least one responsibility gap for each."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Own Your Side of the Model",
+      "content": "The shared responsibility model is not an excuse to point fingers. It's a framework for clarity.\n\n**The best cloud security practitioners:**\n1. Know exactly where the line is drawn for every service they use\n2. Have documented responsibility assignments for each control\n3. Regularly audit the 'shared' zones where gaps are most likely\n4. Never assume the CSP handles something without verifying\n5. Test their own controls as aggressively as an attacker would\n\n**Your action item:** Take one cloud service you work with and map every security control to either CSP or customer responsibility. I guarantee you'll find at least one gap where you assumed the CSP was handling it.\n\nThat gap is where breaches happen. Find it first.",
+      "closing_thought": "The cloud is someone else's computer. You're still responsible for what happens on it."
+    }
+  ],
+  "tags": ["Course: SANS-SEC502", "Career Path: Cloud Security", "Career Path: Security Engineer", "Shared Responsibility", "Cloud Security", "IaaS", "PaaS", "SaaS", "AWS", "Azure", "GCP"]
+}

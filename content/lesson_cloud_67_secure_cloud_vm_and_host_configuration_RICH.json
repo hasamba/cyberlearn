@@ -1,0 +1,171 @@
+{
+  "lesson_id": "c3d5e7f9-1a2b-4c8d-9e0f-3b5a7d9c1e3f",
+  "domain": "cloud",
+  "title": "Secure Cloud VM and Host Configuration",
+  "difficulty": 2,
+  "order_index": 67,
+  "prerequisites": ["Cloud Shared Responsibility Model"],
+  "concepts": [
+    "Cloud VM security baseline configuration",
+    "Host hardening principles for cloud environments",
+    "Secure image management and golden images",
+    "Cloud-specific configuration baselines (CIS Benchmarks)",
+    "Secure deployment automation (IaC security)",
+    "Network security groups and firewall configuration",
+    "Instance metadata service security",
+    "Patch management and vulnerability scanning"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Configure cloud VMs with security baselines following CIS Benchmark recommendations",
+    "Implement secure golden images and automated hardening pipelines",
+    "Secure instance metadata services and prevent SSRF-based credential theft",
+    "Design automated patch management and vulnerability scanning workflows for cloud VMs"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary security risk of cloud instance metadata services?",
+      "options": [
+        "They slow down VM boot times",
+        "They can be exploited via SSRF to steal temporary credentials and IAM roles",
+        "They prevent VMs from communicating with each other",
+        "They require additional licensing costs"
+      ],
+      "correct": 1,
+      "explanation": "Instance metadata services (like AWS IMDS) provide temporary credentials. If an application has an SSRF vulnerability, an attacker can query the metadata service to steal those credentials and escalate privileges."
+    },
+    {
+      "question": "What is the primary benefit of using a golden image for cloud VM deployment?",
+      "options": [
+        "It reduces deployment costs",
+        "It ensures all VMs start from a known, hardened baseline configuration",
+        "It eliminates the need for network security groups",
+        "It provides faster internet connectivity"
+      ],
+      "correct": 1,
+      "explanation": "Golden images provide a consistent, pre-hardened baseline. Every VM deployed from the image starts with the same security configuration, reducing configuration drift and misconfigurations."
+    },
+    {
+      "question": "Which practice is most effective for securing cloud VM patch management?",
+      "options": [
+        "Manually patching VMs when administrators remember",
+        "Automated patching with staged rollout, testing, and rollback capability",
+        "Disabling automatic updates to prevent unexpected changes",
+        "Only patching critical vulnerabilities after they're publicly exploited"
+      ],
+      "correct": 1,
+      "explanation": "Automated patching with staged rollout allows testing patches on a small subset before full deployment. Rollback capability ensures you can revert if a patch causes issues."
+    },
+    {
+      "question": "In cloud VM security, what is the purpose of IMDSv2 (Instance Metadata Service v2)?",
+      "options": [
+        "It provides faster metadata responses",
+        "It requires a session token, preventing SSRF-based metadata retrieval",
+        "It stores metadata in a separate VPC",
+        "It encrypts metadata at rest"
+      ],
+      "correct": 1,
+      "explanation": "IMDSv2 requires a PUT request to obtain a session token before metadata retrieval. This prevents SSRF attacks from directly accessing metadata via GET requests, as the attacker cannot obtain the token without the PUT."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link cloud VM hardening to moving into a new apartment: change the locks (credentials), close the windows (ports), set the alarm (monitoring), and update regularly (patching)."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the defense layers: Network (NSGs) → OS (hardening) → Application (config) → Monitoring (alerts). Visualize them as concentric rings."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break VM security into four chunks: Baseline configuration, Image management, Runtime hardening, Continuous monitoring."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember the Capital One breach: a misconfigured VM role (too permissive IAM) led to S3 access. One VM misconfiguration, 100M+ records exposed."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice hardening a VM from scratch repeatedly until the steps become automatic: disable unnecessary services, configure firewall, set up logging."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the stakes: an unhardened VM in the cloud is like leaving your front door open in a city where everyone can see your address."
+    },
+    {
+      "principle": "Senses",
+      "application": "Use a hardening checklist you can physically check off. The tactile act of marking items complete reinforces the process."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Walk a colleague through hardening a VM. Teaching the steps reveals gaps in your own understanding."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'SHIP' for VM security: Secure baseline, Hardened image, IMDS protection, Patch management."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Deploy a VM in your cloud environment and harden it using CIS Benchmarks. Then scan it with a vulnerability scanner. Real results beat theoretical knowledge."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Your VM is Someone's Target",
+      "content": "Every cloud VM you deploy is visible to the entire internet. Scanners find new VMs within minutes of deployment. An unhardened VM isn't just a risk — it's an invitation.\n\nThe good news: cloud VMs can be secured systematically. The bad news: most organizations don't do it consistently. Configuration drift, inconsistent baselines, and manual processes create gaps that attackers exploit.\n\nThis lesson gives you the framework to harden every VM, every time, consistently. Not because hardening is complex — because consistency is hard.",
+      "coaching_tip": "The goal isn't perfection. It's consistency. A consistently hardened VM is safer than an occasionally perfect one."
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud VM Security: The Baseline",
+      "content": "**Why VM hardening matters in the cloud:**\n- Cloud VMs are internet-accessible by default in many configurations\n- Shared responsibility means YOU configure the OS, not the cloud provider\n- Automation makes it easy to spin up vulnerable VMs at scale\n- Configuration drift is the #1 cause of cloud VM vulnerabilities\n\n**CIS Benchmarks: The gold standard for hardening**\nCIS (Center for Internet Security) provides vendor-specific benchmarks for:\n- AWS (Amazon Linux, Ubuntu, Windows Server)\n- Azure (Ubuntu, Windows Server, RHEL)\n- GCP (Ubuntu, CentOS, Windows)\n\n**Core hardening categories:**\n\n1. **Network Configuration**\n   - Restrict inbound/outbound rules to minimum required\n   - Disable public IPs where possible\n   - Use VPC endpoints for AWS services\n   - Implement network segmentation with security groups\n\n2. **OS Configuration**\n   - Disable unnecessary services and ports\n   - Configure secure SSH (key-based auth, disable root login)\n   - Set appropriate file permissions\n   - Enable audit logging\n\n3. **Identity and Access**\n   - Use IAM roles instead of embedded credentials\n   - Implement least-privilege for all access\n   - Enable MFA for console access\n   - Rotate access keys regularly\n\n4. **Monitoring and Logging**\n   - Enable CloudTrail/Activity Logs/Cloud Audit Logs\n   - Configure VM-level logging (syslog, Event Logs)\n   - Set up alerts for security events\n   - Centralize log storage and analysis",
+      "key_takeaway": "VM hardening is about consistent, systematic configuration — not one-time setup."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The New Apartment",
+      "content": "Imagine you just moved into a new apartment in a big building.\n\n**Default cloud VM** = Moving in without changing anything:\n- The previous tenant's keys might still work (default credentials)\n- All the windows are open (unnecessary ports)\n- There's no alarm system (no monitoring)\n- The front door has a simple lock (weak authentication)\n\n**Hardened cloud VM** = Setting up your apartment properly:\n- Change all the locks (remove default credentials, use SSH keys)\n- Close windows you don't need and add security screens (close unnecessary ports, configure firewalls)\n- Install an alarm system that alerts you to break-ins (enable logging and monitoring)\n- Use a deadbolt (strong authentication, MFA)\n- Check the apartment regularly for maintenance (patching)\n\n**Golden image** = Having a template apartment that's already set up correctly:\n- Every time you move to a new apartment, you start from the same secure template\n- No risk of forgetting to change a lock or close a window\n- Consistency across all apartments (VMs) in the building\n\n**The automation part:** Instead of setting up each apartment manually, you have a checklist that automatically applies all the security settings. That's Infrastructure as Code (IaC) for VM security.",
+      "key_takeaway": "VM hardening = changing the locks, closing unnecessary windows, installing alarms, and doing it consistently with a template."
+    },
+    {
+      "type": "code_exercise",
+      "title": "VM Hardening Script with IMDSv2 Enforcement",
+      "content": "```bash\n#!/bin/bash\n# Cloud VM Hardening Script (Ubuntu/Debian)\n# Applies CIS Benchmark recommendations\n\nset -euo pipefail\n\nlog() { echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $1\"; }\n\n# === 1. System Updates ===\nlog \"Updating system packages...\"\napt-get update && apt-get upgrade -y\napt-get autoremove -y\n\n# === 2. Secure SSH Configuration ===\nlog \"Hardening SSH configuration...\"\nSSHD_CONFIG=\"/etc/ssh/sshd_config\"\n\ncp \"$SSHD_CONFIG\" \"${SSHD_CONFIG}.bak\"\n\n# Disable root login\nsed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' \"$SSHD_CONFIG\"\n\n# Disable password authentication (key-based only)\nsed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' \"$SSHD_CONFIG\"\n\n# Disable empty passwords\nsed -i 's/^#*PermitEmptyPasswords.*/PermitEmptyPasswords no/' \"$SSHD_CONFIG\"\n\n# Set max auth tries\nsed -i 's/^#*MaxAuthTries.*/MaxAuthTries 3/' \"$SSHD_CONFIG\"\n\n# Disable X11 forwarding\nsed -i 's/^#*X11Forwarding.*/X11Forwarding no/' \"$SSHD_CONFIG\"\n\n# Allow only specific users/groups\necho \"AllowUsers admin ssh-user\" >> \"$SSHD_CONFIG\"\n\nsystemctl restart sshd\n\n# === 3. Firewall Configuration ===\nlog \"Configuring firewall...\"\nufw default deny incoming\nufw default allow outgoing\nufw allow ssh\nufw allow https\nufw --force enable\n\n# === 4. Disable Unnecessary Services ===\nlog \"Disabling unnecessary services...\"\nfor service in avahi-daemon cups bluetooth rpcbind; do\n    if systemctl is-enabled \"$service\" 2>/dev/null; then\n        systemctl disable \"$service\"\n        systemctl stop \"$service\"\n        log \"Disabled: $service\"\n    fi\ndone\n\n# === 5. Enable Audit Logging ===\nlog \"Configuring audit logging...\"\napt-get install -y auditd audispd-plugins\n\n# Audit rules for critical system files\ncat > /etc/audit/rules.d/hardening.rules << 'EOF'\n# Monitor changes to system files\n-w /etc/passwd -p wa -k identity\n-w /etc/group -p wa -k identity\n-w /etc/shadow -p wa -k identity\n-w /etc/sudoers -p wa -k privilege\n\n# Monitor SSH configuration changes\n-w /etc/ssh/sshd_config -p wa -k ssh\n\n# Monitor login events\n-w /var/log/faillog -p wa -k login\n-w /var/log/lastlog -p wa -k login\n\n# Monitor cron changes\n-w /etc/cron* -p wa -k cron\nEOF\n\naugenrules --load\nsystemctl enable auditd\nsystemctl start auditd\n\n# === 6. IMDSv2 Enforcement (AWS) ===\nlog \"Checking IMDSv2 configuration...\"\n# IMDSv2 requires PUT requests with a token header\n# This prevents SSRF-based metadata access\nTOKEN=$(curl -s -X PUT \"http://169.254.169.254/latest/api/token\" \\\n    -H \"X-aws-ec2-metadata-token-ttl-seconds: 21600\" 2>/dev/null)\n\nif [ -n \"$TOKEN\" ]; then\n    log \"IMDSv2 is available - enforcing token requirement\"\n    # On AWS, enforce IMDSv2 at the instance level\n    # This should be done via AWS CLI or Terraform:\n    # aws ec2 modify-instance-metadata-options \\\n    #   --instance-id i-12345 \\\n    #   --http-tokens required \\\n    #   --http-endpoint enabled\nelse\n    log \"WARNING: IMDSv2 not detected - verify cloud provider metadata security\"\nfi\n\n# === 7. File Permissions ===\nlog \"Setting secure file permissions...\"\nchmod 600 /etc/shadow\nchmod 600 /etc/gshadow\nchmod 644 /etc/passwd\nchmod 644 /etc/group\nchmod 700 /root\n\nlog \"VM hardening complete!\"\n```\n\n**Challenge:** Add a section that checks for and removes any default cloud credentials (e.g., AWS access keys in environment variables, metadata service credentials). How would you detect credentials accidentally embedded in user data scripts?",
+      "difficulty": "intermediate",
+      "hint": "Check for environment variables like AWS_ACCESS_KEY_ID, scan user data for key patterns using regex, and verify IAM instance profiles are used instead of embedded keys."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Case: VM Misconfiguration Disasters",
+      "content": "**Capital One Breach (2019):**\nA misconfigured EC2 instance with an overly permissive IAM role allowed an attacker to access S3 buckets containing 100+ million customer records.\n\n**Root cause:** The EC2 instance's IAM role had `s3:*` permissions (full S3 access) when it only needed to read specific buckets. The attacker exploited an SSRF vulnerability in the application running on the VM to access the instance metadata service and steal temporary credentials.\n\n**What went wrong:**\n1. IAM role was overly permissive (violated least privilege)\n2. IMDSv1 was used (allowed simple GET-based metadata access)\n3. No monitoring on unusual S3 access patterns\n\n**TeamTNT Cryptomining Campaign (2020-2021):**\nTeamTNT scanned for misconfigured cloud VMs with:\n- Default credentials still active\n- Exposed Docker APIs\n- Misconfigured Kubernetes dashboards\n- Overly permissive IAM roles\n\n**Common cloud VM misconfigurations found in the wild:**\n1. SSH open to 0.0.0.0/0 (entire internet)\n2. Default or weak credentials left in place\n3. IMDSv1 instead of IMDSv2 (SSRF credential theft risk)\n4. Overly permissive IAM roles attached to instances\n5. Unencrypted EBS volumes\n6. Missing or disabled logging\n7. Outdated AMIs with known vulnerabilities\n\n**The pattern:** Every major cloud breach involving VMs traces back to basic hardening failures. Not zero-days. Not sophisticated attacks. Basic configuration mistakes.",
+      "source": "Based on publicly reported cloud security incidents"
+    },
+    {
+      "type": "explanation",
+      "title": "Golden Images and Automated Hardening",
+      "content": "**Why golden images?**\nManual hardening doesn't scale. Every VM deployed without a hardened baseline is a risk.\n\n**Golden image workflow:**\n```\n1. Start with base AMI/VM image\n2. Apply CIS Benchmark hardening\n3. Install required agents (logging, monitoring, security)\n4. Remove default credentials and unnecessary packages\n5. Test and validate security configuration\n6. Create golden image (AMI/Azure Image/GCP Image)\n7. Store in controlled image registry\n8. Deploy all VMs from golden image\n9. Regularly rebuild with updates\n```\n\n**Infrastructure as Code for VM security:**\n```hcl\n# Terraform example: Enforce IMDSv2 on EC2\nresource \"aws_instance\" \"web\" {\n  ami           = var.golden_ami_id\n  instance_type = \"t3.medium\"\n  \n  metadata_options {\n    http_endpoint               = \"enabled\"\n    http_tokens                 = \"required\"  # Enforce IMDSv2\n    http_put_response_hop_limit = 1\n  }\n  \n  # Use IAM instance profile, not embedded keys\n  iam_instance_profile = aws_iam_instance_profile.web_profile.name\n  \n  # Encrypt EBS volume\n  root_block_device {\n    encrypted = true\n  }\n  \n  # Security group with minimal rules\n  vpc_security_group_ids = [aws_security_group.web.id]\n  \n  tags = {\n    Name        = \"web-server\"\n    Hardened    = \"true\"\n    CISLevel    = \"1\"\n    ImageDate   = timestamp()\n  }\n}\n```\n\n**Automated hardening pipeline:**\n1. **Packer** builds golden images from hardened configurations\n2. **Ansible/Chef** applies CIS Benchmark settings\n3. **Inspec** validates compliance against CIS Benchmarks\n4. **AMI pipeline** automatically rebuilds images monthly with patches\n5. **Terraform** deploys only from approved golden images",
+      "key_takeaway": "Golden images + IaC = consistent, hardened VMs at scale. Manual hardening doesn't scale."
+    },
+    {
+      "type": "memory_aid",
+      "title": "SHIP: Cloud VM Security Framework",
+      "content": "Remember the four pillars of cloud VM security with **SHIP**:\n\n🛡️ **S** — Secure Baseline: CIS Benchmarks, disable unnecessary services, secure SSH\n🖼️ **H** — Hardened Image: Golden images, IaC deployment, approved AMIs only\n🔒 **I** — IMDS Protection: Enforce IMDSv2, use IAM roles (not embedded keys), least privilege\n🔄 **P** — Patch Management: Automated updates, vulnerability scanning, consistent rollout\n\n**Quick recall:** Keep your **SHIP** afloat — without all four pillars, your VMs will sink.\n\n**Additional hardening checklist:**\n- ✅ Remove default credentials\n- ✅ Enable encryption at rest (EBS encryption)\n- ✅ Configure network security groups (deny by default)\n- ✅ Enable audit logging\n- ✅ Disable unnecessary services\n- ✅ Set file permissions per CIS Benchmark\n- ✅ Use IAM instance profiles (no embedded keys)\n- ✅ Enforce IMDSv2 on all instances",
+      "visual_cue": "Draw a ship with four compartments labeled S-H-I-P. If any compartment is breached, the ship takes on water. All four must be watertight."
+    },
+    {
+      "type": "reflection",
+      "title": "Your VM Hardening Audit",
+      "content": "Audit your own cloud environment (or a hypothetical one):\n\n1. **Baseline:** Are your VMs deployed from hardened golden images, or are they manually configured?\n2. **IMDS:** Are all instances using IMDSv2 (or equivalent metadata protection)?\n3. **IAM:** Are VMs using instance profiles, or are credentials embedded in scripts?\n4. **Network:** Do your security groups follow least-privilege (deny by default, allow only required)?\n5. **Monitoring:** Is audit logging enabled on all VMs? Are you alerted on security events?\n6. **Patching:** How quickly are critical patches applied? Is the process automated?\n7. **Drift:** How do you detect configuration drift from your hardened baseline?\n\n**The uncomfortable question:** If I scanned your VMs right now, would I find any that deviate from your baseline? (The answer is almost always yes.)\n\n**The follow-up:** What's your process for detecting and remediating that drift?",
+      "reflection_prompt": "Write down three specific hardening gaps in your current cloud VM deployment. For each, note the risk level and remediation step."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Consistency Over Perfection",
+      "content": "The biggest VM security failures aren't sophisticated zero-days. They're basic misconfigurations deployed at scale because hardening wasn't automated.\n\n**The hard truth about VM security:**\n1. A consistently hardened VM beats an occasionally perfect one\n2. Automation isn't optional — manual hardening doesn't scale\n3. Golden images are your best friend — start every VM from a known-good state\n4. IMDSv2 and IAM roles are non-negotiable — SSRF credential theft is a top attack vector\n5. Patch management must be automated — unpatched VMs are low-hanging fruit\n\n**Your VM hardening checklist:**\n- ✅ Golden images with CIS Benchmark compliance\n- ✅ IMDSv2 enforced on all instances\n- ✅ IAM instance profiles (zero embedded credentials)\n- ✅ Network security groups with deny-by-default\n- ✅ Encrypted volumes and logging enabled\n- ✅ Automated patching with staged rollout\n- ✅ Continuous compliance monitoring\n\nMaster these fundamentals and your VMs will be more secure than 90% of what's running in the cloud today.",
+      "closing_thought": "VM security isn't about being perfect. It's about being consistently good, at scale, with automation."
+    }
+  ],
+  "tags": ["Course: SANS-SEC502", "Career Path: Cloud Security", "VM Hardening", "CIS Benchmarks", "Cloud Security", "IMDSv2", "Golden Images", "Infrastructure as Code"]
+}

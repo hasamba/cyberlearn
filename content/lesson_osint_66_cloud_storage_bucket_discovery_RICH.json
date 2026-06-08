@@ -1,0 +1,171 @@
+{
+  "lesson_id": "c4a72e31-9f58-4e2b-b8d6-5f1a3c9d8e7b",
+  "domain": "osint",
+  "title": "Cloud Storage Bucket Discovery",
+  "difficulty": 2,
+  "order_index": 66,
+  "prerequisites": ["Technology-Focused Search: Censys and Shodan"],
+  "concepts": [
+    "Cloud storage architecture (S3, Azure Blob, GCP Storage)",
+    "Bucket enumeration techniques and tools",
+    "Public and misconfigured storage discovery",
+    "Data leakage assessment and impact analysis",
+    "Responsible disclosure and reporting",
+    "Bucket naming conventions and predictability",
+    "Access control lists (ACLs) and permissions",
+    "Automated scanning at scale"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify exposed cloud storage buckets across AWS, Azure, and GCP using OSINT techniques",
+    "Use tools like S3Scanner, BucketFinder, and custom scripts to enumerate storage resources",
+    "Assess the impact of discovered data exposures and categorize severity",
+    "Apply responsible disclosure practices when reporting cloud storage misconfigurations"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which AWS S3 URL format indicates a bucket named 'acme-data'?",
+      "options": [
+        "https://s3-acme-data.amazonaws.com",
+        "https://acme-data.s3.amazonaws.com",
+        "https://s3.amazonaws.com/acme-data",
+        "https://amazonaws.com/s3/acme-data"
+      ],
+      "correct": 1,
+      "explanation": "AWS S3 supports virtual-hosted style (bucket-name.s3.amazonaws.com) and path style (s3.amazonaws.com/bucket-name). The virtual-hosted style is more common."
+    },
+    {
+      "question": "What is the most responsible first step when you discover a publicly exposed cloud storage bucket containing sensitive data?",
+      "options": [
+        "Download all the data as evidence",
+        "Notify the owner and provide details about the exposure",
+        "Post about it on social media",
+        "Delete the exposed files"
+      ],
+      "correct": 1,
+      "explanation": "Responsible disclosure means notifying the data owner first. Downloading excessive data or public disclosure without notification can compound the harm."
+    },
+    {
+      "question": "Which technique is most effective for discovering predictable bucket names associated with a target organization?",
+      "options": [
+        "Random character brute-force",
+        "Permutation-based enumeration using known naming patterns",
+        "DNS zone transfers",
+        "BGP route analysis"
+      ],
+      "correct": 1,
+      "explanation": "Organizations often follow naming conventions (company-env-data-type). Permutation engines that combine known patterns dramatically increase discovery rates."
+    },
+    {
+      "question": "What does an HTTP 403 response from an S3 bucket URL typically indicate?",
+      "options": [
+        "The bucket does not exist",
+        "The bucket exists but access is denied",
+        "The bucket is empty",
+        "The bucket is publicly accessible"
+      ],
+      "correct": 1,
+      "explanation": "403 means the bucket exists but the requester doesn't have permission. This is different from 404 (bucket doesn't exist), making it valuable for enumeration."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link bucket discovery to finding unlocked storage units — same concept, digital scale."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Picture a massive warehouse district where some units have padlocks and others have open doors with no guards."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break the process into: Enumerate names → Test access → Assess contents → Report findings."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember the Pentagon leak through an exposed S3 bucket — real breaches make the stakes memorable."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice building permutation wordlists repeatedly until generating common patterns becomes second nature."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the weight: exposed buckets have leaked voter records, medical data, and military secrets. This isn't theoretical."
+    },
+    {
+      "principle": "Senses",
+      "application": "Draw the three-cloud diagram (AWS/Azure/GCP) with their URL patterns — visual anchoring makes the differences stick."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain to someone why a 403 is actually more useful than a 404 in bucket enumeration — teaching cements the concept."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'PARC' for the bucket discovery flow: Permute names, Assess access, Review contents, Contact owner."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Set up your own S3 bucket with test data and practice discovery against it. Real targets beat hypothetical ones."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Digital Gold Rush — But Ethical",
+      "content": "Cloud storage buckets are the unlocked doors of the internet. Organizations pour data into S3, Azure Blob, and GCP Storage without always checking who can see it. As an OSINT practitioner, you have a superpower: the ability to find these exposures before malicious actors do. But with that power comes responsibility. Every bucket you discover is someone's data. Treat it with the same care you'd want someone to treat yours.",
+      "coaching_tip": "This lesson is about discovery skill AND ethical responsibility. Both matter equally."
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud Storage Architecture: Where the Buckets Live",
+      "content": "**AWS S3** — The most common target for OSINT:\n- URL formats: `https://bucket-name.s3.amazonaws.com` (virtual-hosted) or `https://s3.amazonaws.com/bucket-name` (path-style)\n- Common prefixes: `s3-website`, `s3-accelerate`\n- Default regions: us-east-1 (most misconfigured buckets are here)\n\n**Azure Blob Storage:**\n- URL format: `https://accountname.blob.core.windows.net/container-name`\n- Containers (equivalent to buckets) can be public, private, or blob-level access\n- Naming: only lowercase letters, numbers, and hyphens; 3-24 characters\n\n**GCP Cloud Storage:**\n- URL format: `https://storage.googleapis.com/bucket-name`\n- Bucket names are globally unique across all GCP projects\n- Objects can be made publicly accessible via IAM or ACL policies\n\n**Key insight:** Each provider has different URL patterns, default behaviors, and enumeration techniques. Mastering all three makes you a complete cloud OSINT practitioner.",
+      "key_takeaway": "Know the URL patterns for each cloud provider — they're your entry points for discovery."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cloud Buckets as Storage Lockers",
+      "content": "Imagine a huge building with millions of storage lockers. Each locker has a name on it.\n\nSome lockers are **completely open** — anyone can walk by, open the door, and look inside. These are like public S3 buckets.\n\nSome lockers are **locked** — you can see the locker exists, but you can't open it. These return a 403 error.\n\nSome lockers **don't exist** — the number doesn't have a locker. These return a 404.\n\nThe trick is: you don't have a map of which lockers exist. So you try different names. You try \"acme-backups\", \"acme-logs\", \"acme-dev\" and see which ones respond.\n\nThat's bucket enumeration. You're guessing locker names and checking which ones exist and which ones are open.",
+      "key_takeaway": "Bucket enumeration is trying names and reading the responses — 200, 403, or 404 tell you different things."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Building a Basic Bucket Enumerator",
+      "content": "```python\nimport requests\nfrom concurrent.futures import ThreadPoolExecutor, as_completed\n\ndef check_s3_bucket(bucket_name: str) -> dict:\n    \"\"\"Check if an S3 bucket exists and is accessible.\"\"\"\n    url = f\"https://{bucket_name}.s3.amazonaws.com\"\n    try:\n        resp = requests.get(url, timeout=5)\n        if resp.status_code == 200:\n            # Bucket exists and is publicly listable\n            return {\"name\": bucket_name, \"status\": \"public\", \"code\": 200}\n        elif resp.status_code == 403:\n            # Bucket exists but access denied\n            return {\"name\": bucket_name, \"status\": \"exists\", \"code\": 403}\n        elif resp.status_code == 404:\n            # Bucket doesn't exist\n            return {\"name\": bucket_name, \"status\": \"not_found\", \"code\": 404}\n    except requests.RequestException:\n        return {\"name\": bucket_name, \"status\": \"error\", \"code\": None}\n\ndef generate_permutations(target: str) -> list:\n    \"\"\"Generate likely bucket names for a target.\"\"\"\n    prefixes = [target, f\"{target}-prod\", f\"{target}-dev\", f\"{target}-staging\"]\n    suffixes = [\"backup\", \"logs\", \"data\", \"media\", \"assets\", \"uploads\", \n                \"static\", \"config\", \"secrets\", \"db\"]\n    \n    names = []\n    for prefix in prefixes:\n        for suffix in suffixes:\n            names.append(f\"{prefix}-{suffix}\")\n    return names\n\ndef scan_buckets(target: str, threads: int = 10) -> list:\n    \"\"\"Scan for publicly accessible S3 buckets.\"\"\"\n    bucket_names = generate_permutations(target)\n    results = []\n    \n    with ThreadPoolExecutor(max_workers=threads) as executor:\n        futures = {executor.submit(check_s3_bucket, name): name \n                   for name in bucket_names}\n        for future in as_completed(futures):\n            result = future.result()\n            if result[\"status\"] != \"not_found\":\n                results.append(result)\n    \n    return sorted(results, key=lambda x: (x[\"status\"] != \"public\", x[\"name\"]))\n\n# Run a scan (use only on authorized targets!)\nresults = scan_buckets(\"example\")\nfor r in results:\n    print(f\"{r['name']}: {r['status']} ({r['code']})\")\n```\n\n**Challenge:** Add Azure Blob and GCP Storage URL checks to this script. How would you handle rate limiting?",
+      "difficulty": "intermediate",
+      "hint": "Azure uses `https://{name}.blob.core.windows.net` and GCP uses `https://storage.googleapis.com/{name}`. Add exponential backoff for rate limits."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Case: Major Cloud Storage Exposures",
+      "content": "Cloud storage misconfigurations have caused some of the largest data breaches in history:\n\n**The Pentagon S3 Bucket (2017):** An exposed S3 bucket contained classified intelligence files from the Pentagon's CENTCOM. The bucket was configured for public access, allowing anyone to download the contents.\n\n**Voter Records (2017):** A misconfigured S3 bucket exposed personal information of 198 million American voters. The data was stored by a Republican data firm and left publicly accessible.\n\n**Uber Breach (2017):** Attackers discovered an exposed S3 bucket containing Uber's backup data, leading to a breach affecting 57 million users.\n\n**Common patterns across these incidents:**\n- Default configurations allowed public access\n- No monitoring or alerting on access changes\n- Data classification was absent — everything was treated equally\n- The buckets were discoverable through simple enumeration\n\n**The fix is always the same story:** Default-deny access policies, continuous monitoring, and regular access audits.",
+      "source": "Based on publicly reported cloud storage breaches"
+    },
+    {
+      "type": "explanation",
+      "title": "Enumeration Tools and Techniques",
+      "content": "Popular tools for cloud storage discovery:\n\n**S3Scanner** — Enumerates S3 buckets and checks permissions\n```bash\ns3scanner - buckets.txt --threads 20\n```\n\n**BucketFinder** — Generates permutations and checks AWS/Azure/GCP\n```bash\npython3 bucket_finder.py --target acme --permute\n```\n\n**Custom approaches:**\n- **DNS enumeration:** CNAME records often reveal bucket names\n- **Certificate Transparency logs:** SSL certs may reference S3-hosted sites\n- **Wayback Machine:** Archived URLs can reveal bucket names\n- **GitHub/GitLab search:** Hardcoded bucket URLs in source code\n- **Web scraping:** Extract bucket names from JavaScript bundles\n\n**Advanced permutation strategies:**\n- Company name variations (acme, acme-inc, acmecorp)\n- Environment suffixes (-prod, -dev, -staging, -test)\n- Data type suffixes (-backup, -logs, -uploads, -media)\n- Region prefixes (us-east-1, eu-west-1)\n- Common naming patterns (YYYY-MM-DD, incremental versions)\n\n**Important:** Always operate within legal boundaries. Only enumerate targets you have authorization to test, or use bug bounty programs that permit this testing.",
+      "key_takeaway": "Combine multiple discovery techniques — no single method finds all buckets."
+    },
+    {
+      "type": "memory_aid",
+      "title": "PARC: The Bucket Discovery Flow",
+      "content": "Remember the ethical cloud bucket discovery workflow with **PARC**:\n\n🔍 **P** — Permute names using target-specific patterns\n🚪 **A** — Assess access (200 = public, 403 = exists, 404 = not found)\n📋 **R** — Review contents only if publicly accessible and necessary\n📧 **C** — Contact the owner immediately with responsible disclosure\n\n**Quick recall:** Think \"PARC the lot\" — you're walking through a parking lot, checking which cars are unlocked.\n\n**Critical rule:** If you find sensitive data, DO NOT download more than necessary to verify the exposure. Document what you can see (file names, types, dates) without accessing content unnecessarily.",
+      "visual_cue": "Draw a four-step flowchart: Permute → Assess → Review → Contact, with a stop sign before 'Review' reminding you to minimize data access."
+    },
+    {
+      "type": "reflection",
+      "title": "Ethics and Impact: When Discovery Becomes Responsibility",
+      "content": "Consider this scenario: You're performing authorized OSINT on a healthcare company and discover a publicly accessible S3 bucket containing patient medical records.\n\n**Questions to reflect on:**\n1. How much of the data should you access to verify the exposure? (Answer: as little as possible)\n2. Should you download the data as evidence? What are the legal implications?\n3. Who should you contact, and in what order? (Security team, data protection officer, relevant CERT)\n4. What's the maximum time you should wait for a response before escalating?\n5. How would your approach differ if the data belonged to a government entity vs. a private company?\n\n**The ethical line:** Finding exposed data is a skill. What you do with that finding defines your character. The goal is always to help the data owner secure their information, never to exploit the exposure.",
+      "reflection_prompt": "Write down your personal responsible disclosure protocol. When you find exposed data, what are your non-negotiable steps?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Discovery to Impact: The Complete Practitioner",
+      "content": "Finding an exposed bucket is just the beginning. The real skill is in:\n\n1. **Assessment speed** — How quickly can you determine the severity of an exposure?\n2. **Impact analysis** — What type of data is exposed? PII? Financial? Medical? Intellectual property?\n3. **Clear communication** — Can you explain the risk in terms a non-technical stakeholder understands?\n4. **Responsible action** — Do you report quickly and clearly, enabling the owner to take action?\n\nThe difference between a script kiddie and a professional isn't technical skill — it's judgment. Anyone can run a scanner. A professional understands the impact, communicates responsibly, and helps organizations improve their security posture.\n\nYour goal isn't to find the most buckets. It's to help organizations secure their data before someone with worse intentions finds it.",
+      "closing_thought": "The best OSINT practitioners are the ones whose discoveries lead to real security improvements, not just impressive reports."
+    }
+  ],
+  "tags": ["Course: SANS-SEC497", "Career Path: OSINT", "Career Path: Cloud Security", "Cloud Storage", "S3", "Bucket Enumeration", "Data Leakage", "Responsible Disclosure"]
+}

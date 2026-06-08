@@ -1,0 +1,171 @@
+{
+  "lesson_id": "e7f9a1b3-4c5d-6e8f-9a0b-1c3d5e7f9a2b",
+  "domain": "fundamentals",
+  "title": "Secure Software Development Lifecycle (SDLC)",
+  "difficulty": 2,
+  "order_index": 67,
+  "prerequisites": [],
+  "concepts": [
+    "SDLC phases and security integration points",
+    "Security requirements and threat modeling",
+    "Secure design principles",
+    "Secure coding practices and code review",
+    "Security testing: SAST, DAST, IAST",
+    "DevSecOps and security automation",
+    "Security in Agile methodologies",
+    "Deployment security and post-release monitoring"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain how security integrates into each phase of the SDLC",
+    "Apply threat modeling during the design phase to identify security requirements",
+    "Compare and contrast SAST, DAST, and IAST testing approaches",
+    "Implement DevSecOps practices that automate security throughout the development pipeline"
+  ],
+  "post_assessment": [
+    {
+      "question": "At which SDLC phase is it most cost-effective to fix security vulnerabilities?",
+      "options": [
+        "Testing phase",
+        "Deployment phase",
+        "Design phase",
+        "Maintenance phase"
+      ],
+      "correct": 2,
+      "explanation": "Fixing vulnerabilities during design is 10-100x cheaper than fixing them in production. Design-phase security (threat modeling, secure architecture) prevents vulnerabilities before code is written."
+    },
+    {
+      "question": "What is the key difference between SAST and DAST?",
+      "options": [
+        "SAST tests running applications; DAST tests source code",
+        "SAST analyzes source code without execution; DAST tests running applications from the outside",
+        "SAST is for web apps only; DAST is for mobile apps only",
+        "SAST finds runtime vulnerabilities; DAST finds design flaws"
+      ],
+      "correct": 1,
+      "explanation": "SAST (Static Application Security Testing) analyzes source code, bytecode, or binaries without executing the application. DAST (Dynamic Application Security Testing) tests the running application from an external perspective."
+    },
+    {
+      "question": "In DevSecOps, what does 'shifting left' mean?",
+      "options": [
+        "Moving security testing to the left side of the network topology",
+        "Integrating security practices earlier in the development lifecycle",
+        "Using left-leaning open-source tools exclusively",
+        "Deploying applications to left-coast data centers"
+      ],
+      "correct": 1,
+      "explanation": "Shift left means integrating security earlier in the SDLC — during requirements, design, and coding — rather than treating security as a final gate before deployment."
+    },
+    {
+      "question": "Which practice is most effective for preventing injection vulnerabilities during coding?",
+      "options": [
+        "Running DAST scans after deployment",
+        "Using parameterized queries and input validation during development",
+        "Performing annual penetration tests",
+        "Implementing WAF rules in production"
+      ],
+      "correct": 1,
+      "explanation": "Parameterized queries and input validation prevent injection at the source — during coding. DAST, penetration tests, and WAFs are reactive controls that catch vulnerabilities after code is written."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link secure SDLC to building construction: it's cheaper to fix the blueprint (design) than to tear down walls (production). Security built in from the start stands strong."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the SDLC as a horizontal timeline with security gates at each phase. Visualize 'shift left' as moving security activities earlier on the timeline."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break secure SDLC into: Requirements → Design → Code → Test → Deploy → Monitor. Each has specific security activities."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember the Equifax breach: a known Apache Struts vulnerability that had a patch available for months. If SDLC included timely patching, 147M records wouldn't have been exposed."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice the 'security at every phase' checklist until identifying security activities for each SDLC phase becomes automatic."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the cost curve: a design-phase fix costs $100, a production fix costs $100,000. The earlier you catch it, the cheaper it is."
+    },
+    {
+      "principle": "Senses",
+      "application": "Use color coding: green for secure practices built in, red for vulnerabilities found late. The visual contrast makes the 'shift left' principle tangible."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain 'shift left' to a developer colleague using the construction analogy. If they get why you fix the blueprint before pouring concrete, they'll get secure SDLC."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'RDDTDM' for secure SDLC phases: Requirements, Design, Development, Testing, Deployment, Monitoring."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Pick a real project and add threat modeling, security requirements, and automated scanning to its pipeline. Hands-on integration beats theoretical knowledge."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Security Isn't a Gate — It's a Thread",
+      "content": "The old way: build the software, then run a security test at the end. If it fails, send it back. This is expensive, slow, and demoralizing.\n\nThe new way: weave security into every phase of development. Security requirements inform design. Threat modeling shapes architecture. Automated scanning runs with every commit. Security isn't a gate at the end — it's a thread running through the entire process.\n\nThis shift from 'security as gate' to 'security as thread' is the fundamental change that secure SDLC brings. It's not about adding more security testing — it's about doing security at the right time, which is always earlier than you think.",
+      "coaching_tip": "If you remember one thing: fixing a vulnerability during design costs 1/100th of fixing it in production. Shift left isn't just a principle — it's economics."
+    },
+    {
+      "type": "explanation",
+      "title": "Secure SDLC Phases and Security Activities",
+      "content": "**The Secure SDLC — Security at Every Phase:**\n\n**1. Requirements Phase**\n- Define security requirements (authentication, authorization, data protection)\n- Identify compliance requirements (PCI-DSS, HIPAA, GDPR)\n- Create abuse cases (how could someone misuse this feature?)\n- Security acceptance criteria for user stories\n\n**2. Design Phase**\n- Threat modeling (STRIDE, PASTA, or LINDDUN)\n- Secure architecture review\n- Data flow diagrams with trust boundaries\n- Security control selection and design\n\n**3. Development Phase**\n- Secure coding guidelines (OWASP, CERT)\n- IDE security plugins (linters, real-time scanning)\n- Pre-commit hooks for secrets detection\n- Peer code review with security checklist\n\n**4. Testing Phase**\n- SAST (Static Application Security Testing)\n- DAST (Dynamic Application Security Testing)\n- IAST (Interactive Application Security Testing)\n- Dependency scanning (known vulnerabilities in libraries)\n- Penetration testing\n\n**5. Deployment Phase**\n- Infrastructure security validation\n- Container image scanning\n- Configuration review (no secrets in configs)\n- Security smoke tests in staging\n\n**6. Monitoring Phase**\n- Runtime application self-protection (RASP)\n- Security monitoring and alerting\n- Incident response integration\n- Vulnerability management\n\n**The cost multiplier:** Finding a vulnerability in each phase:\n- Requirements: 1x\n- Design: 5x\n- Development: 10x\n- Testing: 50x\n- Production: 100x",
+      "key_takeaway": "Security at every phase. Fix early, fix cheap. The later you find it, the more it costs."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Building a House",
+      "content": "Building software is like building a house.\n\n**Without secure SDLC (the old way):**\n1. You design the house without thinking about locks\n2. You build it without reinforced doors\n3. After the house is built, a security inspector comes and says 'You forgot locks on the doors, the windows don't lock, and anyone can walk in.'\n4. Now you have to retrofit locks, reinforce doors, and add security cameras — 10x more expensive than doing it right the first time.\n\n**With secure SDLC (the new way):**\n1. **Requirements:** You decide the house needs locks, an alarm, and fire exits\n2. **Design:** The architect includes a secure entry system in the blueprints\n3. **Build:** The construction team installs the locks and alarm as they build\n4. **Test:** You test that every door locks and the alarm works\n5. **Move in:** The house is secure from day one\n6. **Monitor:** You watch for break-in attempts and maintain the locks\n\n**The 'shift left' principle:** The earlier in the process you think about security, the cheaper and easier it is. Locks are cheap on the blueprint. Retrofitting locks is expensive on a finished house.\n\n**DevSecOps is like having a security consultant living on the construction site** — always available, always checking, always building security in rather than inspecting it after.",
+      "key_takeaway": "Shift left = fix it on the blueprint, not after the house is built. Security built in is cheaper and better than security bolted on."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Security Testing Comparison: SAST, DAST, IAST",
+      "content": "```yaml\n# DevSecOps Pipeline - GitHub Actions Example\n# Security at every stage\n\nname: Secure CI/CD Pipeline\n\non:\n  push:\n    branches: [main, develop]\n  pull_request:\n    branches: [main]\n\njobs:\n  # Stage 1: Pre-commit / Code Level Security\n  sast-scan:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      \n      # Secrets detection (pre-commit level)\n      - name: Detect secrets in code\n        uses: gitleaks/gitleaks-action@v2\n        \n      # SAST - Static Analysis\n      - name: Run SAST scan\n        uses: github/super-linter@v5\n        env:\n          VALIDATE_PYTHON: true\n          VALIDATE_JAVASCRIPT_ES: true\n          # Security-specific linters\n          VALIDATE_PYTHON_BANDIT: true\n          VALIDATE_JAVASCRIPT_SEMGREP: true\n      \n      # Dependency scanning\n      - name: Check dependencies for vulnerabilities\n        uses: dependency-check/Dependency-Check_Action@v1\n        \n      # Software Bill of Materials (SBOM)\n      - name: Generate SBOM\n        uses: anchore/sbom-action@v0\n        with:\n          image: myapp:latest\n          output-file: sbom.spdx.json\n\n  # Stage 2: Build and Container Security\n  container-scan:\n    needs: sast-scan\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      \n      - name: Build container image\n        run: docker build -t myapp:latest .\n        \n      # Container image scanning\n      - name: Scan container for vulnerabilities\n        uses: aquasecurity/trivy-action@master\n        with:\n          image-ref: myapp:latest\n          severity: 'CRITICAL,HIGH'\n          exit-code: '1'  # Fail on critical/high\n      \n      # Infrastructure as Code scanning\n      - name: Scan IaC for misconfigurations\n        uses: aquasecurity/tfsec-action@v1.0.0\n\n  # Stage 3: DAST - Dynamic Testing\n  dast-scan:\n    needs: container-scan\n    runs-on: ubuntu-latest\n    steps:\n      - name: Deploy to staging\n        run: ./deploy-staging.sh\n        \n      # DAST - Dynamic Analysis\n      - name: Run DAST scan against staging\n        uses: zaproxy/action-full-scan@v0.10.0\n        with:\n          target: https://staging.myapp.com\n          rules_file_name: zap-rules.tsv\n          cmd_options: '-a'  # Include all alerts\n        \n      # API security testing\n      - name: Run API security scan\n        run: |\n          npm install -g @42crunch/api-security\n          42crunch-api-security scan api-spec.yaml\n```\n\n**Security Testing Comparison:**\n\n| Aspect | SAST | DAST | IAST |\n|--------|------|------|------|\n| When | During coding | After deployment | During testing |\n| How | Source code analysis | Black-box testing | Instrumented runtime |\n| Needs running app | No | Yes | Yes |\n| Finds design flaws | Limited | Yes | Partial |\n| Finds code bugs | Yes | No | Yes |\n| False positive rate | Higher | Lower | Lowest |\n| Language-specific | Yes | No | Yes |\n\n**Challenge:** Add an IAST configuration step that instruments the application during testing. How would you handle the performance overhead of IAST in a CI/CD pipeline?",
+      "difficulty": "intermediate",
+      "hint": "Run IAST only on the test environment, not production. Use sampling for large test suites. Configure IAST to report only medium+ severity findings in CI (low severity in detail reports)."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World SDLC Failures and Successes",
+      "content": "**Equifax Breach (2017):**\n147 million records exposed through an unpatched Apache Struts vulnerability.\n\n**Root cause analysis:**\n- A patch was available for 2 months before the breach\n- The vulnerability was known and disclosed\n- Equifax's patching process took too long\n- Network segmentation was insufficient\n- No runtime monitoring detected the exploit\n\n**SDLC failure:** The patch management phase was broken. The vulnerability was known, the fix was available, but the process to deploy it failed.\n\n**Microsoft SDL Success:**\nMicrosoft's Security Development Lifecycle (SDL), implemented after the early 2000s security crises, reduced vulnerabilities by 50%+ in products that followed the process.\n\n**Key SDL elements:**\n1. Mandatory threat modeling for all features\n2. Banned function list (unsafe APIs)\n3. Automated fuzzing and static analysis\n4. Security code review requirements\n5. Penetration testing before release\n\n**GitLab DevSecOps Success:**\nGitLab integrated security scanning into CI/CD pipelines, making security visible to developers without requiring security expertise.\n\n**Results:**\n- Security findings presented directly in merge requests\n- Developers fix vulnerabilities during development, not after\n- No separate security gate — security is part of the pipeline\n\n**The pattern:** Organizations that succeed at secure SDLC don't add security as a separate phase. They weave it into every existing phase.",
+      "source": "Based on publicly reported breaches and SDLC implementation case studies"
+    },
+    {
+      "type": "explanation",
+      "title": "DevSecOps: Security as Code",
+      "content": "**DevSecOps principles:**\n1. **Security as code** — Security policies, configurations, and tests are version-controlled code\n2. **Automate everything** — Manual security doesn't scale with CI/CD\n3. **Shift left** — Catch vulnerabilities as early as possible\n4. **Fail fast** — Break builds on security findings, don't let them accumulate\n5. **Visibility** — Security findings visible to developers in their workflow\n\n**DevSecOps tools by category:**\n\n| Category | Tools | Phase |\n|----------|-------|-------|\n| SAST | SonarQube, Semgrep, CodeQL, Bandit | Development |\n| DAST | OWASP ZAP, Burp Suite, Nuclei | Testing |\n| SCA | Snyk, Dependabot, Trivy | Development |\n| Container | Trivy, Anchore, Prisma Cloud | Build |\n| IaC | tfsec, Checkov, Terrascan | Deploy |\n| Secrets | GitLeaks, TruffleHog, detect-secrets | Pre-commit |\n| SBOM | Syft, CycloneDX, SPDX | Build |\n\n**Agile security integration:**\n- **Sprint planning:** Include security user stories and threat modeling\n- **Daily standup:** Report security blockers\n- **Sprint review:** Demo security features\n- **Retrospective:** Discuss security incidents and near-misses\n\n**Security acceptance criteria for user stories:**\n- Input validation requirements\n- Authentication/authorization requirements\n- Data protection requirements\n- Error handling requirements\n\n**Key principle:** Security isn't a sprint — it's in every sprint.",
+      "key_takeaway": "DevSecOps = security automated, visible, and integrated into every phase of the development pipeline."
+    },
+    {
+      "type": "memory_aid",
+      "title": "RDDTDM: Secure SDLC Phases",
+      "content": "Remember the secure SDLC phases with **RDDTDM** (think 'Ready To Deploy' — you're ready to deploy when all phases are complete):\n\n📋 **R** — Requirements: Security requirements, compliance, abuse cases\n📐 **D** — Design: Threat modeling, architecture review, data flow diagrams\n💻 **D** — Development: Secure coding, IDE scanning, code review\n🧪 **T** — Testing: SAST, DAST, IAST, dependency scanning\n🚀 **D** — Deployment: Container scanning, IaC security, config review\n📊 **M** — Monitoring: RASP, security alerts, incident response\n\n**Security activities at each phase (shift left!):**\n\n| Phase | Security Activity | Cost to Fix |\n|-------|-------------------|-------------|\n| Requirements | Security requirements, abuse cases | 1x |\n| Design | Threat modeling, architecture review | 5x |\n| Development | Secure coding, SAST, code review | 10x |\n| Testing | DAST, IAST, pen testing | 50x |\n| Deployment | Container scanning, config review | 75x |\n| Production | Incident response, patching | 100x |\n\n**The mnemonic anchor:** You're **RDDTDM** — Ready To Deploy when you've done all six phases. Skip one, and you're not ready.",
+      "visual_cue": "Draw a staircase going up with each step labeled R-D-D-T-D-M. The cost curve rises exponentially with each step. Early steps are cheap, late steps are expensive."
+    },
+    {
+      "type": "reflection",
+      "title": "Your SDLC Security Audit",
+      "content": "Evaluate your current development process:\n\n1. **Requirements:** Do you include security acceptance criteria in user stories? Or is security an afterthought?\n2. **Design:** Do you threat model new features? Or do you skip straight to coding?\n3. **Development:** Do developers have IDE security plugins? Or are security scans only run in CI?\n4. **Testing:** Is SAST/DAST automated in the pipeline? Or is security testing a manual gate?\n5. **Deployment:** Do you scan containers and validate IaC? Or do you push to production without security validation?\n6. **Monitoring:** Do you have runtime security monitoring? Or do you find out about vulnerabilities from external reports?\n\n**For each phase where you answered 'afterthought' or 'no':**\n- What would it take to add security activities?\n- What's the cost of NOT adding them?\n- Where is the biggest gap between your current state and a secure SDLC?\n\n**The honest assessment:** Most organizations have security at 2-3 phases. A secure SDLC covers all six. Where are your gaps?",
+      "reflection_prompt": "List the security activities you currently have at each SDLC phase. Identify the biggest gap and write a one-sentence plan to close it."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Security Is a Feature, Not a Tax",
+      "content": "The biggest myth in software development: 'Security slows us down.'\n\nThe reality: Security debt slows you down. Every vulnerability that makes it to production is a tax you pay later — with interest. The 'speed' of skipping security is an illusion.\n\n**The secure SDLC mindset shift:**\n1. **Security is a feature** — It's not a tax on development; it's a feature users need\n2. **Automate everything** — If security requires manual effort, it won't happen consistently\n3. **Make it visible** — Security findings in merge requests, not in reports nobody reads\n4. **Fail fast** — Break the build on critical findings, don't let them accumulate\n5. **Shift left** — The earlier you find it, the cheaper it is to fix\n\n**Key takeaways from this lesson:**\n- Security must be integrated into every SDLC phase, not bolted on at the end\n- The cost of fixing vulnerabilities increases exponentially with each phase\n- DevSecOps automates security into the CI/CD pipeline\n- Threat modeling during design prevents entire classes of vulnerabilities\n- SAST, DAST, and IAST each catch different types of issues\n- Monitoring and response are the last line of defense, not the first\n\nBuild security in. Automate it. Make it visible. Fix it early. That's the secure SDLC.",
+      "closing_thought": "Security isn't a tax on development. It's an investment that compounds — the earlier you invest, the bigger the returns."
+    }
+  ],
+  "tags": ["Course: ISC2-CISSP", "Career Path: Security Engineer", "Secure SDLC", "DevSecOps", "SAST", "DAST", "Threat Modeling", "Shift Left", "Software Security"]
+}

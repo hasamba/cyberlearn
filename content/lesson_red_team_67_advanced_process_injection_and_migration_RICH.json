@@ -1,0 +1,171 @@
+{
+  "lesson_id": "d4e6f8a0-2b3c-4d5e-9f8a-1c3e5b7d9f2a",
+  "domain": "red_team",
+  "title": "Advanced Process Injection and Migration",
+  "difficulty": 3,
+  "order_index": 67,
+  "prerequisites": [],
+  "concepts": [
+    "Process injection fundamentals and Windows memory architecture",
+    "DLL injection techniques and detection",
+    "Reflective DLL injection",
+    "Process hollowing and replacement",
+    "Thread hijacking and APC injection",
+    "Process migration for persistence",
+    "Injection detection and defensive countermeasures",
+    "Evasion techniques for modern EDR"
+  ],
+  "estimated_time": 60,
+  "learning_objectives": [
+    "Explain the Windows memory architecture that enables process injection techniques",
+    "Implement common process injection techniques including DLL injection, process hollowing, and APC injection",
+    "Understand process migration as a persistence and evasion mechanism",
+    "Identify process injection artifacts and implement detection strategies"
+  ],
+  "post_assessment": [
+    {
+      "question": "What Windows API call is essential for allocating memory in a target process during DLL injection?",
+      "options": [
+        "CreateRemoteThread",
+        "VirtualAllocEx",
+        "WriteProcessMemory",
+        "OpenProcess"
+      ],
+      "correct": 1,
+      "explanation": "VirtualAllocEx allocates memory in the target process's address space. WriteProcessMemory then writes the payload, and CreateRemoteThread executes it."
+    },
+    {
+      "question": "What is the key advantage of reflective DLL injection over standard DLL injection?",
+      "options": [
+        "It's faster to execute",
+        "The DLL is never written to disk and loads itself without LoadLibrary",
+        "It requires fewer API calls",
+        "It works on all operating systems"
+      ],
+      "correct": 1,
+      "explanation": "Reflective DLL injection loads the DLL from memory without calling LoadLibrary, which means the DLL doesn't need to exist on disk and isn't registered in the loaded module list."
+    },
+    {
+      "question": "During process hollowing, what happens to the legitimate process's main thread?",
+      "options": [
+        "It continues running alongside the malicious code",
+        "It is terminated and replaced with a new thread executing the malicious payload",
+        "It is suspended, the process memory is replaced, and then resumed with malicious code",
+        "It is moved to a different process"
+      ],
+      "correct": 2,
+      "explanation": "Process hollowing creates a suspended legitimate process, unmaps its memory, writes malicious code in its place, and resumes execution. The result looks like a legitimate process running malicious code."
+    },
+    {
+      "question": "Which detection method is most effective at identifying process injection in real-time?",
+      "options": [
+        "File system monitoring for new DLLs",
+        "ETW (Event Tracing for Windows) monitoring of memory allocation and thread creation events across processes",
+        "DNS query logging",
+        "Network traffic analysis"
+      ],
+      "correct": 1,
+      "explanation": "ETW provides real-time visibility into cross-process memory operations (VirtualAllocEx, WriteProcessMemory) and thread creation (CreateRemoteThread), which are the indicators of process injection."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link process injection to a parasite entering a host: the parasite (malicious code) lives inside the host (legitimate process), using the host's resources while hiding from detection."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the injection flow: OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread. Visualize each API call as a step in the injection pipeline."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break injection into: Target selection (find process), Memory allocation (make room), Payload writing (inject code), Execution (run code), Migration (move to new host)."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember how Lazarus Group used process hollowing on svchost.exe — a legitimate Windows process running malicious code. The process looked normal but was completely controlled."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice the injection API call sequence until it's automatic: OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the tension: process injection is the most detectable red team technique. Every API call leaves a trace. The art is in minimizing and disguising those traces."
+    },
+    {
+      "principle": "Senses",
+      "application": "Hear the rhythm of the injection sequence: Open, Allocate, Write, Execute. Four beats, each one louder than the last to a defender."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain process injection to someone using the 'hitchhiker' analogy: malicious code hitches a ride inside a legitimate process, using its identity to pass through security checkpoints."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'OAWC' (pronounced 'awk') for the injection sequence: OpenProcess, Allocate, Write, Create."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Implement a basic DLL injection in a lab VM. Then, from the defender side, use Process Monitor to see exactly what traces it leaves. Understanding detection makes you better at evasion."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Double-Edged Sword",
+      "content": "Process injection is one of the most powerful techniques in offensive security — and one of the most detectable. Every injection leaves traces in memory, in API calls, and in process behavior.\n\nUnderstanding process injection from the offensive side teaches you what to look for defensively. Understanding it from the defensive side teaches you how to evade detection. Both perspectives make you better.\n\nThis lesson covers advanced injection techniques with equal emphasis on execution AND detection. If you only understand one side, you're half-prepared.\n\n**Important:** All techniques in this lesson must be practiced only in authorized lab environments. Never use these techniques against systems without explicit written authorization.",
+      "coaching_tip": "For every injection technique you learn, immediately ask: 'What artifacts does this leave? How would I detect it?' That dual perspective is what separates experts from script kiddies."
+    },
+    {
+      "type": "explanation",
+      "title": "Windows Memory Architecture for Injection",
+      "content": "**Why Windows allows process injection:**\nWindows provides legitimate APIs for cross-process memory manipulation. These APIs exist for debugging, performance monitoring, and DLL injection by legitimate software (antivirus, debugging tools). Malware abuses these same APIs.\n\n**Key Windows APIs for injection:**\n\n| API | Purpose | Detection Risk |\n|-----|---------|---------------|\n| OpenProcess | Get handle to target process | Low |\n| VirtualAllocEx | Allocate memory in target process | Medium |\n| WriteProcessMemory | Write data to target process memory | High |\n| CreateRemoteThread | Create thread in target process | Very High |\n| NtCreateThreadEx | Lower-level thread creation | Medium |\n| QueueUserAPC | Queue APC for execution | Medium |\n\n**The injection pipeline (OAWC):**\n1. **O**penProcess — Obtain a handle to the target process\n2. **A**llocate (VirtualAllocEx) — Allocate memory in the target\n3. **W**rite (WriteProcessMemory) — Write the payload\n4. **C**reate (CreateRemoteThread) — Execute the payload\n\n**Memory concepts:**\n- **Virtual Address Space** — Each process has its own 64-bit address space\n- **Pages** — Memory is allocated in 4KB pages\n- **Sections** — Shared memory regions that can be mapped across processes\n- **PE Headers** — Portable Executable structure that defines how code is loaded\n\n**Why processes are targets:**\n- Legitimate processes (explorer.exe, svchost.exe) are trusted by security tools\n- Injected code inherits the process's security context and privileges\n- Security tools are less suspicious of code running in known-good processes",
+      "key_takeaway": "Process injection abuses legitimate Windows APIs. Each API call leaves a detectable trace."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Hitchhiker",
+      "content": "Imagine a city with buses (processes) that drive around. Each bus has a destination (function) and a driver (code) that makes it go.\n\n**Process injection** is like sneaking a hitchhiker onto a bus:\n\n1. **DLL injection:** You put a new passenger on the bus. The passenger (DLL) sits down and starts doing things. The bus still goes where it was going, but now there's someone extra doing their own stuff.\n\n2. **Process hollowing:** You stop the bus, kick out the original passengers, put your own people inside, and start the bus again. From the outside, it still looks like the same bus (same route number, same paint job), but inside it's completely different people going to a different destination.\n\n3. **Thread hijacking:** You don't add a new passenger. Instead, you grab the steering wheel from the driver and make them turn where you want. From the outside, it's the same bus with the same driver, but the driver is no longer in control.\n\n4. **APC injection:** You leave a note for the driver that says 'next time you stop, do this extra thing.' The driver will do it because they think it's part of their normal route.\n\n**From the guard's perspective (EDR):**\n- They check the passenger list (loaded modules)\n- They watch for people boarding who don't have tickets (unexpected DLL loads)\n- They monitor where the bus is actually going vs. where it should go (behavior analysis)",
+      "key_takeaway": "Injection techniques differ in how they get code running inside a legitimate process, but all of them involve some form of unauthorized code execution in another process's memory space."
+    },
+    {
+      "type": "code_exercise",
+      "title": "DLL Injection Technique and Detection",
+      "content": "```c\n// dll_inject.c - Basic DLL Injection Technique\n// EDUCATIONAL PURPOSES ONLY - Use only in authorized lab environments\n\n#include <windows.h>\n#include <stdio.h>\n\n/*\n * DLL Injection Steps (OAWC):\n * 1. OpenProcess - Get handle to target\n * 2. VirtualAllocEx - Allocate memory in target\n * 3. WriteProcessMemory - Write DLL path\n * 4. CreateRemoteThread - Execute LoadLibrary\n */\n\nBOOL InjectDll(DWORD processId, const char* dllPath) {\n    HANDLE hProcess = NULL;\n    LPVOID remoteBuf = NULL;\n    HANDLE hThread = NULL;\n    BOOL success = FALSE;\n    \n    // Step 1: Open target process\n    hProcess = OpenProcess(\n        PROCESS_CREATE_THREAD |  // CreateRemoteThread\n        PROCESS_VM_OPERATION |    // VirtualAllocEx/VirtualFreeEx\n        PROCESS_VM_WRITE,          // WriteProcessMemory\n        FALSE,\n        processId\n    );\n    \n    if (!hProcess) {\n        printf(\"[-] OpenProcess failed: %d\\n\", GetLastError());\n        return FALSE;\n    }\n    printf(\"[+] Opened process %d\\n\", processId);\n    \n    // Step 2: Allocate memory in target process\n    SIZE_T dllPathLen = strlen(dllPath) + 1;\n    remoteBuf = VirtualAllocEx(\n        hProcess,\n        NULL,\n        dllPathLen,\n        MEM_COMMIT | MEM_RESERVE,\n        PAGE_READWRITE\n    );\n    \n    if (!remoteBuf) {\n        printf(\"[-] VirtualAllocEx failed: %d\\n\", GetLastError());\n        goto cleanup;\n    }\n    printf(\"[+] Allocated memory at %p\\n\", remoteBuf);\n    \n    // Step 3: Write DLL path to target process\n    if (!WriteProcessMemory(\n        hProcess,\n        remoteBuf,\n        dllPath,\n        dllPathLen,\n        NULL\n    )) {\n        printf(\"[-] WriteProcessMemory failed: %d\\n\", GetLastError());\n        goto cleanup;\n    }\n    printf(\"[+] Wrote DLL path to target\\n\");\n    \n    // Step 4: Create remote thread to load DLL\n    HMODULE hKernel32 = GetModuleHandleA(\"kernel32.dll\");\n    LPVOID loadLibraryAddr = (LPVOID)GetProcAddress(\n        hKernel32, \"LoadLibraryA\"\n    );\n    \n    hThread = CreateRemoteThread(\n        hProcess,\n        NULL,\n        0,\n        (LPTHREAD_START_ROUTINE)loadLibraryAddr,\n        remoteBuf,\n        0,\n        NULL\n    );\n    \n    if (!hThread) {\n        printf(\"[-] CreateRemoteThread failed: %d\\n\", GetLastError());\n        goto cleanup;\n    }\n    printf(\"[+] Remote thread created successfully\\n\");\n    success = TRUE;\n\ncleanup:\n    if (hThread) CloseHandle(hThread);\n    // Note: Don't free remoteBuf - the DLL needs this path\n    if (hProcess) CloseHandle(hProcess);\n    return success;\n}\n```\n\n**Python detection script for DLL injection artifacts:**\n```python\n\"\"\"Detect common DLL injection indicators using YARA-style rules.\"\"\"\n\nimport psutil\nfrom collections import defaultdict\n\ndef detect_suspicious_injections():\n    \"\"\"Check for common injection indicators.\"\"\"\n    suspicious = []\n    \n    for proc in psutil.process_iter(['pid', 'name', 'memory_info']):\n        try:\n            # Check 1: Processes with unusual loaded modules\n            # (DLLs not from system32 or program files)\n            suspicious_dlls = []\n            for dll in proc.memory_maps():\n                path = dll.path.lower()\n                if not any(x in path for x in ['windows\\\\system32', \n                                                 'windows\\\\syswow64',\n                                                 'program files']):\n                    if not path.startswith('\\\\'):  # Skip shared sections\n                        suspicious_dlls.append(path)\n            \n            if suspicious_dlls:\n                suspicious.append({\n                    'pid': proc.info['pid'],\n                    'name': proc.info['name'],\n                    'indicator': 'unusual_dlls',\n                    'details': suspicious_dlls[:5]  # Top 5\n                })\n            \n        except (psutil.AccessDenied, psutil.NoSuchProcess):\n            continue\n    \n    return suspicious\n\n# Note: Real detection requires ETW, kernel callbacks,\n# or memory scanning - this is simplified for education.\n```\n\n**Challenge:** Modify the injection technique to use NtCreateThreadEx instead of CreateRemoteThread. Why might this be harder to detect? How would you adjust the detection?",
+      "difficulty": "advanced",
+      "hint": "NtCreateThreadEx is a lower-level API that bypasses some user-mode hooks. Detection shifts to kernel-level monitoring (ETW, kernel callbacks) rather than user-mode API interception."
+    },
+    {
+      "type": "real_world",
+      "title": "Process Injection in Real Operations",
+      "content": "**Lazarus Group (HIDDEN COBRA):**\nUsed process hollowing on svchost.exe and explorer.exe. Created suspended processes, unmapped legitimate code, wrote malicious payloads, and resumed execution. The injected processes appeared completely legitimate to task manager.\n\n**APT29 (Cozy Bear):**\nUsed reflective DLL injection to load Cobalt Strike beacons without writing DLLs to disk. The beacons existed only in memory, leaving no file system artifacts.\n\n**FIN7 (Carbanak Group):**\nUsed DLL injection to load Carbanak malware into legitimate processes. The injected DLLs communicated with C2 servers through the legitimate process's network connections.\n\n**Common injection targets:**\n- `svchost.exe` — Windows service host (looks normal, multiple instances expected)\n- `explorer.exe` — Windows shell (always running, high privileges possible)\n- `rundll32.exe` — Legitimate DLL host (designed to load DLLs)\n- `lsass.exe` — Local Security Authority (high privileges, credential access)\n- `RuntimeBroker.exe` — UWP runtime broker (less monitored than svchost)\n\n**Evasion trends:**\n1. Moving from CreateRemoteThread to less-monitored APIs (NtCreateThreadEx)\n2. Using APC injection instead of thread creation\n3. Process hollowing instead of DLL injection (no DLL load events)\n4. Module stomping (overwriting legitimate DLLs in memory)\n5. Thread hijacking (modifying existing threads instead of creating new ones)\n\n**The cat-and-mouse game continues:** As defenders improve detection of classic injection techniques, operators develop new variations that leave fewer artifacts.",
+      "source": "Based on publicly documented threat actor techniques and MITRE ATT&CK"
+    },
+    {
+      "type": "explanation",
+      "title": "Advanced Techniques: Hollowing, APC, and Thread Hijacking",
+      "content": "**Process Hollowing:**\n1. Create a suspended legitimate process (e.g., svchost.exe)\n2. Unmap the legitimate code (NtUnmapViewOfSection)\n3. Allocate new memory in the process\n4. Write malicious PE (Portable Executable) into the allocated memory\n5. Fix imports and relocations\n6. Resume the thread — now running malicious code in a legitimate process\n\n**Advantage:** No DLL load events. The process looks legitimate in both the process list and loaded module list.\n\n**APC Injection:**\n1. Open target process and find a thread\n2. Allocate memory and write payload\n3. Queue an APC (Asynchronous Procedure Call) to the thread\n4. When the thread enters an alertable wait state, the APC executes\n\n**Advantage:** No CreateRemoteThread call. APCs are a legitimate Windows mechanism.\n\n**Thread Hijacking:**\n1. Suspend a thread in the target process\n2. Save the thread's context (registers, instruction pointer)\n3. Modify the instruction pointer to point to injected code\n4. Resume the thread — it executes malicious code\n5. Optionally restore original context when malicious code completes\n\n**Advantage:** No new thread creation. The existing thread runs the payload.\n\n**Process Migration:**\nAfter initial injection, operators often migrate to a more stable or higher-privileged process:\n1. Identify target process with desired privileges\n2. Inject payload into new target\n3. Transfer execution to new process\n4. Clean up original injection\n\n**Why migrate?**\n- Move from temporary process (e.g., word.exe) to persistent process (explorer.exe)\n- Escalate privileges by migrating to a higher-privilege process\n- Evade detection by moving away from monitored processes\n\n**Detection approach for each technique:**\n| Technique | Key Detection Indicator |\n|-----------|----------------------|\n| DLL Injection | Unexpected DLL load (LoadLibrary event) |\n| Process Hollowing | Process with mismatched PE headers in memory vs. disk |\n| APC Injection | QueueUserAPC to threads in other processes |\n| Thread Hijacking | Thread context modification across processes |",
+      "key_takeaway": "Each injection technique has different artifacts. Understanding both the technique AND its detection signature makes you effective on both sides."
+    },
+    {
+      "type": "memory_aid",
+      "title": "OAWC: The Injection Pipeline",
+      "content": "Remember the classic DLL injection sequence with **OAWC** (pronounced 'awk'):\n\n🔓 **O** — OpenProcess: Get a handle to the target process\n📦 **A** — Allocate (VirtualAllocEx): Reserve memory in the target\n✍️ **W** — Write (WriteProcessMemory): Copy the payload into allocated memory\n🚀 **C** — Create (CreateRemoteThread): Execute the payload\n\n**Advanced variations on the pipeline:**\n- **Process Hollowing:** Create (suspended) → Unmap → Allocate → Write → Resume\n- **APC Injection:** Open → Allocate → Write → QueueUserAPC (no CreateRemoteThread)\n- **Thread Hijacking:** Open → Suspend → Modify context → Resume (no allocation or write needed if using existing code)\n\n**Detection keywords for each stage:**\n- OpenProcess → PROCESS_VM_WRITE access request\n- VirtualAllocEx → Cross-process memory allocation\n- WriteProcessMemory → Cross-process memory writes\n- CreateRemoteThread → Thread creation in remote process\n\n**The mnemonic anchor:** The injection process feels **awk** (OAWC) — it's awkward to inject code into someone else's process. Every step is visible to defenders watching.",
+      "visual_cue": "Draw a four-step pipeline: Open → Allocate → Write → Create, with each step labeled with its API call and detection risk level."
+    },
+    {
+      "type": "reflection",
+      "title": "Detection Challenge: Finding the Needle",
+      "content": "You're a defender analyzing a process that might be injected:\n\n- Process: `svchost.exe` (PID 4820)\n- Command line: `svchost.exe -k netsvcs`\n- Started at: 03:14:22\n- Parent: `services.exe`\n- Memory: 145MB working set\n- Loaded modules: 23 DLLs (all from System32)\n- Network: 3 connections to internal servers\n\n**Questions:**\n1. Is this normal svchost.exe behavior? What would make you suspicious?\n2. What additional checks would you run to determine if this process is injected?\n3. How would you distinguish between a legitimately loaded svchost and a hollowed one?\n4. If this process is injected, what technique was likely used (and why)?\n5. What EDR telemetry would you need to detect this in real-time?\n\n**The hard part:** svchost.exe is supposed to have DLLs loaded. It's supposed to have network connections. The art is in detecting the subtle anomalies that differentiate legitimate from injected behavior.",
+      "reflection_prompt": "Write a detection rule that identifies process hollowing. What combination of indicators would you require before alerting?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Best Offense Understands Defense",
+      "content": "Process injection is a fundamental offensive technique, but it's also one of the most heavily monitored. Every major EDR product watches for the OAWC sequence. The operators who stay undetected are the ones who understand detection deeply enough to avoid it.\n\n**Key takeaways:**\n1. **Every injection leaves traces** — The question is whether defenders are watching for them\n2. **Classic techniques are well-detected** — CreateRemoteThread, LoadLibrary are red flags\n3. **Advanced techniques reduce artifacts** — But never eliminate them entirely\n4. **Detection is an arms race** — Each new evasion technique leads to new detection methods\n5. **Understanding both sides makes you better** — Red teamers need to know EDR, blue teamers need to know injection\n\n**For red teamers:** Always ask 'what does my EDR see?' before executing an injection.\n**For blue teamers:** Always ask 'what does this technique look like from the kernel?' when writing detection rules.\n\nThe best practitioners can switch perspectives fluently. Master both.",
+      "closing_thought": "The injection sequence is simple. The art is in the execution and evasion. The mastery is in understanding both sides."
+    }
+  ],
+  "tags": ["Course: OffSec-PEN300", "Career Path: Red Teamer", "Process Injection", "DLL Injection", "Process Hollowing", "APC Injection", "Evasion", "Windows Internals"]
+}

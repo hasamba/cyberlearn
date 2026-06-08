@@ -1,0 +1,171 @@
+{
+  "lesson_id": "b6d8e2f4-9a1c-4d3b-8e5f-2c7a9d1b3f6a",
+  "domain": "osint",
+  "title": "Cyber Threat Intelligence with OSINT",
+  "difficulty": 2,
+  "order_index": 67,
+  "prerequisites": ["The OSINT Process and Methodology"],
+  "concepts": [
+    "Cyber Threat Intelligence (CTI) fundamentals",
+    "CTI collection using OSINT sources",
+    "Threat actor research and profiling",
+    "IOC discovery and enrichment",
+    "Malware analysis via OSINT",
+    "Threat hunting with OSINT indicators",
+    "CTI reporting and dissemination",
+    "OSINT tools for threat intelligence"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Apply OSINT methodology to collect and analyze cyber threat intelligence",
+    "Research and profile threat actors using open-source intelligence sources",
+    "Discover and enrich IOCs (Indicators of Compromise) through OSINT techniques",
+    "Produce actionable CTI reports from OSINT-derived findings"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary difference between tactical and strategic threat intelligence?",
+      "options": [
+        "Tactical intelligence is classified; strategic intelligence is open source",
+        "Tactical intelligence focuses on immediate IOCs and TTPs; strategic focuses on threat trends and actor motivations",
+        "Tactical intelligence comes from internal sources; strategic from external",
+        "There is no meaningful difference"
+      ],
+      "correct": 1,
+      "explanation": "Tactical CTI provides immediate, actionable indicators (IPs, hashes, domains) for defenders. Strategic CTI provides long-term trend analysis, actor motivations, and risk assessments for leadership."
+    },
+    {
+      "question": "Which OSINT source is most valuable for discovering malware infrastructure before it's used in attacks?",
+      "options": [
+        "Social media posts by threat actors",
+        "Passive DNS records showing newly registered domains resolving to known malicious infrastructure",
+        "Vulnerability databases (CVE/NVD)",
+        "News articles about recent breaches"
+      ],
+      "correct": 1,
+      "explanation": "Passive DNS records reveal infrastructure relationships — newly registered domains resolving to IPs with known malicious history indicate preparation for future attacks."
+    },
+    {
+      "question": "What is the MITRE ATT&CK framework primarily used for in CTI?",
+      "options": [
+        "Classifying malware families by signature",
+        "Describing and categorizing adversary tactics, techniques, and procedures",
+        "Scanning networks for vulnerabilities",
+        "Encrypting threat intelligence data"
+      ],
+      "correct": 1,
+      "explanation": "MITRE ATT&CK provides a common language for describing adversary behavior — tactics (what they're trying to do), techniques (how they do it), and procedures (specific implementations)."
+    },
+    {
+      "question": "When producing a CTI report from OSINT, what is the most critical quality factor?",
+      "options": [
+        "Including as many IOCs as possible regardless of confidence",
+        "Clearly communicating confidence levels and source reliability for each finding",
+        "Using only classified sources to ensure accuracy",
+        "Focusing exclusively on technical indicators"
+      ],
+      "correct": 1,
+      "explanation": "Confidence levels and source reliability are critical because they tell the consumer how much to trust each finding. Low-confidence IOCs are useful differently than high-confidence ones."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link CTI to weather forecasting — tactical intelligence is today's forecast (carry an umbrella), strategic is the seasonal outlook (plan for a rainy season)."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the CTI lifecycle: Collection → Processing → Analysis → Production → Dissemination. Each step feeds the next."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break CTI into three levels: Tactical (IOCs, immediate), Operational (TTPs, campaign-level), Strategic (trends, actor motivations)."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember APT29 (Cozy Bear): OSINT researchers tracked their infrastructure through certificate transparency logs, revealing patterns months before public reports."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Practice the CTI cycle daily: pick a threat actor, collect IOCs, analyze patterns, produce a short report. Repetition builds analysts."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the impact: CTI isn't abstract — it's the intelligence that stops attacks before they happen. A single IOC can prevent a breach."
+    },
+    {
+      "principle": "Senses",
+      "application": "Use color-coded threat levels in your reports: red (confirmed), orange (probable), yellow (possible). Visual urgency makes findings actionable."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain the difference between an IOC and a TTP to a colleague. If you can make it click for them, you've internalized it."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'CPAPD' for the CTI lifecycle: Collection, Processing, Analysis, Production, Dissemination."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Pick a real threat actor and research them using only OSINT. Produce a 1-page intelligence brief. Hands-on analysis beats reading any day."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "CTI: From Noise to Knowledge",
+      "content": "The internet is drowning in threat data. New IOCs, new vulnerabilities, new threat actor reports — it's a firehose. The skill isn't in collecting more data. It's in turning that data into intelligence that drives decisions.\n\nCTI with OSINT means you're doing this without classified sources, relying on publicly available information. This isn't a limitation — it's a discipline. Open sources often reveal what classified sources miss: threat actors' public footprints, infrastructure patterns, and operational security failures.\n\nYour job as an OSINT CTI analyst is to find the signal in the noise, assign confidence to what you find, and deliver intelligence that someone can act on.",
+      "coaching_tip": "Think like a journalist, not a technician. The best CTI tells a story: who is attacking, why, how, and what we can do about it."
+    },
+    {
+      "type": "explanation",
+      "title": "CTI Fundamentals: The Intelligence Pyramid",
+      "content": "**CTI exists at three levels:**\n\n**Strategic Intelligence (Top of pyramid)**\n- Audience: C-suite, board, senior leadership\n- Focus: Long-term trends, threat landscape, actor motivations, geopolitical context\n- Timeframe: Months to years\n- Example: 'Nation-state actors are increasingly targeting supply chains to achieve persistent access'\n\n**Operational Intelligence (Middle)**\n- Audience: Security managers, hunt team leads\n- Focus: Campaign-level TTPs, actor capabilities, targeted sectors\n- Timeframe: Weeks to months\n- Example: 'APT28 is conducting spear-phishing campaigns targeting defense contractors using CVE-2024-XXXX'\n\n**Tactical Intelligence (Base)**\n- Audience: SOC analysts, detection engineers, incident responders\n- Focus: IOCs, specific hashes, IPs, domains, TTP details\n- Timeframe: Hours to days\n- Example: 'Malicious domain evil-example.com resolving to 203.0.113.50 distributing Cobalt Strike'\n\n**The CTI Lifecycle (CPAPD):**\n1. **Collection** — Gathering raw data from OSINT sources\n2. **Processing** — Filtering, deduplicating, normalizing\n3. **Analysis** — Correlating, attributing, assessing confidence\n4. **Production** — Creating reports, briefs, and dashboards\n5. **Dissemination** — Delivering intelligence to consumers\n\n**Key principle:** Intelligence is only valuable if it reaches the right person at the right time in the right format.",
+      "key_takeaway": "CTI isn't just data collection. It's the process of turning raw data into actionable intelligence for specific audiences."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Weather Forecast",
+      "content": "Think of cyber threat intelligence like weather forecasting.\n\n**Tactical intelligence** is like looking out the window right now: 'It's raining, grab an umbrella.' It tells you about immediate threats — a specific IP address attacking your network, a specific malware hash to block.\n\n**Operational intelligence** is like the 5-day forecast: 'There's a storm coming this weekend.' It tells you about campaigns — a threat actor targeting your industry, a new attack technique being used.\n\n**Strategic intelligence** is like climate science: 'Winters are getting harsher.' It tells you about long-term trends — nation-state actors shifting focus, ransomware evolving, supply chain attacks increasing.\n\n**The OSINT part:** All of this comes from publicly available sources — weather stations, satellite imagery, research papers. You don't need a spy satellite to forecast the weather, and you don't need classified sources to produce threat intelligence.\n\nThe skill is in reading the signals correctly: not every dark cloud means a tornado, and not every suspicious IP means an APT.",
+      "key_takeaway": "Tactical = what's happening now. Operational = what's coming. Strategic = where things are heading."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Building a CTI Collection and Analysis Pipeline",
+      "content": "```python\nimport json\nfrom datetime import datetime, timedelta\nfrom collections import defaultdict\n\nclass CTIAnalyzer:\n    \"\"\"Simple CTI analyzer for OSINT-derived indicators.\"\"\"\n    \n    def __init__(self):\n        self.iocs = []\n        self.actor_profiles = defaultdict(dict)\n        self.confidence_levels = {\n            'confirmed': 'High — corroborated by multiple sources',\n            'probable': 'Medium — supported by evidence but not independently verified',\n            'possible': 'Low — plausible but lacks supporting evidence',\n            'unsubstantiated': 'Very Low — single uncorroborated source'\n        }\n    \n    def add_ioc(self, ioc_type: str, value: str, source: str, \n                confidence: str, context: str = \"\"):\n        \"\"\"Add an IOC with source tracking and confidence.\"\"\"\n        ioc = {\n            \"type\": ioc_type,  # ip, domain, hash, url, email\n            \"value\": value,\n            \"source\": source,\n            \"confidence\": confidence,\n            \"context\": context,\n            \"collected\": datetime.now().isoformat(),\n            \"first_seen\": None,\n            \"last_seen\": None,\n            \"related_iocs\": [],\n            \"ttps\": [],\n            \"actor\": None\n        }\n        self.iocs.append(ioc)\n        return ioc\n    \n    def correlate_iocs(self) -> dict:\n        \"\"\"Find relationships between IOCs.\"\"\"\n        correlations = defaultdict(list)\n        \n        # Group by shared infrastructure\n        ip_to_domains = defaultdict(list)\n        for ioc in self.iocs:\n            if ioc[\"type\"] == \"domain\":\n                # In real analysis, resolve domain to IP\n                ip_to_domains[ioc[\"value\"]].append(ioc)\n        \n        # Find IOCs with shared context/actor\n        actor_iocs = defaultdict(list)\n        for ioc in self.iocs:\n            if ioc.get(\"actor\"):\n                actor_iocs[ioc[\"actor\"]].append(ioc)\n        \n        return {\n            \"infrastructure_clusters\": dict(ip_to_domains),\n            \"actor_campaigns\": dict(actor_iocs),\n            \"total_iocs\": len(self.iocs),\n            \"confidence_distribution\": self._confidence_distribution()\n        }\n    \n    def _confidence_distribution(self) -> dict:\n        \"\"\"Distribution of confidence levels across IOCs.\"\"\"\n        dist = defaultdict(int)\n        for ioc in self.iocs:\n            dist[ioc[\"confidence\"]] += 1\n        return dict(dist)\n    \n    def produce_brief(self, topic: str) -> dict:\n        \"\"\"Produce a tactical intelligence brief.\"\"\"\n        correlations = self.correlate_iocs()\n        \n        return {\n            \"title\": f\"CTI Brief: {topic}\",\n            \"date\": datetime.now().strftime(\"%Y-%m-%d\"),\n            \"classification\": \"OSINT\",\n            \"summary\": f\"Analysis of {len(self.iocs)} indicators related to {topic}\",\n            \"confidence_overview\": correlations[\"confidence_distribution\"],\n            \"key_findings\": [\n                f\"Total IOCs collected: {len(self.iocs)}\",\n                f\"Infrastructure clusters: {len(correlations['infrastructure_clusters'])}\",\n                f\"Actor-linked campaigns: {len(correlations['actor_campaigns'])}\",\n            ],\n            \"recommendations\": self._generate_recommendations(),\n            \"iocs\": self.iocs[:10]  # Top 10 most relevant\n        }\n    \n    def _generate_recommendations(self) -> list:\n        \"\"\"Generate actionable recommendations based on analysis.\"\"\"\n        recs = []\n        \n        # Check for high-confidence IOCs requiring immediate action\n        high_conf = [ioc for ioc in self.iocs if ioc[\"confidence\"] == \"confirmed\"]\n        if high_conf:\n            recs.append(f\"IMMEDIATE: Block {len(high_conf)} high-confidence indicators\")\n        \n        # Check for actor-linked campaigns\n        if any(ioc.get(\"actor\") for ioc in self.iocs):\n            actors = set(ioc[\"actor\"] for ioc in self.iocs if ioc.get(\"actor\"))\n            recs.append(f\"MONITOR: Track activity from {len(actors)} linked threat actor(s)\")\n        \n        return recs\n\n# Example usage\nanalyzer = CTIAnalyzer()\nanalyzer.add_ioc(\"ip\", \"203.0.113.50\", \"VirusTotal\", \"confirmed\", \"Known C2 server\")\nanalyzer.add_ioc(\"domain\", \"evil-example.com\", \"URLhaus\", \"probable\", \"Phishing domain\")\nanalyzer.add_ioc(\"hash\", \"a1b2c3d4e5f6\", \"MalwareBazaar\", \"confirmed\", \"Cobalt Strike beacon\")\nanalyzer.add_ioc(\"domain\", \"fake-login-example.com\", \"OpenCTI\", \"possible\", \"Lookalike domain\")\n\nbrief = analyzer.produce_brief(\"APT Infrastructure Analysis\")\nprint(json.dumps(brief, indent=2, default=str))\n```\n\n**Challenge:** Add a method that automatically enriches IOCs by cross-referencing with threat intel feeds. How would you handle conflicting information from different sources?",
+      "difficulty": "intermediate",
+      "hint": "Use source reliability scoring — a trusted source (government advisory) should outweigh a single social media post. Implement a weighted confidence calculation."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World CTI: OSINT Discoveries That Changed the Game",
+      "content": "**SolarWinds Supply Chain Attack (2020):**\nOSINT researchers at FireEye discovered the Sunburst backdoor after investigating their own breach. Key OSINT techniques used:\n- Certificate transparency logs revealed suspicious code-signing certificates\n- Passive DNS showed infrastructure connections between C2 nodes\n- WHOIS data linked domains to known APT29 infrastructure patterns\n\n**Key OSINT lesson:** The attackers' operational security failures in domain registration and certificate management were visible in public records months before the breach was publicly discovered.\n\n**Hafnium (2021):**\nMicrosoft identified Hafnium exploiting Exchange Server vulnerabilities using:\n- Passive DNS analysis linking attacker infrastructure\n- SSL certificate analysis connecting C2 servers\n- WHOIS data showing registration patterns consistent with Chinese APT groups\n\n**CTI OSINT Sources That Deliver:**\n1. **VirusTotal** — Malware hashes, IP/domain reputation\n2. **Shodan/Censys** — Infrastructure exposure, service fingerprinting\n3. **Certificate Transparency** — SSL certificates revealing attacker infrastructure\n4. **Passive DNS** — Historical domain-IP relationships\n5. **Threat intel platforms** — MISP, OpenCTI, ThreatConnect\n6. **Social media** — Threat actor boasting, recruitment, operational security failures\n7. **Code repositories** — Leaked tools, credentials, infrastructure configurations\n\n**The pattern:** Threat actors leave footprints in public data. CTI analysts find them.",
+      "source": "Based on publicly reported CTI operations and OSINT methodologies"
+    },
+    {
+      "type": "explanation",
+      "title": "OSINT Tools and Techniques for CTI",
+      "content": "**Essential OSINT tools for threat intelligence:**\n\n**Infrastructure Analysis:**\n- **VirusTotal** — Hash, domain, and IP reputation\n- **Shodan** — Internet-facing service discovery\n- **Censys** — Certificate and host scanning data\n- **PassiveTotal** — Passive DNS and WHOIS correlation\n- **URLhaus** — Malicious URL tracking\n\n**Malware Analysis:**\n- **MalwareBazaar** — Malware sample database\n- **ANY.RUN** — Interactive malware analysis\n- **Hybrid Analysis** — Sandboxed malware analysis\n- **Tri.ge** — Static malware analysis\n\n**Threat Actor Research:**\n- **MITRE ATT&CK** — TTP framework and adversary profiles\n- **Malpedia** — Malware family encyclopedia\n- **APT groups tracker** — Public attribution tracking\n- **Alienvault OTX** — Community-driven threat intel\n\n**CTI Platforms:**\n- **MISP** — Open-source threat intelligence platform\n- **OpenCTI** — Knowledge graph-based CTI platform\n- **YETI** — Threat intelligence management\n\n**Analysis Techniques:**\n1. **Pivot analysis** — Start with one IOC and follow connections\n2. **Infrastructure mapping** — Build graphs of connected domains, IPs, certificates\n3. **Temporal analysis** — Track when infrastructure was registered/activated\n4. **Behavioral analysis** — Map activities to MITRE ATT&CK TTPs\n5. **Attribution assessment** — Weigh evidence for actor identification\n\n**Key principle:** Always document your sources and confidence levels. OSINT is only as good as its provenance.",
+      "key_takeaway": "OSINT tools find the data. CTI methodology turns it into intelligence. Tools without methodology are noise."
+    },
+    {
+      "type": "memory_aid",
+      "title": "CPAPD: The CTI Lifecycle",
+      "content": "Remember the CTI lifecycle with **CPAPD** (think 'CPA PD' — like a CPA who also has a PD):\n\n📥 **C** — Collection: Gather data from OSINT sources (VirusTotal, Shodan, CTI feeds)\n⚙️ **P** — Processing: Filter, deduplicate, normalize raw data\n🧠 **A** — Analysis: Correlate, attribute, assess confidence levels\n📄 **P** — Production: Create reports, briefs, and dashboards\n📡 **D** — Dissemination: Deliver to the right audience at the right time\n\n**Intelligence levels:**\n- **Tactical** (bottom): IOCs, hashes, IPs → SOC analysts\n- **Operational** (middle): TTPs, campaigns → Security managers\n- **Strategic** (top): Trends, actor motivations → Leadership\n\n**The flow:** Raw data → Information → Intelligence → Decision.\n\nEach level serves a different audience with different needs. The same data becomes different intelligence depending on who's consuming it.",
+      "visual_cue": "Draw a pyramid: Strategic (top, narrow), Operational (middle), Tactical (base, wide). The CPAPD cycle flows around the pyramid."
+    },
+    {
+      "type": "reflection",
+      "title": "From Data to Intelligence: A Practical Exercise",
+      "content": "Take this fictional scenario:\n\nYou discover a suspicious domain `secure-microsoft-login.com` through OSINT collection. Passive DNS shows it resolving to IP `198.51.100.42`. VirusTotal reports 3 malicious detections. Certificate transparency shows an SSL cert issued 2 days ago.\n\n**Walk through the CPAPD lifecycle:**\n1. **Collection:** What additional OSINT sources would you check for this domain and IP?\n2. **Processing:** How would you normalize and store the data?\n3. **Analysis:** What confidence level would you assign? What TTPs might this represent?\n4. **Production:** Write a one-paragraph intelligence brief.\n5. **Dissemination:** Who needs this intelligence and how urgently?\n\n**The analytical challenge:** A single suspicious domain could be phishing, a legitimate service, or a false positive. How do you differentiate? What corroboration do you need before you raise the confidence level?",
+      "reflection_prompt": "Write a mini CTI brief for this scenario. Include: finding, confidence level, sources, and recommended action."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Intelligence That Drives Action",
+      "content": "The best CTI analysts aren't the ones who collect the most data. They're the ones who produce intelligence that drives decisions.\n\n**The CTI quality test:**\n- Can someone take action based on your intelligence?\n- Do they know how much to trust it (confidence level)?\n- Do they understand the context (why it matters)?\n- Will it be relevant when they receive it (timeliness)?\n\n**Key principles for OSINT CTI:**\n1. **Source transparency** — Always attribute your sources\n2. **Confidence calibration** — Be honest about uncertainty\n3. **Actionability** — Every finding should have a recommended action\n4. **Timeliness** — Intelligence degrades; deliver before it expires\n5. **Relevance** — Tailor intelligence to the consumer's needs\n\nThe OSINT CTI analyst's superpower is turning publicly available data into intelligence that protects organizations. No classified briefings required — just skill, methodology, and persistence.\n\nMaster the tools, internalize the methodology, and always deliver intelligence that someone can act on.",
+      "closing_thought": "Intelligence without action is just information. CTI without decisions is just data. Make it matter."
+    }
+  ],
+  "tags": ["Course: SANS-SEC497", "Career Path: OSINT", "Career Path: Threat Hunter", "Threat Intelligence", "CTI", "OSINT", "IOCs", "Threat Actor Research", "MITRE ATT&CK"]
+}

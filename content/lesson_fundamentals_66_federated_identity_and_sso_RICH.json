@@ -1,0 +1,171 @@
+{
+  "lesson_id": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+  "domain": "fundamentals",
+  "title": "Federated Identity and SSO",
+  "difficulty": 2,
+  "order_index": 66,
+  "prerequisites": ["Authentication Methods and MFA"],
+  "concepts": [
+    "Federated identity concepts and trust relationships",
+    "SAML (Security Assertion Markup Language) protocol",
+    "OAuth 2.0 authorization framework",
+    "OpenID Connect (OIDC) identity layer",
+    "Identity Provider (IdP) and Service Provider (SP) roles",
+    "Single Sign-On architecture and flows",
+    "Cross-domain trust and federation",
+    "Common SSO attacks and defenses"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain how federated identity enables authentication across organizational boundaries",
+    "Compare and contrast SAML, OAuth 2.0, and OpenID Connect for different use cases",
+    "Diagram the authentication flow for SAML-based SSO and OIDC-based SSO",
+    "Identify common SSO attack vectors and their mitigations"
+  ],
+  "post_assessment": [
+    {
+      "question": "In a SAML federation, which entity generates the authentication assertion?",
+      "options": [
+        "The Service Provider (SP)",
+        "The Identity Provider (IdP)",
+        "The Relying Party",
+        "The client application"
+      ],
+      "correct": 1,
+      "explanation": "The Identity Provider authenticates the user and generates the SAML assertion. The Service Provider consumes the assertion to grant access."
+    },
+    {
+      "question": "What is the primary difference between OAuth 2.0 and OpenID Connect?",
+      "options": [
+        "OAuth 2.0 is for authentication, OIDC is for authorization",
+        "OAuth 2.0 is for authorization, OIDC adds an identity layer for authentication on top of OAuth",
+        "OIDC is the older protocol, OAuth 2.0 is newer",
+        "They are the same protocol with different names"
+      ],
+      "correct": 1,
+      "explanation": "OAuth 2.0 handles authorization (access tokens). OIDC extends OAuth 2.0 with an identity layer (ID tokens) to provide authentication."
+    },
+    {
+      "question": "Which attack exploits SAML by manipulating the assertion's destination or issuer fields?",
+      "options": [
+        "Pass-the-hash",
+        "SAML assertion replay",
+        "XML Signature Wrapping (XXE)",
+        "SAML Golden Ticket"
+      ],
+      "correct": 1,
+      "explanation": "SAML assertion replay involves capturing a valid SAML assertion and replaying it to gain unauthorized access. XML Signature Wrapping is a related but distinct attack that manipulates the XML structure."
+    },
+    {
+      "question": "What is the key benefit of federated identity over local authentication for enterprise environments?",
+      "options": [
+        "It eliminates the need for passwords entirely",
+        "It allows users to authenticate once and access multiple services across trust boundaries",
+        "It makes all services publicly accessible",
+        "It replaces the need for multi-factor authentication"
+      ],
+      "correct": 1,
+      "explanation": "Federated identity enables SSO across organizational boundaries. Users authenticate once with their IdP and access multiple SPs without separate credentials for each."
+    }
+  ],
+  "jim_kwik_principles": [
+    {
+      "principle": "Association",
+      "application": "Link federated identity to a passport — one trusted document that grants access to multiple countries through mutual trust agreements."
+    },
+    {
+      "principle": "Visualization",
+      "application": "Draw the SAML dance: User → SP → IdP → Auth → Assertion → SP → Access. The flow becomes clear when you can see it."
+    },
+    {
+      "principle": "Chunking",
+      "application": "Break SSO into three chunks: Protocols (SAML/OAuth/OIDC), Flows (how authentication happens), and Attacks (what goes wrong)."
+    },
+    {
+      "principle": "Storytelling",
+      "application": "Remember the 2022 SAML attack on Okta — a single compromised IdP key forged assertions for every federated service. One key, global access."
+    },
+    {
+      "principle": "Repetition",
+      "application": "Trace the SAML authentication flow five times until the SP-IdP-User triangle becomes automatic."
+    },
+    {
+      "principle": "Emotion",
+      "application": "Feel the stakes: a federated identity compromise means access to EVERYTHING. One IdP breach = all services compromised."
+    },
+    {
+      "principle": "Senses",
+      "application": "Use three colors to trace flows: blue for user requests, green for IdP assertions, red for SP validation. Color makes the flow tangible."
+    },
+    {
+      "principle": "Teaching",
+      "application": "Explain SSO to someone using the hotel keycard analogy: check in once at the front desk (IdP), use the keycard for all hotel services (SPs)."
+    },
+    {
+      "principle": "Mnemonics",
+      "application": "Use 'SOFA' for SSO protocols: SAML, OAuth, Federation, Authentication (OIDC)."
+    },
+    {
+      "principle": "Active Learning",
+      "application": "Set up a simple SAML or OIDC flow in a lab environment. Watching the assertions/tokens flow between IdP and SP cements the concept better than any diagram."
+    }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Identity Backbone of Modern Security",
+      "content": "Federated identity isn't just a convenience feature — it's the backbone of modern enterprise security. When you authenticate with Google to access a third-party app, that's federation. When you use your corporate credentials to access a SaaS tool, that's SSO. When it works, it's invisible. When it breaks, or when it's compromised, the blast radius is enormous.\n\nUnderstanding federation means understanding trust. You're not just authenticating a user — you're trusting an identity provider to vouch for that user. Get that trust model wrong, and you've given attackers the keys to every door.",
+      "coaching_tip": "Focus on the trust model first. Protocols are just the implementation details of that trust."
+    },
+    {
+      "type": "explanation",
+      "title": "Federated Identity: Core Concepts",
+      "content": "**What is Federated Identity?**\nA system where an organization (Identity Provider) vouches for a user's identity to another organization (Service Provider), without the SP needing to manage the user's credentials directly.\n\n**Key players:**\n- **Identity Provider (IdP):** Authenticates users and issues identity assertions (Okta, Azure AD, ADFS, Ping Identity)\n- **Service Provider (SP):** Relies on the IdP's assertion to grant access (SaaS apps, internal tools)\n- **Relying Party (RP):** In OIDC context, the application that relies on the identity token\n\n**Trust relationships:**\n- The SP trusts the IdP to authenticate users correctly\n- This trust is established through metadata exchange, certificates, and configuration\n- Trust can be unidirectional (SP trusts IdP) or bidirectional\n\n**Why federation matters:**\n1. **Single Sign-On** — Authenticate once, access many services\n2. **Reduced credential sprawl** — No separate passwords for each service\n3. **Centralized policy enforcement** — MFA, conditional access, and session policies in one place\n4. **Cross-organization collaboration** — B2B access without account proliferation\n5. **Compliance** — Auditable authentication and access logs",
+      "key_takeaway": "Federation is about trust: the SP trusts the IdP's assertion about who the user is. Everything else is implementation."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Passport System",
+      "content": "Imagine you're traveling to a different country.\n\n**Without federation:** Every country you visit would make you fill out a form, take your photo, and create a new ID card just for them. You'd have 50 ID cards for 50 countries. What a mess.\n\n**With federation:** Your home country (IdP) gives you a passport. When you arrive at another country (SP), they check your passport. They trust your home country's passport system, so they let you in without creating their own ID.\n\n**SAML** is like a paper passport with a wax seal — formal, established, and trusted by governments.\n\n**OAuth** is like a valet key — it gives someone limited access to do specific things on your behalf (like driving your car to park it) without giving them full control.\n\n**OpenID Connect** is like a digital passport app — modern, fast, and works on your phone. It combines the identity verification of SAML with the modern architecture of OAuth.\n\n**SSO** is the result: you check in once at the front desk (IdP), and your keycard works for the gym, pool, and restaurant (all SPs) without checking in again at each one.",
+      "key_takeaway": "Federation = trust between organizations. SSO = convenience for users. They work together but are different concepts."
+    },
+    {
+      "type": "explanation",
+      "title": "SAML vs. OAuth 2.0 vs. OpenID Connect",
+      "content": "**SAML (Security Assertion Markup Language):**\n- XML-based assertion format\n- Enterprise-focused (legacy enterprise SSO)\n- SP-initiated or IdP-initiated flows\n- Uses signed XML assertions\n- Best for: Enterprise SSO, B2B federation\n\n**OAuth 2.0 (Authorization Framework):**\n- Authorization protocol, NOT authentication\n- Token-based (access tokens, refresh tokens)\n- Grant types: authorization code, implicit, client credentials, device code\n- API access and delegated authorization\n- Best for: API access, third-party app authorization\n\n**OpenID Connect (OIDC):**\n- Authentication layer built on OAuth 2.0\n- Adds ID tokens (JWT) to OAuth access tokens\n- JSON-based (modern, lightweight)\n- Standard scopes: openid, profile, email\n- UserInfo endpoint for additional claims\n- Best for: Modern web and mobile SSO, consumer applications\n\n**When to use what:**\n- Enterprise SSO with existing SAML infrastructure → SAML\n- API authorization, third-party access → OAuth 2.0\n- Modern application SSO (web/mobile) → OIDC\n- B2B federation → SAML or OIDC (depends on partner requirements)\n\n**The trend:** New implementations favor OIDC over SAML. But SAML isn't going away — millions of enterprise apps still rely on it.",
+      "key_takeaway": "SAML = enterprise XML SSO, OAuth = API authorization, OIDC = modern SSO (authentication + authorization)."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Tracing a SAML Authentication Flow",
+      "content": "```python\n\"\"\"\nSAML Authentication Flow Simulator\nDemonstrates the SP-initiated SAML SSO flow\n\"\"\"\nimport base64\nimport hashlib\nimport time\n\nclass IdentityProvider:\n    \"\"\"Simulates a SAML Identity Provider\"\"\"\n    \n    def __init__(self, name: str):\n        self.name = name\n        self.users = {}  # username -> user_data\n    \n    def register_user(self, username: str, attributes: dict):\n        self.users[username] = attributes\n    \n    def authenticate(self, username: str, password: str) -> bool:\n        # In reality, this checks credentials\n        return username in self.users\n    \n    def generate_assertion(self, username: str, sp_entity_id: str) -> dict:\n        \"\"\"Generate a SAML assertion for the authenticated user.\"\"\"\n        if username not in self.users:\n            return {\"error\": \"User not found\"}\n        \n        user_attrs = self.users[username]\n        assertion = {\n            \"issuer\": self.name,\n            \"audience\": sp_entity_id,\n            \"subject\": username,\n            \"attributes\": user_attrs,\n            \"conditions\": {\n                \"not_before\": int(time.time()),\n                \"not_on_or_after\": int(time.time()) + 300,  # 5 min validity\n            },\n            \"authn_context\": \"urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport\"\n        }\n        return assertion\n\n\nclass ServiceProvider:\n    \"\"\"Simulates a SAML Service Provider\"\"\"\n    \n    def __init__(self, entity_id: str, trusted_idps: list):\n        self.entity_id = entity_id\n        self.trusted_idps = trusted_idps\n        self.sessions = {}\n    \n    def validate_assertion(self, assertion: dict) -> bool:\n        \"\"\"Validate a SAML assertion.\"\"\"\n        # Check 1: Is this assertion from a trusted IdP?\n        if assertion.get(\"issuer\") not in self.trusted_idps:\n            print(f\"  ✗ Untrusted IdP: {assertion.get('issuer')}\")\n            return False\n        \n        # Check 2: Is this assertion intended for us?\n        if assertion.get(\"audience\") != self.entity_id:\n            print(f\"  ✗ Wrong audience: {assertion.get('audience')}\")\n            return False\n        \n        # Check 3: Is the assertion still valid?\n        current_time = int(time.time())\n        conditions = assertion.get(\"conditions\", {})\n        if current_time > conditions.get(\"not_on_or_after\", 0):\n            print(\"  ✗ Assertion expired\")\n            return False\n        \n        print(f\"  ✓ Valid assertion for {assertion.get('subject')}\")\n        return True\n    \n    def grant_access(self, assertion: dict) -> dict:\n        \"\"\"Grant access based on the validated assertion.\"\"\"\n        session_id = hashlib.sha256(\n            f\"{assertion['subject']}{time.time()}\".encode()\n        ).hexdigest()[:16]\n        \n        self.sessions[session_id] = {\n            \"user\": assertion[\"subject\"],\n            \"attributes\": assertion[\"attributes\"],\n            \"created\": time.time()\n        }\n        \n        return {\"session_id\": session_id, \"user\": assertion[\"subject\"]}\n\n\n# Simulate the flow\nidp = IdentityProvider(\"https://idp.example.com\")\nidp.register_user(\"alice\", {\"email\": \"alice@example.com\", \"role\": \"admin\", \"department\": \"security\"})\n\nsp = ServiceProvider(\"https://app.example.com\", trusted_idps=[\"https://idp.example.com\"])\n\nprint(\"=== SP-Initiated SAML SSO Flow ===\")\nprint(\"1. User tries to access SP (app.example.com)\")\nprint(\"2. SP generates SAML AuthnRequest and redirects to IdP\")\nprint(\"3. User authenticates with IdP\")\n\nauthenticated = idp.authenticate(\"alice\", \"password123\")\nif authenticated:\n    print(\"4. IdP authenticates user ✓\")\n    assertion = idp.generate_assertion(\"alice\", sp.entity_id)\n    print(f\"5. IdP generates SAML assertion for {sp.entity_id}\")\n    \n    if sp.validate_assertion(assertion):\n        print(\"6. SP validates assertion\")\n        session = sp.grant_access(assertion)\n        print(f\"7. SP grants access: session={session['session_id']}\")\n        print(f\"   User attributes: {session['attributes']}\")\n```\n\n**Challenge:** Add a replay attack scenario where an attacker captures a valid assertion and tries to reuse it after the `not_on_or_after` time. How does the SP detect this?",
+      "difficulty": "intermediate",
+      "hint": "The assertion includes a `not_on_or_after` timestamp. The SP checks current time against this. Also consider adding an assertion ID tracking mechanism to detect reuse."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World SSO Attacks and Breaches",
+      "content": "**SolarWinds / SAML Golden Ticket (2020):**\nAttackers compromised Sunburst malware to forge SAML assertions. By stealing the SAML signing key from the IdP, they could impersonate any user across all federated services. This became known as a 'SAML Golden Ticket' attack.\n\n**Impact:** One compromised signing key = access to every federated application in the organization. The trust model that makes SSO powerful also creates a massive blast radius.\n\n**Okta Breach (2022):**\nAn attacker gained access to an Okta support engineer's workstation, potentially accessing IdP configuration for multiple customer tenants. The breach demonstrated that IdP compromise is the highest-value target in federated identity.\n\n**Common SSO attack patterns:**\n\n1. **SAML assertion replay** — Capturing and replaying a valid assertion\n2. **XML Signature Wrapping** — Moving the original signature to a different location in the XML while adding a malicious assertion\n3. **Certificate confusion** — Using a legitimate certificate from a different context\n4. **Token sidejacking** — Stealing session tokens from browser storage\n5. **IdP phishing** — Phishing the IdP login page to capture credentials\n\n**Defense lessons:**\n- Protect IdP signing keys with hardware security modules (HSMs)\n- Implement assertion validity checks (timestamps, audience, one-time use)\n- Monitor for anomalous SSO activity (impossible travel, unusual SP access)\n- Require MFA at the IdP level, not just at individual SPs",
+      "source": "Based on publicly reported identity security incidents"
+    },
+    {
+      "type": "memory_aid",
+      "title": "SOFA: SSO Protocol Comparison",
+      "content": "Remember the SSO protocol landscape with **SOFA**:\n\n📄 **S** — SAML: Enterprise XML-based SSO (formal, established)\n🔑 **O** — OAuth 2.0: API authorization framework (delegated access)\n🌐 **F** — Federation: Trust between organizations (cross-domain SSO)\n🆔 **A** — Authentication (OIDC): Identity layer on top of OAuth (modern SSO)\n\n**Quick comparison:**\n\n| Feature | SAML | OAuth 2.0 | OIDC |\n|---------|------|----------|------|\n| Purpose | SSO/Auth | Authorization | Auth + Identity |\n| Format | XML | JSON | JSON/JWT |\n| Token | Assertion | Access Token | ID Token + Access Token |\n| Use case | Enterprise SSO | API access | Modern SSO |\n| Age | 2005 | 2012 | 2014 |\n\n**The mnemonic anchor:** You sit on a **SOFA** when you **SSO** (Single Sign-On). Sofa → SSO → SOFA (SAML, OAuth, Federation, Authentication).",
+      "visual_cue": "Picture a couch (SOFA) with four cushions labeled S-O-F-A, each in a different color representing a protocol concept."
+    },
+    {
+      "type": "reflection",
+      "title": "Identity Architecture: Your Organization's SSO",
+      "content": "Think about your own organization's identity infrastructure:\n\n1. **Which IdP does your organization use?** (Azure AD/Entra ID, Okta, ADFS, Ping?)\n2. **Which SSO protocol(s) are in use?** (SAML for legacy apps, OIDC for modern apps?)\n3. **How many SPs federate with your IdP?** Each one is a trust relationship.\n4. **Where are the IdP signing keys stored?** If they're not in an HSM, that's a risk.\n5. **What happens if your IdP goes down?** Does SSO become a single point of failure?\n\n**The hard truth:** Your IdP is the highest-value target in your environment. A compromise of the IdP gives an attacker access to every federated service. Protect it accordingly.",
+      "reflection_prompt": "Map your organization's SSO architecture. Count the number of SPs that trust your IdP — that's your blast radius if the IdP is compromised."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Identity is the New Perimeter",
+      "content": "The old perimeter was the network firewall. The new perimeter is identity. When a user authenticates via SSO, the IdP becomes the gatekeeper to everything.\n\n**This means:**\n1. Your IdP security is your organization's security\n2. MFA at the IdP level is non-negotiable\n3. Conditional access policies are your new firewall rules\n4. Monitoring IdP activity is your new IDS\n5. IdP key protection is your new PKI management\n\n**Key takeaways from this lesson:**\n- Federation is trust, not magic — understand what you're trusting\n- SAML, OAuth, and OIDC serve different purposes — choose the right tool\n- The IdP is the highest-value target — protect it with everything you have\n- SSO convenience creates blast radius — mitigate with defense in depth\n- Every trust relationship is an attack surface — audit regularly\n\nMaster identity architecture, and you master the new perimeter.",
+      "closing_thought": "Identity is the new perimeter. The IdP is the castle gate. Guard it accordingly."
+    }
+  ],
+  "tags": ["Course: ISC2-CISSP", "Career Path: Security Engineer", "SAML", "OAuth", "OIDC", "Federated Identity", "SSO", "Identity Management"]
+}
