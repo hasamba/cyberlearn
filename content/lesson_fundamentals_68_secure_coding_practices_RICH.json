@@ -1,0 +1,144 @@
+{
+  "lesson_id": "7b09698e-1c66-4c24-9ff4-a0696350c0ee",
+  "domain": "fundamentals",
+  "title": "Secure Coding Practices",
+  "difficulty": 2,
+  "order_index": 68,
+  "prerequisites": [
+    "Secure Software Development Lifecycle (SDLC)"
+  ],
+  "concepts": [
+    "OWASP Top 10 vulnerabilities and mitigation",
+    "Input validation and output encoding",
+    "Secure API design and authentication",
+    "Code review and static analysis",
+    "Common coding pitfalls: injection, XSS, CSRF, SSRF",
+    "Secure error handling and logging",
+    "Secrets management in code",
+    "Secure dependency management"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Identify and mitigate the OWASP Top 10 vulnerabilities in application code",
+    "Implement proper input validation and output encoding across multiple contexts",
+    "Design secure APIs with proper authentication, authorization, and rate limiting",
+    "Apply secure coding patterns for error handling, logging, and secrets management",
+    "Conduct effective code reviews with a security-focused checklist"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which defense is MOST effective against SQL injection?",
+      "options": [
+        "Input validation with regex",
+        "Parameterized queries (prepared statements)",
+        "Web Application Firewall rules",
+        "Escaping single quotes in user input"
+      ],
+      "correct": 1,
+      "explanation": "Parameterized queries separate SQL code from data at the database engine level, making injection impossible regardless of input content. Other methods can be bypassed."
+    },
+    {
+      "question": "What is the primary security risk of embedding API keys directly in source code?",
+      "options": [
+        "Code becomes harder to read",
+        "Keys can be extracted from compiled binaries or repositories",
+        "API response times increase",
+        "The application runs slower"
+      ],
+      "correct": 1,
+      "explanation": "Hardcoded keys in source code end up in version control, compiled binaries, and container images. They can be extracted by anyone with access to these artifacts."
+    },
+    {
+      "question": "Which output encoding context requires DIFFERENT encoding than HTML attribute encoding?",
+      "options": [
+        "HTML body context",
+        "JavaScript context",
+        "CSS context",
+        "All require different encoding"
+      ],
+      "correct": 3,
+      "explanation": "Each context (HTML body, HTML attribute, JavaScript, CSS, URL) requires context-specific encoding. Using HTML encoding in a JavaScript context, for example, does not prevent XSS."
+    },
+    {
+      "question": "What is the BEST approach for handling errors in a production application?",
+      "options": [
+        "Return detailed stack traces to help debugging",
+        "Log detailed errors server-side, return generic messages to users",
+        "Never log any errors for security",
+        "Display database error messages to users for transparency"
+      ],
+      "correct": 1,
+      "explanation": "Detailed errors should be logged server-side for debugging but never exposed to users. User-facing messages should be generic to avoid information leakage."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Draw a request flow showing where input enters, where validation should happen, and where encoding applies",
+    "Association: Link each OWASP Top 10 category to a specific code pattern you've seen",
+    "Emotion: Remember that insecure code directly enables breaches — the stakes are real",
+    "Story: Walk through a real breach caused by each vulnerability type",
+    "Simplification: All injection attacks share one root cause: mixing code and data",
+    "Repetition: Practice secure coding patterns until they're muscle memory, not conscious effort",
+    "Teaching: Review a peer's code and explain the security issues you find",
+    "Mnemonic: VALIDATE — Validate inputs, Authenticate properly, Log securely, Isolate errors, Date-check boundaries, Audit dependencies, Transform/encode outputs, Enforce least privilege",
+    "Movement: Walk through the code review checklist physically, checking each item on a wall chart",
+    "Curiosity: When reading any code, ask 'what malicious input could exploit this?'"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Security Is Not a Feature — It's a Quality",
+      "content": "Secure coding isn't about adding security features to your code. It's about writing code that doesn't have vulnerabilities in the first place. Every input is an attack vector. Every output is a potential information leak. Every dependency is inherited risk. Train yourself to see code through an attacker's eyes: what input would break this? What information could this leak? What privilege could this escalate?",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "OWASP Top 10: Practical Mitigations",
+      "content": "The OWASP Top 10 mapped to practical secure coding patterns:\n\n**A01 - Broken Access Control:**\n- Enforce authorization on every endpoint, not just UI hiding\n- Implement RBAC or ABAC — never client-side access control\n- Default deny: deny access unless explicitly granted\n\n**A02 - Cryptographic Failures:**\n- Use TLS 1.3 for all data in transit\n- Use bcrypt/Argon2 for passwords (never MD5/SHA1)\n- Encrypt PII at rest with AES-256\n- Never store secrets in code — use vault services\n\n**A03 - Injection (SQL, NoSQL, OS, LDAP):**\n- Use parameterized queries — always, no exceptions\n- Validate input against allowlists (not blocklists)\n- Use ORM abstractions that parameterize by default\n\n**A04 - Insecure Design:**\n- Threat model during design phase\n- Use secure design patterns (zero trust, defense in depth)\n- Never trust client-side validation alone\n\n**A05 - Security Misconfiguration:**\n- Automate configuration management (IaC)\n- Disable unnecessary features, ports, and default accounts\n- Implement configuration scanning in CI/CD\n\n**A06 - Vulnerable Components:**\n- Automate dependency scanning (Dependabot, Snyk)\n- Maintain a software bill of materials (SBOM)\n- Update dependencies promptly, especially security patches\n\n**A07 - Authentication Failures:**\n- Implement MFA for all sensitive operations\n- Use proven authentication libraries, never roll your own\n- Rate limit authentication endpoints\n\n**A08 - Software and Data Integrity Failures:**\n- Verify code and artifact integrity (signing, checksums)\n- Secure your CI/CD pipeline against tampering\n- Validate deserialized data\n\n**A09 - Logging and Monitoring Failures:**\n- Log all authentication events and access control failures\n- Use structured logging with correlation IDs\n- Never log sensitive data (passwords, tokens, PII)\n\n**A10 - Server-Side Request Forgery:**\n- Validate and allowlist outbound request destinations\n- Block requests to internal IP ranges (169.254.x.x, 10.x.x.x, etc.)\n- Disable URL schema redirects"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Why Bad Code Is Dangerous",
+      "content": "Imagine you're running a restaurant. Your kitchen takes orders from customers. If a customer writes 'I want a burger, and also please give me all the money in the register' on their order slip, you need to make sure your kitchen staff only reads 'burger' and ignores the rest.\n\nThat's what happens with code. When you take input from users (orders), you need to be very careful about how you process it. If you just copy what they wrote directly into your systems, they might sneak in commands that do things you didn't intend — like seeing other people's data or deleting things.\n\nThe solution? Always check that the input makes sense (validation) and make sure dangerous characters can't be interpreted as commands (encoding)."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Vulnerable vs Secure Code Patterns",
+      "content": "Compare vulnerable and secure code patterns:\n\n```python\n# ============================================================\n# VULNERABLE: SQL Injection\n# ============================================================\nusername = request.form['username']\npassword = request.form['password']\nquery = f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\"\n# Attack: username = \"admin' --\" bypasses password check!\n\n# SECURE: Parameterized Query\nquery = \"SELECT * FROM users WHERE username = ? AND password = ?\"\ncursor.execute(query, (username, password))\n\n# ============================================================\n# VULNERABLE: XSS (Cross-Site Scripting)\n# ============================================================\nname = request.args.get('name')\nreturn f\"<h1>Welcome, {name}!</h1>\"  # Attack: name=<script>alert(1)</script>\n\n# SECURE: Context-appropriate output encoding\nfrom markupsafe import escape\nreturn f\"<h1>Welcome, {escape(name)}!</h1>\"\n\n# ============================================================\n# VULNERABLE: Command Injection\n# ============================================================\nfilename = request.args.get('file')\nos.system(f'cat {filename}')  # Attack: file=\"; rm -rf /\"\n\n# SECURE: Use safe APIs, validate input\nimport subprocess\nimport re\nif re.match(r'^[a-zA-Z0-9_.-]+$', filename):\n    result = subprocess.run(['cat', filename], capture_output=True, text=True)\n\n# ============================================================\n# VULNERABLE: Hardcoded secrets\n# ============================================================\nAPI_KEY = \"sk-1234567890abcdef\"  # Never do this!\ndb_password = \"admin123\"          # Or this!\n\n# SECURE: Environment variables / vault\nimport os\nfrom hvac import Client\napi_key = os.environ['API_KEY']  # From environment\n# Or: Fetch from HashiCorp Vault\nvault = Client(url='https://vault.internal')\ndb_password = vault.secrets.kv.v2.read_secret(path='db/creds')['data']['password']\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real Breaches from Insecure Coding",
+      "content": "**Equifax (2017):** Unpatched Apache Struts vulnerability (A06 - Vulnerable Components) led to the breach of 147 million records. A known CVE with an available patch was not applied for months.\n\n**Ashley Madison (2015):** Passwords were hashed with bcrypt for some accounts but MD5 for others (A02 - Cryptographic Failures). The MD5 hashes were trivially cracked.\n\n**GitHub SSRF (2020):** A server-side request forgery vulnerability allowed access to internal infrastructure through a firewall bypass (A10 - SSRF). The attack reached cloud metadata services.\n\n**Colonial Pipeline (2021):** A single compromised VPN password without MFA (A07 - Authentication Failures) led to a ransomware attack that disrupted fuel supply across the US East Coast.\n\n**Common thread:** None of these required zero-day exploits. Every breach exploited a known vulnerability category with established mitigations."
+    },
+    {
+      "type": "memory_aid",
+      "title": "VALIDATE Secure Coding Checklist",
+      "content": "**VALIDATE** — Secure coding checklist:\n\n- **V**alidate all inputs — Allowlist, type checking, length limits\n- **A**uthenticate properly — MFA, proven libraries, rate limiting\n- **L**og securely — Structured logs, no sensitive data, correlation IDs\n- **I**solate errors — Generic messages to users, details in server logs\n- **D**ate-check dependencies — Automated vulnerability scanning, SBOMs\n- **A**udit access control — Default deny, enforce on every endpoint\n- **T**ransform/encode outputs — Context-specific encoding (HTML, JS, URL)\n- **E**nforce least privilege — Minimal permissions, no hardcoded secrets\n\n**Most Critical Code Review Questions:**\n1. Where does user input enter this function?\n2. Where does user input leave (database, HTML, API response)?\n3. Is input validated on arrival? Is output encoded on departure?\n4. Are there any hardcoded secrets?\n5. Is authentication and authorization enforced on every endpoint?"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Own Code",
+      "content": "Pick a project you're working on and review:\n\n1. **Input handling**: Where does user input enter? Is it validated?\n2. **Output encoding**: Where does user data leave? Is it context-encoded?\n3. **Authentication**: Is MFA enforced? Are session tokens secure?\n4. **Authorization**: Is access control checked on every API endpoint?\n5. **Secrets management**: Are there any hardcoded secrets? Are they in a vault?\n6. **Dependencies**: When did you last update? Are there known vulnerabilities?\n7. **Logging**: Are you logging auth events? Are you leaking PII in logs?\n8. **Error handling**: Do errors leak internal details to users?\n\nFix the highest-risk item first. Then the next."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Code Like You're the Attacker",
+      "content": "The shift from 'does this code work?' to 'how could this code be exploited?' is the most important mindset change in secure coding. Every time you write a database query, ask 'what if someone puts SQL in this field?' Every time you render user input, ask 'what if this contains a script tag?' Every time you add a dependency, ask 'what if this has a vulnerability?' This isn't paranoia — it's professionalism.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Secure API Design Principles",
+      "content": "APIs require specific security considerations:\n\n**Authentication:**\n- Use OAuth 2.0 / OpenID Connect for API authentication\n- Issue short-lived access tokens (15 minutes) + refresh tokens\n- Never pass credentials in URLs (use Authorization header)\n- Implement API key rotation and scoping\n\n**Authorization:**\n- Enforce authorization on every endpoint (middleware, not manual checks)\n- Implement object-level authorization (BOLA prevention)\n- Use role-based or attribute-based access control\n- Never trust client-side authorization decisions\n\n**Input Validation:**\n- Validate request body against a strict JSON schema\n- Limit request payload sizes\n- Sanitize and parameterize all database queries\n- Validate content-type headers (reject unexpected types)\n\n**Rate Limiting:**\n- Implement per-user and per-IP rate limiting\n- Use exponential backoff for failed authentication\n- Monitor for abuse patterns (credential stuffing, enumeration)\n\n**Response Security:**\n- Never expose internal errors or stack traces\n- Filter response fields (never return more data than needed)\n- Implement CORS properly (restrict origins, not wildcard)\n- Include security headers (CSP, X-Content-Type-Options, etc.)"
+    }
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "secure-coding",
+    "OWASP",
+    "input-validation",
+    "injection-prevention",
+    "code-review"
+  ]
+}

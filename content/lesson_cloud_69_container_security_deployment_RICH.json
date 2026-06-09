@@ -1,0 +1,147 @@
+{
+  "lesson_id": "42fa7260-ceb4-4f28-8e09-3ab6d869c8ae",
+  "domain": "cloud",
+  "title": "Container Security and Deployment",
+  "difficulty": 3,
+  "order_index": 69,
+  "prerequisites": [
+    "Cloud Application Security and Threat Modeling"
+  ],
+  "concepts": [
+    "Container image security and vulnerability management",
+    "Docker and Kubernetes security configurations",
+    "Container runtime security and isolation",
+    "Supply chain security for container images",
+    "Network policies and service mesh security",
+    "Secrets management in containerized environments",
+    "Container escape techniques and prevention",
+    "CI/CD pipeline security for container deployments",
+    "Pod security standards and admission controllers",
+    "Container forensics and incident response"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Identify and mitigate container image vulnerabilities using scanning and hardening practices",
+    "Configure secure Docker and Kubernetes deployments following defense-in-depth principles",
+    "Understand container escape techniques and implement preventive controls",
+    "Design secure CI/CD pipelines for container image building and deployment",
+    "Implement Kubernetes network policies, pod security standards, and secrets management"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which base image strategy provides the smallest attack surface for container deployments?",
+      "options": [
+        "ubuntu:latest",
+        "alpine:latest",
+        "scratch (distroless)",
+        "centos:latest"
+      ],
+      "correct": 2,
+      "explanation": "The 'scratch' or distroless base image contains only your application and its runtime dependencies — no shell, no package manager, no unnecessary utilities. This minimal footprint dramatically reduces the attack surface."
+    },
+    {
+      "question": "What Kubernetes feature prevents containers from running as root within pods?",
+      "options": [
+        "NetworkPolicy",
+        "PodSecurityPolicy / PodSecurity Standards",
+        "LimitRange",
+        "ResourceQuota"
+      ],
+      "correct": 1,
+      "explanation": "Pod Security Standards (formerly PodSecurityPolicy) enforce security contexts including preventing containers from running as root, dropping capabilities, and enforcing read-only root filesystems."
+    },
+    {
+      "question": "Which container escape technique exploits overly permissive Linux capabilities?",
+      "options": [
+        "SQL injection in the container",
+        "CAP_SYS_ADMIN capability abuse to access host resources",
+        "Container image registry manipulation",
+        "DNS cache poisoning"
+      ],
+      "correct": 1,
+      "explanation": "CAP_SYS_ADMIN is a highly privileged Linux capability that, when granted to a container, can be used to escape the container namespace and access host resources. It should almost never be granted to containers."
+    },
+    {
+      "question": "What is the primary security benefit of image signing and verification in container supply chains?",
+      "options": [
+        "Faster image pulls",
+        "Ensuring images have not been tampered with or replaced by malicious versions",
+        "Reducing image size",
+        "Improving container networking performance"
+      ],
+      "correct": 1,
+      "explanation": "Image signing (using tools like cosign/Notary) provides cryptographic verification that the image was built by a trusted source and has not been modified. This prevents supply chain attacks where malicious images are substituted for legitimate ones."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Draw container layers from host OS through runtime to application, marking trust boundaries",
+    "Association: Link each security control to the attack it prevents (read-only FS = prevents write-based persistence, non-root = prevents privilege escalation)",
+    "Emotion: A single compromised container can escape to the host — the blast radius is terrifying",
+    "Story: Walk through a container breach from initial compromise to host escape as a complete attack narrative",
+    "Simplification: Container security = secure the image, lock down the runtime, isolate the network, protect the secrets",
+    "Repetition: Practice writing secure Dockerfiles and Kubernetes manifests until it's muscle memory",
+    "Teaching: Explain container escape to someone who thinks containers are inherently secure",
+    "Mnemonic: SHIELD — Scan, Harden, Isolate, Enforce least privilege, Limit capabilities, Deploy signed images",
+    "Movement: Map container security layers on a whiteboard, physically moving through each defense",
+    "Curiosity: For every Dockerfile you see, ask 'what would happen if this container were compromised?'"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Containers Are Not a Security Boundary",
+      "content": "A container is a process isolation mechanism, not a security boundary. The Linux kernel is shared between all containers on a host. A container escape means kernel-level access — game over. Start every container security discussion with this understanding: containers provide isolation, not security. Your job is to add security controls on top of isolation, because isolation alone is not enough.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "Container Image Security",
+      "content": "Secure container images from build to deployment:\n\n**Base Image Selection:**\n- Use minimal base images: distroless > alpine > slim > full\n- Pin image versions by digest, not tag (sha256:abc123, not ubuntu:latest)\n- Scan base images for vulnerabilities before use\n- Maintain approved base image catalogs\n\n**Dockerfile Best Practices:**\n```dockerfile\n# INSECURE Dockerfile\nFROM ubuntu:latest\nRUN apt-get update && apt-get install -y python3\nCOPY . /app\nCMD [\"python3\", \"/app/main.py\"]\n\n# SECURE Dockerfile\nFROM gcr.io/distroless/python3@sha256:abc123...  # Pinned, minimal base\nCOPY --chown=1000:1000 app /app                # Non-root user\nUSER 1000                                      # Run as non-root\nWORKDIR /app\nCMD [\"/app/main.py\"]                            # No shell needed\n```\n\n**Image Scanning:**\n- Scan at build time (Trivy, Grype, Snyk)\n- Scan in registry (continuous monitoring)\n- Block deployment of images with critical CVEs\n- Use SBOM (Software Bill of Materials) for dependency tracking\n\n**Image Signing:**\n- Sign images with cosign (Sigstore) or Notary\n- Verify signatures before deployment\n- Enforce signing through admission controllers\n- Implement key rotation and revocation"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Container Security",
+      "content": "Imagine you live in an apartment building. Each apartment (container) has its own door, but everyone shares the same building structure (kernel). If someone figures out how to break through the apartment walls, they can access the whole building.\n\nContainer security is like making each apartment as safe as possible:\n- **Minimal furniture**: Only put in what you need (minimal base image). Less stuff = less to break.\n- **Lock the door from inside**: Don't let anyone become the building manager (run as non-root).\n- **Don't give apartment residents building master keys**: Don't give containers dangerous permissions (capabilities).\n- **Check deliveries**: Make sure the food you ordered hasn't been tampered with (image signing).\n- **Watch the hallways**: Monitor what's happening between apartments (network policies)."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Secure Kubernetes Pod Manifest",
+      "content": "Configure a security-hardened Kubernetes Pod:\n\n```yaml\napiVersion: v1\nkind: Pod\nmetadata:\n  name: secure-app\n  labels:\n    app: secure-app\nspec:\n  # Security context at pod level\n  securityContext:\n    runAsNonRoot: true          # Block root containers\n    runAsUser: 1000             # Specific non-root UID\n    runAsGroup: 1000            # Specific non-root GID\n    fsGroup: 2000               # File system group\n    seccompProfile:\n      type: RuntimeDefault      # Default seccomp profile\n    supplementalGroups: [2000]  # Additional groups\n  \n  containers:\n  - name: app\n    image: ghcr.io/org/app@sha256:abc123...  # Pinned digest, not tag\n    ports:\n    - containerPort: 8080\n    \n    # Container-level security\n    securityContext:\n      allowPrivilegeEscalation: false  # No sudo/suid\n      readOnlyRootFilesystem: true      # Immutable filesystem\n      capabilities:\n        drop:                           # Drop ALL capabilities\n          - ALL\n    \n    # Resource limits (prevent DoS)\n    resources:\n      requests:\n        memory: \"128Mi\"\n        cpu: \"100m\"\n      limits:\n        memory: \"256Mi\"\n        cpu: \"500m\"\n    \n    # Environment from secrets, not hardcoded\n    env:\n    - name: DATABASE_URL\n      valueFrom:\n        secretKeyRef:\n          name: app-secrets\n          key: database-url\n    \n    # Health checks\n    livenessProbe:\n      httpGet:\n        path: /healthz\n        port: 8080\n      initialDelaySeconds: 5\n      periodSeconds: 10\n    readinessProbe:\n      httpGet:\n        path: /ready\n        port: 8080\n      initialDelaySeconds: 3\n      periodSeconds: 5\n  \n  # Service account with minimal permissions\n  serviceAccountName: app-sa\n  automountServiceAccountToken: false  # Don't mount tokens by default\n  \n  # Network policy reference (separate resource)\n  # See NetworkPolicy below\n---\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: app-network-policy\n  namespace: production\nspec:\n  podSelector:\n    matchLabels:\n      app: secure-app\n  policyTypes:\n  - Ingress\n  - Egress\n  ingress:\n  - from:\n    - podSelector:\n        matchLabels:\n          role: frontend\n    ports:\n    - port: 8080\n      protocol: TCP\n  egress:\n  - to:\n    - podSelector:\n        matchLabels:\n          role: database\n    ports:\n    - port: 5432\n      protocol: TCP\n  - to: []  # Allow DNS\n    ports:\n    - port: 53\n      protocol: UDP\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Container Escape Case Studies",
+      "content": "**CVE-2022-0185 — Kernel Container Escape:**\nA flaw in the Linux kernel's file locking implementation allowed a container process with CAP_SYS_ADMIN to escape. An attacker in a container could exploit this to gain root access on the host.\n\n**Lesson:** Never grant CAP_SYS_ADMIN to containers. It provides near-host-level privileges.\n\n**CVE-2019-5736 — runc Container Escape:**\nAn attacker could exploit the runc container runtime to gain host-level root access. The vulnerability allowed a malicious container to overwrite the runc binary on the host.\n\n**Lesson:** Keep container runtimes updated. Use immutable root filesystems.\n\n**Tesla Cryptojacking Incident (2018):**\nAttackers accessed a Kubernetes dashboard that was exposed to the internet without authentication. From the dashboard, they deployed cryptomining containers that used Tesla's compute resources.\n\n**Lesson:** Never expose Kubernetes dashboards publicly. Use RBAC and authentication for all management interfaces.\n\n**Common Escape Paths:**\n1. **Overprivileged capabilities** (CAP_SYS_ADMIN, CAP_SYS_PTRACE, CAP_NET_ADMIN)\n2. **Mounted Docker socket** (/var/run/docker.sock)\n3. **Host PID namespace sharing** (hostPID: true)\n4. **Privileged containers** (privileged: true)\n5. **Mounted host filesystems** (volume mounts of /, /etc, /var/run/docker.sock)"
+    },
+    {
+      "type": "memory_aid",
+      "title": "SHIELD Container Security Checklist",
+      "content": "**SHIELD** — Container security checklist:\n\n- **S**can — Vulnerability scanning for images (Trivy, Grype) and dependencies (SBOM)\n- **H**arden — Minimal base images, non-root, read-only filesystem, dropped capabilities\n- **I**solate — Network policies, pod security standards, namespace separation\n- **E**nforce least privilege — Service accounts with minimal RBAC, no unnecessary capabilities\n- **L**imit capabilities — Drop ALL capabilities, add back only what's needed\n- **D**eploy signed images — Cosign/Notary verification through admission controllers\n\n**Critical Container Security Controls:**\n1. ✅ Run as non-root (runAsNonRoot: true)\n2. ✅ Drop ALL capabilities, add back minimally\n3. ✅ Read-only root filesystem\n4. ✅ Pin images by digest, not tag\n5. ✅ Scan images before deployment\n6. ✅ Sign and verify images\n7. ✅ Network policies (default deny)\n8. ✅ Secrets from vault, not environment variables\n9. ✅ Resource limits on all containers\n10. ✅ Seccomp profiles (RuntimeDefault minimum)"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Container Security",
+      "content": "For your container deployments, answer:\n\n1. What base images are you using? Are they minimal or bloated?\n2. Are images pinned by digest or by tag?\n3. Do any containers run as root?\n4. Are Linux capabilities dropped to minimum?\n5. Do you have network policies? Are they default-deny?\n6. Where are secrets stored — environment variables or a vault?\n7. When did you last scan images for vulnerabilities?\n8. Are images signed and verified before deployment?\n9. Do you have resource limits on all containers?\n10. Can you detect a container escape attempt within minutes?\n\nFix the most critical gaps first. Running as root and missing network policies are usually the highest-risk items."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Defense in Depth for Containers",
+      "content": "No single container security control is sufficient. A non-root user can still exploit a kernel vulnerability. A network policy doesn't prevent a compromised application. Image scanning doesn't catch zero-days. Defense in depth means: secure the image AND harden the runtime AND isolate the network AND monitor for escape attempts AND have incident response procedures. If one control fails, the next one should catch it. Containers are convenient — make them secure too.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Kubernetes Security Architecture",
+      "content": "Kubernetes security operates at multiple layers:\n\n**Cluster-Level Security:**\n- RBAC: Role-Based Access Control for API server access\n- Admission controllers: Enforce policies (image signing, resource limits, security contexts)\n- Audit logging: Track all API server requests\n\n**Namespace-Level Security:**\n- ResourceQuota: Limit compute resources per namespace\n- LimitRange: Set default and max resource limits\n- Network policies: Control pod-to-pod communication\n\n**Pod-Level Security:**\n- Security contexts: runAsNonRoot, capabilities, seccomp\n- Pod Security Standards: Privileged, Baseline, Restricted profiles\n- Service accounts: Per-pod identity with minimal permissions\n\n**Container-Level Security:**\n- Image security: Signing, scanning, minimal base images\n- Resource limits: CPU, memory, ephemeral storage\n- Privilege: Non-root, no privilege escalation, read-only filesystem\n\n**Secrets Management:**\n- Never store secrets in environment variables or ConfigMaps\n- Use Kubernetes Secrets with encryption at rest\n- Prefer external secrets managers (Vault, AWS Secrets Manager)\n- Automate secret rotation\n- Mount secrets as volumes, not environment variables (visible in process list)\n\n**Network Security:**\n- Default deny all ingress and egress\n- Allow specific pod-to-pod communication via labels\n- Use service mesh (Istio, Linkerd) for mTLS between services\n- Egress controls to prevent data exfiltration\n\n**Monitoring and Detection:**\n- Runtime security: Falco for syscall monitoring\n- Log aggregation: Fluentd, Loki, or ELK stack\n- Metrics: Prometheus for resource monitoring\n- Alerting: Anomalous process execution, unexpected network connections"
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC502",
+    "Career Path: Cloud Security",
+    "Career Path: Security Engineer",
+    "containers",
+    "Kubernetes",
+    "Docker",
+    "supply-chain",
+    "runtime-security"
+  ]
+}

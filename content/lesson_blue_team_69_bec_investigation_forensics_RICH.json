@@ -1,0 +1,161 @@
+{
+  "lesson_id": "b0d626ce-c9b9-42e5-b27e-76dab7fe4f78",
+  "domain": "blue_team",
+  "title": "BEC Investigation and Forensics Direction",
+  "difficulty": 3,
+  "order_index": 69,
+  "prerequisites": [
+    "Business Email Compromise (BEC) Incident Management"
+  ],
+  "concepts": [
+    "BEC forensic investigation methodology and scoping",
+    "Email header analysis and authentication verification (SPF, DKIM, DMARC)",
+    "O365/Azure audit log analysis for BEC indicators",
+    "Mailbox rule forensics: detecting attacker-created rules",
+    "Email forwarding and delegation forensics",
+    "Lateral movement detection in cloud email environments",
+    "Financial transaction tracing for BEC cases",
+    "Evidence preservation and chain of custody for BEC investigations"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Conduct a structured forensic investigation of a BEC compromise from initial triage to root cause",
+    "Analyze email headers to verify authentication and identify spoofing or compromise indicators",
+    "Enumerate and interpret O365/Azure audit logs to scope BEC activity and timeline",
+    "Detect attacker-created inbox rules and forwarding configurations used for persistence",
+    "Preserve digital evidence and maintain chain of custody for legal proceedings"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which email authentication mechanism verifies that the sending server is authorized to send on behalf of the domain?",
+      "options": [
+        "DKIM",
+        "SPF",
+        "DMARC",
+        "PTR"
+      ],
+      "correct": 1,
+      "explanation": "SPF (Sender Policy Framework) verifies that the sending IP address is authorized to send email on behalf of the domain listed in the envelope sender."
+    },
+    {
+      "question": "During a BEC investigation, you discover an inbox rule named '.' (single dot) that forwards all emails to an external address. What does this indicate?",
+      "options": [
+        "A legitimate forwarding rule created by the user",
+        "An attacker's persistence mechanism designed to hide in plain sight",
+        "A system-generated rule for mail routing",
+        "A spam filter configuration"
+      ],
+      "correct": 1,
+      "explanation": "Attackers create inbox rules with innocuous names (like '.' or 'LinkedIn notifications') to automatically forward emails without the victim noticing. This is a common BEC persistence technique."
+    },
+    {
+      "question": "In O365, which audit log setting is CRITICAL to enable BEFORE a BEC incident to ensure investigation capability?",
+      "options": [
+        "Mailbox audit logging (enabled by default in newer tenants)",
+        "Exchange ActiveSync logging",
+        "Outlook client version logging",
+        "SMTP protocol logging"
+      ],
+      "correct": 0,
+      "explanation": "Mailbox audit logging records who accessed a mailbox, what operations they performed, and whether delegated access was used. Without it enabled, you lose critical forensic data about the compromise timeline."
+    },
+    {
+      "question": "What is the primary purpose of preserving the mail.pst export separately from the live mailbox during a BEC investigation?",
+      "options": [
+        "It's faster to search",
+        "It preserves the original state as evidence, preventing spoliation during remediation",
+        "PST files compress better",
+        "It bypasses legal hold requirements"
+      ],
+      "correct": 1,
+      "explanation": "Exporting to PST before remediation preserves the mailbox in its compromised state. This ensures that evidence (attacker rules, forwarded emails, deleted items) isn't destroyed during containment activities."
+    },
+    {
+      "question": "When tracing financial transactions in a BEC case, which log source provides the most definitive evidence of unauthorized payment redirection?",
+      "options": [
+        "Email sent items folder",
+        "Bank wire transfer records with beneficiary change documentation",
+        "DNS lookup logs",
+        "VPN connection logs"
+      ],
+      "correct": 1,
+      "explanation": "Bank wire transfer records showing the original and modified beneficiary details provide definitive evidence of payment redirection. Email context supports the BEC narrative, but financial records are the primary evidence of actual loss."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Map the BEC investigation as a timeline — from initial compromise through financial impact to remediation",
+    "Association: Link each log source to a specific investigation question (O365 audit → what did they access, mail headers → where did it come from)",
+    "Emotion: The urgency of a BEC investigation — every hour of delay means more potential financial loss",
+    "Story: Build each investigation as a detective narrative: compromise → monitoring → execution → detection",
+    "Simplification: BEC forensics = who got in, what did they see, what did they change, where did the money go?",
+    "Repetition: Practice email header analysis until SPF/DKIM/DMARC failures are immediately recognizable",
+    "Teaching: Walk through a BEC investigation timeline with a colleague to reinforce the methodology",
+    "Mnemonic: TRACE — Timeline, Rules, Authentication, Collections, Evidence preservation",
+    "Movement: Physically arrange log entries on a timeline to visualize the attack progression",
+    "Curiosity: Always ask 'what did the attacker READ, not just what did they send?' — intelligence gathering is often the real goal"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "BEC Forensics: Time Is the Enemy",
+      "content": "In BEC investigations, every hour matters. Attackers typically monitor compromised mailboxes for 30-90 days before executing their fraud — reading communications, understanding payment patterns, identifying targets. When you start investigating, you're not just finding what happened; you're racing to understand what the attacker already knows and what they might do next. Speed and thoroughness must coexist. Build your investigation methodology so you can execute it fast and completely.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "BEC Investigation Methodology",
+      "content": "A structured BEC investigation follows five phases:\n\n**Phase 1: Triage and Scoping (First 2-4 hours)**\n- Confirm BEC vs. phishing (was the account actually compromised?)\n- Identify the compromised account(s) and initial access vector\n- Determine if the attacker is still active (active sessions, new inbox rules)\n- Assess financial impact: were payments redirected?\n\n**Phase 2: Evidence Preservation (Immediate)**\n- Export compromised mailbox to PST before any remediation\n- Enable litigation hold on the mailbox\n- Preserve O365 audit logs (extend retention if needed)\n- Screenshot attacker inbox rules and forwarding configurations\n- Secure financial transaction records\n\n**Phase 3: Timeline Reconstruction**\n- Map initial compromise (credential theft date)\n- Identify monitoring period (when attacker read emails)\n- Document fraud execution (fraudulent payment instructions)\n- Track persistence mechanisms (inbox rules, forwarding, delegated access)\n\n**Phase 4: Root Cause Analysis**\n- How were credentials obtained? (phishing, brute force, purchased)\n- Was MFA enabled and bypassed, or not enabled?\n- What authentication methods were used?\n- Were there prior warnings or failed attempts?\n\n**Phase 5: Remediation and Lessons Learned**\n- Revoke all sessions and reset credentials\n- Remove attacker inbox rules and forwarding\n- Implement enhanced monitoring\n- Document findings for legal proceedings"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: BEC Forensics Explained",
+      "content": "Imagine someone sneaks into your house, hides in a closet, and watches everything your family does for weeks. Then they send a fake letter to your bank saying 'send money to this new address.'\n\nBEC forensics is like being a detective in this situation:\n1. **How did they get in?** (Did they steal a key? Pick a lock? Find an open window?)\n2. **What did they see?** (Which rooms did they visit? What conversations did they overhear?)\n3. **What did they change?** (Did they set up a secret camera? Forward your mail?)\n4. **Where did the money go?** (Which bank account did they redirect payments to?)\n\nThe faster you figure this out, the faster you can kick them out and stop more money from disappearing."
+    },
+    {
+      "type": "code_exercise",
+      "title": "O365 Audit Log Analysis for BEC",
+      "content": "Analyze O365 audit logs for BEC indicators:\n\n```powershell\n# O365 BEC Investigation PowerShell Commands\n# Connect to Exchange Online\nConnect-ExchangeOnline -UserPrincipalName admin@company.com\n\n# Phase 1: Identify suspicious inbox rules\nGet-InboxRule -Mailbox compromised@company.com | \n    Where-Object { $_.ForwardTo -ne $null -or $_.ForwardAsAttachmentTo -ne $null }\n\n# Check for hidden rules (rules named with dots or spaces)\nGet-InboxRule -Mailbox compromised@company.com | \n    Where-Object { $_.Name -match '^\\.|^\\s*$' -or $_.Name.Length -le 3 }\n\n# Phase 2: Check mailbox delegation\nGet-MailboxPermission -Identity compromised@company.com | \n    Where-Object { $_.AccessRights -match 'FullAccess' -and $_.User -notmatch 'NT AUTHORITY' }\n\n# Check for forwarding rules at organization level\nGet-Mailbox -ResultSize Unlimited | \n    Where-Object { $_.ForwardingAddress -ne $null -or $_.ForwardingSmtpAddress -ne $null }\n\n# Phase 3: Search audit logs for suspicious activity\nSearch-UnifiedAuditLog -RecordType ExchangeItem -Operations MailItemsAccessed \\\n    -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) \\\n    -UserIds compromised@company.com -ResultSize 5000\n\n# Search for login anomalies\nSearch-UnifiedAuditLog -RecordType AzureActiveDirectoryAccountLogon \\\n    -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) \\\n    -UserIds compromised@company.com -ResultSize 5000\n\n# Phase 4: Export mailbox for evidence preservation\nNew-MailboxExportRequest -Mailbox compromised@company.com \\\n    -FilePath '\\\\SERVER\\EVIDENCE$\\compromised_BEC_20260609.pst'\n\n# Monitor export progress\nGet-MailboxExportRequest | Get-MailboxExportRequestStatistics\n```\n\n**Key Investigation Queries:**\n- Who accessed the mailbox and from where?\n- What emails were read during the monitoring period?\n- Were any emails deleted by the attacker?\n- What inbox rules were created or modified?"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: O365 BEC Investigation Timeline",
+      "content": "A mid-size company discovered a BEC attack when a vendor reported not receiving an expected payment. Investigation revealed:\n\n**Day 0 (Initial Compromise):**\n- Employee clicked credential harvesting link in phishing email\n- MFA was not enabled on the account\n- Attacker logged in from Nigerian IP address\n\n**Days 0-45 (Monitoring Phase):**\n- Attacker created inbox rule: 'LinkedIn notifications' → forward to attacker@protonmail.com\n- Read 200+ emails including payment communications with vendors\n- Sent no emails from the compromised account (avoiding detection)\n\n**Day 46 (Execution Phase):**\n- Attacker sent email to AP department from compromised account\n- Modified vendor payment details in the email thread\n- Requested wire transfer of $230,000 to new account\n\n**Detection & Response:**\n- Vendor called to confirm payment change (unusual)\n- AP team checked with actual vendor — confirmed fraud\n- Investigation team activated within 1 hour\n- Discovered inbox rule during triage\n- Found 45 days of email forwarding\n- No financial loss (caught before payment executed)\n\n**Key Takeaway:** The inbox rule named 'LinkedIn notifications' was designed to look legitimate. Always enumerate ALL inbox rules, not just obviously suspicious ones."
+    },
+    {
+      "type": "memory_aid",
+      "title": "TRACE Investigation Framework",
+      "content": "**TRACE** — BEC Investigation Framework:\n\n- **T**imeline — Build chronological sequence from first compromise to detection\n- **R**ules — Enumerate ALL inbox rules, forwarding, and delegation settings\n- **A**uthentication — Analyze SPF, DKIM, DMARC for every suspicious email\n- **C**ollections — Preserve mailbox, audit logs, financial records as evidence\n- **E**vidence — Maintain chain of custody and document everything for legal proceedings\n\n**Critical O365 Log Sources:**\n1. **Unified Audit Log** — MailItemsAccessed, SendAs, InboxRuleCreated\n2. **Azure AD Sign-ins** — Authentication events, MFA challenges, conditional access\n3. **Message Trace** — Email routing and delivery status\n4. **Mailbox Audit** — Item-level access (if enabled)\n5. **Exchange Admin Audit** — Admin actions on mailboxes and rules"
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your BEC Investigation Readiness",
+      "content": "For your organization, answer:\n\n1. Is mailbox audit logging enabled for all users?\n2. What's the retention period for O365 audit logs? Is it sufficient for BEC investigations (minimum 90 days)?\n3. Do you have a process to quickly export a mailbox for evidence preservation?\n4. Can you enumerate all inbox rules across the organization quickly?\n5. What's your average time to detect an attacker-created inbox rule?\n6. Do you monitor for forwarding rules to external domains?\n7. Is DMARC configured in enforcement mode for your domain?\n8. What's your process for coordinating with financial institutions to recover funds?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Forensic Mindset: Document Everything",
+      "content": "In BEC investigations, you're not just solving a technical puzzle — you're building a legal case. Every finding must be documented with timestamps, sources, and chain of custody. The email header analysis that proves the attacker accessed the mailbox on March 15th at 2:47 AM UTC could be the evidence that determines liability in a $500,000 fraud case. Treat every log entry as potential courtroom evidence. Be precise. Be thorough. Be defensible.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Email Header Analysis for BEC",
+      "content": "Email headers are the forensic backbone of BEC investigation:\n\n**Authentication Results to Check:**\n- **SPF**: Does the sending IP match the domain's SPF record? (Pass/Fail/SoftFail/None)\n- **DKIM**: Was the email cryptographically signed by the domain? (Pass/Fail/Neutral)\n- **DMARC**: Does the domain's policy align with SPF and DKIM results? (Pass/Fail/None)\n\n**Header Analysis Points:**\n- **Received headers** (bottom-up): Trace the email's path from sender to recipient\n- **X-Originating-IP**: Original sender IP address\n- **Message-ID**: Unique identifier — verify domain matches claimed sender\n- **Reply-To vs From**: Mismatched domains indicate spoofing\n- **Date/Time**: UTC timestamps for timeline correlation\n- **X-Mailer / User-Agent**: Email client used — inconsistencies are suspicious\n\n**Common BEC Indicators in Headers:**\n- Reply-To domain differs from From domain (different TLD)\n- Received from IP in a country inconsistent with sender's location\n- Message-ID domain doesn't match sender domain\n- Missing or failing authentication results\n- X-Originating-IP from known proxy/VPN services\n\n**Forensic Documentation:**\n- Export full headers (not just visible fields) before any remediation\n- Correlate header timestamps with O365 audit logs\n- Document authentication results for each suspicious email\n- Note any hops through unexpected mail servers"
+    },
+    {
+      "type": "explanation",
+      "title": "Financial Transaction Tracing in BEC Cases",
+      "content": "In BEC cases involving financial fraud, trace the money:\n\n**Payment Redirection Indicators:**\n- Vendor payment details changed shortly before a scheduled payment\n- Urgent or last-minute payment instruction changes\n- Requests to route payment through a different country\n- Payments to accounts with no prior transaction history\n\n**Transaction Analysis:**\n- Compare original vs. modified payment instructions\n- Trace wire transfer routing (originator bank → intermediary → beneficiary)\n- Identify beneficiary account details (name, bank, country)\n- Document time between payment initiation and detection\n\n**Recovery Actions:**\n- Contact originating bank immediately (within 24-48 hours for best recovery odds)\n- File a complaint with law enforcement (FBI IC3, local authorities)\n- Request a recall of the wire transfer\n- Engage financial investigation firm if amount is significant\n\n**Evidence Preservation:**\n- Preserve all financial records (original and modified payment instructions)\n- Document the full payment chain with timestamps\n- Obtain bank records showing account opening and beneficiary details\n- Preserve communication records with the impersonated party"
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR500",
+    "Career Path: DFIR Specialist",
+    "Career Path: Blue Teamer",
+    "BEC",
+    "forensics",
+    "O365",
+    "email-forensics",
+    "incident-investigation"
+  ]
+}

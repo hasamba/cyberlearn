@@ -1,0 +1,145 @@
+{
+  "lesson_id": "3a4185f7-5307-4a79-8260-0dd76d790fe1",
+  "domain": "cloud",
+  "title": "Cloud Application Security and Threat Modeling",
+  "difficulty": 2,
+  "order_index": 68,
+  "prerequisites": [
+    "Cloud Shared Responsibility Model"
+  ],
+  "concepts": [
+    "Cloud-native application threat modeling with STRIDE",
+    "Shared responsibility model implications for application security",
+    "API security in cloud environments",
+    "Identity-based access control for cloud applications",
+    "Serverless and container security considerations",
+    "Cloud-specific attack surfaces: metadata services, IAM roles, storage misconfigurations",
+    "Secure development lifecycle for cloud applications",
+    "OWASP Cloud Security risks"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Apply STRIDE threat modeling methodology to cloud-native applications",
+    "Identify cloud-specific attack surfaces including metadata services and IAM misconfigurations",
+    "Design secure architecture patterns for cloud applications using defense in depth",
+    "Evaluate shared responsibility boundaries for application security across cloud service models",
+    "Create threat models that address serverless, container, and API-based architectures"
+  ],
+  "post_assessment": [
+    {
+      "question": "In cloud application threat modeling, which STRIDE category best describes an attacker modifying data in transit between a client and a cloud API?",
+      "options": [
+        "Spoofing",
+        "Tampering",
+        "Repudiation",
+        "Information Disclosure"
+      ],
+      "correct": 1,
+      "explanation": "Tampering involves unauthorized modification of data. In cloud contexts, modifying API requests in transit (e.g., changing parameters or payload) is a tampering threat."
+    },
+    {
+      "question": "What cloud-specific attack surface allows an attacker with SSRF to potentially retrieve temporary IAM credentials?",
+      "options": [
+        "Cloud storage bucket",
+        "Instance metadata service (169.254.169.254)",
+        "Cloud DNS records",
+        "API gateway endpoint"
+      ],
+      "correct": 1,
+      "explanation": "Cloud instance metadata services (169.254.169.254 on AWS, equivalent on Azure/GCP) provide temporary IAM credentials. SSRF vulnerabilities that can reach this service are a critical cloud-specific attack vector."
+    },
+    {
+      "question": "In the shared responsibility model for SaaS, who is primarily responsible for application-level access control configuration?",
+      "options": [
+        "The cloud provider exclusively",
+        "The customer exclusively",
+        "Both share responsibility — the provider secures the platform, the customer configures access policies",
+        "Neither — it's handled by the network layer"
+      ],
+      "correct": 2,
+      "explanation": "In SaaS, the provider secures the underlying platform, but the customer must properly configure access policies, role assignments, and data sharing settings within the application."
+    },
+    {
+      "question": "Which cloud security threat involves an application inadvertently exposing internal service endpoints through an API?",
+      "options": [
+        "SSRF",
+        "Broken Object-Level Authorization (BOLA)",
+        "Serverless injection",
+        "Container escape"
+      ],
+      "correct": 1,
+      "explanation": "BOLA (Broken Object-Level Authorization) occurs when an API exposes internal objects without proper authorization checks, allowing attackers to access resources belonging to other users or internal services."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Draw cloud architecture diagrams with trust boundaries and data flow arrows",
+    "Association: Map each STRIDE category to a specific cloud attack scenario",
+    "Emotion: Consider the blast radius of a single misconfigured IAM role in a cloud environment",
+    "Story: Walk through a cloud breach scenario from initial access to data exfiltration as a narrative",
+    "Simplification: Every cloud threat model reduces to: who can reach what, and what can they do with it?",
+    "Repetition: Practice threat modeling different cloud architectures until STRIDE becomes automatic",
+    "Teaching: Explain your threat model to a developer colleague to validate assumptions",
+    "Mnemonic: CLOUD-S — Compute, Locks (IAM), Objects (storage), URLs (APIs), Data flows, Service mesh",
+    "Movement: Walk through a data flow diagram physically, tracing each path with your finger",
+    "Curiosity: For every component, ask 'what if this were compromised?' and trace the blast radius"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Think Like a Cloud Attacker",
+      "content": "Cloud application security isn't just traditional security with 'cloud' sprinkled on top. Cloud environments have unique attack surfaces — metadata services, IAM roles that auto-rotate, storage buckets with complex permission models, and APIs that span organizational boundaries. When threat modeling cloud applications, start from the attacker's perspective: what can I reach, what credentials can I steal, and what can I do with them?",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "STRIDE Threat Modeling for Cloud Applications",
+      "content": "Apply STRIDE to cloud-native architectures:\n\n**Spoofing:**\n- Identity spoofing via stolen API keys or JWT tokens\n- Service-to-service impersonation with compromised IAM roles\n- OAuth application impersonation through redirect URI manipulation\n\n**Tampering:**\n- Modifying data in cloud storage (if misconfigured permissions)\n- Altering infrastructure-as-code templates\n- Injecting malicious code through CI/CD pipeline compromise\n\n**Repudiation:**\n- Insufficient logging in serverless functions\n- Cloud trail gaps due to misconfigured log settings\n- Missing correlation IDs across distributed services\n\n**Information Disclosure:**\n- Cloud storage buckets with public read access\n- Error messages exposing internal service endpoints\n- Metadata service leaks through SSRF vulnerabilities\n\n**Denial of Service:**\n- API rate limiting bypass in serverless (cost amplification)\n- Resource exhaustion through unbounded cloud function invocations\n- Dependency on shared cloud services with no SLA guarantees\n\n**Elevation of Privilege:**\n- IAM role chain escalation (role assumption chains)\n- Container escape to host IAM metadata\n- Overprivileged service accounts in Kubernetes"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cloud Threat Modeling",
+      "content": "Imagine your cloud app is a house with many doors and windows. Threat modeling is like being a security guard who walks around the house looking for ways a burglar might get in.\n\n- **Spoofing**: Someone puts on a fake uniform and pretends to be the mail carrier.\n- **Tampering**: Someone changes the lock on your door while you're not looking.\n- **Repudiation**: Someone does something bad and then says 'that wasn't me!'\n- **Information Disclosure**: Leaving your curtains open so anyone can see inside.\n- **Denial of Service**: A crowd blocks your front door so you can't get in.\n- **Elevation of Privilege**: A guest finds the key to the master bedroom.\n\nIn cloud computing, these same things happen, but the 'house' is your application running on someone else's computers, and the 'doors' are APIs, IAM roles, and storage buckets."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Cloud Threat Model Template",
+      "content": "Document cloud application threats systematically:\n\n```python\nfrom dataclasses import dataclass, field\nfrom typing import List\nfrom enum import Enum\n\nclass STRIDE(Enum):\n    SPOOFING = 'Spoofing'\n    TAMPERING = 'Tampering'\n    REPUDIATION = 'Repudiation'\n    INFO_DISCLOSURE = 'Information Disclosure'\n    DOS = 'Denial of Service'\n    ELEVATION = 'Elevation of Privilege'\n\n@dataclass\nclass CloudThreat:\n    stride_category: STRIDE\n    threat: str\n    cloud_component: str\n    attack_vector: str\n    impact: str\n    mitigation: str\n    priority: str  # High, Medium, Low\n\n# Example: Threat model for a serverless API\nthreats = [\n    CloudThreat(\n        stride_category=STRIDE.SPOOFING,\n        threat='Stolen API key used to access API Gateway',\n        cloud_component='API Gateway + Lambda',\n        attack_vector='API key leakage in client code or repository',\n        impact='Unauthorized data access and modification',\n        mitigation='Rotate keys, implement OAuth 2.0 with short-lived tokens',\n        priority='High'\n    ),\n    CloudThreat(\n        stride_category=STRIDE.INFO_DISCLOSURE,\n        threat='SSRF to instance metadata exposes IAM credentials',\n        cloud_component='Lambda + VPC',\n        attack_vector='SSRF in user input processing',\n        impact='AWS/GCP/Azure credentials compromised',\n        mitigation='IMDSv2 enforcement, input validation, VPC endpoints',\n        priority='Critical'\n    ),\n    CloudThreat(\n        stride_category=STRIDE.ELEVATION,\n        threat='Overprivileged IAM role for Lambda execution',\n        cloud_component='IAM + Lambda',\n        attack_vector='Compromised function assumes excessive permissions',\n        impact='Lateral movement across AWS/GCP/Azure resources',\n        mitigation='Least privilege IAM policies, permission boundaries',\n        priority='High'\n    ),\n]\n\nfor t in threats:\n    print(f'[{t.priority}] {t.stride_category.value}: {t.threat}')\n    print(f'   Mitigation: {t.mitigation}\\n')\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Capital One Breach: Cloud Threat Modeling Failure",
+      "content": "The 2019 Capital One breach is a textbook cloud threat modeling failure:\n\n- An attacker exploited an SSRF vulnerability in a misconfigured WAF (ModSecurity on Apache).\n- The SSRF request reached the AWS instance metadata service at 169.254.169.254.\n- The metadata service returned temporary IAM role credentials for an overprivileged Lambda function.\n- Those credentials allowed access to S3 buckets containing 100+ million customer records.\n\n**Threat Modeling Gaps:**\n1. No SSRF protection on the web application layer.\n2. IMDSv1 (vulnerable to SSRF) was used instead of IMDSv2 (requires session token).\n3. The Lambda role had far more permissions than needed (least privilege violated).\n4. No data exfiltration detection on S3 access patterns.\n\n**Lessons:** Every cloud threat model MUST include metadata service access as a critical threat surface. SSRF + metadata = credential compromise is the #1 cloud attack pattern."
+    },
+    {
+      "type": "memory_aid",
+      "title": "CLOUD-S Threat Modeling Checklist",
+      "content": "**CLOUD-S** — Cloud threat modeling checklist:\n\n- **C**ompute — What compute resources exist? Are they overprivileged? Can they be reached from untrusted input?\n- **L**ocks (IAM) — Who can assume what roles? Are permissions least privilege? Are role chains bounded?\n- **O**bjects (Storage) — What data is stored where? Who can access it? Are buckets private?\n- **U**RLs (APIs) — What endpoints exist? Are they authenticated? Can SSRF reach metadata services?\n- **D**ata flows — Where does data travel? Is it encrypted in transit? Between which trust boundaries?\n- **S**ervice mesh — How do services authenticate each other? Is mTLS used? Are there shared service accounts?\n\n**Critical Cloud Attack Surfaces:**\n1. Instance metadata service (SSRF → credentials)\n2. IAM role chains (privilege escalation)\n3. Storage bucket policies (data exposure)\n4. API Gateway misconfigurations (unauthorized access)\n5. CI/CD pipeline (supply chain compromise)"
+    },
+    {
+      "type": "reflection",
+      "title": "Threat Model Your Cloud Application",
+      "content": "For a cloud application you work with:\n\n1. Draw the architecture — where does data flow? Where are trust boundaries?\n2. For each component, ask: what STRIDE threats apply?\n3. Specifically check: Can any component reach the metadata service? How?\n4. Are IAM roles following least privilege? Can you reduce any permissions?\n5. What happens if an API key is leaked? What's the blast radius?\n6. Where are the logging gaps? Would you detect the threats you identified?\n7. What's the highest-impact, highest-probability threat? Fix that first."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Assume Breach, Model Accordingly",
+      "content": "The most effective cloud threat models start with 'assume breach.' Don't ask 'could someone get in?' — ask 'when someone gets in, what can they reach?' This shifts your focus from perimeter defense (important but insufficient) to lateral movement prevention, blast radius containment, and detection. In cloud, identity IS the perimeter. Model accordingly.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud-Specific Attack Surfaces",
+      "content": "Cloud applications have attack surfaces that don't exist in traditional environments:\n\n**Metadata Services:**\n- AWS: http://169.254.169.254/latest/meta-data/\n- Azure: http://169.254.169.254/metadata/instance\n- GCP: http://metadata.google.internal/computeMetadata/v1/\n- Any SSRF vulnerability can reach these and steal credentials\n\n**IAM Privilege Escalation Paths:**\n- iam:PassRole + lambda:CreateFunction = arbitrary role assumption\n- ec2:RunInstances + iam:PassRole = compute with injected role\n- sts:AssumeRole chains for lateral movement\n- Overprivileged service accounts in Kubernetes\n\n**Storage Misconfigurations:**\n- S3 bucket policies allowing public access\n- Azure Blob containers with anonymous read\n- GCS buckets with allUsers access\n- Cross-account trust policies that are too broad\n\n**API Gateway Risks:**\n- Missing authentication on endpoints\n- Insufficient rate limiting (cost amplification)\n- Overly broad CORS policies\n- Unvalidated request parameters reaching backend services\n\n**Serverless-Specific:**\n- Event injection through SNS/SQS/DynamoDB triggers\n- Environment variable secrets exposure\n- Cold start timing attacks\n- Unbounded function invocation (cost and resource exhaustion)"
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC502",
+    "Career Path: Cloud Security",
+    "Career Path: Security Engineer",
+    "threat-modeling",
+    "STRIDE",
+    "cloud-native",
+    "API-security",
+    "IAM"
+  ]
+}

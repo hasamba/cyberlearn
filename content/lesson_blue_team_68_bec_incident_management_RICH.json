@@ -1,0 +1,161 @@
+{
+  "lesson_id": "24056be5-d063-468e-b67f-cd553e5141d2",
+  "domain": "blue_team",
+  "title": "Business Email Compromise (BEC) Incident Management",
+  "difficulty": 3,
+  "order_index": 68,
+  "prerequisites": [
+    "Credential Theft Attack Management"
+  ],
+  "concepts": [
+    "Business Email Compromise attack lifecycle and stages",
+    "BEC typology: CEO fraud, invoice manipulation, payroll redirect, attorney impersonation, data theft, vendor fraud",
+    "Attacker positioning: reconnaissance, social engineering, email compromise",
+    "Impacted parties: employees, executives, vendors, customers, legal",
+    "Legal support: evidence preservation, regulatory notification, liability determination",
+    "MITRE ATT&CK mapping for O365 BEC campaigns",
+    "Incident categorization and severity classification for BEC",
+    "Cross-functional coordination: legal, HR, finance, communications"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Identify and classify at least six distinct BEC attack types",
+    "Map BEC tactics to MITRE ATT&CK techniques for O365 environments",
+    "Determine attacker position within compromised email accounts",
+    "Coordinate incident response across legal, finance, and executive stakeholders",
+    "Establish liability and regulatory notification requirements for BEC incidents"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which BEC type involves an attacker impersonating a vendor to redirect invoice payments?",
+      "options": [
+        "CEO fraud",
+        "Vendor fraud",
+        "Payroll redirect",
+        "Attorney impersonation"
+      ],
+      "correct": 1,
+      "explanation": "Vendor fraud (also called supplier fraud) involves impersonating or compromising a vendor's email to redirect legitimate invoice payments to attacker-controlled accounts."
+    },
+    {
+      "question": "During a BEC incident, which MITRE technique best describes an attacker maintaining persistent access to a compromised O365 mailbox?",
+      "options": [
+        "T1078 Valid Accounts",
+        "T1114 Email Collection",
+        "T1098 Account Manipulation",
+        "T1534 Internal Spearphishing"
+      ],
+      "correct": 0,
+      "explanation": "T1078 Valid Accounts describes the attacker using legitimately obtained credentials to maintain persistent access, which is the primary persistence mechanism in BEC campaigns."
+    },
+    {
+      "question": "What is the first priority when a BEC incident is confirmed?",
+      "options": [
+        "Notify law enforcement",
+        "Revoke the compromised account",
+        "Preserve evidence and scope the compromise",
+        "Issue a public statement"
+      ],
+      "correct": 2,
+      "explanation": "Evidence preservation and scoping must happen first. Without understanding the scope, you cannot properly contain or communicate about the incident."
+    },
+    {
+      "question": "Who should be involved in determining liability during a BEC incident involving diverted vendor payments?",
+      "options": [
+        "Only the IT security team",
+        "IT security, legal counsel, and finance leadership",
+        "Only the CFO",
+        "External law enforcement only"
+      ],
+      "correct": 1,
+      "explanation": "Liability determination requires cross-functional input: IT security for technical evidence, legal for contractual and regulatory analysis, and finance for transaction and payment verification."
+    },
+    {
+      "question": "Which BEC attack type specifically targets employee payroll direct deposit information?",
+      "options": [
+        "CEO fraud",
+        "Invoice manipulation",
+        "Payroll redirect",
+        "Data theft"
+      ],
+      "correct": 2,
+      "explanation": "Payroll redirect BEC involves compromising HR or employee accounts to change direct deposit information, redirecting salary payments to attacker-controlled accounts."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Map BEC attack flows as visual diagrams to internalize the stages",
+    "Association: Link each BEC type to a memorable real-world scenario",
+    "Emotion: Remember the financial and reputational impact of BEC to fuel retention",
+    "Story: Frame each BEC stage as a chapter in an adversary narrative",
+    "Simplification: Break complex BEC investigations into a repeatable checklist",
+    "Repetition: Rehearse BEC classification until it becomes automatic",
+    "Teaching: Explain BEC types to a colleague to reinforce your understanding",
+    "Mnemonic: Use BEC-CLASS (CEO, Legal, Attorney, Supplier, Salary, Data) for the six types",
+    "Movement: Walk through each BEC stage physically while reviewing notes",
+    "Curiosity: Ask 'what would I miss?' at each investigation step to deepen analysis"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why BEC Matters",
+      "content": "Business Email Compromise costs organizations billions annually — not through sophisticated exploits, but through social engineering and trust manipulation. As a defender, understanding BEC isn't optional; it's essential. The FBI reports BEC as the costliest cybercrime category. Your ability to quickly classify, contain, and coordinate BEC response directly impacts whether your organization loses thousands or millions.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "BEC Attack Stages and Typology",
+      "content": "BEC follows a predictable lifecycle:\n\n1. **Reconnaissance**: Attacker identifies targets via LinkedIn, company websites, and social media.\n2. **Compromise**: Account takeover via credential phishing, brute force, or purchased credentials.\n3. **Monitoring**: Attacker reads emails to understand communication patterns and financial workflows.\n4. **Execution**: Fraudulent payment instructions, invoice modifications, or data exfiltration requests.\n5. **Persistence**: Maintaining access through inbox rules, forwarding rules, or additional account compromises.\n\n**Six+ BEC Types:**\n- **CEO Fraud**: Impersonating a C-level executive to authorize wire transfers.\n- **Vendor Fraud**: Compromising vendor email to redirect legitimate invoice payments.\n- **Payroll Redirect**: Changing employee direct deposit information.\n- **Attorney Impersonation**: Posing as legal counsel to pressure urgent payments.\n- **Data Theft**: Requesting sensitive employee data (W-2s, PII) under false pretenses.\n- **Gift Card Scam**: Requesting gift card purchases supposedly for executives.\n\nEach type requires a different detection and response approach."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: BEC Explained Simply",
+      "content": "Imagine someone sneaks into your school and pretends to be the principal. They send a message to the school treasurer saying 'Quick, transfer money to this new bank account!' The treasurer trusts the principal, so they do it. That's BEC — someone pretends to be a trusted person in a company and tricks others into sending money or sharing secrets.\n\nThere are different tricks: sometimes they pretend to be the boss (CEO fraud), sometimes they pretend to be a supplier asking for payment to a different account (vendor fraud), and sometimes they steal an employee's password to read their emails and learn how the company works before making their move."
+    },
+    {
+      "type": "code_exercise",
+      "title": "MITRE ATT&CK Mapping for O365 BEC",
+      "content": "Map BEC tactics to MITRE ATT&CK techniques in an O365 environment:\n\n```python\n# BEC MITRE ATT&CK mapping for O365\nbec_mitre_mapping = {\n    'Initial Access': {\n        'T1566.001': 'Spearphishing Attachment',\n        'T1566.002': 'Spearphishing Link',\n        'T1078': 'Valid Accounts (compromised credentials)'\n    },\n    'Persistence': {\n        'T1098': 'Account Manipulation (inbox rules, forwarding)',\n        'T1114': 'Email Collection (reading sensitive emails)'\n    },\n    'Defense Evasion': {\n        'T1070': 'Indicator Removal (deleting sent/deleted items)',\n        'T1562': 'Impair Defenses (disabling MFA)'\n    },\n    'Collection': {\n        'T1114.001': 'Local Email Collection',\n        'T1114.002': 'Remote Email Collection'\n    },\n    'Command and Control': {\n        'T1071.001': 'Web Protocols (O365 API abuse)'\n    }\n}\n\n# Print the attack chain\nfor tactic, techniques in bec_mitre_mapping.items():\n    print(f'\\n{tactic}:')\n    for tid, tname in techniques.items():\n        print(f'  {tid} - {tname}')\n```\n\nThis mapping helps you correlate detections and build investigation timelines."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World BEC Case: The $42 Million Vendor Fraud",
+      "content": "In 2019, a Chinese-owned manufacturer was targeted in a vendor fraud BEC campaign. Attackers compromised a vendor's email account, monitored communications for weeks, then sent modified invoices with updated bank details. The company transferred over $42 million before discovering the fraud.\n\n**Key Lessons:**\n- Vendor email compromise is harder to detect than internal compromise — you don't control the vendor's security.\n- Payment change verification procedures are critical: always call the vendor at a known number.\n- Multi-channel verification (phone + email) for any payment detail changes should be mandatory.\n- Mail forwarding rules were the attacker's primary persistence mechanism — audit these regularly."
+    },
+    {
+      "type": "memory_aid",
+      "title": "BEC-CLASS Mnemonic",
+      "content": "Remember the six BEC types with **BEC-CLASS**:\n\n- **C** = CEO Fraud (executive impersonation)\n- **L** = Legal/Attorney Impersonation\n- **A** = Account Compromise (credential theft-based)\n- **S** = Supplier/Vendor Fraud\n- **S** = Salary/Payroll Redirect\n- **D** = Data Theft (W-2, PII requests)\n\n**BEC Response Priorities** — **SCOPE**:\n- **S** = Secure the account (revoke sessions, reset password)\n- **C** = Collect evidence (preserve mail, logs, headers)\n- **O** = Organize the team (legal, finance, HR, PR)\n- **P** = Probe the scope (check forwarding rules, delegated access)\n- **E** = Execute containment (notify affected parties, block domains)"
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your Organization's BEC Readiness",
+      "content": "Consider your current environment:\n\n1. Do you have a defined BEC response playbook?\n2. How quickly can you identify inbox rules set by an attacker?\n3. What's your process for verifying payment change requests?\n4. Can you distinguish between a legitimate executive request and a BEC attempt?\n5. Who would lead the cross-functional response: security, legal, or finance?\n\nWrite down your gaps. These become your immediate action items."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The BEC Investigator's Mindset",
+      "content": "BEC investigations require switching between two modes: **technical forensics** (what did the attacker do in the mailbox?) and **business coordination** (who needs to know, what legal obligations exist?). The best BEC responders are those who can translate technical findings into business risk language. When you find a forwarding rule, don't just document it — calculate how many days data was exfiltrated and which transactions may have been observed. That translation is what makes your investigation actionable.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Liability Determination in BEC Incidents",
+      "content": "Liability in BEC is rarely straightforward. Key considerations:\n\n**Internal Liability:**\n- Did the organization have reasonable security controls (MFA, email filtering)?\n- Were payment verification procedures followed?\n- Was there adequate employee training on BEC?\n\n**External Liability:**\n- Did the vendor follow security best practices if their account was compromised?\n- Is the bank liable for processing transactions to suspicious accounts?\n- Does cyber insurance cover the specific BEC type?\n\n**Regulatory Obligations:**\n- GDPR/CCPA notification for PII exposure (data theft BEC)\n- SEC reporting for material financial losses\n- Industry-specific regulations (healthcare, finance)\n\n**Evidence Preservation:**\n- Maintain forensic copies of compromised mailboxes\n- Preserve O365 audit logs (set retention policies BEFORE incidents)\n- Document the timeline with UTC timestamps\n- Chain of custody for any evidence shared with law enforcement"
+    },
+    {
+      "type": "explanation",
+      "title": "Coordinating Cross-Functional BEC Response",
+      "content": "BEC response requires orchestration across multiple teams:\n\n**Security Team:** Technical investigation, account recovery, threat containment.\n**Legal Counsel:** Liability assessment, regulatory notification, law enforcement coordination.\n**Finance:** Payment recovery, bank coordination, transaction verification.\n**HR:** Employee communication, payroll verification, identity confirmation.\n**Communications/PR:** Internal and external messaging, media response.\n**Executive Leadership:** Decision authority on ransom/negotiation, public disclosure.\n\n**Coordination Protocol:**\n1. Establish a dedicated communication channel (not email — it may be compromised).\n2. Assign a single incident commander with cross-functional authority.\n3. Hold structured briefings every 2-4 hours during active response.\n4. Document all decisions with timestamps and rationale.\n5. Use out-of-band communication for sensitive details."
+    }
+  ],
+  "tags": [
+    "Course: SANS-LDR553",
+    "Career Path: Blue Teamer",
+    "Career Path: DFIR Specialist",
+    "BEC",
+    "incident-management",
+    "email-security",
+    "O365",
+    "MITRE-ATT&CK"
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "lesson_id": "86ab7b00-dbb8-4ec8-88a8-80eb9aa63fea",
+  "domain": "osint",
+  "title": "Wireless Network OSINT",
+  "difficulty": 2,
+  "order_index": 69,
+  "prerequisites": [
+    "Business and Corporate OSINT"
+  ],
+  "concepts": [
+    "WiFi network discovery and enumeration techniques",
+    "Wireless network naming conventions and intelligence",
+    "Wigle.net and wireless mapping databases",
+    "Bluetooth device discovery and tracking",
+    "RF signal analysis and geolocation",
+    "Corporate wireless network reconnaissance",
+    "IoT and smart device wireless fingerprinting",
+    "Wireless security protocol identification and assessment"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Discover and enumerate wireless networks using OSINT techniques and databases",
+    "Extract intelligence from wireless network naming conventions and metadata",
+    "Use Wigle.net and similar databases to map wireless infrastructure geographically",
+    "Identify and track Bluetooth and IoT devices for physical and logical reconnaissance",
+    "Assess wireless security configurations from publicly available signal data"
+  ],
+  "post_assessment": [
+    {
+      "question": "What intelligence can be derived from WiFi network naming conventions (SSIDs)?",
+      "options": [
+        "Nothing useful — SSIDs are random",
+        "Organization identity, location type, building/floor info, and technology stack indicators",
+        "Only the network password strength",
+        "The exact GPS coordinates of the access point"
+      ],
+      "correct": 1,
+      "explanation": "SSIDs often reveal organizational identity, building/floor designators, network purpose (guest, corp, IoT), and sometimes technology vendors — all valuable OSINT without connecting to the network."
+    },
+    {
+      "question": "Which platform aggregates WiFi access point data submitted by volunteers worldwide, enabling geolocation and infrastructure mapping?",
+      "options": [
+        "Shodan",
+        "Wigle.net",
+        "Censys",
+        "VirusTotal"
+      ],
+      "correct": 1,
+      "explanation": "Wigle.net (Wireless Geographic Logging Engine) is the primary platform for WiFi access point data aggregation, with billions of networks mapped globally."
+    },
+    {
+      "question": "How can Bluetooth device discovery contribute to physical surveillance detection?",
+      "options": [
+        "It can't — Bluetooth is too short-range",
+        "Repeatedly observing the same Bluetooth device across different locations may indicate surveillance or tracking",
+        "Bluetooth only reveals device names, which aren't useful",
+        "Bluetooth scanning is illegal everywhere"
+      ],
+      "correct": 1,
+      "explanation": "Bluetooth devices broadcast unique MAC addresses and often descriptive names. Observing the same device across multiple locations and times can indicate surveillance — a technique used in counter-surveillance."
+    },
+    {
+      "question": "What wireless security protocol information is visible in beacon frames without authentication?",
+      "options": [
+        "Nothing — all security info requires authentication",
+        "Cipher suite information, authentication type (WPA2/WPA3), and management frame protection status",
+        "The actual encryption keys in use",
+        "The number of connected clients only"
+      ],
+      "correct": 1,
+      "explanation": "Beacon frames broadcast security capabilities including authentication type (Open, WPA2-Personal, WPA2-Enterprise, WPA3), cipher suites (CCMP, TKIP), and management frame protection status — all without requiring any connection."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Map wireless networks on a physical map to see coverage patterns and organizational infrastructure",
+    "Association: Link SSID naming patterns to organizational intelligence (CorpWiFi = corporate, IoT-VLAN = smart building)",
+    "Emotion: The realization that wireless signals broadcast organizational infrastructure to anyone listening",
+    "Story: Build a target profile entirely from wireless signals discovered during a walk near the facility",
+    "Simplification: Wireless OSINT = listen to what networks broadcast, map what you find, connect the dots",
+    "Repetition: Practice interpreting beacon frame data until security indicators are immediately readable",
+    "Teaching: Explain to a colleague how an organization's wireless infrastructure reveals its security posture",
+    "Mnemonic: WIRELESS — Wardriving, Identification, Range mapping, Encryption analysis, Location pinpointing, ESSID analysis, Signal tracking, Spectrum analysis, Surveillance detection",
+    "Movement: Walk a perimeter observing wireless signals — physical movement helps map coverage zones",
+    "Curiosity: For every WiFi network you see, ask 'what does this name tell me about the organization?'"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Air Is Talking — Are You Listening?",
+      "content": "Every organization broadcasts information about itself through wireless signals. SSIDs reveal company names, building locations, and sometimes even department designators. Signal strength maps building layouts. Encryption types reveal security maturity. Bluetooth devices expose employee devices and IoT infrastructure. The air around a target is a rich intelligence source — you just need to know how to listen.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "WiFi Network Discovery and Intelligence",
+      "content": "Wireless networks broadcast information that anyone can receive:\n\n**Beacon Frame Intelligence:**\n- **SSID**: Network name — often reveals organization, building, floor, purpose\n- **BSSID**: Access point MAC address — identifies vendor and specific device\n- **Security type**: Open, WPA2-Personal, WPA2-Enterprise, WPA3\n- **Cipher suites**: CCMP (AES), TKIP, or mixed — indicates security posture\n- **Channel**: Frequency band usage — indicates infrastructure density\n- **Signal strength**: Proximity and location estimation\n- **Management Frame Protection**: Indicates 802.11w support (security maturity)\n\n**SSID Naming Intelligence:**\n- **Corporate**: 'AcmeCorp-5G', 'AcmeCorp-Guest' → organization name + network purpose\n- **Departmental**: 'Finance-5G', 'Engineering-WiFi' → departmental segmentation\n- **Building/Floor**: 'BldgA-Fl3-Corp' → physical location\n- **IoT**: 'IoT-Smart-Lighting', 'HVAC-Control' → IoT infrastructure\n- **Default**: 'NETGEAR-5G', 'Linksys02440' → likely unconfigured, potential vulnerability\n\n**Security Posture Indicators:**\n- Open networks → No wireless security\n- WPA2-Personal → Shared password, suitable for home/small office\n- WPA2-Enterprise → 802.1X authentication, more mature security\n- WPA3 → Modern security with SAE, indicates security awareness\n- Mixed WPA2/WPA3 → Transitional, potential downgrade attacks\n- Hidden SSIDs → Security through obscurity (easily discovered)"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Wireless Spying — But Legal!",
+      "content": "Every WiFi router shouts its name to anyone who'll listen. It's like a store with a sign outside saying 'I'm Bob's Store, I use brand X locks, and I'm on channel 6.' You don't need to go inside to read the sign.\n\nWhen you walk around with your phone, it sees these signs (called 'beacon frames') from every router nearby. By collecting these signs, you can figure out:\n- What companies are in this building\n- How many floors the building has (different networks for different floors)\n- Whether they take security seriously (WPA3 = yes, Open = no)\n- Where the router is physically (based on signal strength)\n\nThis is all legal because the information is being broadcast publicly — just like reading store signs on the street."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Wireless Network OSINT Tools and Techniques",
+      "content": "Analyze wireless network data using Python:\n\n```python\nfrom dataclasses import dataclass\nfrom typing import List, Optional\nfrom collections import Counter\n\n@dataclass\nclass AccessPoint:\n    ssid: str\n    bssid: str\n    security: str  # Open, WPA2-Personal, WPA2-Enterprise, WPA3\n    channel: int\n    signal_dbm: int\n    vendor: str = ''  # OUI lookup\n    frequency: str = ''  # 2.4GHz, 5GHz, 6GHz\n    \n    @property\n    def is_secure(self) -> bool:\n        return self.security != 'Open'\n    \n    @property\n    def is_enterprise(self) -> bool:\n        return 'Enterprise' in self.security\n\n@dataclass\nclass WirelessOSINTReport:\n    target_name: str\n    access_points: List[AccessPoint]\n    \n    def analyze_ssid_patterns(self) -> dict:\n        \"\"\"Extract intelligence from SSID naming conventions.\"\"\"\n        patterns = {\n            'corporate_networks': [],\n            'guest_networks': [],\n            'iot_networks': [],\n            'default_configs': [],\n            'hidden_networks': []\n        }\n        \n        for ap in self.access_points:\n            ssid_lower = ap.ssid.lower()\n            if any(k in ssid_lower for k in ['corp', 'internal', 'secure']):\n                patterns['corporate_networks'].append(ap)\n            elif any(k in ssid_lower for k in ['guest', 'public', 'visitor']):\n                patterns['guest_networks'].append(ap)\n            elif any(k in ssid_lower for k in ['iot', 'smart', 'hvac', 'camera']):\n                patterns['iot_networks'].append(ap)\n            elif any(k in ssid_lower for k in ['netgear', 'linksys', 'd-link', 'asus']):\n                patterns['default_configs'].append(ap)\n            \n        return patterns\n    \n    def security_assessment(self) -> dict:\n        \"\"\"Assess wireless security posture.\"\"\"\n        total = len(self.access_points)\n        secure = sum(1 for ap in self.access_points if ap.is_secure)\n        enterprise = sum(1 for ap in self.access_points if ap.is_enterprise)\n        open_nets = [ap for ap in self.access_points if not ap.is_secure]\n        \n        return {\n            'total_access_points': total,\n            'secure_percentage': round(secure / total * 100, 1) if total else 0,\n            'enterprise_percentage': round(enterprise / total * 100, 1) if total else 0,\n            'open_networks': [{'ssid': ap.ssid, 'channel': ap.channel} \n                            for ap in open_nets],\n            'assessment': 'HIGH RISK' if secure / total < 0.5 else \n                         'MODERATE' if secure / total < 0.8 else 'LOW RISK'\n        }\n    \n    def vendor_distribution(self) -> dict:\n        \"\"\"Identify AP vendor distribution.\"\"\"\n        vendors = Counter(ap.vendor for ap in self.access_points)\n        return dict(vendors.most_common(10))\n\n# Example usage\naps = [\n    AccessPoint('AcmeCorp-5G', '00:1A:2B:3C:4D:5E', 'WPA2-Enterprise', 36, -45, 'Cisco'),\n    AccessPoint('AcmeCorp-Guest', '00:1A:2B:3C:4D:5F', 'Open', 36, -50, 'Cisco'),\n    AccessPoint('IoT-Smart-Lighting', '00:1A:2B:3C:4D:60', 'WPA2-Personal', 1, -55, 'Aruba'),\n    AccessPoint('NETGEAR-5G', 'A0:2B:3C:4D:5E:6F', 'WPA2-Personal', 6, -70, 'Netgear'),\n]\n\nreport = WirelessOSINTReport('AcmeCorp HQ', aps)\nprint(report.security_assessment())\nprint(report.analyze_ssid_patterns())\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Corporate Wireless Reconnaissance",
+      "content": "During a red team engagement, wireless reconnaissance revealed:\n\n**Passive Discovery (15 minutes near target building):**\n- 47 access points broadcasting from 3 adjacent buildings\n- SSIDs revealed: 'TargetCorp-Corp-5G', 'TargetCorp-Guest', 'TargetCorp-IoT', 'TargetCorp-VoIP'\n- Naming convention indicated building numbers and floors: 'TC-B2-F3-5G'\n- All corporate networks used WPA2-Enterprise (mature security)\n- Guest network was open with captive portal\n- IoT network used WPA2-Personal (shared key risk)\n\n**Wigle.net Analysis:**\n- Historical data showed network expansion over 3 years (from 12 to 47 APs)\n- New SSIDs appeared 6 months ago coinciding with a merger announcement\n- 'MergerCo-Corp' SSIDs were visible alongside 'TargetCorp' SSIDs\n- This revealed the integration timeline and network architecture decisions\n\n**Physical Intelligence:**\n- Signal mapping revealed AP locations, indicating office layout\n- Parking garage had 'TargetCorp-Guest' with strong signal → potential entry point\n- Executive floor had separate SSID with WPA3 → higher security zone\n- IoT devices visible: HVAC, lighting, camera networks\n\n**Key Lesson:** 15 minutes of passive wireless monitoring revealed organizational structure, merger integration status, building layout, and security segmentation — all without touching the network."
+    },
+    {
+      "type": "memory_aid",
+      "title": "WIRELESS OSINT Framework",
+      "content": "**WIRELESS** — Wireless OSINT methodology:\n\n- **W**ardriving — Systematic wireless network discovery and mapping\n- **I**dentification — SSID and BSSID analysis for organizational intelligence\n- **R**ange mapping — Signal strength analysis for physical location estimation\n- **E**ncryption analysis — Security posture assessment from beacon data\n- **L**ocation pinpointing — Triangulation and geolocation of access points\n- **E**SSID analysis — Network naming conventions and organizational intelligence\n- **S**ignal tracking — Monitoring for changes, new devices, and surveillance indicators\n- **S**pectrum analysis — Understanding frequency bands and channel usage\n\n**Key OSINT Sources:**\n1. **Wigle.net** — WiFi mapping database (billions of networks)\n2. **Wireshark** — Packet capture and beacon frame analysis\n3. **Kismet** — Passive wireless detection and IDS\n4. **Bluetooth scanners** — Device discovery and tracking\n5. **SDR** — Software defined radio for broader RF analysis"
+    },
+    {
+      "type": "reflection",
+      "title": "Map Your Own Wireless Footprint",
+      "content": "Walk around your own office or home and observe:\n\n1. How many WiFi networks can you see? What do their SSIDs reveal?\n2. What security types are in use? Any open networks?\n3. Can you identify your organization's networks among the results?\n4. What IoT devices are broadcasting Bluetooth signals nearby?\n5. What would an attacker learn about your organization from 15 minutes of passive monitoring?\n\nThis exercise reveals how much intelligence your wireless infrastructure leaks. Use it to improve your own security posture."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Passive Before Active",
+      "content": "The cardinal rule of wireless OSINT: passive collection first, active engagement only when necessary. Passive monitoring (listening to beacon frames) reveals enormous intelligence without alerting anyone. Active scanning (probing, connecting) leaves traces. Start with Wigle.net data, passive monitoring, and signal analysis. Only move to active techniques when you have specific questions that passive collection can't answer. The best OSINT operators collect maximum intelligence with minimum footprint.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Bluetooth and IoT Device Intelligence",
+      "content": "Beyond WiFi, Bluetooth and IoT devices provide additional OSINT:\n\n**Bluetooth Discovery:**\n- BLE beacons broadcast device type, name, and services\n- Device names reveal: 'John's iPhone', 'Tesla Model 3', 'Fitbit Charge 5'\n- MAC address OUI identifies device manufacturer\n- Proximity estimation from signal strength\n- Tracking: Same device across multiple locations indicates movement patterns\n\n**IoT Device Fingerprinting:**\n- Smart home devices broadcast on WiFi and Bluetooth\n- Device types: thermostats, cameras, speakers, locks, sensors\n- Default device names reveal manufacturer and model\n- Weak security (Open/WPA2-Personal) on IoT networks indicates vulnerability\n- IoT networks on corporate infrastructure indicate smart building systems\n\n**RF Analysis:**\n- Zigbee, Z-Wave, and other IoT protocols broadcast on specific frequencies\n- SDR can capture these signals for device identification\n- Industrial IoT sensors broadcast on LoRa, Sigfox, or NB-IoT\n- RF mapping can reveal building automation and security systems\n\n**Counter-Surveillance:**\n- Monitor for unknown Bluetooth devices appearing repeatedly\n- Track AirTags and other tracking devices near your location\n- Detect unauthorized wireless cameras or microphones\n- Identify unknown access points in your vicinity"
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "wireless",
+    "WiFi",
+    "Bluetooth",
+    "wardriving",
+    "Wigle",
+    "IoT",
+    "reconnaissance"
+  ]
+}

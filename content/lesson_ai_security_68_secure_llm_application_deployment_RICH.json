@@ -1,0 +1,147 @@
+{
+  "lesson_id": "f23d01f9-27d4-4bac-83a2-9d61eebea24f",
+  "domain": "ai_security",
+  "title": "Secure LLM Application Deployment",
+  "difficulty": 3,
+  "order_index": 68,
+  "prerequisites": [
+    "AI Guardrail Implementation"
+  ],
+  "concepts": [
+    "Production deployment architecture for LLM applications",
+    "Secure API gateway configuration and authentication",
+    "Input/output filtering and content moderation pipelines",
+    "Infrastructure hardening for LLM serving environments",
+    "Monitoring, logging, and observability for LLM workloads",
+    "Rate limiting, throttling, and abuse prevention",
+    "Secrets management and environment configuration",
+    "Blue-green and canary deployment strategies for LLM updates",
+    "Container security for model serving infrastructure",
+    "Incident response playbooks for LLM-specific failures"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Design a secure production deployment architecture for LLM-powered applications",
+    "Implement input validation and output filtering pipelines to prevent prompt injection and data leakage",
+    "Configure API gateways with authentication, rate limiting, and monitoring for LLM endpoints",
+    "Establish deployment strategies that enable safe model updates with rollback capabilities",
+    "Create incident response procedures for LLM-specific security incidents"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which deployment strategy allows you to route a small percentage of traffic to a new LLM version before full rollout?",
+      "options": [
+        "Blue-green deployment",
+        "Canary deployment",
+        "Rolling update",
+        "Recreate strategy"
+      ],
+      "correct": 1,
+      "explanation": "Canary deployment gradually shifts traffic to the new version, allowing you to monitor for security issues before full rollout."
+    },
+    {
+      "question": "What is the primary security risk of exposing an LLM API endpoint without rate limiting?",
+      "options": [
+        "Model accuracy degradation",
+        "Prompt injection",
+        "Resource exhaustion and cost amplification attacks",
+        "Data corruption"
+      ],
+      "correct": 2,
+      "explanation": "Without rate limiting, attackers can exhaust compute resources and inflate costs through volumetric requests, making the service unavailable to legitimate users."
+    },
+    {
+      "question": "Which layer should implement content filtering in a secure LLM deployment?",
+      "options": [
+        "Only the LLM model itself",
+        "Only the frontend",
+        "Multiple layers: input preprocessing, model guardrails, and output post-processing",
+        "The database layer"
+      ],
+      "correct": 2,
+      "explanation": "Defense in depth requires filtering at multiple layers: input preprocessing catches obvious attacks, model guardrails handle in-context issues, and output post-processing catches what slips through."
+    },
+    {
+      "question": "When deploying LLM updates, what should you monitor FIRST after canary deployment?",
+      "options": [
+        "Model accuracy benchmarks",
+        "Response latency and error rates indicating new attack surfaces",
+        "Disk space usage",
+        "Training data provenance"
+      ],
+      "correct": 1,
+      "explanation": "Latency spikes and error rates often indicate that the new model version is being exploited or handling edge cases differently, which can signal new security vulnerabilities."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Draw the full deployment pipeline from user request through API gateway, preprocessing, LLM inference, and response filtering",
+    "Association: Link each security layer to a physical security analogy (API gateway = bouncer, rate limiting = turnstile, filtering = metal detector)",
+    "Emotion: Consider the business impact of a single unguarded LLM endpoint leaking proprietary data",
+    "Story: Walk through a deployment incident from detection to resolution as a narrative",
+    "Simplification: Each deployment component has exactly ONE primary security job — know it",
+    "Repetition: Practice deploying, breaking, and rolling back until the sequence is automatic",
+    "Teaching: Explain the architecture to someone who has never deployed an LLM application",
+    "Mnemonic: SECURE LLM — Secrets, Egress, Canary, URL filtering, Rate limiting, Logging, Load balancing, Monitoring",
+    "Movement: Physically map the architecture on a whiteboard, walking through the request flow",
+    "Curiosity: Ask 'what if this component fails?' for every layer in the stack"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Production Means Different Rules",
+      "content": "In development, a broken LLM response is a bug. In production, it's an incident. The gap between 'works on my machine' and 'secure at scale' is where most LLM applications fail. You need to think about authentication, rate limiting, content filtering, monitoring, and rollback BEFORE you deploy — not after the first prompt injection takes down your service.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "Secure LLM Deployment Architecture",
+      "content": "A production-grade LLM deployment consists of multiple security layers:\n\n**1. API Gateway Layer:**\n- Authentication (OAuth 2.0, API keys, mTLS)\n- Rate limiting (per-user, per-tenant, global)\n- Request size limits and timeout policies\n- TLS termination and certificate management\n\n**2. Input Preprocessing Layer:**\n- Prompt length validation and sanitization\n- Known attack pattern detection (jailbreak signatures)\n- PII detection and redaction before model processing\n- Content policy enforcement\n\n**3. LLM Inference Layer:**\n- Model serving infrastructure (vLLM, TGI, Triton)\n- Container security (read-only filesystem, minimal base image)\n- GPU resource isolation\n- Model version pinning and integrity verification\n\n**4. Output Post-Processing Layer:**\n- Response content filtering (toxicity, PII leakage)\n- Hallucination detection heuristics\n- Format validation (JSON schema, markdown structure)\n- Audit logging for compliance\n\n**5. Observability Layer:**\n- Request/response logging (with PII handling)\n- Latency and error rate monitoring\n- Cost tracking per user/tenant\n- Anomaly detection on usage patterns"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Keeping Robot Helpers Safe",
+      "content": "Imagine you built a robot helper that answers questions. Before you let people talk to it in public, you need:\n\n1. **A door guard** (API gateway) — checks if people are allowed to talk to the robot and makes sure no one asks a million questions at once.\n2. **A filter** (input preprocessing) — removes bad words or tricky instructions before the robot sees them.\n3. **A safe room** (container security) — the robot lives in a locked room where it can't access anything it shouldn't.\n4. **A checker** (output filtering) — reviews what the robot says before it reaches people, making sure it doesn't share secrets.\n5. **A security camera** (monitoring) — watches everything so you can fix problems quickly."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Configuring a Secure LLM API Gateway",
+      "content": "Set up API gateway security configuration:\n\n```python\n# Secure LLM API Gateway Configuration\nimport hashlib\nimport time\nfrom dataclasses import dataclass, field\nfrom typing import Optional\n\n@dataclass\nclass RateLimitConfig:\n    requests_per_minute: int = 60\n    requests_per_day: int = 1000\n    max_concurrent: int = 5\n    cost_limit_daily: float = 50.0  # USD\n\n@dataclass\nclass InputFilterConfig:\n    max_prompt_length: int = 4096\n    block_patterns: list = field(default_factory=lambda: [\n        r'ignore.*previous.*instructions',\n        r'system:.*you are',\n        r'pretend.*you are',\n        r'jailbreak',\n    ])\n    redact_pii: bool = True\n    redact_patterns: list = field(default_factory=lambda: [\n        r'\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b',  # Phone\n        r'\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b',  # Email\n    ])\n\n@dataclass\nclass OutputFilterConfig:\n    toxicity_threshold: float = 0.7\n    max_response_length: int = 8192\n    hallucination_check: bool = True\n    audit_log: bool = True\n\n@dataclass\nclass LLMDeploymentConfig:\n    model_version: str = 'v2.3.1'\n    model_hash: str = ''  # SHA256 of model weights\n    canary_percentage: float = 0.0  # 0-100%\n    rollback_on_error_rate: float = 0.05  # 5% error rate triggers rollback\n    health_check_interval: int = 30  # seconds\n    \n# Example usage\ndeploy_config = LLMDeploymentConfig(\n    model_hash=hashlib.sha256(b'model_weights').hexdigest(),\n    canary_percentage=10.0  # Route 10% to new version\n)\nprint(f'Deploying {deploy_config.model_version} with '\n      f'{deploy_config.canary_percentage}% canary traffic')\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: LLM Deployment Gone Wrong",
+      "content": "A fintech company deployed a customer-facing LLM chatbot without proper rate limiting or output filtering. Within 48 hours:\n\n- An attacker discovered the API endpoint lacked authentication.\n- They crafted prompts that extracted internal system prompts and proprietary financial analysis templates.\n- The attacker used prompt injection to bypass content filters and generated harmful content on the company's domain.\n- Cost amplification: 2 million API calls in 6 hours, resulting in $47,000 in compute costs.\n\n**Root Causes:**\n1. No API authentication on the chatbot endpoint.\n2. Missing rate limiting — the attacker could make unlimited requests.\n3. No output filtering for system prompt leakage.\n4. No cost alerts or anomaly detection on token usage.\n\n**Remediation:** The company added OAuth 2.0 authentication, per-user rate limits, output content filtering, and real-time cost monitoring with automatic circuit breakers."
+    },
+    {
+      "type": "memory_aid",
+      "title": "SECURE LLM Deployment Checklist",
+      "content": "**SECURE LLM** — Production deployment checklist:\n\n- **S**ecrets management — Vault or AWS Secrets Manager, never env vars in code\n- **E**gress controls — Restrict outbound network from model containers\n- **C**anary deployments — Gradual rollout with automated rollback triggers\n- **U**RL/input filtering — Sanitize all inputs before model processing\n- **R**ate limiting — Per-user, per-tenant, and global thresholds\n- **E**ncryption — TLS in transit, encryption at rest for model weights\n\n- **L**ogging — Structured audit logs with PII handling\n- **L**oad balancing — Distribute inference across multiple replicas\n- **M**onitoring — Latency, error rate, cost, and content quality metrics"
+    },
+    {
+      "type": "reflection",
+      "title": "Architecture Review: Your LLM Deployment",
+      "content": "For your next LLM deployment, answer:\n\n1. How will you authenticate API requests? What happens when auth fails?\n2. What's your rate limit strategy for different user tiers?\n3. Where does input filtering happen — can prompts bypass it?\n4. How do you detect and block prompt injection attempts?\n5. What's your rollback plan if a model update introduces vulnerabilities?\n6. How do you monitor for cost amplification attacks?\n7. Where are secrets stored, and who has access?\n8. What's your incident response plan for LLM-specific failures?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Defense in Depth Isn't Optional",
+      "content": "The most dangerous assumption in LLM deployment is 'the model will handle it.' LLMs are inherently unpredictable — that's their strength AND their weakness. You must assume the model will sometimes produce harmful output, leak information, or respond to adversarial prompts. Your deployment architecture must catch these failures at every layer. Single points of failure in LLM security are single points of catastrophic failure.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Deployment Strategies and Rollback Procedures",
+      "content": "When updating LLM models in production, use progressive deployment:\n\n**Canary Deployment:**\n- Route 5-10% of traffic to the new model version.\n- Monitor error rates, latency, and content quality for 1-4 hours.\n- Automated rollback if error rate exceeds threshold or content filtering catches anomalous outputs.\n- Gradually increase traffic: 10% → 25% → 50% → 100%.\n\n**Blue-Green Deployment:**\n- Maintain two identical environments (blue = current, green = new).\n- Run shadow traffic through green environment for validation.\n- Switch DNS/load balancer when green passes all checks.\n- Keep blue environment warm for instant rollback.\n\n**Rollback Triggers:**\n- Error rate exceeds 5% above baseline.\n- Latency P99 exceeds 2x baseline.\n- Content filtering rejection rate spikes above normal.\n- Cost per request exceeds threshold.\n- Specific attack patterns detected against new version.\n\n**Model Integrity:**\n- Pin model versions by hash, not tag.\n- Verify model weight integrity on load.\n- Store previous versions for instant rollback.\n- Never auto-update model versions in production."
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC411",
+    "Career Path: AI Security",
+    "Career Path: Security Engineer",
+    "LLM",
+    "deployment",
+    "production",
+    "API-security",
+    "infrastructure"
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "lesson_id": "8455a59b-566b-42fb-abc1-a933d69ec0f8",
+  "domain": "osint",
+  "title": "Business and Corporate OSINT",
+  "difficulty": 2,
+  "order_index": 68,
+  "prerequisites": [
+    "The OSINT Process and Methodology"
+  ],
+  "concepts": [
+    "Corporate registration databases and business entity research",
+    "Financial disclosures: SEC filings, annual reports, and proxy statements",
+    "Organizational structure mapping: subsidiaries, parent companies, mergers",
+    "Supply chain OSINT: vendor relationships and third-party dependencies",
+    "Litigation and regulatory records for corporate intelligence",
+    "Patent and trademark intelligence",
+    "Executive and board member profiling",
+    "Corporate DNS and infrastructure enumeration",
+    "Open source business intelligence platforms"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Research business entities using corporate registration databases across multiple jurisdictions",
+    "Map organizational structures including subsidiaries, parent companies, and hidden relationships",
+    "Analyze financial disclosures to extract strategic intelligence about company direction and risk",
+    "Investigate supply chain relationships to identify vendor dependencies and third-party risks",
+    "Profile executives and board members using publicly available corporate and social records"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which SEC filing provides the most detailed information about a public company's executive compensation and board structure?",
+      "options": [
+        "10-K Annual Report",
+        "DEF 14A Proxy Statement",
+        "8-K Current Report",
+        "10-Q Quarterly Report"
+      ],
+      "correct": 1,
+      "explanation": "The DEF 14A (Definitive Proxy Statement) contains detailed executive compensation, board nominations, and corporate governance information — more granular than what appears in 10-K filings."
+    },
+    {
+      "question": "When researching a private company's ownership structure, which source provides the most reliable jurisdiction-level entity data?",
+      "options": [
+        "LinkedIn company pages",
+        "State Secretary of State business registries",
+        "Wikipedia",
+        "Google search results"
+      ],
+      "correct": 1,
+      "explanation": "Secretary of State business registries are primary sources for entity formation, registered agents, and officer information. They are authoritative and current, unlike secondary aggregators."
+    },
+    {
+      "question": "What technique reveals hidden corporate relationships through shared infrastructure?",
+      "options": [
+        "Searching LinkedIn for employee overlap",
+        "Correlating SSL certificate and DNS records across domains",
+        "Reading press releases",
+        "Checking social media mentions"
+      ],
+      "correct": 1,
+      "explanation": "Shared SSL certificates (same organizational unit), overlapping DNS nameservers, and common IP ranges often reveal corporate relationships not disclosed in public filings."
+    },
+    {
+      "question": "Which type of public record would reveal if a target company is involved in ongoing litigation?",
+      "options": [
+        "SEC 10-K filings",
+        "PACER court records",
+        "Patent databases",
+        "WHOIS records"
+      ],
+      "correct": 1,
+      "explanation": "PACER (Public Access to Court Electronic Records) provides access to federal court case filings, revealing litigation, bankruptcy, and regulatory enforcement actions."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Create mind maps of corporate structures — subsidiaries branch from parent nodes",
+    "Association: Link each OSINT source to a physical investigative tool (SEC filings = x-ray, DNS = fingerprint)",
+    "Emotion: The thrill of discovering a hidden subsidiary or undisclosed relationship fuels deeper investigation",
+    "Story: Build each investigation as a corporate thriller narrative — who owns what, who hides what",
+    "Simplification: Every corporate investigation reduces to three questions: Who owns it? Who runs it? Who supplies it?",
+    "Repetition: Practice looking up companies until the sources are second nature",
+    "Teaching: Walk a colleague through a corporate investigation to solidify your process",
+    "Mnemonic: CORP — Corporate records, Ownership chains, Relationships, Patents & IP",
+    "Movement: Physically arrange sticky notes showing corporate hierarchy on a wall",
+    "Curiosity: Always ask 'what relationship is NOT disclosed?' when examining corporate data"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Corporate OSINT: Seeing Behind the Curtain",
+      "content": "Every organization leaves a paper trail. Corporate registrations, financial filings, patent applications, litigation records — they all tell a story. Your job as an OSINT investigator is to piece together that story, revealing hidden relationships, undisclosed risks, and strategic direction. The best corporate investigators don't just find data — they connect dots that companies would prefer stay unconnected.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "Business Entity Research Fundamentals",
+      "content": "Corporate OSINT begins with understanding your target's legal entity structure:\n\n**Registration Databases:**\n- **US**: State Secretary of State databases (Delaware, Nevada, Wyoming are key jurisdictions)\n- **International**: Companies House (UK), OpenCorporates (global), local registries\n- **Key Data**: Incorporation date, registered agent, officers, entity status, filing history\n\n**Financial Disclosures:**\n- **10-K**: Annual reports with risk factors, business description, financial statements\n- **10-Q**: Quarterly updates on financial performance\n- **DEF 14A**: Proxy statements revealing executive compensation, board composition\n- **8-K**: Material event disclosures (acquisitions, leadership changes, legal proceedings)\n- **13-F**: Institutional investor holdings (who holds large positions)\n\n**Subsidiary Discovery:**\n- Exhibit 21 in 10-K filings lists all subsidiaries\n- Cross-reference with state registrations for entities not in Exhibit 21\n- Check for DBA ('doing business as') registrations\n- International subsidiaries via local registries"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Investigating Companies",
+      "content": "Think of a company like a Russian nesting doll. The big doll you see on the outside is the main company, but inside there are smaller dolls — subsidiaries, hidden companies, and partnerships that the company doesn't always talk about. Your job is to open each doll and see what's inside.\n\nYou can find these hidden dolls by:\n- Looking at official government records where companies must register\n- Reading the reports public companies have to file\n- Checking who owns the websites and computer systems the company uses\n- Finding court records if the company has been sued\n- Looking at patents to see what new things they're building"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Automating Corporate Entity Research",
+      "content": "Build a corporate OSINT research framework:\n\n```python\nimport requests\nfrom datetime import datetime\n\nclass CorporateOSINT:\n    \"\"\"Corporate intelligence research framework.\"\"\"\n    \n    def __init__(self, target_company):\n        self.target = target_company\n        self.findings = {\n            'entity_data': {},\n            'filings': [],\n            'subsidiaries': [],\n            'executives': [],\n            'litigation': [],\n            'domains': [],\n            'relationships': []\n        }\n    \n    def research_entity_registration(self, state='DE'):\n        \"\"\"Research business entity registration.\"\"\"\n        # Delaware Division of Corporations\n        # Note: Requires actual API access or manual lookup\n        sources = {\n            'DE': 'https://icis.corp.delaware.gov/ecorp/',\n            'NV': 'https://www.nvsilverfluming\",\n            'OpenCorporates': f'https://opencorporates.com/companies?q={self.target}'\n        }\n        return sources.get(state, 'Unknown jurisdiction')\n    \n    def analyze_sec_filings(self):\n        \"\"\"Key SEC filings to research.\"\"\"\n        filings_map = {\n            '10-K': 'Annual report — risk factors, business overview, financials',\n            '10-Q': 'Quarterly financial update',\n            'DEF 14A': 'Proxy statement — executives, compensation, board',\n            '8-K': 'Material events — acquisitions, leadership changes',\n            '13-F': 'Institutional holdings — who owns large positions',\n            'SC 13D': 'Activist investor disclosures (>5% ownership)'\n        }\n        return filings_map\n    \n    def extract_subsidiaries(self):\n        \"\"\"Exhibit 21 from 10-K lists all subsidiaries.\"\"\"\n        print(f'Search EDGAR for {self.target} 10-K Exhibit 21')\n        print('https://www.sec.gov/cgi-bin/browse-edgar')\n        return 'Cross-reference with state registrations'\n\n# Initialize and research\ninvestigation = CorporateOSINT('TargetCorp Inc.')\nprint(investigation.analyze_sec_filings())\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Uncovering Hidden Corporate Networks",
+      "content": "A security researcher investigating a suspicious SaaS vendor discovered:\n\n1. The vendor's website claimed 'founded in 2018, serving 10,000+ customers.'\n2. Delaware registration showed incorporation in 2021, not 2018.\n3. The registered agent matched a shell company formation service.\n4. DNS records showed the vendor's infrastructure shared nameservers with three other 'independent' review sites that all gave the vendor 5-star ratings.\n5. LinkedIn profiles for 'team members' used stock photos.\n6. One real executive on the website appeared on two other company boards — both with litigation histories.\n7. PACER records showed the parent company had been sued for false advertising.\n\n**Takeaway**: No single OSINT source told the full story. The combination of corporate registrations, DNS analysis, social media verification, and litigation records revealed a fabricated company with manufactured credibility."
+    },
+    {
+      "type": "memory_aid",
+      "title": "CORP Framework for Business OSINT",
+      "content": "**CORP** — Your business OSINT framework:\n\n- **C**orporate records — Registration, filings, entity status\n- **O**wnership chains — Parent companies, subsidiaries, beneficial owners\n- **R**elationships — Executives, board members, shared infrastructure\n- **P**atents & IP — Trademarks, patents, IP strategy indicators\n\n**Five Essential Sources:**\n1. SEC EDGAR — Financial filings and exhibits\n2. State Secretary of State — Entity registration and officers\n3. OpenCorporates — Global corporate relationships\n4. PACER — Litigation and regulatory actions\n5. Patent databases — USPTO, WIPO, EPO for IP strategy"
+    },
+    {
+      "type": "reflection",
+      "title": "Practice: Research a Public Company",
+      "content": "Pick a publicly traded company and research:\n\n1. What subsidiaries are listed in their latest 10-K Exhibit 21?\n2. Who are the board members listed in the DEF 14A?\n3. What material events have been reported in the last year (8-K filings)?\n4. What litigation appears in their 10-K risk factors?\n5. What domains resolve to their infrastructure?\n6. Are there any undisclosed related-party transactions?\n\nDocument your findings. You'll be surprised how much intelligence is hiding in plain sight."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Connect the Dots, Don't Collect the Dots",
+      "content": "The difference between data collection and intelligence is analysis. Anyone can look up a company on SEC EDGAR. The skill is connecting that filing to the subsidiary that was quietly spun off, to the executive who simultaneously sits on the board of a competitor, to the patent that reveals a new product direction they haven't announced. Train yourself to always ask: 'What does this data point connect to?' That's where the real intelligence lives.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Supply Chain and Third-Party Intelligence",
+      "content": "Supply chain OSINT reveals dependencies and vulnerabilities:\n\n**Vendor Discovery:**\n- Press releases and case studies naming specific vendors\n- Job postings mentioning tools and platforms ('seeking experience with Workday')\n- LinkedIn employee profiles listing technology stacks\n- Conference sponsor lists and exhibitor pages\n- Subcontractor and vendor disclosures in government contracts\n\n**Third-Party Risk Indicators:**\n- Financial instability of key vendors (credit ratings, SEC filings)\n- Geographic concentration of supply chain (single-country dependency)\n- Vendor litigation history (PACER, state court records)\n- Security incident disclosures (state breach notification databases)\n- Sanctions and export control compliance\n\n**Intelligence Value:**\n- Supply chain attacks target the weakest vendor link\n- Vendor financial distress can indicate service disruption risk\n- Shared infrastructure between vendor and target expands attack surface\n- M&A activity in vendor ecosystem can change security posture"
+    }
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "corporate-intelligence",
+    "business-OSINT",
+    "SEC-filings",
+    "supply-chain",
+    "entity-research"
+  ]
+}

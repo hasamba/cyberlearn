@@ -1,0 +1,148 @@
+{
+  "lesson_id": "0cc6e17e-a57a-4322-8234-a703567bd349",
+  "domain": "red_team",
+  "title": "In-Memory Payload Execution",
+  "difficulty": 3,
+  "order_index": 68,
+  "prerequisites": [
+    "Advanced Process Injection and Migration"
+  ],
+  "concepts": [
+    "Reflective DLL injection and loading",
+    "In-memory .NET assembly execution",
+    "Fileless malware techniques and evasion",
+    "Memory-only payload architectures",
+    "Position-independent code (shellcode)",
+    "AMSI and ETW bypass techniques",
+    "Unmanaged code execution from managed processes",
+    "Process hollowing vs reflective loading trade-offs",
+    "Payload staging and obfuscation in memory",
+    "Detection considerations and defensive countermeasures"
+  ],
+  "estimated_time": 55,
+  "learning_objectives": [
+    "Understand the architecture and execution flow of reflective PE loading in memory",
+    "Execute .NET assemblies in memory without touching disk using approved tools",
+    "Differentiate between fileless techniques: reflective loading, process hollowing, and injection",
+    "Implement in-memory payload execution while understanding detection risk and OPSEC implications",
+    "Analyze how EDR/AV detects in-memory execution and apply appropriate evasion strategies"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary advantage of reflective DLL injection over traditional LoadLibrary injection?",
+      "options": [
+        "It's faster to execute",
+        "The DLL is not registered in the PEB loaded module list",
+        "It requires fewer privileges",
+        "It works across process boundaries automatically"
+      ],
+      "correct": 1,
+      "explanation": "Reflective DLL injection resolves its own imports and calls its own entry point without using LoadLibrary, which means the DLL is not added to the PEB (Process Environment Block) loaded module list — making it harder for EDR to enumerate."
+    },
+    {
+      "question": "Which technique executes a .NET assembly entirely in memory without writing to disk?",
+      "options": [
+        "Process hollowing",
+        "Assembly.Load via reflection",
+        "DLL side-loading",
+        "COM hijacking"
+      ],
+      "correct": 1,
+      "explanation": "Assembly.Load() loads a .NET assembly from a byte array into the AppDomain without touching disk, making it a core technique for in-memory .NET execution."
+    },
+    {
+      "question": "What does AMSI (Anti-Malware Scan Interface) do that affects in-memory .NET execution?",
+      "options": [
+        "Blocks network connections from injected code",
+        "Scans content before it's loaded into memory (scripts, assemblies)",
+        "Prevents process creation from injected threads",
+        "Monitors registry changes from in-memory code"
+      ],
+      "correct": 1,
+      "explanation": "AMSI integrates with PowerShell, VBScript, and .NET to scan content before execution. It catches malicious scripts and assemblies even if they never touch disk."
+    },
+    {
+      "question": "In OPSEC terms, why is execute-assembly preferred over traditional shellcode injection for .NET payloads?",
+      "options": [
+        "It's completely undetectable",
+        "It executes within an existing legitimate process without creating a new sacrificial process",
+        "It doesn't use any memory",
+        "It automatically evades all EDR products"
+      ],
+      "correct": 1,
+      "explanation": "execute-assembly runs within the current process context, avoiding the suspicious behavior of creating new processes or injecting into other processes — reducing detection surface."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Visualization: Draw the memory layout showing where payloads are loaded, executed, and how imports are resolved",
+    "Association: Link each technique to its detection signature — reflective loading → PEB walking, .NET assembly → AMSI",
+    "Emotion: Understanding in-memory execution gives you the power to see what defenders miss and what attackers exploit",
+    "Story: Trace a payload from C2 staging server through memory injection to execution as a complete attack narrative",
+    "Simplification: In-memory execution = code runs but never exists as a file on disk",
+    "Repetition: Practice each technique until the API call sequence is second nature",
+    "Teaching: Explain the difference between reflective loading and process hollowing to a colleague",
+    "Mnemonic: REFLECT — Resolve imports, Execute entry point, Find base address, Load into memory, Erase headers, Callback hook, Thread creation",
+    "Movement: Physically map memory addresses on a whiteboard, walking through the loading sequence",
+    "Curiosity: Always ask 'how would EDR detect this?' — understand both sides of the coin"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Fileless Frontier",
+      "content": "In-memory execution is the cornerstone of modern evasion. Defenders have built their detection around files — scanning the filesystem, checking signatures on disk. When you execute code that never touches disk, you bypass the primary detection mechanism. But understand this: in-memory doesn't mean invisible. EDR has memory scanning, AMSI has content scanning, and behavioral detection watches what code does. The game isn't about being invisible — it's about being indistinguishable from legitimate activity.",
+      "emoji": "🧠"
+    },
+    {
+      "type": "explanation",
+      "title": "Reflective PE Loading Architecture",
+      "content": "Reflective loading is the process of manually loading a PE (Portable Executable) into memory without using the Windows loader:\n\n**Standard Loading (LoadLibrary):**\n1. OS reads PE headers from disk\n2. Allocates memory at the preferred image base\n3. Maps PE sections into memory\n4. Resolves imports via IAT (Import Address Table)\n5. Registers the module in PEB loaded module list\n6. Calls DllMain with DLL_PROCESS_ATTACH\n\n**Reflective Loading:**\n1. Allocate memory in target process (VirtualAllocEx)\n2. Copy PE headers and sections into allocated memory\n3. **Self-resolve imports**: The DLL contains code that calls LoadLibrary/GetProcAddress for each import\n4. Process relocations (fix base address differences)\n5. Call entry point manually\n6. **Module is NOT registered in PEB** — harder to enumerate\n\n**Key OPSEC Considerations:**\n- Unbacked executable memory (memory not backed by a file on disk) is a strong EDR signal\n- AMSI may still scan .NET content before loading\n- ETW (Event Tracing for Windows) captures process creation and module loads\n- Behavioral detection focuses on API call sequences (VirtualAllocEx → WriteProcessMemory → CreateRemoteThread)"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Running Code Without Files",
+      "content": "Normally, when you run a program, Windows reads it from a file on your hard drive, puts it in memory, and starts it. It's like reading a recipe from a cookbook and then cooking it.\n\nIn-memory execution is like memorizing the recipe and cooking it without ever opening the cookbook. The food still gets made, but there's no cookbook on the counter for someone to find.\n\nSecurity programs usually look for the cookbook (files on disk). If you never open the cookbook, they might miss what you're cooking. But clever security programs can still smell what's cooking in the kitchen (memory scanning) or watch what ingredients you're using (API call monitoring)."
+    },
+    {
+      "type": "code_exercise",
+      "title": "In-Memory .NET Assembly Execution",
+      "content": "Execute a .NET assembly in memory without touching disk:\n\n```csharp\n// In-memory .NET assembly execution concept\n// This is for educational purposes — understand the technique\n\nusing System;\nusing System.Reflection;\nusing System.IO;\n\npublic class InMemoryExecution\n{\n    // Method 1: Assembly.Load from byte array\n    public static void LoadFromBytes(byte[] assemblyBytes)\n    {\n        // Load assembly directly from memory\n        Assembly asm = Assembly.Load(assemblyBytes);\n        \n        // Find and invoke the entry point\n        MethodInfo entry = asm.EntryPoint;\n        if (entry != null)\n        {\n            entry.Invoke(null, null);\n        }\n    }\n    \n    // Method 2: Load from memory stream\n    public static void LoadFromStream(byte[] assemblyBytes)\n    {\n        using (var ms = new MemoryStream(assemblyBytes))\n        {\n            // BinaryReader for raw bytes\n            // Assembly.Load handles the rest\n            var asm = Assembly.Load(assemblyBytes);\n            var entry = asm.EntryPoint;\n            entry?.Invoke(null, null);\n        }\n    }\n}\n\n// OPSEC Notes for defenders:\n// 1. AMSI scans Assembly.Load content before execution\n// 2. ETW captures assembly load events (dotnet runtime events)\n// 3. Unbacked executable memory is flagged by EDR\n// 4. Process injection creates visible API call patterns\n```\n\n**Important**: Modern EDR products detect:\n- `Assembly.Load` calls from suspicious processes\n- Unbacked executable memory regions\n- AMSI content scanning for known malicious patterns\n- ETW telemetry showing anomalous assembly loading"
+    },
+    {
+      "type": "real_world",
+      "title": "Cobalt Strike execute-assembly and Its Detection",
+      "content": "Cobalt Strike's `execute-assembly` command is the canonical example of in-memory .NET execution in red team operations:\n\n**How it works:**\n1. Beacon downloads .NET assembly bytes from team server\n2. `execute-assembly` uses the CLR hosting API to load the assembly\n3. The assembly runs within the Beacon's process (typically a legitimate process like svchost.exe)\n4. Output is captured and sent back through the C2 channel\n5. The assembly exists only in memory — never on disk\n\n**Detection methods:**\n- **AMSI**: Scans .NET content before loading. Cobalt Strike patches AMSI to bypass this.\n- **ETW**: .NET runtime events capture assembly loads. Defenders monitor for `AssemblyLoad` events from suspicious processes.\n- **Memory scanning**: EDR products scan for unbacked executable memory regions.\n- **Behavioral**: Process executing .NET code that doesn't normally run .NET (e.g., svchost.exe running .NET assemblies).\n- **Parent-child anomalies**: Unexpected .NET execution from system processes.\n\n**OPSEC improvements** (for defenders to understand attacker tradecraft):\n- Hosting CLR in processes that legitimately run .NET\n- Using alternative loading mechanisms (e.g., COM objects)\n- Patching AMSI and ETW before loading assemblies\n- Employing sleep masking to hide beacon memory during idle periods"
+    },
+    {
+      "type": "memory_aid",
+      "title": "REFLECT Mnemonic for In-Memory Execution",
+      "content": "**REFLECT** — Key steps of reflective loading:\n\n- **R**esolve imports manually (LoadLibrary + GetProcAddress)\n- **E**xecute entry point (call DllMain manually)\n- **F**ind base address (parse PE headers)\n- **L**oad into allocated memory (VirtualAlloc)\n- **E**rase headers (optional: remove PE header from memory)\n- **C**allback via thread (CreateRemoteThread or callback)\n- **T**hread execution context (APC, fiber, or thread hijacking)\n\n**Detection Surfaces to Remember:**\n- **A**MSI — Content scanning before loading\n- **E**TW — Runtime event telemetry\n- **P**EB — Loaded module enumeration\n- **M**emory — Unbacked executable regions\n- **B**ehavior — API call sequence patterns"
+    },
+    {
+      "type": "reflection",
+      "title": "Detection Analysis: In-Memory vs On-Disk",
+      "content": "For each technique, consider detection implications:\n\n1. **Reflective DLL**: What EDR artifacts does it leave? How does PEB enumeration detect it?\n2. **Assembly.Load**: How does AMSI intercept it? What does ETW reveal?\n3. **Process hollowing**: What process creation events does it trigger?\n4. **execute-assembly**: What behavioral indicators does it produce?\n5. **Shellcode injection**: What memory patterns do EDR products scan for?\n\nFor each technique, identify:\n- The most reliable detection method\n- The most common evasion technique\n- The OPSEC trade-off between stealth and reliability\n\nUnderstanding both sides makes you a better operator and a better defender."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Attack and Defend — Know Both Sides",
+      "content": "The best red team operators understand EDR detection better than most defenders. The best defenders understand attacker tradecraft better than most operators. In-memory execution sits at this intersection. When you inject code into memory, you must know exactly what telemetry you generate — ETW events, AMSI scans, memory allocation patterns, thread creation events. Every technique leaves traces. The question is whether those traces are in a place defenders are watching.",
+      "emoji": "🎯"
+    },
+    {
+      "type": "explanation",
+      "title": "Fileless Techniques Comparison",
+      "content": "Compare in-memory execution techniques:\n\n**Reflective DLL Injection:**\n- Stealth: High (not in PEB)\n- Complexity: High\n- Detection: Unbacked memory, import resolution patterns\n- Use case: Long-running implants, C2 frameworks\n\n**Process Hollowing:**\n- Stealth: Medium (creates legitimate process, replaces code)\n- Complexity: Medium\n- Detection: Process creation with suspicious parent, unmapped memory\n- Use case: Running arbitrary payloads in known-good processes\n\n**Assembly.Load (.NET):**\n- Stealth: Low (AMSI scans, ETW events)\n- Complexity: Low\n- Detection: AMSI content scanning, ETW assembly load events\n- Use case: Quick tool execution, red team tooling\n\n**Shellcode Injection:**\n- Stealth: Medium (depends on injection method)\n- Complexity: Medium\n- Detection: VirtualAllocEx + WriteProcessMemory + CreateRemoteThread pattern\n- Use case: Staged payloads, initial access\n\n**COM Object Execution:**\n- Stealth: High (legitimate execution mechanism)\n- Complexity: High\n- Detection: Suspicious COM activation, unusual CLSID usage\n- Use case: Persistence, living-off-the-land\n\n**PowerShell in-memory:**\n- Stealth: Low (heavily monitored)\n- Complexity: Low\n- Detection: Script block logging, AMSI, transcript logging\n- Use case: Rapid prototyping, automation (not OPSEC-safe)"
+    }
+  ],
+  "tags": [
+    "Course: OffSec-PEN300",
+    "Career Path: Red Teamer",
+    "in-memory",
+    "reflective-loading",
+    "fileless",
+    "OPSEC",
+    "evasion",
+    ".NET-assembly",
+    "AMSI-bypass"
+  ]
+}
