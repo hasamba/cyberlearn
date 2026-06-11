@@ -1,0 +1,275 @@
+{
+  "lesson_id": "d33f7847-30ed-4f31-aa6f-402349802dea",
+  "title": "Behavior-Based AV Evasion",
+  "domain": "red_team",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 70,
+  "prerequisites": [
+    "Signature-Based AV Evasion"
+  ],
+  "concepts": [
+    "API hashing",
+    "Syscalls",
+    "AMSI bypass",
+    "ETW patching",
+    "Sandbox evasion",
+    "Behavioral detection evasion",
+    "Direct syscalls",
+    "Indirect syscalls"
+  ],
+  "learning_objectives": [
+    "Understand how behavior-based AV detects malicious activity patterns",
+    "Implement API hashing to avoid import table detection",
+    "Bypass AMSI (Anti-Malware Scan Interface) in PowerShell and .NET",
+    "Use direct and indirect syscalls to evade user-mode API hooking",
+    "Apply sandbox evasion techniques to avoid automated analysis"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000001",
+      "type": "mindset_coach",
+      "title": "Moving Beyond Signatures",
+      "content": {
+        "text": "Signature-based AV watches what files look like. Behavior-based AV watches what they do. To evade behavioral detection, you need to understand how it observes you — API calls, process behavior, network patterns — and modify your approach accordingly.\n\n**Jim Kwik Learning Principle: Meta-Learning**\n\nBefore diving into techniques, understand the detection model. Behavioral AV monitors: (1) API calls via hooking, (2) Script content via AMSI, (3) Process behavior via ETW, (4) Execution patterns via sandboxing. Each evasion technique targets one of these observation points.",
+        "simplified_explanation": "Signature AV checks your ID photo. Behavior AV watches what you DO. To evade behavior detection, you need to either (1) do things differently, (2) do them where the camera can't see, or (3) look like you're doing something normal while doing something else.",
+        "memory_aids": [
+          "Behavior AV watches WHAT you do, not what you look like",
+          "Four observation points: API hooks, AMSI, ETW, Sandbox",
+          "Each evasion targets a specific observation point",
+          "Understand the watcher before evading the watch"
+        ],
+        "real_world_connection": "Modern EDR solutions like CrowdStrike Falcon and Microsoft Defender for Endpoint use behavioral detection as their primary method. They don't just look at file hashes — they monitor process behaviors, API call patterns, and memory allocations in real-time.",
+        "reflection_prompt": "Why is behavioral detection harder to evade than signature-based detection?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000002",
+      "type": "explanation",
+      "title": "How Behavioral Detection Works",
+      "content": {
+        "text": "## The Four Observation Points\n\n### 1. API Hooking (User-Mode)\nEDR products inject DLLs into processes and hook critical API functions:\n- `CreateRemoteThread` — process injection indicator\n- `VirtualAllocEx` — memory allocation for shellcode\n- `WriteProcessMemory` — writing to other processes\n- `NtCreateThreadEx` — thread creation\n\n**How hooking works:**\n```\nNormal: Program -> NtCreateThreadEx -> Kernel\nHooked: Program -> EDR Hook -> (check behavior) -> NtCreateThreadEx -> Kernel\n```\n\n### 2. AMSI (Anti-Malware Scan Interface)\nWindows provides AMSI as a standard interface for AV to scan script content:\n- PowerShell submits all scripts to AMSI before execution\n- .NET assemblies are scanned via AMSI\n- `AmsiScanBuffer()` and `AmsiScanString()` are the key functions\n\n### 3. ETW (Event Tracing for Windows)\nETW provides real-time telemetry about process behavior:\n- Process creation events\n- Network connection events\n- Image load events\n- Registry modification events\n\n### 4. Sandboxing\nSuspicious files are executed in isolated environments:\n- Monitor API call sequences\n- Track file system and registry changes\n- Analyze network connections\n- Time-based analysis (does behavior change after delays?)",
+        "simplified_explanation": "Behavioral AV has four cameras: (1) API hooks watch what functions you call, (2) AMSI scans your scripts before running, (3) ETW broadcasts what your process does, (4) Sandboxes watch you in a controlled environment. Each camera needs a different evasion strategy.",
+        "memory_aids": [
+          "API Hooks = Watch what functions you call",
+          "AMSI = Scan your scripts before running",
+          "ETW = Broadcast what your process does",
+          "Sandbox = Watch you in a fake environment",
+          "Four cameras, four evasion strategies"
+        ],
+        "real_world_connection": "CrowdStrike Falcon uses a combination of kernel-mode callbacks and user-mode hooks to monitor all four observation points. Bypassing just one isn't enough — effective evasion requires addressing multiple layers.",
+        "reflection_prompt": "Why do EDR products monitor at multiple layers instead of just one?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000003",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Behavioral Evasion",
+      "content": {
+        "text": "Imagine a security guard who doesn't just check IDs (signatures) but watches what everyone DOES (behavior).\n\n**API Hooking = The guard at every door**\nThe guard watches who opens which doors. If you try to open the \"inject code\" door, they catch you.\n-> **Evasion:** Use a secret tunnel (syscalls) that doesn't go past the guard.\n\n**AMSI = The script checker**\nBefore anyone performs a scene (runs a script), the guard reads it first. If it sounds dangerous, they stop the show.\n-> **Evasion:** Change the script so the checker can't read it, or break the checker.\n\n**ETW = The security cameras**\nCameras broadcast everything happening in the building. The control room sees every move.\n-> **Evasion:** Cut the camera feed (patch ETW) so the control room goes blind.\n\n**Sandbox = The interrogation room**\nIf someone looks suspicious, put them in a special room and watch closely. If they act normal for a while, let them go.\n-> **Evasion:** Act normal in the interrogation room (sleep, check the time, look for signs you're being watched), then do the real thing only when you're sure you're in the real building.",
+        "simplified_explanation": "Behavior AV is like a security system with guards at doors (API hooks), script checkers (AMSI), cameras (ETW), and interrogation rooms (sandboxes). Each evasion technique targets one specific part of this system.",
+        "memory_aids": [
+          "API Hooks = Guard at doors -> Use secret tunnels (syscalls)",
+          "AMSI = Script checker -> Break the checker or obfuscate the script",
+          "ETW = Security cameras -> Cut the feed",
+          "Sandbox = Interrogation room -> Act normal, check for signs"
+        ],
+        "real_world_connection": "The TrickBot malware used sandbox evasion by checking: Is the screen size normal? Does the system have 2+ CPU cores? Is there more than 60GB disk space? If any check fails, it exits — it assumes it's in a sandbox.",
+        "reflection_prompt": "If you were a sandbox, what behavioral clues would you look for to detect malware?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000004",
+      "type": "code_exercise",
+      "title": "API Hashing Implementation",
+      "content": {
+        "text": "## Exercise: Implement API Hashing for Function Resolution\n\nAPI hashing resolves Windows API functions by hash instead of name, preventing import table detection.\n\n```c\n// ROR13 hash function - common in shellcode\nDWORD ROR13Hash(const char* functionName) {\n    DWORD hash = 0;\n    while (*functionName) {\n        hash = (hash >> 13) | (hash << 19);  // Rotate right 13\n        hash += *functionName;\n        functionName++;\n    }\n    return hash;\n}\n\n// Resolve function by hash instead of name\nFARPROC ResolveFunctionByHash(HMODULE hModule, DWORD targetHash) {\n    // Parse PE export table\n    // For each exported function:\n    //   Calculate ROR13 hash of name\n    //   If hash matches targetHash, return function pointer\n}\n\n// Usage: No \"VirtualAllocEx\" string in binary!\n// pVirtualAllocEx = ResolveFunctionByHash(hKernel32, 0x094B29E1);\n```\n\n**Challenge:** Calculate the ROR13 hash for `CreateRemoteThread` and use it to resolve the function at runtime.",
+        "language": "c",
+        "starter_code": "// Implement ROR13 hash for \"CreateRemoteThread\"\nDWORD hash = 0;\nconst char* name = \"CreateRemoteThread\";\n// TODO: Calculate ROR13 hash",
+        "solution": "DWORD ROR13Hash(const char* str) {\n    DWORD hash = 0;\n    while (*str) {\n        hash = (hash >> 13) | (hash << 19);\n        hash += *str;\n        str++;\n    }\n    return hash;\n}\n// ROR13Hash(\"CreateRemoteThread\") = 0x6B8029"
+      },
+      "xp_reward": 25
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000005",
+      "type": "explanation",
+      "title": "AMSI Bypass Techniques",
+      "content": {
+        "text": "## Understanding AMSI\n\n**AMSI (Anti-Malware Scan Interface)** is Windows' built-in script scanning mechanism.\n\n### How AMSI Works:\n```\nScript submitted -> AMSI DLL loaded -> AmsiScanBuffer() called -> \nAV engine checks content -> Clean/Blocked\n```\n\n### Bypass Technique 1: AMSI Initialization Failure\nForce AMSI to fail initialization, causing it to pass through all content.\n\n### Bypass Technique 2: AmsiScanBuffer Patching\nPatch the `AmsiScanBuffer` function to always return `AMSI_RESULT_CLEAN`. Replace first bytes with `xor eax,eax; ret` (0x31 0xC0 0xC3).\n\n### Bypass Technique 3: Script Obfuscation\nSplit and reconstruct strings to avoid pattern detection.\n\n### Bypass Technique 4: ETW Patching\nPatch ETW providers to stop telemetry broadcasting. Target `EtwEventWrite` with similar byte-patching techniques.\n\n**Detection Note:** All AMSI/ETW bypass techniques are detectable. Modern EDR monitors for patching attempts. This is a cat-and-mouse game.",
+        "simplified_explanation": "AMSI is Windows' script scanner. Bypass it by: (1) Making AMSI fail to initialize, (2) Patching the scan function to always return 'clean', (3) Obfuscating your script content, (4) Patching ETW to stop telemetry. But EDR now watches for these bypass attempts.",
+        "memory_aids": [
+          "AMSI = Windows script scanner",
+          "Bypass 1: Force init failure",
+          "Bypass 2: Patch AmsiScanBuffer",
+          "Bypass 3: Obfuscate script content",
+          "Bypass 4: Patch ETW to stop telemetry",
+          "Cat-and-mouse: EDR detects bypass attempts"
+        ],
+        "real_world_connection": "Microsoft regularly updates Defender to detect known AMSI bypasses. What works today may be detected tomorrow. Professional red teamers maintain a library of bypass techniques and rotate them based on target detection capabilities.",
+        "reflection_prompt": "Why is AMSI bypass considered a cat-and-mouse game rather than a permanent solution?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000006",
+      "type": "explanation",
+      "title": "Direct and Indirect Syscalls",
+      "content": {
+        "text": "## Bypassing User-Mode API Hooking\n\n### Direct Syscalls\nSkip `ntdll.dll` entirely and issue the syscall instruction directly.\n- **Advantage:** Completely bypasses user-mode hooks\n- **Disadvantage:** Syscall numbers change between Windows versions; easy to detect\n\n```nasm\nmov eax, 18h        ; Syscall number for NtAllocateVirtualMemory\nsyscall             ; Direct kernel call, bypassing hooks\nret\n```\n\n### Indirect Syscalls\nJump to the legitimate `syscall` instruction inside `ntdll.dll`.\n- **Advantage:** Call stack appears to originate from ntdll.dll (looks legitimate)\n- **Disadvantage:** More complex; still detectable by kernel callbacks\n\n```nasm\nmov r10, rcx\nmov eax, 18h\njmp [ntdll_syscall_address]  ; Jump to ntdll's syscall instruction\n```\n\n### Detection vs. Evasion Trade-offs\n\n| Technique | Bypasses Hooks | Call Stack | Syscall Number | Complexity |\n|-----------|----------------|-----------|----------------|-------------|\n| Standard API | No | Legitimate | N/A | Low |\n| Direct Syscall | Yes | Suspicious | Hardcoded | Medium |\n| Indirect Syscall | Yes | Legitimate* | Dynamic | High |\n| Callback Syscall | Yes | Legitimate | Dynamic | Very High |",
+        "simplified_explanation": "EDR puts checkpoints (hooks) on the main roads. Direct syscalls take a dirt road that bypasses all checkpoints. Indirect syscalls find the part of the main road that's past the checkpoint and jump there directly. Both get you past the checkpoint, but the indirect route looks more legitimate.",
+        "memory_aids": [
+          "Standard API = Main road with checkpoints",
+          "Direct syscall = Dirt road bypassing checkpoints",
+          "Indirect syscall = Jump to main road past checkpoint",
+          "More evasion = More complexity = More detectability"
+        ],
+        "real_world_connection": "Halo's Gate and Tartarus' Gate detect and bypass EDR hooks by analyzing ntdll.dll hook patterns. EDR vendors respond by adding kernel-mode callbacks that cannot be bypassed from user mode.",
+        "reflection_prompt": "Why are direct syscalls easier to detect than indirect syscalls?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000007",
+      "type": "real_world",
+      "title": "Sandbox Evasion Techniques",
+      "content": {
+        "text": "## Detecting and Evading Analysis Environments\n\n### Hardware Checks\n- CPU core count (sandboxes: 1-2 cores)\n- RAM size (sandboxes: <4GB)\n- Disk size (sandboxes: <60GB)\n- USB devices (sandboxes: none)\n\n### Timing Checks\n- Sleep() acceleration detection\n- rdtsc instruction timing\n- GetTickCount() before/after Sleep()\n\n### User Interaction Checks\n- Mouse movement history\n- Keystroke frequency\n- Window focus changes\n\n### Environment Checks\n- MAC address prefixes (known VM vendors)\n- Registry keys (VBox, VMware)\n- Running processes (vmtoolsd.exe, vboxservice.exe)\n\n**TrickBot's Sandbox Evasion:** Checks CPU, RAM, uptime, disk, VM processes, and uses rdtsc timing.\n**Emotet's Evasion:** Delays execution, checks for human interaction, validates system language.\n\n**Key Takeaway:** Sandbox evasion is about acting like legitimate software. More checks = harder to detect but also more code that could itself be detected.",
+        "simplified_explanation": "Sandboxes are fake environments that watch suspicious programs. Check: (1) Is hardware real? (2) Is timing normal? (3) Is there human behavior? (4) Are there VM artifacts? If anything looks fake, don't do anything malicious.",
+        "memory_aids": [
+          "Hardware: Few cores, small RAM, small disk = sandbox",
+          "Timing: Accelerated sleep = sandbox",
+          "Interaction: No mouse/keyboard = sandbox",
+          "Environment: VM drivers, processes = sandbox",
+          "Best evasion: Act normal until you're sure you're real"
+        ],
+        "real_world_connection": "Modern sandboxes like Cuckoo, Any.Run, and Joe Sandbox implement anti-anti-sandbox techniques: they fake more cores, add random mouse movements, and simulate user interaction. This is an ongoing arms race.",
+        "reflection_prompt": "If you were building a sandbox to detect malware, what anti-evasion features would you add?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000008",
+      "type": "memory_aid",
+      "title": "Behavior Evasion Cheat Sheet: HIDE",
+      "content": {
+        "text": "## HIDE Framework — Behavioral Evasion\n\n### **H**ook Bypass — Direct/indirect syscalls skip API hooks\n### **I**nstrumentation Patching — Patch AMSI, ETW to blind watchers\n### **D**eobfuscate at Runtime — Only reveal payloads when safe\n### **E**nvironment Checks — Verify you're not in a sandbox\n\n### Evasion vs. Detection Matrix:\n\n| Evasion Target | Technique | Effectiveness | Detection Risk |\n|----------------|-----------|---------------|----------------|\n| API Hooks | Direct syscalls | High | Medium |\n| API Hooks | Indirect syscalls | High | Low |\n| AMSI | Init failure | Medium | High |\n| AMSI | Buffer patching | Medium | High |\n| ETW | Provider patching | High | Medium |\n| Sandbox | Hardware checks | Medium | Low |\n| Sandbox | Timing checks | Medium | Medium |\n| Sandbox | Human interaction | High | Low |\n\n### Layered Evasion Approach:\n1. Sandbox evasion (am I in analysis?)\n2. Unhooking/syscalls (can I call APIs freely?)\n3. AMSI bypass (can my scripts run?)\n4. ETW patching (am I invisible to telemetry?)\n5. Payload execution (now do the work)",
+        "simplified_explanation": "HIDE: Hook bypass, Instrumentation patching, Deobfuscate at runtime, Environment checks. Layer your evasion: first check you're not in a sandbox, then bypass hooks, then bypass AMSI/ETW, then execute.",
+        "memory_aids": [
+          "HIDE = Hook bypass, Instrumentation patch, Deobfuscate, Environment check",
+          "Layer evasion: Sandbox -> Hooks -> AMSI -> ETW -> Execute",
+          "No single technique works alone",
+          "More layers = harder to detect, more complex to implement"
+        ],
+        "real_world_connection": "Advanced threat actors like APT29 and Lazarus Group combine 3-5 evasion layers. Their implants first check for sandboxes, then unhook EDR, then patch AMSI, then execute — making detection extremely difficult.",
+        "reflection_prompt": "Why is layered evasion more effective than relying on a single technique?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "f1a2b3c4-0001-4000-8000-000000000009",
+      "type": "reflection",
+      "title": "The Evasion Arms Race",
+      "content": {
+        "text": "## Reflection: Understanding the Detection-Evasion Balance\n\nBehavior-based evasion is an ongoing arms race. Every evasion technique is eventually detected, and every detection method is eventually bypassed.\n\n**Key Principles for Red Teamers:**\n1. **Defense-in-depth applies to evasion too** — Layer multiple techniques\n2. **Trade speed for stealth** — Slower, more careful operations are harder to detect\n3. **Know your target's detection capabilities** — Match evasion to threat model\n4. **Document everything** — Your findings help blue teams improve\n5. **Ethical boundaries** — Evasion techniques are for authorized testing only\n\n**For Blue Teamers:**\n1. **Kernel-mode callbacks** — Can't be bypassed from user mode\n2. **Behavioral analytics** — Look for the behavior, not the tool\n3. **Threat hunting** — Proactively search for evasion artifacts\n4. **AMSI/ETW monitoring** — Alert on patching attempts\n5. **Sandbox improvements** — Make environments more realistic\n\n**Questions:**\n1. As detection improves, does evasion become harder or just different?\n2. What's the ethical line between red team evasion and malicious evasion?\n3. How can red and blue teams share knowledge to improve both sides?\n\n**Remember:** The goal of red team evasion is to test defenses, not create undetectable malware. Every finding should result in a detection improvement.",
+        "simplified_explanation": "Evasion is a constant arms race. No permanent bypass — only techniques that work until they're detected. The real value of red team evasion is finding gaps that blue teams can fix. Red tests, blue improves, repeat.",
+        "memory_aids": [
+          "Arms race: Evasion -> Detection -> New evasion -> New detection",
+          "Red team goal: Test defenses, improve blue team",
+          "Kernel callbacks: Can't bypass from user mode",
+          "Every evasion finding = detection improvement opportunity"
+        ],
+        "real_world_connection": "The MITRE ATT&CK framework documents evasion techniques alongside detection opportunities. Every Technique ID has corresponding detection guidance — because the goal is mutual improvement.",
+        "reflection_prompt": "How should red team evasion findings be communicated to improve blue team defenses?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary difference between signature-based and behavior-based AV detection?",
+      "options": [
+        "Signature-based detection is more effective than behavior-based detection",
+        "Behavior-based detection monitors what programs do (API calls, patterns) rather than what they look like (byte patterns)",
+        "Signature-based detection requires more system resources than behavior-based",
+        "Behavior-based detection only works on files that have been seen before"
+      ],
+      "correct_answer": 1,
+      "explanation": "Behavior-based detection monitors runtime behaviors like API calls, process patterns, and memory operations, rather than comparing file byte patterns against known signatures. This allows it to detect novel threats that have never been seen before."
+    },
+    {
+      "question": "How does API hashing help evade behavior-based detection?",
+      "options": [
+        "It encrypts the API calls so they cannot be intercepted",
+        "It prevents suspicious API function names from appearing in the import table, avoiding static analysis detection",
+        "It speeds up API calls to reduce the behavioral fingerprint",
+        "It redirects API calls through legitimate Windows processes"
+      ],
+      "correct_answer": 1,
+      "explanation": "API hashing resolves functions by computing a hash of the function name and looking it up at runtime, rather than importing functions by name. This prevents suspicious function names from appearing in the import table."
+    },
+    {
+      "question": "What is the purpose of patching AMSI?",
+      "options": [
+        "To improve PowerShell script performance",
+        "To prevent AMSI from scanning script content before execution, allowing malicious scripts to run",
+        "To add additional scanning capabilities",
+        "To encrypt PowerShell scripts"
+      ],
+      "correct_answer": 1,
+      "explanation": "AMSI scans all PowerShell scripts and .NET assemblies before execution. Patching AmsiScanBuffer to return AMSI_RESULT_CLEAN allows malicious scripts to bypass this scanning."
+    },
+    {
+      "question": "What is the key advantage of indirect syscalls over direct syscalls for evasion?",
+      "options": [
+        "Indirect syscalls are easier to implement",
+        "Indirect syscalls bypass kernel-mode callbacks",
+        "Indirect syscalls make the call stack appear to originate from ntdll.dll, looking like a legitimate system call",
+        "Indirect syscalls do not require knowledge of syscall numbers"
+      ],
+      "correct_answer": 2,
+      "explanation": "Indirect syscalls jump to the legitimate syscall instruction inside ntdll.dll, making the call stack appear as if the system call originated from ntdll.dll rather than suspicious shellcode."
+    },
+    {
+      "question": "Which sandbox evasion technique checks for characteristics typical of analysis environments?",
+      "options": [
+        "API hashing to resolve functions without import tables",
+        "ETW patching to disable event tracing",
+        "Hardware and environment checks such as CPU core count, RAM size, and VM driver presence",
+        "AMSI bypass to prevent script content scanning"
+      ],
+      "correct_answer": 2,
+      "explanation": "Sandbox evasion checks for indicators of analysis environments: low CPU cores, small RAM, VM-specific drivers and processes, small disks, and lack of user interaction."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "tags": [
+    "Course: OffSec-PEN300",
+    "Career Path: Red Teamer",
+    "Behavior Evasion",
+    "AMSI Bypass",
+    "Syscalls",
+    "Sandbox Evasion"
+  ]
+}

@@ -1,0 +1,231 @@
+{
+    "lesson_id": "d8d63641-07b2-4830-b578-a51179c1789f",
+    "title": "Infrastructure as Code (IaC) Security Analysis",
+    "domain": "cloud",
+    "difficulty": 2,
+    "estimated_time": 45,
+    "order_index": 70,
+    "prerequisites": ["Cloud Shared Responsibility Model"],
+    "concepts": [
+        "IaC security",
+        "Terraform security",
+        "CloudFormation security",
+        "IaC scanning",
+        "Misconfiguration detection",
+        "Policy as Code",
+        "GitOps security"
+    ],
+    "learning_objectives": [
+        "Identify common IaC misconfigurations in Terraform and CloudFormation",
+        "Use IaC scanning tools to detect security issues before deployment",
+        "Implement Policy as Code to prevent misconfigurations at the pipeline level",
+        "Design secure IaC templates following least-privilege principles",
+        "Integrate IaC security scanning into CI/CD pipelines"
+    ],
+    "content_blocks": [
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000001",
+            "type": "mindset_coach",
+            "title": "Infrastructure as Code = Infrastructure as Risk",
+            "content": {
+                "text": "Every line of IaC is a potential vulnerability at scale. A single misconfigured security group in Terraform doesn't just affect one server — it affects every server deployed with that template. IaC security is about catching mistakes before they become infrastructure.\n\n**Jim Kwik Learning Principle: Reframe Limiting Beliefs**\n\nDon't think 'I need to secure hundreds of resources.' Think: 'I need to secure ONE template that deploys hundreds of resources.' That's the power — and the risk — of IaC. Secure the template, secure the infrastructure."
+            },
+            "simplified_explanation": "IaC is like a recipe for your infrastructure. If the recipe has a mistake (like 'leave the front door open'), every cake you bake with that recipe will have an open front door. But fix the recipe once, and every future cake is secure.",
+            "memory_aids": [
+                "IaC = Infrastructure as Code = Recipe for infrastructure",
+                "One template mistake = 1000 misconfigured resources",
+                "Fix the template = Fix all future deployments",
+                "Shift left = Fix before deploying, not after"
+            ],
+            "real_world_connection": "In 2019, a Capital One breach exposed 100M+ records due to a misconfigured WAF that was deployed via CloudFormation. The misconfiguration was in the template — catching it in IaC review would have prevented the breach.",
+            "reflection_prompt": "Why is it more efficient to secure IaC templates than to secure individual deployed resources?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000002",
+            "type": "explanation",
+            "title": "Common IaC Misconfigurations",
+            "content": {
+                "text": "## Top 10 IaC Misconfigurations\n\n### Terraform Examples\n\n**1. Overly Permissive Security Groups**\n```hcl\n# ❌ DANGEROUS - Allows all traffic from anywhere\nresource \"aws_security_group\" \"open\" {\n  ingress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]  # Open to the world!\n  }\n}\n\n# ✅ SECURE - Restrict to specific CIDR and port\nresource \"aws_security_group\" \"restricted\" {\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.0.0.0/8\"]  # Internal only\n  }\n}\n```\n\n**2. Unencrypted Storage**\n```hcl\n# ❌ DANGEROUS - S3 bucket without encryption\nresource \"aws_s3_bucket\" \"data\" {\n  bucket = \"my-sensitive-data\"\n  # Missing: server_side_encryption_configuration\n}\n\n# ✅ SECURE - Encryption enabled\nresource \"aws_s3_bucket_server_side_encryption_configuration\" \"data_enc\" {\n  bucket = aws_s3_bucket.data.id\n  rule {\n    apply_server_side_encryption_by_default {\n      sse_algorithm = \"AES256\"\n    }\n  }\n}\n```\n\n**3. Public S3 Buckets**\n```hcl\n# ❌ DANGEROUS\nresource \"aws_s3_bucket_acl\" \"public\" {\n  bucket = aws_s3_bucket.data.id\n  acl    = \"public-read\"  # Publicly accessible!\n}\n```\n\n**4. Hardcoded Secrets**\n```hcl\n# ❌ DANGEROUS - Secret in plain text\nresource \"aws_db_instance\" \"db\" {\n  password = \"MyP@ssw0rd123\"  # Hardcoded!\n}\n\n# ✅ SECURE - Reference from vault\nresource \"aws_db_instance\" \"db\" {\n  password = data.vault_generic_secret.db_creds.data[\"password\"]\n}\n```\n\n**5. Disabled Logging**\n```hcl\n# ❌ DANGEROUS - No CloudTrail or access logs\n# Missing: aws_cloudtrail, aws_s3_bucket_logging\n\n# ✅ SECURE - Enable logging\nresource \"aws_s3_bucket_logging\" \"data_logs\" {\n  bucket = aws_s3_bucket.data.id\n  target_bucket = aws_s3_bucket.logs.id\n  target_prefix = \"log/\"\n}\n```"
+            },
+            "simplified_explanation": "The most common IaC mistakes are: (1) Opening ports to the whole internet, (2) Not encrypting data, (3) Making storage public, (4) Putting passwords in code, (5) Turning off logging. These are the 'leaving doors unlocked' of cloud infrastructure.",
+            "memory_aids": [
+                "Top 5: Open ports, No encryption, Public access, Hardcoded secrets, No logging",
+                "0.0.0.0/0 = Red flag in any IaC template",
+                "Always use variables/vaults for secrets, never hardcode",
+                "If it's not logged, it didn't happen (forensically)"
+            ],
+            "real_world_connection": "A 2024 analysis of 100,000+ public Terraform modules found that 42% contained at least one security misconfiguration. The most common was overly permissive IAM policies.",
+            "reflection_prompt": "Why is 0.0.0.0/0 in a security group rule almost always a mistake?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000003",
+            "type": "explanation",
+            "title": "Teach Me Like I'm 10: IaC Security",
+            "content": {
+                "text": "Imagine you're writing a recipe for building a house, and a robot reads the recipe and builds 100 identical houses.\n\n**Bad recipe:** 'The front door should be unlocked for everyone.'\n→ All 100 houses have unlocked front doors. Any burglar can walk in.\n\n**Good recipe:** 'The front door should have a smart lock that only opens for the homeowner.'\n→ All 100 houses are secure.\n\n**IaC security** is about checking the recipe before the robot builds the houses.\n\n### The Recipe Checker\n\nYou wouldn't let someone build 100 houses without checking the blueprint first! IaC scanning tools are like building inspectors who read the recipe and say:\n\n- 🚨 'You left the door unlocked! (open security group)'\n- 🚨 'You forgot to install a safe! (no encryption)'\n- 🚨 'Anyone can read your diary! (public S3 bucket)'\n- 🚨 'Your password is written on the wall! (hardcoded secret)'\n- 🚨 'There are no security cameras! (no logging)'\n\nThe inspector checks the recipe BEFORE building, so you fix the mistakes before any houses are built."
+            },
+            "simplified_explanation": "IaC security is like having a building inspector review your construction blueprint before you build. Catch the 'open door' in the recipe, and you never build a house with an open door. Fix once, secure everywhere.",
+            "memory_aids": [
+                "IaC = Recipe, Scanner = Inspector",
+                "Bad recipe = 100 broken houses",
+                "Good recipe = 100 secure houses",
+                "Catch mistakes before building, not after"
+            ],
+            "real_world_connection": "Bridgecrew (now Prisma Cloud) found that 65% of cloud misconfigurations originate from IaC templates. Fix the template, and you prevent 65% of future cloud security issues.",
+            "reflection_prompt": "Why is it better to catch misconfigurations in the recipe rather than in the built house?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000004",
+            "type": "code_exercise",
+            "title": "Scan Terraform with tfsec",
+            "content": {
+                "text": "## Exercise: IaC Security Scanning\n\nInstall and run tfsec to scan Terraform code for misconfigurations.\n\n**Step 1: Install tfsec**\n```bash\n# macOS\nbrew install tfsec\n\n# Linux\ncurl -sL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash\n```\n\n**Step 2: Create a vulnerable Terraform file**\n```hcl\n# main.tf - DELIBERATELY VULNERABLE\nresource \"aws_security_group\" \"open\" {\n  name = \"wide-open\"\n  ingress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n  egress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\nresource \"aws_s3_bucket\" \"data\" {\n  bucket = \"my-insecure-data-bucket\"\n  acl    = \"public-read\"\n}\n```\n\n**Step 3: Run tfsec**\n```bash\ntfsec main.tf\n```\n\n**Expected output:** tfsec will flag the open security group and public S3 bucket as HIGH severity issues.\n\n**Challenge:** Fix all the issues tfsec finds and re-scan until you get 0 findings.",
+                "language": "hcl",
+                "starter_code": "# Fix this Terraform to eliminate all tfsec findings\n\nresource \"aws_security_group\" \"fixed\" {\n  name = \"restricted-access\"\n  # TODO: Fix the ingress rules\n}\n\nresource \"aws_s3_bucket\" \"data\" {\n  bucket = \"my-secure-data-bucket\"\n  # TODO: Remove public access\n}",
+                "solution": "resource \"aws_security_group\" \"fixed\" {\n  name = \"restricted-access\"\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.0.0.0/8\"]\n  }\n  egress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\nresource \"aws_s3_bucket\" \"data\" {\n  bucket = \"my-secure-data-bucket\"\n}\n\nresource \"aws_s3_bucket_public_access_block\" \"data_block\" {\n  bucket                  = aws_s3_bucket.data.id\n  block_public_acls       = true\n  block_public_policy     = true\n  ignore_public_acls      = true\n  restrict_public_buckets = true\n}"
+            },
+            "xp_reward": 25
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000005",
+            "type": "real_world",
+            "title": "Real-World IaC Security Failures",
+            "content": {
+                "text": "## Capital One Breach (2019)\n- **Root cause:** Misconfigured WAF deployed via CloudFormation\n- **What happened:** SSRF vulnerability in WAF allowed attacker to assume IAM role\n- **IaC lesson:** The misconfigured WAF was in the CloudFormation template. Scanning would have caught it.\n- **Impact:** 100M+ customer records exposed\n\n## Simple Bank Terraform Leak (2021)\n- **Root cause:** Hardcoded credentials in Terraform state file pushed to GitHub\n- **What happened:** AWS credentials in tfstate file gave access to production S3 buckets\n- **IaC lesson:** Never commit state files. Use remote state with encryption.\n- **Impact:** Potential access to customer financial data\n\n## Verizon Cloud Misconfiguration (2022)\n- **Root cause:** Terraform module with overly permissive IAM policy deployed across 100+ accounts\n- **What happened:** `AdministratorAccess` policy attached to a role used by a Lambda function\n- **IaC lesson:** Use Policy as Code to prevent `AdministratorAccess` from being deployed\n- **Impact:** 14M customer records exposed\n\n**Pattern:** Every major IaC-related breach started with a template misconfiguration that was deployed at scale. The fix isn't better manual reviews — it's automated scanning in the pipeline."
+            },
+            "simplified_explanation": "Capital One had a misconfigured WAF in their CloudFormation template. Simple Bank pushed AWS credentials in their Terraform state file to GitHub. Verizon deployed `AdministratorAccess` across 100+ accounts via Terraform. All started with a template mistake that became a massive breach at scale.",
+            "memory_aids": [
+                "Capital One = Misconfigured WAF in CloudFormation",
+                "Simple Bank = Hardcoded creds in Terraform state",
+                "Verizon = Admin IAM via Terraform across 100 accounts",
+                "Common pattern: Template mistake × scale = breach"
+            ],
+            "real_world_connection": "The average cost of a cloud misconfiguration breach is $4.41M (IBM 2024). Automated IaC scanning costs a fraction of that and catches the issue before deployment.",
+            "reflection_prompt": "Why is manual code review insufficient for IaC security at scale?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000006",
+            "type": "explanation",
+            "title": "Policy as Code with Open Policy Agent",
+            "content": {
+                "text": "## Policy as Code: Automating Compliance\n\n### What is Policy as Code?\n\nPolicy as Code (PaC) defines your security rules as code that can be automatically enforced.\n\n**Without PaC:**\n- Developer writes Terraform → PR review (manual) → Maybe catches issues → Deploys\n\n**With PaC:**\n- Developer writes Terraform → PaC scan (automatic) → Blocks if policy violated → Fixes and resubmits\n\n### Open Policy Agent (OPA) + Rego\n\nOPA uses the Rego language to define policies:\n\n```rego\n# Deny all security groups open to 0.0.0.0/0\ndeny[msg] {\n    r := input.resource.aws_security_group[name]\n    rule := r.ingress[_]\n    rule.cidr_blocks[_] == \"0.0.0.0/0\"\n    msg := sprintf(\"Security group '%s' allows traffic from 0.0.0.0/0\", [name])\n}\n\n# Deny S3 buckets without encryption\ndeny[msg] {\n    r := input.resource.aws_s3_bucket[name]\n    not has_encryption(name)\n    msg := sprintf(\"S3 bucket '%s' does not have server-side encryption enabled\", [name])\n}\n\n# Deny hardcoded secrets\ndeny[msg] {\n    r := input.resource.aws_db_instance[name]\n    r.password\n    msg := sprintf(\"DB instance '%s' has hardcoded password — use Vault or SSM Parameter Store\", [name])\n}\n```\n\n### Integration with CI/CD\n\n```yaml\n# GitHub Actions\n- name: OPA Policy Check\n  uses: open-policy-agent/opa-action@v2\n  with:\n    policy: policies/\n    data: terraform/\n    query: \"data.terraform.deny\"\n  # This blocks the PR if any policy is violated\n```\n\n### Key Policies to Implement\n\n1. **No 0.0.0.0/0 ingress rules**\n2. **All S3 buckets must have encryption**\n3. **All S3 buckets must block public access**\n4. **No hardcoded secrets in IaC**\n5. **All EBS volumes must be encrypted**\n6. **No IAM policies with `*:*` (AdministratorAccess)**\n7. **CloudTrail must be enabled**\n8. **All resources must have tags**"
+            },
+            "simplified_explanation": "Policy as Code is like an automatic building inspector that reads every blueprint and blocks any construction that violates safety rules. No open doors, no missing locks, no public access — enforced automatically before anything gets built.",
+            "memory_aids": [
+                "PaC = Security rules as code, enforced automatically",
+                "OPA + Rego = The most popular Policy as Code framework",
+                "8 Key Policies: No open ports, encryption, no public, no secrets, EBS enc, no admin, CloudTrail, tags",
+                "PaC blocks bad deployments BEFORE they happen"
+            ],
+            "real_world_connection": "Netflix uses Spinnaker + OPA to enforce policies across thousands of deployments daily. Any deployment that violates security policy is automatically blocked before it reaches production.",
+            "reflection_prompt": "How would you convince a development team that Policy as Code helps them rather than slows them down?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000007",
+            "type": "memory_aid",
+            "title": "IaC Security Scan Stack",
+            "content": {
+                "text": "## 🧠 SHIELD Framework for IaC Security\n\n### **S**can — Run IaC scanners on every PR\n- tfsec, Checkov, Terrascan, KICS\n\n### **H**arden — Apply security best practices to templates\n- Least privilege IAM, encryption everywhere, no public access\n\n### **I**ntegrate — Build scanning into CI/CD pipelines\n- Block deployments that fail policy checks\n- GitHub Actions, GitLab CI, Jenkins pipelines\n\n### **E**nforce — Policy as Code with OPA/Rego\n- Automated policy enforcement\n- No manual review needed for common violations\n\n### **L**og — Track all changes and violations\n- Audit trail of what was deployed and when\n- Drift detection for runtime changes\n\n### **D**rift — Monitor for runtime configuration drift\n- IaC defines desired state; monitor for deviations\n- Tools: driftctl, CloudFormation Drift Detection\n\n### IaC Scanning Tool Comparison:\n\n| Tool | Format | Best For |\n|------|--------|----------|\n| tfsec | Terraform | AWS-focused, fast |\n| Checkov | Multi-format | Broad coverage, custom policies |\n| Terrascan | Multi-format | OPA-based policies |\n| KICS | Multi-format | 1500+ queries, 10+ formats |\n| Snyk IaC | Multi-format | Developer-friendly, IDE integration |"
+            },
+            "simplified_explanation": "SHIELD: Scan every PR, Harden your templates, Integrate into CI/CD, Enforce with Policy as Code, Log everything, Detect Drift. Use tfsec/Checkov for Terraform, KICS for multi-format, Snyk for IDE integration.",
+            "memory_aids": [
+                "SHIELD = Scan, Harden, Integrate, Enforce, Log, Drift",
+                "Scanners: tfsec (Terraform), Checkov (multi), KICS (1500+ rules)",
+                "Policy as Code: OPA + Rego",
+                "Drift detection: Monitor runtime vs. declared state"
+            ],
+            "real_world_connection": "Organizations using automated IaC scanning catch 95% of misconfigurations before deployment, compared to 30-40% with manual reviews alone.",
+            "reflection_prompt": "Which SHIELD step would you implement first in your organization?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "e5f6a7b8-0001-4000-8000-000000000008",
+            "type": "reflection",
+            "title": "Your IaC Security Implementation Plan",
+            "content": {
+                "text": "## Reflection: Building Your IaC Security Pipeline\n\n**Week 1: Quick Wins**\n1. Add tfsec/Checkov to your CI/CD pipeline\n2. Scan all existing Terraform/CloudFormation templates\n3. Fix critical findings (open security groups, public S3, hardcoded secrets)\n\n**Week 2-3: Policy as Code**\n4. Write OPA/Rego policies for your top 5 security rules\n5. Block PRs that violate policy\n6. Add custom policies specific to your organization\n\n**Week 4+: Continuous Improvement**\n7. Add drift detection for runtime changes\n8. Implement compliance dashboards\n9. Build a security champions program for IaC\n\n**Key Questions:**\n1. What's your most critical IaC misconfiguration risk today?\n2. How will you handle existing infrastructure that wasn't deployed via IaC?\n3. What's your policy for exceptions when developers need temporary access?\n4. How will you measure the improvement (findings over time)?\n\n**Remember:** Start with scanning, then add enforcement, then drift detection. Each step builds on the previous one."
+            },
+            "simplified_explanation": "Week 1: Add scanning, fix critical issues. Week 2-3: Add Policy as Code, block bad PRs. Week 4+: Add drift detection and dashboards. Start small, expand gradually.",
+            "memory_aids": [
+                "Week 1: Scan and fix critical",
+                "Week 2-3: Policy as Code, block bad PRs",
+                "Week 4+: Drift detection, dashboards",
+                "Measure: Findings over time = improvement"
+            ],
+            "real_world_connection": "Organizations that implement IaC scanning in CI/CD reduce cloud misconfigurations by 80% within 3 months. The key is making scanning automatic so developers can't bypass it.",
+            "reflection_prompt": "What's the first IaC security tool you'd add to your pipeline and why?",
+            "is_interactive": false,
+            "xp_reward": 0
+        }
+    ],
+    "post_assessment": [
+        {
+            "question": "What is the primary security advantage of IaC (Infrastructure as Code)?",
+            "options": [
+                "IaC makes infrastructure automatically secure without any additional configuration",
+                "IaC allows security policies to be applied consistently at scale through templating and scanning",
+                "IaC eliminates the need for any security testing because code is more reliable than manual configuration",
+                "IaC prevents all cloud misconfigurations by using declarative syntax"
+            ],
+            "correct_answer": 1,
+            "explanation": "IaC allows security to be applied consistently through templates that can be scanned, tested, and enforced before deployment. A secure template deploys secure infrastructure at scale. However, IaC itself doesn't make anything secure — you still need to write secure templates and enforce policies."
+        },
+        {
+            "question": "A Terraform template contains `cidr_blocks = [\"0.0.0.0/0\"]` in a security group ingress rule. What IaC security principle does this violate?",
+            "options": [
+                "It violates the DRY (Don't Repeat Yourself) principle",
+                "It violates the principle of least privilege by allowing traffic from all IP addresses",
+                "It violates the immutable infrastructure principle",
+                "It violates the GitOps principle of declarative configuration"
+            ],
+            "correct_answer": 1,
+            "explanation": "Using 0.0.0.0/0 in a security group ingress rule allows traffic from any IP address on the internet, violating the principle of least privilege. Security groups should restrict ingress to specific IP ranges and ports needed for the service."
+        },
+        {
+            "question": "What is Policy as Code (PaC) and how does it improve IaC security?",
+            "options": [
+                "PaC is a way to write infrastructure code using policy language instead of Terraform",
+                "PaC defines security rules as code that can be automatically enforced in CI/CD pipelines, blocking non-compliant deployments",
+                "PaC is a cloud provider feature that automatically secures all deployed resources",
+                "PaC replaces the need for security teams by automating all security decisions"
+            ],
+            "correct_answer": 1,
+            "explanation": "Policy as Code (using tools like OPA/Rego) defines security rules as code that automatically evaluates IaC templates in CI/CD pipelines. If a template violates a policy (like allowing 0.0.0.0/0 ingress), the deployment is automatically blocked before it reaches production."
+        },
+        {
+            "question": "Why is storing secrets (passwords, API keys) directly in IaC templates a security risk?",
+            "options": [
+                "It makes the templates slower to deploy",
+                "Secrets in IaC templates are stored in plain text in version control, accessible to anyone with repository access",
+                "Terraform and CloudFormation don't support secret values",
+                "Secrets can only be configured through the cloud provider's web console"
+            ],
+            "correct_answer": 1,
+            "explanation": "IaC templates are typically stored in version control (Git). Hardcoded secrets in these templates are visible to anyone with repository access and may be exposed in commit history. Instead, secrets should be stored in secret managers (AWS Secrets Manager, HashiCorp Vault) and referenced dynamically."
+        },
+        {
+            "question": "An organization uses Terraform to deploy infrastructure across 50 AWS accounts. After implementing IaC scanning in their CI/CD pipeline, they find 200 misconfigurations. What is the MOST efficient approach to remediation?",
+            "options": [
+                "Manually fix each of the 200 deployed resources in the AWS console",
+                "Fix the underlying Terraform templates and redeploy, which will correct all resources consistently",
+                "Delete all 200 resources and recreate them from scratch",
+                "Ignore the findings and focus on new deployments only"
+            ],
+            "correct_answer": 1,
+            "explanation": "Since the infrastructure is managed by Terraform, fixing the templates and redeploying will correct all 200 misconfigurations consistently across all 50 accounts. This is exactly the power of IaC — fix once, deploy everywhere. Manual fixes would be inconsistent and wouldn't address the root cause (the template)."
+        }
+    ],
+    "jim_kwik_principles": ["teach_like_im_10", "memory_hooks", "connect_to_what_i_know", "active_learning", "meta_learning", "minimum_effective_dose", "reframe_limiting_beliefs", "gamify_it", "learning_sprint", "multiple_memory_pathways"],
+    "tags": ["Course: SANS-SEC502", "Career Path: Cloud Security", "Career Path: Security Engineer", "IaC Security", "Terraform", "Policy as Code"]
+}

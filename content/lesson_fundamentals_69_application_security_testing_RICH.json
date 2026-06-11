@@ -1,0 +1,248 @@
+{
+    "lesson_id": "12c1f2ed-e36a-4a14-a10e-e77ece5508a0",
+    "title": "Application Security Testing",
+    "domain": "fundamentals",
+    "difficulty": 2,
+    "estimated_time": 40,
+    "order_index": 69,
+    "prerequisites": ["Secure Coding Practices"],
+    "concepts": [
+        "Static Application Security Testing (SAST)",
+        "Dynamic Application Security Testing (DAST)",
+        "Interactive Application Security Testing (IAST)",
+        "Software Composition Analysis (SCA)",
+        "Dependency scanning",
+        "Security testing automation",
+        "CI/CD security integration"
+    ],
+    "learning_objectives": [
+        "Distinguish between SAST, DAST, IAST, and SCA and when to use each",
+        "Configure SAST tools to scan source code for vulnerabilities",
+        "Set up DAST tools for runtime vulnerability detection",
+        "Integrate security testing into CI/CD pipelines",
+        "Interpret and prioritize security test results"
+    ],
+    "content_blocks": [
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000001",
+            "type": "mindset_coach",
+            "title": "Shift Left — Catch It Early",
+            "content": {
+                "text": "Application security testing isn't about finding bugs after release — it's about catching them when they're cheapest to fix. A vulnerability found in code review costs 10x less to fix than one found in production.\n\n**Jim Kwik Learning Principle: Minimum Effective Dose**\n\nYou don't need to master every security tool. Start with understanding the categories (SAST, DAST, IAST, SCA), then pick one tool in each category and get good with it. That's your minimum effective dose."
+            },
+            "simplified_explanation": "Imagine finding a typo in a recipe. If you catch it while writing the recipe, it takes seconds to fix. If you catch it after cooking the dish for 100 people, it's a disaster. Security testing finds the 'typos' as early as possible.",
+            "memory_aids": [
+                "Shift Left = Find bugs early, fix them cheap",
+                "10x rule: Each phase costs 10x more to fix",
+                "Start with categories, then pick one tool each"
+            ],
+            "real_world_connection": "Equifax's 2017 breach (147 million records exposed) was caused by an unpatched Apache Struts vulnerability that could have been caught by SCA — scanning dependencies for known CVEs.",
+            "reflection_prompt": "Why do you think organizations still skip security testing despite the cost savings?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000002",
+            "type": "explanation",
+            "title": "The Four Pillars of Application Security Testing",
+            "content": {
+                "text": "## Application Security Testing Landscape\n\n| Type | When | How | Finds | Example Tools |\n|------|------|-----|------|---------------|\n| **SAST** | Build time | Source code analysis | Code-level vulnerabilities | SonarQube, Semgrep, Checkmarx |\n| **DAST** | Running app | HTTP requests to running app | Runtime vulnerabilities | OWASP ZAP, Burp Suite, Nikto |\n| **IAST** | Running app (with agent) | Instrumented code monitoring | Code + runtime vulnerabilities | Contrast Security, Seeker |\n| **SCA** | Build time | Dependency/package analysis | Known CVEs in libraries | Snyk, Dependabot, OWASP Dependency-Check |\n\n### SAST — Static Application Security Testing\n- Analyzes **source code** without running it\n- Catches issues like SQL injection patterns, hardcoded secrets, buffer overflows\n- **False positive rate**: Medium-High (doesn't understand runtime context)\n- **When to run**: Every commit / PR\n\n### DAST — Dynamic Application Security Testing\n- Tests a **running application** from the outside\n- Finds runtime issues: misconfigurations, auth bypass, injection points\n- **False positive rate**: Low (it found an actual vulnerability)\n- **When to run**: Every deployment to staging\n\n### IAST — Interactive Application Security Testing\n- Combines SAST + DAST using an **instrumentation agent** inside the app\n- Monitors actual code execution paths during testing\n- **False positive rate**: Very Low (sees the actual code path)\n- **When to run**: During functional testing\n\n### SCA — Software Composition Analysis\n- Scans **third-party dependencies** for known vulnerabilities\n- Checks package versions against CVE databases\n- **False positive rate**: Very Low (matches exact CVE data)\n- **When to run**: Every build + continuously"
+            },
+            "simplified_explanation": "Think of building inspections:\n- **SAST** = Reading the blueprints for design flaws\n- **DAST** = Walking through the finished building testing doors and locks\n- **IAST** = Having sensors inside the walls watching while you test\n- **SCA** = Checking if any of the building materials have been recalled",
+            "memory_aids": [
+                "SAST = Static = Source code = Blueprints",
+                "DAST = Dynamic = Running app = Walking through",
+                "IAST = Interactive = Agent inside = Sensors in walls",
+                "SCA = Composition = Dependencies = Recalled materials"
+            ],
+            "real_world_connection": "The average commercial application has 50+ open-source dependencies, and 78% of codebases contain at least one known vulnerability. SCA is not optional — it's essential.",
+            "reflection_prompt": "Which type of testing would catch a hardcoded API key left in source code?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000003",
+            "type": "explanation",
+            "title": "Teach Me Like I'm 10: Security Testing Types",
+            "content": {
+                "text": "Imagine you're testing a new treehouse fort for safety:\n\n**SAST (Reading the Plans):**\nYou read the blueprint before building. You notice: 'The ladder is too thin' and 'No handrail on the balcony.' You fix these on paper before cutting any wood.\n\n**DAST (Climbing the Treehouse):**\nAfter it's built, you climb up and try to break things. You push on walls, shake the ladder, and try to open the trap door from the outside. You find the lock is broken!\n\n**IAST (Sensors in the Walls):**\nYou put tiny sensors inside the wood. While you climb and test, the sensors tell you exactly which beams are under stress and where the weak spots are.\n\n**SCA (Checking the Materials):**\nYou check the tags on all the wood and nails you bought. The manufacturer recalls 'Batch #42 nails' because they rust too fast — you used those nails! Time to replace them.\n\n**The Best Approach: Use ALL of them!** Each catches different problems."
+            },
+            "simplified_explanation": "No single test catches everything. SAST finds code mistakes, DAST finds runtime problems, IAST sees inside while testing, and SCA checks your building materials. Together they cover the full picture.",
+            "memory_aids": [
+                "SAST = Check the recipe before cooking",
+                "DAST = Taste the food after cooking",
+                "IAST = Watch the food cook with a camera inside",
+                "SCA = Check if any ingredients were recalled"
+            ],
+            "real_world_connection": "Google's Project Wycheproof found vulnerabilities in widely-used crypto libraries by testing actual implementations (DAST approach). Many of these had been in the source code (SAST) for years but weren't caught because no one tested them dynamically.",
+            "reflection_prompt": "If you could only afford one type of testing for a small startup, which would you pick and why?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000004",
+            "type": "code_exercise",
+            "title": "Set Up SAST with Semgrep",
+            "content": {
+                "text": "## Exercise: Configure and Run Semgrep SAST\n\nSemgrep is a fast, open-source static analysis tool that finds vulnerabilities in source code.\n\n**Step 1: Install Semgrep**\n```bash\npip install semgrep\n```\n\n**Step 2: Run with OWASP rules**\n```bash\n# Scan a Python project for OWASP Top 10 issues\nsemgrep --config p/owasp-top-ten ./src/\n\n# Scan a JavaScript project\nsemgrep --config p/xss ./src/\n```\n\n**Step 3: Create a custom rule**\n```yaml\n# custom-rule.yaml\nrules:\n  - id: hardcoded-secret\n    patterns:\n      - pattern: |\n          $KEY = \"...\"\n      - metavariable-regex:\n          metavariable: $KEY\n          regex: '(?i)(password|secret|api_key|token)'\n    message: \"Hardcoded secret detected! Use environment variables instead.\"\n    severity: ERROR\n    languages: [python, javascript]\n```\n\n**Step 4: Run your custom rule**\n```bash\nsemgrep --config custom-rule.yaml ./src/\n```\n\n**Challenge:** Write a Semgrep rule that detects SQL string concatenation (potential SQL injection).",
+                "language": "bash",
+                "starter_code": "# Install and run Semgrep\npip install semgrep\nsemgrep --config p/owasp-top-ten ./src/",
+                "solution": "# SQL injection detection rule\n# sql-injection-rule.yaml\nrules:\n  - id: sql-concat-injection\n    patterns:\n      - pattern: |\n          $CURSOR.execute($QUERY + $VAR)\n      - pattern: |\n          $CURSOR.execute(f\"...{$VAR}...\")\n    message: \"Potential SQL injection via string concatenation or f-string. Use parameterized queries instead.\"\n    severity: ERROR\n    languages: [python]"
+            },
+            "xp_reward": 25
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000005",
+            "type": "explanation",
+            "title": "Integrating Security Testing into CI/CD",
+            "content": {
+                "text": "## DevSecOps: Security as Code\n\nThe goal is to make security testing automatic, consistent, and fast enough that developers don't bypass it.\n\n### Pipeline Integration Points\n\n```\nCode Commit → SAST + SCA → Build → Unit Tests → \nDeploy to Staging → DAST + IAST → Deploy to Prod → \nContinuous Monitoring\n```\n\n### GitHub Actions Example\n```yaml\nname: Security Pipeline\non: [push, pull_request]\njobs:\n  sast:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Semgrep SAST\n        uses: returntocorp/semgrep-action@v1\n        with:\n          config: p/owasp-top-ten\n  \n  sca:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Snyk SCA\n        uses: snyk/actions/python@master\n        env:\n          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}\n  \n  dast:\n    needs: [deploy-staging]\n    runs-on: ubuntu-latest\n    steps:\n      - name: OWASP ZAP Scan\n        uses: zaproxy/action-full-scan@v0.10.0\n        with:\n          target: 'https://staging.example.com'\n```\n\n### Key Metrics to Track\n- **MTTR** (Mean Time to Remediate): How fast vulnerabilities get fixed\n- **False Positive Rate**: How many findings are real vs noise\n- **Coverage**: What % of code is scanned\n- **Critical/High Findings**: Number of serious issues per sprint"
+            },
+            "simplified_explanation": "CI/CD security testing is like having a quality inspector at every station of a factory assembly line. Instead of checking the final product only, you check at every step — and the inspection is automatic so nobody can skip it.",
+            "memory_aids": [
+                "Pipeline: Commit → SAST+SCA → Build → Test → DAST+IAST → Deploy",
+                "DevSecOps = Security built into every step, not bolted on at the end",
+                "Key metrics: MTTR, false positive rate, coverage, critical findings"
+            ],
+            "real_world_connection": "Microsoft's SDL (Security Development Lifecycle) requires security testing at every phase. Since implementing it, they've reduced vulnerabilities in their products by over 50%.",
+            "reflection_prompt": "What happens if security testing in the pipeline is too slow?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000006",
+            "type": "real_world",
+            "title": "Real-World Failures and Successes",
+            "content": {
+                "text": "## Case Study: Equifax Breach (2017)\n\n**What happened:** 147 million records exposed\n**Root cause:** Unpatched Apache Struts CVE-2017-5638\n**What could have caught it:** SCA scanning dependencies for known CVEs\n**Lesson:** Always scan your dependencies — automated SCA would have flagged this in minutes.\n\n## Case Study: SolarWinds Supply Chain Attack (2020)\n\n**What happened:** Malicious code injected into Orion build process\n**Root cause:** Compromised build pipeline, no integrity verification\n**What could have caught it:** Build pipeline security, code signing verification, SAST on build scripts\n**Lesson:** Your CI/CD pipeline is itself an attack surface.\n\n## Success Story: Google's OSS-Fuzz\n\n**What it does:** Continuous fuzzing of 400+ open-source projects\n**Results:** Found 36,000+ bugs, 30,000+ fixed\n**Approach:** Automated testing (DAST-style) integrated into project CI\n**Lesson:** Automated, continuous security testing works at scale."
+            },
+            "simplified_explanation": "Equifax missed a known bug in their building materials (dependency). SolarWinds had their factory compromised (CI/CD pipeline). Google built an automatic testing factory that runs non-stop (OSS-Fuzz). The pattern: automate, don't skip steps.",
+            "memory_aids": [
+                "Equifax = Missed a known CVE in a dependency → SCA would have caught it",
+                "SolarWinds = Build pipeline compromised → Pipeline security is essential",
+                "OSS-Fuzz = Automated continuous testing = 36,000+ bugs found",
+                "Pattern: Automate, don't skip"
+            ],
+            "real_world_connection": "The Log4Shell vulnerability (CVE-2021-44228) in December 2021 affected millions of applications. Organizations with SCA tools remediated in hours; those without took weeks or months.",
+            "reflection_prompt": "Why do you think organizations skip security testing despite these high-profile failures?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000007",
+            "type": "explanation",
+            "title": "DAST in Practice: OWASP ZAP",
+            "content": {
+                "text": "## Running OWASP ZAP for Dynamic Testing\n\nOWASP ZAP (Zed Attack Proxy) is the world's most popular free DAST tool.\n\n### Scan Types\n\n1. **Passive Scan** — Observes traffic without attacking\n2. **Active Scan** — Actively sends attack payloads\n3. **Spider** — Crawls the application to discover pages\n4. **Fuzzer** — Sends many inputs to find edge cases\n\n### Quick Scan via CLI\n```bash\n# Baseline scan (fast, low false positives)\nzap-baseline.py -t https://staging.example.com -r baseline_report.html\n\n# Full scan (thorough, takes longer)\nzap-full-scan.py -t https://staging.example.com -r full_report.html\n\n# API scan (for REST APIs)\nzap-api-scan.py -t https://staging.example.com/api/openapi.json \\\n  -f openapi -r api_report.html\n```\n\n### Interpreting Results\n\nZAP reports findings with alert levels:\n- **High** — SQL injection, authentication bypass\n- **Medium** — Cross-site scripting (reflected), weak cryptography\n- **Low** — Cookie missing flags, information disclosure\n- **Informational** — Comments in JavaScript, tech fingerprinting\n\n**Prioritize by risk:** Business impact × Likelihood = Priority"
+            },
+            "simplified_explanation": "ZAP is like a security inspector that walks through your website clicking every button, trying every trick, and reporting what's broken. Passive scan just watches. Active scan actively tries to break things. Spider maps out all the rooms first.",
+            "memory_aids": [
+                "ZAP = Zed Attack Proxy = Free DAST tool",
+                "Passive = Watch, Active = Attack, Spider = Map",
+                "High/Medium/Low/Info = Alert levels",
+                "Priority = Business impact × Likelihood"
+            ],
+            "real_world_connection": "OWASP ZAP is used by thousands of organizations worldwide and is integrated into CI/CD pipelines at companies ranging from startups to Fortune 500 enterprises.",
+            "reflection_prompt": "Why should you run both passive and active scans instead of just active?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000008",
+            "type": "memory_aid",
+            "title": "Application Security Testing Decision Framework",
+            "content": {
+                "text": "## 🧠 SDSI Framework — Pick the Right Test\n\n### **S**AST → Code written → Scan source code\n### **D**AST → App running → Test from outside\n### **S**CA → Dependencies → Check for known CVEs\n### **I**AST → Code + runtime → Instrument inside\n\n### When to Use What:\n\n| Situation | Best Tool | Why |\n|-----------|-----------|-----|\n| Developer writing code | SAST | Catch bugs in IDE |\n| PR review time | SAST + SCA | Automated gate |\n| Deploying to staging | DAST | Test running app |\n| QA running functional tests | IAST | See inside during testing |\n| Nightly build | All four | Full coverage |\n| Critical vulnerability announced | SCA | Check dependencies NOW |\n\n### Red Flags to Watch For:\n- 🚨 No security testing in CI/CD → Add SAST + SCA immediately\n- 🚨 DAST only in production → Move to staging\n- 🚨 Ignoring medium findings → Triage everything\n- 🚨 No dependency scanning → SCA is non-negotiable"
+            },
+            "simplified_explanation": "SDSI: SAST for code, DAST for running apps, SCA for dependencies, IAST for deep runtime analysis. Use SAST+SCA early, DAST+IAST when running, and all four for complete coverage.",
+            "memory_aids": [
+                "SDSI = SAST, DAST, SCA, IAST",
+                "Early = SAST + SCA (before app runs)",
+                "Late = DAST + IAST (while app runs)",
+                "Critical CVE announced = Run SCA NOW"
+            ],
+            "real_world_connection": "Organizations that implement all four testing types (SAST, DAST, SCA, IAST) catch 95%+ of vulnerabilities before production, compared to ~40% with only one type.",
+            "reflection_prompt": "If your team only had budget for two types of security testing, which two would you pick and why?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "b2c3d4e5-0001-4000-8000-000000000009",
+            "type": "reflection",
+            "title": "Your Security Testing Strategy",
+            "content": {
+                "text": "## Reflection: Building Your Testing Pipeline\n\nYou now understand the four pillars of application security testing. Here's how to apply them:\n\n**Immediate Actions:**\n1. Add SCA to your CI/CD pipeline today (Snyk free tier or Dependabot)\n2. Add SAST scanning on every PR (Semgrep is free and fast)\n3. Schedule weekly DAST scans on staging (OWASP ZAP)\n4. Evaluate IAST for high-risk applications\n\n**Questions to Consider:**\n1. What's the minimum security testing you'd require before a production deploy?\n2. How do you handle false positives without developer burnout?\n3. What's your SLA for fixing Critical vs High vs Medium findings?\n4. How do you handle findings in third-party libraries you can't modify?\n\n**Key Insight:** Security testing is not a phase — it's a continuous practice. The goal isn't to find every bug; it's to make finding bugs cheap and fast so developers fix them immediately."
+            },
+            "simplified_explanation": "Start small: SCA + SAST in CI/CD. Add DAST on staging. Consider IAST for critical apps. The goal is continuous, automated testing that's fast enough that no one wants to skip it.",
+            "memory_aids": [
+                "Start small: SCA + SAST first",
+                "Add DAST on staging next",
+                "IAST for high-risk apps only",
+                "Testing must be fast or devs will skip it"
+            ],
+            "real_world_connection": "Netflix's chaos engineering approach: they don't just test for vulnerabilities — they actively break things in production to verify their security controls work. Start smaller, but think bigger.",
+            "reflection_prompt": "What's the first security testing tool you'd add to your pipeline and why?",
+            "is_interactive": false,
+            "xp_reward": 0
+        }
+    ],
+    "post_assessment": [
+        {
+            "question": "Which application security testing type analyzes source code without executing the application?",
+            "options": [
+                "DAST (Dynamic Application Security Testing)",
+                "SAST (Static Application Security Testing)",
+                "IAST (Interactive Application Security Testing)",
+                "SCA (Software Composition Analysis)"
+            ],
+            "correct_answer": 1,
+            "explanation": "SAST (Static Application Security Testing) analyzes source code, bytecode, or binary code without running the application. It catches vulnerabilities like SQL injection patterns, hardcoded secrets, and buffer overflows at the code level."
+        },
+        {
+            "question": "Your organization uses an open-source library with a newly disclosed critical CVE. Which testing type would have caught this earliest?",
+            "options": [
+                "SAST — it would find the vulnerability in your code",
+                "DAST — it would detect the vulnerability at runtime",
+                "SCA — it would match the library version against the CVE database",
+                "IAST — it would observe the vulnerability during testing"
+            ],
+            "correct_answer": 2,
+            "explanation": "SCA (Software Composition Analysis) specifically scans third-party dependencies against known vulnerability databases (CVEs). It would immediately flag the library version as vulnerable, potentially before any exploit exists in the wild."
+        },
+        {
+            "question": "What is the primary advantage of IAST over DAST?",
+            "options": [
+                "IAST is faster to run than DAST",
+                "IAST doesn't require a running application",
+                "IAST sees inside the application during testing, providing code-level context for findings",
+                "IAST requires fewer system resources"
+            ],
+            "correct_answer": 2,
+            "explanation": "IAST instruments the application with an agent that monitors code execution from inside while tests run. This means it can identify the exact line of code responsible for a vulnerability, unlike DAST which only sees the application from the outside."
+        },
+        {
+            "question": "In a CI/CD pipeline, when should SAST scanning ideally occur?",
+            "options": [
+                "Only before production deployment",
+                "After the application is deployed to staging",
+                "On every code commit or pull request",
+                "During quarterly security audits"
+            ],
+            "correct_answer": 2,
+            "explanation": "SAST should run on every commit or PR to catch vulnerabilities as early as possible (shift left). Waiting until deployment or quarterly audits means vulnerabilities accumulate and become more expensive to fix."
+        },
+        {
+            "question": "What was the root cause of the Equifax breach that could have been prevented by SCA?",
+            "options": [
+                "A custom SQL injection vulnerability in their web application",
+                "An unpatched known vulnerability (CVE-2017-5638) in the Apache Struts dependency",
+                "A misconfigured firewall allowing unauthorized access",
+                "Hardcoded credentials left in their source code"
+            ],
+            "correct_answer": 1,
+            "explanation": "The Equifax breach was caused by CVE-2017-5638 in Apache Struts, a known vulnerability that had a patch available. SCA would have flagged this dependency as vulnerable, allowing the team to update it before it was exploited."
+        }
+    ],
+    "jim_kwik_principles": ["teach_like_im_10", "memory_hooks", "connect_to_what_i_know", "active_learning", "meta_learning", "minimum_effective_dose", "reframe_limiting_beliefs", "gamify_it", "learning_sprint", "multiple_memory_pathways"],
+    "tags": ["Course: ISC2-CISSP", "Career Path: Security Engineer", "SAST", "DAST", "IAST", "SCA", "DevSecOps"]
+}

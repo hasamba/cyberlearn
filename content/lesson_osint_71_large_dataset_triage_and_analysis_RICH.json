@@ -1,0 +1,257 @@
+{
+  "lesson_id": "6534ae16-0fe9-42c7-bb7d-1b14ccb626ad",
+  "title": "Large Dataset Triage and Analysis",
+  "domain": "osint",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 71,
+  "prerequisites": [
+    "Web Data Collection and Processing"
+  ],
+  "concepts": [
+    "Bulk data processing",
+    "Dataset triage",
+    "Data analysis tools",
+    "Pattern recognition",
+    "Large-scale OSINT",
+    "Data cleaning and normalization",
+    "Entity resolution at scale"
+  ],
+  "learning_objectives": [
+    "Apply triage methodologies to rapidly assess large OSINT datasets",
+    "Use command-line tools and Python for efficient bulk data processing",
+    "Implement entity resolution and deduplication at scale",
+    "Design pattern recognition workflows for anomaly detection",
+    "Build automated pipelines for recurring OSINT dataset analysis"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000001",
+      "type": "mindset_coach",
+      "title": "Triage: The Art of Rapid Prioritization",
+      "content": {
+        "text": "In OSINT, you often receive datasets with millions of records — breached databases, social media dumps, DNS logs. You can't analyze everything. Triage is about quickly separating signal from noise: what matters, what might matter, and what you can safely ignore.\n\n**Jim Kwik Learning Principle: Minimum Effective Dose**\n\nDon't try to analyze every field in every record. Start with: (1) What are you looking for? (2) Which fields are most likely to contain it? (3) What can you filter out immediately? The 80/20 rule applies — 80% of your findings come from 20% of the data.",
+        "simplified_explanation": "Triage means quickly sorting a huge pile of data into three buckets: Must investigate now, Might be relevant later, Definitely noise. You don't read everything — you find the 20% that matters and focus there.",
+        "memory_aids": [
+          "Triage = Sort into: Now / Later / Noise",
+          "80/20 rule: 80% of findings from 20% of data",
+          "Start with: What am I looking for?",
+          "Filter aggressively, then analyze"
+        ],
+        "real_world_connection": "When the Have I Been Pwned database grew to 12 billion records, researchers couldn't analyze every entry. They used triage: filter by domain, sort by recency, deduplicate, then focus on the most relevant breaches.",
+        "reflection_prompt": "If you received a 10-million-record breach database, what would your first step be?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000002",
+      "type": "explanation",
+      "title": "The OSINT Dataset Triage Process",
+      "content": {
+        "text": "## Five-Stage Triage Process\n\n### Stage 1: Initial Assessment (5 minutes)\n```bash\n# What is this data?\nwc -l data.csv                    # How many records?\nhead -1 data.csv                   # What fields?\nfile data.csv                      # File type?\nmd5sum data.csv                    # Integrity check\n```\n\n### Stage 2: Quick Statistics (15 minutes)\n```bash\n# Field distribution and completeness\ncsvcut -n data.csv                 # List all columns\ncsvstat data.csv                   # Column statistics\n\n# Find patterns in key fields\nawk -F, '{print $3}' data.csv | sort | uniq -c | sort -rn | head -20   # Top 20 values\n```\n\n### Stage 3: Filtering and Prioritization (30 minutes)\n```python\nimport pandas as pd\n\ndf = pd.read_csv('data.csv')\n\n# Quick triage filters\npriority = df[\n    (df['email'].str.contains('admin|root|system', na=False)) |  # High-value accounts\n    (df['password'].notna()) |                                      # Has credentials\n    (df['date'] > '2024-01-01')                                     # Recent data\n]\nprint(f'Priority records: {len(priority)} of {len(df)} ({len(priority)/len(df)*100:.1f}%)')\n```\n\n### Stage 4: Entity Resolution (1-2 hours)\n- Deduplicate similar records\n- Resolve entities across fields (same person, different email)\n- Normalize formats (dates, phone numbers, addresses)\n\n### Stage 5: Deep Analysis (As needed)\n- Pattern recognition in prioritized data\n- Correlation with other datasets\n- Timeline construction\n- Intelligence product generation",
+        "simplified_explanation": "Triage in 5 stages: (1) What is this data? (5 min), (2) Quick stats (15 min), (3) Filter and prioritize (30 min), (4) Resolve entities and deduplicate (1-2 hours), (5) Deep analysis on prioritized data. The first 3 stages take under an hour and tell you 80% of what matters.",
+        "memory_aids": [
+          "5 min: What is it?",
+          "15 min: Quick stats",
+          "30 min: Filter and prioritize",
+          "1-2 hours: Resolve entities",
+          "As needed: Deep analysis",
+          "First hour = 80% of value"
+        ],
+        "real_world_connection": "The Panama Papers analysis (11.5M documents) used exactly this triage process. Researchers spent 45 minutes on initial assessment, found the key data types, filtered to the most relevant 5% of records, and produced actionable intelligence within days.",
+        "reflection_prompt": "Why is spending more time on initial assessment and filtering better than diving into deep analysis immediately?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000003",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Data Triage",
+      "content": {
+        "text": "Imagine you're a detective who just received a warehouse full of filing cabinets — 10 million documents. You can't read them all.\n\n**Step 1: What are we looking at?** (5 minutes)\nOpen a few cabinets. Are they financial records? Phone bills? Medical files? This tells you what you're dealing with.\n\n**Step 2: Quick count** (15 minutes)\nHow many cabinets? How many folders per cabinet? Any labels on the outside? Which cabinets are newest?\n\n**Step 3: Sort into piles** (30 minutes)\n- **RED pile:** Definitely suspicious — admin accounts, recent dates, high-value targets\n- **YELLOW pile:** Might be relevant — unusual patterns, partial matches\n- **GREEN pile:** Probably noise — duplicates, old records, generic data\n\n**Step 4: Merge duplicates** (1-2 hours)\nSame person appearing in 5 different folders? Merge them into one file. Same phone number in 3 places? One record.\n\n**Step 5: Read the RED pile carefully**\nNow you only have a small stack of files that actually matter. Read those thoroughly. The GREEN pile goes in storage — maybe look at it later if needed.\n\n**Result:** Instead of reading 10 million documents, you read maybe 10,000 that actually matter. And you found them in under 2 hours.",
+        "simplified_explanation": "Data triage is like sorting mail into urgent, maybe, and junk. Don't read everything — quickly sort, focus on what matters, and deal with the rest later if you have time.",
+        "memory_aids": [
+          "Step 1: What is it? (5 min)",
+          "Step 2: Quick count (15 min)",
+          "Step 3: RED/YELLOW/GREEN piles (30 min)",
+          "Step 4: Merge duplicates (1-2 hours)",
+          "Step 5: Read the RED pile",
+          "Result: 10M -> 10K in under 2 hours"
+        ],
+        "real_world_connection": "Bellingcat analyzes millions of social media posts using this exact triage process. They estimate it reduces their analysis time by 90% compared to trying to read everything.",
+        "reflection_prompt": "What characteristics would make a record go into your RED (urgent) pile?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000004",
+      "type": "code_exercise",
+      "title": "Large Dataset Triage Lab",
+      "content": {
+        "text": "## Exercise: Triage a Breach Dataset\n\nProcess a large dataset using the triage methodology.\n\n```python\nimport pandas as pd\nfrom collections import Counter\n\n# Stage 1: Initial Assessment\ndef assess_dataset(filepath):\n    \"\"\"Quick assessment of dataset structure.\"\"\"\n    df = pd.read_csv(filepath, nrows=1000)  # Sample first 1000 rows\n    print(f'Columns: {list(df.columns)}')\n    print(f'Sample shape: {df.shape}')\n    print(f'Data types:\\n{df.dtypes}')\n    print(f'Null counts:\\n{df.isnull().sum()}')\n    return df.columns.tolist()\n\n# Stage 2: Quick Statistics\ndef quick_stats(df):\n    \"\"\"Generate quick statistics for key fields.\"\"\"\n    for col in df.select_dtypes(include=['object']).columns:\n        print(f'\\n--- {col} ---')\n        print(f'Unique values: {df[col].nunique()}')\n        print(f'Null values: {df[col].isnull().sum()}')\n        print(f'Top 5 values:')\n        print(df[col].value_counts().head(5))\n\n# Stage 3: Triage Filtering\ndef triage_filter(df):\n    \"\"\"Filter dataset into priority categories.\"\"\"\n    red = df[\n        df['email'].str.contains('admin|root|security|it|sys', na=False, case=False) |\n        df['password'].notna()\n    ]\n    yellow = df[\n        df['email'].str.contains('gov|military|bank', na=False, case=False)\n    ]\n    green = df[~df.index.isin(red.index) & ~df.index.isin(yellow.index)]\n    \n    print(f'RED (urgent): {len(red)} records ({len(red)/len(df)*100:.1f}%)')\n    print(f'YELLOW (review): {len(yellow)} records ({len(yellow)/len(df)*100:.1f}%)')\n    print(f'GREEN (noise): {len(green)} records ({len(green)/len(df)*100:.1f}%)')\n    return red, yellow, green\n```\n\n**Challenge:** Add entity resolution that merges records with the same username across different email domains.",
+        "language": "python",
+        "starter_code": "import pandas as pd\n\ndef triage_filter(df):\n    \"\"\"Filter dataset into priority categories.\"\"\"\n    red = df[df['email'].str.contains('admin|root', na=False)]\n    # TODO: Add yellow and green categories\n    return red",
+        "solution": "def resolve_entities(df, username_col='username'):\n    \"\"\"Merge records with the same username across domains.\"\"\"\n    # Extract username from email\n    df['normalized_user'] = df['email'].str.split('@').str[0].str.lower()\n    \n    # Group by normalized username\n    entities = df.groupby('normalized_user').agg({\n        'email': lambda x: list(x),\n        'password': lambda x: list(x.dropna()),\n        'date': 'max'\n    }).reset_index()\n    \n    # Flag entities with multiple accounts\n    entities['account_count'] = entities['email'].str.len()\n    entities['multi_account'] = entities['account_count'] > 1\n    \n    return entities"
+      },
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000005",
+      "type": "real_world",
+      "title": "Real-World Large Dataset Analysis",
+      "content": {
+        "text": "## Panama Papers (11.5M Documents)\n- **Challenge:** 11.5M leaked documents from Mossack Fonseca\n- **Triage approach:** Filter by high-value individuals (politicians, celebrities), recent years, specific jurisdictions\n- **Result:** 400+ journalists analyzed prioritized data over months, producing actionable intelligence\n- **Key insight:** Initial triage reduced the dataset from 11.5M to approximately 150K relevant documents\n\n## LinkedIn Data Dump (700M Records, 2021)\n- **Challenge:** 700M scraped LinkedIn profiles\n- **Triage approach:** Filter by target organizations, job titles, locations\n- **Result:** Focused on specific organizational structures for threat modeling\n- **Key insight:** The full dataset was too large for manual analysis; targeted triage produced immediate value\n\n## DNS Logs Analysis (Billion+ Records)\n- **Challenge:** Analyzing DNS resolution logs for C2 detection\n- **Triage approach:** Filter by known IoC domains, unusual TLDs, high-frequency queries, new domain registrations\n- **Result:** Reduced billions of records to hundreds of suspicious indicators\n- **Key insight:** Time-based filtering (recent activity) and pattern-based filtering (beaconing) are the most effective\n\n**Common Pattern:** Every successful large dataset analysis started with aggressive triage that reduced the data by 90%+ before deep analysis.",
+        "simplified_explanation": "Panama Papers: 11.5M to 150K relevant docs. LinkedIn: 700M to targeted structures. DNS logs: Billions to hundreds of indicators. The pattern is always the same: aggressive triage reduces data by 90%+ before deep analysis.",
+        "memory_aids": [
+          "Panama Papers: 11.5M -> 150K (99% reduction)",
+          "LinkedIn: 700M -> targeted structures",
+          "DNS logs: Billions -> hundreds of IoCs",
+          "Common pattern: Aggressive triage = 90%+ reduction",
+          "Filter first, analyze second"
+        ],
+        "real_world_connection": "The International Consortium of Investigative Journalists (ICIJ) built a custom triage tool for the Panama Papers that allowed 400+ journalists in 80 countries to collaboratively analyze the prioritized data. Without triage, the analysis would have been impossible.",
+        "reflection_prompt": "Why is it better to risk missing 5% of relevant data than to drown in 100% of noise?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000006",
+      "type": "explanation",
+      "title": "Entity Resolution at Scale",
+      "content": {
+        "text": "## What is Entity Resolution?\n\nEntity resolution (also called deduplication or record linkage) is the process of identifying and merging records that refer to the same real-world entity.\n\n### Common Scenarios\n- Same person, different email addresses\n- Same organization, different name spellings\n- Same phone number, different formats\n- Same address, different abbreviations\n\n### Techniques\n\n**1. Exact Matching**\n```python\n# Simple deduplication on exact fields\ndf_deduped = df.drop_duplicates(subset=['email'])\n```\n\n**2. Fuzzy Matching**\n```python\nfrom fuzzywuzzy import fuzz, process\n\n# Find similar names\nfuzz.ratio('John Smith', 'Jon Smyth')      # 80\nfuzz.ratio('Mossack Fonseca', 'Mossack-Fonseca')  # 95\n\n# Threshold: >85 for organization names, >80 for person names\n```\n\n**3. Blocking for Scale**\n```python\n# Instead of comparing all pairs, block by common key first\nblocks = df.groupby(df['email'].str.split('@').str[1])  # Block by domain\n# Then fuzzy match within each block only\n```\n\n**4. Progressive Resolution**\n```python\n# Step 1: Exact match on email (fast)\n# Step 2: Exact match on normalized phone (fast)\n# Step 3: Fuzzy match on name within same domain (medium)\n# Step 4: Fuzzy match on name + location (slow, last resort)\n```\n\n### Performance at Scale\n\n| Records | Exact Match | Fuzzy Match | Progressive |\n|---------|-------------|-------------|-------------|\n| 10K     | <1s         | 10s         | 3s          |\n| 1M      | 5s          | 28 hours    | 5 min       |\n| 100M    | 2 min       | ~years      | 30 min      |\n\n**Key Insight:** Progressive resolution (exact first, then fuzzy within blocks) reduces processing time by 99%+ while maintaining accuracy.",
+        "simplified_explanation": "Entity resolution = Finding that 'John Smith' and 'Jon Smyth' are the same person, or that 'jsmith@gmail.com' and 'john.s@company.com' are the same John Smith. Start with exact matches (fast), then fuzzy matches within groups (medium), then cross-group fuzzy matches (slow).",
+        "memory_aids": [
+          "Exact match = Fast, simple",
+          "Fuzzy match = Slow, handles typos",
+          "Blocking = Group by domain/key, then match within groups",
+          "Progressive = Exact first, then fuzzy (99% faster)",
+          "100M records: Progressive = 30min, Fuzzy = years"
+        ],
+        "real_world_connection": "The US Census Bureau uses entity resolution to match 330M people across multiple data sources. They use progressive resolution: exact match on SSN first, then fuzzy match on name+address, reducing processing from months to hours.",
+        "reflection_prompt": "Why is progressive resolution so much faster than brute-force fuzzy matching?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000007",
+      "type": "memory_aid",
+      "title": "FILTER Framework for Dataset Triage",
+      "content": {
+        "text": "## FILTER Framework for Dataset Triage\n\n### **F**ormat — Understand the data format and structure\n- CSV, JSON, SQL dump, unstructured text?\n- How many records? What fields?\n- Run integrity checks (hash, line count)\n\n### **I**dentify — Know what you're looking for\n- What's your intelligence requirement?\n- Which fields are most relevant?\n- What patterns would be suspicious?\n\n### **L**ayer — Apply triage filters in layers\n- RED (urgent): High-value targets, admin accounts, recent data\n- YELLOW (review): Domain matches, unusual patterns\n- GREEN (noise): Duplicates, old data, generic records\n\n### **T**riage — Process each layer appropriately\n- RED: Immediate deep analysis\n- YELLOW: Queue for review\n- GREEN: Archive for future reference\n\n### **E**ntity Resolution — Merge duplicates and related records\n- Exact matching first (fast)\n- Fuzzy matching within blocks (medium)\n- Cross-block fuzzy matching (slow, last resort)\n\n### **R**eport — Generate intelligence products\n- Timeline of key events\n- Entity relationship map\n- Summary of findings with confidence levels\n- Recommendations for further investigation\n\n### Quick Triage Command Reference:\n```bash\nwc -l data.csv              # Record count\nhead -1 data.csv             # Column headers\ncsvstat data.csv             # Column statistics\nawk -F, '{print $3}' | sort | uniq -c | sort -rn | head 20   # Top values\n```",
+        "simplified_explanation": "FILTER: Format (what is it?), Identify (what am I looking for?), Layer (RED/YELLOW/GREEN), Triage (process each layer), Entity resolution (merge duplicates), Report (generate intelligence). Apply in order, spend most time on RED.",
+        "memory_aids": [
+          "FILTER = Format, Identify, Layer, Triage, Entity, Report",
+          "RED/YELLOW/GREEN = Urgent/Review/Noise",
+          "Exact match first, then fuzzy",
+          "Command-line tools: wc, head, csvstat, awk"
+        ],
+        "real_world_connection": "OSINT investigators at Bellingcat use a similar triage process for every large dataset. They report that proper triage saves 80-90% of analysis time by focusing effort on the most relevant data.",
+        "reflection_prompt": "How would you apply the FILTER framework to a leaked database with 5 million email/password pairs?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "c4d5e6f7-0001-4000-8000-000000000008",
+      "type": "reflection",
+      "title": "Your Dataset Triage Workflow",
+      "content": {
+        "text": "## Reflection: Building Your Triage Pipeline\n\n**For Your Next Large Dataset:**\n1. **Assess first:** Run initial checks before diving into analysis\n2. **Define your target:** What are you looking for? Be specific.\n3. **Filter aggressively:** It's better to miss 5% than drown in 100%\n4. **Deduplicate early:** Entity resolution saves massive time later\n5. **Document everything:** Record your triage decisions for reproducibility\n\n**Tool Kit:**\n- Command-line: `wc`, `head`, `csvcut`, `csvstat`, `awk`, `jq`\n- Python: `pandas`, `fuzzywuzzy`, `dedupe`\n- Databases: SQLite for medium datasets, PostgreSQL for large\n- Visualization: matplotlib, seaborn, Maltego for entity relationships\n\n**Key Questions:**\n1. What's the largest dataset you've had to analyze? How would triage have helped?\n2. How would you handle a dataset that's too large for pandas (100M+ records)?\n3. What's your confidence level in fuzzy matching results? How do you validate?\n\n**Remember:** The goal of triage isn't perfection — it's rapid prioritization. You can always go back to the GREEN pile later.",
+        "simplified_explanation": "Assess first, define your target, filter aggressively, deduplicate early, document everything. The goal isn't perfection — it's rapid prioritization. You can always revisit the noise later.",
+        "memory_aids": [
+          "Assess -> Define -> Filter -> Deduplicate -> Document",
+          "Triage isn't perfection, it's prioritization",
+          "Tools: CLI (wc, awk, jq) + Python (pandas, fuzzywuzzy)",
+          "100M+ records: Use databases, not pandas"
+        ],
+        "real_world_connection": "Professional OSINT analysts report that proper triage reduces their analysis time by 80-90%. The ones who skip triage spend weeks on datasets that could have been analyzed in hours.",
+        "reflection_prompt": "What's your biggest challenge when analyzing large datasets, and how would the FILTER framework address it?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary goal of the triage phase in large dataset analysis?",
+      "options": [
+        "To analyze every record in the dataset thoroughly",
+        "To quickly separate high-priority records from noise, reducing the dataset by 90%+",
+        "To create a complete backup of the dataset before analysis",
+        "To identify the data format and structure only"
+      ],
+      "correct_answer": 1,
+      "explanation": "Triage rapidly separates signal from noise by categorizing records into priority levels (RED/YELLOW/GREEN). The goal is to reduce the working dataset by 90%+ so analysts can focus their deep analysis on the most relevant records."
+    },
+    {
+      "question": "Why is progressive entity resolution (exact matching first, then fuzzy matching within blocks) significantly faster than brute-force fuzzy matching?",
+      "options": [
+        "Fuzzy matching is less accurate than exact matching",
+        "Exact matching eliminates the vast majority of comparisons, and blocking reduces the fuzzy matching search space to small groups instead of all possible pairs",
+        "Progressive resolution uses different algorithms that are inherently faster",
+        "Fuzzy matching cannot be parallelized"
+      ],
+      "correct_answer": 1,
+      "explanation": "Progressive resolution first handles exact matches (very fast, eliminates most records), then uses blocking to group remaining records by a common key, and only fuzzy-matches within each small block. This reduces comparisons from O(n^2) across all records to O(k^2) within each block of size k, which is orders of magnitude faster."
+    },
+    {
+      "question": "In the FILTER framework, what does the 'Layer' step involve?",
+      "options": [
+        "Adding more data sources to the analysis",
+        "Categorizing records into priority levels (RED/YELLOW/GREEN) based on relevance and urgency",
+        "Applying machine learning models to the dataset",
+        "Creating visualization layers for the data"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Layer step categorizes records into priority levels: RED (urgent - immediate analysis), YELLOW (review - queue for later review), and GREEN (noise - archive for future reference). This prioritization enables focused analysis on the most important records."
+    },
+    {
+      "question": "When processing a 100-million-record dataset, which approach is MOST practical?",
+      "options": [
+        "Load all records into pandas DataFrame for analysis",
+        "Use brute-force fuzzy matching to find all entity relationships",
+        "Apply progressive resolution: exact matching first, then fuzzy matching within blocks",
+        "Manually review each record for relevance"
+      ],
+      "correct_answer": 2,
+      "explanation": "For 100M+ records, pandas may run out of memory, brute-force fuzzy matching is computationally infeasible (years of processing), and manual review is impossible. Progressive resolution (exact matching -> blocking -> fuzzy within blocks) completes in approximately 30 minutes while maintaining accuracy."
+    },
+    {
+      "question": "What is the recommended first step when receiving a large OSINT dataset?",
+      "options": [
+        "Start analyzing the most interesting records immediately",
+        "Run initial assessment: check file integrity, record count, column structure, and data types",
+        "Deduplicate all records before any other processing",
+        "Search for specific keywords related to your investigation"
+      ],
+      "correct_answer": 1,
+      "explanation": "The first step is initial assessment: verify file integrity (hash check), determine record count, understand column structure and data types, and identify what the dataset contains. This 5-minute step informs all subsequent triage decisions and prevents wasting time on corrupt or irrelevant data."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "tags": [
+    "Course: SANS-SEC497",
+    "Career Path: OSINT",
+    "Data Analysis",
+    "Entity Resolution",
+    "Large Datasets",
+    "OSINT Methodology"
+  ]
+}

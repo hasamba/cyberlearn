@@ -1,0 +1,254 @@
+{
+  "lesson_id": "8153ac46-8a56-47ad-9ce6-99e0b5e18050",
+  "title": "Database Security",
+  "domain": "fundamentals",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 70,
+  "prerequisites": [],
+  "concepts": [
+    "Database access controls",
+    "Encryption at rest and in transit",
+    "SQL injection prevention",
+    "Database auditing",
+    "Principle of least privilege",
+    "Database hardening"
+  ],
+  "learning_objectives": [
+    "Implement database access controls following least privilege",
+    "Configure encryption for data at rest and in transit",
+    "Prevent SQL injection through parameterized queries and input validation",
+    "Set up database auditing and monitoring",
+    "Apply database hardening best practices"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000001",
+      "type": "mindset_coach",
+      "title": "Databases: The Crown Jewels",
+      "content": {
+        "text": "Databases hold the data that organizations value most — customer records, financial data, intellectual property, credentials. If your database is compromised, everything it contains is at risk. Database security isn't just about the database itself — it's about protecting the crown jewels.\n\n**Jim Kwik Learning Principle: Connect to What I Know**\n\nYou already understand access controls and encryption from other domains. Database security applies those same principles to a specific target: the data store. Think of it as applying everything you know about security, but focused on the most valuable asset.",
+        "simplified_explanation": "A database is like a bank vault. It holds the most valuable stuff. You need multiple locks (access controls), an alarm system (auditing), armored transport (encryption), and guards who only have access to what they need (least privilege).",
+        "memory_aids": [
+          "Database = Bank vault for data",
+          "Access controls = Multiple locks",
+          "Encryption = Armored transport",
+          "Auditing = Alarm system",
+          "Least privilege = Guards with limited access"
+        ],
+        "real_world_connection": "The 2017 Equifax breach exposed 147 million records because an unpatched database vulnerability was exploited. The database held everything — and one missing patch cost $1.4 billion.",
+        "reflection_prompt": "Why are databases often the most targeted asset in an organization?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000002",
+      "type": "explanation",
+      "title": "Database Access Controls and Least Privilege",
+      "content": {
+        "text": "## Least Privilege for Databases\n\n### Principle of Least Privilege (PoLP) for Databases\nEvery database user should have the minimum permissions necessary to perform their job.\n\n**Bad Practice:**\n```sql\nGRANT ALL PRIVILEGES ON *.* TO 'webapp'@'%';\n```\n\n**Good Practice:**\n```sql\n-- Application needs only SELECT and INSERT on specific tables\nGRANT SELECT, INSERT ON ecommerce.orders TO 'webapp'@'10.0.%';\nGRANT SELECT ON ecommerce.products TO 'webapp'@'10.0.%';\n-- No UPDATE, DELETE, DROP, or access to other databases\n```\n\n### Database Roles Hierarchy\n```\n+------------------+\n|   db_owner        |  <-- Only DBAs, full control\n+------------------+\n|   db_datawriter   |  <-- Can INSERT, UPDATE, DELETE\n+------------------+\n|   db_datareader   |  <-- Can SELECT only\n+------------------+\n|   db_executor     |  <-- Can EXECUTE stored procedures\n+------------------+\n|   app_readonly    |  <-- Application read-only access\n+------------------+\n```\n\n### Key Access Control Rules\n1. **Separate accounts** for each application and function\n2. **No shared credentials** — every user has their own account\n3. **Rotate credentials** regularly (every 90 days minimum)\n4. **Revoke unused access** — quarterly access reviews\n5. **Deny by default** — explicitly grant only what's needed",
+        "simplified_explanation": "Least privilege means each database user gets only the exact permissions they need. The web app can read products and insert orders, but can't delete anything or access the admin database. Think of it as giving each employee a keycard that only opens the doors they need.",
+        "memory_aids": [
+          "GRANT ALL = Bad",
+          "GRANT SELECT, INSERT ON specific tables = Good",
+          "Separate accounts for each app",
+          "Deny by default, grant explicitly",
+          "Quarterly access reviews"
+        ],
+        "real_world_connection": "The Uber 2016 breach occurred because attackers found hardcoded database credentials in a GitHub repo. The credentials had db_owner privileges — far more access than needed. Proper least privilege would have limited the damage.",
+        "reflection_prompt": "Why is GRANT ALL PRIVILEGES almost always a mistake?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000003",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Database Security",
+      "content": {
+        "text": "Imagine your database is a school filing cabinet with all student records.\n\n**Access Controls** = Different keys for different teachers\n- Math teacher can only see math grades\n- Principal can see everything\n- Janitor can't open the cabinet at all\n\n**Encryption** = Writing records in secret code\n- Even if someone steals the file, they can't read it without the key\n- Different codes for files in the cabinet (at rest) vs. files being carried (in transit)\n\n**SQL Injection Prevention** = Checking that forms are filled out correctly\n- A student writes 'Grade: A OR 1=1' on the form (trying to see all grades)\n- The teacher checks: 'That's not a valid grade format!' and rejects it\n\n**Auditing** = Security camera on the filing cabinet\n- Records who opened it, when, and what they looked at\n- If someone accesses records at 3am, the camera catches it\n\n**Database Hardening** = Putting the cabinet in a locked room\n- Remove unnecessary locks and drawers (default settings)\n- Only one door in and out (network restrictions)\n- Regular maintenance checks (patching)",
+        "simplified_explanation": "Database security = Keys (access controls) + Secret codes (encryption) + Form checking (SQL injection prevention) + Security cameras (auditing) + Locked room (hardening). All five together protect the data.",
+        "memory_aids": [
+          "Access Controls = Right keys for right people",
+          "Encryption = Secret code for data",
+          "SQL Injection Prevention = Check form inputs",
+          "Auditing = Security camera",
+          "Hardening = Locked room with minimal doors"
+        ],
+        "real_world_connection": "Target's 2013 breach started with a vendor's stolen credentials that had too much database access. The vendor only needed access to one system but had broad database privileges. Least privilege would have stopped the attack.",
+        "reflection_prompt": "Why do you need all five layers instead of just one?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000004",
+      "type": "code_exercise",
+      "title": "SQL Injection Prevention Lab",
+      "content": {
+        "text": "## Exercise: Fix SQL Injection Vulnerabilities\n\nIdentify and fix SQL injection vulnerabilities in the following code.\n\n**Vulnerable Code:**\n```python\n# VULNERABLE - String concatenation\nusername = request.form['username']\npassword = request.form['password']\nquery = f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\"\ncursor.execute(query)\n```\n\n**Attack:** Attacker enters `admin' --` as username, which creates:\n```sql\nSELECT * FROM users WHERE username='admin' --' AND password='anything'\n```\nThe `--` comments out the password check!\n\n**Fixed Code:**\n```python\n# SECURE - Parameterized query\nusername = request.form['username']\npassword = request.form['password']\nquery = \"SELECT * FROM users WHERE username=? AND password=?\"\ncursor.execute(query, (username, password))\n```\n\n**Challenge:** Fix this second-order SQL injection:\n```python\n# Username is stored safely, but used unsafely later\nusername = cursor.fetchone()['username']  # From database\nquery = f\"SELECT * FROM logs WHERE user='{username}'\"  # VULNERABLE!\n```",
+        "language": "python",
+        "starter_code": "# Fix the second-order SQL injection\nusername = cursor.fetchone()['username']\n# TODO: Write a parameterized query\nquery = f\"SELECT * FROM logs WHERE user='{username}'\"  # VULNERABLE!",
+        "solution": "# Second-order SQL injection fixed with parameterized query\nusername = cursor.fetchone()['username']\nquery = \"SELECT * FROM logs WHERE user=?\"\ncursor.execute(query, (username,))\n# Parameterized queries prevent BOTH first-order and second-order SQL injection"
+      },
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000005",
+      "type": "explanation",
+      "title": "Database Encryption: At Rest and In Transit",
+      "content": {
+        "text": "## Encryption Layers\n\n### Encryption at Rest\nProtects data stored on disk from physical theft or unauthorized access.\n\n**SQL Server:**\n```sql\n-- Enable Transparent Data Encryption (TDE)\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'StrongPassword123!';\nCREATE CERTIFICATE TDE_Cert WITH SUBJECT = 'TDE Certificate';\nCREATE DATABASE ENCRYPTION KEY\nWITH ALGORITHM = AES_256 ENCRYPTION BY SERVER CERTIFICATE TDE_Cert;\nALTER DATABASE Production SET ENCRYPTION ON;\n```\n\n**PostgreSQL:**\n```sql\n-- Column-level encryption using pgcrypto\nCREATE EXTENSION IF NOT EXISTS pgcrypto;\n\nINSERT INTO users (name, ssn) \nVALUES ('John Doe', encrypt('123-45-6789', 'encryption_key', 'aes'));\n\nSELECT name, decrypt(ssn::bytea, 'encryption_key', 'aes') FROM users;\n```\n\n### Encryption in Transit\nProtects data moving between application and database.\n\n```\nApplication -> TLS 1.3 -> Database\n           (encrypted channel)\n```\n\n**MySQL TLS Configuration:**\n```ini\n[mysqld]\nrequire_secure_transport = ON\nssl_ca = /etc/mysql/ca.pem\nssl_cert = /etc/mysql/server-cert.pem\nssl_key = /etc/mysql/server-key.pem\n```\n\n### Key Management\n- **Never store encryption keys in the database** — use a KMS or vault\n- **Rotate keys** annually or after any suspected compromise\n- **Separate key management** from data management (different access controls)\n- **Use HSM** (Hardware Security Module) for production key storage",
+        "simplified_explanation": "Encryption at rest = Scrambling data on the hard drive so thieves can't read it. Encryption in transit = Scrambling data while it travels between app and database. Key management = Keeping the scrambling keys in a different safe than the scrambled data.",
+        "memory_aids": [
+          "At rest = Encrypt data on disk (TDE, pgcrypto)",
+          "In transit = Encrypt connection (TLS 1.3)",
+          "Key management = NEVER store keys with data",
+          "Use KMS/HSM for production keys",
+          "Rotate keys annually"
+        ],
+        "real_world_connection": "The 2019 Capital One breach exposed 100M+ records because the database had encryption at rest, but the attacker accessed data through a misconfigured IAM role that had decryption permissions. Encryption doesn't help if the attacker has the key.",
+        "reflection_prompt": "Why doesn't encryption at rest help if the attacker has legitimate access to decrypt the data?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000006",
+      "type": "real_world",
+      "title": "Real-World Database Breaches",
+      "content": {
+        "text": "## Equifax (2017) — 147M Records\n- **Root cause:** Unpatched Apache Struts vulnerability leading to database access\n- **Database lesson:** Patch management is database security. The vulnerability was 2 months old with a patch available.\n- **Prevention:** Automated patch management, network segmentation\n\n## Capital One (2019) — 100M+ Records\n- **Root cause:** Misconfigured IAM role leading to SSRF and database access with decryption keys\n- **Database lesson:** Over-privileged IAM roles gave access to both data AND decryption keys\n- **Prevention:** Least privilege IAM, separate data and key access\n\n## Uber (2016) — 57M Records\n- **Root cause:** Hardcoded database credentials in GitHub repo\n- **Database lesson:** Never store credentials in code repositories. The credentials had db_owner access.\n- **Prevention:** Use secrets management, least privilege credentials\n\n## Yahoo (2013-2014) — 3B Records\n- **Root cause:** Backdoors planted by state-sponsored actors, unencrypted passwords\n- **Database lesson:** MD5 password hashing (weak) and lack of encryption\n- **Prevention:** Strong password hashing (bcrypt/Argon2), encryption at rest\n\n**Common Pattern:** Over-privileged access + unpatched systems + missing encryption = breach",
+        "simplified_explanation": "Equifax: Missing patch leading to database breach. Capital One: Over-privileged access leading to database breach. Uber: Credentials in code repo leading to database breach. Yahoo: Weak password hashing leading to database breach. The pattern: too much access + missing basics = disaster.",
+        "memory_aids": [
+          "Equifax = Unpatched vulnerability",
+          "Capital One = Over-privileged IAM",
+          "Uber = Hardcoded credentials in GitHub",
+          "Yahoo = Weak password hashing",
+          "Pattern: Over-access + missing basics = breach"
+        ],
+        "real_world_connection": "The average cost of a database breach is $4.45M (IBM 2023). The top 3 causes: compromised credentials, misconfigurations, and unpatched vulnerabilities — all preventable.",
+        "reflection_prompt": "What single database security practice would have prevented the most breaches in this list?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000007",
+      "type": "memory_aid",
+      "title": "SECURE Framework for Database Security",
+      "content": {
+        "text": "## SECURE Framework for Database Security\n\n### **S**egregate — Separate databases, roles, and networks\n- Separate read/write accounts\n- Network segmentation between app and DB tiers\n- Different databases for different sensitivity levels\n\n### **E**ncrypt — At rest AND in transit\n- TDE for data at rest\n- TLS 1.3 for data in transit\n- Column-level encryption for PII\n- Keys in KMS, never in the database\n\n### **C**ontrol — Least privilege access\n- GRANT only what's needed\n- No db_owner for applications\n- Separate accounts per app/function\n- Quarterly access reviews\n\n### **U**naudit — No, wait: AUDIT everything!\n- Failed logins, privilege changes, DDL\n- Sensitive data access patterns\n- Bulk exports and off-hours queries\n- Alert on anomalies\n\n### **R**estrict — Network and configuration\n- Disable default accounts (sa, postgres superuser)\n- Remove unnecessary features and stored procedures\n- Network allowlist (only app servers can connect)\n- Disable xp_cmdshell, OPENROWSET, etc.\n\n### **E**xceptions — Managed carefully\n- Document all exceptions to policies\n- Time-limited elevated access\n- Emergency access with approval workflow\n- Audit all exception usage\n\n### Quick Hardening Checklist:\n- Change default passwords and ports\n- Disable unused features and services\n- Enable TLS for all connections\n- Enable TDE or column-level encryption\n- Set up auditing and alerting\n- Apply least privilege to all accounts\n- Schedule regular patch management\n- Test backups and recovery procedures",
+        "simplified_explanation": "SECURE: Segregate (separate roles and networks), Encrypt (at rest and in transit), Control (least privilege), Unaudit -> AUDIT everything, Restrict (network and config), Exceptions (managed carefully). Plus the hardening checklist.",
+        "memory_aids": [
+          "SECURE = Segregate, Encrypt, Control, AUDIT, Restrict, Exceptions",
+          "Default passwords: CHANGE THEM",
+          "Unused features: DISABLE THEM",
+          "Least privilege: GRANT only what's needed",
+          "Keys: NEVER in the database"
+        ],
+        "real_world_connection": "CIS (Center for Internet Security) benchmarks for databases cover 100+ hardening settings. Applying just the top 20 eliminates 80% of common attack vectors.",
+        "reflection_prompt": "Which SECURE principle would you implement first in a new database deployment?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    },
+    {
+      "block_id": "a1b2c3d4-db01-4000-8000-000000000008",
+      "type": "reflection",
+      "title": "Your Database Security Plan",
+      "content": {
+        "text": "## Reflection: Securing Your Database Infrastructure\n\n**Day 1 (Quick Wins):**\n1. Change all default passwords and disable default accounts\n2. Enable TLS for all database connections\n3. Apply least privilege to application database accounts\n4. Enable basic auditing (failed logins, privilege changes)\n\n**Week 1:**\n5. Enable encryption at rest (TDE or column-level)\n6. Set up alerting on suspicious activity\n7. Network-segment database servers from application servers\n8. Remove unused stored procedures and features\n\n**Month 1:**\n9. Implement quarterly access reviews\n10. Set up automated patch management\n11. Test backup and recovery procedures\n12. Create an incident response plan for database breaches\n\n**Key Questions:**\n1. Where are your encryption keys stored? (Should be KMS, not DB)\n2. Which accounts have db_owner access? (Should be very few)\n3. When was your last database patch applied?\n4. How would you detect a data exfiltration attempt?",
+        "simplified_explanation": "Day 1: Default passwords, TLS, least privilege, basic auditing. Week 1: Encryption, alerting, segmentation. Month 1: Reviews, patching, backups, IR plan. Start with the basics, build up systematically.",
+        "memory_aids": [
+          "Day 1: Passwords, TLS, least privilege, auditing",
+          "Week 1: Encryption, alerting, segmentation",
+          "Month 1: Reviews, patching, backups, IR",
+          "Keys in KMS, not in database"
+        ],
+        "real_world_connection": "Organizations that implement CIS benchmarks for their databases reduce their breach risk by 80%. The top 5 CIS controls alone (default passwords, TLS, least privilege, auditing, patching) address the majority of real-world attacks.",
+        "reflection_prompt": "What's the first database security control you'd implement on a new production database?",
+        "is_interactive": false,
+        "xp_reward": 0
+      }
+    }
+  ],
+  "post_assessment": [
+    {
+      "question": "Why is granting ALL PRIVILEGES to an application database account a security risk?",
+      "options": [
+        "It makes the database run slower due to permission checks",
+        "The application could accidentally or maliciously drop tables, modify schemas, or access data it doesn't need",
+        "ALL PRIVILEGES is not supported by most database engines",
+        "It conflicts with TLS encryption settings"
+      ],
+      "correct_answer": 1,
+      "explanation": "Granting ALL PRIVILEGES violates least privilege. If the application only needs SELECT and INSERT, it shouldn't have DROP, ALTER, or DELETE permissions. If the application is compromised, the attacker gets the same level of access as the application — which could include destructive operations."
+    },
+    {
+      "question": "What is the difference between first-order and second-order SQL injection?",
+      "options": [
+        "First-order injection uses GET requests; second-order uses POST requests",
+        "First-order injection affects the current query directly; second-order injection stores malicious input that is used unsafely in a later query",
+        "Second-order injection is less dangerous than first-order",
+        "They are the same thing with different names"
+      ],
+      "correct_answer": 1,
+      "explanation": "First-order SQL injection injects malicious input directly into the current query. Second-order SQL injection stores malicious input in the database (safely), which is then used unsafely in a different query later. Parameterized queries prevent both types."
+    },
+    {
+      "question": "Why should encryption keys never be stored in the same database as the encrypted data?",
+      "options": [
+        "It makes the encryption slower",
+        "If an attacker gains access to the database, they have both the encrypted data AND the keys to decrypt it",
+        "Database encryption keys are incompatible with database storage",
+        "It violates database normalization rules"
+      ],
+      "correct_answer": 1,
+      "explanation": "Storing encryption keys alongside encrypted data defeats the purpose of encryption. If an attacker compromises the database, they get both the locked vault and the key to open it. Keys should be stored in a separate key management system (KMS) or hardware security module (HSM)."
+    },
+    {
+      "question": "Which database auditing event is MOST indicative of a potential data exfiltration attempt?",
+      "options": [
+        "A single failed login attempt",
+        "A SELECT query returning more than 10,000 rows from a sensitive table",
+        "A successful login during business hours",
+        "A schema change by a DBA account"
+      ],
+      "correct_answer": 1,
+      "explanation": "A SELECT query returning an abnormally large number of rows from a sensitive table (like customer records) suggests someone may be trying to export bulk data. This is a strong indicator of data exfiltration, especially if it occurs outside business hours or from an unusual IP address."
+    },
+    {
+      "question": "What is Transparent Data Encryption (TDE) and what does it protect against?",
+      "options": [
+        "TDE encrypts data in transit between application and database",
+        "TDE encrypts database files at rest, protecting against physical theft or unauthorized access to database storage",
+        "TDE encrypts individual database columns using separate keys",
+        "TDE prevents SQL injection by transparently validating queries"
+      ],
+      "correct_answer": 1,
+      "explanation": "TDE encrypts the entire database at the storage level — data files, log files, and backups. It protects against physical theft of storage media or unauthorized access to database files. It does NOT protect against authenticated users accessing data through normal queries."
+    }
+  ],
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "tags": [
+    "Course: ISC2-CISSP",
+    "Career Path: Security Engineer",
+    "Database Security",
+    "SQL Injection",
+    "Encryption",
+    "Access Controls"
+  ]
+}
