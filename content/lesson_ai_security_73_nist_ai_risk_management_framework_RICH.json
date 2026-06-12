@@ -1,0 +1,226 @@
+{
+  "lesson_id": "def08f56-38d5-469d-91f7-1a5d85b2f5e1",
+  "domain": "ai_security",
+  "title": "NIST AI Risk Management Framework",
+  "subtitle": "Applying Structured Risk Management to AI Systems",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 73,
+  "prerequisites": ["AI Threat Landscape and Attack Surfaces"],
+  "learning_objectives": [
+    "Understand the NIST AI RMF structure and its four core functions: Govern, Map, Measure, Manage",
+    "Identify AI-specific risks including bias, explainability, and safety concerns",
+    "Apply the AI RMF to assess and manage risks in AI system deployment",
+    "Distinguish between AI system risks and traditional software risks",
+    "Implement AI risk governance processes within an organization"
+  ],
+  "concepts": [
+    "NIST AI RMF Overview and Structure",
+    "Govern Function: AI Risk Governance",
+    "Map Function: Context and Risk Identification",
+    "Measure Function: AI Risk Assessment",
+    "Manage Function: Risk Response and Monitoring",
+    "AI-Specific Risk Categories",
+    "Trustworthy AI Characteristics"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "Why AI Needs Its Own Risk Framework",
+      "content": "AI systems introduce risks that traditional software risk management doesn't cover:\n\n- **Bias and fairness**: AI can discriminate at scale\n- **Explainability**: AI decisions are often opaque — why did the model deny the loan?\n- **Safety**: AI can take actions in the physical world (autonomous vehicles, medical diagnosis)\n- **Emergent behavior**: AI can behave in ways the designers didn't anticipate\n- **Data dependency**: AI is only as good as its training data, which can be biased, incomplete, or poisoned\n\nThe NIST AI Risk Management Framework (AI RMF) gives you a structured way to identify, assess, and manage these risks. It's not regulation — it's guidance. But it's quickly becoming the industry standard.\n\nThis lesson teaches you to think about AI risk the way you think about cybersecurity risk: systematically, with clear processes for identification, assessment, and response.",
+      "simplified_explanation": "AI has unique risks that regular software doesn't: bias, unexplainable decisions, unexpected behavior, and data dependency. The NIST AI RMF gives you a playbook for managing these risks systematically.",
+      "memory_aids": ["AI risks ≠ software risks", "Bias, explainability, safety, emergent behavior, data dependency", "NIST AI RMF = playbook for AI risk management", "Not regulation — guidance"],
+      "real_world_connection": "The EU AI Act (2024) references NIST AI RMF as a risk management framework. Organizations deploying AI are expected to demonstrate risk management — and NIST AI RMF is the standard framework.",
+      "reflection_prompt": "What's an AI risk in your organization that traditional risk management wouldn't cover?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "NIST AI RMF: Four Core Functions",
+      "content": "The NIST AI RMF is organized around four core functions, similar to the NIST Cybersecurity Framework (Identify, Protect, Detect, Respond, Recover) but adapted for AI:\n\n**1. GOVERN — Establish AI Risk Culture and Policies**\n- Define organizational AI risk policies and procedures\n- Assign roles and responsibilities for AI risk management\n- Establish risk tolerance and risk criteria for AI systems\n- Create oversight and accountability structures\n- Ensure stakeholder engagement and transparency\n- Document AI risk management processes\n\nKey outcomes: AI risk policy, defined roles, risk tolerance, accountability structure\n\n**2. MAP — Understand Context and Identify Risks**\n- Identify the AI system's intended use and context\n- Map the AI system's dependencies (data, infrastructure, people)\n- Identify potential harms (to individuals, groups, society)\n- Assess the AI system's position in the risk landscape\n- Understand the system's boundaries and interactions\n- Engage affected stakeholders in risk identification\n\nKey outcomes: Context understanding, risk identification, stakeholder engagement\n\n**3. MEASURE — Assess and Quantify AI Risks**\n- Develop metrics for identified risks\n- Evaluate AI system performance against fairness, accuracy, and robustness criteria\n- Assess explainability and transparency of AI decisions\n- Test for bias and discriminatory outcomes\n- Measure security and safety risks\n- Benchmark against established standards\n\nKey outcomes: Risk metrics, bias assessment, performance evaluation, safety testing\n\n**4. MANAGE — Respond to and Monitor AI Risks**\n- Implement risk treatment decisions (mitigate, transfer, accept, avoid)\n- Monitor AI system performance and risks over time\n- Establish incident response plans for AI failures\n- Communicate risk information to stakeholders\n- Update risk management based on new information\n- Ensure continuous improvement of AI risk practices\n\nKey outcomes: Risk mitigation, monitoring, incident response, continuous improvement",
+      "simplified_explanation": "Four functions: Govern (set policies), Map (understand risks), Measure (quantify risks), Manage (respond to risks). Start with governance, understand the context, measure the risks, then manage them.",
+      "memory_aids": ["Govern = set policies and roles", "Map = understand context and identify risks", "Measure = quantify and assess risks", "Manage = respond to and monitor risks", "G-M-M-M = Govern, Map, Measure, Manage"],
+      "real_world_connection": "Microsoft, Google, and IBM all reference NIST AI RMF in their responsible AI documentation. It's becoming the de facto standard for AI risk management in the US and internationally.",
+      "reflection_prompt": "Can you name all four functions and explain what each one does?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: AI Risk Management",
+      "content": "Imagine you're building a robot that decides who gets a scholarship. The robot reads applications and picks winners.\n\n**The problem**: The robot might make unfair choices. Maybe it picks boys more than girls. Maybe it favors rich kids. Maybe nobody can understand WHY it picked who it picked.\n\n**NIST AI RMF says: use four steps:**\n\n1. **GOVERN** (Set the Rules)\n   'Who's in charge of making sure the robot is fair? What counts as unfair? What are we willing to risk?'\n   → You: 'A teacher committee will oversee the robot. Unfair means picking based on gender or income. We accept a 5% error rate.'\n\n2. **MAP** (Understand the Robot)\n   'What data does the robot use? Who could be hurt if it makes bad choices? What are the risks?'\n   → You: 'The robot reads grades, essays, and extracurriculars. If it's biased, students could lose scholarships unfairly.'\n\n3. **MEASURE** (Check the Robot)\n   'Is the robot actually fair? Does it pick boys more? Does it work for all types of students? Can we understand its choices?'\n   → You: 'We test 1,000 applications and find the robot picks boys 60% of the time. That's unfair.'\n\n4. **MANAGE** (Fix the Robot)\n   'We found bias. How do we fix it? Do we retrain it? Add rules? Turn it off?'\n   → You: 'We retrain the robot without gender data and add a rule that selections must be 50/50.'\n\n**Then we GOVERN again** — set new rules based on what we learned, and the cycle continues.",
+      "simplified_explanation": "Four steps: Set rules (Govern), Understand risks (Map), Check for problems (Measure), Fix problems (Manage). Then repeat. It's a cycle, not a one-time check.",
+      "memory_aids": ["Govern = set the rules", "Map = understand what could go wrong", "Measure = check if it IS going wrong", "Manage = fix it and keep watching", "Then GOVERN again — it's a cycle"],
+      "real_world_connection": "This is exactly how organizations manage AI risk. They set policies (Govern), understand their AI systems (Map), test for bias and performance (Measure), and fix issues (Manage). Then they update policies based on what they learned.",
+      "reflection_prompt": "Can you apply the four steps to an AI system you know about?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_ai_risks",
+      "type": "explanation",
+      "title": "AI-Specific Risk Categories",
+      "content": "AI introduces risks that traditional software risk management doesn't adequately address:\n\n**1. Bias and Fairness Risks**\n- Training data reflects historical biases\n- Model amplifies existing disparities\n- Fairness metrics conflict (equal opportunity vs. demographic parity)\n- Disparate impact on protected groups\n- Example: Hiring AI that penalizes women's resumes because training data has fewer women in leadership\n\n**2. Explainability and Transparency Risks**\n- 'Black box' models can't explain their decisions\n- Users can't understand why they were denied a loan\n- Regulators can't audit AI decisions\n- Lack of transparency erodes trust\n- Example: Credit scoring AI that can't explain why someone's score dropped\n\n**3. Safety and Reliability Risks**\n- AI behaves unpredictably in edge cases\n- Adversarial attacks cause misclassification\n- Model degradation over time (drift)\n- Failure modes that traditional testing doesn't catch\n- Example: Self-driving car that doesn't recognize a pedestrian in unusual clothing\n\n**4. Privacy and Data Risks**\n- Training data contains PII that the model might leak\n- Model inversion attacks reconstruct training data\n- Membership inference reveals whether someone was in the training set\n- Data poisoning attacks corrupt model behavior\n- Example: Language model that reproduces training data containing personal information\n\n**5. Security Risks**\n- Prompt injection attacks manipulate model behavior\n- Adversarial examples cause misclassification\n- Model theft through API probing\n- Supply chain attacks on training data\n- Example: Attackers trick a content filter AI into generating harmful content\n\n**6. Societal and Ethical Risks**\n- Automation displaces workers\n- Surveillance capabilities enable human rights abuses\n- Deepfakes erode trust in media\n- Polarization through recommendation algorithms\n- Example: Social media AI that amplifies divisive content for engagement",
+      "simplified_explanation": "AI has six unique risk types: bias (unfair decisions), explainability (can't explain why), safety (unpredictable failures), privacy (leaking personal data), security (being attacked), and societal (harming communities). Traditional software risk doesn't cover these.",
+      "memory_aids": ["Bias = unfair decisions", "Explainability = can't explain why", "Safety = unpredictable failures", "Privacy = leaking personal data", "Security = being attacked", "Societal = harming communities", "B-E-S-P-S-S (Bias, Explainability, Safety, Privacy, Security, Societal)"],
+      "real_world_connection": "Amazon scrapped an AI recruiting tool that discriminated against women. COMPAS risk assessment software was found to be racially biased. These real cases demonstrate bias and fairness risks that traditional risk management never anticipated.",
+      "reflection_prompt": "Which AI risk category is most relevant to your organization? How would you detect it?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_5_trustworthy",
+      "type": "explanation",
+      "title": "Trustworthy AI Characteristics",
+      "content": "NIST defines seven characteristics of trustworthy AI. An AI system should be:\n\n**1. Valid and Reliable**\n- The AI does what it's designed to do, consistently\n- Tested across diverse conditions and edge cases\n- Performance is monitored over time\n- Failures are graceful, not catastrophic\n\n**2. Safe**\n- The AI does not cause physical or psychological harm\n- Safety constraints are built into the system\n- There are kill switches and fallback mechanisms\n- Example: Medical AI that defaults to 'refer to human doctor' when uncertain\n\n**3. Secure and Resilient**\n- The AI can withstand adversarial attacks\n- Security controls protect training data, model weights, and inference\n- Resilient to data poisoning and prompt injection\n- Incident response plans exist for AI-specific attacks\n\n**4. Accountable and Transparent**\n- Decisions can be traced and explained\n- Responsibility for AI outcomes is clearly assigned\n- Stakeholders are informed about AI use\n- Audit trails exist for AI decisions\n\n**5. Explainable and Interpretable**\n- Users can understand why the AI made a decision\n- Explanations are appropriate for the audience (technical vs. non-technical)\n- Model decisions can be decomposed into contributing factors\n- Trade-offs between accuracy and explainability are documented\n\n**6. Privacy-Enhanced**\n- Training data privacy is protected\n- Models don't leak personal information\n- Data minimization principles are applied\n- Privacy-preserving techniques are used where possible (federated learning, differential privacy)\n\n**7. Fair with Harmful Bias Managed**\n- The AI treats groups equitably\n- Bias is measured and documented\n- Mitigation strategies are in place\n- Ongoing monitoring for emergent bias\n\n**The interplay between characteristics:**\nThese characteristics can conflict. For example:\n- **Explainability vs. Accuracy**: Simpler models are more explainable but less accurate\n- **Privacy vs. Fairness**: Removing demographic data for privacy might hide bias\n- **Safety vs. Functionality**: Overly conservative safety constraints limit usefulness\n\nThe key: Document these trade-offs explicitly and involve stakeholders in the decisions.",
+      "simplified_explanation": "Trustworthy AI has seven traits: valid/reliable, safe, secure, accountable, explainable, privacy-enhanced, and fair. These traits can conflict — you have to make trade-offs and document your decisions.",
+      "memory_aids": ["VRS ATE PF = Valid, Reliable, Safe, Accountable, Transparent, Explainable, Privacy-enhanced, Fair", "Or: Valid, Safe, Secure, Accountable, Explainable, Private, Fair", "Trade-offs exist: explainability vs. accuracy, privacy vs. fairness", "Document trade-offs explicitly"],
+      "real_world_connection": "NIST AI RMF 1.0 (January 2023) and the accompanying AI RMF Playbook provide detailed guidance on implementing each characteristic. The EU AI Act also defines similar trustworthiness requirements for high-risk AI systems.",
+      "reflection_prompt": "Which trustworthiness characteristic is hardest to achieve? Which trade-off concerns you most?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_6_code_exercise",
+      "type": "code_exercise",
+      "title": "AI Risk Assessment Template",
+      "content": "Here's a practical AI risk assessment template based on the NIST AI RMF:\n\n```python\n# AI Risk Assessment Template\n# Based on NIST AI RMF 1.0\n\nfrom dataclasses import dataclass\nfrom enum import Enum\nfrom typing import List, Optional\n\nclass RiskLevel(Enum):\n    NEGLIGIBLE = 1\n    LOW = 2\n    MODERATE = 3\n    HIGH = 4\n    CRITICAL = 5\n\nclass RiskCategory(Enum):\n    BIAS = \"Bias & Fairness\"\n    EXPLAINABILITY = \"Explainability & Transparency\"\n    SAFETY = \"Safety & Reliability\"\n    PRIVACY = \"Privacy & Data Protection\"\n    SECURITY = \"Security & Adversarial\"\n    SOCIETAL = \"Societal & Ethical\"\n\n@dataclass\nclass AIRisk:\n    category: RiskCategory\n    description: str\n    likelihood: RiskLevel\n    impact: RiskLevel\n    affected_stakeholders: List[str]\n    mitigation: str\n    owner: str\n    status: str = \"identified\"  # identified, assessing, mitigating, monitoring, accepted\n\n# Example AI Risk Assessment for a Hiring AI\nhiring_ai_risks = [\n    AIRisk(\n        category=RiskCategory.BIAS,\n        description=\"AI may favor candidates from certain universities or backgrounds due to training data bias\",\n        likelihood=RiskLevel.HIGH,\n        impact=RiskLevel.HIGH,\n        affected_stakeholders=[\"Candidates\", \"Hiring team\", \"Company reputation\"],\n        mitigation=\"Regular bias audits, diverse training data, human-in-the-loop review for edge cases\",\n        owner=\"HR Data Science Lead\",\n        status=\"mitigating\"\n    ),\n    AIRisk(\n        category=RiskCategory.EXPLAINABILITY,\n        description=\"Deep learning model cannot explain why a candidate was rejected\",\n        likelihood=RiskLevel.HIGH,\n        impact=RiskLevel.MODERATE,\n        affected_stakeholders=[\"Candidates\", \"HR compliance\", \"Legal team\"],\n        mitigation=\"Implement SHAP values for feature importance, provide reason codes for rejections\",\n        owner=\"ML Engineering Lead\",\n        status=\"assessing\"\n    ),\n    AIRisk(\n        category=RiskCategory.SAFETY,\n        description=\"AI may reject qualified candidates, causing business impact\",\n        likelihood=RiskLevel.MODERATE,\n        impact=RiskLevel.MODERATE,\n        affected_stakeholders=[\"Hiring team\", \"Candidates\", \"Business units\"],\n        mitigation=\"Human review for all final decisions, confidence thresholds for AI recommendations\",\n        owner=\"HR Director\",\n        status=\"mitigating\"\n    ),\n    AIRisk(\n        category=RiskCategory.PRIVACY,\n        description=\"Training data contains PII that could be extracted through model inversion\",\n        likelihood=RiskLevel.LOW,\n        impact=RiskLevel.HIGH,\n        affected_stakeholders=[\"Candidates\", \"Legal team\", \"Privacy officer\"],\n        mitigation=\"Data anonymization, differential privacy, regular privacy audits\",\n        owner=\"Data Privacy Officer\",\n        status=\"mitigating\"\n    ),\n    AIRisk(\n        category=RiskCategory.SECURITY,\n        description=\"Prompt injection could manipulate AI to approve unqualified candidates\",\n        likelihood=RiskLevel.LOW,\n        impact=RiskLevel.MODERATE,\n        affected_stakeholders=[\"Hiring team\", \"Security team\"],\n        mitigation=\"Input validation, human-in-the-loop for final decisions, adversarial testing\",\n        owner=\"AI Security Lead\",\n        status=\"monitoring\"\n    ),\n]\n\n# Calculate risk score (likelihood × impact)\nfor risk in hiring_ai_risks:\n    risk_score = risk.likelihood.value * risk.impact.value\n    print(f\"{risk.category.value}: {risk.description[:60]}...\")\n    print(f\"  Risk Score: {risk_score}/25 | Status: {risk.status} | Owner: {risk.owner}\")\n    print()\n```\n\n**Exercise:** Create a risk assessment for an AI system you're familiar with. Identify at least 3 risks across different categories, assign likelihood and impact, and define mitigations.",
+      "simplified_explanation": "This template helps you identify, categorize, and assess AI risks. For each risk, you describe it, rate likelihood and impact, identify who's affected, and define how to mitigate it. It's the practical side of the NIST AI RMF.",
+      "memory_aids": ["Risk = Likelihood × Impact", "Six categories: Bias, Explainability, Safety, Privacy, Security, Societal", "Each risk needs: description, likelihood, impact, stakeholders, mitigation, owner", "Status: identified → assessing → mitigating → monitoring → accepted"],
+      "real_world_connection": "Organizations deploying AI are expected to produce exactly this type of risk assessment. The NIST AI RMF Playbook provides templates and examples for each function.",
+      "reflection_prompt": "What AI system would you assess first? What's the highest-risk category for it?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_7_real_world",
+      "type": "real_world",
+      "title": "NIST AI RMF in Practice: Real Implementations",
+      "content": "How are organizations actually using the NIST AI RMF?\n\n**Microsoft's Responsible AI Standard**\n- Maps directly to NIST AI RMF functions\n- Impact assessments for every AI system before deployment\n- Fairness dashboards measuring bias metrics across protected groups\n- Transparency notes explaining AI capabilities and limitations\n- Example: Azure AI services include 'Responsible AI impact assessments' in their documentation\n\n**Google's Model Cards**\n- Model Cards are a Map function output — documenting context, performance, and limitations\n- Each model card includes: intended use, performance metrics, ethical considerations, limitations\n- Example: The BERT model card documents performance across demographic groups\n\n**IBM's AI FactSheets**\n- FactSheets document AI system characteristics (Map function)\n- Include training data, performance metrics, bias assessments, and maintenance info\n- Example: Watson OpenScale provides automated bias detection and monitoring\n\n**Implementation challenges organizations face:**\n\n1. **Measuring bias is hard**: Fairness metrics conflict (equal opportunity vs. demographic parity)\n2. **Explainability vs. performance**: More explainable models are often less accurate\n3. **Governance gaps**: No clear owner for AI risk in many organizations\n4. **Scope creep**: Where does the AI system end and the traditional system begin?\n5. **Continuous monitoring**: AI models drift over time — risk assessment is not one-time\n\n**Best practices from early adopters:**\n- Start with Govern — establish policies before deploying AI\n- Involve diverse stakeholders in Map — not just data scientists\n- Measure early and often — bias and performance testing throughout development\n- Manage iteratively — risk management is a cycle, not a one-time assessment\n- Document everything — if it's not documented, it didn't happen",
+      "simplified_explanation": "Microsoft uses impact assessments, Google uses model cards, IBM uses factsheets. They all map to NIST AI RMF. The challenges: measuring bias, choosing explainability vs. performance, and finding who owns AI risk. Start with governance, measure early, manage iteratively.",
+      "memory_aids": ["Microsoft = impact assessments", "Google = model cards", "IBM = factsheets", "Start with governance, measure early, manage iteratively", "If it's not documented, it didn't happen"],
+      "real_world_connection": "The NIST AI RMF was released in January 2023. Since then, it's been adopted by major tech companies and referenced in the EU AI Act. It's becoming the global standard for AI risk management.",
+      "reflection_prompt": "Which implementation approach (impact assessments, model cards, or factsheets) would work best in your organization?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_8_memory_aid",
+      "type": "memory_aid",
+      "title": "NIST AI RMF Quick Reference",
+      "content": "**G-M-M-M — Four Functions**\n| Function | Purpose | Key Question |\n|---|---|---|\n| **G**overn | Set policies and roles | Who's in charge? What's our tolerance? |\n| **M**ap | Understand context and risks | What could go wrong? Who's affected? |\n| **M**easure | Assess and quantify risks | How likely? How bad? Are we fair? |\n| **M**anage | Respond and monitor | What do we do about it? Are we watching? |\n\n**BESPSS — Six Risk Categories**\n- **B**ias & Fairness\n- **E**xplainability & Transparency\n- **S**afety & Reliability\n- **P**rivacy & Data Protection\n- **S**ecurity & Adversarial\n- **S**ocietal & Ethical\n\n**Trustworthy AI = V²S²APEF**\n- **V**alid & Reliable\n- **V**erifiable (implied by accountable)\n- **S**afe\n- **S**ecure & Resilient\n- **A**ccountable & Transparent\n- **P**rivacy-enhanced\n- **E**xplainable & Interpretable\n- **F**air (bias managed)\n\n**Key Trade-offs**\n- Explainability ↔ Accuracy\n- Privacy ↔ Fairness\n- Safety ↔ Functionality",
+      "simplified_explanation": "Remember GMMM for the four functions, BESPSS for risk categories, and V²S²APEF for trustworthy AI traits. When traits conflict, document the trade-off.",
+      "memory_aids": ["GMMM = Govern, Map, Measure, Manage", "BESPSS = Bias, Explainability, Safety, Privacy, Security, Societal", "Trustworthy = Valid, Safe, Secure, Accountable, Private, Explainable, Fair", "Trade-offs exist — document them"],
+      "real_world_connection": "The AI RMF Playbook (playbook.nist.gov) provides detailed worksheets and templates for each function. It's free and practical.",
+      "reflection_prompt": "Can you list all four functions and all six risk categories from memory?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_9_reflection",
+      "type": "reflection",
+      "title": "Apply AI RMF to a Real AI System",
+      "content": "**Scenario**: Your organization is deploying an AI system for automated resume screening. It reads resumes, scores candidates, and recommends top applicants to hiring managers.\n\n**Apply the NIST AI RMF:**\n\n1. **Govern**: What policies do you need? Who owns AI risk? What's your risk tolerance for hiring bias?\n\n2. **Map**: What are the specific risks? Who could be harmed? What data does the system use? What are the system boundaries?\n\n3. **Measure**: How will you test for bias? What fairness metrics will you use? How will you measure explainability? What's your accuracy threshold?\n\n4. **Manage**: What mitigations will you implement? What monitoring will you set up? What's your incident response plan for AI failures? When will you pull the plug?\n\n**Consider:**\n- What if the AI systematically scores women lower?\n- What if a candidate asks why they were rejected and you can't explain it?\n- What if the training data reflects historical hiring biases?\n- What if an adversary submits crafted resumes to manipulate the scoring?\n- What if the model's performance degrades over time?",
+      "simplified_explanation": "Apply the four functions to a hiring AI: set governance policies, map the risks (bias, explainability, etc.), measure them (fairness tests, accuracy), and manage them (human review, monitoring, incident response).",
+      "memory_aids": ["Govern = who owns it, what's tolerated", "Map = what risks, who's affected", "Measure = how to test, what metrics", "Manage = mitigations, monitoring, kill switch"],
+      "real_world_connection": "Amazon scrapped their hiring AI in 2018 because it systematically discriminated against women. This exact scenario happened, and they didn't have adequate governance in place.",
+      "reflection_prompt": "Would you deploy this hiring AI with human-in-the-loop review, or fully automated? What's the trade-off?",
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_10_mindset",
+      "type": "mindset_coach",
+      "title": "The AI Risk Mindset: Continuous Vigilance",
+      "content": "AI risk management is not a checkbox exercise. It's continuous vigilance.\n\n**The trap**: 'We assessed the risk before deployment, so we're done.'\n**The reality**: AI models drift, data changes, new risks emerge, and societal expectations evolve. Risk management is ongoing.\n\n**Key mindset shifts:**\n\n1. **From 'one-time assessment' to 'continuous monitoring'**\n   AI risk is not static. Models degrade, data drifts, and new threats emerge. Monitor continuously.\n\n2. **From 'model performance' to 'system performance'**\n   A fair model in isolation can create unfair outcomes in context. Assess the entire system, not just the model.\n\n3. **From 'data scientist responsibility' to 'organizational responsibility'**\n   AI risk isn't just a data science problem. Legal, ethics, product, and leadership all own parts of it.\n\n4. **From 'compliance' to 'trustworthiness'**\n   Checking boxes doesn't make AI trustworthy. Genuine commitment to fairness, safety, and transparency does.\n\n**Jim Kwik principle: Meta Learning** — Learn how to learn about AI risk. The field is evolving rapidly. The frameworks, metrics, and techniques you learn today will change. The skill that stays is knowing how to assess, adapt, and apply risk management to new AI systems as they emerge.",
+      "simplified_explanation": "AI risk management is continuous, not one-time. Models drift, data changes, new risks emerge. Assess the whole system, not just the model. AI risk is everyone's responsibility, not just data scientists. Compliance ≠ trustworthiness.",
+      "memory_aids": ["Continuous, not one-time", "System performance, not just model", "Organizational responsibility, not just data science", "Trustworthiness, not just compliance", "The field evolves — learn how to learn"],
+      "real_world_connection": "The NIST AI RMF is designed to evolve. Version 1.0 was released in 2023 and will be updated as the field matures. The best organizations update their risk assessments quarterly, not just once.",
+      "reflection_prompt": "What's the biggest mindset shift your organization needs to make regarding AI risk?",
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "What are the four core functions of the NIST AI Risk Management Framework?",
+      "options": [
+        "Identify, Protect, Detect, Respond",
+        "Govern, Map, Measure, Manage",
+        "Plan, Do, Check, Act",
+        "Assess, Mitigate, Monitor, Report"
+      ],
+      "correct_index": 1,
+      "explanation": "The NIST AI RMF has four core functions: Govern (establish policies and roles), Map (understand context and identify risks), Measure (assess and quantify risks), and Manage (respond to and monitor risks)."
+    },
+    {
+      "question": "Why is bias considered a unique AI risk compared to traditional software?",
+      "options": [
+        "AI bias is always intentional",
+        "AI can systematically discriminate at scale based on biased training data, without explicit programming",
+        "Traditional software cannot have bias",
+        "Bias only affects AI in hiring applications"
+      ],
+      "correct_index": 1,
+      "explanation": "AI bias is unique because it can emerge from biased training data without explicit programming. The model learns and amplifies patterns in the data, potentially discriminating at scale across thousands of decisions."
+    },
+    {
+      "question": "What is the primary purpose of the Govern function in the AI RMF?",
+      "options": [
+        "To measure AI performance metrics",
+        "To establish organizational AI risk policies, roles, and risk tolerance",
+        "To identify technical vulnerabilities in AI systems",
+        "To deploy AI systems in production"
+      ],
+      "correct_index": 1,
+      "explanation": "The Govern function establishes the organizational foundation: AI risk policies, roles and responsibilities, risk tolerance criteria, and accountability structures. It sets the context for all other functions."
+    },
+    {
+      "question": "What trade-off exists between explainability and accuracy in AI systems?",
+      "options": [
+        "More explainable models are always more accurate",
+        "Simpler models that are easier to explain are often less accurate than complex models",
+        "Accuracy and explainability have no relationship",
+        "Deep learning models are both the most explainable and most accurate"
+      ],
+      "correct_index": 1,
+      "explanation": "There's often a trade-off between explainability and accuracy. Simpler models (linear regression, decision trees) are more explainable but less accurate on complex problems. Complex models (deep learning) are more accurate but harder to explain."
+    },
+    {
+      "question": "What does 'assume breach' mean in the context of AI risk management?",
+      "options": [
+        "Assume all AI systems will be hacked",
+        "Design AI systems assuming that failures and adversarial conditions will occur, and plan for those scenarios",
+        "Never deploy AI systems because they're too risky",
+        "Only use AI systems that have never had security incidents"
+      ],
+      "correct_index": 1,
+      "explanation": "Assume breach means designing AI systems with the expectation that failures, adversarial attacks, and unexpected conditions will occur. This means building in monitoring, fallback mechanisms, and incident response plans rather than assuming perfect operation."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}

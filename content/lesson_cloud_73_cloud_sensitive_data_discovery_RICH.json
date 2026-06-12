@@ -1,0 +1,226 @@
+{
+  "lesson_id": "2f1d7b63-c559-45b5-a068-e7c3386168f8",
+  "domain": "cloud",
+  "title": "Cloud Sensitive Data Discovery",
+  "subtitle": "Finding and Classifying Sensitive Data Across Multi-Cloud Environments",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 73,
+  "prerequisites": ["Securing Cloud Storage (S3, Azure Blob, GCS)"],
+  "learning_objectives": [
+    "Understand the challenges of discovering sensitive data across cloud environments",
+    "Implement automated data classification using cloud-native tools (Macie, Purview, DLP)",
+    "Design data discovery workflows that cover structured, unstructured, and semi-structured data",
+    "Apply data sensitivity frameworks to classify discovered data",
+    "Build remediation workflows for exposed sensitive data"
+  ],
+  "concepts": [
+    "Cloud Data Discovery Challenges",
+    "Data Sensitivity Classification Frameworks",
+    "AWS Macie for Data Discovery",
+    "Azure Purview and Microsoft Information Protection",
+    "GCP Cloud Data Loss Prevention (DLP)",
+    "Multi-Cloud Data Discovery Strategies",
+    "Remediation Workflows for Exposed Data"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "You Can't Protect What You Can't See",
+      "content": "The #1 problem in cloud security: **organizations don't know where their sensitive data is.**\n\n- 60% of organizations have more than 1,000 cloud data stores they don't track\n- The average enterprise has sensitive data in 50+ cloud services\n- Data sprawl is the norm — dev buckets, shadow IT, merged companies, migration leftovers\n- Compliance (GDPR, HIPAA, PCI) requires knowing where sensitive data lives\n\nData discovery isn't a one-time project. It's a continuous process because:\n- New data is created constantly\n- Data moves between environments (dev → staging → production)\n- Permissions change over time\n- New regulations create new categories of sensitive data\n\nThis lesson teaches you to build systematic data discovery that finds sensitive data before attackers do.",
+      "simplified_explanation": "Most organizations don't know where their sensitive data is. Data discovery is finding all sensitive data across your cloud environments so you can protect it. It's not a one-time project — it's continuous because data keeps moving and growing.",
+      "memory_aids": ["Can't protect what you can't see", "60% of orgs don't track 1,000+ data stores", "Data discovery = continuous, not one-time", "Compliance requires knowing where data lives"],
+      "real_world_connection": "In 2023, Toyota disclosed that a misconfigured cloud bucket exposed 2.15 million customers' data for 10 years. They didn't know the data was exposed because they didn't have data discovery covering all their cloud environments.",
+      "reflection_prompt": "How many cloud data stores does your organization have? Do you know where all the sensitive data is?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "Cloud Data Discovery Challenges",
+      "content": "Cloud environments create unique data discovery challenges:\n\n**1. Data Sprawl**\n- Data lives in S3 buckets, RDS databases, EFS file systems, Redshift clusters, EBS snapshots, Lambda environment variables, and dozens of other services\n- Each service stores data differently and needs different discovery approaches\n- Development and test environments often contain production data copies\n\n**2. Shadow Data**\n- Data created outside official governance processes\n- Developer personal buckets, department-specific storage, third-party integrations\n- No one knows it exists until a breach happens\n\n**3. Multi-Cloud Complexity**\n- AWS, Azure, GCP each have different data stores and discovery tools\n- Data replicates across clouds for redundancy and performance\n- Each cloud has different access controls and logging\n\n**4. Data in Motion**\n- Data moves between environments (ETL pipelines, backups, analytics)\n- A discovery scan today may miss data that arrives tomorrow\n- APIs and webhooks continuously receive new data\n\n**5. Unstructured Data**\n- Documents, images, PDFs, logs — 80% of enterprise data is unstructured\n- Structured data discovery (database scanning) is relatively easy\n- Unstructured data discovery requires content analysis (NLP, pattern matching)\n\n**6. Classification at Scale**\n- Manual classification doesn't scale — you need automated tools\n- Automated classification isn't perfect — you need human review for edge cases\n- Classification must happen continuously, not just once\n\n**The discovery lifecycle:**\n```\nDiscover → Classify → Assess Risk → Remediate → Monitor → Repeat\n```\n\nIt's a cycle, not a project. Discovery finds data, classification labels it, risk assessment prioritizes it, remediation protects it, monitoring ensures it stays protected, and then discovery runs again to find new data.",
+      "simplified_explanation": "Cloud data is everywhere: buckets, databases, file systems, snapshots, and more. Shadow data exists outside governance. Multi-cloud makes it harder. Data moves constantly. 80% is unstructured. Manual classification doesn't scale. The solution: automated, continuous discovery.",
+      "memory_aids": ["Discover → Classify → Assess Risk → Remediate → Monitor → Repeat", "Data sprawl = data in too many places", "Shadow data = data outside governance", "80% is unstructured", "Manual classification doesn't scale", "Discovery is a cycle, not a project"],
+      "real_world_connection": "The average enterprise has data in 50+ SaaS applications, multiple cloud providers, and on-premises systems. A single data discovery scan at a large organization found over 100,000 files containing PII that no one knew existed.",
+      "reflection_prompt": "Where might your organization have shadow data that nobody is tracking?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Finding Secrets in the Cloud",
+      "content": "Imagine your school has 100 lockers (cloud storage), and some of them have secret notes (sensitive data) inside. The problem: you don't know which lockers have secret notes, and new notes are added every day.\n\n**The old way:** Open every locker and check each note one by one. Too slow!\n\n**The smart way:** Use a special scanner that can look inside all lockers at once and flag any that contain:\n- Phone numbers (PII)\n- Passwords (secrets)\n- Bank account numbers (financial data)\n- Medical information (health data)\n\n**Here's how cloud data discovery works:**\n\n1. **Scan everything**: The scanner checks every locker in every building (every S3 bucket, every database, every file share)\n\n2. **Pattern matching**: The scanner looks for patterns — does this look like a credit card number? A social security number? An API key?\n\n3. **Machine learning**: The scanner is smart — it can also understand context. 'This document talks about patient records, so it's health data even without a pattern match.'\n\n4. **Label everything**: Each finding gets a label — 'PII', 'Financial', 'Health', 'Secrets'. This label stays with the data.\n\n5. **Priority list**: The scanner creates a list: 'These 10 lockers have the most sensitive notes. Fix these first.'\n\n6. **Keep watching**: The scanner runs every day, catching new notes as they're added.\n\n**The result:** You always know where the sensitive data is, how much there is, and whether it's properly protected.",
+      "simplified_explanation": "Cloud data discovery is like a smart scanner that checks every storage location for sensitive information. It uses pattern matching and machine learning to find credit cards, passwords, health data, and more. Then it labels everything and tells you what to fix first. It runs continuously so nothing is missed.",
+      "memory_aids": ["Scan everything = check all storage", "Pattern matching = find credit cards, SSNs, keys", "ML = understand context, not just patterns", "Label everything = PII, financial, health, secrets", "Priority list = fix the worst first", "Keep watching = continuous, not one-time"],
+      "real_world_connection": "AWS Macie, Azure Purview, and GCP DLP all work exactly this way. They scan your cloud storage, use ML and pattern matching to find sensitive data, and create a priority list of what needs protection.",
+      "reflection_prompt": "If you were designing a data scanner, what types of sensitive data would you prioritize?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_macie",
+      "type": "explanation",
+      "title": "AWS Macie: Data Discovery in AWS",
+      "content": "Amazon Macie is AWS's managed data discovery and classification service. It uses ML and pattern matching to find sensitive data in S3 buckets.\n\n**What Macie does:**\n- Scans S3 buckets for sensitive data (PII, PHI, financial data, credentials)\n- Uses managed identifiers for common data types (SSN, credit card, email, etc.)\n- Supports custom identifiers with regex patterns\n- Provides findings with severity, count, and location\n- Integrates with Security Hub, EventBridge, and Step Functions\n\n**Key Macie concepts:**\n\n**Managed Data Identifiers**\n- Pre-built patterns for common sensitive data types\n- Categories: PII (SSN, email, phone), Financial (credit card, bank account), Health (medical record number), Credentials (API key, secret key)\n- ~150 built-in identifiers covering most common data types\n\n**Custom Data Identifiers**\n- Define your own patterns with regex\n- Example: employee IDs matching `EMP-\\d{6}`, internal project codes\n- Combine with keyword proximity for accuracy\n\n**Classification Jobs**\n- **One-time job**: Scan specific buckets once\n- **Scheduled job**: Scan buckets on a schedule (daily, weekly, monthly)\n- **Automated discovery**: Continuously monitor all buckets\n- Recommended: Start with one-time, then move to scheduled, then automated\n\n**Macie Findings**\n- **Policy findings**: S3 bucket misconfigurations (public access, unencrypted)\n- **Sensitive data findings**: PII, credentials, financial data found in S3 objects\n- Each finding includes: severity, data type, location, count\n\n**Macie workflow:**\n```bash\n# Enable Macie\naws macie2 enable-macie --region us-east-1\n\n# Create a classification job for specific buckets\naws macie2 create-classification-job \\\n  --name \"weekly-pii-scan\" \\\n  --s3-job-definition bucketDefinitions='[{\"accountId\":\"123456789012\",\"buckets\":[\"my-bucket\"]}]' \\\n  --finding-publishing-frequency FIFTEEN_MINUTES \\\n  --schedule-frequency dailySchedule='{\"daily\":{}}' \\\n  --job-type SCHEDULED\n\n# List findings\naws macie2 list-findings --region us-east-1\n\n# Get finding details\naws macie2 get-findings --finding-ids arn:aws:macie2:us-east-1:123456789012:finding/abc123\n```\n\n**Macie limitations:**\n- S3 only (no EBS, RDS, EFS, or other AWS data stores)\n- Limited custom identifier support\n- Cost: $1 per GB scanned (can be expensive for large datasets)\n- No real-time scanning — periodic jobs only\n\n**For non-S3 data**, use:\n- Amazon Inspector for container images\n- AWS Config rules for configuration compliance\n- Custom Lambda functions with regex patterns",
+      "simplified_explanation": "Macie scans S3 buckets for sensitive data using ML and pattern matching. It has 150+ built-in patterns (SSN, credit card, email, etc.) and supports custom regex. It can run one-time, scheduled, or continuous scans. Limitations: S3 only, costs $1/GB, no real-time scanning.",
+      "memory_aids": ["Macie = S3 data discovery with ML", "150+ built-in identifiers for common data types", "Custom identifiers with regex", "One-time → scheduled → automated", "Finding types: policy (misconfig) + sensitive data (PII)", "$1/GB — watch costs"],
+      "real_world_connection": "Organizations running Macie for the first time typically find thousands of S3 objects containing PII they didn't know existed. Common findings: old database dumps in dev buckets, log files containing emails, and backup files with SSNs.",
+      "reflection_prompt": "What types of sensitive data in your AWS environment would Macie find on a first scan?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_5_azure_gcp",
+      "type": "explanation",
+      "title": "Azure Purview and GCP DLP: Multi-Cloud Discovery",
+      "content": "AWS Macie covers S3. But multi-cloud organizations need discovery across all clouds.\n\n**Azure Purview**\n- Microsoft's unified data governance and discovery platform\n- Scans Azure Blob Storage, Azure Data Lake, SQL databases, Cosmos DB, and more\n- Maps data lineage — where data came from and where it goes\n- Integrates with Microsoft Information Protection (MIP) for classification\n- Supports Power BI, Dynamics 365, and on-premises SQL Server\n\n**Key Purview features:**\n- **Automated scanning**: Schedule scans across Azure and on-premises data stores\n- **Classification**: 100+ built-in classifiers (SSN, credit card, SWIFT code, etc.)\n- **Sensitivity labels**: Apply MIP labels automatically (Public, Internal, Confidential, Restricted)\n- **Data map**: Visualize data flows and relationships across the organization\n- **Data lineage**: Track data from source to destination\n\n**Purview workflow:**\n1. Register data sources (Azure Blob, SQL, etc.)\n2. Create a scan with classification rules\n3. Run the scan (scheduled or on-demand)\n4. Review findings and sensitivity labels\n5. Apply remediation based on labels\n\n**GCP Cloud Data Loss Prevention (DLP)**\n- Google's data discovery and redaction service\n- Scans Cloud Storage, BigQuery, Datastore, and Pub/Sub\n- Supports 130+ built-in info types (SSN, email, phone, etc.)\n- Can de-identify and redact sensitive data automatically\n- Integrates with Security Command Center\n\n**Key GCP DLP features:**\n- **Inspect templates**: Define what to scan for\n- **De-identify templates**: Define how to redact data\n- **Job triggers**: Schedule recurring scans\n- **Findings**: Detailed reports of what was found where\n- **Risk analysis**: Statistical analysis of data re-identification risk\n\n**GCP DLP workflow:**\n```python\n# Create a DLP inspection job\nfrom google.cloud import dlp_v2\n\nclient = dlp_v2.DlpServiceClient()\n\n# Define what to scan for\ninfo_types = [{'name': 'EMAIL_ADDRESS'}, {'name': 'PHONE_NUMBER'}, {'name': 'CREDIT_CARD_NUMBER'}, {'name': 'US_SOCIAL_SECURITY_NUMBER'}]\n\n# Create inspect config\ninspect_config = {\n    'info_types': info_types,\n    'min_likelihood': 'POSSIBLE',\n    'limits': {'max_findings_per_request': 1000}\n}\n\n# Scan a BigQuery table\njob_config = {\n    'storage_config': {\n        'big_query_options': {\n            'table_reference': {\n                'project_id': 'my-project',\n                'dataset_id': 'my_dataset',\n                'table_id': 'users'\n            }\n        }\n    }\n}\n\n# Run the scan\nresponse = client.inspect_content(\n    parent=f'projects/my-project',\n    inspect_config=inspect_config,\n    item=job_config\n)\n```\n\n**Multi-cloud discovery comparison:**\n| Feature | AWS Macie | Azure Purview | GCP DLP |\n|---|---|---|---|\n| Primary storage | S3 | Blob, SQL, Data Lake | Cloud Storage, BigQuery |\n| Built-in identifiers | ~150 | ~100 | ~130 |\n| Custom patterns | Regex | Regex + ML | Regex + ML |\n| Data lineage | No | Yes | No |\n| De-identification | No | Limited | Yes (built-in) |\n| Cost model | $1/GB | Capacity units | $0.08/GB inspected |\n| Real-time | No | No | Limited (Pub/Sub) |",
+      "simplified_explanation": "Azure Purview scans Azure data stores, maps data lineage, and applies sensitivity labels. GCP DLP scans GCP storage, BigQuery, and more, and can redact sensitive data automatically. Each cloud has its own tool — multi-cloud means using all three.",
+      "memory_aids": ["Macie = S3 only, $1/GB", "Purview = Azure + on-prem, data lineage, sensitivity labels", "GCP DLP = Cloud Storage + BigQuery, 130+ info types, built-in redaction", "Multi-cloud = use all three tools", "Each cloud has different coverage and cost"],
+      "real_world_connection": "Organizations running multi-cloud typically use Macie for AWS S3, Purview for Azure, and GCP DLP for Google. Centralizing the findings into a SIEM or security dashboard is the next challenge.",
+      "reflection_prompt": "If you had to choose one cloud data discovery tool to start with, which would you pick and why?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_6_code_exercise",
+      "type": "code_exercise",
+      "title": "Building a Multi-Cloud Data Discovery Scanner",
+      "content": "Here's a Python framework for centralized multi-cloud data discovery:\n\n```python\nimport re\nimport json\nfrom dataclasses import dataclass, field\nfrom enum import Enum\nfrom typing import List, Optional, Dict\n\n\nclass SensitivityLevel(Enum):\n    PUBLIC = 1\n    INTERNAL = 2\n    CONFIDENTIAL = 3\n    RESTRICTED = 4\n    TOP_SECRET = 5\n\n\nclass DataType(Enum):\n    PII_EMAIL = \"email_address\"\n    PII_PHONE = \"phone_number\"\n    PII_SSN = \"social_security_number\"\n    PII_NAME = \"full_name\"\n    FINANCIAL_CC = \"credit_card_number\"\n    FINANCIAL_BANK = \"bank_account_number\"\n    HEALTH_MRN = \"medical_record_number\"\n    CREDENTIAL_API_KEY = \"api_key\"\n    CREDENTIAL_PASSWORD = \"password\"\n    CREDENTIAL_SECRET = \"secret_key\"\n\n\n@dataclass\nclass DataFinding:\n    data_type: DataType\n    location: str  # s3://bucket/key, az://container/blob, gs://bucket/object\n    sensitivity: SensitivityLevel\n    count: int\n    sample: str  # Masked sample\n    cloud_provider: str\n    scan_timestamp: str\n\n\n@dataclass\nclass ScanResult:\n    findings: List[DataFinding] = field(default_factory=list)\n    total_objects_scanned: int = 0\n    total_findings: int = 0\n    \n    def get_findings_by_type(self, data_type: DataType) -> List[DataFinding]:\n        return [f for f in self.findings if f.data_type == data_type]\n    \n    def get_findings_by_severity(self, min_severity: SensitivityLevel) -> List[DataFinding]:\n        return [f for f in self.findings if f.sensitivity.value >= min_severity.value]\n    \n    def get_findings_by_cloud(self, cloud: str) -> List[DataFinding]:\n        return [f for f in self.findings if f.cloud_provider == cloud]\n\n\n# Pattern matching engine\nclass DataPatternScanner:\n    \"\"\"Multi-cloud data pattern scanner for sensitive data discovery.\"\"\"\n    \n    PATTERNS = {\n        DataType.PII_SSN: re.compile(r'\\b(?!000|666|9\\d{2})\\d{3}-(?!00)\\d{2}-(?!0000)\\d{4}\\b'),\n        DataType.PII_EMAIL: re.compile(r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b'),\n        DataType.PII_PHONE: re.compile(r'\\b(\\+?1?[-.]?)?\\(?\\d{3}\\)?[-.]?\\d{3}[-.]?\\d{4}\\b'),\n        DataType.FINANCIAL_CC: re.compile(r'\\b(?:4\\d{12}(?:\\d{3})?|5[1-5]\\d{14}|3[47]\\d{13}|6(?:011|5\\d{2})\\d{12})\\b'),\n        DataType.CREDENTIAL_API_KEY: re.compile(r'(?:api[_-]?key|apikey|API_KEY)\\s*[:=]\\s*[\"\\']?([A-Za-z0-9_\\-]{20,})[\"\\']?', re.IGNORECASE),\n        DataType.CREDENTIAL_SECRET: re.compile(r'(?:secret|SECRET|aws_secret_access_key)\\s*[:=]\\s*[\"\\']?([A-Za-z0-9/+=]{40})[\"\\']?', re.IGNORECASE),\n    }\n    \n    SENSITIVITY_MAP = {\n        DataType.PII_SSN: SensitivityLevel.RESTRICTED,\n        DataType.PII_EMAIL: SensitivityLevel.CONFIDENTIAL,\n        DataType.PII_PHONE: SensitivityLevel.CONFIDENTIAL,\n        DataType.PII_NAME: SensitivityLevel.CONFIDENTIAL,\n        DataType.FINANCIAL_CC: SensitivityLevel.RESTRICTED,\n        DataType.FINANCIAL_BANK: SensitivityLevel.RESTRICTED,\n        DataType.HEALTH_MRN: SensitivityLevel.RESTRICTED,\n        DataType.CREDENTIAL_API_KEY: SensitivityLevel.TOP_SECRET,\n        DataType.CREDENTIAL_PASSWORD: SensitivityLevel.TOP_SECRET,\n        DataType.CREDENTIAL_SECRET: SensitivityLevel.TOP_SECRET,\n    }\n    \n    def scan_content(self, content: str, location: str, cloud: str) -> List[DataFinding]:\n        findings = []\n        for data_type, pattern in self.PATTERNS.items():\n            matches = pattern.findall(content)\n            if matches:\n                # Mask the sample for reporting\n                sample = self._mask(matches[0]) if matches else '***'\n                findings.append(DataFinding(\n                    data_type=data_type,\n                    location=location,\n                    sensitivity=self.SENSITIVITY_MAP[data_type],\n                    count=len(matches),\n                    sample=sample,\n                    cloud_provider=cloud,\n                    scan_timestamp=\"2026-06-12T14:30:00Z\"\n                ))\n        return findings\n    \n    def _mask(self, value: str) -> str:\n        \"\"\"Mask sensitive data for safe reporting.\"\"\"\n        if len(value) <= 4:\n            return '****'\n        return value[:2] + '*' * (len(value) - 4) + value[-2:]\n\n\n# Example usage\nscanner = DataPatternScanner()\n\n# Simulate scanning a file with multiple sensitive data types\nsample_content = \"\"\"\nCustomer Record:\nName: John Smith\nEmail: john.smith@example.com\nPhone: (555) 123-4567\nSSN: 123-45-6789\nCredit Card: 4532015112830366\nAPI Key: api_key=\"AKIAIOSFODNN7EXAMPLE\"\nAWS Secret: aws_secret_access_key=\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"\n\"\"\"\n\nresults = scanner.scan_content(sample_content, \"s3://my-bucket/customer-data.csv\", \"AWS\")\n\nfor finding in results:\n    print(f\"[{finding.sensitivity.name}] {finding.data_type.value}: {finding.count} found in {finding.location}\")\n    print(f\"  Sample: {finding.sample}\")\n```\n\n**Exercise:** Extend this scanner with:\n1. A pattern for Israeli ID numbers (9 digits with checksum)\n2. A pattern for JWT tokens\n3. A severity filter that only returns RESTRICTED and above\n4. Multi-cloud locations (s3://, az://, gs://)",
+      "simplified_explanation": "This scanner uses regex patterns to find SSNs, emails, phone numbers, credit cards, and API keys in any content. It masks samples for safe reporting and categorizes findings by severity. It's a simplified version of what Macie, Purview, and GCP DLP do at scale.",
+      "memory_aids": ["Pattern matching = regex for SSN, email, credit card, API keys", "Sensitivity levels = Public → Internal → Confidential → Restricted → Top Secret", "Mask samples for safe reporting", "Credentials = Top Secret severity", "Extend with your own patterns"],
+      "real_world_connection": "This is exactly how Macie, Purview, and GCP DLP work at scale — they scan content, match patterns, apply classification, and generate findings. The commercial tools add ML-based classification for patterns that regex can't catch.",
+      "reflection_prompt": "What patterns would you add to this scanner for your organization's specific data types?",
+      "is_interactive": true,
+      "xp_reward": 30
+    },
+    {
+      "block_id": "block_7_real_world",
+      "type": "real_world",
+      "title": "Real-World Data Discovery Failures and Lessons",
+      "content": "Organizations that skip data discovery learn the hard way:\n\n**Toyota (2023)**\n- 2.15 million customers' data exposed for 10 years\n- Cause: Misconfigured cloud bucket with no data discovery monitoring\n- Lesson: Without discovery, you don't know what's exposed\n\n**Capital One (2019)**\n- 100 million customer records exposed via SSRF\n- Cause: Sensitive data in S3 buckets accessible through a misconfigured WAF\n- Lesson: Data discovery + access control = defense in depth\n\n**Accenture (2017)**\n- Four S3 buckets containing passwords, API keys, and authentication data exposed publicly\n- Cause: No data discovery scanning, no sensitive data classification\n- Lesson: Credentials in cloud storage need immediate discovery and remediation\n\n**Verizon (2017)**\n- 14 million customer records exposed in an S3 bucket\n- Cause: Misconfigured bucket permissions, no data classification\n- Lesson: Public access + sensitive data + no discovery = breach\n\n**Common patterns in these failures:**\n\n1. **No visibility**: Organizations didn't know sensitive data was in those locations\n2. **No classification**: Data wasn't labeled as sensitive, so no one protected it\n3. **No monitoring**: No continuous scanning to catch new exposures\n4. **No remediation workflow**: Even when found, there was no process to fix it\n\n**What successful organizations do differently:**\n\n1. **Continuous discovery**: Macie, Purview, and DLP run scheduled scans\n2. **Automated classification**: Sensitive data is labeled automatically\n3. **Alert-driven remediation**: Findings trigger automatic remediation workflows\n4. **Access control alignment**: Classification drives access control policies\n5. **Compliance mapping**: Classification maps to regulatory requirements (GDPR, HIPAA, PCI)",
+      "simplified_explanation": "Toyota, Capital One, Accenture, and Verizon all had breaches from exposed cloud data they didn't know about. The pattern: no visibility, no classification, no monitoring, no remediation. The fix: continuous discovery, automated classification, alert-driven remediation, and compliance mapping.",
+      "memory_aids": ["Toyota = 10 years of exposed data", "Capital One = 100M records via SSRF", "Accenture = passwords in public bucket", "Verizon = 14M records in misconfigured bucket", "Pattern: no visibility → no classification → no protection", "Fix: discover → classify → remediate → monitor"],
+      "real_world_connection": "Every major cloud data breach in the last 5 years involved data that the organization didn't know was exposed. Data discovery is the single most impactful cloud security control.",
+      "reflection_prompt": "Which of these failure patterns is most likely in your organization?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_8_memory_aid",
+      "type": "memory_aid",
+      "title": "Cloud Data Discovery Quick Reference",
+      "content": "**Discovery Lifecycle — D.C.A.R.M.**\n- **D**iscover — Find all data stores\n- **C**lassify — Label sensitive data types\n- **A**ssess — Evaluate risk and exposure\n- **R**emediate — Fix exposures and misconfigurations\n- **M**onitor — Continuously scan for new data\n\n**AWS Macie**\n- S3 only, $1/GB, 150+ identifiers\n- Finding types: policy (misconfig) + sensitive data\n- Jobs: one-time, scheduled, automated discovery\n\n**Azure Purview**\n- Multi-source (Blob, SQL, Data Lake, on-prem)\n- Data lineage + sensitivity labels + data map\n- Integrates with MIP for classification\n\n**GCP DLP**\n- Cloud Storage + BigQuery + Pub/Sub\n- 130+ info types, built-in de-identification\n- $0.08/GB, can redact data automatically\n\n**Sensitivity Levels**\n| Level | Examples | Access Control |\n|---|---|---|\n| Public | Marketing materials | Anyone |\n| Internal | Business documents | Employees |\n| Confidential | Customer PII | Authorized users |\n| Restricted | SSNs, passwords | Named individuals |\n| Top Secret | Encryption keys, credentials | Need-to-know |\n\n**Remediation Actions**\n- **Block public access** immediately\n- **Encrypt** at rest and in transit\n- **Apply classification labels**\n- **Restrict access** to named individuals\n- **Set up alerts** for new exposures\n- **Quarantine** if risk is critical",
+      "simplified_explanation": "Remember DCARM: Discover, Classify, Assess, Remediate, Monitor. Macie for AWS S3, Purview for Azure, DLP for GCP. Sensitivity goes from Public to Top Secret. Remediate by blocking access, encrypting, labeling, restricting, alerting, quarantining.",
+      "memory_aids": ["DCARM = Discover, Classify, Assess, Remediate, Monitor", "Macie = AWS S3, Purview = Azure, DLP = GCP", "Sensitivity: Public → Internal → Confidential → Restricted → Top Secret", "Remediate: block, encrypt, label, restrict, alert, quarantine"],
+      "real_world_connection": "The DCARM lifecycle is used by cloud security teams at major organizations. The key insight: discovery must be continuous because data is constantly being created and moved.",
+      "reflection_prompt": "Can you list all five DCARM steps from memory?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_9_remediation",
+      "type": "explanation",
+      "title": "Building Remediation Workflows",
+      "content": "Finding sensitive data is only half the job. The other half is fixing it.\n\n**Remediation workflow for exposed sensitive data:**\n\n**Step 1: Triage**\nClassify findings by severity and exposure:\n- **Critical**: Publicly accessible credentials or PII → Immediate action\n- **High**: Internally accessible PII or financial data → Fix within 24 hours\n- **Medium**: Misclassified data with excessive permissions → Fix within 1 week\n- **Low**: Data in wrong storage tier → Fix within 1 month\n\n**Step 2: Immediate Containment**\nFor critical findings:\n- Block public access immediately (S3 Block Public Access, Azure firewall rule, GCP IAM deny)\n- Rotate any exposed credentials (API keys, passwords, certificates)\n- Notify the data owner and security team\n- Document the finding with timestamps\n\n**Step 3: Assess Impact**\n- Who had access? (Was it truly public, or just internal?)\n- How long was it exposed? (Check access logs)\n- What data was in the affected object? (Review Macie/Purview/DLP findings)\n- Was it accessed? (Check CloudTrail, Azure Monitor, GCP Audit Logs)\n\n**Step 4: Remediate**\nBased on data type and exposure:\n- **Credentials**: Rotate, revoke, and replace\n- **PII**: Encrypt, restrict access, apply classification label\n- **Financial**: Encrypt, restrict to named individuals, apply DLP rules\n- **Health**: Encrypt, restrict to authorized users, apply HIPAA controls\n- **Internal**: Reclassify and apply appropriate access controls\n\n**Step 5: Prevent Recurrence**\n- **SCP/Policy**: Add Service Control Policies to prevent public S3 buckets\n- **Config rules**: AWS Config, Azure Policy, GCP Organization Policies\n- **Automated remediation**: Lambda/Functions triggered by Macie/Purview findings\n- **CI/CD checks**: Prevent sensitive data from being deployed to cloud storage\n- **Tagging enforcement**: Require data classification tags on all new resources\n\n**Automated remediation example (AWS):**\n```python\n# Lambda function triggered by Macie finding\nimport boto3\n\ndef lambda_handler(event, context):\n    # Parse Macie finding\n    finding = event['detail']['findings'][0]\n    severity = finding['severity']['description']\n    data_type = finding['type']\n    resource_arn = finding['resources'][0]['id']\n    \n    if severity == 'High' and 'credentials' in data_type.lower():\n        # CRITICAL: Exposed credentials - rotate immediately\n        s3 = boto3.client('s3')\n        # Block all public access to the bucket\n        bucket = resource_arn.split(':::')[1].split('/')[0]\n        s3.put_public_access_block(\n            Bucket=bucket,\n            PublicAccessBlockConfiguration={\n                'BlockPublicAcls': True,\n                'IgnorePublicAcls': True,\n                'BlockPublicPolicy': True,\n                'RestrictPublicBuckets': True\n            }\n        )\n        # Notify security team\n        sns = boto3.client('sns')\n        sns.publish(\n            TopicArn='arn:aws:sns:us-east-1:123456789012:security-alerts',\n            Subject=f'CRITICAL: Exposed credentials in {bucket}',\n            Message=f'Macie found credentials in {resource_arn}. Public access blocked.'\n        )\n        return {'status': 'remediated', 'action': 'public_access_blocked'}\n    \n    elif severity in ['High', 'Medium']:\n        # MEDIUM/HIGH: Restrict access and notify\n        # Add resource tag for tracking\n        # Send notification to data owner\n        return {'status': 'notified', 'action': 'access_restricted'}\n```\n\n**Remediation metrics to track:**\n- Mean time to detect (MTTD): Finding → Alert\n- Mean time to respond (MTTR): Alert → Containment\n- Mean time to remediate: Containment → Full remediation\n- Recurrence rate: How often the same type of finding recurs",
+      "simplified_explanation": "Remediation: triage by severity, contain critical findings immediately (block access, rotate credentials), assess impact (who accessed it?), fix the root cause (encrypt, restrict, label), prevent recurrence (policies, automated remediation, CI/CD checks). Track MTTD, MTTR, and recurrence rate.",
+      "memory_aids": ["Triage: Critical (immediate) → High (24h) → Medium (1 week) → Low (1 month)", "Contain: block access, rotate credentials", "Assess: who accessed, how long, what data", "Remediate: encrypt, restrict, label", "Prevent: policies, automated remediation, CI/CD checks", "Track: MTTD, MTTR, recurrence rate"],
+      "real_world_connection": "Organizations with automated remediation reduce mean time to respond from days to minutes. AWS Lambda triggered by Macie findings can block public access within seconds of detection.",
+      "reflection_prompt": "What's your organization's mean time to respond to a publicly exposed S3 bucket?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_10_mindset",
+      "type": "mindset_coach",
+      "title": "Data Discovery Is a Discipline, Not a Project",
+      "content": "The biggest mistake organizations make: treating data discovery as a one-time project.\n\n'We did a data discovery scan last quarter' ≠ data discovery.\n\nData is created, moved, copied, and changed constantly. A scan from last quarter misses everything that happened since. Data discovery must be:\n\n1. **Continuous**: Run scans on a schedule (daily, weekly) or use automated discovery\n2. **Comprehensive**: Cover all data stores, not just production (dev, staging, backups)\n3. **Actionable**: Findings must trigger remediation, not just reports\n4. **Measured**: Track MTTD, MTTR, and recurrence rate\n\n**The discovery maturity model:**\n\n| Level | Description | Capabilities |\n|---|---|---|\n| 1. Reactive | Scan after a breach or audit | Manual, ad hoc scanning |\n| 2. Scheduled | Regular scans on a schedule | Macie/Purview/DLP jobs |\n| 3. Automated | Continuous discovery + classification | Automated scanning + labeling |\n| 4. Proactive | Automated discovery + remediation | Finding → alert → auto-fix |\n| 5. Predictive | ML-based prediction of sensitive data | Data classification before creation |\n\n**Where most organizations are:** Level 1-2 (reactive or scheduled)\n**Where they should be:** Level 3-4 (automated or proactive)\n\n**Jim Kwik principle: Active Learning** — Don't just read about data discovery. Set up Macie on an AWS account, scan your S3 buckets, and review the findings. The real learning happens when you see what your organization is actually storing.",
+      "simplified_explanation": "Data discovery must be continuous, comprehensive, actionable, and measured. It's not a one-time project. Maturity goes from reactive (scan after breach) to predictive (ML-based classification before data is created). Most orgs are at level 1-2 and should aim for 3-4.",
+      "memory_aids": ["Continuous, not one-time", "Comprehensive = all environments, not just production", "Actionable = findings trigger remediation", "Measured = track MTTD, MTTR, recurrence", "Maturity: Reactive → Scheduled → Automated → Proactive → Predictive"],
+      "real_world_connection": "The most mature organizations (Level 4-5) use automated remediation triggered by discovery findings. When Macie finds publicly accessible PII, it's automatically restricted within minutes. This requires automation, not manual intervention.",
+      "reflection_prompt": "What maturity level is your organization at? What would it take to reach the next level?",
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "What is the primary benefit of automated data discovery over manual data classification?",
+      "options": [
+        "Automated discovery is always 100% accurate",
+        "Automated discovery is continuous and scalable, catching data that manual processes miss",
+        "Automated discovery eliminates the need for security teams",
+        "Manual classification is faster than automated discovery"
+      ],
+      "correct_index": 1,
+      "explanation": "Automated data discovery is continuous and scalable. It scans all data stores on a schedule, catching new data and shadow IT that manual processes miss. It's not 100% accurate (human review is still needed for edge cases), but it provides coverage that manual classification can't achieve at scale."
+    },
+    {
+      "question": "What is the co-spend (input clustering) heuristic in cryptocurrency investigation?",
+      "options": [
+        "A method for tracking Bitcoin transaction fees",
+        "When multiple addresses appear as inputs in the same transaction, they belong to the same entity, enabling wallet clustering",
+        "A technique for hiding cryptocurrency transactions",
+        "A way to calculate the total amount spent on a blockchain"
+      ],
+      "correct_index": 1,
+      "explanation": "The co-spend heuristic states that when multiple addresses appear as inputs in the same transaction, they must belong to the same entity (because spending from multiple addresses requires all their private keys). This is the most reliable method for clustering wallet addresses."
+    },
+    {
+      "question": "AWS Macie primarily scans which data store for sensitive data?",
+      "options": [
+        "Amazon RDS databases",
+        "Amazon S3 buckets only",
+        "Amazon EBS volumes",
+        "Amazon DynamoDB tables"
+      ],
+      "correct_index": 1,
+      "explanation": "AWS Macie scans S3 buckets only. It does not cover RDS, EBS, DynamoDB, or other AWS data stores. For non-S3 data discovery, you need other tools (custom Lambda functions, Amazon Inspector for containers, etc.)."
+    },
+    {
+      "question": "What is the recommended first step when a critical data exposure is discovered (e.g., publicly accessible credentials)?",
+      "options": [
+        "Wait for the next scheduled review meeting",
+        "Block public access and rotate exposed credentials immediately",
+        "Send an email to the data owner and wait for their response",
+        "Document the finding and add it to the backlog"
+      ],
+      "correct_index": 1,
+      "explanation": "Critical exposures (publicly accessible credentials) require immediate containment: block public access and rotate exposed credentials. Waiting for review meetings or owner responses gives attackers time to exploit the exposure."
+    },
+    {
+      "question": "What does the DCARM lifecycle stand for in cloud data discovery?",
+      "options": [
+        "Detect, Classify, Assess, Respond, Monitor",
+        "Discover, Classify, Assess, Remediate, Monitor",
+        "Define, Categorize, Analyze, Remediate, Maintain",
+        "Discover, Catalog, Audit, Repair, Manage"
+      ],
+      "correct_index": 1,
+      "explanation": "DCARM stands for Discover (find all data stores), Classify (label sensitive data types), Assess (evaluate risk and exposure), Remediate (fix exposures and misconfigurations), and Monitor (continuously scan for new data). It's a continuous cycle, not a one-time process."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}

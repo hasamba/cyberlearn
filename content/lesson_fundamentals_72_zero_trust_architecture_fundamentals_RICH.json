@@ -1,0 +1,226 @@
+{
+  "lesson_id": "2f2a99f7-52cf-4869-96b2-8cd182569ca0",
+  "domain": "fundamentals",
+  "title": "Zero Trust Architecture Fundamentals",
+  "subtitle": "Never Trust, Always Verify — The Modern Security Model",
+  "difficulty": 1,
+  "estimated_time": 35,
+  "order_index": 72,
+  "prerequisites": ["Security Controls and Types"],
+  "learning_objectives": [
+    "Understand the core principles of Zero Trust Architecture and why it replaced perimeter-based security",
+    "Identify the five pillars of Zero Trust: Identity, Devices, Networks, Applications, and Data",
+    "Explain the difference between Zero Trust philosophy and Zero Trust Network Architecture (ZTNA)",
+    "Apply Zero Trust principles to real-world security architecture decisions",
+    "Evaluate common Zero Trust implementation challenges and misconceptions"
+  ],
+  "concepts": [
+    "Zero Trust Principles: Never Trust, Always Verify",
+    "Perimeter vs Zero Trust Security Models",
+    "Five Pillars of Zero Trust",
+    "Identity-Based Access and Continuous Verification",
+    "Microsegmentation and Least Privilege Network Access",
+    "Zero Trust Network Architecture (ZTNA)",
+    "Zero Trust Implementation Challenges"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "Zero Trust Isn't a Product — It's a Mindset",
+      "content": "The biggest misconception about Zero Trust: 'We bought a Zero Trust solution, so we're done.'\n\nZero Trust is NOT a product. It's a philosophy: **never trust, always verify.** Every access request — regardless of where it comes from, who's making it, or what network it's on — must be authenticated, authorized, and encrypted.\n\nThe old model (castle-and-moat) assumed that everything inside the network was trusted. If you're inside the perimeter, you're safe. Zero Trust says: there is no inside. Every request is potentially hostile.\n\nThis lesson teaches you to think in Zero Trust terms: verify every identity, validate every device, encrypt every connection, and enforce least privilege for every access request.",
+      "simplified_explanation": "Zero Trust means 'never automatically trust anyone or anything.' Every single request to access anything must be verified, no matter where it's coming from. It's not a product you buy — it's a way of thinking about security.",
+      "memory_aids": ["Zero Trust = never trust, always verify", "Not a product — a philosophy", "No 'inside' the network = no automatic trust", "Verify every identity, device, and request"],
+      "real_world_connection": "Google implemented Zero Trust with their BeyondCorp architecture in 2014. Microsoft built Zscaler and Azure AD around Zero Trust. The US government mandated Zero Trust in Executive Order 14028. It's not a trend — it's the new standard.",
+      "reflection_prompt": "What's the difference between a Zero Trust product and a Zero Trust architecture?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "From Castle-and-Moat to Zero Trust",
+      "content": "**The old model: Castle-and-Moat (Perimeter Security)**\n\n```\n[Internet] → 🔥 Firewall → [Trusted Internal Network] → All Resources Accessible\n```\n\nAssumptions:\n- Everything inside the network is trusted\n- If you're inside, you can access everything\n- The firewall keeps bad actors out\n- VPN access means you're trusted\n\nProblems:\n- Lateral movement: Once inside, attackers can access everything\n- VPN = unlimited trust: Remote users get full network access\n- Cloud breaks the perimeter: Resources aren't inside the network anymore\n- Insider threats: Trusted users can be malicious\n\n**The new model: Zero Trust**\n\n```\n[User/Device] → 🔒 Verify Identity → 🔒 Verify Device → 🔒 Verify Access → 🔒 Verify Context → [Resource]\n```\n\nPrinciples:\n- **Verify explicitly**: Always authenticate and authorize based on all available data points\n- **Use least privilege access**: Limit user access with just-in-time and just-enough access\n- **Assume breach**: Assume attackers are already in your network and design accordingly\n\n**Key differences:**\n| Castle-and-Moat | Zero Trust |\n|---|---|\n| Trust based on network location | Trust based on identity verification |\n| Full access once inside | Least privilege per request |\n| Hard perimeter, soft interior | No implicit trust anywhere |\n| VPN gives full access | Every request is evaluated independently |\n| One-time authentication | Continuous verification |\n| Protects the network | Protects the resources |\n\n**Zero Trust doesn't mean 'trust nothing.'** It means 'trust based on verification, not based on network location.' You can still trust — but you verify first, every time.",
+      "simplified_explanation": "Old model: if you're inside the network, you're trusted. New model: every request is verified regardless of where it comes from. There's no 'inside' anymore — just verified access to specific resources.",
+      "memory_aids": ["Castle-and-Moat = inside = trusted", "Zero Trust = every request = verified", "Verify explicitly, least privilege, assume breach", "Trust based on identity, not network location"],
+      "real_world_connection": "The SolarWinds breach (2020) demonstrated why perimeter security fails. Attackers got inside the network via a trusted software update and moved laterally for months — exactly what Zero Trust prevents.",
+      "reflection_prompt": "What's one system in your environment that still uses castle-and-moat security? How would Zero Trust change it?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Zero Trust",
+      "content": "Imagine a school with two approaches to security:\n\n**Castle-and-Moat School:**\nThere's a big gate at the front. Once you're through the gate (the firewall), you can go anywhere — classrooms, offices, the principal's office, the supply closet. Everyone inside is trusted.\n\nOne day, someone sneaks through the gate. They can now go EVERYWHERE because there are no locks on the inside doors.\n\n**Zero Trust School:**\nThere's no 'inside.' Every single door has a lock. Before you can go through ANY door, you have to:\n1. Prove who you are (ID card → identity verification)\n2. Prove your device is safe (health check → device verification)\n3. Prove you NEED to be there (only math teachers in the math room → least privilege)\n4. This all happens EVERY TIME, not just at the front gate (continuous verification)\n\nIf someone sneaks in, they can only access the one room they managed to get into — not the whole school.\n\n**That's Zero Trust:** Every door has a lock. Every person is checked. Every time. No 'once you're in, you're trusted.'",
+      "simplified_explanation": "Old way: one gate at the front, open doors inside. New way: every door has a lock, every person is checked every time. If someone gets through one door, they can't access the whole building.",
+      "memory_aids": ["Castle-and-Moat = one gate, open inside", "Zero Trust = every door locked, every person checked", "If they get through one door, they only get ONE room", "Verify identity + device + need + context = EVERY time"],
+      "real_world_connection": "Airports use this model. You don't just check ID at the entrance — you check it at check-in, at security, at the gate, and sometimes again at the door. Every access point is verified independently.",
+      "reflection_prompt": "How would your school or workplace be different if it used Zero Trust instead of castle-and-moat security?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_pillars",
+      "type": "explanation",
+      "title": "The Five Pillars of Zero Trust",
+      "content": "NIST SP 800-207 defines Zero Trust around five pillars. Every pillar must be secured — skip one and the whole structure is weak.\n\n**1. Identity**\n- Every user and service must be authenticated and authorized\n- Multi-factor authentication (MFA) for all users\n- Identity-based access control (not network-based)\n- Privileged access management (PAM) for admin accounts\n- Continuous identity verification (not just at login)\n\n**2. Device**\n- Every device must be identified and assessed for health\n- Device compliance checks (OS version, patches, EDR status)\n- Unmanaged devices get limited access\n- Certificate-based device authentication\n- Real-time device posture assessment\n\n**3. Network**\n- Microsegmentation — no flat networks\n- Encrypted traffic everywhere (no 'trusted internal network')\n- Real-time traffic inspection\n- Network access tied to identity and device posture\n- Software-defined perimeters replace VPNs\n\n**4. Application**\n- Application access based on identity, device, and context\n- API security (every API call is verified)\n- Runtime application self-protection\n- Continuous authorization per session\n- No implicit trust based on network location\n\n**5. Data**\n- Data classification and labeling\n- Encryption at rest and in transit\n- Data loss prevention (DLP) policies\n- Access based on data sensitivity classification\n- Monitoring and analytics on data access patterns\n\n**How the pillars work together:**\n```\nUser (Identity) + Device (Health) + Network (Segment) → Access Decision\n\nResult: Allow / Deny / Step-up Auth / Limit Scope\n```\nEvery access decision considers ALL five pillars. A healthy device with a verified identity on a segmented network accessing a low-sensitivity app? Allow. An unmanaged device from an unknown location accessing sensitive data? Deny or step-up.",
+      "simplified_explanation": "Zero Trust has five pillars: verify who you are (identity), that your device is safe (device), that you're on the right network (network), which app you can use (application), and what data you can see (data). All five must check out for access.",
+      "memory_aids": ["Identity = who are you?", "Device = is your computer safe?", "Network = are you on the right network?", "Application = which app can you use?", "Data = what data can you see?", "All five must pass for access"],
+      "real_world_connection": "Microsoft's Zero Trust implementation checks identity (Azure AD MFA), device (Intune compliance), network (Conditional Access), application (app-specific permissions), and data (sensitivity labels) for every single access request.",
+      "reflection_prompt": "Which pillar would be hardest to implement in your organization? Why?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_5_real_world",
+      "type": "real_world",
+      "title": "Zero Trust in Practice: Real Implementations",
+      "content": "Zero Trust isn't theory — it's being deployed everywhere:\n\n**Google BeyondCorp**\n- Eliminated VPN requirement for employees\n- Every access request evaluated based on device, identity, and context\n- Access granted per resource, not per network\n- Result: No 'trusted network' — all access is evaluated identically\n\n**Microsoft Zero Trust**\n- Conditional Access evaluates every sign-in in real-time\n- Combines identity signal (who), device signal (health), location (where), and risk (behavior)\n- Step-up authentication when risk increases\n- Result: Continuous verification, not one-time at login\n\n**US Federal Government (EO 14028)**\n- Mandated Zero Trust architecture across all federal agencies\n- CISA Zero Trust Maturity Model defines five pillars\n- Agencies must achieve specific maturity levels within defined timeframes\n- Result: The largest Zero Trust deployment in the world\n\n**Common implementation challenges:**\n\n1. **Legacy applications**: Don't support modern authentication\n   - Solution: Use identity-aware proxies that add MFA without changing the app\n\n2. **User friction**: Too many MFA prompts frustrate users\n   - Solution: Risk-based authentication — step up only when risk is high\n\n3. **Network dependencies**: Apps that require network-level access\n   - Solution: Microsegmentation with identity-based policies\n\n4. **Cost and complexity**: Zero Trust touches every system\n   - Solution: Start with high-value assets, expand gradually (identity first)\n\n5. **Monitoring at scale**: Verifying every request creates massive logs\n   - Solution: SIEM + behavioral analytics to identify anomalies, not just log everything",
+      "simplified_explanation": "Google removed VPNs and verifies every request. Microsoft checks identity + device + location in real-time. The US government mandated Zero Trust for all agencies. The challenge: legacy apps, user frustration, and complexity. Start with identity.",
+      "memory_aids": ["Google BeyondCorp = no VPN, every request verified", "Microsoft = Conditional Access, real-time evaluation", "US Gov = EO 14028, mandated Zero Trust", "Start with identity = highest value, lowest friction"],
+      "real_world_connection": "The 2021 Executive Order on Cybersecurity (EO 14028) mandated Zero Trust across all federal agencies. This is driving the largest Zero Trust deployment in history and shaping the entire cybersecurity industry's direction.",
+      "reflection_prompt": "If you were implementing Zero Trust in your organization, which pillar would you start with and why?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_6_code_exercise",
+      "type": "code_exercise",
+      "title": "Zero Trust Access Policy Design",
+      "content": "Let's design a Zero Trust access policy using pseudocode:\n\n```python\ndef evaluate_access_request(user, device, network, resource):\n    \"\"\"Zero Trust access evaluation engine.\"\"\"\n    \n    # Initialize risk score\n    risk_score = 0\n    conditions = []\n    \n    # === PILLAR 1: Identity ===\n    if not user.authenticated:\n        return AccessDecision.DENY, \"User not authenticated\"\n    \n    if not user.mfa_completed:\n        return AccessDecision.DENY, \"MFA required\"\n    \n    if user.risk_level == 'high':\n        risk_score += 40\n        conditions.append('High-risk identity')\n    elif user.risk_level == 'medium':\n        risk_score += 20\n        conditions.append('Medium-risk identity')\n    \n    # Check role-based access\n    if resource.required_role not in user.roles:\n        return AccessDecision.DENY, f\"Role {resource.required_role} required\"\n    \n    # === PILLAR 2: Device ===\n    if not device.registered:\n        risk_score += 30\n        conditions.append('Unregistered device')\n    \n    if not device.compliant:\n        risk_score += 25\n        conditions.append('Non-compliant device')\n    \n    if not device.edr_running:\n        risk_score += 20\n        conditions.append('No EDR agent')\n    \n    if device.os_version not in approved_os_versions:\n        risk_score += 15\n        conditions.append('Outdated OS')\n    \n    # === PILLAR 3: Network ===\n    if network.location == 'untrusted':\n        risk_score += 30\n        conditions.append('Untrusted network')\n    elif network.location == 'corporate':\n        risk_score += 5  # Even corporate networks aren't fully trusted\n    elif network.location == 'known_safe':\n        risk_score += 0\n    \n    if not network.encrypted:\n        risk_score += 15\n        conditions.append('Unencrypted connection')\n    \n    # === PILLAR 4: Application ===\n    if resource.sensitivity == 'critical' and not device.compliant:\n        return AccessDecision.DENY, \"Critical resources require compliant device\"\n    \n    # === PILLAR 5: Data ===\n    if resource.data_classification == 'restricted':\n        if user.clearance_level < resource.required_clearance:\n            return AccessDecision.DENY, \"Insufficient clearance for restricted data\"\n        if network.location != 'corporate':\n            return AccessDecision.DENY, \"Restricted data requires corporate network\"\n    \n    # === Risk-based Decision ===\n    if risk_score >= 50:\n        return AccessDecision.STEP_UP, f\"Step-up authentication required: {conditions}\"\n    elif risk_score >= 30:\n        return AccessDecision.LIMITED, f\"Limited access granted: {conditions}\"\n    else:\n        return AccessDecision.ALLOW, \"Full access granted\"\n\n\nclass AccessDecision:\n    ALLOW = \"allow\"\n    DENY = \"deny\"\n    STEP_UP = \"step_up\"    # Require additional authentication\n    LIMITED = \"limited\"    # Reduced permissions\n```\n\n**Analysis Questions:**\n1. Why does the corporate network still add a small risk score (5 points)?\n2. What happens if a user has high identity risk but a compliant device?\n3. Why is step-up authentication triggered instead of outright denial at risk score 50?\n4. How would you modify this for a developer who needs access to production systems?",
+      "simplified_explanation": "This code evaluates every access request based on who you are (identity), your device's health, your network, the app, and the data. Low risk = full access. Medium risk = limited access. High risk = extra verification. Too risky = denied.",
+      "memory_aids": ["Evaluate every request: identity + device + network + app + data", "Low risk → allow, Medium risk → limit, High risk → step up, Too risky → deny", "Even corporate networks aren't fully trusted", "Risk-based decisions = not just allow/deny, but also 'step up' and 'limit'"],
+      "real_world_connection": "This is exactly how Azure AD Conditional Access works. It evaluates identity risk, device compliance, location, and resource sensitivity for every single sign-in, then applies the appropriate access level.",
+      "reflection_prompt": "What risk score thresholds would you set for your organization? Why 50 for step-up and not higher?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_7_memory_aid",
+      "type": "memory_aid",
+      "title": "Zero Trust Quick Reference",
+      "content": "**Three Principles**\n- **Verify explicitly** — Always authenticate and authorize\n- **Use least privilege** — Just-in-time, just-enough access\n- **Assume breach** — Design as if attackers are already inside\n\n**Five Pillars — I.D.N.A.D.**\n| Pillar | Question | Key Control |\n|---|---|---|\n| **I**dentity | Who are you? | MFA, Conditional Access |\n| **D**evice | Is your device safe? | Compliance checks, EDR |\n| **N**etwork | Are you on the right network? | Microsegmentation, encryption |\n| **A**pplication | Which app can you access? | App-specific policies |\n| **D**ata | What data can you see? | Classification, DLP |\n\n**Zero Trust vs Castle-and-Moat**\n| Castle-and-Moat | Zero Trust |\n|---|---|\n| Network = trust boundary | Identity = trust boundary |\n| One-time auth | Continuous verification |\n| Full access inside | Least privilege per request |\n| Hard perimeter | No perimeter |\n\n**Implementation Order (Start Here)**\n1. Identity — MFA everywhere\n2. Device — Compliance checks\n3. Network — Microsegmentation\n4. Application — App-specific policies\n5. Data — Classification and DLP",
+      "simplified_explanation": "Three principles: verify, least privilege, assume breach. Five pillars: Identity, Device, Network, Application, Data. Start with MFA (identity), then device compliance, then microsegmentation.",
+      "memory_aids": ["Verify, Least privilege, Assume breach", "IDNAD = Identity, Device, Network, Application, Data", "Start with MFA, then devices, then networks", "No perimeter = no 'trusted inside'"],
+      "real_world_connection": "CISA's Zero Trust Maturity Model defines three levels: Traditional, Advanced, and Optimal. Most organizations are between Traditional and Advanced on Identity, and at Traditional on Network and Data.",
+      "reflection_prompt": "Can you list all five pillars and the key question each one answers?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_8_misconceptions",
+      "type": "explanation",
+      "title": "Zero Trust Misconceptions",
+      "content": "Let's clear up the most common misconceptions:\n\n**Misconception 1: 'Zero Trust means we don't trust anyone'**\nReality: Zero Trust means trust is earned through verification, not granted by default. You still trust — but you verify first.\n\n**Misconception 2: 'Zero Trust is a product you can buy'**\nReality: Zero Trust is a security philosophy and architecture. You can buy tools that support it (IdP, ZTNA, microsegmentation), but you can't buy Zero Trust itself.\n\n**Misconception 3: 'Zero Trust eliminates the need for firewalls'**\nReality: Firewalls still have a role — they're part of the network pillar. Zero Trust adds verification ON TOP of perimeter controls, not instead of them.\n\n**Misconception 4: 'Zero Trust requires replacing all our infrastructure'**\nReality: Zero Trust is a journey. Start with identity (MFA), then device compliance, then network segmentation. You don't rip and replace — you evolve.\n\n**Misconception 5: 'Zero Trust slows everything down'**\nReality: Properly implemented Zero Trust with Conditional Access and risk-based policies actually IMPROVES user experience. No VPN, faster access for low-risk scenarios, and step-up only when needed.\n\n**Misconception 6: 'Zero Trust is only for large enterprises'**\nReality: Small organizations benefit even more because they have fewer resources to recover from breaches. Start simple: MFA everywhere, device checks, and least-privilege access.\n\n**The reality:**\n- Zero Trust is a mindset that informs architecture decisions\n- It's implemented gradually, starting with the highest-value pillars\n- It works with existing tools, not against them\n- It improves both security AND user experience when done right\n- It's not a destination — it's a continuous improvement process",
+      "simplified_explanation": "Zero Trust doesn't mean 'trust no one.' It means 'verify before trusting.' It's not a product, doesn't replace firewalls, doesn't require replacing everything, doesn't slow things down, and isn't only for big companies. It's a mindset you implement gradually.",
+      "memory_aids": ["Zero Trust ≠ no trust, it's verified trust", "Not a product — a philosophy", "Firewalls still needed — they're part of network pillar", "Start with MFA, evolve gradually", "Done right = better UX, not worse"],
+      "real_world_connection": "Organizations that implement Zero Trust well (like Google BeyondCorp) report better user experience because employees no longer need VPNs. The 'slowdown' only happens with poor implementation.",
+      "reflection_prompt": "Which of these misconceptions have you heard? How would you explain the reality?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_9_reflection",
+      "type": "reflection",
+      "title": "Design a Zero Trust Roadmap",
+      "content": "**Scenario**: Your organization currently uses a traditional perimeter-based security model:\n- VPN for remote access (full network access once connected)\n- Single password authentication for most systems\n- Flat internal network with no segmentation\n- No device compliance checks\n- Sensitive data accessible to all authenticated users\n\n**Task**: Design a 12-month Zero Trust implementation roadmap:\n\n**Month 1-3: Foundation (Identity)**\n- What identity changes would you implement first?\n- How do you handle MFA rollout without causing user friction?\n\n**Month 4-6: Devices**\n- What device compliance policies would you enforce?\n- How do you handle personal/unmanaged devices?\n\n**Month 7-9: Network**\n- What microsegmentation would you implement first?\n- How do you transition from VPN to ZTNA?\n\n**Month 10-12: Applications and Data**\n- What data classification would you implement?\n- How do you handle legacy applications that don't support modern auth?\n\n**Key considerations:**\n- What's the business impact of each phase?\n- How do you measure success at each stage?\n- What rollback plans do you need?\n- How do you communicate changes to users?",
+      "simplified_explanation": "Plan a 12-month rollout: start with MFA (identity), then device checks, then network segmentation, then app and data controls. Handle legacy apps with identity proxies. Measure success at each stage.",
+      "memory_aids": ["Phase 1: MFA everywhere", "Phase 2: Device compliance", "Phase 3: Microsegmentation", "Phase 4: App policies + data classification", "Start simple, evolve gradually"],
+      "real_world_connection": "Most Zero Trust implementations follow this exact order. Identity is the highest-value, lowest-friction starting point. Network segmentation is typically last because it's the most complex.",
+      "reflection_prompt": "What's the single most impactful change you could make in month one?",
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_10_mindset",
+      "type": "mindset_coach",
+      "title": "The Zero Trust Mindset Shift",
+      "content": "Adopting Zero Trust requires a fundamental shift in how you think about security:\n\n**Old mindset**: 'They're inside the network, so they're trusted.'\n**New mindset**: 'They're authenticated and authorized for this specific resource. Period.'\n\n**Old mindset**: 'VPN means they're an employee.'\n**New mindset**: 'VPN means their traffic is encrypted. Identity verification happens separately.'\n\n**Old mindset**: 'This app is on the internal network, so it's safe.'\n**New mindset**: 'Every app requires authentication regardless of network location.'\n\n**Old mindset**: 'We need to protect the perimeter.'\n**New mindset**: 'There is no perimeter. We protect the resources.'\n\nThis is hard. It means changing how networks are designed, how applications are secured, and how users authenticate. But the shift is necessary because the old model is fundamentally broken — attackers are already inside.\n\n**Jim Kwik principle: Reframe Limiting Beliefs** — 'Zero Trust is too complex' → 'Zero Trust starts with MFA. Everything else is incremental improvement.' 'We can't change everything at once' → 'We don't have to. Start with identity, then devices, then networks. Each step improves security.'",
+      "simplified_explanation": "The mindset shift: inside the network ≠ trusted. VPN ≠ verified. Internal app ≠ safe. Perimeter ≠ protection. Instead: verify every identity, check every device, authenticate every request, protect every resource.",
+      "memory_aids": ["Inside ≠ trusted", "VPN ≠ verified", "Internal ≠ safe", "Perimeter ≠ protection", "Start with MFA, improve incrementally"],
+      "real_world_connection": "Organizations that successfully adopt Zero Trust report that the mindset shift is harder than the technology. Getting teams to stop trusting 'internal' traffic is the real challenge.",
+      "reflection_prompt": "What's the hardest mindset shift for your organization? How would you explain Zero Trust to someone who's skeptical?",
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "What is the core principle of Zero Trust?",
+      "options": [
+        "Trust everyone inside the network perimeter",
+        "Never trust, always verify — every access request must be authenticated and authorized",
+        "Use VPNs to create a secure perimeter",
+        "Eliminate all firewalls and network security"
+      ],
+      "correct_index": 1,
+      "explanation": "Zero Trust means never implicitly trusting any access request based on network location. Every request must be explicitly verified through authentication and authorization, regardless of where it originates."
+    },
+    {
+      "question": "Which of the following is NOT one of the five pillars of Zero Trust?",
+      "options": [
+        "Identity",
+        "Device",
+        "Firewall",
+        "Data"
+      ],
+      "correct_index": 2,
+      "explanation": "The five pillars of Zero Trust are Identity, Device, Network, Application, and Data. Firewall is a tool within the Network pillar, not a pillar itself."
+    },
+    {
+      "question": "What is the primary difference between castle-and-moat security and Zero Trust?",
+      "options": [
+        "Castle-and-moat uses encryption while Zero Trust does not",
+        "Castle-and-moat trusts everything inside the perimeter; Zero Trust verifies every request regardless of network location",
+        "Zero Trust requires VPN while castle-and-moat does not",
+        "Castle-and-moat is more secure than Zero Trust"
+      ],
+      "correct_index": 1,
+      "explanation": "Castle-and-moat security trusts everything inside the network perimeter. Zero Trust verifies every access request based on identity, device, and context — regardless of network location. There is no 'trusted inside' in Zero Trust."
+    },
+    {
+      "question": "In a Zero Trust architecture, what should happen when a user with high identity risk tries to access a sensitive resource?",
+      "options": [
+        "Allow access since they're on the corporate network",
+        "Deny access completely with no recourse",
+        "Require step-up authentication and verify device compliance before granting limited access",
+        "Allow access but log the event for later review"
+      ],
+      "correct_index": 2,
+      "explanation": "Zero Trust uses risk-based access decisions. High identity risk triggers step-up authentication and additional verification. Access may be granted with limited scope if the additional verification passes, but never granted blindly."
+    },
+    {
+      "question": "Why is identity typically the first pillar to implement in a Zero Trust journey?",
+      "options": [
+        "It's the cheapest pillar to implement",
+        "MFA provides the highest security improvement with the least infrastructure change",
+        "Identity is the only pillar that matters",
+        "Network segmentation can't work without identity"
+      ],
+      "correct_index": 1,
+      "explanation": "MFA implementation provides the biggest security improvement with the least infrastructure change. It's the highest-value, lowest-friction starting point for Zero Trust. Other pillars build on top of verified identity."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}

@@ -1,0 +1,226 @@
+{
+  "lesson_id": "f8e85c5e-8acd-4772-8eb6-e36debcb9d27",
+  "domain": "osint",
+  "title": "Dark Web and Tor Investigation",
+  "subtitle": "Navigating and Investigating the Dark Web Safely and Effectively",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 72,
+  "prerequisites": ["OPSEC for OSINT Investigators"],
+  "learning_objectives": [
+    "Understand the Tor network architecture and how onion services work",
+    "Configure a secure research environment for dark web investigations",
+    "Navigate onion services and dark web marketplaces for intelligence gathering",
+    "Apply PGP encryption for secure communication and verification",
+    "Maintain operational security while conducting dark web research"
+  ],
+  "concepts": [
+    "Tor Network Architecture",
+    "Onion Services and Hidden Services",
+    "Dark Web Research OPSEC",
+    "Onion Service Navigation and Discovery",
+    "PGP Encryption and Verification",
+    "Anonymous Communication Practices",
+    "Dark Web Intelligence Collection Methodology"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "Why Dark Web Investigation Matters",
+      "content": "The dark web isn't a mystical underworld — it's a tool. Like any tool, it can be used for legitimate purposes (privacy, journalism, whistleblowing) or criminal ones (drug markets, stolen data, attack services).\n\nFor OSINT investigators, the dark web is an intelligence goldmine. Threat actors discuss TTPs, sell compromised data, and recruit collaborators — all in plain sight (if you know where to look). Ignoring it means missing a significant portion of the threat landscape.\n\nThis lesson teaches you to navigate the dark web safely, gather intelligence ethically, and maintain OPSEC throughout. You'll learn to think of the dark web as another data source — one that requires extra precautions but provides unique insights.",
+      "simplified_explanation": "The dark web is just the internet with extra privacy. Investigators use it to find threats, stolen data, and criminal activity. It's a data source, not a scary underworld. You just need to be careful.",
+      "memory_aids": ["Dark web = internet + privacy tools", "OSINT goldmine = threat actors discuss TTPs openly", "Tool, not underworld", "Extra precautions, unique insights"],
+      "real_world_connection": "Major data breaches are often announced on dark web forums before they're publicly reported. The Vectra breach, the Lexmark breach, and countless others were discovered through dark web monitoring first.",
+      "reflection_prompt": "What specific intelligence would dark web investigation provide that surface web OSINT cannot?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "Tor Network Architecture: How Onion Routing Works",
+      "content": "Tor (The Onion Router) provides anonymity through layered encryption and traffic routing through volunteer-operated relays.\n\n**How Tor works — the journey of a request:**\n\n1. **Client selects a circuit**: Three random relays — Entry Guard, Middle Relay, Exit Relay\n2. **Layered encryption**: The request is encrypted three times (like nesting dolls):\n   - Inner layer: Encrypted with Exit Relay's key\n   - Middle layer: Encrypted with Middle Relay's key\n   - Outer layer: Encrypted with Entry Guard's key\n3. **Hop-by-hop routing**:\n   - Entry Guard decrypts outer layer → sees 'send to Middle Relay'\n   - Middle Relay decrypts middle layer → sees 'send to Exit Relay'\n   - Exit Relay decrypts inner layer → sees destination website\n4. **No relay knows both**: Entry Guard knows your IP but not the destination. Exit Relay knows the destination but not your IP. Middle Relay knows neither.\n\n**Key Tor components:**\n- **Entry Guards**: First hop; long-lived connections to prevent profiling\n- **Middle Relays**: Random intermediate hops\n- **Exit Relays**: Last hop before the destination; can see unencrypted traffic\n- **Bridge Relays**: Unlisted entry points for circumventing censorship\n- **Directory Authorities**: Trusted servers that maintain the network map\n\n**Onion Services (formerly Hidden Services):**\n- Services that run entirely within the Tor network\n- Addresses end in `.onion` and are 56 characters long (v3)\n- No exit relay needed — both client and server are inside Tor\n- Provide server anonymity in addition to client anonymity\n- Example: `zqktlwiuav7vyg4bvn2t2llyeql7arj5c4zp3r7pmgq6kpvz7etv5qyd.onion`\n\n**Important distinctions:**\n- **Tor ≠ Dark Web**: Tor is the network; the dark web is content accessible via Tor\n- **Clearnet over Tor**: You can access normal websites through Tor (exit relay needed)\n- **Onion services**: Stay entirely within Tor (no exit relay)",
+      "simplified_explanation": "Tor wraps your traffic in three layers of encryption and bounces it through three random computers. Each computer only knows the one before and after it. Nobody can see both who you are and where you're going. Onion services are websites that live entirely inside Tor.",
+      "memory_aids": ["Three relays: Entry → Middle → Exit", "Three encryption layers = onion", "No relay knows both source AND destination", ".onion = stays inside Tor", "Tor ≠ Dark Web (Tor is the road, dark web is the destination)"],
+      "real_world_connection": "Journalists use Tor to communicate with sources in oppressive regimes. Whistleblowers use it to leak documents safely. You use it to investigate threats. Same tool, different purposes.",
+      "reflection_prompt": "What information does each relay know? Why is this architecture considered anonymous?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: How Tor Works",
+      "content": "Imagine you want to send a secret message to your friend, but you don't want anyone to know you're talking to them.\n\nHere's what you do:\n\n1. You write the message and put it in a box. Lock the box with Key #3.\n2. Put that box inside a bigger box. Lock it with Key #2.\n3. Put THAT box inside an even bigger box. Lock it with Key #1.\n\nNow you send the boxes through three delivery people:\n- **Delivery Person #1** unlocks Box #1 with Key #1. Inside, they find Box #2 and an address for Delivery Person #2. They don't know what's in Box #2 or who the final recipient is.\n- **Delivery Person #2** unlocks Box #2 with Key #2. Inside, they find Box #3 and an address for Delivery Person #3. They don't know who started this or what's in Box #3.\n- **Delivery Person #3** unlocks Box #3 with Key #3. Inside, they find your message and your friend's address. They deliver it. They don't know who YOU are, only where it's going.\n\n**Nobody knows both who sent it AND who it's for.**\n\nThat's Tor. Three boxes, three locks, three delivery people. Each one only knows one part of the journey.\n\nOnion services are like your friend living inside a locked building. You never have to leave the building — the message stays inside the whole time. No delivery person #3 needed.",
+      "simplified_explanation": "Tor is like sending a letter through three people, each only knowing one step of the journey. Nobody can connect you to your friend. Onion services keep everything inside the network — no outside delivery needed.",
+      "memory_aids": ["Three boxes, three locks, three people", "Nobody knows both sender AND receiver", "Onion = layers of encryption", "Onion services = everything stays inside"],
+      "real_world_connection": "This is literally how the Tor network works. The 'boxes' are encryption layers, the 'keys' are public key cryptography, and the 'delivery people' are Tor relays.",
+      "reflection_prompt": "Can you explain Tor to someone with no technical background using the box analogy?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_opsec",
+      "type": "explanation",
+      "title": "Dark Web Research OPSEC: Don't Get Burned",
+      "content": "Before you touch the dark web, secure your environment. This isn't optional.\n\n**Rule #1: Dedicated Research Environment**\n- Use a dedicated VM or physical machine that is NEVER used for personal activities\n- Tails OS or Whonix are recommended (Tails routes all traffic through Tor)\n- Never, ever use your work machine with your real identity\n\n**Rule #2: Network Isolation**\n- Use a dedicated VPN before Tor (VPN → Tor, not Tor → VPN)\n- Consider using a public Wi-Fi or dedicated research connection\n- Never access Tor from your home IP if you can avoid it\n- MAC address randomization\n\n**Rule #3: Identity Separation**\n- Create a completely separate research identity (username, email, PGP key)\n- Never mix your real identity with your research identity\n- Use different browsers, fonts, and configurations for each identity\n- Separate research sessions by time and topic\n\n**Rule #4: Communication Security**\n- Use PGP for all communications on dark web forums\n- Never share personal details, even seemingly innocent ones\n- Be aware of correlation attacks (timing, behavior patterns)\n- Use different accounts for different investigations\n\n**Rule #5: Legal and Ethical Boundaries**\n- Document everything you do (for legal protection)\n- Never purchase illegal goods, even for 'research'\n- Know your local laws regarding dark web access\n- Maintain a clear research objective and stop if you exceed it\n\n**The OPSEC Stack:**\n```\n[Research VM (Tails/Whonix)]\n    ↓\n[VPN - privacy-focused provider]\n    ↓\n[Tor Network]\n    ↓\n[Onion Service / Dark Web Forum]\n```\n\n**What NOT to do:**\n- Don't download files from unknown sources without a sandbox\n- Don't enable JavaScript on onion services\n- Don't reuse usernames across forums\n- Don't access personal accounts from your research environment\n- Don't discuss your research OPSEC with anyone who doesn't need to know\n- Don't take screenshots that include your real IP or identifying information",
+      "simplified_explanation": "Use a special computer that's only for research. Hide your real identity completely. Never mix your personal life with your research life. Use encryption for everything. Don't break the law, even 'for research.'",
+      "memory_aids": ["Separate machine, separate identity, separate network", "VPN → Tor, never Tor → VPN", "PGP for all communication", "No JS on onion services", "Document everything for legal protection"],
+      "real_world_connection": "Law enforcement and intelligence agencies follow these exact OPSEC procedures. The difference is they have legal authorization; you need to ensure your research activities are legal in your jurisdiction.",
+      "reflection_prompt": "What's the most likely OPSEC mistake you could make? How would you prevent it?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_5_real_world",
+      "type": "real_world",
+      "title": "Dark Web Intelligence Sources and Methodology",
+      "content": "The dark web contains several types of intelligence sources, each requiring different approaches:\n\n**1. Dark Web Marketplaces**\n- R/WeedStreet, ASAP Market, and others sell drugs, stolen data, and services\n- Monitor for: your organization's data, credentials, and tools\n- Intelligence value: Breach notification, threat actor identification, pricing trends\n\n**2. Dark Web Forums**\n- Exploit.in, XSS.is, BreachForums (and successors)\n- Technical discussions, exploit sharing, collaboration between threat actors\n- Intelligence value: TTPs, emerging threats, zero-day discussions\n\n**3. Paste Sites**\n- Dark web pastebins where leaked data is initially shared\n- Often the first place stolen data appears\n- Intelligence value: Early breach detection, credential exposure\n\n**4. Ransomware Leak Sites**\n- Organizations that don't pay get their data published\n- Intelligence value: Victim tracking, ransomware group attribution\n\n**5. Telegram Channels**\n- Increasingly replacing traditional dark web forums\n- Easier to access, harder to monitor comprehensively\n- Intelligence value: Real-time threat intelligence, threat actor communication\n\n**Investigation Methodology:**\n\n1. **Define Objective**: What are you looking for? (Stolen credentials? Threat actor attribution? TTP discovery?)\n2. **Select Sources**: Which platforms are most likely to contain your target intelligence?\n3. **Access Safely**: Use your OPSEC stack to access the platform\n4. **Search Methodically**: Use forum search, marketplace categories, and keyword monitoring\n5. **Document Findings**: Record URLs, screenshots (sanitized), timestamps, and context\n6. **Analyze**: Correlate findings with known threat actors, CVEs, and your organization's assets\n7. **Report**: Produce actionable intelligence reports\n\n**Automation Tips:**\n- Use dark web monitoring services (Flare, DarkOwl, Flashpoint) for continuous monitoring\n- Set up keyword alerts for your organization's name, domains, and key personnel\n- Automate screenshot capture with sanitized metadata\n- Use PGP to verify threat actor identities on forums",
+      "simplified_explanation": "The dark web has marketplaces (selling stolen stuff), forums (hackers talking), paste sites (leaked data), ransomware sites (victim shaming), and Telegram channels (real-time chatter). Search systematically, document everything, and use monitoring tools to stay ahead.",
+      "memory_aids": ["Marketplaces = stolen data for sale", "Forums = hackers discussing TTPs", "Paste sites = first place leaks appear", "Ransomware sites = victim data dumps", "Telegram = the new forum", "Methodology: Define → Select → Access → Search → Document → Analyze → Report"],
+      "real_world_connection": "Organizations like Mandiant, Recorded Future, and Flashpoint build entire businesses on dark web intelligence. Their reports regularly identify breaches weeks before the affected organizations discover them through normal channels.",
+      "reflection_prompt": "If your organization's name appeared on a dark web paste site, what would your immediate response be?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_6_pgp",
+      "type": "explanation",
+      "title": "PGP Encryption for Dark Web Communication",
+      "content": "PGP (Pretty Good Privacy) is essential for dark web investigations — both for protecting your communications and for verifying identities.\n\n**Why PGP matters on the dark web:**\n- Forum accounts are anonymous. PGP keys prove identity.\n- Messages on forums are readable by admins. PGP encrypts them.\n- Threat actors use PGP to sign their posts. Verify the signature to confirm authenticity.\n- Data leaks are often PGP-encrypted. You need the key to read them.\n\n**Generating your research PGP key:**\n```bash\n# Generate a PGP key pair for your research identity\ngpg --full-generate-key\n# Choose: RSA and RSA, 4096 bits\n# Use your research identity (NOT your real name)\n# Set a strong passphrase\n\n# Export your public key (share this)\ngpg --armor --export research_identity@example.com > public_key.asc\n\n# Export your private key (NEVER share this, back it up securely)\ngpg --armor --export-secret-keys research_identity@example.com > private_key.asc\n```\n\n**Encrypting a message:**\n```bash\n# Encrypt a message for a specific recipient\necho 'Your intelligence report here' | gpg --armor --encrypt --recipient recipient@example.com --sign --local-user research_identity@example.com\n```\n\n**Decrypting a message:**\n```bash\ngpg --decrypt message.asc\n```\n\n**Verifying a signature:**\n```bash\n# Verify a threat actor's signed message\ngpg --verify signed_message.asc\n# This confirms the message was signed by the holder of the public key\n```\n\n**PGP best practices for investigators:**\n- Generate a unique key for each research identity\n- Use 4096-bit RSA or Ed25519 keys\n- Set strong passphrases (20+ characters)\n- Never share your private key\n- Back up your private key offline (encrypted USB, not cloud)\n- Verify key fingerprints through multiple channels\n- Use key revocation certificates if a key is compromised\n- Separate keys for encryption vs. signing if needed",
+      "simplified_explanation": "PGP is like a lock and key for messages. Your public key is the lock — anyone can use it to lock a message for you. Your private key is the key — only you can unlock and read messages locked with your public key. On the dark web, PGP proves who you are and keeps messages secret.",
+      "memory_aids": ["Public key = lock (share freely)", "Private key = key (never share)", "Sign with private key = prove identity", "Encrypt with recipient's public key = keep secret", "Verify signature = confirm sender"],
+      "real_world_connection": "Threat actors like LockBit and Conti used PGP to sign their communications. When a copycat group claimed to be LockBit, the PGP signature didn't match — proving the claim was fake. PGP verification is a critical OSINT skill.",
+      "reflection_prompt": "Why is PGP key verification important on anonymous forums? How could an attacker use a fake PGP key?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_7_memory_aid",
+      "type": "memory_aid",
+      "title": "Dark Web Investigation Quick Reference",
+      "content": "**TOR — Three-Layer Anonymity**\n| Component | Knows Your IP? | Knows Destination? | Role |\n|---|---|---|---|\n| Entry Guard | ✅ Yes | ❌ No | First hop |\n| Middle Relay | ❌ No | ❌ No | Random relay |\n| Exit Relay | ❌ No | ✅ Yes | Last hop |\n\n**OPSEC Stack — S.A.F.E.R.**\n- **S**eparate: Dedicated VM, separate identity\n- **A**nonymize: VPN → Tor, MAC randomization\n- **F**ilter: No JavaScript, sandbox downloads\n- **E**ncrypt: PGP for all communications\n- **R**ecord: Document everything for legal protection\n\n**Investigation Methodology — D.A.S.D.A.R.**\n- **D**efine objective\n- **A**ccess safely (OPSEC stack)\n- **S**earch methodically\n- **D**ocument findings (sanitized)\n- **A**nalyze and correlate\n- **R**eport intelligence\n\n**PGP — Lock and Key**\n- Public key = lock (share it)\n- Private key = key (protect it)\n- Sign = prove identity\n- Encrypt = keep secret\n\n**Red Lines — N.E.V.E.R.**\n- **N**ever use real identity\n- **E**ver purchase illegal goods\n- **V**isit without OPSEC stack\n- **E**nable JavaScript on onion services\n- **R**euse usernames across forums",
+      "simplified_explanation": "Remember SAFER for OPSEC, DASDAR for methodology, and NEVER for red lines. These three acronyms cover the core of dark web investigation safety.",
+      "memory_aids": ["SAFER = Separate, Anonymize, Filter, Encrypt, Record", "DASDAR = Define, Access, Search, Document, Analyze, Report", "NEVER = No real identity, Ever buy illegal, Visit without OPSEC, Enable JS, Reuse usernames", "Entry knows IP, Exit knows destination, Nobody knows both"],
+      "real_world_connection": "Professional OSINT investigators at companies like Flashpoint and Recorded Future follow these exact procedures. The methodology is the same — the scale and tooling differ.",
+      "reflection_prompt": "Can you recite all three acronyms (SAFER, DASDAR, NEVER) from memory?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_8_reflection",
+      "type": "reflection",
+      "title": "Plan a Dark Web Investigation",
+      "content": "**Scenario**: Your organization's CISO reports that employee credentials may have been leaked. You need to investigate.\n\n**Task**: Plan the complete investigation:\n\n1. **Objective**: What exactly are you looking for? Define 3 specific things.\n2. **OPSEC Setup**: Describe your research environment configuration (OS, browser, VPN, Tor setup).\n3. **Sources**: Which dark web sources will you check first? List 4 specific sources.\n4. **Search Strategy**: What keywords will you search for? List 5 specific search terms.\n5. **Documentation**: How will you record findings? What format? What metadata?\n6. **Legal Considerations**: What legal boundaries must you not cross?\n7. **Escalation**: What findings would trigger immediate notification to leadership?\n\n**Key considerations:**\n- How do you verify that leaked credentials actually belong to your organization?\n- How do you avoid alerting threat actors that you're investigating them?\n- What if the data is behind a paywall on a dark web marketplace?\n- How do you handle discovering that your organization's data IS for sale?",
+      "simplified_explanation": "Plan a real investigation: what you're looking for, how you'll stay safe, where you'll search, what you'll search for, how you'll document it, what you won't do, and when you'll escalate.",
+      "memory_aids": ["Objective → OPSEC → Sources → Search → Document → Legal → Escalate", "Never alert the target", "Verify before escalating", "Document everything"],
+      "real_world_connection": "This is exactly what threat intelligence teams do daily. Companies like IBM X-Force and CrowdStrike have dedicated teams that monitor dark web forums for client credential leaks.",
+      "reflection_prompt": "What's the first source you'd check and why? How long would you spend before escalating a confirmed finding?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_9_mindset",
+      "type": "mindset_coach",
+      "title": "The Investigator's Mindset on the Dark Web",
+      "content": "The dark web can feel intimidating. It shouldn't. It's just another network with different access requirements.\n\n**The right mindset:**\n- You're a researcher, not a participant. Observe, document, and report.\n- Curiosity is your asset; recklessness is your enemy.\n- Every action you take should be deliberate and documented.\n- If something feels wrong, it probably is. Trust your instincts and exit.\n\n**The wrong mindset:**\n- 'I'll just quickly check this on my work machine' — NO\n- 'I need to buy this data to verify it' — NO (illegal and unnecessary)\n- 'Nobody will notice me browsing' — They absolutely track visitors\n- 'I can handle this investigation informally' — Document everything\n\n**Practical wisdom:**\n- Dark web forums track visitor statistics. Your presence is noted.\n- Some onion services are honeypots operated by law enforcement.\n- Downloaded files can contain malware. Sandbox everything.\n- Threat actors are observant. Inconsistent behavior gets flagged.\n\n**Jim Kwik principle: Meta Learning** — Before diving in, study the landscape. Understand which forums exist, how they operate, what their rules are. The more you know about the environment before you enter it, the safer you'll be. Preparation beats improvisation in hostile environments.",
+      "simplified_explanation": "You're a researcher visiting a new neighborhood. Observe carefully, document everything, and don't do anything illegal. The people there are watching you just as much as you're watching them.",
+      "memory_aids": ["Researcher, not participant", "Curiosity = asset, recklessness = enemy", "Every action = deliberate + documented", "If it feels wrong, exit", "Preparation beats improvisation"],
+      "real_world_connection": "The best dark web investigators spend more time preparing than investigating. They study forum cultures, learn the jargon, and understand the economy before they ever post or interact.",
+      "reflection_prompt": "What would make you abort a dark web investigation mid-session?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_10_code_exercise",
+      "type": "code_exercise",
+      "title": "Setting Up a Secure Research Environment",
+      "content": "Here's a practical script for setting up a Tails-based research environment checklist:\n\n```python\n# Research Environment Setup Checklist\n\ndef verify_research_environment():\n    \"\"\"Verify that your dark web research environment meets OPSEC standards.\"\"\"\n    \n    checks = {\n        \"VM Isolation\": {\n            \"description\": \"Dedicated VM or physical machine for research only\",\n            \"critical\": True,\n            \"verify\": lambda: check_vm_isolation(),\n        },\n        \"Tor Configuration\": {\n            \"description\": \"Tor Browser with JavaScript disabled (NoScript)\",\n            \"critical\": True,\n            \"verify\": lambda: check_tor_config(),\n        },\n        \"VPN Connection\": {\n            \"description\": \"VPN connected before Tor (kill switch enabled)\",\n            \"critical\": True,\n            \"verify\": lambda: check_vpn(),\n        },\n        \"Identity Separation\": {\n            \"description\": \"Research identity (username, email, PGP) separate from real identity\",\n            \"critical\": True,\n            \"verify\": lambda: check_identity(),\n        },\n        \"MAC Randomization\": {\n            \"description\": \"MAC address randomized or using Tails\",\n            \"critical\": False,\n            \"verify\": lambda: check_mac(),\n        },\n        \"Screenshots Sanitized\": {\n            \"description\": \"Screenshot tool configured to strip EXIF and metadata\",\n            \"critical\": True,\n            \"verify\": lambda: check_screenshots(),\n        },\n        \"No Personal Accounts\": {\n            \"description\": \"No personal accounts (email, social media) accessible from research VM\",\n            \"critical\": True,\n            \"verify\": lambda: check_accounts(),\n        },\n        \"Time Zone Spoofing\": {\n            \"description\": \"VM timezone set to UTC (not your local timezone)\",\n            \"critical\": False,\n            \"verify\": lambda: check_timezone(),\n        },\n        \"Documentation Ready\": {\n            \"description\": \"Investigation log template prepared\",\n            \"critical\": True,\n            \"verify\": lambda: check_logging(),\n        },\n        \"Legal Review\": {\n            \"description\": \"Confirmed legal authority to conduct research in jurisdiction\",\n            \"critical\": True,\n            \"verify\": lambda: check_legal(),\n        },\n    }\n    \n    results = []\n    for name, check in checks.items():\n        try:\n            passed = check[\"verify\"]()\n            status = \"✅ PASS\" if passed else \"❌ FAIL\"\n        except Exception:\n            status = \"⚠️ UNABLE TO VERIFY\"\n        \n        results.append(f\"{status} {'🔴' if check['critical'] and not passed else '🟡' if not check['critical'] and not passed else '✅'} {name}: {check['description']}\")\n    \n    critical_failures = sum(1 for r in results if '❌' in r and '🔴' in r)\n    \n    if critical_failures > 0:\n        print(f\"\\n🚨 {critical_failures} CRITICAL CHECKS FAILED — DO NOT PROCEED\")\n    else:\n        print(\"\\n✅ All critical checks passed — safe to proceed with research\")\n    \n    return results\n\n# Print the checklist\nfor check_name, check_info in [\n    (\"VM Isolation\", \"Use Tails OS or a dedicated VM. Never use your host OS.\"),\n    (\"Tor Config\", \"Disable JavaScript. Use Tor Browser's safest security level.\"),\n    (\"VPN\", \"Connect VPN first, then Tor. Enable kill switch.\"),\n    (\"Identity\", \"Create separate research identity. Generate PGP key.\"),\n    (\"Documentation\", \"Prepare investigation log with timestamps and objectives.\"),\n]:\n    print(f\"☐ {check_name}: {check_info}\")\n```\n\n**Critical setup notes:**\n1. **Tails OS** is recommended because it routes ALL traffic through Tor and leaves no trace on the host machine\n2. **Whonix** separates the Tor gateway from the workstation — even a compromised workstation can't reveal your IP\n3. **JavaScript must be disabled** on onion services — it's the #1 vector for deanonymization\n4. **Never resize the Tor Browser window** — window size is a fingerprinting vector\n5. **Never download and open files** on your research VM without a sandbox",
+      "simplified_explanation": "Use Tails or Whonix, disable JavaScript, connect VPN before Tor, create a separate identity, and document everything. If any critical check fails, don't proceed.",
+      "memory_aids": ["Tails/Whonix = routes everything through Tor", "No JavaScript on onion services = #1 safety rule", "VPN → Tor, never reverse", "Separate identity always", "Never resize Tor Browser window"],
+      "real_world_connection": "Deanonymization attacks have been demonstrated using JavaScript (Mozilla Bug 1697860), CSS-based timing attacks, and window size fingerprinting. These aren't theoretical — they're why the OPSEC checklist exists.",
+      "reflection_prompt": "Which OPSEC check would you be most likely to skip? What's the risk of skipping it?",
+      "is_interactive": true,
+      "xp_reward": 20
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "In the Tor network, which relay knows your real IP address?",
+      "options": [
+        "Exit relay only",
+        "Middle relay only",
+        "Entry guard only",
+        "All three relays"
+      ],
+      "correct_index": 2,
+      "explanation": "Only the Entry Guard knows your real IP address. It receives your encrypted traffic directly from you. The middle relay and exit relay only see the previous relay's IP, not yours."
+    },
+    {
+      "question": "What is the recommended OPSEC setup for dark web research?",
+      "options": [
+        "Tor Browser on your work machine",
+        "VPN → Tor on a dedicated research VM",
+        "Direct connection to Tor from your home IP",
+        "Tor → VPN for maximum anonymity"
+      ],
+      "correct_index": 1,
+      "explanation": "The recommended setup is VPN → Tor on a dedicated research VM. The VPN provides an additional layer before entering the Tor network, and the dedicated VM ensures no cross-contamination with your real identity."
+    },
+    {
+      "question": "Why should JavaScript be disabled on onion services?",
+      "options": [
+        "It slows down page loading",
+        "It can be used to deanonymize users through browser exploitation",
+        "Onion services don't support JavaScript",
+        "It interferes with Tor encryption"
+      ],
+      "correct_index": 1,
+      "explanation": "JavaScript is the #1 vector for deanonymization attacks on Tor. It can be used to execute code that reveals your real IP address, perform browser fingerprinting, and exploit vulnerabilities in the Tor Browser."
+    },
+    {
+      "question": "What is PGP primarily used for on dark web forums?",
+      "options": [
+        "Bypassing forum authentication",
+        "Encrypting messages and verifying identities through digital signatures",
+        "Accelerating Tor connections",
+        "Hiding your IP address"
+      ],
+      "correct_index": 1,
+      "explanation": "PGP serves two critical functions on dark web forums: encrypting messages so only the intended recipient can read them, and verifying identities through digital signatures so you can confirm that a post truly comes from the claimed author."
+    },
+    {
+      "question": "What should you do FIRST when planning a dark web investigation?",
+      "options": [
+        "Immediately access the most popular dark web marketplace",
+        "Define your specific intelligence objective",
+        "Generate a PGP key pair",
+        "Set up a VPN connection"
+      ],
+      "correct_index": 1,
+      "explanation": "The first step is defining your objective. Without a clear goal, you'll waste time and increase exposure. The DASDAR methodology starts with Define, followed by Access (which includes OPSEC setup like VPN and PGP)."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}

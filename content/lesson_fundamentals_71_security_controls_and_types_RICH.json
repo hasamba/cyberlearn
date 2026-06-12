@@ -1,0 +1,227 @@
+{
+  "lesson_id": "ab92a49b-fa2c-4acd-854a-31375135ccd8",
+  "domain": "fundamentals",
+  "title": "Security Controls and Types",
+  "subtitle": "Understanding the Building Blocks of Security Defense",
+  "difficulty": 1,
+  "estimated_time": 30,
+  "order_index": 71,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Identify and classify the six main types of security controls: preventive, detective, corrective, deterrent, compensating, and physical",
+    "Distinguish between technical, administrative, and physical control categories",
+    "Apply the correct control type to real-world security scenarios",
+    "Understand how multiple controls work together in defense-in-depth",
+    "Evaluate control effectiveness and identify gaps in security posture"
+  ],
+  "concepts": [
+    "Preventive Controls",
+    "Detective Controls",
+    "Corrective Controls",
+    "Deterrent Controls",
+    "Compensating Controls",
+    "Physical Controls",
+    "Technical vs Administrative vs Physical Categories",
+    "Defense-in-Depth"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "Controls Are Your Security Toolbox",
+      "content": "Security controls aren't just checkboxes — they're the tools in your toolbox. Knowing which tool to use and when is what separates someone who passes an exam from someone who actually secures an environment.\n\nThink of it this way: a lock on the door (preventive), a camera watching the door (detective), and an alarm that sounds when the door opens (corrective) all work together. No single control is enough. That's defense-in-depth.\n\nBy the end of this lesson, you'll look at any security measure and instantly know: what type is it, what does it do, and what's missing?",
+      "simplified_explanation": "Security controls are like different types of locks and alarms. A lock stops people from getting in (preventive), a camera sees who got in (detective), and an alarm tells you to fix the door (corrective). You need all of them working together.",
+      "memory_aids": ["Controls = your toolbox, not your checklist", "No single lock makes a secure house"],
+      "real_world_connection": "Every security policy, firewall rule, and door badge reader is a control. Your job is to know which type each one is and whether you have enough of each type.",
+      "reflection_prompt": "Look around your room right now. How many security controls can you spot? What types are they?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "The Six Types of Security Controls",
+      "content": "Security controls are categorized by **what they do** (their function) and **what they are** (their nature). Let's start with function:\n\n**1. Preventive Controls** — Stop bad things from happening\n- Firewall blocking traffic\n- Door lock requiring a badge\n- Encryption preventing unauthorized reading\n- Input validation preventing SQL injection\n- Security awareness training preventing social engineering\n\n**2. Detective Controls** — Alert you that something happened\n- Intrusion Detection System (IDS) alerting on suspicious traffic\n- Security camera recording who entered a room\n- Audit logs showing unauthorized access attempts\n- SIEM correlating events into alerts\n- Motion sensors detecting after-hours activity\n\n**3. Corrective Controls** — Fix things after something happened\n- Antivirus quarantining malware\n- Incident response procedures\n- Backup restoration after ransomware\n- Patching a vulnerability after discovery\n- Account lockout after failed login attempts\n\n**4. Deterrent Controls** — Discourage attacks by making them less appealing\n- Warning signs ('CCTV in operation')\n- Published security policies\n- Visible security guards\n- Honeypots that make attackers waste time\n- Legal penalties in acceptable use policies\n\n**5. Compensating Controls** — Alternative measures when the primary control isn't possible\n- Manual review when automated scanning isn't available\n- Separation of duties when single-person approval exists\n- Extra monitoring when encryption can't be implemented\n- Time-based one-time passwords when hardware tokens aren't available\n\n**6. Physical Controls** — Tangible barriers to protect assets\n- Fences, locks, and gates\n- Security guards\n- Biometric scanners\n- Fire suppression systems\n- Environmental controls (HVAC, humidity)",
+      "simplified_explanation": "Preventive = stop it. Detective = see it. Corrective = fix it. Deterrent = scare them off. Compensating = backup plan. Physical = tangible barriers.",
+      "memory_aids": ["Preventive = STOP", "Detective = SEE", "Corrective = FIX", "Deterrent = SCARE", "Compensating = BACKUP PLAN", "Physical = TOUCH IT"],
+      "real_world_connection": "A firewall (preventive) blocks traffic. An IDS (detective) alerts on what gets through. Antivirus (corrective) quarantines malware that made it in. A warning sign (deterrent) might have stopped the attacker before they tried.",
+      "reflection_prompt": "Think of your home's security. Can you identify at least one of each control type?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Security Controls",
+      "content": "Imagine your bike. You want to keep it safe from thieves.\n\n**Preventive**: You lock it with a strong chain. The thief can't take it.\n**Detective**: You put a GPS tracker on it. If someone takes it, you know where it went.\n**Corrective**: If the bike IS stolen, you have insurance that buys you a new one.\n**Deterrent**: You put a sign on it saying 'GPS tracked — thieves will be caught.' Most thieves walk away.\n**Compensating**: Your chain lock broke? You also parked it in a guarded garage. The guard is your backup plan.\n**Physical**: The garage itself — walls, door, roof. You can touch it. It physically blocks access.\n\nSee how they all work together? The lock stops most thieves. The sign scares off the rest. If someone gets past both, the GPS tells you. And the garage walls add another physical barrier. That's **defense-in-depth**: multiple layers, each one catching what the previous layer missed.",
+      "simplified_explanation": "Think of bike security: lock it (preventive), track it (detective), insure it (corrective), warn thieves (deterrent), have a backup plan (compensating), put it in a garage (physical). All together = defense-in-depth.",
+      "memory_aids": ["Bike lock = preventive", "GPS tracker = detective", "Insurance = corrective", "Warning sign = deterrent", "Guard + backup lock = compensating", "Garage = physical"],
+      "real_world_connection": "This bike analogy maps exactly to cybersecurity. Your firewall is the lock, your SIEM is the GPS, your incident response plan is the insurance, your AUP is the sign, your redundant controls are the backup lock, and your data center physical security is the garage.",
+      "reflection_prompt": "Can you map all six control types to security measures at your workplace?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_categories",
+      "type": "explanation",
+      "title": "Control Categories: Technical, Administrative, Physical",
+      "content": "Controls are also classified by their **nature** — what kind of thing they are:\n\n**Technical (Logical) Controls** — Implemented in hardware, software, or firmware\n- Firewalls, IDS/IPS, encryption\n- Access control lists (ACLs), authentication systems\n- Antivirus, DLP, SIEM\n- Network segmentation, VPNs\n\n**Administrative (Managerial) Controls** — Policies, procedures, and guidelines\n- Security policies and standards\n- Training and awareness programs\n- Risk assessments and audits\n- Hiring practices and background checks\n- Change management procedures\n\n**Physical Controls** — Tangible, touchable security measures\n- Fences, walls, locked doors\n- Security guards, CCTV\n- Biometric scanners, mantraps\n- Fire suppression, UPS systems\n\n**The matrix:**\n| | Preventive | Detective | Corrective | Deterrent | Compensating |\n|---|---|---|---|---|---|\n| **Technical** | Firewall, Encryption | IDS, SIEM | Antivirus, Patch | Honeypot | WAF when IPS is down |\n| **Administrative** | Security policy, Training | Audit log review | IR procedures | Acceptable use policy | Separation of duties |\n| **Physical** | Door lock, Badge reader | CCTV, Motion sensor | Fire suppression | Warning signs | Security guard when CCTV is down |\n\nThis matrix is your cheat sheet. Any control fits somewhere in it.",
+      "simplified_explanation": "Technical controls are software/hardware. Administrative controls are rules and policies. Physical controls are things you can touch. Any control is both a type (preventive, detective, etc.) AND a category (technical, administrative, physical).",
+      "memory_aids": ["Technical = software/hardware", "Administrative = rules/policies", "Physical = things you touch", "Every control has a type AND a category"],
+      "real_world_connection": "CompTIA Security+ loves this matrix. Expect questions like: 'What type of control is a security camera?' Answer: It's detective AND physical. Two labels, one control.",
+      "reflection_prompt": "Classify a firewall: what type(s) AND what category? What about a security policy?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_5_real_world",
+      "type": "real_world",
+      "title": "Defense-in-Depth: Controls Working Together",
+      "content": "No single control is sufficient. Defense-in-depth means layering controls so that if one fails, the next one catches it.\n\n**Real-world scenario: Protecting a web application**\n\n| Layer | Control | Type | Category |\n|---|---|---|---|\n| Network | Firewall rules blocking known bad IPs | Preventive | Technical |\n| Network | IDS detecting attack patterns | Detective | Technical |\n| Application | Input validation preventing injection | Preventive | Technical |\n| Application | WAF blocking SQL injection | Preventive + Corrective | Technical |\n| Authentication | MFA requiring password + phone | Preventive | Technical |\n| Authentication | Account lockout after 5 failures | Corrective | Technical |\n| Authorization | Role-based access control | Preventive | Administrative + Technical |\n| Data | Encryption at rest and in transit | Preventive | Technical |\n| Logging | Audit logs of all access | Detective | Technical |\n| Physical | Server room badge access | Preventive | Physical |\n| Policy | Security awareness training | Preventive + Deterrent | Administrative |\n| Recovery | Daily backups + tested restore | Corrective | Administrative + Technical |\n\n**Key insight**: Each layer handles what the previous layer missed. The firewall blocks known bad IPs. If a new IP gets through, the IDS detects it. If the attacker reaches the app, input validation stops injection. If they find a way around, the WAF catches it. If they get credentials, MFA stops them. If they get in, audit logs show what happened and backups enable recovery.\n\nThis is why single controls fail — there's no backup layer.",
+      "simplified_explanation": "Defense-in-depth = Swiss cheese model. Each slice has holes, but stack enough slices and the holes don't line up. No single control is perfect, but together they cover each other's gaps.",
+      "memory_aids": ["Swiss cheese model = holes don't line up when stacked", "Each layer catches what the previous layer missed", "Single control = single point of failure"],
+      "real_world_connection": "The Equifax breach (2017) happened because multiple controls failed simultaneously: no patch management (preventive), no IDS alert (detective), no segmentation (preventive), and no timely incident response (corrective). Remove any one failure and the breach might have been prevented.",
+      "reflection_prompt": "Pick a system you use daily. Map out the defense-in-depth layers protecting it. Where are the gaps?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_6_code_exercise",
+      "type": "code_exercise",
+      "title": "Classify Security Controls Exercise",
+      "content": "Let's practice classifying controls. For each scenario, identify the control type(s) and category:\n\n```python\n# Exercise: Classify each control\n\ncontrols = [\n    {\n        \"name\": \"Security camera in the lobby\",\n        \"type\": [\"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Security awareness training program\",\n        \"type\": [\"???\", \"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Account lockout after 5 failed logins\",\n        \"type\": [\"???\", \"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Honeypot deployed in DMZ\",\n        \"type\": [\"???\", \"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Background checks for new employees\",\n        \"type\": [\"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Fire suppression system in server room\",\n        \"type\": [\"???\", \"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Encryption of sensitive data at rest\",\n        \"type\": [\"???\"],\n        \"category\": [\"???\"]\n    },\n    {\n        \"name\": \"Separation of duties for financial transactions\",\n        \"type\": [\"???\", \"???\"],\n        \"category\": [\"???\"]\n    },\n]\n\n# ANSWERS:\n# 1. Camera: Detective, Physical\n# 2. Training: Preventive + Deterrent, Administrative\n# 3. Account lockout: Corrective + Preventive, Technical\n# 4. Honeypot: Detective + Deterrent, Technical\n# 5. Background checks: Preventive, Administrative\n# 6. Fire suppression: Corrective + Preventive, Physical\n# 7. Encryption: Preventive, Technical\n# 8. Separation of duties: Preventive + Compensating, Administrative\n```\n\n**Challenge**: Can a single control be both preventive AND detective? Think about it — an IDS that blocks traffic is actually both. That's why many controls have dual types.\n\n**Key insight**: The Security+ exam often tests your ability to identify controls that serve multiple purposes. Always consider: 'What does this control DO? Stop something? Detect something? Fix something? Discourage something? Back up another control?'",
+      "simplified_explanation": "Every control has a type (what it does) and a category (what it is). Many controls serve multiple purposes. Always ask: does it stop, detect, fix, scare, or back up?",
+      "memory_aids": ["Camera = detective + physical", "Training = preventive + deterrent + administrative", "Honeypot = detective + deterrent + technical", "Lockout = corrective + technical"],
+      "real_world_connection": "Security+ exams love questions like: 'A security camera is what type of control?' The answer is detective and physical. Always give both dimensions.",
+      "reflection_prompt": "Create 3 controls for protecting email and classify each by type and category.",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_7_memory_aid",
+      "type": "memory_aid",
+      "title": "PDC3D — Control Types Mnemonic",
+      "content": "**PDC³D — The Six Control Types**\n\n| Letter | Type | What It Does | Example |\n|---|---|---|---|\n| **P** | Preventive | Stops it from happening | Firewall, lock, encryption |\n| **D** | Detective | Sees it happening | IDS, CCTV, audit log |\n| **C** | Corrective | Fixes it after it happens | Antivirus, patch, backup restore |\n| **C** | Compensating | Backup plan when primary fails | Manual review, extra monitoring |\n| **D** | Deterrent | Discourages attackers | Warning signs, honeypots |\n| + | Physical | Tangible barriers | Fences, guards, badge readers |\n\n**TAP — Control Categories**\n- **T**echnical (software/hardware)\n- **A**dministrative (policies/procedures)\n- **P**hysical (things you touch)\n\n**Quick quiz trick**: Every control has a TYPE (what it does) and a CATEGORY (what it is). Answer both.\n\n**Swiss Cheese Rule**: Defense-in-depth works because layers cover each other's holes. No single layer is enough.",
+      "simplified_explanation": "Remember PDC³D for types and TAP for categories. Every control question needs both answers.",
+      "memory_aids": ["PDC3D = Preventive, Detective, Corrective, Compensating, Deterrent + Physical", "TAP = Technical, Administrative, Physical", "Every control = TYPE + CATEGORY", "Swiss cheese = layers cover holes"],
+      "real_world_connection": "This framework maps directly to NIST SP 800-53 control families and CompTIA Security+ exam objectives. Master it once, use it everywhere.",
+      "reflection_prompt": "Can you list all 6 control types from memory? What about the 3 categories?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_8_reflection",
+      "type": "reflection",
+      "title": "Control Gap Analysis",
+      "content": "Time to think like a security assessor.\n\n**Scenario**: A small company has:\n- A firewall (technical, preventive)\n- Antivirus on all endpoints (technical, corrective)\n- A security policy document (administrative, preventive)\n- Locked server room (physical, preventive)\n- Daily backups (technical, corrective)\n\n**Questions:**\n1. What control types are **missing** from their security posture?\n2. What would you recommend adding for each missing type?\n3. Which single addition would have the most security impact?\n4. What's the risk of having no detective controls?\n\n**Think about it:**\n- Without detective controls, they won't know when preventive controls fail\n- Without deterrent controls, there's no psychological barrier\n- Without compensating controls, there's no backup when primary controls fail\n- The company can't respond to incidents they can't see\n\n**The biggest gap**: No IDS/monitoring. They have no way to know if their firewall was bypassed, their antivirus missed something, or their server room was accessed without authorization. They're blind.",
+      "simplified_explanation": "This company has locks and insurance but no cameras or alarms. They'll never know when something goes wrong until it's too late.",
+      "memory_aids": ["No detective controls = flying blind", "Preventive without detective = don't know when it fails", "The biggest single improvement = add monitoring"],
+      "real_world_connection": "This is a common finding in security audits. Many organizations focus on preventive controls and neglect detective controls, leaving them unable to detect breaches until significant damage has occurred.",
+      "reflection_prompt": "What's the first detective control you'd recommend? Why that one specifically?",
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_9_mindset",
+      "type": "mindset_coach",
+      "title": "The Control Mindset: Ask 'What If?'",
+      "content": "The real skill isn't memorizing control types — it's developing the habit of asking 'What if this fails?'\n\nEvery control has a failure mode:\n- Firewall fails → what detects it? (detective control)\n- IDS fails → what catches it? (redundant detective control)\n- Both fail → what fixes the damage? (corrective control)\n- All fail → what deters the attacker in the first place? (deterrent control)\n\nThis is the **'What If' mindset**: For every control you implement, ask what happens when it fails. The answer should be 'another control catches it.' If there's no answer, you have a gap.\n\n**Jim Kwik principle: Connect to What I Know** — You already understand defense-in-depth from everyday life. Your house has locks (preventive), cameras (detective), insurance (corrective), alarm signs (deterrent). Cybersecurity uses the exact same thinking, just with different tools.",
+      "simplified_explanation": "For every control, ask: 'What if this fails?' If there's no backup, you have a gap. That's the security mindset.",
+      "memory_aids": ["'What if this fails?' = the security question", "No backup = gap = risk", "Everyday life = same pattern as cybersecurity"],
+      "real_world_connection": "In real security assessments, this is exactly what auditors do. They don't just check if controls exist — they check if there's a backup when each control fails.",
+      "reflection_prompt": "Pick one security control you rely on daily. What happens when it fails? Is there a backup?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_10_compensating",
+      "type": "explanation",
+      "title": "Compensating Controls: The Backup Plan",
+      "content": "Compensating controls deserve special attention because they're the most misunderstood type.\n\n**What is a compensating control?**\nA compensating control is an alternative measure that provides a similar level of protection when the primary (preferred) control cannot be implemented.\n\n**When do you need one?**\n- The primary control is too expensive\n- The primary control isn't technically feasible\n- The primary control would break a business process\n- The primary control is temporarily unavailable\n\n**Examples:**\n| Primary Control (Can't Implement) | Compensating Control |\n|---|---|\n| MFA (too expensive for all users) | Enhanced monitoring + shorter session timeouts |\n| Encryption (legacy system can't support it) | Network segmentation + access restrictions |\n| Automated vulnerability scanning (no budget) | Manual penetration testing quarterly |\n| Separation of duties (team too small) | Dual approval for critical changes |\n| Biometric authentication (no hardware) | Complex passwords + account lockout policy |\n\n**Key rules for compensating controls:**\n1. They must provide **equivalent or comparable** protection — not just 'something'\n2. They must be **documented** with justification for why the primary control can't be implemented\n3. They must be **approved** by management or the compliance team\n4. They are **temporary** — the goal is always to implement the primary control eventually\n\n**Common mistake**: Thinking any alternative control is compensating. A compensating control must specifically address the risk the primary control was meant to mitigate. Throwing a firewall at a physical security problem isn't compensating — it's irrelevant.",
+      "simplified_explanation": "A compensating control is like a spare tire. It's not as good as the real tire, but it gets you where you need to go when the real one fails. It must actually solve the same problem, just differently.",
+      "memory_aids": ["Compensating = backup plan for when the primary control can't work", "Must address the SAME risk", "Must be documented and approved", "Ideally temporary — always aim for the primary control"],
+      "real_world_connection": "PCI DSS explicitly defines compensating controls and requires documentation. In audit findings, you'll often see: 'Compensating control: X implemented in lieu of Y because Z.' This language matters for compliance.",
+      "reflection_prompt": "Your company can't afford MFA for all users. What compensating control would you implement? Does it address the same risk (unauthorized access)?",
+      "is_interactive": false,
+      "xp_reward": 20
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "What type of control is a security camera?",
+      "options": [
+        "Preventive only",
+        "Detective and physical",
+        "Corrective and administrative",
+        "Deterrent and technical"
+      ],
+      "correct_index": 1,
+      "explanation": "A security camera detects incidents (detective) and is a tangible physical device (physical). It can also serve as a deterrent, but its primary classification is detective + physical."
+    },
+    {
+      "question": "A company implements enhanced monitoring because it cannot afford MFA for all users. What type of control is the enhanced monitoring?",
+      "options": [
+        "Detective",
+        "Preventive",
+        "Compensating",
+        "Deterrent"
+      ],
+      "correct_index": 2,
+      "explanation": "Enhanced monitoring is a compensating control when MFA (the preferred preventive control) cannot be implemented. It provides an alternative way to address the same risk (unauthorized access)."
+    },
+    {
+      "question": "Which control type stops an incident from occurring?",
+      "options": [
+        "Detective",
+        "Corrective",
+        "Preventive",
+        "Deterrent"
+      ],
+      "correct_index": 2,
+      "explanation": "Preventive controls stop incidents before they happen. Examples: firewalls blocking traffic, locks preventing entry, encryption preventing unauthorized access."
+    },
+    {
+      "question": "What is the primary characteristic of defense-in-depth?",
+      "options": [
+        "Using the most expensive controls available",
+        "Implementing only preventive controls",
+        "Layering multiple control types so that if one fails, others still protect",
+        "Relying on a single strong control"
+      ],
+      "correct_index": 2,
+      "explanation": "Defense-in-depth means layering controls so that the failure of any single control doesn't result in a total security failure. Like Swiss cheese: each slice has holes, but stacked together the holes don't align."
+    },
+    {
+      "question": "A honeypot deployed to attract and detect attackers is what type of control?",
+      "options": [
+        "Preventive and technical",
+        "Detective and deterrent",
+        "Corrective and administrative",
+        "Physical and preventive"
+      ],
+      "correct_index": 1,
+      "explanation": "A honeypot detects attackers (detective) and deters them by wasting their time on a fake system (deterrent). It's a technical control implemented in software/hardware."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}

