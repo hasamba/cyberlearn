@@ -1,0 +1,294 @@
+{
+  "lesson_id": "b2f682f7-d8d1-4fef-88c8-dc8673d437dd",
+  "domain": "fundamentals",
+  "title": "Cryptographic Solutions",
+  "subtitle": "Understanding practical cryptography for cybersecurity",
+  "difficulty": 1,
+  "estimated_time": 40,
+  "order_index": 75,
+  "prerequisites": [
+    "Public Key Infrastructure (PKI) Basics"
+  ],
+  "learning_objectives": [
+    "Compare symmetric and asymmetric encryption algorithms and their use cases",
+    "Explain hash functions and their role in data integrity verification",
+    "Understand digital signatures and how they provide authentication and non-repudiation",
+    "Identify common cryptographic protocols (TLS, SSH, IPsec) and their applications",
+    "Evaluate cryptographic solution selection based on security requirements"
+  ],
+  "concepts": [
+    "Symmetric Encryption",
+    "Asymmetric Encryption",
+    "Hash Functions",
+    "Digital Signatures",
+    "Key Exchange",
+    "TLS/SSL",
+    "SSH",
+    "IPsec",
+    "Blockchain Basics",
+    "Quantum Resistance"
+  ],
+  "tags": [
+    "Course: CompTIA-Security+",
+    "Career Path: Security Engineer",
+    "Career Path: SOC Analyst",
+    "Built-In"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "8ea42dbf-8c5a-432b-adad-c148824fe84c",
+      "type": "mindset_coach",
+      "title": "Cryptography: The Foundation of Digital Trust",
+      "content": {
+        "text": "Every time you browse a website, send a message, or verify a download, cryptography is working behind the scenes. It's not just math — it's the foundation of digital trust. Without cryptography, there's no e-commerce, no online banking, no private communication. Understanding cryptographic solutions is essential for every cybersecurity professional, not just specialists."
+      },
+      "simplified_explanation": "Cryptography = the math that makes digital trust possible. Symmetric encryption uses one key (fast). Asymmetric uses two keys (secure). Hash functions verify integrity. Together, they protect everything online.",
+      "memory_aids": [
+        "Symmetric = one key, fast",
+        "Asymmetric = two keys, secure",
+        "Hash = one-way integrity check",
+        "Cryptography = foundation of ALL digital trust"
+      ],
+      "real_world_connection": "Security+ exam heavily tests cryptographic concepts because they underpin every security control. Understanding these basics is non-negotiable for cybersecurity professionals.",
+      "reflection_prompt": "Think about your last online purchase. How many cryptographic operations protected that transaction? (Answer: at least a dozen — TLS handshake, certificate verification, payment encryption, integrity checks...)",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f70187a0-9933-46d4-8c9f-0fc1a3509798",
+      "type": "explanation",
+      "title": "Symmetric vs Asymmetric Encryption",
+      "content": {
+        "text": "**Symmetric Encryption — One Key to Rule Them All**\n- Same key encrypts and decrypts\n- Fast: suitable for bulk data encryption\n- Algorithms: AES (gold standard), ChaCha20, 3DES (deprecated)\n- Key sizes: AES-128, AES-192, AES-256\n- Key distribution problem: How do you securely share the key?\n- Use cases: disk encryption, database encryption, VPN tunnels\n\n**Asymmetric Encryption — The Key Pair**\n- Two keys: public key (share freely) and private key (keep secret)\n- Encrypt with public key → decrypt with private key\n- Sign with private key → verify with public key\n- Slow: not suitable for bulk data\n- Algorithms: RSA, ECC (Elliptic Curve Cryptography)\n- Key sizes: RSA 2048+, ECC P-256+\n- Use cases: key exchange, digital signatures, certificate authentication\n\n**How They Work Together:**\n1. Asymmetric encryption establishes a secure connection (TLS handshake)\n2. Keys exchange a symmetric session key\n3. Symmetric encryption protects the actual data (fast!)\n4. This is how HTTPS, SSH, and VPNs actually work\n\n**Why not just use asymmetric?**\n- RSA encrypts ~1000x slower than AES\n- Asymmetric is for small amounts of data (key exchange, signatures)\n- Symmetric is for everything else (data encryption)"
+      },
+      "simplified_explanation": "Symmetric = one key, fast, for data. Asymmetric = two keys, slow, for key exchange and signatures. Real crypto uses both: asymmetric to establish trust, symmetric for speed.",
+      "memory_aids": [
+        "Symmetric: one key, fast, AES",
+        "Asymmetric: two keys, slow, RSA/ECC",
+        "Hybrid: asymmetric for trust, symmetric for speed",
+        "HTTPS = asymmetric handshake + symmetric data"
+      ],
+      "real_world_connection": "Every HTTPS connection uses this hybrid approach. The TLS handshake uses RSA/ECC to exchange keys, then AES encrypts the data. Security+ tests this pattern heavily.",
+      "reflection_prompt": "Next time you see the lock icon in your browser, remember: asymmetric encryption established that connection, and symmetric encryption is protecting every byte you send.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "301c6174-2014-40dd-98a7-98f72782f89f",
+      "type": "explanation",
+      "title": "Hash Functions and Data Integrity",
+      "content": {
+        "text": "**What is a Hash Function?**\n- One-way mathematical function: input → fixed-length output (hash/digest)\n- Deterministic: same input always produces same output\n- Avalanche effect: tiny change in input = completely different hash\n- Cannot be reversed: hash → original input is impossible\n\n**Common Hash Algorithms:**\n- **SHA-256/SHA-3** — Current gold standard, 256-bit output\n- **SHA-1** — Deprecated, vulnerable to collision attacks\n- **MD5** — Broken, never use for security purposes\n- **bcrypt/Argon2** — Password hashing (includes salt and work factor)\n\n**Hash Use Cases:**\n1. **Integrity verification** — Compare hash of downloaded file with published hash\n2. **Password storage** — Store hash instead of plaintext (use bcrypt/Argon2)\n3. **Digital signatures** — Hash the document, then sign the hash\n4. **Blockchain** — Each block contains the hash of the previous block\n5. **Git commits** — Every commit is identified by its SHA-1 hash\n\n**Collision Resistance:**\n- A collision is when two different inputs produce the same hash\n- MD5 collisions: trivially easy to find\n- SHA-1 collisions: demonstrated (SHAttered attack, 2017)\n- SHA-256 collisions: computationally infeasible (2^128 operations)\n\n**Salting Passwords:**\n- Salt: random value added before hashing\n- Prevents rainbow table attacks\n- Same password + different salts = different hashes\n- Always use bcrypt or Argon2 for password hashing (they include salt + work factor)"
+      },
+      "simplified_explanation": "Hash = one-way function. Same input = same output. Different input = different output. Can't reverse it. Use it for integrity checks, password storage, and digital signatures.",
+      "memory_aids": [
+        "Hash = one-way, deterministic, fixed-length",
+        "SHA-256 = current gold standard",
+        "MD5/SHA-1 = broken, don't use",
+        "Password hashing = bcrypt/Argon2 (with salt)"
+      ],
+      "real_world_connection": "When you verify a software download with a checksum, you're using hash functions. When a website stores your password, it stores a hash (hopefully with bcrypt). These are everyday applications of cryptographic hashing.",
+      "reflection_prompt": "Go to any Linux terminal and run `sha256sum /etc/passwd`. That 64-character hex string is the SHA-256 hash. Change one character in the file and the entire hash changes.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "1213e84d-3d3f-4d23-99e6-273d9e1fcce3",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Lock and Key Story",
+      "content": {
+        "text": "Imagine you have a treasure chest and want to send messages to your friend.\n\n**Symmetric Encryption (One Key):**\nYou and your friend share the same key to the lock. Anyone with the key can lock or unlock the chest. Fast and simple! But how do you safely give your friend the key without someone else copying it?\n\n**Asymmetric Encryption (Two Keys):**\nYour friend has a special lock with TWO keys:\n- The **public key** can only lock the chest (anyone can get a copy)\n- The **private key** can only unlock the chest (only your friend has it)\n\nSo you lock the message with your friend's public key. Only they can unlock it with their private key. Problem solved!\n\n**Hash Functions (The Seal):**\nYou also want to make sure nobody changed your message. You put a special wax seal on it. The seal is unique to the exact words in your message. If someone changes even one letter, the seal looks completely different. Your friend can verify the seal matches.\n\n**Digital Signatures (The Signature):**\nYou sign the seal with your private key. Your friend checks the signature with your public key. Now they know: (1) the message wasn't changed (seal matches), and (2) it was definitely from you (signature verifies).\n\n**How They All Work Together:**\n1. Use asymmetric encryption to safely share a symmetric key\n2. Use the symmetric key to encrypt the actual message (it's faster)\n3. Use a hash to verify the message wasn't changed\n4. Use a digital signature to prove who sent it"
+      },
+      "simplified_explanation": "Symmetric = sharing one key (fast but key distribution is hard). Asymmetric = public key locks, private key unlocks (solves key distribution). Hash = unique seal that changes if message changes. Signature = proves who sent it.",
+      "memory_aids": [
+        "Symmetric = one shared key, fast",
+        "Asymmetric = public lock, private unlock",
+        "Hash = unique seal, changes if message changes",
+        "Signature = proves identity + integrity"
+      ],
+      "real_world_connection": "This is exactly how HTTPS works. Your browser uses the website's public key (from their certificate) to set up a symmetric key, then encrypts data with it, verifies hashes for integrity, and checks signatures for authenticity.",
+      "reflection_prompt": "Think about sending a sealed letter: the envelope keeps it private (encryption), the wax seal proves it wasn't opened (hash), and your signature proves it's from you (digital signature).",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "fac82e19-ca58-4a11-a526-d23bb1fed1a8",
+      "type": "code_exercise",
+      "title": "Hands-On Cryptographic Operations",
+      "content": {
+        "text": "Practice cryptographic operations with OpenSSL:\n\n```bash\n# === Symmetric Encryption (AES-256) ===\n# Encrypt a file\nopenssl enc -aes-256-cbc -salt -in secret.txt -out secret.enc\n# Decrypt a file\nopenssl enc -aes-256-cbc -d -in secret.enc -out secret_decrypted.txt\n\n# === Asymmetric Encryption (RSA) ===\n# Generate a key pair\nopenssl genrsa -out private.key 2048\nopenssl rsa -in private.key -pubout -out public.key\n\n# Encrypt with public key\nopenssl rsautl -encrypt -pubin -inkey public.key \\\n  -in small_message.txt -out encrypted.bin\n\n# Decrypt with private key\nopenssl rsautl -decrypt -inkey private.key \\\n  -in encrypted.bin -out decrypted.txt\n\n# === Hashing ===\n# SHA-256 hash of a file\nsha256sum important_document.pdf\n\n# Compare hashes (integrity check)\nsha256sum download.iso > download.hash\nsha256sum download.iso  # Compare with expected\n\n# === Digital Signatures ===\n# Sign a file with private key\nopenssl dgst -sha256 -sign private.key \\\n  -out document.sig document.pdf\n\n# Verify signature with public key\nopenssl dgst -sha256 -verify public.key \\\n  -signature document.sig document.pdf\n\n# === Certificate Inspection ===\n# View certificate details\nopenssl x509 -in cert.pem -text -noout\n\n# Check TLS connection\nopenssl s_client -connect example.com:443\n```\n\n**Key takeaways:**\n- AES-256-CBC is the standard for symmetric encryption\n- RSA keys must be at least 2048 bits\n- Always verify hashes when downloading files\n- Digital signatures provide both integrity and authenticity"
+      },
+      "simplified_explanation": "OpenSSL commands for encryption, hashing, and signing. These are the practical tools every security professional needs.",
+      "memory_aids": [
+        "AES-256-CBC = standard symmetric encryption",
+        "RSA 2048+ = standard asymmetric encryption",
+        "sha256sum = integrity verification",
+        "dgst -sign/verify = digital signatures"
+      ],
+      "real_world_connection": "Security+ and real-world troubleshooting both require these OpenSSL commands. When a certificate expires or a file integrity check fails, these commands save hours.",
+      "reflection_prompt": "Encrypt a file with AES-256, then decrypt it. Hash it before and after. See how one character change in the file produces a completely different hash.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "3cb84e60-818e-48d9-aa8a-18b5c8847d1f",
+      "type": "real_world",
+      "title": "Cryptographic Protocols in Practice",
+      "content": {
+        "text": "**TLS (Transport Layer Security)**\n- Secures HTTP → HTTPS, SMTP → SMTPS, FTP → FTPS\n- TLS 1.3 is the current standard (TLS 1.0/1.1 deprecated)\n- Handshake: client/server agree on cipher suite, verify certificates, establish keys\n- Uses hybrid approach: asymmetric handshake + symmetric data\n- Cipher suites: TLS_AES_256_GCM_SHA384 (preferred)\n\n**SSH (Secure Shell)**\n- Remote administration, file transfer (SCP/SFTP), tunneling\n- Uses asymmetric keys for authentication (public key auth)\n- Symmetric encryption for the session (AES-256-GCM preferred)\n- Key exchange: Diffie-Hellman or Elliptic Curve\n- Configuration: /etc/ssh/sshd_config\n\n**IPsec (Internet Protocol Security)**\n- VPN protocol operating at network layer (Layer 3)\n- Two modes: Transport (payload only) and Tunnel (entire packet)\n- AH (Authentication Header): integrity only\n- ESP (Encapsulating Security Payload): integrity + encryption\n- IKE (Internet Key Exchange): manages SA (Security Association)\n\n**Other Important Protocols:**\n- **DNSSEC** — DNS Security Extensions (authenticates DNS responses)\n- **S/MIME** — Email encryption and signing\n- **PGP/OpenPGP** — Email and file encryption\n- **WPA3** — WiFi security using SAE (Simultaneous Authentication of Equals)\n\n**Choosing the Right Protocol:**\n| Need | Protocol | Why |\n|------|----------|-----|\n| Web security | TLS 1.3 | Industry standard, hybrid crypto |\n| Remote access | SSH | Key-based auth, encrypted tunnel |\n| Site-to-site VPN | IPsec | Network-layer encryption |\n| Email security | S/MIME or PGP | End-to-end encryption |\n| WiFi security | WPA3 | Modern authentication |\n| File integrity | SHA-256 | One-way hash verification |"
+      },
+      "simplified_explanation": "TLS secures the web. SSH secures remote access. IPsec secures VPNs. Each protocol uses the same cryptographic building blocks (symmetric, asymmetric, hashing) in different combinations.",
+      "memory_aids": [
+        "TLS 1.3 = web security standard",
+        "SSH = remote access + key auth",
+        "IPsec = VPN at network layer",
+        "All use hybrid: asymmetric handshake + symmetric data"
+      ],
+      "real_world_connection": "Security+ tests your ability to choose the right cryptographic protocol for each scenario. The pattern is always the same: asymmetric for key exchange, symmetric for data, hashing for integrity.",
+      "reflection_prompt": "When you connect to a website, your browser uses TLS. When you SSH to a server, it uses SSH. When you connect to a corporate VPN, it uses IPsec. Same crypto building blocks, different protocols.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "650c5ead-80e6-43a9-a440-453a41d584d9",
+      "type": "memory_aid",
+      "title": "Cryptographic Solutions — Complete Reference",
+      "content": {
+        "text": "**🔐 Symmetric Encryption:**\n- One key, fast, bulk data\n- AES-256 = gold standard\n- ChaCha20 = mobile-friendly alternative\n- Problem: key distribution\n\n**🔓 Asymmetric Encryption:**\n- Two keys (public/private), slow\n- RSA 2048+ = standard\n- ECC = smaller keys, same security\n- Solves: key exchange, signatures\n\n**#️⃣ Hash Functions:**\n- One-way, deterministic, fixed output\n- SHA-256 = current standard\n- MD5/SHA-1 = broken\n- bcrypt/Argon2 = password hashing\n\n**✍️ Digital Signatures:**\n- Sign with private key, verify with public\n- Provides: authentication + non-repudiation + integrity\n- Used in: certificates, code signing, documents\n\n**🔗 Key Protocols:**\n- TLS 1.3 = web security\n- SSH = remote access\n- IPsec = VPN\n- DNSSEC = DNS authentication\n\n**⚠️ Common Mistakes:**\n- Don't use MD5/SHA-1 for security\n- Don't use symmetric encryption for key exchange\n- Don't store passwords in plaintext\n- Don't use ECB mode (use CBC or GCM)\n- Don't use RSA keys < 2048 bits"
+      },
+      "simplified_explanation": "Symmetric = fast data. Asymmetric = secure key exchange. Hash = integrity. Signature = identity. Protocol = how they combine.",
+      "memory_aids": [
+        "Symmetric: one key, AES-256, fast",
+        "Asymmetric: two keys, RSA/ECC, secure",
+        "Hash: one-way, SHA-256, integrity",
+        "Signature: private signs, public verifies",
+        "TLS/SSH/IPsec = protocols combining all three"
+      ],
+      "real_world_connection": "Keep this reference for Security+ exam prep. Every question about 'which cryptographic solution' maps to one of these categories.",
+      "reflection_prompt": "Draw a diagram showing how symmetric, asymmetric, hashing, and signatures combine in a TLS handshake. That one diagram explains 80% of cryptographic exam questions.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "33997778-6e10-46a5-86c3-9aa23fc0776e",
+      "type": "reflection",
+      "title": "Cryptographic Solution Design Challenge",
+      "content": {
+        "text": "Choose the right cryptographic solution for each scenario:\n\n1. **Secure web browsing** — Which protocol and cipher suite?\n2. **Remote server administration** — Which protocol and key type?\n3. **File integrity verification** — Which algorithm?\n4. **Password storage** — Which hashing algorithm and why?\n5. **Site-to-site VPN** — Which protocol and mode?\n6. **Email encryption** — Which protocol for end-to-end encryption?\n7. **Code signing** — Which algorithm provides non-repudiation?\n\n**Design challenge:** You're building a new application that needs to:\n- Authenticate users\n- Encrypt data in transit\n- Encrypt data at rest\n- Verify file integrity\n- Provide audit trail with non-repudiation\n\nWhich cryptographic solutions would you use for each requirement, and why?\n\n**Key principles:**\n- Always use the strongest algorithm appropriate for the use case\n- Hybrid approach: asymmetric for trust, symmetric for speed\n- Hashing for integrity, signatures for identity\n- Never roll your own crypto"
+      },
+      "simplified_explanation": "Match the tool to the job: TLS for web, SSH for remote, AES for data, SHA-256 for integrity, RSA/ECC for trust. Never use deprecated algorithms.",
+      "memory_aids": [
+        "TLS for transit, AES for storage, SHA for integrity, RSA/ECC for trust",
+        "Hybrid approach always wins",
+        "Never use MD5/SHA-1/3DES/ECB",
+        "Never roll your own crypto"
+      ],
+      "real_world_connection": "Security+ presents exactly these scenarios. The answer pattern is: symmetric for data, asymmetric for key exchange/signatures, hashing for integrity.",
+      "reflection_prompt": "Which cryptographic solution would you choose to protect a new microservice API, and why?",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "crypto-q1",
+      "type": "multiple_choice",
+      "question": "Which type of encryption uses a single shared key for both encryption and decryption?",
+      "options": [
+        "Asymmetric encryption",
+        "Symmetric encryption",
+        "Hashing",
+        "Digital signatures"
+      ],
+      "correct_answer": 1,
+      "explanation": "Symmetric encryption uses the same key for both encryption and decryption. It's fast and suitable for bulk data encryption. The challenge is securely distributing the shared key.",
+      "difficulty": 1,
+      "memory_aid": "Symmetric = same key for both sides. Fast but key distribution is hard.",
+      "points": 10
+    },
+    {
+      "question_id": "crypto-q2",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of a hash function in cryptography?",
+      "options": [
+        "Encrypt data for confidentiality",
+        "Generate key pairs",
+        "Verify data integrity by producing a fixed-length digest",
+        "Exchange keys between two parties"
+      ],
+      "correct_answer": 2,
+      "explanation": "Hash functions produce a fixed-length digest from any input. They're used to verify data integrity — any change to the input produces a completely different hash. They cannot encrypt or decrypt data.",
+      "difficulty": 1,
+      "memory_aid": "Hash = integrity verification. One-way, fixed-length digest.",
+      "points": 10
+    },
+    {
+      "question_id": "crypto-q3",
+      "type": "multiple_choice",
+      "question": "In a TLS handshake, which type of encryption is used for key exchange and which for data transfer?",
+      "options": [
+        "Symmetric for both",
+        "Asymmetric for key exchange, symmetric for data",
+        "Symmetric for key exchange, asymmetric for data",
+        "Asymmetric for both"
+      ],
+      "correct_answer": 1,
+      "explanation": "TLS uses asymmetric encryption (RSA/ECC) for the key exchange phase, then switches to symmetric encryption (AES) for data transfer. This hybrid approach leverages the security of asymmetric crypto for key distribution and the speed of symmetric crypto for data.",
+      "difficulty": 2,
+      "memory_aid": "TLS: asymmetric handshake + symmetric data. Best of both worlds.",
+      "points": 15
+    },
+    {
+      "question_id": "crypto-q4",
+      "type": "multiple_choice",
+      "question": "Which hashing algorithm should be used for password storage?",
+      "options": [
+        "MD5",
+        "SHA-256",
+        "bcrypt or Argon2",
+        "SHA-1"
+      ],
+      "correct_answer": 2,
+      "explanation": "bcrypt and Argon2 are specifically designed for password hashing. They include automatic salting and configurable work factors (iterations) that slow down brute-force attacks. SHA-256 is a general-purpose hash and doesn't include salting or work factors.",
+      "difficulty": 2,
+      "memory_aid": "Password hashing = bcrypt/Argon2. General hashing = SHA-256. Never MD5/SHA-1.",
+      "points": 15
+    },
+    {
+      "question_id": "crypto-q5",
+      "type": "multiple_choice",
+      "question": "What does a digital signature provide that hashing alone cannot?",
+      "options": [
+        "Data integrity only",
+        "Confidentiality",
+        "Authentication and non-repudiation",
+        "Key distribution"
+      ],
+      "correct_answer": 2,
+      "explanation": "A digital signature combines hashing with asymmetric encryption. The sender signs with their private key, and anyone can verify with the public key. This provides authentication (proves who sent it) and non-repudiation (sender can't deny sending it), which hashing alone cannot provide.",
+      "difficulty": 2,
+      "memory_aid": "Signature = hash + asymmetric. Adds authentication + non-repudiation.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

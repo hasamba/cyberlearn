@@ -1,0 +1,281 @@
+{
+  "lesson_id": "a2b3c4d5-0000-0000-0006-000000001032",
+  "domain": "cloud",
+  "title": "Cloud Data Lifecycle Management",
+  "subtitle": "From creation to deletion — managing data securely across its entire lifecycle",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 75,
+  "prerequisites": ["Securing Cloud Storage (S3, Azure Blob, GCS)"],
+  "learning_objectives": [
+    "Define the stages of the cloud data lifecycle and their security implications",
+    "Configure data classification and retention policies in AWS, Azure, and GCP",
+    "Implement data loss prevention (DLP) controls across cloud services",
+    "Design data archival and deletion strategies that meet compliance requirements",
+    "Explain data residency, sovereignty, and cross-border transfer considerations"
+  ],
+  "concepts": [
+    "Data Lifecycle Stages",
+    "Data Classification",
+    "Retention Policies",
+    "Data Loss Prevention (DLP)",
+    "Data Archival",
+    "Secure Deletion",
+    "Data Residency",
+    "Data Sovereignty",
+    "Cross-Border Data Transfer",
+    "Compliance Frameworks"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000001",
+      "type": "mindset_coach",
+      "title": "Data Doesn't Die — It Needs a Plan",
+      "content": {
+        "text": "Every piece of data has a lifecycle: it's created, stored, used, shared, archived, and eventually deleted. In the cloud, this lifecycle is more complex because your data may cross regions, services, and jurisdictions. Without a plan, data accumulates forever, compliance violations pile up, and costs spiral. Managing the data lifecycle isn't just good practice — it's a security and compliance requirement."
+      },
+      "simplified_explanation": "Think of data lifecycle management like a library system: new books arrive (creation), are shelved (storage), get checked out (processing), might go to storage (archive), and eventually get removed (deletion). Without a system, books pile up everywhere.",
+      "memory_aids": [
+        "Create → Store → Use → Share → Archive → Delete",
+        "No lifecycle plan = data chaos + compliance violations",
+        "Cloud data crosses borders — residency matters"
+      ],
+      "real_world_connection": "GDPR Article 5(1)(e) requires that personal data is kept no longer than necessary. Organizations without retention policies face massive fines.",
+      "reflection_prompt": "How much data does your organization store that no one has accessed in over a year? That's your data lifecycle gap.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000002",
+      "type": "explanation",
+      "title": "The Cloud Data Lifecycle — Six Stages",
+      "content": {
+        "text": "**1. Creation** — Data is generated or ingested\n- User uploads, application logs, IoT data, database entries\n- Security: Apply classification tags at creation\n- Cloud: Object tagging (S3, Blob, GCS), event-driven classification\n\n**2. Storage** — Data at rest in cloud services\n- Object storage (S3, Blob, GCS), databases (RDS, CosmosDB, Cloud SQL), file systems\n- Security: Encryption at rest, access controls, bucket policies\n- Cloud: SSE-KMS, CMK, customer-managed encryption keys\n\n**3. Use** — Data is processed, analyzed, or transformed\n- Compute services read/write data, analytics queries, ML training\n- Security: Encryption in transit, least privilege access, audit logging\n- Cloud: VPC endpoints, Private Link, IAM conditions\n\n**4. Share** — Data is distributed to internal or external parties\n- APIs, file sharing, cross-account access, B2B data exchange\n- Security: DLP policies, access logging, presigned URLs with expiry\n- Cloud: S3 Access Points, Azure Shared Access Signatures, GCP IAM conditions\n\n**5. Archive** — Data moves to long-term, low-cost storage\n- Compliance retention, legal holds, historical records\n- Security: Immutable storage (WORM), access auditing, encryption continuity\n- Cloud: S3 Glacier, Azure Archive, GCP Coldline/Nearline\n\n**6. Delete** — Data is securely destroyed\n- End of retention period, right to erasure (GDPR), data minimization\n- Security: Cryptographic erasure, secure overwrite, verification\n- Cloud: Object versioning deletion, lifecycle policies, key destruction"
+      },
+      "simplified_explanation": "Data has six stages: Create, Store, Use, Share, Archive, Delete. Each stage has different security needs. Miss any one and you have a gap.",
+      "memory_aids": [
+        "Create → Store → Use → Share → Archive → Delete",
+        "Each stage = different security controls",
+        "Classification at creation = foundation for everything else"
+      ],
+      "real_world_connection": "SEC502 Section 3 emphasizes that data lifecycle management is foundational to cloud security. Without classification at creation, you can't apply the right controls at any other stage.",
+      "reflection_prompt": "Which stage of the data lifecycle does your organization handle worst? Most organizations struggle with archival and deletion.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000003",
+      "type": "explanation",
+      "title": "Data Classification and Retention in the Cloud",
+      "content": {
+        "text": "**Data Classification Levels:**\n\n| Level | Description | Examples | Controls |\n|-------|-------------|----------|----------|\n| Public | No harm if disclosed | Marketing materials, press releases | No special controls |\n| Internal | Limited harm if disclosed | Internal documentation, org charts | Access controls, encryption in transit |\n| Confidential | Significant harm if disclosed | Customer data, financial reports | Encryption at rest + transit, access logging, DLP |\n| Restricted | Severe harm if disclosed | PII, health records, trade secrets | Maximum controls, key management, audit |\n\n**AWS Classification Tools:**\n- S3 object tags for classification labels\n- Macie for automatic PII discovery and classification\n- IAM policies conditioned on resource tags\n- Lifecycle policies for automated transitions\n\n**Azure Classification Tools:**\n- Azure Information Protection (AIP) labels\n- Microsoft Purview for data classification and governance\n- Sensitivity labels in Microsoft 365\n- Lifecycle management policies on blob storage\n\n**GCP Classification Tools:**\n- DLP API for automated PII discovery\n- Cloud Data Loss Prevention templates\n- Organization policy constraints\n- Object Lifecycle Management\n\n**Retention Policies:**\n- Define how long each data type must be kept\n- Legal hold overrides retention (data cannot be deleted during litigation)\n- Automated lifecycle transitions: Hot → Cool → Archive → Delete\n- Must align with regulatory requirements (GDPR, HIPAA, SOX, PCI DSS)\n\n**Retention by Regulation:**\n- GDPR: No longer than necessary\n- HIPAA: 6 years for designated records\n- SOX: 7 years for financial records\n- PCI DSS: 1 year minimum for audit logs"
+      },
+      "simplified_explanation": "Data classification = labeling data by sensitivity. Retention = how long to keep it. Classification determines controls, retention determines timeline. Both are required for compliance.",
+      "memory_aids": [
+        "Public → Internal → Confidential → Restricted = increasing controls",
+        "Classification at creation = apply right controls immediately",
+        "Retention = how long, Legal hold = can't delete even if expired"
+      ],
+      "real_world_connection": "AWS Macie and Azure Purview automatically discover and classify sensitive data. Without them, organizations don't know what data they have or where it is — a compliance nightmare.",
+      "reflection_prompt": "Can you list your organization's data classification levels and their corresponding retention periods? If not, that's a gap.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000004",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Data Lifecycle as a Story",
+      "content": {
+        "text": "Imagine your diary entries go through a lifecycle:\n\n**1. Create** — You write a diary entry. It's fresh and personal.\n→ In the cloud: Data is uploaded, created, or generated. Tag it as 'confidential' right away.\n\n**2. Store** — You put the diary in a locked drawer.\n→ In the cloud: Data is stored with encryption at rest. Only you have the key.\n\n**3. Use** — You re-read the entry to write a blog post (with your permission).\n→ In the cloud: Data is processed by applications. Encryption in transit, least privilege access.\n\n**4. Share** — You share a story from your diary with a friend, but only parts of it.\n→ In the cloud: Data is shared via APIs with DLP controls that redact sensitive parts.\n\n**5. Archive** — You put old diary entries in a box in the attic. You might need them someday.\n→ In the cloud: Data moves to cold storage (Glacier, Archive). Still encrypted, still auditable, but cheaper.\n\n**6. Delete** — You destroy diary entries you no longer need.\n→ In the cloud: Data is cryptographically erased or securely deleted. The encryption key is destroyed.\n\n**What happens without a plan?**\n- You keep every diary entry forever (data hoarding = compliance risk)\n- You leave entries where anyone can find them (no classification = exposure)\n- You share entries without redacting names (no DLP = data breach)\n- You can't find entries when you need them (no organization = inefficiency)"
+      },
+      "simplified_explanation": "Data lifecycle = diary lifecycle. Write it (create), lock it up (store), read it (use), share parts (share), box it (archive), shred it (delete). Every stage needs a plan.",
+      "memory_aids": [
+        "Diary analogy: Write → Lock → Read → Share → Box → Shred",
+        "Cloud: Create → Encrypt → Process → DLP → Archive → Cryptographic erasure",
+        "No plan = data hoarding + compliance risk + exposure"
+      ],
+      "real_world_connection": "The diary analogy maps directly to cloud data management. Every organization has 'diary entries' (data) that need proper handling at each lifecycle stage.",
+      "reflection_prompt": "Which of the six lifecycle stages does your organization handle worst? Most struggle with deletion.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000005",
+      "type": "code_exercise",
+      "title": "Implementing S3 Lifecycle Policies",
+      "content": {
+        "text": "Configure a complete data lifecycle for an S3 bucket:\n\n```json\n{\n  \"Rules\": [\n    {\n      \"ID\": \"DataLifecycleRule\",\n      \"Status\": \"Enabled\",\n      \"Filter\": {\n        \"Tag\": {\n          \"Key\": \"Classification\",\n          \"Value\": \"Confidential\"\n        }\n      },\n      \"Transitions\": [\n        {\n          \"Days\": 30,\n          \"StorageClass\": \"STANDARD_IA\"\n        },\n        {\n          \"Days\": 90,\n          \"StorageClass\": \"GLACIER\"\n        },\n        {\n          \"Days\": 365,\n          \"StorageClass\": \"DEEP_ARCHIVE\"\n        }\n      ],\n      \"Expiration\": {\n        \"Days\": 2555,\n        \"ExpiredObjectDeleteMarker\": true\n      },\n      \"NoncurrentVersionExpiration\": {\n        \"NoncurrentDays\": 30\n      }\n    }\n  ]\n}\n```\n\n**What this policy does:**\n1. **Day 0-30:** Hot storage (S3 Standard) — Active data, frequently accessed\n2. **Day 31-90:** Infrequent access (S3-IA) — Less active, cheaper storage\n3. **Day 91-365:** Glacier — Archived, retrieval takes hours\n4. **Day 366-2555:** Deep Archive — Long-term compliance retention\n5. **Day 2555+:** Auto-deletion — 7-year retention policy met\n6. **Non-current versions:** Deleted after 30 days\n\n**Key considerations:**\n- Legal hold overrides lifecycle deletion\n- Versioning must be enabled for non-current expiration\n- Encryption keys must persist through archive transitions\n- Cost optimization: IA saves 40%, Glacier saves 83%, Deep Archive saves 95%"
+      },
+      "simplified_explanation": "Lifecycle policies automate the data journey: Hot → Cool → Cold → Delete. Set it once and let the cloud handle transitions based on age and classification tags.",
+      "memory_aids": [
+        "Day 30 = move to IA, Day 90 = move to Glacier, Day 365 = Deep Archive",
+        "Legal hold = override lifecycle deletion",
+        "Tag-based lifecycle = different rules for different classifications"
+      ],
+      "real_world_connection": "AWS S3 lifecycle policies are the most common way organizations implement automated data lifecycle management. Without them, data costs explode and compliance gaps widen.",
+      "reflection_prompt": "What's your organization's longest data retention requirement? Does your lifecycle policy match it?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000006",
+      "type": "real_world",
+      "title": "Data Residency, Sovereignty, and Compliance",
+      "content": {
+        "text": "**Data Residency** — Where data physically resides\n- AWS regions, Azure regions, GCP regions\n- Data may be stored in specific countries due to regulatory requirements\n- GDPR: EU personal data must be processed in the EU (or adequate protection)\n- China Cybersecurity Law: Data must stay in China\n- Russia: Personal data of Russian citizens must be stored in Russia\n\n**Data Sovereignty** — Which laws govern the data\n- Data stored in a country is subject to that country's laws\n- US CLOUD Act: US providers must provide data regardless of physical location\n- EU-US Data Privacy Framework: New agreement for transatlantic data transfer\n- Schrems II: Invalidated Privacy Shield, imposed new requirements\n\n**Cross-Border Data Transfer:**\n- Standard Contractual Clauses (SCCs) — EU-approved transfer mechanism\n- Binding Corporate Rules (BCRs) — For intra-organization transfers\n- Adequacy decisions — EU determines if a country has adequate protection\n- Data Localization — Storing data within national borders\n\n**Cloud Provider Controls:**\n- AWS: Region selection, S3 Object Lock (WORM), Macie for PII discovery\n- Azure: Region selection, Azure Policy for geo-restrictions, Purview for governance\n- GCP: Organization policies for resource location, DLP API, Access Transparency\n\n**Compliance Framework Mapping:**\n| Framework | Retention | Residency | Key Requirement |\n|-----------|-----------|-----------|----------------|\n| GDPR | No longer than necessary | EU/adequate | Right to erasure |\n| HIPAA | 6 years | No specific | PHI protection |\n| SOX | 7 years | No specific | Financial record integrity |\n| PCI DSS | 1 year minimum | No specific | Cardholder data security |\n| CCPA | Varies | No specific | Right to deletion |"
+      },
+      "simplified_explanation": "Data residency = where it lives. Data sovereignty = whose laws apply. Cross-border transfer = how to move data legally. Get any of these wrong and you face fines.",
+      "memory_aids": [
+        "Residency = where, Sovereignty = whose laws, Transfer = how legally",
+        "GDPR = EU data stays in EU (or adequate protection)",
+        "CLOUD Act = US can demand data from US providers anywhere",
+        "SCCs = Standard Contractual Clauses for EU data transfer"
+      ],
+      "real_world_connection": "SEC502 Section 3 covers data residency and sovereignty because multi-region cloud deployments must comply with local laws. A misconfigured S3 bucket in the wrong region can violate GDPR.",
+      "reflection_prompt": "Where does your organization's data physically reside? Do you have data in regions that violate compliance requirements?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000007",
+      "type": "memory_aid",
+      "title": "Cloud Data Lifecycle — Quick Reference",
+      "content": {
+        "text": "**📊 Data Lifecycle Stages:**\n1. Create → Tag with classification\n2. Store → Encrypt at rest\n3. Use → Encrypt in transit, least privilege\n4. Share → DLP, access controls\n5. Archive → WORM, audit trail\n6. Delete → Cryptographic erasure\n\n**🏷️ Classification Levels:**\nPublic → Internal → Confidential → Restricted\n\n**🏛️ Compliance Retention:**\n- GDPR: No longer than necessary\n- HIPAA: 6 years\n- SOX: 7 years\n- PCI DSS: 1 year minimum\n\n**🌍 Data Residency:**\n- Know where your data lives\n- Match region to regulation\n- Legal hold overrides deletion\n\n**🛠️ Cloud Tools:**\n- AWS: Macie, S3 Lifecycle, Object Lock\n- Azure: Purview, Lifecycle Management, AIP\n- GCP: DLP API, Lifecycle Rules, Org Policies\n\n**⚠️ Common Mistakes:**\n- No classification at creation\n- Data kept forever (no lifecycle policy)\n- Cross-border transfer without SCCs\n- Legal hold not enforced on archival data\n- Encryption keys deleted before data lifecycle ends"
+      },
+      "simplified_explanation": "Create → Store → Use → Share → Archive → Delete. Classify at creation, encrypt at every stage, retain per regulation, delete per policy.",
+      "memory_aids": [
+        "CSUSAD = Create, Store, Use, Share, Archive, Delete",
+        "Classification at creation = controls from day one",
+        "Retention per regulation, legal hold overrides all",
+        "Cryptographic erasure = destroy the key, destroy the data"
+      ],
+      "real_world_connection": "SEC502 Section 3 is all about these lifecycle controls. Know the stages, classification, and compliance requirements.",
+      "reflection_prompt": "Does your organization have automated data lifecycle policies? If not, you're paying for storage you don't need and risking compliance violations.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a2b3c4d5-0000-0000-0006-000000000008",
+      "type": "reflection",
+      "title": "Data Lifecycle Design Challenge",
+      "content": {
+        "text": "Design a data lifecycle policy for these scenarios:\n\n1. **Healthcare provider** storing patient records in AWS\n   - Classification level: Restricted\n   - Retention: 7 years (HIPAA + state law)\n   - Data residency: US regions only\n   - What controls at each lifecycle stage?\n\n2. **E-commerce company** storing customer transaction data in Azure\n   - Classification level: Confidential\n   - Retention: 3 years active, 7 years archived (tax requirements)\n   - Data residency: EU for EU customers\n   - What lifecycle transitions?\n\n3. **SaaS startup** storing application logs in GCP\n   - Classification level: Internal\n   - Retention: 90 days hot, 1 year cold\n   - Data residency: Any region\n   - What cost optimization applies?\n\n**Key insights:**\n- Different data types need different lifecycle policies\n- Compliance requirements drive retention periods\n- Data residency constraints drive region selection\n- Lifecycle automation reduces cost and risk",
+        "interactive_prompt": "Create a lifecycle policy matrix for your organization covering: data type, classification, retention period, storage tier transitions, residency requirements, and deletion method."
+      },
+      "simplified_explanation": "Different data = different rules. Healthcare data stays 7 years in the US. E-commerce data splits by region. Logs rotate fast. Design the policy to match the regulation.",
+      "memory_aids": [
+        "Healthcare = Restricted, 7 years, US only",
+        "E-commerce = Confidential, 3+7 years, EU for EU",
+        "Logs = Internal, 90 days hot, rotate fast"
+      ],
+      "real_world_connection": "Every cloud security assessment starts with: 'What data do you have, where is it, and how long do you keep it?' If you can't answer, you have a lifecycle management gap.",
+      "reflection_prompt": "Map your organization's top 5 data types to lifecycle stages. How many have proper classification and retention policies?",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "dlm-q1",
+      "type": "multiple_choice",
+      "question": "What is the correct order of the cloud data lifecycle stages?",
+      "options": [
+        "Store, Create, Use, Share, Delete, Archive",
+        "Create, Store, Use, Share, Archive, Delete",
+        "Create, Use, Store, Share, Delete, Archive",
+        "Store, Use, Create, Archive, Share, Delete"
+      ],
+      "correct_answer": 1,
+      "explanation": "The correct order is: Create (data is generated) → Store (data at rest) → Use (data is processed) → Share (data is distributed) → Archive (long-term storage) → Delete (secure destruction).",
+      "difficulty": 1,
+      "memory_aid": "CSUSAD = Create, Store, Use, Share, Archive, Delete.",
+      "points": 10
+    },
+    {
+      "question_id": "dlm-q2",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of data classification?",
+      "options": [
+        "To reduce storage costs by compressing data",
+        "To assign sensitivity labels that determine appropriate security controls",
+        "To encrypt all data regardless of sensitivity",
+        "To ensure all data is stored in the same cloud region"
+      ],
+      "correct_answer": 1,
+      "explanation": "Data classification assigns sensitivity labels (Public, Internal, Confidential, Restricted) that determine what security controls are appropriate. Without classification, you can't apply the right controls — either over-protecting (wasting resources) or under-protecting (risking breaches).",
+      "difficulty": 1,
+      "memory_aid": "Classification = sensitivity labels = right controls for right data.",
+      "points": 10
+    },
+    {
+      "question_id": "dlm-q3",
+      "type": "multiple_choice",
+      "question": "What happens to data under a legal hold when the retention period expires?",
+      "options": [
+        "The data is automatically deleted",
+        "The data cannot be deleted until the legal hold is lifted, regardless of retention period",
+        "The data is moved to a cheaper storage tier",
+        "The data is encrypted with a new key"
+      ],
+      "correct_answer": 1,
+      "explanation": "Legal holds override retention policies. Data under legal hold cannot be deleted, even if the retention period has expired, until the hold is lifted. This ensures evidence preservation for litigation.",
+      "difficulty": 2,
+      "memory_aid": "Legal hold = deletion override. Keep it until the hold is lifted, period.",
+      "points": 15
+    },
+    {
+      "question_id": "dlm-q4",
+      "type": "multiple_choice",
+      "question": "What is cryptographic erasure?",
+      "options": [
+        "Overwriting data with zeros seven times",
+        "Destroying the encryption key that protects the data, making it permanently unreadable",
+        "Encrypting data before deletion for security",
+        "Moving data to a secure archive storage tier"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cryptographic erasure destroys the encryption key used to protect the data. Without the key, the encrypted data is permanently unreadable — effectively deleted. This is faster and more reliable than overwriting large datasets.",
+      "difficulty": 2,
+      "memory_aid": "Cryptographic erasure = destroy the key, data becomes unreadable. Fast and effective.",
+      "points": 15
+    },
+    {
+      "question_id": "dlm-q5",
+      "type": "multiple_choice",
+      "question": "An organization stores EU customer data in a US-based AWS region. Which compliance framework is most likely violated?",
+      "options": [
+        "HIPAA",
+        "PCI DSS",
+        "GDPR",
+        "SOX"
+      ],
+      "correct_answer": 2,
+      "explanation": "GDPR requires that EU personal data be processed in the EU or in countries with adequate data protection. Storing EU customer data in a US region without proper safeguards (SCCs, adequacy decision) violates GDPR data residency requirements.",
+      "difficulty": 2,
+      "memory_aid": "GDPR = EU data must stay in EU or have adequate protection. US region without SCCs = violation.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

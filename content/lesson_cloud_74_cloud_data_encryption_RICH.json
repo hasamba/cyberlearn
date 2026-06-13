@@ -1,0 +1,284 @@
+{
+  "lesson_id": "c1a2b3c4-0000-0000-0002-000000001031",
+  "domain": "cloud",
+  "title": "Cloud Data Encryption (At Rest and In Transit)",
+  "subtitle": "Protecting data where it lives and where it moves",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 74,
+  "prerequisites": ["Securing Cloud Storage (S3, Azure Blob, GCS)"],
+  "learning_objectives": [
+    "Differentiate between encryption at rest and encryption in transit and explain why both are necessary",
+    "Configure encryption at rest for AWS S3, Azure Blob Storage, and GCP Cloud Storage",
+    "Understand key management services (KMS) across AWS, Azure, and GCP",
+    "Identify TLS/HTTPS implementation requirements for cloud services",
+    "Explain customer-managed encryption keys (CMEK) vs provider-managed keys"
+  ],
+  "concepts": [
+    "Encryption at Rest",
+    "Encryption in Transit",
+    "Key Management Service (KMS)",
+    "Customer-Managed Keys (CMEK)",
+    "Envelope Encryption",
+    "TLS/HTTPS",
+    "AWS S3 SSE",
+    "Azure Storage Encryption",
+    "GCP Cloud KMS",
+    "Hardware Security Modules (HSM)"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000001",
+      "type": "mindset_coach",
+      "title": "Why Cloud Encryption Changes Everything",
+      "content": {
+        "text": "In the cloud, your data lives on infrastructure you don't physically control. Encryption isn't optional — it's the primary control that ensures your data remains yours, even when the physical hardware is someone else's. Understanding encryption at rest and in transit is the difference between trusting a cloud provider and verifying that trust through cryptography."
+      },
+      "simplified_explanation": "Imagine sending a locked briefcase through a delivery service. Encryption in transit = the briefcase is locked while it's being moved. Encryption at rest = the briefcase stays locked even when it's sitting in the delivery warehouse. Both locks matter.",
+      "memory_aids": [
+        "At Rest = locked in storage",
+        "In Transit = locked while moving",
+        "Cloud = someone else's warehouse → you NEED both locks"
+      ],
+      "real_world_connection": "When Capital One had their 2019 breach (100M+ records), the data was encrypted at rest — but the attacker accessed it through an IAM misconfiguration that granted decryption permissions. Encryption alone isn't enough; key access control matters too.",
+      "reflection_prompt": "If a cloud provider employee could physically access the hard drive storing your data, what protects it? Answer: encryption at rest.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000002",
+      "type": "explanation",
+      "title": "Encryption at Rest — Protecting Stored Data",
+      "content": {
+        "text": "Encryption at rest protects data stored on physical media — hard drives, SSDs, backup tapes, and snapshots.\n\n**Why it matters in the cloud:**\n- You share physical infrastructure with other tenants\n- Disks may be repurposed after deletion\n- Insider threats at the provider level\n- Compliance requirements (PCI DSS, HIPAA, GDPR)\n\n**AWS S3 Encryption Options:**\n\n| Method | Key Management | Use Case |\n|--------|---------------|----------|\n| SSE-S3 | AWS-managed keys | Default, simplest option |\n| SSE-KMS | AWS KMS keys | Audit trail, granular control |\n| SSE-C | Customer-provided keys | Full key control |\n| Client-side | You manage everything | Maximum control |\n\n**Azure Storage Encryption:**\n- All Azure storage accounts are encrypted by default using Microsoft-managed keys\n- Customer-managed keys (CMK) via Azure Key Vault\n- Double encryption (infrastructure + storage level) available\n\n**GCP Cloud Storage Encryption:**\n- Default encryption at rest using Google-managed keys\n- CMEK via Cloud KMS\n- CSEK (Customer-Supplied Encryption Keys) for maximum control\n\n**Envelope Encryption:**\nMost cloud providers use envelope encryption — a data encryption key (DEK) encrypts your data, and a key encryption key (KEK) encrypts the DEK. This allows key rotation without re-encrypting all data."
+      },
+      "simplified_explanation": "Encryption at rest is like putting your valuables in a safe. The cloud provider gives you different safe options: they keep the key (SSE-S3), you both keep keys (SSE-KMS), or you bring your own lock (SSE-C).",
+      "memory_aids": [
+        "At Rest = encrypting the storage media",
+        "SSE-S3 = AWS manages keys (easiest)",
+        "SSE-KMS = you control key policy (audit trail)",
+        "Envelope encryption = DEK encrypts data, KEK encrypts DEK"
+      ],
+      "real_world_connection": "AWS S3 buckets without encryption are still one of the top causes of data breaches. Enabling default encryption is a one-click fix that prevents entire categories of exposure.",
+      "reflection_prompt": "Check your own cloud storage — is default encryption enabled? If not, why?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000003",
+      "type": "explanation",
+      "title": "Encryption in Transit — Protecting Data in Motion",
+      "content": {
+        "text": "Encryption in transit protects data as it moves between systems — from client to server, between services, or across regions.\n\n**TLS/HTTPS:**\n- TLS 1.2+ is the standard for cloud service endpoints\n- All major cloud providers enforce HTTPS on their APIs\n- Certificate management ( ACM, Let's Encrypt, self-signed for internal)\n\n**Cloud-specific transit encryption:**\n\n**AWS:**\n- VPC endpoints (PrivateLink) keep traffic within AWS network\n- S3 bucket policies can enforce `aws:SecureTransport`\n- Transit Gateway encryption for inter-VPC traffic\n\n**Azure:**\n- Private Link for private connectivity\n- Service tags and NSG rules for restricting traffic\n- Enforce HTTPS on App Services and Storage Accounts\n\n**GCP:**\n- Private Service Connect\n- VPC Service Controls for data exfiltration prevention\n- Enforce SSL policies on load balancers\n\n**Key considerations:**\n1. Enforce TLS 1.2 minimum — disable TLS 1.0/1.1\n2. Use HSTS headers to prevent downgrade attacks\n3. Certificate pinning for mobile/IoT clients\n4. Internal service mesh (mTLS with Istio/Envoy) for service-to-service encryption"
+      },
+      "simplified_explanation": "Encryption in transit is like a sealed, armored truck carrying your data. Even if someone intercepts the truck, they can't read what's inside. TLS is the armor plating.",
+      "memory_aids": [
+        "In Transit = TLS/HTTPS encryption",
+        "TLS 1.2+ minimum, disable 1.0/1.1",
+        "aws:SecureTransport = force HTTPS in S3 policies",
+        "mTLS = both sides verify identity (mutual)"
+      ],
+      "real_world_connection": "The AWS S3 `aws:SecureTransport` condition key is a simple bucket policy that rejects any non-HTTPS request. It takes 2 minutes to add and prevents man-in-the-middle attacks on your data uploads.",
+      "reflection_prompt": "Can your cloud services be accessed over HTTP (port 80)? If so, you're missing encryption in transit.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000004",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Encryption Keys and Who Holds Them",
+      "content": {
+        "text": "Imagine you have a diary with a lock and key:\n\n**Provider-managed keys (SSE-S3 / default):**\nThe cloud provider has both the diary and the key. They promise to keep your diary safe, and they're really good at it. But technically, they could open it.\n\n**Customer-managed keys (CMEK / SSE-KMS):**\nYou give the cloud provider a special key to lock your diary, but YOU keep the master key in your own safe. The provider can lock and unlock the diary when you tell them to, but you can revoke their access anytime. If someone hacks the provider, they still can't read your diary without YOUR key.\n\n**Customer-supplied keys (SSE-C / CSEK):**\nYou bring your own lock AND key every time. The provider never has permanent access. You hand them the key, they lock/unlock the diary, and you take the key back. Maximum control, maximum responsibility.\n\n**Client-side encryption:**\nYou lock the diary before you even hand it to the provider. They never see the key, they never see the contents. They just store the locked box. This is the most secure option but requires the most work.\n\n**Which should you choose?**\n- Most organizations: CMEK (good balance of security and convenience)\n- High-compliance workloads: CMEK with HSM\n- Maximum paranoia: Client-side encryption"
+      },
+      "simplified_explanation": "Provider keys = valet parks your car (they have the keys). CMEK = you decide when the valet can drive. Client-side = you lock everything before handing over the car. More control = more responsibility.",
+      "memory_aids": [
+        "Provider-managed = easiest, least control",
+        "CMEK = best balance for most",
+        "Client-side = most secure, most work",
+        "Key rotation = changing the locks regularly"
+      ],
+      "real_world_connection": "When you see a data breach headline about 'encrypted data was accessed,' it's almost always because the attacker got the decryption key through IAM misconfiguration — not because they broke the encryption algorithm.",
+      "reflection_prompt": "If you rotate your CMEK key, does your existing data need to be re-encrypted? (Hint: No — envelope encryption handles this.)",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000005",
+      "type": "code_exercise",
+      "title": "Hands-On: Enforce Encryption on an S3 Bucket",
+      "content": {
+        "text": "Let's enforce encryption in transit and at rest on an S3 bucket:\n\n```json\n// S3 Bucket Policy — Enforce HTTPS (Encryption in Transit)\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyNonHTTPS\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:*\",\n      \"Resource\": [\n        \"arn:aws:s3:::my-secure-bucket\",\n        \"arn:aws:s3:::my-secure-bucket/*\"\n      ],\n      \"Condition\": {\n        \"Bool\": {\n          \"aws:SecureTransport\": \"false\"\n        }\n      }\n    }\n  ]\n}\n```\n\n```bash\n# Enable default encryption at rest (SSE-KMS)\naws s3api put-bucket-encryption \\\n  --bucket my-secure-bucket \\\n  --server-side-encryption-configuration '{\n    \"Rules\": [\n      {\n        \"ApplyServerSideEncryptionByDefault\": {\n          \"SSEAlgorithm\": \"aws:kms\",\n          \"KMSMasterKeyID\": \"arn:aws:kms:us-east-1:123456789012:key/abcd1234\"\n        },\n        \"BucketKeyEnabled\": true\n      }\n    ]\n  }'\n```\n\n**What this achieves:**\n1. All S3 API calls must use HTTPS (no HTTP allowed)\n2. All objects are automatically encrypted with KMS when uploaded\n3. You have an audit trail in CloudTrail for every KMS key usage\n4. You can revoke access by disabling the KMS key"
+      },
+      "simplified_explanation": "Two lines of defense: bucket policy says 'HTTPS only' and bucket encryption says 'always encrypt with my key.' Together they cover both in transit and at rest.",
+      "memory_aids": [
+        "aws:SecureTransport = false → DENY (block HTTP)",
+        "SSE-KMS = auto-encrypt with your key",
+        "BucketKeyEnabled = cost optimization for KMS",
+        "Disable KMS key = instant data access revocation"
+      ],
+      "real_world_connection": "This is the exact configuration that would have prevented dozens of S3 data breaches. Adding `aws:SecureTransport` is a 5-minute change with massive security impact.",
+      "reflection_prompt": "What happens if you disable the KMS key used for S3 encryption? Can you still read existing objects? Can you write new ones?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000006",
+      "type": "real_world",
+      "title": "Key Management Across Cloud Providers",
+      "content": {
+        "text": "**AWS KMS:**\n- Manage CMKs (Customer Master Keys) with full IAM control\n- Automatic key rotation (annual) for symmetric keys\n- CloudHSM for FIPS 140-2 Level 3 compliance\n- Key policies for cross-account access\n- Costs: $1/key/month + $0.03/10,000 requests\n\n**Azure Key Vault:**\n- Software-protected keys (HSM-backed available in Premium tier)\n- Managed HSM for dedicated HSM instances\n- Key vault access policies and RBAC\n- Integration with Azure Disk Encryption, Storage, SQL\n- Soft-delete and purge protection enabled by default\n\n**GCP Cloud KMS:**\n- Software and HSM-backed key options\n- Cloud EKMS for external key management\n- Automatic key rotation configurable\n- VPC Service Controls for key isolation\n- Import existing keys (self-managed)\n\n**Cross-cloud key management considerations:**\n1. Each provider's KMS has different pricing and feature sets\n2. Multi-cloud key management adds complexity — consider HashiCorp Vault\n3. Key rotation policies must align with compliance requirements\n4. Key deletion = permanent data loss (plan carefully!)\n5. Audit all key usage through provider-specific logging"
+      },
+      "simplified_explanation": "Each cloud has its own key manager: AWS KMS, Azure Key Vault, GCP Cloud KMS. They all do the same job but with different knobs and buttons. If you're multi-cloud, consider a universal key manager like HashiCorp Vault.",
+      "memory_aids": [
+        "AWS KMS, Azure Key Vault, GCP Cloud KMS — same concept, different names",
+        "HSM = Hardware Security Module = tamper-proof key storage",
+        "Key rotation = changing the lock periodically",
+        "Key deletion = permanent data loss = think twice"
+      ],
+      "real_world_connection": "The 2019 Capital One breach exploited an IAM role that had excessive KMS permissions. The data was encrypted, but the attacker could call `kms:Decrypt` through the misconfigured role. Encryption is only as strong as your key access controls.",
+      "reflection_prompt": "If you're running multi-cloud, where do your encryption keys live? Are they provider-managed or centralized?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000007",
+      "type": "memory_aid",
+      "title": "Cloud Encryption Cheat Sheet",
+      "content": {
+        "text": "**🔒 Encryption at Rest Cheat Sheet:**\n\n| Provider | Default | CMEK | Bring Your Own Key |\n|----------|---------|------|---------------------|\n| AWS S3 | SSE-S3 ✅ | SSE-KMS | SSE-C |\n| Azure Storage | MS-managed ✅ | Key Vault CMK | BYOK |\n| GCP Storage | Google-managed ✅ | Cloud KMS CMEK | CSEK |\n\n**🚀 Encryption in Transit Cheat Sheet:**\n\n- TLS 1.2 minimum (1.3 preferred)\n- Enforce HTTPS via policy (not just recommendation)\n- Use private links/endpoints where possible\n- mTLS for service-to-service\n- HSTS headers for web clients\n\n**🔑 Key Management Decision Tree:**\n1. Do you need audit trails? → Use CMEK\n2. Do you need compliance? → Use HSM-backed keys\n3. Do you need to revoke access instantly? → Use CMEK + IAM policies\n4. Do you need zero provider access? → Use client-side encryption\n\n**⚠️ Common Pitfalls:**\n- Forgetting to enforce HTTPS (encryption at rest ≠ encryption in transit)\n- Over-permissioned KMS key policies\n- Not rotating keys annually\n- Deleting keys before data lifecycle ends"
+      },
+      "simplified_explanation": "Default encryption = free and automatic. CMEK = audit and control. Client-side = maximum paranoia. Always enforce both at rest AND in transit — one without the other is like locking your house but leaving the windows open.",
+      "memory_aids": [
+        "At rest + in transit = both required",
+        "Default encryption = free, turn it on!",
+        "CMEK = audit trail + instant revocation",
+        "HSM = tamper-proof key storage",
+        "Envelope encryption = rotate keys without re-encrypting data"
+      ],
+      "real_world_connection": "SEC502 Section 3 focuses heavily on these concepts because cloud encryption misconfiguration is one of the top findings in cloud security assessments.",
+      "reflection_prompt": "Can you name your organization's encryption strategy for each cloud provider? If not, that's your next action item.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "c1d2e3f4-0000-0000-0002-000000000008",
+      "type": "reflection",
+      "title": "Apply Your Knowledge",
+      "content": {
+        "text": "Test your understanding with these scenarios:\n\n1. An S3 bucket contains sensitive customer data. What two encryption controls should you enable?\n2. Your organization needs to prove to auditors that only authorized personnel can decrypt production data. Which key management approach satisfies this?\n3. A developer complains that enabling `aws:SecureTransport` broke their application. What's the most likely cause?\n4. You need to rotate a CMEK key used by 500 S3 objects. Do you need to re-encrypt those objects?\n\n**Answers:**\n1. SSE-KMS (at rest) + bucket policy enforcing HTTPS (in transit)\n2. CMEK with IAM key policies — all KMS usage is logged in CloudTrail\n3. Their code is making HTTP requests instead of HTTPS\n4. No — envelope encryption handles this. New objects use the new key version, existing objects are decrypted with the old key version",
+        "interactive_prompt": "Design the encryption architecture for a multi-cloud application storing PII in both AWS and Azure. Which keys go where? How do you handle rotation?"
+      },
+      "simplified_explanation": "The best way to learn encryption is to break it on purpose. Disable HTTPS on a test bucket and try to access it. Rotate a key. Revoke a key and watch what happens. Practical experience beats memorization.",
+      "memory_aids": [
+        "Practice > Theory for encryption concepts"
+      ],
+      "real_world_connection": "Cloud security certifications (AWS Security Specialty, Azure Security Engineer) test exactly these scenarios. Understanding key management deeply differentiates you.",
+      "reflection_prompt": "What's one encryption configuration you can verify or improve in your current cloud environment today?",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "cloud-enc-q1",
+      "type": "multiple_choice",
+      "question": "What is the primary difference between encryption at rest and encryption in transit?",
+      "options": [
+        "Encryption at rest uses symmetric keys; encryption in transit uses asymmetric keys",
+        "Encryption at rest protects stored data; encryption in transit protects data being transmitted",
+        "Encryption at rest is required by law; encryption in transit is optional",
+        "There is no practical difference"
+      ],
+      "correct_answer": 1,
+      "explanation": "Encryption at rest protects data on storage media (disks, databases, object storage). Encryption in transit protects data as it moves between systems (network traffic). Both are needed for comprehensive security.",
+      "difficulty": 1,
+      "memory_aid": "At rest = sitting still. In transit = moving. Both need protection.",
+      "points": 10
+    },
+    {
+      "question_id": "cloud-enc-q2",
+      "type": "multiple_choice",
+      "question": "Which S3 server-side encryption option provides a CloudTrail audit trail for key usage?",
+      "options": [
+        "SSE-S3",
+        "SSE-KMS",
+        "SSE-C",
+        "Client-side encryption"
+      ],
+      "correct_answer": 1,
+      "explanation": "SSE-KMS uses AWS KMS keys, and every use of a KMS key is logged in CloudTrail. This provides an audit trail showing exactly when and by whom data was encrypted/decrypted. SSE-S3 has no such audit capability.",
+      "difficulty": 2,
+      "memory_aid": "SSE-KMS = KMS keys = CloudTrail audit trail. SSE-S3 = no audit.",
+      "points": 15
+    },
+    {
+      "question_id": "cloud-enc-q3",
+      "type": "multiple_choice",
+      "question": "What happens when you disable a KMS key that was used to encrypt S3 objects?",
+      "options": [
+        "All encrypted objects are automatically re-encrypted with a different key",
+        "The encrypted objects can no longer be read until the key is re-enabled",
+        "Nothing — disabling a key does not affect existing data",
+        "The objects are automatically deleted after 30 days"
+      ],
+      "correct_answer": 1,
+      "explanation": "Disabling a KMS key immediately prevents decryption of any data encrypted with that key. This is a powerful access control mechanism — effectively an instant kill switch for data access. Re-enabling the key restores access.",
+      "difficulty": 2,
+      "memory_aid": "Disable KMS key = instant data lockdown. Re-enable = data access restored.",
+      "points": 15
+    },
+    {
+      "question_id": "cloud-enc-q4",
+      "type": "multiple_choice",
+      "question": "What is envelope encryption?",
+      "options": [
+        "Encrypting data in a sealed physical envelope before uploading to the cloud",
+        "Using a data encryption key (DEK) to encrypt data, and a key encryption key (KEK) to encrypt the DEK",
+        "Sending encrypted emails with multiple layers of encryption",
+        "A type of TLS handshake protocol"
+      ],
+      "correct_answer": 1,
+      "explanation": "Envelope encryption uses two layers: a data encryption key (DEK) encrypts the actual data, and a key encryption key (KEK) encrypts the DEK. This allows key rotation without re-encrypting all data — you only re-encrypt the DEK with a new KEK version.",
+      "difficulty": 2,
+      "memory_aid": "DEK encrypts data, KEK encrypts DEK. Rotate KEK = no need to re-encrypt data.",
+      "points": 15
+    },
+    {
+      "question_id": "cloud-enc-q5",
+      "type": "multiple_choice",
+      "question": "Which S3 bucket policy condition enforces encryption in transit?",
+      "options": [
+        "aws:UserAgent equals \"aws-internal\"",
+        "aws:SecureTransport equals \"false\" with Deny effect",
+        "s3:x-amz-server-side-encryption equals \"AES256\"",
+        "kms:Decryption equals \"true\""
+      ],
+      "correct_answer": 1,
+      "explanation": "The condition `aws:SecureTransport: false` with a Deny effect rejects any request made over HTTP (non-HTTPS). This is the standard way to enforce encryption in transit for S3 buckets.",
+      "difficulty": 2,
+      "memory_aid": "aws:SecureTransport = false → DENY = block HTTP = enforce HTTPS.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

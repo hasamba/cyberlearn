@@ -1,0 +1,284 @@
+{
+  "lesson_id": "801c17e5-866f-4e57-8a70-1d0a3119a7c6",
+  "domain": "osint",
+  "title": "Russian OSINT Techniques",
+  "subtitle": "Specialized OSINT methods for Russian-language intelligence gathering",
+  "difficulty": 3,
+  "estimated_time": 55,
+  "order_index": 75,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Navigate Russian social media platforms and search engines for intelligence gathering",
+    "Analyze Russian corporate registries and government databases",
+    "Map Russian internet infrastructure using specialized tools and techniques",
+    "Identify and cross-reference Russian personas across multiple platforms",
+    "Apply ethical and legal considerations specific to Russian OSINT investigations"
+  ],
+  "concepts": [
+    "VKontakte (VK) Analysis",
+    "Yandex Search Techniques",
+    "Russian Corporate Registries",
+    "Telegram Intelligence",
+    "EGRUL/EGRIP Databases",
+    "RuNet Infrastructure Mapping",
+    "Russian Social Media Cross-Referencing",
+    "Language and Cultural Context",
+    "VPN and Access Considerations",
+    "Ethical Russian OSINT"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "d082f195-b482-4d59-b438-979da96d1e76",
+      "type": "mindset_coach",
+      "title": "Navigating the Russian Internet Landscape",
+      "content": {
+        "text": "Russian OSINT is a specialized discipline. RuNet (the Russian internet) has its own platforms, search engines, and data ecosystems that differ significantly from the Western internet. Understanding Russian OSINT techniques is critical for threat intelligence, geopolitical analysis, and investigations involving Russian-speaking actors."
+      },
+      "simplified_explanation": "Russian OSINT = regular OSINT in a different universe. VK instead of Facebook, Yandex instead of Google, EGRUL instead of SEC filings.",
+      "memory_aids": [
+        "RuNet = separate internet ecosystem",
+        "VK = Russian Facebook, Yandex = Russian Google",
+        "EGRUL = Russian corporate registry",
+        "Cultural context matters as much as technical skills"
+      ],
+      "real_world_connection": "Threat intelligence analysts investigating Russian APT groups, disinformation campaigns, or cybercriminal operations must navigate RuNet effectively. Western tools miss 80%+ of Russian-language content.",
+      "reflection_prompt": "How much of your threat intelligence relies on English-language sources? What are you missing from Russian-language platforms?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "edde35ee-c2d9-43b3-9f5c-17ac9ee914f2",
+      "type": "explanation",
+      "title": "Yandex and VKontakte — The Russian Internet Core",
+      "content": {
+        "text": "**Yandex — The Russian Google**\n- Largest search engine in Russia (~60% market share)\n- Yandex Images: Reverse image search often finds results Google misses\n- Yandex Maps: Detailed Russian mapping with street views\n- Yandex People: People search across Russian platforms\n- Advanced operators: `site:`, `inurl:`, `intitle:` work differently\n\n**VKontakte (VK) — The Russian Facebook**\n- ~100M monthly active users, primarily Russian-speaking\n- Rich metadata: birth dates, locations, education, employment\n- Photo albums with timestamps and geolocation\n- Friends network mapping for relationship analysis\n- VK API for programmatic data collection\n\n**Telegram — The Primary Communication Platform**\n- Primary messaging and channel platform in Russian-speaking world\n- Public channels searchable via TGStat\n- Bot intelligence: many Russian services operate as Telegram bots\n\n**Other Key Platforms:**\n- **OK (Odnoklassniki)** — Older demographic, rich personal data\n- **Mail.ru** — Email and portal, linked social profiles\n- **Avito** — Russian classifieds for financial intelligence\n- **2GIS** — Detailed Russian city maps with business data\n\n**Language Considerations:**\n- Russian names have multiple forms (Иван/Ваня/Ванюша)\n- Cyrillic/Latin transliteration variations (Petrov/Petroff/Petrow)\n- Patronymics reveal family relationships"
+      },
+      "simplified_explanation": "Yandex = Russian Google for search. VK = Russian Facebook for people. Telegram = Russian communication hub. These three cover 90% of Russian OSINT needs.",
+      "memory_aids": [
+        "Yandex = search + images + maps",
+        "VK = people + social connections",
+        "Telegram = channels + bots + communication",
+        "Transliteration = always check spelling variants"
+      ],
+      "real_world_connection": "SEC587 Section 1 covers Russian OSINT because many APT groups operate in Russian-speaking spaces. Western tools alone miss critical intelligence.",
+      "reflection_prompt": "Try searching for a topic on both Google and Yandex. Notice how different the results are.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a124c7a5-5659-48fc-a7b5-3ec37133ec1f",
+      "type": "explanation",
+      "title": "Russian Corporate and Government Databases",
+      "content": {
+        "text": "**EGRUL (ЕГРЮЛ) — Unified State Register of Legal Entities**\n- Contains data on all Russian legal entities (companies, NGOs, government orgs)\n- Includes: registration dates, addresses, directors, founders, OKVED codes\n- Searchable at egrul.nalog.ru (Federal Tax Service)\n- Data includes: INN (tax ID), OGRN (registration number), director names\n- Historical data available for tracking changes over time\n\n**EGRIP (ЕГРИП) — Individual Entrepreneurs**\n- Similar to EGRUL but for sole proprietors\n- Contains: INN, OGRNIP, registration dates, business types\n\n**Other Key Databases:**\n- **Fedresurs** — Federal register of legally significant facts (bankruptcy, pledges)\n- **Zakupki.gov.ru** — Government procurement portal (contract data)\n- **Rospatent** — Russian patent and trademark office\n- **FSSP** — Bailiff service (debt and enforcement data)\n- **Sudrf.ru** — Russian court decisions\n- **Rusprofile.ru** — Aggregated company data\n\n**Cross-Referencing Strategy:**\n1. Find person on VK → full name, location, education\n2. Search EGRUL for companies with that person as director\n3. Cross-reference with Zakupki for government contracts\n4. Check Fedresurs for bankruptcy or legal proceedings\n5. Search Sudrf for court cases"
+      },
+      "simplified_explanation": "EGRUL is like the Russian SEC — it lists every registered company, its directors, and registration data. Cross-reference with court records, procurement data, and bankruptcy filings for a complete picture.",
+      "memory_aids": [
+        "EGRUL = Russian company register (like SEC filings)",
+        "EGRIP = Russian sole proprietor register",
+        "INN = tax ID, OGRN = registration number",
+        "Cross-reference: VK → EGRUL → Zakupki → Courts"
+      ],
+      "real_world_connection": "Investigators use EGRUL data to trace Russian companies linked to APT groups, sanctions evasion, and money laundering.",
+      "reflection_prompt": "If you needed to investigate a Russian company, which three databases would you start with?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "080bf44a-4b97-46ce-9429-350f1f2f7c13",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Investigating on RuNet",
+      "content": {
+        "text": "Imagine looking for information about someone, but all the websites are in a different language and your usual tools don't work.\n\n**Step 1: Find the person** on VK (Russian Facebook). Russian names have three parts: first name + patronymic (father's name) + last name. Try transliteration variations.\n\n**Step 2: Check their company** on EGRUL. You'll find every company they're a director of, plus the INN (tax ID).\n\n**Step 3: Find connections** by looking at VK friends. Map who they're connected to and cross-reference with company registrations.\n\n**Step 4: Look for red flags** in court records (Sudrf), bankruptcy filings (Fedresurs), and government contracts (Zakupki).\n\nThe methodology is the same as Western OSINT — only the platforms differ."
+      },
+      "simplified_explanation": "Find person on VK → check companies on EGRUL → map connections → check for red flags in courts and registries. Same methodology, different platforms.",
+      "memory_aids": [
+        "VK → EGRUL → Connections → Red flags",
+        "Russian names: First + Patronymic + Last",
+        "INN = company tax ID",
+        "Same methodology, different platforms"
+      ],
+      "real_world_connection": "Bellingcat used these exact techniques to investigate Russian military intelligence officers involved in the Skripal poisoning. VK, EGRUL, and court records were key data sources.",
+      "reflection_prompt": "The methodology is universal — only the platforms change. How would you apply your existing OSINT skills to Russian platforms?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e567eec0-e61c-4adb-957a-e8b95a6de5e9",
+      "type": "code_exercise",
+      "title": "Russian OSINT Investigation Toolkit",
+      "content": {
+        "text": "Practical search techniques for Russian OSINT:\n\n```\n# Yandex Search Operators\nsite:vk.com \"target name\"          # Search VK via Yandex\nsite:t.me \"target name\"            # Search Telegram channels\ninurl:forum \"target name\"          # Find forum posts\n\n# EGRUL Search\nhttps://egrul.nalog.ru/INN_OR_OGRN   # Direct company lookup\n\n# VK People Search\nhttps://vk.com/search?c[section]=people&c[q]=name\n\n# Key transliteration variants to check:\nPetrov / Petroff / Petrow\nAlexandr / Alexander / Aleksandr\nsh / sch / shch (Ш / Щ)\nya / ia / ja (Я)\n```\n\n**Investigation workflow:**\n1. VK profile search → full name, location, education, employment\n2. Yandex reverse image search → photo matches across platforms\n3. EGRUL search → company affiliations, director roles\n4. Telegram search → channel memberships, public posts\n5. Court records → legal issues, cases\n6. Cross-reference all findings"
+      },
+      "simplified_explanation": "The investigation process: VK for people, Yandex for search, EGRUL for companies, Telegram for communication. Always cross-reference across sources.",
+      "memory_aids": [
+        "VK = people, Yandex = search, EGRUL = companies, Telegram = channels",
+        "Always cross-reference across multiple sources",
+        "Transliteration variants = more search queries"
+      ],
+      "real_world_connection": "These exact techniques are used by Bellingcat, investigative journalists, and threat intelligence analysts to investigate Russian-speaking subjects.",
+      "reflection_prompt": "Try searching for a topic on both Google and Yandex. Notice how different the results are.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "fb1a513c-36e5-41ec-b269-4421028d773e",
+      "type": "real_world",
+      "title": "Russian OSINT Case Studies and Ethics",
+      "content": {
+        "text": "**Case Study: Bellingcat Investigations**\n- Used VK profiles to identify Russian military personnel\n- Cross-referenced VK data with EGRUL for company affiliations\n- Mapped social connections through VK friend networks\n- Identified travel patterns through geotagged photos\n\n**Ethical and Legal Considerations:**\n- Russian data protection laws differ from GDPR\n- Some platforms block access from certain countries\n- VPN access may be legally restricted in some jurisdictions\n- Never hack, phish, or socially engineer targets\n- Distinguish between public and private information\n- Consider safety implications for sources and investigators\n\n**Access Considerations:**\n- Some platforms require Russian phone numbers\n- Yandex may return different results based on IP geolocation\n- VK API requires authentication for programmatic access\n- Use dedicated investigation accounts, never personal accounts\n- Consider operational security when accessing Russian platforms"
+      },
+      "simplified_explanation": "Bellingcat used VK, EGRUL, and Yandex to identify GRU officers. The methodology works. But always follow ethical guidelines: use public data only, never hack or phish, and comply with local laws.",
+      "memory_aids": [
+        "Bellingcat = gold standard for Russian OSINT",
+        "VK + EGRUL + Yandex = powerful combination",
+        "Ethics: public data only, no hacking, comply with laws",
+        "OpSec: dedicated accounts, VPN considerations"
+      ],
+      "real_world_connection": "SEC587 Section 1 covers Russian OSINT as a critical skill for threat intelligence. The techniques are the same as Western OSINT — only the platforms differ.",
+      "reflection_prompt": "What ethical boundaries would you set for yourself when conducting Russian OSINT investigations?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "bd4865e4-b056-4d69-9b62-1a55d734c33f",
+      "type": "memory_aid",
+      "title": "Russian OSINT — Quick Reference",
+      "content": {
+        "text": "**Core Platforms:**\n- Yandex — Search, images, maps\n- VKontakte (VK) — People, social connections\n- Telegram — Channels, bots, communication\n- OK (Odnoklassniki) — Older demographic\n- 2GIS — Maps and business data\n\n**Corporate/Government:**\n- EGRUL — Company registry\n- EGRIP — Sole proprietor registry\n- Zakupki.gov.ru — Government procurement\n- Fedresurs — Legal facts\n- Sudrf.ru — Court decisions\n- Rusprofile — Aggregated company data\n\n**Key Identifiers:**\n- INN — Tax identification number\n- OGRN — Primary state registration number\n- Phone number — Key for cross-referencing\n\n**Considerations:**\n- Transliteration variations\n- Patronymics reveal family connections\n- VPN access may be restricted\n- Ethics: public data only, comply with laws"
+      },
+      "simplified_explanation": "Yandex + VK + Telegram = Russian OSINT trinity. EGRUL for companies. INN and OGRN are key identifiers.",
+      "memory_aids": [
+        "Yandex/VK/Telegram = core platforms",
+        "EGRUL = company data",
+        "INN = tax ID, OGRN = registration number",
+        "Transliteration = always check variants"
+      ],
+      "real_world_connection": "Keep this reference handy during Russian OSINT investigations.",
+      "reflection_prompt": "Create bookmarks for all the Russian OSINT platforms listed above.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "7c7c7d32-6343-4cca-8d1e-d78a98f02880",
+      "type": "reflection",
+      "title": "Russian OSINT Investigation Challenge",
+      "content": {
+        "text": "Practice scenarios:\n\n1. Investigate a Russian company suspected of sanctions evasion. Walk through your methodology.\n2. A threat intelligence report mentions a Russian hacker using 'DarkWolf' on Telegram. How would you identify this person?\n3. You find a VK profile matching your target. What information can you extract, and how would you cross-reference it?\n4. How would you handle a situation where a Russian platform blocks access from your country?\n\n**Key takeaways:**\n- Different platforms, same methodology\n- Cross-referencing is critical for verification\n- Language skills and cultural context improve results\n- Always follow ethical guidelines and local laws\n- Operational security matters when investigating adversaries"
+      },
+      "simplified_explanation": "Same methodology, different platforms. Cross-reference everything. Respect ethics and law.",
+      "memory_aids": [
+        "Same methodology, different platforms",
+        "Cross-reference = verification",
+        "Ethics and law always apply",
+        "OpSec when investigating adversary infrastructure"
+      ],
+      "real_world_connection": "Professional threat intelligence analysts use these techniques daily. The ability to navigate RuNet is a differentiator.",
+      "reflection_prompt": "Which Russian OSINT platform would you start with for a new investigation, and why?",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "ru-osint-q1",
+      "type": "multiple_choice",
+      "question": "What is the primary search engine for Russian-language OSINT?",
+      "options": [
+        "Google.ru",
+        "Yandex",
+        "Rambler",
+        "Bing"
+      ],
+      "correct_answer": 1,
+      "explanation": "Yandex is the primary search engine for Russian-language content with ~60% market share in Russia.",
+      "difficulty": 1,
+      "memory_aid": "Yandex = Russian Google.",
+      "points": 10
+    },
+    {
+      "question_id": "ru-osint-q2",
+      "type": "multiple_choice",
+      "question": "What is EGRUL?",
+      "options": [
+        "A Russian social media platform",
+        "The Russian Unified State Register of Legal Entities containing company registration data",
+        "A Russian people search engine",
+        "A Russian court records database"
+      ],
+      "correct_answer": 1,
+      "explanation": "EGRUL is the Unified State Register of Legal Entities, containing registration data for all Russian companies.",
+      "difficulty": 2,
+      "memory_aid": "EGRUL = Russian company register.",
+      "points": 15
+    },
+    {
+      "question_id": "ru-osint-q3",
+      "type": "multiple_choice",
+      "question": "Why is transliteration variation important in Russian OSINT?",
+      "options": [
+        "Russian doesn't use the Latin alphabet, so names can be transliterated multiple ways",
+        "It makes searches faster",
+        "Russian law requires it",
+        "It reduces the number of search results"
+      ],
+      "correct_answer": 0,
+      "explanation": "Russian names written in Cyrillic can be transliterated to Latin characters in multiple ways (Petrov/Petroff/Petrow). Searching all variations ensures comprehensive coverage.",
+      "difficulty": 2,
+      "memory_aid": "Petrov = Petroff = Petrow. Always check variants.",
+      "points": 15
+    },
+    {
+      "question_id": "ru-osint-q4",
+      "type": "multiple_choice",
+      "question": "Which platform is the primary communication and channel platform in the Russian-speaking world?",
+      "options": [
+        "WhatsApp",
+        "VKontakte",
+        "Telegram",
+        "WeChat"
+      ],
+      "correct_answer": 2,
+      "explanation": "Telegram is the primary communication and channel platform in the Russian-speaking world, hosting thousands of public channels.",
+      "difficulty": 1,
+      "memory_aid": "Telegram = primary communication platform in Russian-speaking world.",
+      "points": 10
+    },
+    {
+      "question_id": "ru-osint-q5",
+      "type": "multiple_choice",
+      "question": "What is the recommended approach when Russian platforms are blocked in your country?",
+      "options": [
+        "Use a VPN without considering legal implications",
+        "Skip Russian OSINT entirely",
+        "Check local laws and organizational policies, use dedicated investigation accounts",
+        "Ask a colleague in Russia to do the investigation"
+      ],
+      "correct_answer": 2,
+      "explanation": "Check local laws and organizational policies first. VPN use may be legally restricted. Use dedicated investigation accounts and ensure compliance.",
+      "difficulty": 2,
+      "memory_aid": "Check laws → dedicated accounts → follow policies.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

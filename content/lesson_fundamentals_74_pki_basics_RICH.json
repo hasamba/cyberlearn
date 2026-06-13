@@ -1,0 +1,288 @@
+{
+  "lesson_id": "e1f2a3b4-0000-0000-0005-000000001301",
+  "domain": "fundamentals",
+  "title": "Public Key Infrastructure (PKI) Basics",
+  "subtitle": "The trust framework that secures the internet",
+  "difficulty": 1,
+  "estimated_time": 40,
+  "order_index": 74,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Explain the purpose and components of Public Key Infrastructure",
+    "Describe how digital certificates establish trust between parties",
+    "Understand the role of Certificate Authorities in the trust chain",
+    "Differentiate between public key and private key operations",
+    "Identify common PKI failures and their security implications"
+  ],
+  "concepts": [
+    "Public Key Infrastructure",
+    "Certificate Authority (CA)",
+    "Digital Certificates",
+    "Public/Private Key Pairs",
+    "Certificate Chain of Trust",
+    "Certificate Signing Request (CSR)",
+    "X.509 Standard",
+    "Revocation (CRL/OCSP)",
+    "Root CA",
+    "Intermediate CA"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000001",
+      "type": "mindset_coach",
+      "title": "PKI — The Trust Engine of the Internet",
+      "content": {
+        "text": "Every time you see the padlock icon in your browser, PKI is working behind the scenes. It's the invisible framework that lets you trust that google.com is actually Google, that your bank's website is really your bank, and that the software update you're downloading hasn't been tampered with. Understanding PKI means understanding how trust works on the internet."
+      },
+      "simplified_explanation": "PKI is like a notary system for the internet. A Certificate Authority (the notary) verifies identities and issues certificates (stamped documents) that let others trust that a public key really belongs to who it claims to belong to.",
+      "memory_aids": [
+        "PKI = the trust system for the internet",
+        "CA = the notary that verifies identity",
+        "Certificate = the stamped document proving identity",
+        "No PKI = no trust = no secure browsing"
+      ],
+      "real_world_connection": "When you connect to your bank's website, PKI ensures you're really talking to your bank — not a man-in-the-middle attacker. The certificate your browser validates is part of PKI.",
+      "reflection_prompt": "How many HTTPS connections did your browser make today? Each one relied on PKI.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000002",
+      "type": "explanation",
+      "title": "How PKI Works — The Trust Chain",
+      "content": {
+        "text": "PKI is built on asymmetric cryptography — two mathematically related keys that work as a pair:\n\n- **Public key** — Shared openly, used to encrypt data or verify signatures\n- **Private key** — Kept secret, used to decrypt data or create signatures\n\n**The problem PKI solves:**\nAnyone can generate a key pair and claim to be anyone. How do you know that a public key really belongs to google.com?\n\n**PKI's solution:** A trusted third party (Certificate Authority) vouches for the binding between a public key and an identity.\n\n**The PKI Trust Chain:**\n1. **Root CA** — Self-signed, pre-installed in browsers/OS. The ultimate trust anchor.\n2. **Intermediate CA** — Certified by the Root CA. Issues end-entity certificates.\n3. **End-entity Certificate** — Certified by an Intermediate CA. Used by websites, people, devices.\n\nWhen your browser validates a certificate, it checks:\n1. Is the certificate signed by a trusted CA?\n2. Is the certificate still within its validity period?\n3. Has the certificate been revoked?\n4. Does the certificate's subject match the website's domain?\n\n**Certificate contents (X.509):**\n- Subject (who it's issued to)\n- Issuer (which CA issued it)\n- Public key\n- Validity period (not before / not after)\n- Serial number\n- Digital signature (from the CA)\n- Extensions (Subject Alternative Names, key usage, etc.)\n\n**Certificate types:**\n| Type | Validation Level | Use Case |\n|------|-----------------|----------|\n| DV (Domain Validated) | Email/file verification | Basic websites |\n| OV (Organization Validated) | Organization identity verified | Business websites |\n| EV (Extended Validation) | Rigorous identity verification | Banks, high-security |\n| Code Signing | Developer identity verified | Software distribution |\n| Client/Email | Individual identity verified | S/MIME, client auth |"
+      },
+      "simplified_explanation": "Root CA = the ultimate trust anchor (pre-installed in your browser). Intermediate CA = middle manager. End-entity cert = the website certificate. Your browser follows the chain from the website cert up to the root CA to verify trust.",
+      "memory_aids": [
+        "Root CA → Intermediate CA → End-entity certificate",
+        "Public key = shareable, Private key = secret",
+        "DV = domain only, OV = organization verified, EV = rigorous verification",
+        "X.509 = certificate format standard"
+      ],
+      "real_world_connection": "Security+ Domain 1.4 tests PKI concepts heavily. Understanding the chain of trust and certificate types is essential for the exam and real-world security.",
+      "reflection_prompt": "Open a website and click the padlock icon. Can you trace the certificate chain from the end-entity to the root CA?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000003",
+      "type": "explanation",
+      "title": "Certificate Lifecycle — From Request to Revocation",
+      "content": {
+        "text": "**Certificate Lifecycle:**\n\n1. **Key Generation** — Generate a public/private key pair\n2. **CSR (Certificate Signing Request)** — Send public key + identity info to a CA\n3. **Validation** — CA verifies identity (DV/OV/EV levels)\n4. **Issuance** — CA signs the certificate and sends it back\n5. **Deployment** — Install certificate on web server, device, or application\n6. **Use** — Certificate is presented during TLS handshake\n7. **Renewal** — Before expiration, get a new certificate\n8. **Revocation** — If compromised, revoke the certificate\n\n**Revocation Methods:**\n- **CRL (Certificate Revocation List)** — A published list of revoked certificate serial numbers. Downloaded periodically.\n- **OCSP (Online Certificate Status Protocol)** — Real-time query: 'Is this certificate still valid?' Faster than CRL.\n- **OCSP Stapling** — Server includes a recent OCSP response in the TLS handshake. Reduces client-side OCSP lookups.\n\n**Certificate Pinning:**\n- Pin a specific certificate or public key\n- Prevents MITM even if a CA is compromised\n- Used in mobile apps and some browsers\n- HPKP (HTTP Public Key Pinning) was deprecated due to operational issues\n\n**Common PKI Failures:**\n- **Expired certificates** — Causes outages (Cloudflare 2023 incident)\n- **Misissued certificates** — CA issues cert to wrong entity (DigiNotar 2011 breach)\n- **Compromised CA** — Root or intermediate CA private key stolen\n- **Certificate spoofing** — Attacker obtains fraudulent certificate\n- **Trust store manipulation** — Malicious root CA added to trust store"
+      },
+      "simplified_explanation": "A certificate's life: born (generated), validated (CA checks), deployed (installed), used (TLS), renewed (before expiry), and possibly revoked (if compromised). Think of it like a passport — issued, used, renewed, or cancelled.",
+      "memory_aids": [
+        "Certificate lifecycle: Generate → CSR → Validate → Issue → Deploy → Use → Renew/Revoke",
+        "CRL = list of bad certificates (download periodically)",
+        "OCSP = real-time check (is this cert still good?)",
+        "Expired cert = outage (check your renewals!)"
+      ],
+      "real_world_connection": "The 2023 Cloudflare outage was caused by an expired certificate. The DigiNotar CA breach in 2011 led to fraudulent certificates for Google, Yahoo, and others — resulting in DigiNotar's trust being revoked entirely.",
+      "reflection_prompt": "Does your organization have certificate expiration monitoring? An expired cert can take down critical services.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000004",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: PKI as a Notary System",
+      "content": {
+        "text": "Imagine you want to send a letter to your friend, but you need to prove it's really from you.\n\n**Without PKI:**\nYou write a letter and sign it 'Alex.' But anyone can write 'Alex' on a letter. Your friend has no way to verify it's really from you.\n\n**With PKI:**\n1. You go to a Notary (Certificate Authority) with your ID\n2. The Notary checks your identity and creates an official stamp (certificate)\n3. The Notary's stamp says: 'This public key belongs to Alex, verified by me'\n4. You use your private key to sign your letter\n5. Your friend uses your public key (from the certificate) to verify the signature\n6. Your friend trusts the Notary, so they trust your certificate\n\n**The Chain of Trust:**\n- The Notary (CA) is trusted because a higher authority (Root CA) certified them\n- The Root CA is trusted because your browser/OS has their public key pre-installed\n- Your friend's browser automatically checks the entire chain\n\n**What can go wrong?**\n- A fake Notary issues a certificate for your identity → impersonation\n- The Notary gets hacked → fraudulent certificates issued\n- Your private key is stolen → someone else can sign as you\n- The certificate expires → your friend can't verify your letters anymore\n\nThis is exactly what happens with HTTPS, except with math instead of stamps."
+      },
+      "simplified_explanation": "PKI = notary system for the internet. The CA (notary) verifies your identity and issues a certificate (stamp). Everyone trusts the notary, so they trust your certificate. The root CA is like the government that licenses notaries.",
+      "memory_aids": [
+        "CA = Notary, Certificate = Stamp, Private Key = Your signature",
+        "Root CA = Government (pre-trusted)",
+        "Intermediate CA = Licensed Notary",
+        "End-entity = You, getting your document stamped"
+      ],
+      "real_world_connection": "Security+ tests this analogy directly. If you can explain PKI using the notary metaphor, you can answer the exam questions.",
+      "reflection_prompt": "Next time you see a certificate error in your browser, check the details. Which part of the trust chain failed?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000005",
+      "type": "real_world",
+      "title": "PKI in Practice — From HTTPS to Email",
+      "content": {
+        "text": "**HTTPS/TLS (Most Common PKI Use Case):**\n- Browser connects to server, server presents certificate\n- Browser validates certificate chain to root CA\n- Browser and server negotiate encryption using public key cryptography\n- This is what makes the padlock icon appear\n\n**S/MIME (Email Encryption & Signing):**\n- Certificates issued to individuals for email signing and encryption\n- Ensures email authenticity (signing) and confidentiality (encryption)\n- Requires both sender and recipient to have certificates\n\n**Code Signing:**\n- Developers sign software with certificates\n- Users verify the signature before installing\n- Prevents tampering and verifies developer identity\n- Compromised code signing certs are extremely valuable to attackers\n\n**VPN Authentication:**\n- Client certificates authenticate users/devices to VPNs\n- More secure than passwords alone\n- Often used with mutual TLS (mTLS)\n\n**Smart Cards and PIV/CAC:**\n- Government and military use PKI on smart cards\n- Personal Identity Verification (PIV) cards contain certificates\n- Common Access Card (CAC) for Department of Defense\n\n**Enterprise PKI:**\n- Microsoft AD CS (Active Directory Certificate Services)\n- Internal CAs for enterprise applications\n- Auto-enrollment via Group Policy\n- Certificate templates for different use cases\n\n**PKI Management Tools:**\n- Let's Encrypt (free, automated certificates via ACME)\n- HashiCorp Vault (secret management with PKI backend)\n- Smallstep (modern PKI for zero-trust architectures)\n- cert-manager (Kubernetes certificate management)"
+      },
+      "simplified_explanation": "PKI is everywhere: HTTPS (padlock icon), S/MIME (encrypted email), code signing (trusted software), VPN auth (certificate-based login), and smart cards (government ID). If trust is involved, PKI is involved.",
+      "memory_aids": [
+        "HTTPS = most common PKI use case",
+        "S/MIME = email encryption + signing",
+        "Code signing = verified software",
+        "mTLS = both sides verify each other",
+        "Let's Encrypt = free automated certificates"
+      ],
+      "real_world_connection": "Every modern organization runs internal PKI for device authentication, Wi-Fi (802.1X), VPN access, and email encryption. If PKI breaks, everything breaks.",
+      "reflection_prompt": "How many PKI-dependent services does your organization run? What happens if the internal CA goes down?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000006",
+      "type": "memory_aid",
+      "title": "PKI Cheat Sheet — Security+ Domain 1.4",
+      "content": {
+        "text": "**🔑 PKI Components:**\n- **Root CA** — Trust anchor, self-signed, pre-installed in browsers\n- **Intermediate CA** — Certified by root, issues end-entity certs\n- **End-entity certificate** — Issued to websites, people, devices\n- **CRL** — List of revoked certificates\n- **OCSP** — Real-time certificate status check\n\n**📜 Certificate Types:**\n- **DV** — Domain Validated (basic, email verification)\n- **OV** — Organization Validated (business identity verified)\n- **EV** — Extended Validation (rigorous identity verification)\n- **Code Signing** — Software authenticity\n- **Client/Email** — Individual identity\n\n**🔐 Key Operations:**\n- **Public key** → Encrypt data, verify signatures\n- **Private key** → Decrypt data, create signatures\n- **Digital signature** → Private key signs, public key verifies\n- **Key exchange** → Public key encrypts session key\n\n**⚠️ Common PKI Attacks & Failures:**\n- Compromised CA → fraudulent certificates (DigiNotar)\n- Expired certificates → service outages\n- Man-in-the-middle → intercepted certificate validation\n- Trust store manipulation → malicious root CA added\n- Certificate spoofing → attacker obtains fraudulent cert\n\n**🛠️ Management Commands:**\n- `openssl req -new -key private.key -out request.csr` — Generate CSR\n- `openssl x509 -in cert.pem -text -noout` — Inspect certificate\n- `openssl verify -CAfile ca.pem cert.pem` — Verify chain"
+      },
+      "simplified_explanation": "PKI: Root CA trusts Intermediate CA, which trusts your certificate. Your browser follows the chain. If any link breaks, trust fails.",
+      "memory_aids": [
+        "Root CA → Intermediate → End-entity = trust chain",
+        "DV/OV/EV = increasing validation levels",
+        "Public key = encrypt/verify, Private key = decrypt/sign",
+        "CRL = list, OCSP = real-time check",
+        "Expired cert = outage, Compromised CA = catastrophe"
+      ],
+      "real_world_connection": "Security+ Domain 1.4 focuses on PKI concepts. Know the chain of trust, certificate types, and common failures — they're guaranteed exam topics.",
+      "reflection_prompt": "Practice inspecting certificates: click the padlock icon on any HTTPS site and trace the chain from end-entity to root CA.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000007",
+      "type": "reflection",
+      "title": "PKI Knowledge Check",
+      "content": {
+        "text": "Test your understanding:\n\n1. What is the difference between a root CA and an intermediate CA?\n2. Why does your browser trust certain CAs by default?\n3. What happens when a certificate expires?\n4. How does OCSP improve on CRL?\n5. Why was DigiNotar's root certificate removed from all browsers?\n\n**Real-world scenario:**\nA company's internal CA certificate expires on a Friday evening. By Monday morning, 50% of internal services are down — VPN, Wi-Fi, email encryption, and code signing all fail. How could this have been prevented?\n\n**Answer:** Certificate expiration monitoring, automated renewal (like Let's Encrypt's ACME protocol), and certificate lifecycle management tools. The Friday evening expiry suggests no one was watching.",
+        "interactive_prompt": "Inspect three different HTTPS websites and trace each certificate chain. How many intermediate CAs does each have? What organization issued each certificate?"
+      },
+      "simplified_explanation": "PKI failures are usually operational, not cryptographic. Expired certificates cause more outages than broken encryption. The math works — it's the management that breaks.",
+      "memory_aids": [
+        "Most PKI failures are operational, not cryptographic",
+        "Certificate monitoring = essential",
+        "Automated renewal = prevent outages"
+      ],
+      "real_world_connection": "The majority of PKI-related outages are caused by expired certificates, not compromised keys. Certificate lifecycle management is a critical operations function.",
+      "reflection_prompt": "Does your organization have certificate expiration alerts? If not, set them up today — before a Friday evening expiry takes down Monday morning.",
+      "is_interactive": true,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "e1f2a3b4-0000-0000-0005-000000000006",
+      "type": "code_exercise",
+      "title": "Inspecting and Verifying Certificates",
+      "content": {
+        "text": "Practice inspecting certificate chains with OpenSSL:\n\n```bash\n# View certificate details\nopenssl x509 -in certificate.pem -text -noout\n\n# Verify certificate chain\nopenssl verify -CAfile ca-bundle.crt server-cert.pem\n\n# Check a website's certificate\nopenssl s_client -connect google.com:443 -showcerts\n\n# Generate a CSR (Certificate Signing Request)\nopenssl req -new -newkey rsa:2048 -nodes \\\n  -keyout private.key -out request.csr\n\n# Check certificate expiration date\nopenssl x509 -in cert.pem -noout -enddate\n\n# Convert certificate formats\nopenssl x509 -in cert.der -inform DER -out cert.pem -outform PEM\n```\n\n**Key verification checks:**\n1. Subject Alternative Names (SAN) match the domain\n2. Certificate chain is complete to a trusted root\n3. Certificate is within validity period\n4. Key usage matches intended purpose\n5. No revocation (check OCSP/CRL)\n\n**Common certificate errors:**\n- `ERR_CERT_DATE_INVALID` — Expired or not-yet-valid certificate\n- `ERR_CERT_AUTHORITY_INVALID` — Untrusted CA\n- `ERR_CERT_COMMON_NAME_INVALID` — CN/SAN mismatch\n- `NET::ERR_CERT_REVOKED` — Certificate has been revoked"
+      },
+      "simplified_explanation": "OpenSSL commands let you inspect, verify, and troubleshoot certificates in real-time. These are essential commands for any security professional.",
+      "memory_aids": [
+        "openssl x509 -text = inspect certificate",
+        "openssl verify = check chain",
+        "openssl s_client = check live website cert",
+        "Common errors: date, authority, CN, revoked"
+      ],
+      "real_world_connection": "Security+ and real-world troubleshooting both require certificate inspection skills. When a service breaks due to certificate expiration, these commands save hours of debugging.",
+      "reflection_prompt": "Run `openssl s_client -connect google.com:443 -showcerts` and trace the certificate chain. How many intermediate CAs does Google use?",
+      "is_interactive": false,
+      "xp_reward": 20
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "pki-q1",
+      "type": "multiple_choice",
+      "question": "What role does a Certificate Authority (CA) play in PKI?",
+      "options": [
+        "Encrypts data using symmetric keys",
+        "Binds identities to public keys by issuing digital certificates",
+        "Stores private keys for all users",
+        "Manages network firewall rules"
+      ],
+      "correct_answer": 1,
+      "explanation": "A Certificate Authority verifies identities and binds them to public keys by issuing digital certificates. The CA's signature on a certificate is what allows others to trust that a public key belongs to the claimed identity.",
+      "difficulty": 1,
+      "memory_aid": "CA = identity verifier + certificate issuer. They vouch for the binding between identity and public key.",
+      "points": 10
+    },
+    {
+      "question_id": "pki-q2",
+      "type": "multiple_choice",
+      "question": "What is the purpose of a Certificate Revocation List (CRL)?",
+      "options": [
+        "To list all valid certificates in a PKI",
+        "To publish certificates that have been revoked before their expiration date",
+        "To generate new certificate signing requests",
+        "To store private keys securely"
+      ],
+      "correct_answer": 1,
+      "explanation": "A CRL is a list of certificates that have been revoked by the CA before their expiration date. Clients download CRLs periodically to check if a certificate is still valid.",
+      "difficulty": 1,
+      "memory_aid": "CRL = 'bad certificate list' published by CA. Check it before trusting a cert.",
+      "points": 10
+    },
+    {
+      "question_id": "pki-q3",
+      "type": "multiple_choice",
+      "question": "In the PKI trust chain, which entity is self-signed and pre-installed in browsers?",
+      "options": [
+        "End-entity certificate",
+        "Intermediate CA certificate",
+        "Root CA certificate",
+        "Certificate Signing Request"
+      ],
+      "correct_answer": 2,
+      "explanation": "Root CA certificates are self-signed and pre-installed in browsers and operating systems. They are the ultimate trust anchors in PKI. All other certificates in the chain derive their trust from the root CA.",
+      "difficulty": 1,
+      "memory_aid": "Root CA = self-signed, pre-installed, ultimate trust anchor. Everything else derives trust from it.",
+      "points": 10
+    },
+    {
+      "question_id": "pki-q4",
+      "type": "multiple_choice",
+      "question": "What advantage does OCSP have over CRL for certificate revocation checking?",
+      "options": [
+        "OCSP requires less bandwidth than CRL",
+        "OCSP provides real-time certificate status instead of periodic list downloads",
+        "OCSP can revoke certificates automatically",
+        "OCSP is more secure because it uses symmetric encryption"
+      ],
+      "correct_answer": 1,
+      "explanation": "OCSP (Online Certificate Status Protocol) provides real-time certificate status checking by querying the CA directly. CRL requires downloading a full list of revoked certificates periodically, which can be outdated. OCSP is faster and more current.",
+      "difficulty": 2,
+      "memory_aid": "CRL = download the bad list periodically. OCSP = ask the CA in real-time. OCSP is faster.",
+      "points": 15
+    },
+    {
+      "question_id": "pki-q5",
+      "type": "multiple_choice",
+      "question": "A company's internal CA private key is compromised. What is the most appropriate response?",
+      "options": [
+        "Revoke only the compromised end-entity certificates",
+        "Revoke the CA certificate and re-issue all certificates in the chain",
+        "Change the CA's password and continue using the same key",
+        "Wait for certificates to expire naturally and then re-issue"
+      ],
+      "correct_answer": 1,
+      "explanation": "If a CA's private key is compromised, the attacker can issue fraudulent certificates for any domain. The entire trust chain is broken. All certificates issued by that CA must be revoked and re-issued under a new CA key pair. This is what happened with DigiNotar — their root was removed from all browsers.",
+      "difficulty": 2,
+      "memory_aid": "Compromised CA key = entire chain broken. Revoke everything, re-issue under new key.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 110,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

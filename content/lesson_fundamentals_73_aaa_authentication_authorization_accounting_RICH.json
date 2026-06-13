@@ -1,0 +1,277 @@
+{
+  "lesson_id": "f1a2b3c4-0000-0000-0001-000000001300",
+  "domain": "fundamentals",
+  "title": "AAA: Authentication, Authorization, Accounting",
+  "subtitle": "Understanding the three pillars of access control",
+  "difficulty": 1,
+  "estimated_time": 35,
+  "order_index": 73,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Define authentication and explain how it verifies identity",
+    "Define authorization and explain how it controls access levels",
+    "Define accounting (auditing) and explain how it tracks actions",
+    "Distinguish between authentication, authorization, and accounting with real-world examples",
+    "Explain how AAA frameworks work together to enforce security policy"
+  ],
+  "concepts": [
+    "Authentication",
+    "Authorization",
+    "Accounting (Auditing)",
+    "AAA Framework",
+    "Identity Verification",
+    "Access Control",
+    "Multi-factor Authentication",
+    "Least Privilege",
+    "Non-repudiation",
+    "Audit Logs"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000001",
+      "type": "mindset_coach",
+      "title": "Welcome to AAA — The Security Gatekeeper!",
+      "content": {
+        "text": "Every time you unlock your phone, swipe a badge at work, or log into a website, you're interacting with AAA — Authentication, Authorization, and Accounting. It's the invisible security framework that decides who you are, what you're allowed to do, and keeps a record of it all. Master this concept and you'll understand the backbone of every access control system."
+      },
+      "simplified_explanation": "Think of AAA like entering a club: the bouncer checks your ID (Authentication), the wristband decides which rooms you can enter (Authorization), and the security cameras record everywhere you went (Accounting).",
+      "memory_aids": [
+        "AAA = Authentication (Who are you?) + Authorization (What can you do?) + Accounting (What did you do?)",
+        "Authentication = Identity, Authorization = Permission, Accounting = Proof"
+      ],
+      "real_world_connection": "When you log into your email: your password authenticates you, your account type determines which folders you can see, and the mail server logs every message you send.",
+      "reflection_prompt": "Think about your morning routine — how many times did AAA happen before you reached your desk?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000002",
+      "type": "explanation",
+      "title": "Authentication — Proving Who You Are",
+      "content": {
+        "text": "Authentication is the process of verifying a claimed identity. It answers the question: **Are you really who you say you are?**\n\nAuthentication factors fall into three categories:\n\n1. **Something you know** — Passwords, PINs, security questions\n2. **Something you have** — Smart cards, tokens, OTP devices, phone-based authenticators\n3. **Something you are** — Fingerprints, facial recognition, iris scans, voice patterns\n\n**Single-factor authentication** uses only one factor (e.g., a password). **Multi-factor authentication (MFA)** combines two or more factors, dramatically reducing the risk of compromise. If someone steals your password, they still can't authenticate without your second factor.\n\nCommon authentication protocols include RADIUS, TACACS+, Kerberos, and OAuth 2.0. Each serves different use cases — from network device logins to web application SSO."
+      },
+      "simplified_explanation": "Authentication is like showing your passport at the airport. The officer doesn't care what you'll do in the country — they just need to confirm you are who your document says you are.",
+      "memory_aids": [
+        "AuthN = Identity Verification (the 'N' is for 'iN')",
+        "Three factors: Know, Have, Are",
+        "MFA = combining factors = harder to break"
+      ],
+      "real_world_connection": "When you enable 2FA on GitHub, you're adding a 'something you have' factor (your phone) to the 'something you know' factor (your password). Even if your password leaks, your account stays safe.",
+      "reflection_prompt": "Which accounts you use daily rely on single-factor authentication? How would adding MFA change the threat model?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000003",
+      "type": "explanation",
+      "title": "Authorization — Defining What You Can Do",
+      "content": {
+        "text": "Authorization determines what actions and resources an authenticated identity is permitted to access. It answers: **What are you allowed to do?**\n\nAuthorization models include:\n\n- **RBAC (Role-Based Access Control)** — Permissions tied to roles (e.g., 'Admin', 'Analyst', 'Viewer')\n- **ABAC (Attribute-Based Access Control)** — Permissions based on attributes (user department, time of day, location, device posture)\n- **MAC (Mandatory Access Control)** — System-enforced labels (e.g., classification levels like Secret, Top Secret)\n- **DAC (Discretionary Access Control)** — Resource owners decide who gets access\n\nThe principle of **least privilege** dictates that users should receive only the minimum permissions required for their job. Over-provisioning is one of the most common authorization failures — it's how attackers escalate from a compromised user account to full domain admin.\n\nAuthorization is always evaluated **after** authentication. You must know WHO someone is before deciding WHAT they can do."
+      },
+      "simplified_explanation": "If authentication is the bouncer checking your ID, authorization is the VIP wristband that decides whether you can go to the backstage area or just the main floor.",
+      "memory_aids": [
+        "AuthZ = Permissions (the 'Z' stands for 'Zee what you can do')",
+        "Least Privilege = minimum keys to do your job",
+        "RBAC = role-based, ABAC = attribute-based"
+      ],
+      "real_world_connection": "In AWS, IAM policies are pure authorization. They define what an authenticated identity (user, role, or service) can do with which resources, under what conditions.",
+      "reflection_prompt": "If you have admin access to your laptop right now — do you actually need it for daily work, or is that a violation of least privilege?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000004",
+      "type": "explanation",
+      "title": "Accounting — Recording What Happened",
+      "content": {
+        "text": "Accounting (also called auditing) tracks and records the actions of authenticated and authorized users. It answers: **What did you do, and can we prove it?**\n\nAccounting provides:\n\n- **Accountability** — Users are responsible for their actions because those actions are logged\n- **Non-repudiation** — Users cannot deny having performed an action (especially with strong authentication)\n- **Forensic evidence** — Logs support incident investigation and legal proceedings\n- **Compliance** — Regulations like SOX, HIPAA, GDPR, and PCI DSS mandate comprehensive audit trails\n\nKey accounting artifacts include:\n- Login/logout timestamps and source IPs\n- File access logs (who read, modified, or deleted what)\n- Configuration change records\n- Privilege escalation events\n- Network connection logs\n\nEffective accounting requires:\n1. **Centralized log collection** (SIEM, syslog servers)\n2. **Tamper-proof storage** (WORM drives, blockchain logs)\n3. **Regular log review** (automated alerting + periodic audits)\n4. **Retention policies** (how long to keep logs, legal requirements)"
+      },
+      "simplified_explanation": "Accounting is like the security camera in a store. It doesn't stop theft, but it records exactly what happened, when, and by whom — so you can investigate, prove, and prevent future incidents.",
+      "memory_aids": [
+        "Accounting = 'The Camera' — records everything",
+        "Non-repudiation = You can't say 'I didn't do that'",
+        "No logs = no evidence = no accountability"
+      ],
+      "real_world_connection": "When a ransomware attack happens, the first thing investigators check are the logs. Who logged in? From where? What files were accessed? Without accounting, incident response is blind.",
+      "reflection_prompt": "If your organization's VPN logs were deleted today — what security visibility would you lose?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000005",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: How AAA Works Together",
+      "content": {
+        "text": "Imagine you're going to a theme park:\n\n1. **Authentication** — At the gate, you show your ticket and ID. The scanner verifies: 'Yes, this is really Alex, and the ticket is valid.'\n\n2. **Authorization** — Your ticket type (VIP, regular, kids) determines which rides you can go on. VIP gets the fast lane. Kids can't ride the roller coaster. The wristband color tells ride operators what you're allowed to do.\n\n3. **Accounting** — Every time you scan your wristband at a ride, the park's system logs it. At the end of the day, they know exactly which rides you went on, at what time, and how many times.\n\n**What happens if one pillar fails?**\n- No authentication → Anyone can walk in pretending to be you\n- No authorization → A regular ticket holder rides the VIP roller coaster\n- No accounting → Someone causes trouble and nobody can prove who did it\n\nAll three must work together for a secure system."
+      },
+      "simplified_explanation": "AAA is like a theme park system: ticket check (who are you?), wristband color (what can you ride?), and ride log (what did you ride?). Missing any one breaks the whole system.",
+      "memory_aids": [
+        "AAA = Who? What? Proof?",
+        "AuthN = door key, AuthZ = room access, Accounting = visitor log"
+      ],
+      "real_world_connection": "When you use SSH with a key pair to a server, the key authenticates you. The server's sudoers file authorizes what commands you can run. And /var/log/auth.log accounts for every login attempt.",
+      "reflection_prompt": "Can you think of a system where one of the AAA pillars is missing? What goes wrong?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000006",
+      "type": "real_world",
+      "title": "AAA in Enterprise Security",
+      "content": {
+        "text": "In enterprise environments, AAA is implemented through dedicated protocols and servers:\n\n**RADIUS (Remote Authentication Dial-In User Service)**\n- Unified authentication, authorization, and accounting\n- Most commonly used for network access (VPN, Wi-Fi, switches)\n- Authenticates users against a central directory (Active Directory, LDAP)\n- Encrypts only the password, not the entire packet\n- UDP-based, ports 1812/1813\n\n**TACACS+ (Terminal Access Controller Access-Control System Plus)**\n- Separates authentication, authorization, and accounting into distinct processes\n- Primarily used for network device administration (routers, switches, firewalls)\n- Encrypts the entire packet body\n- TCP-based, port 49\n- Cisco-proprietary but widely supported\n\n**When to use which:**\n| Scenario | Better Choice |\n|----------|---------------|\n| VPN/Wi-Fi access | RADIUS |\n| Network device admin | TACACS+ |\n| 802.1X port authentication | RADIUS |\n| Granular command authorization | TACACS+ |\n| Centralized user accounting | Both |\n\nModern implementations often use cloud identity providers (Okta, Azure AD) for AuthN/AuthZ and SIEM solutions for accounting."
+      },
+      "simplified_explanation": "RADIUS and TACACS+ are like two different security guard companies. RADIUS handles all three A's together and is great for letting people into the building (network access). TACACS+ separates the A's and is better for controlling exactly which rooms someone can enter (device commands).",
+      "memory_aids": [
+        "RADIUS = Network access, combines AAA, UDP",
+        "TACACS+ = Device admin, separates AAA, TCP",
+        "RADIUS encrypts password only, TACACS+ encrypts everything"
+      ],
+      "real_world_connection": "When you connect to corporate Wi-Fi with your domain credentials, RADIUS is doing the AuthN. When a network engineer logs into a core switch with granular command permissions, that's TACACS+ doing AuthZ.",
+      "reflection_prompt": "Does your organization use RADIUS, TACACS+, or both? How would you find out?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000007",
+      "type": "memory_aid",
+      "title": "AAA Key Takeaways",
+      "content": {
+        "text": "**Authentication, Authorization, and Accounting — The Security Trinity**\n\n🔑 **Authentication (AuthN)** — Who are you?\n- Factors: Know (password), Have (token), Are (biometric)\n- MFA = stronger identity verification\n- Protocols: RADIUS, Kerberos, OAuth 2.0\n\n🛡️ **Authorization (AuthZ)** — What can you do?\n- Models: RBAC, ABAC, MAC, DAC\n- Least privilege = minimum necessary access\n- Evaluated AFTER authentication\n\n📋 **Accounting** — What did you do?\n- Logs, audit trails, non-repudiation\n- Required for compliance (SOX, HIPAA, PCI DSS)\n- Must be tamper-proof and centralized\n\n⚠️ **Common exam gotchas:**\n- Authentication ≠ Authorization (identity vs. permission)\n- Accounting provides non-repudiation only when combined with strong authentication\n- RADIUS combines AAA; TACACS+ separates them\n- Something you are (biometrics) = strongest single factor\n- Something you know (passwords) = weakest single factor"
+      },
+      "simplified_explanation": "AuthN = who you are, AuthZ = what you can do, Accounting = proof of what you did. Remember: Authentication comes first, then authorization, then accounting tracks it all.",
+      "memory_aids": [
+        "AAA = Who? What? Proof?",
+        "AuthN before AuthZ — you must be identified before you get permissions",
+        "RADIUS = combined, TACACS+ = separated",
+        "MFA > SFA always",
+        "Least privilege = fewer keys = smaller attack surface"
+      ],
+      "real_world_connection": "Every security incident investigation starts with accounting (what happened?), moves to authentication (who did it?), and ends with authorization review (were they even allowed to do that?).",
+      "reflection_prompt": "Write down the AAA flow for logging into your work VPN. Which factor authenticates you? What does the VPN authorize? What gets logged?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "b1a2c3d4-0000-0000-0001-000000000008",
+      "type": "reflection",
+      "title": "Check Your Understanding",
+      "content": {
+        "text": "Before moving on, make sure you can answer these questions:\n\n1. What is the difference between authentication and authorization?\n2. Name the three authentication factors and give an example of each.\n3. Why is multi-factor authentication stronger than single-factor?\n4. What is the principle of least privilege and how does it relate to authorization?\n5. How does accounting support non-repudiation?\n6. When would you choose TACACS+ over RADIUS?\n\nIf you can explain these to someone else, you've got AAA down.",
+        "interactive_prompt": "Try explaining AAA to a colleague using the theme park analogy. If they understand it, you've truly learned it."
+      },
+      "simplified_explanation": "If you can teach AAA to someone who's never heard of it, you've mastered it. Use the theme park analogy — it works every time.",
+      "memory_aids": [
+        "Teach it to learn it — the Feynman Technique"
+      ],
+      "real_world_connection": "Security+ Domain 1.3 tests your ability to distinguish between these concepts. Most wrong answers come from confusing authentication with authorization.",
+      "reflection_prompt": "Which AAA pillar do you think is most often neglected in real organizations? Why?",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "aaa-q1",
+      "type": "multiple_choice",
+      "question": "A user enters a username and password to access a system. Which AAA component is being performed?",
+      "options": [
+        "Authorization",
+        "Authentication",
+        "Accounting",
+        "Auditing"
+      ],
+      "correct_answer": 1,
+      "explanation": "Entering credentials (username and password) is authentication — the process of verifying identity. Authorization determines what the verified user can access, and accounting logs what they do.",
+      "difficulty": 1,
+      "memory_aid": "Username + Password = Who are you? = Authentication",
+      "points": 10
+    },
+    {
+      "question_id": "aaa-q2",
+      "type": "multiple_choice",
+      "question": "Which of the following is an example of multi-factor authentication?",
+      "options": [
+        "Username and password",
+        "Password and security question",
+        "Password and SMS verification code",
+        "Two different passwords"
+      ],
+      "correct_answer": 2,
+      "explanation": "MFA requires factors from different categories. Password (something you know) + SMS code (something you have) combines two different factor types. Two passwords are both 'something you know' — that's still single-factor.",
+      "difficulty": 1,
+      "memory_aid": "Different factor types = MFA. Same factor type twice ≠ MFA.",
+      "points": 10
+    },
+    {
+      "question_id": "aaa-q3",
+      "type": "multiple_choice",
+      "question": "A security policy states that developers should only have access to production servers during approved maintenance windows. Which AAA principle does this enforce?",
+      "options": [
+        "Authentication",
+        "Accounting",
+        "Least Privilege",
+        "Non-repudiation"
+      ],
+      "correct_answer": 2,
+      "explanation": "Limiting access to only what's needed, when it's needed, is least privilege — an authorization principle. It ensures users don't have more permissions than required.",
+      "difficulty": 1,
+      "memory_aid": "Least privilege = minimum access = authorization principle",
+      "points": 10
+    },
+    {
+      "question_id": "aaa-q4",
+      "type": "multiple_choice",
+      "question": "Which protocol separates authentication, authorization, and accounting into distinct processes and encrypts the entire packet body?",
+      "options": [
+        "RADIUS",
+        "Kerberos",
+        "TACACS+",
+        "LDAP"
+      ],
+      "correct_answer": 2,
+      "explanation": "TACACS+ separates the three AAA functions into independent processes and encrypts the full packet body. RADIUS combines authentication and authorization and only encrypts the password field.",
+      "difficulty": 2,
+      "memory_aid": "TACACS+ = TCP, full encryption, separated AAA. RADIUS = UDP, partial encryption, combined AAA.",
+      "points": 15
+    },
+    {
+      "question_id": "aaa-q5",
+      "type": "multiple_choice",
+      "question": "After a data breach, investigators find that all access logs were stored on the same server that was compromised. Which AAA pillar failed?",
+      "options": [
+        "Authentication",
+        "Authorization",
+        "Accounting",
+        "All three"
+      ],
+      "correct_answer": 2,
+      "explanation": "The accounting pillar failed because logs were not tamper-proof or centralized separately. Accounting requires that logs be protected from modification — storing them on the compromised server means the attacker could alter or delete evidence of their actions.",
+      "difficulty": 2,
+      "memory_aid": "Accounting = logs. Logs on compromised server = failed accounting = no accountability.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}

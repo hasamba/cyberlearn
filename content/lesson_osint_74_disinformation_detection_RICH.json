@@ -1,0 +1,286 @@
+{
+  "lesson_id": "d1e2f3a4-0000-0000-0004-000000001150",
+  "domain": "osint",
+  "title": "Disinformation Detection and Analysis",
+  "subtitle": "Identifying, analyzing, and countering false narratives in the information age",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 74,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Define disinformation, misinformation, and malinformation and explain their differences",
+    "Identify common disinformation techniques and narrative manipulation tactics",
+    "Apply OSINT techniques to verify information sources and claims",
+    "Analyze disinformation campaigns using attribution and network analysis",
+    "Develop strategies for countering disinformation in organizational contexts"
+  ],
+  "concepts": [
+    "Disinformation vs Misinformation vs Malinformation",
+    "Cognitive Biases",
+    "Narrative Manipulation",
+    "Source Verification",
+    "Bot and Sockpuppet Detection",
+    "Deepfake Detection",
+    "Information Laundering",
+    "Network Analysis",
+    "Reverse Image Search",
+    "Media Literacy"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000001",
+      "type": "mindset_coach",
+      "title": "The Information Battlefield",
+      "content": {
+        "text": "In the modern threat landscape, information is both weapon and battlefield. Disinformation campaigns have influenced elections, crashed stock prices, and undermined public health responses. As an OSINT practitioner, your ability to detect and analyze disinformation isn't just an academic skill — it's a critical defense capability. This lesson teaches you to see through the noise."
+      },
+      "simplified_explanation": "Disinformation is like a fake map — it leads you in the wrong direction on purpose. Misinformation is like an outdated map — wrong, but not intentional. Your job is to verify the map before you follow it.",
+      "memory_aids": [
+        "Disinformation = deliberate deception",
+        "Misinformation = honest mistake",
+        "Malinformation = true info used to harm"
+      ],
+      "real_world_connection": "The 2016 US election interference, COVID-19 infodemics, and deepfake videos of CEOs are all real disinformation campaigns that had measurable global impact.",
+      "reflection_prompt": "How many times today have you encountered information you didn't verify? Disinformation exploits our tendency to share before checking.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000002",
+      "type": "explanation",
+      "title": "The Three Faces of False Information",
+      "content": {
+        "text": "**Disinformation** — False information deliberately created and spread to deceive.\n- Created with intent to manipulate\n- Often state-sponsored or organized\n- Examples: Russian IRA troll farms, deepfake videos of political leaders\n\n**Misinformation** — False information shared without malicious intent.\n- Spread by people who believe it's true\n- Amplified by algorithms and cognitive biases\n- Examples: Grandma sharing a fake health tip on Facebook\n\n**Malinformation** — True information shared out of context to cause harm.\n- Factually accurate but deliberately misleading\n- Often involves private information (leaks, doxing)\n- Examples: The Podesta email leak (real emails, weaponized timing)\n\n**The Disinformation Lifecycle:**\n1. **Creation** — Content is fabricated or manipulated\n2. **Emplacement** — Content placed on fringe platforms\n3. **Laundering** — Legitimate sources pick it up\n4. **Amplification** — Bots, trolls, and unwitting users spread it\n5. **Mainstreaming** — Major outlets report on it\n\n**Key disinformation techniques:**\n- **Emotional hijacking** — Trigger anger, fear, or outrage to bypass critical thinking\n- **False equivalence** — Present fringe views as equal to scientific consensus\n- **Context stripping** — Real events presented with false context\n- **Fabricated authority** — Fake experts, credentials, or institutions\n- **What aboutism** — Deflecting criticism by pointing to unrelated issues\n- **Flooding** — Overwhelming the information space with multiple narratives"
+      },
+      "simplified_explanation": "Disinformation = lying on purpose. Misinformation = lying by accident. Malinformation = truth used as a weapon. All three damage trust and manipulate decisions.",
+      "memory_aids": [
+        "Disinformation = deliberate lie",
+        "Misinformation = accidental lie",
+        "Malinformation = weaponized truth",
+        "Creation → Emplacement → Laundering → Amplification → Mainstreaming"
+      ],
+      "real_world_connection": "SEC587 Section 1 covers disinformation as a core OSINT challenge because analysts must verify their own sources before acting on intelligence.",
+      "reflection_prompt": "Can you think of a time when true information was shared maliciously out of context? That's malinformation.",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000003",
+      "type": "explanation",
+      "title": "OSINT Verification Techniques",
+      "content": {
+        "text": "**The SIFT Method (Mike Caulfield):**\n1. **Stop** — Don't share or react immediately\n2. **Investigate the source** — Who wrote this? What's their track record?\n3. **Find better coverage** — Are reputable sources reporting the same story?\n4. **Trace claims** — Find the original source of the claim\n\n**Image Verification:**\n- **Reverse image search** (Google Images, TinEye, Yandex)\n- **Metadata analysis** (EXIF data, timestamps, GPS coordinates)\n- **Forensic analysis** (ELA, noise analysis, shadow consistency)\n- **Geolocation** (matching landmarks, satellite imagery)\n\n**Video Verification:**\n- Thumbnail reverse image search\n- Keyframe extraction and analysis\n- Metadata inspection\n- Deepfake artifacts (blurring, inconsistent lighting, audio sync)\n\n**Source Verification:**\n- Domain registration (WHOIS) — when was it created?\n- Social media account age and posting patterns\n- Cross-reference with known disinformation sources\n- Check for bot indicators (posting frequency, content patterns)\n\n**Text Verification:**\n- Claim checking sites (Snopes, PolitiFact, Full Fact)\n- Original source tracing\n- Linguistic analysis (writing style, translation artifacts)\n- Statistical claims verification against primary sources\n\n**Network Analysis:**\n- Map information flow from origin to amplification\n- Identify bot networks and coordination patterns\n- Use tools like Maltego, Hoaxy, Botometer\n- Trace funding and organizational connections"
+      },
+      "simplified_explanation": "SIFT: Stop, Investigate, Find better coverage, Trace. Before you believe anything: who wrote it, are others confirming it, and can you find the original source?",
+      "memory_aids": [
+        "SIFT = Stop, Investigate, Find, Trace",
+        "Reverse image search = your first line of defense",
+        "WHOIS = who registered this domain?",
+        "Botometer = is this account real or automated?"
+      ],
+      "real_world_connection": "Bellingcat uses these exact techniques to verify conflict footage, identify chemical weapon attacks, and debunk state-sponsored disinformation. Their methods are the gold standard.",
+      "reflection_prompt": "Pick a recent viral claim and apply SIFT. How many steps does it take to verify or debunk?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000004",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Spotting Fake News",
+      "content": {
+        "text": "Imagine you see a photo of a shark swimming in a flooded street after a hurricane. It looks real. How do you check?\n\n**Step 1: Stop** 🛑\nDon't share it yet. Your brain wants to share exciting things, especially when they trigger emotions like shock or fear.\n\n**Step 2: Investigate the Source** 🔍\n- Who posted it? A news organization? A random account? A known satire site?\n- When was the account created? (New accounts sharing viral content = suspicious)\n- Do they have a history of accurate reporting?\n\n**Step 3: Find Better Coverage** 📰\n- Are major news outlets reporting the same story?\n- Search the key claim on Google News\n- If only one source has it, be skeptical\n\n**Step 4: Trace the Claim** 🕵️\n- Reverse image search the photo (right-click → Google Image Search)\n- You might find the original — a 2014 photo of a shark in Puerto Rico, not the current hurricane\n- The image was real, but the context was fake\n\n**Common red flags:**\n- 🚩 Emotional headline in ALL CAPS\n- 🚩 No source cited\n- 🚩 Brand new account sharing viral content\n- 🚩 Image metadata stripped\n- 🚩 Only shared on one platform\n- 🚩 Too perfect — sharks in streets are almost always recycled photos"
+      },
+      "simplified_explanation": "Before sharing anything viral: Stop 🛑, Check who posted it 🔍, See if others report it 📰, Trace the original 🕵️. If only one source has it and it makes you angry, it's probably designed to manipulate you.",
+      "memory_aids": [
+        "SIFT = Stop, Investigate, Find, Trace",
+        "Emotional content = verify before sharing",
+        "Reverse image search = instant reality check",
+        "One source = big red flag"
+      ],
+      "real_world_connection": "The 'shark in a flooded street' photo goes viral after every major hurricane. It's always the same recycled image from 2014 Puerto Rico. Reverse image search proves it in seconds.",
+      "reflection_prompt": "Next time you see a shocking image on social media, try SIFT before sharing. How often does a 30-second check prevent you from spreading false information?",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000005",
+      "type": "code_exercise",
+      "title": "Practical Verification Lab",
+      "content": {
+        "text": "Let's practice verification techniques with Python and OSINT tools:\n\n```python\nimport requests\nfrom datetime import datetime\nimport json\n\ndef verify_domain(domain):\n    \"\"\"Quick domain verification using WHOIS-like data.\"\"\"\n    checks = {\n        'domain': domain,\n        'checks': []\n    }\n    \n    # Red flags for disinformation domains\n    red_flags = {\n        'very_new_domain': 'Domain registered < 1 year ago',\n        'short_history': 'Very few historical records',\n        'privacy_protected': 'WHOIS privacy enabled (not always bad)',\n        'hosting_mismatch': 'Hosted in unexpected country',\n    }\n    \n    # Verification checklist\n    verification_steps = [\n        'Check domain age (WHOIS)',\n        'Check domain registration history',\n        'Check hosting location vs. content language',\n        'Check for SSL certificate details',\n        'Check Wayback Machine for site history',\n        'Check social media presence',\n        'Cross-reference with fact-checking sites'\n    ]\n    \n    return checks\n\ndef analyze_image_metadata(image_url):\n    \"\"\"Extract and analyze image metadata for verification.\"\"\"\n    metadata_checks = [\n        'EXIF data (date, GPS, camera model)',\n        'Image hash comparison',\n        'Reverse image search results',\n        'Compression artifacts analysis'\n    ]\n    return metadata_checks\n```\n\n**Essential verification tools:**\n\n| Tool | Purpose | URL |\n|------|---------|-----|\n| TinEye | Reverse image search | tineye.com |\n| Yandex Images | Best for Russian/OSINT images | yandex.com/images |\n| InVID | Video verification plugin | weverify.eu |\n| Botometer | Twitter/X bot detection | botometer.osome.iu.edu |\n| Wayback Machine | Site history | web.archive.org |\n| WHOIS | Domain registration | whois.domaintools.com |"
+      },
+      "simplified_explanation": "Verification is a process, not a feeling. Use tools to check domain age, reverse search images, and cross-reference claims. The tools make it fast — the discipline makes it reliable.",
+      "memory_aids": [
+        "TinEye/Yandex = reverse image search",
+        "InVID = video verification",
+        "Wayback Machine = site history",
+        "Botometer = bot detection",
+        "WHOIS = domain age and ownership"
+      ],
+      "real_world_connection": "Bellingcat and BBC Africa Eye used these exact techniques to verify satellite imagery and debunk state-sponsored narratives about civilian casualties in multiple conflicts.",
+      "reflection_prompt": "Install the InVID plugin and try it on a viral video. What metadata can you extract?",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000006",
+      "type": "real_world",
+      "title": "Case Studies: Disinformation Campaigns",
+      "content": {
+        "text": "**Case 1: Russian IRA Campaign (2016-2018)**\n- Internet Research Agency created fake American personas\n- Operated across Facebook, Twitter, Instagram, YouTube\n- Organized real-world protests on both sides of divisive issues\n- Reached 126 million Americans on Facebook alone\n- Cost: ~$100K in ads, impact: immeasurable\n\n**Key lesson:** Disinformation doesn't just create fake content — it manipulates real communities.\n\n**Case 2: COVID-19 Infodemic (2020-2022)**\n- Multiple false narratives spread globally\n- 'Plandemic' video viewed 8 million times before removal\n- Hydroxychloroware and ivermectin promoted as cures\n- Anti-vax movements amplified by bot networks\n- WHO declared an 'infodemic' alongside the pandemic\n\n**Key lesson:** Health disinformation has body counts.\n\n**Case 3: Deepfake CEO Scam (2019)**\n- Fraudsters used deepfake audio to impersonate a CEO\n- Instructed a subordinate to transfer €220,000\n- Voice was cloned from publicly available recordings\n- The transfer went through before anyone verified\n\n**Key lesson:** Verification protocols must include voice and video authentication.\n\n**Case 4: Election Disinformation (Multiple Countries)**\n- False claims of election fraud spread before and after votes\n- Pre-bunking and post-bunking strategies developed\n- Bot networks amplified false claims about voting locations and dates\n- Deepfake videos of candidates circulated\n\n**Key lesson:** Disinformation targets trust in institutions, not just individuals."
+      },
+      "simplified_explanation": "Real disinformation campaigns are cheap to run, devastatingly effective, and target our emotions more than our logic. They create fake personas, manipulate real communities, and exploit our tendency to share before verifying.",
+      "memory_aids": [
+        "IRA = Russian troll farm, $100K, 126M Americans reached",
+        "COVID infodemic = health disinformation costs lives",
+        "Deepfake CEO = €220K stolen with cloned voice",
+        "Election disinfo = targets institutional trust"
+      ],
+      "real_world_connection": "SEC587 Section 1 trains analysts to detect these campaigns using OSINT techniques. Real-world disinformation is the primary threat domain for modern OSINT practitioners.",
+      "reflection_prompt": "Which disinformation technique do you think is most effective? Emotional manipulation or fabricated authority? Why?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000007",
+      "type": "memory_aid",
+      "title": "Disinformation Detection — Quick Reference",
+      "content": {
+        "text": "**🔍 SIFT Method:**\n- **S**top — Don't share or react immediately\n- **I**nvestigate — Who's behind this? What's their track record?\n- **F**ind — Are better sources reporting this?\n- **T**race — Find the original source\n\n**🚩 Red Flags:**\n- Emotional headline in ALL CAPS\n- No cited sources\n- Brand new account sharing viral content\n- Only on one platform\n- Metadata stripped from images\n- Too perfect / too shocking\n\n**🛠️ Verification Tools:**\n- Images: TinEye, Yandex, Google Reverse Image\n- Video: InVID, YouTube DataViewer\n- Domains: WHOIS, Wayback Machine\n- Accounts: Botometer, social media analysis\n- Claims: Snopes, PolitiFact, Full Fact\n\n**📊 Analysis Framework:**\n1. Identify the claim\n2. Find the original source\n3. Check source credibility\n4. Cross-reference with independent sources\n5. Verify supporting evidence (images, data, quotes)\n6. Assess motivation and context\n7. Document findings\n\n**⚠️ Cognitive Biases to Watch:**\n- Confirmation bias (believing what fits your views)\n- Anchoring (trusting the first thing you hear)\n- Bandwagon (trusting because others do)\n- Availability heuristic (overweighting recent/vivid info)"
+      },
+      "simplified_explanation": "SIFT: Stop, Investigate, Find, Trace. When in doubt, check it out. Every red flag you catch is a potential disinformation campaign stopped.",
+      "memory_aids": [
+        "SIFT = Stop, Investigate, Find, Trace",
+        "Red flags: ALL CAPS, no sources, new accounts, stripped metadata",
+        "Verification: reverse search, cross-reference, trace original",
+        "Watch your biases: confirmation, anchoring, bandwagon"
+      ],
+      "real_world_connection": "Professional OSINT analysts use SIFT and these verification tools daily. It's not about being skeptical of everything — it's about verifying before acting.",
+      "reflection_prompt": "Which of your cognitive biases is most likely to make you share disinformation? Awareness is the first defense.",
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "d1e2f3a4-0000-0000-0004-000000000008",
+      "type": "reflection",
+      "title": "Apply Your Disinformation Analysis Skills",
+      "content": {
+        "text": "Practice scenarios:\n\n1. You see a tweet claiming a company CEO resigned amid a fraud investigation, with a screenshot of a 'press release.' Apply SIFT. What do you check first?\n\n2. A viral video shows a political leader making a controversial statement. How would you verify its authenticity?\n\n3. Your organization's social media team finds a Reddit thread claiming your product caused injuries. The thread has 500 upvotes. Walk through your verification process.\n\n4. An employee reports receiving a video call from 'the CEO' asking for an urgent wire transfer. What disinformation technique is this, and how do you respond?\n\n**Key takeaways:**\n- Always verify before sharing or acting\n- Emotional content demands the most scrutiny\n- Use multiple verification tools and methods\n- Document everything for future reference\n- Build organizational verification protocols",
+        "interactive_prompt": "Create a disinformation response playbook for your organization. Include: verification protocols, escalation procedures, and communication templates for debunking false narratives."
+      },
+      "simplified_explanation": "The best defense against disinformation is a verification habit. Stop, check, trace. Every time. Build protocols so your whole team does the same.",
+      "memory_aids": [
+        "Verification = habit, not reaction",
+        "Emotional content = highest scrutiny",
+        "Protocols > Individual judgment"
+      ],
+      "real_world_connection": "Organizations with pre-established disinformation response protocols recover 3-5x faster from information attacks than those improvising a response.",
+      "reflection_prompt": "Does your organization have a disinformation response playbook? If not, that's your next project.",
+      "is_interactive": true,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "disinfo-q1",
+      "type": "multiple_choice",
+      "question": "What is the key difference between disinformation and misinformation?",
+      "options": [
+        "Disinformation is more dangerous than misinformation",
+        "Disinformation is deliberately created to deceive; misinformation is shared without malicious intent",
+        "Misinformation only spreads on social media",
+        "There is no practical difference"
+      ],
+      "correct_answer": 1,
+      "explanation": "Disinformation is false information created and spread with deliberate intent to deceive. Misinformation is false information shared by people who believe it's true. The key difference is intent, not impact — both can cause equal harm.",
+      "difficulty": 1,
+      "memory_aid": "Disinformation = deliberate. Misinformation = accidental. Intent differs, harm is similar.",
+      "points": 10
+    },
+    {
+      "question_id": "disinfo-q2",
+      "type": "multiple_choice",
+      "question": "What does the SIFT method stand for?",
+      "options": [
+        "Search, Investigate, Filter, Trace",
+        "Stop, Investigate, Find better coverage, Trace claims",
+        "Scan, Identify, Fact-check, Tag",
+        "Source, Inspect, Filter, Test"
+      ],
+      "correct_answer": 1,
+      "explanation": "SIFT: Stop (don't share immediately), Investigate the source (who's behind this?), Find better coverage (are reputable sources reporting this?), Trace claims (find the original source).",
+      "difficulty": 1,
+      "memory_aid": "SIFT = Stop, Investigate, Find, Trace. Four steps to verify anything.",
+      "points": 10
+    },
+    {
+      "question_id": "disinfo-q3",
+      "type": "multiple_choice",
+      "question": "A journalist finds a video of a political leader making a controversial statement. Which verification technique should they use FIRST?",
+      "options": [
+        "Share the video with a disclaimer that it's unverified",
+        "Reverse image search a key frame from the video",
+        "Contact the political leader's office for comment",
+        "Post the video and ask followers if it's real"
+      ],
+      "correct_answer": 1,
+      "explanation": "Reverse image searching a key frame is the fastest first verification step. It can immediately reveal if the video is recycled, taken out of context, or has been previously debunked. Then proceed with other verification steps.",
+      "difficulty": 2,
+      "memory_aid": "First step for video verification: reverse image search a key frame. Fast, effective, and often immediately reveals manipulation.",
+      "points": 15
+    },
+    {
+      "question_id": "disinfo-q4",
+      "type": "multiple_choice",
+      "question": "What is 'malinformation'?",
+      "options": [
+        "Information that is completely fabricated",
+        "Information designed to malfunction computer systems",
+        "True information shared out of context to cause harm",
+        "Information spread by malware"
+      ],
+      "correct_answer": 2,
+      "explanation": "Malinformation is factually accurate information shared out of context or with malicious intent. Examples include leaked private emails, doxing, or sharing true information at a strategically harmful time.",
+      "difficulty": 2,
+      "memory_aid": "Malinformation = true + weaponized. Real info, harmful intent, wrong context.",
+      "points": 15
+    },
+    {
+      "question_id": "disinfo-q5",
+      "type": "multiple_choice",
+      "question": "Which of the following is a strong indicator that a social media account is part of a disinformation campaign?",
+      "options": [
+        "The account posts in multiple languages",
+        "The account was created recently and immediately began sharing polarizing content at high frequency",
+        "The account follows many news organizations",
+        "The account has a profile picture"
+      ],
+      "correct_answer": 1,
+      "explanation": "A recently created account that immediately shares polarizing content at high frequency is a classic indicator of a disinformation bot or sockpuppet account. Legitimate users typically build a history gradually. High posting frequency on controversial topics from a new account is a major red flag.",
+      "difficulty": 2,
+      "memory_aid": "New account + high frequency + polarizing content = bot/sockpuppet red flag.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 130,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-13T14:30:00+03:00",
+  "updated_at": "2026-06-13T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0"
+}
