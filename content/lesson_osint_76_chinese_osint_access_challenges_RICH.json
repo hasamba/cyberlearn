@@ -1,0 +1,282 @@
+{
+  "lesson_id": "892c04a9-14fa-4215-bda2-5c7df24adc4a",
+  "domain": "osint",
+  "title": "Chinese OSINT and Access Challenges",
+  "subtitle": "Navigating the Great Firewall and Chinese Digital Landscape for Intelligence Collection",
+  "difficulty": 3,
+  "estimated_time": 45,
+  "order_index": 76,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Navigate the Chinese internet landscape including Baidu, Weibo, and WeChat for intelligence collection",
+    "Understand the Great Firewall architecture and techniques for accessing Chinese internet services",
+    "Analyze Chinese social media platforms for OSINT data extraction",
+    "Apply Mandarin language tools and translation techniques for non-English OSINT",
+    "Evaluate legal and ethical considerations when conducting OSINT on Chinese platforms"
+  ],
+  "concepts": [
+    "Great Firewall of China",
+    "Baidu Search Engine",
+    "WeChat OSINT",
+    "Weibo Analysis",
+    "Mandarin OSINT",
+    "Chinese Social Media",
+    "ICP Licensing",
+    "Douyin/TikTok",
+    "Chinese Forum Intelligence",
+    "Translation Pipelines"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c",
+      "type": "mindset_coach",
+      "title": "Entering a Different Digital Universe",
+      "content": {
+        "text": "Chinese OSINT is fundamentally different from Western OSINT. The platforms, the language, the culture, and the legal framework all shift dramatically. This isn't just translating your English queries — it's learning an entirely different digital ecosystem. The good news: massive amounts of intelligence exist on Chinese platforms that most analysts never see. Master this, and you'll have access to data your competitors simply can't reach."
+      },
+      "simplified_explanation": "Imagine trying to investigate someone but all their social media is on a platform you've never heard of, written in a language you don't speak, behind a wall that tries to keep foreigners out. That's Chinese OSINT. But once you learn the tools and techniques, you'll see intelligence that 95% of analysts never find.",
+      "memory_aids": [
+        "Chinese OSINT = New platforms + New language + New rules",
+        "The data is there — most analysts just don't know how to reach it"
+      ],
+      "real_world_connection": "Chinese platforms contain intelligence unavailable anywhere else — company registrations on Tianyancha, social media activity on Weibo, location data from WeChat check-ins, and shipping data from Chinese port authorities. Analysts who can access this have a decisive advantage.",
+      "reflection_prompt": "How much intelligence are you missing by only searching in English on Western platforms?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
+      "type": "explanation",
+      "title": "The Chinese Internet Ecosystem",
+      "content": {
+        "text": "China's internet operates on an entirely different platform stack from the West:\n\n**Search:** Baidu (百度) dominates with ~70% market share. Google is blocked.\n- Baidu indexes Chinese-language content preferentially\n- Baidu Tieba (贴吧) is a massive forum system — like Reddit for Chinese users\n- Baidu Maps provides detailed Chinese mapping data\n\n**Social Media:**\n- **Weibo (微博)** — China's Twitter-equivalent, ~580M monthly users\n- **WeChat (微信)** — Super-app: messaging, payments, social, mini-programs (~1.3B users)\n- **Douyin (抖音)** — Original TikTok (different from international version)\n- **Xiaohongshu (小红书)** — Lifestyle/social commerce (like Instagram + Pinterest)\n- **Zhihu (知乎)** — Q&A platform (like Quora, higher quality answers)\n\n**Business/Corporate:**\n- **Tianyancha (天眼查)** — Corporate registration data (like Companies House on steroids)\n- **Qichacha (企查查)** — Alternative corporate intelligence platform\n- **QCC** — Business verification and relationship mapping\n\n**Key Difference:** Western platforms are blocked in China. Chinese platforms are accessible globally (with some exceptions). This asymmetry works in the OSINT analyst's favor."
+      },
+      "simplified_explanation": "China has its own complete internet ecosystem: Baidu instead of Google, Weibo instead of Twitter, WeChat instead of WhatsApp+Facebook+Apple Pay combined. These platforms contain enormous amounts of publicly available data — the challenge is knowing they exist and how to search them effectively.",
+      "memory_aids": [
+        "Baidu = Chinese Google, Weibo = Chinese Twitter, WeChat = Chinese Everything",
+        "Tianyancha/Qichacha = Corporate intelligence goldmines",
+        "Western platforms blocked in China, but Chinese platforms are globally accessible"
+      ],
+      "real_world_connection": "Tianyancha shows Chinese company registrations, shareholders, legal disputes, and corporate relationships — information that would require paid databases in the West. It's freely searchable and contains data on millions of entities.",
+      "reflection_prompt": "If you were investigating a Chinese company, which platform would you start with and why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e",
+      "type": "explanation",
+      "title": "The Great Firewall: Architecture and Access",
+      "content": {
+        "text": "The Great Firewall (GFW) is China's internet censorship and control system. Understanding it is essential for Chinese OSINT:\n\n**How the GFW Works:**\n1. **IP Blocking** — Entire IP ranges of blocked services (Google, Facebook, Twitter) are inaccessible from China\n2. **DNS Poisoning** — DNS queries for blocked domains return wrong IP addresses\n3. **Deep Packet Inspection (DPI)** — Analyzes traffic patterns to identify and block VPN protocols\n4. **SNI Filtering** — Blocks HTTPS connections to specific domains during TLS handshake\n5. **Keyword Filtering** — Blocks traffic containing sensitive keywords\n\n**Impact on OSINT:**\n- Data created in China stays on Chinese platforms (not copied to Twitter/Facebook)\n- Chinese users can't access Western platforms, reducing cross-platform correlation\n- The GFW creates a data silo — intelligence inside is invisible to Western analysts\n\n**Accessing Chinese Platforms from Outside:**\n- Most Chinese platforms ARE accessible without VPN\n- Some services may rate-limit or block foreign IPs — residential proxies help\n- Mobile apps (WeChat) may require phone verification with a Chinese number\n- Some platforms require Chinese phone numbers for full access\n\n**Legal Considerations:**\n- Using VPNs inside China violates Chinese law for Chinese citizens\n- OSINT collection on public Chinese platforms is generally legal from outside China\n- Always verify compliance with your organization's legal framework"
+      },
+      "simplified_explanation": "The Great Firewall keeps Chinese internet users on Chinese platforms and blocks Western ones. This means Chinese people's data stays on Weibo and WeChat, not on Twitter and Facebook. For OSINT, this is actually helpful — you can access most Chinese platforms from outside China. The challenge is language and platform knowledge, not access.",
+      "memory_aids": [
+        "GFW = IP blocking + DNS poisoning + DPI + SNI filtering + Keyword filtering",
+        "For OSINT: Chinese platforms are accessible from outside, the GFW is mostly one-way",
+        "The data silo means your competitors can't find it either — competitive advantage"
+      ],
+      "real_world_connection": "When investigating Chinese companies involved in intellectual property theft, analysts use Tianyancha to find corporate structures, Qichacha for legal disputes, and Weibo for public sentiment. This intelligence has been used in trade dispute cases and corporate investigations.",
+      "reflection_prompt": "Why does the Great Firewall actually help OSINT analysts rather than hinder them (when operating from outside China)?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c4d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f",
+      "type": "explanation",
+      "title": "Baidu OSINT Techniques",
+      "content": {
+        "text": "Baidu is the primary search engine for Chinese-language content. Mastering it is essential:\n\n**Baidu Search Operators:**\n- `site:baike.baidu.com` — Search Baidu Encyclopedia (like Wikipedia in Chinese)\n- `site:tieba.baidu.com` — Search Baidu Forums\n- `site:zhihu.com` — Search Zhihu Q&A\n- `intitle:` — Search page titles\n- `inurl:` — Search URLs\n- `\"exact phrase\"` — Exact match (useful for Chinese-language queries)\n\n**Baidu Advanced Features:**\n- **Baidu Baike (百度百科)** — Encyclopedia entries on people, companies, events\n- **Baidu Tieba (贴吧)** — Massive forum system organized by topic\n- **Baidu Zhidao (知道)** — Q&A platform (older, but rich historical data)\n- **Baidu Images** — Chinese image search (reverse image search available)\n- **Baidu Maps** — Detailed mapping with street-level imagery\n\n**Critical Tip:** Search in Mandarin, not English. Use simplified Chinese characters (简体字) for mainland China content. Traditional characters (繁體字) for Taiwan/Hong Kong content.\n\n**Translation Pipeline:**\n1. Translate your query to Mandarin using DeepL or Google Translate\n2. Search on Baidu in Mandarin\n3. Translate results back to English\n4. Refine queries based on initial results\n5. Use domain-specific terms (Chinese cybersecurity jargon, company names in Chinese)"
+      },
+      "simplified_explanation": "Baidu works like Google but for Chinese content. The key trick: search in Mandarin. If you search for 'Huawei data breach' in English on Baidu, you'll get poor results. Search '华为 数据泄露' and you'll find Chinese-language discussions that never appear in English.",
+      "memory_aids": [
+        "Baidu OSINT = Search in Mandarin + Use site: operators + Check Baike + Tieba + Zhidao",
+        "Always use simplified Chinese for mainland China content",
+        "Translation pipeline: English → Mandarin → Search → Translate results back"
+      ],
+      "real_world_connection": "Security researchers investigating Chinese APT groups often find operational details on Baidu Tieba — members discussing tools, techniques, and even job postings for Chinese cybersecurity companies that reveal organizational structures.",
+      "reflection_prompt": "Try searching for a Chinese company name in English vs. Mandarin. What differences do you notice in the results?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d5e6f7a8-b9c0-1d2e-3f4a-5b6c7d8e9f0a",
+      "type": "code_exercise",
+      "title": "Automated Baidu and Weibo Search",
+      "content": {
+        "text": "Here's a Python script for automating Chinese OSINT searches:\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\nimport json\n\ndef baidu_search(query: str, num_results: int = 10) -> list:\n    \"\"\"Search Baidu for Chinese-language content.\"\"\"\n    headers = {\n        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',\n        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'\n    }\n    results = []\n    for page in range(0, num_results, 10):\n        url = f'https://www.baidu.com/s?wd={query}&pn={page}'\n        try:\n            resp = requests.get(url, headers=headers, timeout=10)\n            soup = BeautifulSoup(resp.text, 'html.parser')\n            for item in soup.find_all('div', class_='result'):\n                title_tag = item.find('h3')\n                link_tag = item.find('a')\n                if title_tag and link_tag:\n                    results.append({\n                        'title': title_tag.get_text(),\n                        'url': link_tag.get('href', ''),\n                        'snippet': item.get_text()[:200]\n                    })\n        except Exception as e:\n            print(f'Error on page {page}: {e}')\n    return results\n\ndef tianyancha_search(company: str) -> dict:\n    \"\"\"Search Tianyancha for Chinese corporate data.\"\"\"\n    # Note: Tianyancha has API restrictions; this is illustrative\n    headers = {\n        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',\n        'Accept-Language': 'zh-CN,zh;q=0.9'\n    }\n    search_url = f'https://www.tianyancha.com/search?key={company}'\n    try:\n        resp = requests.get(search_url, headers=headers, timeout=10)\n        return {\n            'status': resp.status_code,\n            'company': company,\n            'note': 'Full API access requires authentication'\n        }\n    except Exception as e:\n        return {'error': str(e)}\n\n# Example: Search for Huawei in Chinese\nresults = baidu_search('华为 网络安全 事件')\nfor r in results[:5]:\n    print(f\"Title: {r['title']}\")\n    print(f\"URL: {r['url']}\")\n    print(f\"Snippet: {r['snippet'][:100]}\")\n    print('---')\n```\n\n**Key Points:**\n- Always set `Accept-Language: zh-CN` header for better Chinese results\n- Use simplified Chinese for search queries targeting mainland China\n- Tianyancha and Qichacha have anti-scraping measures — use their APIs where possible\n- Rate-limit your requests to avoid IP bans",
+        "language": "python",
+        "difficulty": "advanced"
+      },
+      "simplified_explanation": "This script automates Baidu searches and Tianyancha lookups. The key insight: always search in Mandarin and set Chinese language headers. The results you get in Chinese are dramatically different from English searches.",
+      "memory_aids": [
+        "Automated Chinese OSINT = Mandarin queries + zh-CN headers + Rate limiting",
+        "Tianyancha API > Scraping (use official APIs when possible)"
+      ],
+      "real_world_connection": "OSINT analysts at threat intelligence firms use automated Baidu monitoring to track emerging Chinese cybersecurity discussions, new vulnerability disclosures in Chinese, and corporate intelligence on Chinese companies.",
+      "reflection_prompt": "How would you adapt this script to monitor for new mentions of a specific Chinese company over time?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b",
+      "type": "real_world",
+      "title": "Real-World Chinese OSINT Case Studies",
+      "content": {
+        "text": "**Case Study 1: Tracking APT Infrastructure via Baidu**\nResearchers investigating Chinese APT groups discovered command-and-control infrastructure by searching Baidu for specific SSL certificate fingerprints. The Chinese-language security forums discussed the certificates before Western researchers noticed them.\n\nLesson: Chinese-language threat intelligence often appears days or weeks before English-language reporting.\n\n**Case Study 2: Corporate Intelligence via Tianyancha**\nAn investigator tracing a Chinese company's links to military procurement used Tianyancha to map the corporate structure: subsidiaries, shareholders, and legal disputes. The corporate registration data revealed connections to a state-owned enterprise that were invisible in English-language databases.\n\nLesson: Chinese corporate data on Tianyancha/Qichacha often contains details unavailable in Western databases.\n\n**Case Study 3: Weibo Sentiment Analysis**\nDuring a trade dispute, analysts monitored Weibo sentiment to gauge Chinese public and corporate reactions. Real-time Weibo posts revealed supply chain disruptions and corporate responses before they appeared in English news.\n\nLesson: Weibo provides real-time Chinese sentiment that lags in Western media by days.\n\n**Case Study 4: Supply Chain Risk via Zhihu**\nAn analyst found detailed technical discussions on Zhihu about a Chinese hardware vendor's security vulnerabilities — discussions that were never published in English. This intelligence enabled proactive supply chain risk assessment.\n\nLesson: Zhihu's expert Q&A format contains high-quality technical intelligence."
+      },
+      "simplified_explanation": "These cases show that Chinese platforms contain intelligence that simply doesn't exist in English. Baidu for threat intel, Tianyancha for corporate data, Weibo for real-time sentiment, and Zhihu for expert analysis — each platform has unique data.",
+      "memory_aids": [
+        "Baidu = Threat intel that appears before English reporting",
+        "Tianyancha = Corporate data invisible in Western databases",
+        "Weibo = Real-time sentiment, days ahead of English news",
+        "Zhihu = Expert Q&A with high-quality technical intelligence"
+      ],
+      "real_world_connection": "Threat intelligence teams at major security firms maintain dedicated Chinese-language analysts precisely because of this intelligence gap. The teams that find APT infrastructure first are often the ones monitoring Chinese forums and search engines.",
+      "reflection_prompt": "Which Chinese platform would be most valuable for your specific area of interest? Why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f7a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c",
+      "type": "memory_aid",
+      "title": "Chinese OSINT Quick Reference",
+      "content": {
+        "text": "**PLATFORM Quick Reference:**\n\n**Search & Knowledge:**\n- Baidu (百度) — Primary search engine\n- Baidu Baike (百度百科) — Encyclopedia\n- Zhihu (知乎) — Expert Q&A\n\n**Social & Communication:**\n- Weibo (微博) — Microblogging (Twitter-like)\n- WeChat (微信) — Super-app, messaging + payments + mini-programs\n- Douyin (抖音) — Short video (Chinese TikTok)\n- Xiaohongshu (小红书) — Lifestyle/social commerce\n\n**Corporate Intelligence:**\n- Tianyancha (天眼查) — Company registrations, shareholders, legal\n- Qichacha (企查查) — Alternative corporate data\n\n**LANGUAGE Tips:**\n- Simplified Chinese (简体字) → Mainland China\n- Traditional Chinese (繁體字) → Taiwan, Hong Kong\n- Always search in the local language\n- Translation pipeline: English → Mandarin → Search → Translate back\n\n**ACCESS Tips:**\n- Most Chinese platforms accessible from outside China\n- Set Accept-Language: zh-CN in HTTP headers\n- Use residential proxies for rate-limiting issues\n- Some features require Chinese phone numbers (WeChat verification)"
+      },
+      "simplified_explanation": "This is your cheat sheet: Baidu for search, Tianyancha for corporate intel, Weibo for real-time info, WeChat for deep access. Always search in Mandarin. Most platforms are accessible from outside China.",
+      "memory_aids": [
+        "Chinese OSINT platforms: Baidu + Weibo + WeChat + Tianyancha + Zhihu",
+        "Language rule: Always search in simplified Chinese for mainland China content",
+        "Access rule: Most platforms accessible globally, language is the real barrier"
+      ],
+      "real_world_connection": "Print this reference and keep it next to your workstation. When you need to investigate a Chinese entity, start with Tianyancha for corporate data and Baidu for general intelligence.",
+      "reflection_prompt": "Can you list all 5 major Chinese OSINT platforms and what each is best for, from memory?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a8b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d",
+      "type": "reflection",
+      "title": "Chinese OSINT Investigation Scenario",
+      "content": {
+        "text": "You're investigating a Chinese technology company suspected of supplying equipment to military end-users in violation of export controls.\n\n**Available leads:**\n- Company name: Shenzhen StarNet Technologies Co., Ltd. (fictional)\n- The company has a website but limited English information\n- You need to find: corporate structure, related entities, key personnel, and any connection to military procurement\n\n**Investigation plan — which platforms would you use for each step?**\n1. Find the company's registration details and shareholders\n2. Identify subsidiary companies and related entities\n3. Find key personnel and their backgrounds\n4. Search for any military procurement connections\n5. Monitor public sentiment about the company\n6. Find technical discussions about the company's products\n\n**Consider:**\n- Which platforms require Chinese-language queries?\n- What legal and ethical boundaries should you observe?\n- How would you verify information found on Chinese platforms?"
+      },
+      "simplified_explanation": "This scenario tests your ability to select the right Chinese platform for each intelligence need. Tianyancha for corporate data, Weibo for sentiment, Zhihu for technical discussions, Baidu for general search.",
+      "memory_aids": [
+        "Corporate data → Tianyancha/Qichacha",
+        "Real-time info → Weibo",
+        "Technical discussions → Zhihu",
+        "General search → Baidu",
+        "Deep access → WeChat"
+      ],
+      "real_world_connection": "This is exactly the type of investigation that export control enforcement agencies conduct. The difference between finding and missing critical connections often comes down to whether the analyst can search Chinese-language sources.",
+      "reflection_prompt": "Write out your investigation plan. Which platform do you check first, and why?",
+      "is_interactive": false,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1-osint-76",
+      "type": "multiple_choice",
+      "question": "Which Chinese platform is most analogous to Companies House but provides far more detailed corporate intelligence?",
+      "options": [
+        "Weibo",
+        "Tianyancha",
+        "Douyin",
+        "Zhihu"
+      ],
+      "correct_answer": 1,
+      "explanation": "Tianyancha (天眼查) is China's premier corporate intelligence platform. It provides company registrations, shareholder information, legal disputes, corporate relationships, and financial data — far more detailed than Western equivalents like Companies House or OpenCorporates.",
+      "difficulty": 1,
+      "memory_aid": "Tianyancha = 'Sky Eye Check' — it sees everything about Chinese companies.",
+      "points": 10
+    },
+    {
+      "question_id": "q2-osint-76",
+      "type": "multiple_choice",
+      "question": "What is the primary reason Chinese-language OSINT data is invisible to most Western analysts?",
+      "options": [
+        "Chinese platforms are technically inaccessible from outside China",
+        "The data is encrypted and requires special decryption tools",
+        "The language barrier means most analysts search in English, missing Mandarin-only content",
+        "Chinese platforms require government approval to access"
+      ],
+      "correct_answer": 2,
+      "explanation": "Most Chinese platforms ARE accessible from outside China. The primary barrier is language — analysts who search in English miss the Mandarin-language content that contains the actual intelligence. Chinese users post on Chinese platforms in Chinese, creating a data silo that language barriers, not technical ones, maintain.",
+      "difficulty": 1,
+      "memory_aid": "The barrier is language, not access. Chinese platforms are reachable; the data just isn't in English.",
+      "points": 10
+    },
+    {
+      "question_id": "q3-osint-76",
+      "type": "multiple_choice",
+      "question": "When should you use simplified Chinese (简体字) vs. traditional Chinese (繁體字) in your OSINT searches?",
+      "options": [
+        "Always use traditional Chinese for better results",
+        "Use simplified Chinese for mainland China, traditional for Taiwan and Hong Kong",
+        "Use whichever you're more comfortable with",
+        "Use English and rely on machine translation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Simplified Chinese is used in mainland China, while traditional Chinese is used in Taiwan, Hong Kong, and Macau. Using the wrong character set will dramatically reduce your search results on the respective platforms. Always match the character set to the region you're investigating.",
+      "difficulty": 2,
+      "memory_aid": "Simplified = Mainland China. Traditional = Taiwan, Hong Kong. Match your characters to your target region.",
+      "points": 10
+    },
+    {
+      "question_id": "q4-osint-76",
+      "type": "multiple_choice",
+      "question": "How does the Great Firewall (GFW) affect OSINT analysts operating from outside China?",
+      "options": [
+        "It blocks all access to Chinese platforms from foreign IPs",
+        "It primarily restricts Chinese citizens' access to Western platforms, creating a data silo that analysts can exploit",
+        "It encrypts all Chinese internet traffic making it unreadable",
+        "It has no impact on OSINT whatsoever"
+      ],
+      "correct_answer": 1,
+      "explanation": "The GFW primarily works one direction — keeping Chinese users on Chinese platforms by blocking Western alternatives. This means Chinese data stays on Chinese platforms rather than being cross-posted to Twitter/Facebook. For analysts outside China, most Chinese platforms are accessible, making the GFW a data concentrator rather than a barrier.",
+      "difficulty": 2,
+      "memory_aid": "The GFW keeps data IN (on Chinese platforms), not OUT. This creates an intelligence goldmine for analysts who know how to access it.",
+      "points": 10
+    },
+    {
+      "question_id": "q5-osint-76",
+      "type": "multiple_choice",
+      "question": "Which search approach will yield the best results when investigating a Chinese cybersecurity incident on Baidu?",
+      "options": [
+        "Search for the company name in English on Baidu",
+        "Search for the company's Chinese name plus relevant keywords in simplified Chinese",
+        "Use Google's Chinese language filter to search Baidu-indexed content",
+        "Search on Weibo using English keywords"
+      ],
+      "correct_answer": 1,
+      "explanation": "Baidu heavily favors Chinese-language content. Searching for the company's Chinese name (e.g., '华为' not 'Huawei') combined with Chinese keywords for the incident type (e.g., '网络安全事件' not 'cybersecurity incident') will yield dramatically better results. English searches on Baidu return a small fraction of available content.",
+      "difficulty": 2,
+      "memory_aid": "Baidu searches: Always use the Chinese name + Chinese keywords. '华为 网络安全' > 'Huawei cybersecurity'",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 60,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-14T14:30:00+03:00",
+  "updated_at": "2026-06-14T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": ["osint", "chinese-osint", "baidu", "wechat", "weibo", "great-firewall", "mandarin", "Course: SANS-SEC587", "Career Path: OSINT"]
+}

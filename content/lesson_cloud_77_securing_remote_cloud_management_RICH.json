@@ -1,0 +1,281 @@
+{
+  "lesson_id": "6f785eb5-25f5-44a7-a44d-d666f0575260",
+  "domain": "cloud",
+  "title": "Securing Remote Cloud Management",
+  "subtitle": "Bastion Hosts, Jump Servers, SSM, and SSH Hardening for Cloud Infrastructure",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 77,
+  "prerequisites": ["Cloud Networking vs On-Premises"],
+  "learning_objectives": [
+    "Design and deploy bastion hosts and jump servers for secure cloud access",
+    "Configure AWS Systems Manager (SSM) Session Manager as a bastion-free access solution",
+    "Implement SSH hardening techniques for cloud infrastructure",
+    "Apply least privilege and access control principles to remote management",
+    "Evaluate and choose between bastion, SSM, and VPN approaches for different scenarios"
+  ],
+  "concepts": [
+    "Bastion Hosts",
+    "Jump Servers",
+    "AWS Systems Manager Session Manager",
+    "SSH Hardening",
+    "Key-Based Authentication",
+    "Port Knocking",
+    "Access Control Lists",
+    "Principle of Least Privilege",
+    "VPN vs Bastion",
+    "Zero Trust Remote Access"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-e5f6-7890-abcd-ef0123456789",
+      "type": "mindset_coach",
+      "title": "The Most Attacked Entry Point",
+      "content": {
+        "text": "Remote management access is the #1 attack vector in cloud environments. Every SSH port exposed to the internet is a target. Every bastion host is a potential pivot point. This lesson teaches you how to lock down remote access while still doing your job. Get this right, and you've closed the most common door attackers use to get into cloud infrastructure."
+      },
+      "simplified_explanation": "Think of remote management like the key to your house. If you leave the key under the doormat (default SSH), anyone can get in. This lesson teaches you how to build a proper lock system — and maybe even a security guard at the door.",
+      "memory_aids": [
+        "Remote access = Most attacked entry point",
+        "Every exposed SSH port is being scanned within minutes"
+      ],
+      "real_world_connection": "Researchers set up honeypot SSH servers that receive brute-force login attempts within seconds of being exposed to the internet. Default credentials are attacked within minutes. This isn't theoretical — it's happening constantly.",
+      "reflection_prompt": "Have you ever left an SSH port open with password authentication? What happened?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "type": "explanation",
+      "title": "Bastion Hosts and Jump Servers",
+      "content": {
+        "text": "A bastion host (or jump server) is a hardened instance that serves as the single entry point for accessing internal cloud resources.\n\n**Architecture:**\n```\nInternet → [Bastion Host] → [Private Subnet Resources]\n                ↑\n        Only entry point\n        Hardened & monitored\n```\n\n**Bastion Host Security Requirements:**\n1. **Minimal attack surface** — Only SSH port open, no unnecessary services\n2. **Hardened OS** — CIS benchmarks applied, automatic updates\n3. **Key-based auth only** — No password authentication\n4. **Network restrictions** — Security groups allowing access only from known IPs\n5. **Monitoring** — Full audit logging of all sessions\n6. **Auto-termination** — Spot instances that terminate when not in use\n\n**Jump Server vs Bastion Host:**\n- **Jump Server**: Primarily a relay point for accessing other servers. May have more services.\n- **Bastion Host**: Purpose-built, hardened gateway with minimal software installed.\n- In practice, the terms are often used interchangeably.\n\n**Problems with Bastion Hosts:**\n- They're a high-value target (single point of entry)\n- They require ongoing maintenance and patching\n- SSH keys must be distributed to users\n- Session recording and audit can be complex\n- They still expose SSH to the internet"
+      },
+      "simplified_explanation": "A bastion host is like the reception desk of a building — everyone has to go through it to get inside. It's the only door to the private network, and it's heavily guarded. The problem: it's still a door, and attackers will try to break through it.",
+      "memory_aids": [
+        "Bastion = Single entry point, heavily guarded, minimal software",
+        "Internet → Bastion → Private resources",
+        "Problems: High-value target, needs maintenance, SSH still exposed"
+      ],
+      "real_world_connection": "Many cloud breaches start with compromised bastion hosts. The Capital One breach (2019) exploited a misconfigured WAF on an EC2 instance that served as a management point, allowing access to S3 buckets with 100M+ customer records.",
+      "reflection_prompt": "If a bastion host is a single point of entry, isn't it also a single point of failure? What happens if it's compromised?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c3d4e5f6-a7b8-9012-cdef-012345678912",
+      "type": "explanation",
+      "title": "AWS Systems Manager Session Manager — The Bastion-Free Alternative",
+      "content": {
+        "text": "AWS Systems Manager (SSM) Session Manager eliminates the need for bastion hosts entirely:\n\n**How SSM Session Manager Works:**\n1. The SSM Agent runs on your EC2 instances (pre-installed on most Amazon Linux and Ubuntu AMIs)\n2. You connect via the AWS console or CLI — no SSH ports, no bastion needed\n3. All communication goes through AWS's internal network\n4. Sessions are fully logged and can be recorded\n\n**Advantages over Bastion Hosts:**\n- ✅ No SSH ports exposed to the internet\n- ✅ No bastion host to maintain and patch\n- ✅ No SSH key distribution\n- ✅ Built-in session logging and recording\n- ✅ IAM-based access control (fine-grained permissions)\n- ✅ Integrates with AWS CloudTrail for audit\n- ✅ Works with on-premises servers (via hybrid activation)\n\n**Requirements:**\n- SSM Agent installed on target instances\n- IAM role with SSM permissions attached to instances\n- VPC endpoints for SSM (for private subnets without internet access)\n- Session Manager plugin for the AWS CLI\n\n**Session Manager Commands:**\n```bash\n# Start an interactive shell session\naws ssm start-session --target i-1234567890abcdef0\n\n# Start a session with port forwarding\naws ssm start-session --target i-1234567890abcdef0 \\\n  --document-name AWS-StartPortForwardingSession \\\n  --parameters '{\"portNumber\":[\"22\"]}'\n\n# List active sessions\naws ssm describe-sessions --state Active\n```\n\n**Security Best Practices:**\n- Restrict SSM access using IAM policies (least privilege)\n- Enable session logging to S3\n- Enable session recording for audit\n- Use condition keys to restrict which instances users can access"
+      },
+      "simplified_explanation": "SSM Session Manager is like having a secure tunnel that goes through AWS's own network instead of the internet. No open SSH ports, no bastion servers to maintain, and AWS handles the security. It's the modern replacement for bastion hosts in AWS.",
+      "memory_aids": [
+        "SSM = No SSH ports, No bastion, No key distribution",
+        "SSM Agent on instance + IAM permissions = Secure shell access",
+        "Session logging built-in, no extra setup needed"
+      ],
+      "real_world_connection": "Most AWS security teams have moved from bastion hosts to SSM Session Manager. It's the recommended approach in the AWS Well-Architected Framework and is used by companies like Netflix and Amazon themselves for internal infrastructure access.",
+      "reflection_prompt": "If SSM is so much better than bastion hosts, when would you still need a bastion?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d4e5f6a7-b8c9-0123-defa-123456789023",
+      "type": "explanation",
+      "title": "SSH Hardening Deep Dive",
+      "content": {
+        "text": "When you must use SSH (bastion hosts, on-premises, or non-AWS environments), harden it aggressively:\n\n**sshd_config Hardening:**\n```bash\n# /etc/ssh/sshd_config\n\n# Authentication\nPermitRootLogin no                    # Never allow root login\nPasswordAuthentication no             # Keys only\nPubkeyAuthentication yes              # Enable key auth\nAuthorizedKeysFile .ssh/authorized_keys\nMaxAuthTries 3                        # Limit attempts\n\n# Network\nPort 2222                              # Non-standard port (security by obscurity)\nListenAddress 10.0.1.0/24             # Only on internal interface\nAllowUsers admin@10.0.0.0/8          # Restrict by user and source IP\n\n# Session\nClientAliveInterval 300               # Check client every 5 min\nClientAliveCountMax 2                  # Disconnect after 2 misses\nMaxSessions 3                         # Limit sessions per connection\nMaxStartups 5:50:10                   # Limit unauthenticated connections\nLoginGraceTime 30                      # 30 seconds to authenticate\n\n# Crypto\nKexAlgorithms curve25519-sha256       # Modern key exchange\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com   # Modern MACs\nHostKeyAlgorithms ssh-ed25519         # Ed25519 host keys\n\n# Logging\nLogLevel VERBOSE                      # Detailed logging\nSyslogFacility AUTH\n\n# Disable weak features\nX11Forwarding no                      # No X11 forwarding\nAllowTcpForwarding no                 # No port forwarding (or restrict)\nPermitTunnel no                       # No tunneling\nPermitEmptyPasswords no               # Obvious\nChallengeResponseAuthentication no    # Disable challenge-response\nUsePAM yes                            # Keep PAM for account control\n```\n\n**SSH Key Management:**\n- Use Ed25519 keys (shorter, faster, more secure than RSA)\n- Minimum RSA key size: 4096 bits\n- Rotate keys annually\n- Use SSH certificates (not raw public keys) for large fleets\n- Implement key revocation procedures\n\n**SSH Certificates (Advanced):**\n```bash\n# Generate CA key\nssh-keygen -t ed25519 -f /etc/ssh/ca_key\n\n# Sign a user key (24-hour validity)\nssh-keygen -s /etc/ssh/ca_key -I username -V +24h -n user,admin user_key.pub\n\n# Add CA to sshd_config\nTrustedUserCAKeys /etc/ssh/ca_key.pub\n```\n\nSSH certificates eliminate the need to distribute and manage authorized_keys files across servers."
+      },
+      "simplified_explanation": "SSH hardening means: no passwords, no root login, strong crypto only, restricted access by IP, and short session timeouts. Think of it as replacing every weak lock in your building with a high-security one and adding a guard who checks IDs at the door.",
+      "memory_aids": [
+        "SSH hardening: No passwords, No root, Strong crypto, Restricted IPs, Short timeouts",
+        "Ed25519 > RSA for SSH keys",
+        "SSH certificates > authorized_keys for fleet management"
+      ],
+      "real_world_connection": "The 2021 Microsoft Exchange breach started with attackers brute-forcing SSH on exposed servers. Properly hardened SSH configurations would have prevented most of these attacks.",
+      "reflection_prompt": "Go through each sshd_config setting and ask: 'What attack does this prevent?' If you can't answer, research it.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e5f6a7b8-c9d0-1234-efab-234567890134",
+      "type": "code_exercise",
+      "title": "Automated SSH Hardening Script",
+      "content": {
+        "text": "Here's a script for automating SSH hardening on Linux servers:\n\n```bash\n#!/bin/bash\n# ssh_hardening.sh — Automated SSH security hardening\n\nset -euo pipefail\n\nSSHD_CONFIG=\"/etc/ssh/sshd_config\"\nBACKUP=\"/etc/ssh/sshd_config.backup.$(date +%Y%m%d%H%M%S)\"\n\n# Backup original config\ncp \"$SSHD_CONFIG\" \"$BACKUP\"\necho \"[*] Backup saved to $BACKUP\"\n\n# Function to set or add SSH config option\nset_ssh_option() {\n    local key=\"$1\"\n    local value=\"$2\"\n    if grep -q \"^${key}\" \"$SSHD_CONFIG\"; then\n        sed -i \"s/^${key}.*/${key} ${value}/\" \"$SSHD_CONFIG\"\n    elif grep -q \"^#${key}\" \"$SSHD_CONFIG\"; then\n        sed -i \"s/^#${key}.*/${key} ${value}/\" \"$SSHD_CONFIG\"\n    else\n        echo \"${key} ${value}\" >> \"$SSHD_CONFIG\"\n    fi\n    echo \"[+] ${key} = ${value}\"\n}\n\n# Apply hardening settings\necho \"[*] Applying SSH hardening...\"\n\nset_ssh_option \"PermitRootLogin\" \"no\"\nset_ssh_option \"PasswordAuthentication\" \"no\"\nset_ssh_option \"PubkeyAuthentication\" \"yes\"\nset_ssh_option \"MaxAuthTries\" \"3\"\nset_ssh_option \"ClientAliveInterval\" \"300\"\nset_ssh_option \"ClientAliveCountMax\" \"2\"\nset_ssh_option \"MaxSessions\" \"3\"\nset_ssh_option \"MaxStartups\" \"5:50:10\"\nset_ssh_option \"LoginGraceTime\" \"30\"\nset_ssh_option \"X11Forwarding\" \"no\"\nset_ssh_option \"PermitEmptyPasswords\" \"no\"\nset_ssh_option \"ChallengeResponseAuthentication\" \"no\"\nset_ssh_option \"LogLevel\" \"VERBOSE\"\n\n# Modern crypto only\necho \"[*] Setting modern crypto algorithms...\"\n\ncat >> \"$SSHD_CONFIG\" << 'EOF'\n\n# Modern cryptographic algorithms\nKexAlgorithms curve25519-sha256\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com\nHostKeyAlgorithms ssh-ed25519\nEOF\n\n# Validate config\necho \"[*] Validating configuration...\"\nif sshd -t; then\n    echo \"[+] Configuration valid. Restarting sshd...\"\n    systemctl restart sshd\n    echo \"[+] SSH hardening complete!\"\nelse\n    echo \"[!] Configuration error! Restoring backup...\"\n    cp \"$BACKUP\" \"$SSHD_CONFIG\"\n    systemctl restart sshd\n    echo \"[!] Backup restored. Manual review required.\"\n    exit 1\nfi\n\n# Generate Ed25519 key if not present\nif [ ! -f ~/.ssh/id_ed25519 ]; then\n    echo \"[*] Generating Ed25519 SSH key...\"\n    ssh-keygen -t ed25519 -C \"$(whoami)@$(hostname)\" -f ~/.ssh/id_ed25519\n    echo \"[+] Key generated. Public key:\"\n    cat ~/.ssh/id_ed25519.pub\nfi\n\necho \"[*] Done. Review the changes with: diff $BACKUP $SSHD_CONFIG\"\n```\n\n**Key Points:**\n- Always backup before modifying sshd_config\n- Validate with `sshd -t` before restarting — a bad config locks you out\n- Ed25519 keys are the modern standard (shorter, faster, more secure)\n- This script is a starting point — customize for your environment",
+        "language": "bash",
+        "difficulty": "intermediate"
+      },
+      "simplified_explanation": "This script automates SSH hardening: backs up the config, applies security settings, validates the configuration before restarting, and generates a secure key. The `sshd -t` validation step is critical — it prevents you from locking yourself out with a bad config.",
+      "memory_aids": [
+        "SSH hardening script: Backup → Apply → Validate → Restart → Generate key",
+        "`sshd -t` = The save-yourself-from-lockout command. Always validate before restart.",
+        "Ed25519 > RSA: Shorter keys, faster, more secure"
+      ],
+      "real_world_connection": "Every cloud security team has a version of this script. Automating hardening ensures consistency — manual SSH configuration on 100 servers will have mistakes. Automated configuration won't.",
+      "reflection_prompt": "What would happen if you applied this script and didn't have SSH key authentication already set up? (Hint: you'd lock yourself out!)",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "f6a7b8c9-d0e1-2345-fabc-345678901245",
+      "type": "real_world",
+      "title": "Remote Access Architecture Comparison",
+      "content": {
+        "text": "**Architecture 1: Traditional Bastion Host**\n```\n[Internet] → [Bastion Host (public subnet)] → [Private instances]\n```\n- ✅ Simple architecture, well-understood\n- ✅ Works with any SSH client\n- ❌ SSH port exposed to internet (even restricted)\n- ❌ Bastion is a high-value target\n- ❌ Key distribution and management overhead\n- ❌ Requires ongoing maintenance and patching\n\n**Architecture 2: SSM Session Manager**\n```\n[Administrator] → [AWS SSM] → [Private instances (via SSM Agent)]\n```\n- ✅ No SSH ports exposed to internet\n- ✅ No bastion host to maintain\n- ✅ IAM-based access control\n- ✅ Built-in session logging\n- ❌ Requires SSM Agent on all instances\n- ❌ AWS-specific (not portable to other clouds)\n- ❌ Session Manager plugin required for SSH/SCP\n\n**Architecture 3: VPN + Private Subnet**\n```\n[Administrator] → [VPN Gateway] → [Private subnet] → [Instances]\n```\n- ✅ No public-facing management ports\n- ✅ Full network access to private resources\n- ✅ Works with any cloud or on-premises\n- ❌ VPN setup and maintenance overhead\n- ❌ VPN is a new attack surface (certificates, configuration)\n- ❌ Users need VPN client installed and configured\n\n**Architecture 4: Zero Trust (WireGuard/Tailscale)**\n```\n[Administrator] → [Mesh VPN] → [Any instance with agent]\n```\n- ✅ No public ports at all\n- ✅ Identity-based access (not network-based)\n- ✅ Works across clouds and on-premises\n- ✅ Simple configuration\n- ❌ Agent required on all devices\n- ❌ Relatively new approach for enterprise\n- ❌ Key management still needed"
+      },
+      "simplified_explanation": "Four ways to access cloud servers: Bastion (simple but risky), SSM (best for AWS), VPN (good for multi-cloud), and Zero Trust (modern and secure). For AWS, SSM is usually the right choice. For multi-cloud, Zero Trust is the future.",
+      "memory_aids": [
+        "Bastion = Simple but risky, SSH exposed",
+        "SSM = Best for AWS, no exposed ports",
+        "VPN = Good for multi-cloud, adds complexity",
+        "Zero Trust = Modern, identity-based, works everywhere"
+      ],
+      "real_world_connection": "Netflix uses SSM for AWS access. Google uses BeyondCorp (zero trust). Large multi-cloud organizations use VPNs. The trend is clearly moving toward SSM and zero trust — exposing SSH ports is becoming unacceptable.",
+      "reflection_prompt": "Which architecture would you choose for your organization? What factors influence your decision?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a7b8c9d0-e1f2-3456-abcd-456789012356",
+      "type": "memory_aid",
+      "title": "Remote Cloud Management Cheat Sheet",
+      "content": {
+        "text": "**SSH Hardening Checklist:**\n☐ PermitRootLogin no\n☐ PasswordAuthentication no\n☐ PubkeyAuthentication yes (Ed25519)\n☐ MaxAuthTries 3\n☐ ClientAliveInterval 300\n☐ Modern crypto only (curve25519, chacha20-poly1305)\n☐ X11Forwarding no\n☐ AllowTcpForwarding no (or restrict)\n☐ LogLevel VERBOSE\n\n**SSM Session Manager Checklist:**\n☐ SSM Agent installed on target instances\n☐ IAM role with AmazonSSMManagedInstanceCore attached\n☐ VPC endpoints for private subnets (if no internet)\n☐ Session logging to S3 enabled\n☐ IAM policies restricting access by user/instance\n\n**Access Decision Matrix:**\n| Scenario | Best Approach |\n|----------|--------------|\n| AWS-only, modern | SSM Session Manager |\n| Multi-cloud | VPN or Zero Trust |\n| Legacy applications needing SSH | Bastion + Hardened SSH |\n| Highly regulated environment | SSM + Session Recording + CloudTrail |\n| Emergency access | SSM with break-glass IAM role |\n\n**Key Rule: If you can eliminate SSH exposure entirely, do it. SSM > Bastion > Exposed SSH.**"
+      },
+      "simplified_explanation": "This is your go-to cheat sheet for remote cloud access. SSM for AWS, VPN/Zero Trust for multi-cloud, bastion only when you must. And always harden SSH if you use it.",
+      "memory_aids": [
+        "Priority: SSM > Bastion > Exposed SSH",
+        "SSH hardening = No root + No passwords + Ed25519 keys + Modern crypto",
+        "SSM checklist = Agent + IAM role + VPC endpoints + Logging"
+      ],
+      "real_world_connection": "Print this cheat sheet and keep it next to your terminal. Every time you set up remote access to cloud infrastructure, run through this checklist.",
+      "reflection_prompt": "Can you recite the priority order from memory? SSM > Bastion > Exposed SSH. Why is SSM always preferred over bastion?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b8c9d0e1-f2a3-4567-bcde-567890123467",
+      "type": "reflection",
+      "title": "Design a Secure Remote Access Architecture",
+      "content": {
+        "text": "You're designing remote access for a multi-cloud organization:\n\n**Environment:**\n- 200 EC2 instances in AWS (mix of Linux and Windows)\n- 50 VMs in Azure\n- 20 on-premises servers\n- 15-person DevOps team needing daily access\n- Compliance requirement: All sessions must be recorded\n- Security requirement: No SSH/RDP ports exposed to the internet\n\n**Design questions:**\n1. How would you handle AWS instance access?\n2. How would you handle Azure VM access?\n3. How would you handle on-premises server access?\n4. How would you implement session recording across all platforms?\n5. How would you handle emergency 'break-glass' access?\n6. How would you manage SSH keys or certificates?\n\n**Consider:**\n- Consistency across platforms\n- Least privilege access\n- Audit and compliance requirements\n- Operational simplicity for the DevOps team"
+      },
+      "simplified_explanation": "This scenario forces you to think about remote access across multiple environments. SSM for AWS, Azure Bastion or Arc for Azure, VPN for on-premises. The challenge is making it consistent and auditable.",
+      "memory_aids": [
+        "Multi-cloud = Multiple solutions, unified audit",
+        "SSM for AWS + Azure Bastion + VPN for on-premises",
+        "Session recording is non-negotiable for compliance"
+      ],
+      "real_world_connection": "Every enterprise with multi-cloud environments faces this exact challenge. The solution typically involves SSM for AWS, Azure Bastion for Azure, and a VPN or mesh network for on-premises, with centralized logging to a SIEM.",
+      "reflection_prompt": "Draw your architecture. Which solution do you choose for each platform, and how do you unify the audit trail?",
+      "is_interactive": false,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1-cloud-77",
+      "type": "multiple_choice",
+      "question": "What is the primary security advantage of AWS SSM Session Manager over a traditional bastion host?",
+      "options": [
+        "SSM is cheaper than maintaining a bastion host",
+        "SSM eliminates the need to expose SSH ports to the internet",
+        "SSM provides faster connection speeds",
+        "SSM works with all operating systems including Windows 98"
+      ],
+      "correct_answer": 1,
+      "explanation": "The primary security advantage of SSM Session Manager is that it eliminates the need to expose SSH ports to the internet entirely. Connections go through AWS's internal network via the SSM Agent, meaning no inbound ports are needed on your instances. This removes the attack surface that bastion hosts still expose.",
+      "difficulty": 1,
+      "memory_aid": "SSM = No SSH ports exposed. Period. That's the key security advantage.",
+      "points": 10
+    },
+    {
+      "question_id": "q2-cloud-77",
+      "type": "multiple_choice",
+      "question": "Which SSH key type is recommended for modern deployments due to its security and performance advantages?",
+      "options": [
+        "RSA 1024-bit",
+        "DSA 2048-bit",
+        "Ed25519",
+        "ECDSA P-256"
+      ],
+      "correct_answer": 2,
+      "explanation": "Ed25519 is the recommended SSH key type for modern deployments. It uses elliptic curve cryptography, producing shorter keys (much smaller authorized_keys files), faster authentication, and stronger security than RSA. Ed25519 keys are 256-bit but provide security equivalent to RSA 3072-bit keys.",
+      "difficulty": 1,
+      "memory_aid": "Ed25519 = Shorter keys, faster auth, stronger security. The modern choice for SSH keys.",
+      "points": 10
+    },
+    {
+      "question_id": "q3-cloud-77",
+      "type": "multiple_choice",
+      "question": "In sshd_config, what does `PermitRootLogin no` accomplish?",
+      "options": [
+        "Prevents the root user from creating new accounts",
+        "Prevents direct root login via SSH, requiring users to log in as a normal user and escalate privileges",
+        "Disables the root account entirely on the system",
+        "Prevents root from running sudo commands"
+      ],
+      "correct_answer": 1,
+      "explanation": "`PermitRootLogin no` prevents direct root login via SSH. Users must first authenticate as a regular user and then use sudo or su to gain root privileges. This provides an audit trail showing who escalated to root, and it means attackers must compromise two credentials (user + root) instead of one.",
+      "difficulty": 2,
+      "memory_aid": "PermitRootLogin no = No direct root SSH. Log in as user, then sudo. Audit trail created.",
+      "points": 10
+    },
+    {
+      "question_id": "q4-cloud-77",
+      "type": "multiple_choice",
+      "question": "When is a bastion host still necessary despite SSM Session Manager being available?",
+      "options": [
+        "When you need faster SSH connections",
+        "When you have instances without the SSM Agent or in non-AWS environments",
+        "When you want to save money on AWS costs",
+        "When your organization prefers older security practices"
+      ],
+      "correct_answer": 1,
+      "explanation": "SSM Session Manager requires the SSM Agent on target instances and only works in AWS (or with hybrid activation). You still need bastion hosts or alternative access methods for: instances without SSM Agent, on-premises servers, other cloud providers, or when you need to access network devices that can't run agents.",
+      "difficulty": 2,
+      "memory_aid": "SSM needs the Agent. No Agent = Need bastion. Non-AWS = Need alternative.",
+      "points": 10
+    },
+    {
+      "question_id": "q5-cloud-77",
+      "type": "multiple_choice",
+      "question": "What is the correct priority order for remote cloud access approaches, from most to least secure?",
+      "options": [
+        "VPN > Bastion Host > Exposed SSH > SSM",
+        "Exposed SSH > VPN > Bastion Host > SSM",
+        "SSM > Bastion Host > Exposed SSH",
+        "Bastion Host > SSM > VPN > Exposed SSH"
+      ],
+      "correct_answer": 2,
+      "explanation": "The priority order is SSM > Bastion Host > Exposed SSH. SSM is most secure because it eliminates SSH ports entirely. Bastion hosts are second because they at least centralize and restrict access. Exposed SSH directly to instances is least secure because it creates the largest attack surface. VPN adds another secure layer but isn't a direct comparison.",
+      "difficulty": 2,
+      "memory_aid": "Priority: SSM (no ports) > Bastion (centralized) > Exposed SSH (risky). If you can eliminate SSH exposure, do it.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 60,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-14T14:30:00+03:00",
+  "updated_at": "2026-06-14T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": ["cloud-security", "bastion-host", "ssm", "ssh-hardening", "remote-access", "aws", "Course: SANS-SEC502", "Career Path: Cloud Security"]
+}

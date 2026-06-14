@@ -1,0 +1,279 @@
+{
+  "lesson_id": "461c3b79-9200-445a-8a8b-f1f0cfde9d1f",
+  "domain": "osint",
+  "title": "Python for OSINT Automation",
+  "subtitle": "Building Automated Intelligence Collection Pipelines with Python",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 77,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Build Python scripts for automated OSINT data collection from multiple sources",
+    "Implement web scraping with BeautifulSoup and requests for intelligence gathering",
+    "Use Selenium for dynamic JavaScript-heavy websites that resist simple scraping",
+    "Design rate-limited, ethical automation pipelines that respect terms of service",
+    "Create reusable OSINT automation modules for common intelligence tasks"
+  ],
+  "concepts": [
+    "Python Requests Library",
+    "BeautifulSoup Web Scraping",
+    "Selenium Browser Automation",
+    "API Integration",
+    "Rate Limiting",
+    "User-Agent Rotation",
+    "Proxy Management",
+    "Data Parsing and Normalization",
+    "OSINT Pipeline Architecture",
+    "Ethical Automation"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1e2d3c4-b5a6-7890-cdef-012345678901",
+      "type": "mindset_coach",
+      "title": "Automate the Boring Stuff, Keep the Smart Stuff",
+      "content": {
+        "text": "OSINT is 80% data collection and 20% analysis. Python automates that 80% so you can focus your brain on the analysis that actually requires intelligence. Every manual search you repeat is a candidate for automation. Every data source you check regularly should be scripted. This lesson turns you from a manual searcher into an automation architect."
+      },
+      "simplified_explanation": "If you search the same thing every day, script it. If you check the same 5 websites for intelligence, automate the checking. Your brain is for analysis — let Python handle the repetitive collection.",
+      "memory_aids": [
+        "OSINT = 80% collection + 20% analysis. Automate the 80%.",
+        "If you do it more than twice, script it."
+      ],
+      "real_world_connection": "Professional threat intelligence teams run automated OSINT pipelines that collect from hundreds of sources daily. The analysts only see curated, deduplicated results. This is how small teams cover massive data surfaces.",
+      "reflection_prompt": "What OSINT tasks do you currently do manually that you could automate?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e2d3c4b5-a6f7-8901-defa-123456789012",
+      "type": "explanation",
+      "title": "Python OSINT Fundamentals: Requests and APIs",
+      "content": {
+        "text": "The `requests` library is the foundation of Python OSINT automation:\n\n**Basic HTTP Requests:**\n```python\nimport requests\nfrom typing import Optional\n\ndef fetch_url(url: str, headers: dict = None, timeout: int = 10) -> Optional[str]:\n    \"\"\"Fetch a URL with proper error handling.\"\"\"\n    default_headers = {\n        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'\n    }\n    if headers:\n        default_headers.update(headers)\n    \n    try:\n        response = requests.get(url, headers=default_headers, timeout=timeout)\n        response.raise_for_status()\n        return response.text\n    except requests.exceptions.Timeout:\n        print(f'Timeout fetching {url}')\n    except requests.exceptions.HTTPError as e:\n        print(f'HTTP error {e.response.status_code} for {url}')\n    except requests.exceptions.RequestException as e:\n        print(f'Error fetching {url}: {e}')\n    return None\n```\n\n**API Integration Pattern:**\n```python\nimport requests\nimport json\nimport time\n\nclass OSINTAPIClient:\n    \"\"\"Base class for OSINT API integrations.\"\"\"\n    \n    def __init__(self, api_key: str, rate_limit: float = 1.0):\n        self.api_key = api_key\n        self.rate_limit = rate_limit  # Seconds between requests\n        self.session = requests.Session()\n        self.last_request = 0\n    \n    def _rate_limit(self):\n        \"\"\"Enforce rate limiting between requests.\"\"\"\n        elapsed = time.time() - self.last_request\n        if elapsed < self.rate_limit:\n            time.sleep(self.rate_limit - elapsed)\n        self.last_request = time.time()\n    \n    def get(self, url: str, params: dict = None) -> dict:\n        \"\"\"Make a rate-limited GET request.\"\"\"\n        self._rate_limit()\n        headers = {'Authorization': f'Bearer {self.api_key}'}\n        response = self.session.get(url, headers=headers, params=params, timeout=30)\n        response.raise_for_status()\n        return response.json()\n```\n\n**Key Principles:**\n- Always set a proper User-Agent header\n- Always implement rate limiting (respect the service)\n- Always handle errors gracefully\n- Always set timeouts (never hang indefinitely)\n- Use sessions for connection pooling"
+      },
+      "simplified_explanation": "The requests library is your web browser in code. Always set a User-Agent (so you don't look like a bot), always rate-limit (so you don't get banned), and always handle errors (so your script doesn't crash at 3 AM).",
+      "memory_aids": [
+        "Requests pattern: User-Agent + Rate limiting + Error handling + Timeouts",
+        "Use sessions for connection pooling — more efficient than creating new connections"
+      ],
+      "real_world_connection": "Every OSINT tool you've heard of — Shodan, VirusTotal, Censys — has an API. Python's requests library is how you access all of them. Master this pattern and you can integrate any API.",
+      "reflection_prompt": "Why is rate limiting important even when an API doesn't explicitly require it?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d3c4b5a6-f7e8-9012-abcd-234567890123",
+      "type": "explanation",
+      "title": "Web Scraping with BeautifulSoup",
+      "content": {
+        "text": "BeautifulSoup parses HTML and extracts structured data from web pages:\n\n**Basic Scraping Pattern:**\n```python\nfrom bs4 import BeautifulSoup\nimport requests\n\ndef scrape_website(url: str) -> dict:\n    \"\"\"Scrape a website and extract key information.\"\"\"\n    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}\n    response = requests.get(url, headers=headers, timeout=10)\n    soup = BeautifulSoup(response.text, 'html.parser')\n    \n    results = {\n        'title': soup.title.string if soup.title else None,\n        'meta_description': None,\n        'links': [],\n        'emails': [],\n        'phone_numbers': [],\n        'headings': []\n    }\n    \n    # Extract meta description\n    meta = soup.find('meta', attrs={'name': 'description'})\n    if meta:\n        results['meta_description'] = meta.get('content', '')\n    \n    # Extract all links\n    for link in soup.find_all('a', href=True):\n        results['links'].append({\n            'text': link.get_text(strip=True),\n            'url': link['href']\n        })\n    \n    # Extract headings for content structure\n    for tag in ['h1', 'h2', 'h3']:\n        for heading in soup.find_all(tag):\n            results['headings'].append({\n                'level': tag,\n                'text': heading.get_text(strip=True)\n            })\n    \n    return results\n```\n\n**Advanced Extraction Patterns:**\n```python\n# Extract emails using regex (BeautifulSoup alone misses these)\nimport re\n\ndef extract_emails(text: str) -> list:\n    pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'\n    return list(set(re.findall(pattern, text)))\n\n# Extract social media profiles\ndef extract_social_profiles(soup: BeautifulSoup) -> dict:\n    social_patterns = {\n        'twitter': r'twitter\\.com/([a-zA-Z0-9_]+)',\n        'linkedin': r'linkedin\\.com/in/([a-zA-Z0-9-]+)',\n        'github': r'github\\.com/([a-zA-Z0-9-]+)',\n    }\n    profiles = {}\n    for platform, pattern in social_patterns.items():\n        matches = re.findall(pattern, soup.get_text())\n        if matches:\n            profiles[platform] = list(set(matches))\n    return profiles\n\n# Extract forms (potential attack surface)\ndef extract_forms(soup: BeautifulSoup) -> list:\n    forms = []\n    for form in soup.find_all('form'):\n        forms.append({\n            'action': form.get('action', ''),\n            'method': form.get('method', 'get').upper(),\n            'inputs': [input_tag.get('name', '') for input_tag in form.find_all('input')]\n        })\n    return forms\n```\n\n**Ethical Scraping Guidelines:**\n- Always check robots.txt before scraping\n- Respect rate limits (1-2 second delays minimum)\n- Don't overload servers\n- Check terms of service\n- Store only what you need"
+      },
+      "simplified_explanation": "BeautifulSoup is like a smart highlighter for web pages. You tell it what you want (links, emails, headings) and it finds it in the HTML. Always scrape ethically — check robots.txt, add delays, and don't hammer servers.",
+      "memory_aids": [
+        "BeautifulSoup = HTML parser, extracts structured data from messy HTML",
+        "Ethical scraping: Check robots.txt, Rate limit, Store only what you need",
+        "Regex complements BeautifulSoup for emails, phones, social profiles"
+      ],
+      "real_world_connection": "OSINT analysts use BeautifulSoup daily to extract emails, social media profiles, and employee information from company websites. A single scrape of a 'Team' page can reveal names, titles, and social profiles for social engineering attacks — or for threat intelligence.",
+      "reflection_prompt": "What data would you extract from a company's website for a threat intelligence report?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c4b5a6f7-e8d9-0123-4abc-def5678901234",
+      "type": "code_exercise",
+      "title": "Building an OSINT Automation Pipeline",
+      "content": {
+        "text": "Here's a complete OSINT automation pipeline that combines multiple collection techniques:\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\nimport json\nimport re\nimport time\nfrom datetime import datetime\nfrom typing import List, Dict, Optional\n\n\nclass OSINTPipeline:\n    \"\"\"Automated OSINT collection pipeline.\"\"\"\n\n    def __init__(self, target: str, output_file: str = None):\n        self.target = target\n        self.output_file = output_file or f'osint_{target}_{int(time.time())}.json'\n        self.results = {\n            'target': target,\n            'timestamp': datetime.now().isoformat(),\n            'dns_records': {},\n            'subdomains': [],\n            'emails': [],\n            'social_profiles': {},\n            'technologies': [],\n            'metadata': {}\n        }\n        self.session = requests.Session()\n        self.session.headers.update({\n            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'\n        })\n\n    def collect_dns(self) -> dict:\n        \"\"\"Gather DNS records via Certificate Transparency.\"\"\"\n        url = f'https://crt.sh/?q=%.{self.target}&output=json'\n        try:\n            resp = self.session.get(url, timeout=30)\n            if resp.status_code == 200:\n                data = resp.json()\n                subdomains = set()\n                for entry in data:\n                    name = entry.get('name_value', '')\n                    for sub in name.split('\\n'):\n                        sub = sub.strip().lower()\n                        if sub.endswith(self.target) and '*' not in sub:\n                            subdomains.add(sub)\n                self.results['subdomains'] = sorted(subdomains)\n                self.results['dns_records']['crt_sh_count'] = len(data)\n        except Exception as e:\n            print(f'DNS collection error: {e}')\n        return self.results['subdomains']\n\n    def collect_website_info(self) -> dict:\n        \"\"\"Scrape the main website for intelligence.\"\"\"\n        url = f'https://{self.target}'\n        try:\n            resp = self.session.get(url, timeout=10)\n            soup = BeautifulSoup(resp.text, 'html.parser')\n\n            # Extract emails\n            email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'\n            self.results['emails'] = list(set(\n                re.findall(email_pattern, resp.text)\n            ))\n\n            # Extract social profiles\n            social_patterns = {\n                'twitter': r'twitter\\.com/([a-zA-Z0-9_]+)',\n                'linkedin': r'linkedin\\.com/(?:in|company)/([a-zA-Z0-9-]+)',\n                'github': r'github\\.com/([a-zA-Z0-9-]+)',\n            }\n            for platform, pattern in social_patterns.items():\n                matches = re.findall(pattern, resp.text)\n                if matches:\n                    self.results['social_profiles'][platform] = list(set(matches))\n\n            # Extract technologies from meta tags and headers\n            generator = soup.find('meta', attrs={'name': 'generator'})\n            if generator:\n                self.results['technologies'].append(generator.get('content', ''))\n\n            # Extract page title and description\n            self.results['metadata'] = {\n                'title': soup.title.string if soup.title else None,\n                'status_code': resp.status_code,\n                'server': resp.headers.get('Server', 'Unknown'),\n                'content_type': resp.headers.get('Content-Type', 'Unknown')\n            }\n\n        except Exception as e:\n            print(f'Website collection error: {e}')\n        return self.results['metadata']\n\n    def save_results(self):\n        \"\"\"Save collected data to JSON.\"\"\"\n        with open(self.output_file, 'w') as f:\n            json.dump(self.results, f, indent=2, default=str)\n        print(f'Results saved to {self.output_file}')\n\n    def run(self):\n        \"\"\"Execute the full collection pipeline.\"\"\"\n        print(f'[*] Starting OSINT collection for: {self.target}')\n        \n        print('[*] Collecting DNS/Subdomain data...')\n        self.collect_dns()\n        time.sleep(1)  # Rate limiting\n        \n        print('[*] Collecting website information...')\n        self.collect_website_info()\n        \n        print(f'[+] Collection complete. Results:')\n        print(f'    Subdomains: {len(self.results[\"subdomains\"])}')\n        print(f'    Emails: {len(self.results[\"emails\"])}')\n        print(f'    Social profiles: {len(self.results[\"social_profiles\"])}')\n        \n        self.save_results()\n        return self.results\n\n\n# Usage\nif __name__ == '__main__':\n    pipeline = OSINTPipeline('example.com')\n    results = pipeline.run()\n```\n\n**Key Design Principles:**\n- Modular: Each collection method is independent and can be run separately\n- Rate-limited: Built-in delays between requests\n- Persistent: Results saved to JSON for later analysis\n- Extensible: New collection methods can be added easily\n- Error-tolerant: Each method catches its own errors without crashing the pipeline",
+        "language": "python",
+        "difficulty": "advanced"
+      },
+      "simplified_explanation": "This pipeline collects DNS/subdomain data from crt.sh, scrapes the target website for emails and social profiles, and saves everything to JSON. It's modular (add more collectors), rate-limited (1 second between requests), and error-tolerant (each method handles its own errors).",
+      "memory_aids": [
+        "OSINT Pipeline: Modular + Rate-limited + Persistent + Extensible + Error-tolerant",
+        "Each collector is independent — one failure doesn't crash the pipeline"
+      ],
+      "real_world_connection": "This is the foundation that professional OSINT tools are built on. Tools like Amass, Subfinder, and theHarvester all follow this pattern: collect from multiple sources, normalize, deduplicate, and save results.",
+      "reflection_prompt": "How would you extend this pipeline to also check Shodan, VirusTotal, and social media APIs?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "b5a6f7e8-d9c0-1234-5678-9012345678901",
+      "type": "explanation",
+      "title": "Selenium for Dynamic Content and Anti-Bot Bypass",
+      "content": {
+        "text": "Some websites use JavaScript rendering that BeautifulSoup can't handle. Selenium controls a real browser:\n\n**When to Use Selenium vs Requests:**\n- **Use Requests + BeautifulSoup** for: Static HTML, APIs, simple pages\n- **Use Selenium** for: JavaScript-rendered content, login-required pages, anti-bot protections\n\n**Basic Selenium OSINT:**\n```python\nfrom selenium import webdriver\nfrom selenium.webdriver.common.by import By\nfrom selenium.webdriver.support.ui import WebDriverWait\nfrom selenium.webdriver.support import expected_conditions as EC\nfrom selenium.webdriver.chrome.options import Options\n\ndef setup_driver() -> webdriver.Chrome:\n    \"\"\"Configure Chrome for OSINT collection.\"\"\"\n    options = Options()\n    options.add_argument('--headless')  # No GUI\n    options.add_argument('--no-sandbox')\n    options.add_argument('--disable-dev-shm-usage')\n    options.add_argument('--disable-blink-features=AutomationControlled')\n    options.add_experimental_option('excludeSwitches', ['enable-automation'])\n    \n    driver = webdriver.Chrome(options=options)\n    driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {\n        'source': 'Object.defineProperty(navigator, \"webdriver\", {get: () => undefined})'\n    })\n    return driver\n\ndef scrape_dynamic_page(url: str, wait_seconds: int = 10) -> str:\n    \"\"\"Scrape a JavaScript-rendered page.\"\"\"\n    driver = setup_driver()\n    try:\n        driver.get(url)\n        # Wait for content to load\n        WebDriverWait(driver, wait_seconds).until(\n            EC.presence_of_element_located((By.TAG_NAME, 'body'))\n        )\n        # Additional wait for dynamic content\n        import time\n        time.sleep(3)\n        return driver.page_source\n    finally:\n        driver.quit()\n```\n\n**Anti-Detection Techniques (Ethical Use Only):**\n```python\n# Rotate User-Agent\nimport random\n\nUSER_AGENTS = [\n    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',\n    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',\n    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',\n]\n\ndef get_random_user_agent() -> str:\n    return random.choice(USER_AGENTS)\n\n# Rate limiting with random delays\nimport time\nimport random\n\ndef rate_limited_request(min_delay: float = 1.0, max_delay: float = 3.0):\n    \"\"\"Random delay between requests to appear more human.\"\"\"\n    delay = random.uniform(min_delay, max_delay)\n    time.sleep(delay)\n```\n\n**Important Ethics Note:** These techniques are for legitimate OSINT collection. Never use them to bypass authentication, access private data, or violate terms of service. Always operate within legal and ethical boundaries."
+      },
+      "simplified_explanation": "Selenium is a real browser in code — it handles JavaScript, login pages, and anti-bot protections that simple requests can't. Use it when BeautifulSoup fails. Always add random delays and rotate user agents to avoid detection — but only for legitimate OSINT collection.",
+      "memory_aids": [
+        "BeautifulSoup = Static pages. Selenium = Dynamic, JavaScript, login-required pages.",
+        "Anti-detection: Rotate User-Agents + Random delays + Remove webdriver flag",
+        "Ethics: Never bypass auth for private data. Always respect ToS."
+      ],
+      "real_world_connection": "Most modern social media platforms use JavaScript rendering and anti-bot protections. LinkedIn, Twitter, and Instagram all require Selenium or similar tools for automated data collection. Always use official APIs when available — Selenium should be the fallback.",
+      "reflection_prompt": "When would you choose the official API over Selenium, even if Selenium is technically possible?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a6f7e8d9-c0b1-2345-6789-0123456789012",
+      "type": "real_world",
+      "title": "OSINT Automation Case Studies",
+      "content": {
+        "text": "**Case Study 1: Automated Brand Monitoring**\nA security team built a Python pipeline that monitors Twitter, Reddit, and pastebin for mentions of their company name and product names. The pipeline runs hourly, deduplicates results, and sends alerts for new mentions that match threat patterns. They detected a credential leak 4 hours before it hit mainstream news.\n\nLesson: Continuous automated monitoring catches threats that manual searches miss.\n\n**Case Study 2: Subdomain Discovery Pipeline**\nA bug bounty hunter automated subdomain discovery using crt.sh, DNS brute-force, and Shodan. The pipeline runs daily and emails new subdomains. On one target, it discovered a forgotten staging server with default credentials — a $2,000 bounty.\n\nLesson: Automation finds what manual searching misses because it's consistent and thorough.\n\n**Case Study 3: Dark Web Monitor**\nA threat intelligence team built a Python scraper that monitors specific dark web forums for mentions of their organization. The scraper handles CAPTCHAs via manual fallback, rotates proxies, and uses NLP to classify threat severity. They detected a ransomware group discussing their company 2 weeks before an attack.\n\nLesson: Automated dark web monitoring provides early warning that no manual process can sustain.\n\n**Case Study 4: Social Engineering Prepper**\nA red team automated LinkedIn scraping to build organizational charts and identify target employees for phishing campaigns. The pipeline extracted names, titles, and connections, then generated targeted phishing templates. This reduced recon time from 40 hours to 2 hours per engagement.\n\nLesson: Automation dramatically speeds up repetitive OSINT tasks, but always verify and stay within legal boundaries."
+      },
+      "simplified_explanation": "These cases show the power of automation: continuous monitoring catches threats early, subdomain discovery finds forgotten assets, dark web monitoring provides early warning, and social engineering prep goes from 40 hours to 2. The pattern: automate the repetitive, verify the important.",
+      "memory_aids": [
+        "Brand monitoring: Caught credential leak 4 hours early",
+        "Subdomain pipeline: Found forgotten staging server = $2,000 bounty",
+        "Dark web monitor: Detected ransomware discussion 2 weeks before attack",
+        "Social engineering: 40 hours → 2 hours with automation"
+      ],
+      "real_world_connection": "Every professional threat intelligence team runs automated collection pipelines. Manual OSINT is still valuable for deep analysis, but automated pipelines provide the breadth and continuous monitoring that humans can't sustain.",
+      "reflection_prompt": "Which of these case studies is most relevant to your work? How would you implement a similar pipeline?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f7e8d9c0-b1a2-3456-7890-abcdef012345",
+      "type": "memory_aid",
+      "title": "Python OSINT Automation Cheat Sheet",
+      "content": {
+        "text": "**Library Quick Reference:**\n\n| Task | Library | Key Functions |\n|------|---------|---------------|\n| HTTP Requests | requests | get(), post(), Session() |\n| HTML Parsing | BeautifulSoup | find(), find_all(), get_text() |\n| Browser Automation | Selenium | WebDriver, WebDriverWait, By |\n| Regex | re | findall(), search(), match() |\n| JSON | json | load(), dumps(), dump() |\n| DNS | dnspython | resolve(), zone() |\n| APIs | requests | JSON API calls with rate limiting |\n\n**Pipeline Architecture:**\n```\n[Data Sources] → [Collection Scripts] → [Normalization] → [Deduplication] → [Storage] → [Alerts]\n```\n\n**Rate Limiting Best Practices:**\n- Minimum 1-2 second delay between requests\n- Use random delays (1-3 seconds) to appear more human\n- Respect API rate limits (check documentation)\n- Use exponential backoff for retries\n- Set per-domain rate limits\n\n**Ethical Guidelines:**\n☐ Check robots.txt before scraping\n☐ Use official APIs when available\n☐ Don't access private/authenticated data\n☐ Store only what you need\n☐ Respect terms of service\n☐ Add proper User-Agent identifying your bot\n☐ Rate limit all requests\n\n**Error Handling Pattern:**\n```python\ntry:\n    # Your code\nexcept requests.Timeout:\n    # Handle timeout\nexcept requests.HTTPError as e:\n    # Handle HTTP errors\nexcept Exception as e:\n    # Handle unexpected errors\n    logger.error(f'Unexpected error: {e}')\n```"
+      },
+      "simplified_explanation": "This cheat sheet covers the essential libraries, pipeline architecture, rate limiting practices, ethical guidelines, and error handling patterns. Print it and keep it next to your terminal.",
+      "memory_aids": [
+        "Libraries: requests + BeautifulSoup + Selenium + re + json + dnspython",
+        "Pipeline: Sources → Collection → Normalization → Dedup → Storage → Alerts",
+        "Rate limiting: 1-2 sec minimum, random delays, exponential backoff",
+        "Ethics: robots.txt, use APIs, respect ToS, don't access private data"
+      ],
+      "real_world_connection": "Every professional OSINT tool follows this architecture. Amass, SpiderFoot, theHarvester — they all collect, normalize, deduplicate, and store. Understanding this pattern means you can build your own tools or extend existing ones.",
+      "reflection_prompt": "Can you draw the pipeline architecture from memory? What are the 5 stages?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e8d9c0b1-a2f3-4567-8901-bcdef0123456",
+      "type": "reflection",
+      "title": "Build Your Own OSINT Automation Tool",
+      "content": {
+        "text": "Design an automated OSINT pipeline for monitoring a specific target:\n\n**Target:** A company you're providing threat intelligence for\n\n**Requirements:**\n1. Daily collection from at least 4 sources\n2. Rate-limited and respectful of service limits\n3. Automated deduplication of results\n4. Severity classification of findings\n5. Alert generation for high-severity items\n6. Results stored in a structured format (JSON)\n\n**Design questions:**\n1. Which 4+ data sources would you use, and why?\n2. How would you handle rate limiting across multiple sources?\n3. What deduplication strategy would you use?\n4. How would you classify severity (high/medium/low)?\n5. What would trigger an immediate alert vs. a daily digest?\n6. How would you handle errors and maintain uptime?\n\n**Consider:**\n- Some sources may go offline or change their APIs\n- You need to handle network failures gracefully\n- New sources may need to be added over time\n- The pipeline should be easy to extend and maintain"
+      },
+      "simplified_explanation": "This exercise asks you to design a real OSINT pipeline from scratch. Think about: which sources, how to collect, how to deduplicate, how to classify severity, and how to alert. Architecture matters more than code at this stage.",
+      "memory_aids": [
+        "OSINT pipeline design: Sources → Collection → Deduplication → Classification → Alerts",
+        "Architecture for resilience: Handle failures, plan for changes, make it extensible"
+      ],
+      "real_world_connection": "This is exactly what threat intelligence teams design. The companies that detect threats early are the ones with well-designed automated pipelines, not teams manually searching every day.",
+      "reflection_prompt": "Sketch your pipeline architecture. Which sources do you choose, and how do they connect?",
+      "is_interactive": false,
+      "xp_reward": 15
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1-osint-77",
+      "type": "multiple_choice",
+      "question": "Why is rate limiting essential in OSINT automation scripts?",
+      "options": [
+        "It makes the script run faster",
+        "It prevents getting banned by target services and respects their usage limits",
+        "It reduces the amount of data collected",
+        "It bypasses anti-bot protections"
+      ],
+      "correct_answer": 1,
+      "explanation": "Rate limiting is essential because it prevents your scripts from overwhelming target services, which would result in IP bans. It also demonstrates ethical behavior by respecting the service's capacity and terms of use. Without rate limiting, aggressive scripts can cause denial of service and get your IP permanently blocked.",
+      "difficulty": 1,
+      "memory_aid": "Rate limiting = Don't get banned + Respect the service. 1-2 seconds minimum between requests.",
+      "points": 10
+    },
+    {
+      "question_id": "q2-osint-77",
+      "type": "multiple_choice",
+      "question": "When should you use Selenium instead of BeautifulSoup for web scraping?",
+      "options": [
+        "When the website has a robots.txt file",
+        "When the website uses JavaScript to render content dynamically",
+        "When you need to scrape faster",
+        "When the website has a simple HTML structure"
+      ],
+      "correct_answer": 1,
+      "explanation": "Selenium is needed when websites use JavaScript to render content dynamically. BeautifulSoup only parses static HTML — if the content you need is loaded by JavaScript after the page loads, BeautifulSoup will see empty containers. Selenium controls a real browser that executes JavaScript, giving you access to the fully rendered page.",
+      "difficulty": 2,
+      "memory_aid": "BeautifulSoup = Static HTML. Selenium = Dynamic JavaScript. If content loads after page load, use Selenium.",
+      "points": 10
+    },
+    {
+      "question_id": "q3-osint-77",
+      "type": "multiple_choice",
+      "question": "What is the correct order of stages in an OSINT automation pipeline?",
+      "options": [
+        "Alerts → Storage → Deduplication → Collection → Sources",
+        "Sources → Collection → Normalization → Deduplication → Storage → Alerts",
+        "Collection → Sources → Alerts → Deduplication → Storage",
+        "Deduplication → Collection → Normalization → Alerts → Storage"
+      ],
+      "correct_answer": 1,
+      "explanation": "The correct pipeline order is: Sources → Collection → Normalization → Deduplication → Storage → Alerts. Data flows from sources through collection scripts, gets normalized to a common format, deduplicated to remove repeated findings, stored in a structured format, and finally alerts are generated for high-priority items.",
+      "difficulty": 2,
+      "memory_aid": "Pipeline: Sources → Collection → Normalization → Dedup → Storage → Alerts. Data flows left to right.",
+      "points": 10
+    },
+    {
+      "question_id": "q4-osint-77",
+      "type": "multiple_choice",
+      "question": "What is the primary ethical concern when building OSINT automation tools?",
+      "options": [
+        "Automation tools are too slow compared to manual collection",
+        "Automated collection may access private data or violate terms of service at scale",
+        "Python scripts are not reliable enough for OSINT work",
+        "APIs always provide all the data needed, making scraping unnecessary"
+      ],
+      "correct_answer": 1,
+      "explanation": "The primary ethical concern is that automation can violate terms of service or access private data at scale — much faster and more extensively than manual collection. A script that accidentally accesses restricted data can cause far more damage than a human doing the same thing. Always check robots.txt, use official APIs when available, respect terms of service, and never access authenticated/private data.",
+      "difficulty": 2,
+      "memory_aid": "Ethics: Check robots.txt, use APIs, respect ToS, never access private data. Automation scales mistakes too.",
+      "points": 10
+    },
+    {
+      "question_id": "q5-osint-77",
+      "type": "multiple_choice",
+      "question": "In the OSINTPipeline class example, why does each collection method catch its own errors instead of letting exceptions propagate?",
+      "options": [
+        "To make the code look more professional",
+        "To ensure that one failed collection method doesn't crash the entire pipeline",
+        "To hide errors from the user",
+        "To make the code run faster"
+      ],
+      "correct_answer": 1,
+      "explanation": "Each collection method catches its own errors to ensure that a failure in one method doesn't crash the entire pipeline. If crt.sh is down, the website scraper should still work. If the website is down, DNS collection should still run. This error isolation makes the pipeline resilient — it degrades gracefully rather than failing completely.",
+      "difficulty": 1,
+      "memory_aid": "Error isolation: One failure shouldn't crash the whole pipeline. Each method handles its own errors.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 60,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-14T14:30:00+03:00",
+  "updated_at": "2026-06-14T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": ["osint", "python", "automation", "web-scraping", "beautifulsoup", "selenium", "api-integration", "Course: SANS-SEC587", "Career Path: OSINT"]
+}

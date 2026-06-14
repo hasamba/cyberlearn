@@ -1,0 +1,278 @@
+{
+  "lesson_id": "c587b49a-a46c-4c42-8073-dd4938cde5fa",
+  "domain": "fundamentals",
+  "title": "Attack Vectors and Techniques",
+  "subtitle": "Understanding How Attackers Break In — From Phishing to Supply Chain",
+  "difficulty": 1,
+  "estimated_time": 30,
+  "order_index": 77,
+  "prerequisites": ["Threat Actors and Motivations"],
+  "learning_objectives": [
+    "Identify and classify common attack vectors including social engineering, malware, and supply chain attacks",
+    "Explain how phishing attacks work and why they remain the most effective initial access method",
+    "Distinguish between different malware types and their delivery mechanisms",
+    "Understand supply chain attacks and their increasing prevalence",
+    "Map attack vectors to the appropriate defense strategies"
+  ],
+  "concepts": [
+    "Phishing",
+    "Social Engineering",
+    "Malware",
+    "Ransomware",
+    "Supply Chain Attacks",
+    "Physical Attacks",
+    "Attack Surface",
+    "Initial Access",
+    "Attack Vector Classification",
+    "Defense Mapping"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-e5f6-7890-cdef-012345678901",
+      "type": "mindset_coach",
+      "title": "Think Like an Attacker",
+      "content": {
+        "text": "To defend effectively, you need to understand how attackers actually break in. This isn't about learning to hack — it's about understanding the paths attackers take so you can block them. The most sophisticated attacks often start with the simplest technique: a convincing email. Understanding attack vectors is understanding where your defenses need to be strongest."
+      },
+      "simplified_explanation": "Every break-in has a door. Attack vectors are those doors. Some are front doors (phishing), some are side doors (unpatched software), and some are delivery doors (supply chain). Your job is to lock them all, starting with the ones attackers use most.",
+      "memory_aids": [
+        "Attack vectors = Doors into your organization",
+        "91% of cyberattacks start with a phishing email — lock that door first"
+      ],
+      "real_world_connection": "The Verizon DBIR report consistently shows that phishing is the #1 initial access vector. Not zero-days, not sophisticated exploits — just emails that trick people. Understanding this changes where you invest your defense budget.",
+      "reflection_prompt": "What's the most likely way someone would try to break into your organization?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b2c3d4e5-f6a7-8901-defa-123456789012",
+      "type": "explanation",
+      "title": "The Attack Vector Landscape",
+      "content": {
+        "text": "Attack vectors are the methods attackers use to gain initial access. Here are the major categories:\n\n**1. Social Engineering (The Human Vector)**\n- **Phishing**: Fraudulent emails pretending to be from trusted sources\n- **Spear phishing**: Targeted phishing aimed at specific individuals\n- **Whaling**: Phishing aimed at executives (CEO, CFO)\n- **Vishing**: Voice phishing (phone calls)\n- **Smishing**: SMS phishing\n- **Pretexting**: Creating a fake scenario to extract information\n- **Baiting**: Leaving infected USB drives in parking lots\n\n**2. Malware (The Software Vector)**\n- **Viruses**: Self-replicating code that attaches to legitimate programs\n- **Worms**: Self-propagating malware that spreads across networks\n- **Trojans**: Malware disguised as legitimate software\n- **Ransomware**: Encrypts data and demands payment\n- **Spyware**: Secretly monitors and collects user activity\n- **Rootkits**: Hides malware deep in the operating system\n- **Keyloggers**: Records every keystroke\n\n**3. Supply Chain (The Trust Vector)**\n- **Software supply chain**: Compromising updates to trusted software\n- **Hardware supply chain**: Tampering with devices before delivery\n- **Third-party services**: Compromising SaaS or cloud services\n- **Open source dependencies**: Malicious code in libraries\n\n**4. Network-Based Vectors**\n- **Man-in-the-Middle (MitM)**: Intercepting communications\n- **DNS poisoning**: Redirecting traffic to malicious sites\n- **Drive-by downloads**: Malware installed by visiting a compromised website\n- **Wi-Fi attacks**: Rogue access points, evil twins\n\n**5. Physical Vectors**\n- **Tailgating**: Following authorized personnel through doors\n- **Dumpster diving**: Searching through trash for information\n- **Shoulder surfing**: Observing screens or keyboards\n- **USB drops**: Leaving infected USB drives in target areas"
+      },
+      "simplified_explanation": "Five ways attackers get in: through people (social engineering), through software (malware), through trust (supply chain), through networks (MitM, DNS), and through physical access. The human vector is by far the most common — 91% of attacks start with phishing.",
+      "memory_aids": [
+        "5 vectors: Social Engineering, Malware, Supply Chain, Network, Physical",
+        "Phishing = #1 attack vector (91% of breaches start here)",
+        "Supply chain = Attacking trust relationships, not technology"
+      ],
+      "real_world_connection": "The SolarWinds attack was a supply chain attack that compromised 18,000 organizations. Colonial Pipeline was ransomware delivered through a compromised VPN account. Twitter's 2020 hack was a social engineering attack on employees. Different vectors, different defenses.",
+      "reflection_prompt": "Which attack vector would be most effective against your organization? Why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c3d4e5f6-a7b8-9012-abcd-345678901234",
+      "type": "explanation",
+      "title": "Phishing Deep Dive — The #1 Attack Vector",
+      "content": {
+        "text": "Phishing remains the most effective initial access method because it targets humans, not technology:\n\n**Why Phishing Works:**\n- Humans trust authority and urgency\n- Email is essential — you can't block all suspicious emails\n- Attackers can craft convincing messages using publicly available information\n- One click is all it takes\n\n**Types of Phishing Attacks:**\n\n**Standard Phishing:**\n- Broad, untargeted emails sent to thousands\n- Low success rate, but high volume = some will bite\n- Example: 'Your account has been compromised, click here to verify'\n\n**Spear Phishing:**\n- Targeted emails using personal information\n- Higher success rate due to personalization\n- Example: 'Hi [Name], the Q3 report you requested is attached' — sent to a specific employee\n\n**Whaling:**\n- Spear phishing targeting executives\n- Often involves fake legal subpoenas, wire transfer requests, or tax documents\n- Example: CEO receives email pretending to be legal counsel requesting urgent wire transfer\n\n**Business Email Compromise (BEC):**\n- Compromising or impersonating a business email account\n- Redirecting payments, requesting gift cards, or asking for sensitive data\n- Costliest form of cybercrime — $2.7 billion in reported losses in 2022\n\n**How to Identify Phishing:**\n1. **Check the sender address** — Is it exactly right or a close misspelling?\n2. **Look for urgency** — 'Act now or your account will be closed'\n3. **Hover before clicking** — Check where links actually go\n4. **Check for grammar errors** — Professional organizations send professional emails\n5. **Verify through a different channel** — Call the person directly\n6. **Be suspicious of attachments** — Especially .exe, .zip, .docm files"
+      },
+      "simplified_explanation": "Phishing works because it targets humans, not computers. A perfectly crafted email can fool even security-aware people. The key defenses: verify through a different channel, hover before clicking, and be suspicious of urgency.",
+      "memory_aids": [
+        "Phishing = #1 attack vector because it targets humans, not technology",
+        "BEC = Costliest cybercrime ($2.7B in 2022)",
+        "Identify phishing: Check sender, Look for urgency, Hover before click, Verify separately"
+      ],
+      "real_world_connection": "In 2020, Twitter was hacked through a spear phishing attack targeting employees with access to internal tools. The attackers used the access to post cryptocurrency scam tweets from high-profile accounts including Barack Obama and Elon Musk. It started with a simple phone call to employees.",
+      "reflection_prompt": "Have you ever received a phishing email that almost fooled you? What gave it away?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d4e5f6a7-b8c9-0123-4abc-def5678901234",
+      "type": "explanation",
+      "title": "Supply Chain Attacks — The Trust Exploit",
+      "content": {
+        "text": "Supply chain attacks exploit the trust relationships between organizations:\n\n**How Supply Chain Attacks Work:**\nInstead of attacking the target directly, attackers compromise a trusted vendor, supplier, or dependency that the target already trusts.\n\n**SolarWinds Attack (2020) — The Gold Standard:**\n1. APT29 (Cozy Bear) compromised SolarWinds' build system\n2. They inserted a backdoor into the Orion network monitoring software\n3. The compromised update was distributed to ~18,000 organizations\n4. ~100 organizations were actually compromised (the backdoor 'activated')\n5. Victims included US government agencies, Fortune 500 companies, and cybersecurity firms\n\n**Other Supply Chain Attack Examples:**\n- **Dependency confusion (2021):** Attackers published malicious packages with the same name as private internal packages on public registries. Package managers downloaded the malicious version instead.\n- **Codecov (2021):** Attackers compromised a CI/CD script used by thousands of companies, exfiltrating secrets from build processes.\n- **3CX (2023):** Compromised trading software distributed to thousands of financial institutions.\n- **XZ Utils (2024):** Backdoor inserted into a widely-used Linux compression utility, caught before widespread deployment.\n\n**Why Supply Chain Attacks Are Growing:**\n1. Direct attacks are getting harder — organizations are better defended\n2. Trust relationships are hard to verify at scale\n3. Modern software has hundreds of dependencies\n4. CI/CD pipelines are complex and have many attack surfaces\n5. The payoff is enormous — compromise one, access thousands"
+      },
+      "simplified_explanation": "Instead of attacking your front door (which you've locked), supply chain attacks go through the delivery truck you trust. If your software vendor is compromised, their update delivers malware directly into your network — bypassing your perimeter defenses entirely.",
+      "memory_aids": [
+        "Supply chain = Attack through trust relationships, not technology",
+        "SolarWinds = Compromise one vendor, access 18,000 organizations",
+        "Growing because direct attacks are harder and software has many dependencies"
+      ],
+      "real_world_connection": "The average modern application has hundreds of open-source dependencies. Each one is a potential supply chain attack vector. The npm/PyPI ecosystems have had multiple supply chain attacks through typosquatting, dependency confusion, and compromised maintainer accounts.",
+      "reflection_prompt": "How many dependencies does your organization's software have? Do you verify the integrity of updates before deploying them?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e5f6a7b8-c9d0-1234-5678-90123456789012",
+      "type": "memory_aid",
+      "title": "Attack Vector Defense Mapping",
+      "content": {
+        "text": "**ATTACK → DEFENSE Mapping:**\n\n| Attack Vector | Primary Defense | Secondary Defense |\n|-------------|----------------|-------------------|\n| Phishing | Email filtering + Training | MFA + Reporting |\n| Spear Phishing | Security awareness + DMARC | MFA + Verification |\n| Malware | EDR + AV | Patch management |\n| Ransomware | Backups + EDR | Network segmentation |\n| Supply Chain | Vendor assessment + SBOM | Code signing + Hash verification |\n| MitM | TLS + Certificate pinning | VPN |\n| Physical | Access controls + Cameras | Security awareness + Policies |\n| Insider Threat | Least privilege + Monitoring | DLP + Background checks |\n\n**PHISHED Defense Checklist:**\n**P** — Phishing filters (email gateway)\n**H** — Hover over links before clicking\n**I** — Inspect sender addresses carefully\n**S** — Suspicious of urgency and threats\n**H** — Handle attachments with caution\n**E** — External verification (call the sender)\n**D** — Don't trust, always verify\n\n**Defense Priority Order:**\n1. **MFA everywhere** — Stops 99.9% of account compromise attacks\n2. **Email security** — DMARC, DKIM, SPF, and advanced filtering\n3. **Patching** — Close known vulnerabilities\n4. **EDR** — Detect and respond to malware\n5. **Backups** — Recover from ransomware\n6. **Training** — Reduce phishing success rate\n7. **Least privilege** — Limit blast radius of compromise"
+      },
+      "simplified_explanation": "PHISHED is your phishing defense checklist. The defense priority list tells you where to invest: MFA first (stops 99.9% of account attacks), then email security, patching, EDR, backups, training, and least privilege.",
+      "memory_aids": [
+        "PHISHED: Phishing filters, Hover, Inspect, Suspicious, Handle caution, External verify, Don't trust",
+        "Defense priority: MFA → Email → Patching → EDR → Backups → Training → Least privilege",
+        "MFA stops 99.9% of account compromise — implement it FIRST"
+      ],
+      "real_world_connection": "Microsoft reported that MFA blocks 99.9% of account compromise attacks. This single control is more effective than most other defenses combined. If your organization hasn't implemented MFA everywhere, it should be your #1 priority.",
+      "reflection_prompt": "Can you recite PHISHED from memory? What's the first defense you'd implement at your organization?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f6a7b8c9-d0e1-2345-6789-abcdef0123456",
+      "type": "real_world",
+      "title": "Attack Vector Case Studies",
+      "content": {
+        "text": "**Case Study 1: Colonial Pipeline Ransomware (2021)**\nAttackers used a compromised VPN account (no MFA) to gain access. They deployed DarkSide ransomware, encrypting systems and forcing a pipeline shutdown. Gas prices spiked across the US East Coast.\n\nVector: Compromised VPN → Initial access → Ransomware\nDefense that would have stopped it: MFA on VPN\n\n**Case Study 2: SolarWinds Supply Chain (2020)**\nAPT29 compromised SolarWinds' software build system, inserting a backdoor into Orion updates distributed to 18,000 organizations. The attack went undetected for 9+ months.\n\nVector: Supply chain → Trusted software update → Backdoor\nDefense that would have helped: Code signing verification, behavioral monitoring of Orion\n\n**Case Study 3: Twitter Social Engineering (2020)**\nAttackers called Twitter employees, posing as IT support, and convinced them to provide access to internal tools. They used this access to post scam tweets from high-profile accounts.\n\nVector: Social engineering (vishing) → Employee access → Account takeover\nDefense that would have stopped it: Verification procedures for access changes\n\n**Case Study 4: Log4Shell (2021)**\nA critical vulnerability in the Apache Log4j library (used by millions of applications) allowed remote code execution. Because Log4j was embedded in countless products, patching was extremely complex.\n\nVector: Vulnerability in a widely-used dependency → RCE everywhere\nDefense that would have helped: SBOM (Software Bill of Materials), rapid vulnerability scanning"
+      },
+      "simplified_explanation": "Each case shows a different primary vector: compromised credentials (MFA would stop), supply chain (verification would help), social engineering (procedures would catch), and dependency vulnerability (SBOM would identify). The pattern: most attacks exploit a specific gap that has a known defense.",
+      "memory_aids": [
+        "Colonial Pipeline = No MFA on VPN → Ransomware → $4.4M ransom",
+        "SolarWinds = Supply chain → 9 months undetected → 18,000 orgs",
+        "Twitter = Social engineering → Employee access → Account takeover",
+        "Log4Shell = Dependency vulnerability → Millions of apps affected"
+      ],
+      "real_world_connection": "Notice that each attack had a known defense that would have significantly reduced its impact. The gap isn't usually knowledge — it's implementation. MFA, verification procedures, and SBOMs are well-understood defenses that many organizations still haven't fully deployed.",
+      "reflection_prompt": "Which of these attacks could happen at your organization today? Which defenses are you missing?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a7b8c9d0-e1f2-3456-7890-abcdef01234567",
+      "type": "reflection",
+      "title": "Map Attack Vectors to Your Organization",
+      "content": {
+        "text": "Choose your organization (or a hypothetical one) and create an attack vector assessment:\n\n**Organization Profile:**\n- Type: [Healthcare / Finance / Tech / Government / Education]\n- Size: [Small / Medium / Large / Enterprise]\n- Remote work: [None / Hybrid / Fully remote]\n\n**Assessment:**\n1. Which attack vector is MOST likely to be used against this organization?\n2. Which attack vector would have the HIGHEST impact?\n3. What is the TOP defense you'd implement first?\n4. What is the defense GAP you see most often?\n5. If you had $100K for security improvements, how would you allocate it?\n\n**Map each vector to a defense:**\n- Social engineering → ?\n- Malware → ?\n- Supply chain → ?\n- Network attacks → ?\n- Physical attacks → ?\n- Insider threat → ?"
+      },
+      "simplified_explanation": "This exercise forces you to think about your organization's specific risk profile. A hospital faces different threats than a tech startup. Map the most likely attacks to the most effective defenses for YOUR situation.",
+      "memory_aids": [
+        "Risk assessment = Most likely vector × Highest impact vector → Defense priorities",
+        "Budget allocation: MFA first, then email security, then EDR, then training"
+      ],
+      "real_world_connection": "This is exactly what security consultants do during risk assessments. The exercise above is a simplified version of a formal threat modeling exercise.",
+      "reflection_prompt": "Complete the assessment for your organization. What's your #1 defense gap?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b8c9d0e1-f2a3-4567-8901-abcdef01234567",
+      "type": "mindset_coach",
+      "title": "You Now See the Doors",
+      "content": {
+        "text": "You've learned the five major attack vectors and the defenses that map to each one. More importantly, you've learned that most attacks exploit known gaps with known solutions. MFA stops 99.9% of account compromise. Email filtering catches most phishing. Patching closes known vulnerabilities. The knowledge gap isn't what to do — it's prioritizing and implementing. Now that you see the doors, start locking them."
+      },
+      "simplified_explanation": "Most attacks exploit gaps that have known fixes. MFA stops credential theft. Email filtering stops phishing. Patching stops vulnerability exploitation. The challenge isn't knowing what to do — it's doing it consistently across your organization.",
+      "memory_aids": [
+        "Most attacks exploit known gaps with known fixes",
+        "Knowledge isn't the gap — implementation is",
+        "Start with MFA, then email security, then patching"
+      ],
+      "real_world_connection": "Every major breach in recent years exploited a vulnerability that had a known defense. Colonial Pipeline — no MFA. SolarWinds — no build verification. Twitter — no verification procedure. The defenses exist; they just need to be implemented.",
+      "reflection_prompt": "What's the one defense you can implement today that would have the biggest impact? Go do it.",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1-fundamentals-77",
+      "type": "multiple_choice",
+      "question": "What percentage of cyberattacks start with phishing, according to industry reports?",
+      "options": [
+        "50%",
+        "71%",
+        "91%",
+        "99%"
+      ],
+      "correct_answer": 2,
+      "explanation": "According to multiple industry reports, approximately 91% of cyberattacks begin with a phishing email. This makes phishing by far the most common initial access vector, which is why email security and security awareness training are top priorities.",
+      "difficulty": 1,
+      "memory_aid": "91% of attacks start with phishing. It's the #1 vector by a huge margin.",
+      "points": 10
+    },
+    {
+      "question_id": "q2-fundamentals-77",
+      "type": "multiple_choice",
+      "question": "What makes supply chain attacks particularly dangerous compared to direct attacks?",
+      "options": [
+        "They use more sophisticated malware than direct attacks",
+        "They exploit trust relationships, bypassing perimeter defenses by coming through trusted software updates",
+        "They always involve nation-state actors",
+        "They are faster to execute than direct attacks"
+      ],
+      "correct_answer": 1,
+      "explanation": "Supply chain attacks are dangerous because they exploit trust relationships. Organizations automatically trust software updates from their vendors, so compromised updates bypass perimeter defenses entirely. The SolarWinds attack distributed malware through a legitimate update — no firewall would block it because it was 'trusted.'",
+      "difficulty": 2,
+      "memory_aid": "Supply chain = Attack through trust. Software updates bypass firewalls because they're trusted.",
+      "points": 10
+    },
+    {
+      "question_id": "q3-fundamentals-77",
+      "type": "multiple_choice",
+      "question": "What single defense control blocks approximately 99.9% of account compromise attacks?",
+      "options": [
+        "Antivirus software",
+        "Multi-factor authentication (MFA)",
+        "Network firewalls",
+        "Employee security training"
+      ],
+      "correct_answer": 1,
+      "explanation": "Microsoft reported that MFA blocks 99.9% of account compromise attacks. Even if an attacker steals a password through phishing, they can't complete the login without the second factor. MFA is the single most effective control against credential-based attacks.",
+      "difficulty": 1,
+      "memory_aid": "MFA = 99.9% account compromise blocked. The single most effective defense. Implement it FIRST.",
+      "points": 10
+    },
+    {
+      "question_id": "q4-fundamentals-77",
+      "type": "multiple_choice",
+      "question": "In the PHISHED acronym for phishing defense, what does the 'E' stand for?",
+      "options": [
+        "Encrypt all emails",
+        "External verification (call the sender to confirm)",
+        "Examine attachments with sandbox",
+        "Enable spam filters"
+      ],
+      "correct_answer": 1,
+      "explanation": "The 'E' in PHISHED stands for 'External verification' — calling or contacting the sender through a different channel to confirm the email is legitimate. If you receive a suspicious email from your CEO requesting a wire transfer, call the CEO directly to verify. This simple step defeats most spear phishing and BEC attacks.",
+      "difficulty": 2,
+      "memory_aid": "PHISHED: Phishing filters, Hover, Inspect, Suspicious, Handle caution, External verify, Don't trust",
+      "points": 10
+    },
+    {
+      "question_id": "q5-fundamentals-77",
+      "type": "multiple_choice",
+      "question": "The Colonial Pipeline ransomware attack (2021) was primarily enabled by which security gap?",
+      "options": [
+        "Lack of employee security training",
+        "A compromised VPN account without multi-factor authentication",
+        "Outdated antivirus software",
+        "An unpatched web server vulnerability"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Colonial Pipeline attack was enabled by a compromised VPN account that did not have MFA enabled. The attackers obtained legitimate credentials (likely through phishing or password reuse) and used them to access the VPN. MFA would have blocked this access even with valid credentials. The attack caused a major fuel disruption on the US East Coast.",
+      "difficulty": 1,
+      "memory_aid": "Colonial Pipeline = No MFA on VPN. $4.4M ransom. MFA would have prevented it.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 60,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-14T14:30:00+03:00",
+  "updated_at": "2026-06-14T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": ["fundamentals", "attack-vectors", "phishing", "social-engineering", "supply-chain", "malware", "Course: CompTIA-Security+", "Career Path: SOC Analyst"]
+}

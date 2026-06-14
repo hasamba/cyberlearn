@@ -1,0 +1,293 @@
+{
+  "lesson_id": "417c1931-1506-4db9-bd58-a8a66df467e5",
+  "domain": "cloud",
+  "title": "Cloud Network Segmentation",
+  "subtitle": "Micro-Segmentation, Security Zones, and Defense in Depth for Cloud Networks",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 78,
+  "prerequisites": [
+    "Cloud Networking vs On-Premises"
+  ],
+  "learning_objectives": [
+    "Design network segmentation architectures for cloud environments",
+    "Implement security zones and trust boundaries in AWS, Azure, and GCP",
+    "Apply micro-segmentation principles to limit lateral movement",
+    "Configure cloud security groups and network ACLs for defense in depth",
+    "Evaluate segmentation strategies for different workload types"
+  ],
+  "concepts": [
+    "Network Segmentation",
+    "Micro-Segmentation",
+    "Security Zones",
+    "Trust Boundaries",
+    "VPC Design",
+    "Security Groups",
+    "Network ACLs",
+    "Defense in Depth",
+    "Lateral Movement Prevention",
+    "Zero Trust Networking"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1e2d3c4-b5a6-7890-abcdef-012345678901",
+      "type": "mindset_coach",
+      "title": "Contain the Blast Radius",
+      "content": {
+        "text": "Network segmentation isn't about making things complicated — it's about containing damage. When (not if) an attacker gets into your network, segmentation determines how far they can move. A flat network means one compromise leads to total network access. A properly segmented network means one compromise leads to one small zone. Think of segmentation as fire doors in a building: they don't prevent fires, but they prevent a fire in one room from spreading to the entire building."
+      },
+      "simplified_explanation": "Segmentation is like fire doors in a building. A fire in one room is bad. A fire that spreads to every room is catastrophic. Segmentation puts doors between sections so damage stays contained.",
+      "memory_aids": [
+        "Segmentation = Containing the blast radius",
+        "Flat network = One compromise, total access. Segmented = One compromise, limited zone.",
+        "Think of segmentation as fire doors between building sections"
+      ],
+      "real_world_connection": "The Equifax breach (2017) spread across a flat network — attackers moved from one compromised server to the entire database infrastructure. Proper segmentation would have contained the breach to a single zone, potentially saving 147 million people's personal data.",
+      "reflection_prompt": "If an attacker compromised one server in your network today, how far could they move laterally?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "e2d3c4b5-a6f7-8901-bcdef-123456789012",
+      "type": "explanation",
+      "title": "Cloud Network Segmentation Architecture",
+      "content": {
+        "text": "Cloud network segmentation uses VPCs, subnets, and security groups to create isolation:\n\n**AWS Segmentation Hierarchy:**\n```\nAWS Account (isolation boundary)\n  └── VPC (network isolation)\n        ├── Public Subnet (DMZ - load balancers, bastions)\n        │     └── Security Group: Allow HTTPS from internet\n        ├── Private Subnet (application tier)\n        │     └── Security Group: Allow from public subnet only\n        └── Isolated Subnet (database tier)\n              └── Security Group: Allow from private subnet only\n```\n\n**Security Zones:**\n1. **DMZ / Public Zone** — Internet-facing resources (load balancers, WAF, bastions)\n2. **Application Zone** — Application servers, APIs, microservices\n3. **Data Zone** — Databases, caches, object storage\n4. **Management Zone** — CI/CD, monitoring, logging, security tools\n5. **Restricted Zone** — Highly sensitive data, key management, compliance systems\n\n**Zone Communication Rules:**\n- DMZ → Application: Allow specific ports (8080, 8443)\n- Application → Data: Allow specific ports (5432, 3306, 6379)\n- Management → All: Allow SSH/RDP for administration\n- All → DMZ: DENY (inbound from internet goes through load balancers only)\n- Data → DMZ: DENY (databases never initiate connections to the internet)\n- Zone → Zone (lateral): DENY by default, allow specific business flows\n\n**Key Principle: Deny by Default, Allow by Exception**\nEvery zone starts with no communication to other zones. You explicitly allow only the traffic flows that business requires."
+      },
+      "simplified_explanation": "Cloud segmentation organizes your network into zones: DMZ (internet-facing), Application (business logic), Data (databases), Management (admin tools), and Restricted (highly sensitive). Traffic between zones is denied by default and only allowed where business needs require it.",
+      "memory_aids": [
+        "5 zones: DMZ, Application, Data, Management, Restricted",
+        "Traffic rule: Deny by default, Allow by exception",
+        "Data zone never talks to the internet. DMZ never talks directly to Data."
+      ],
+      "real_world_connection": "AWS's own Well-Architected Framework recommends this zone architecture. Companies like Netflix and Airbnb use this model with separate VPCs for each zone and VPC peering for controlled communication.",
+      "reflection_prompt": "Can an application server in your architecture talk directly to the internet? Should it?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "d3c4b5a6-f7e8-9012-abcdef-234567890123",
+      "type": "explanation",
+      "title": "Micro-Segmentation: Beyond Network Zones",
+      "content": {
+        "text": "Micro-segmentation takes zone-level isolation to the workload level:\n\n**Traditional Segmentation vs Micro-Segmentation:**\n\nTraditional: DMZ ←→ App ←→ Data (3 zones)\nMicro: Web-App-A ←→ API-Service-B ←→ DB-C (per-workload rules)\n\n**Why Micro-Segmentation Matters:**\n- In a zone, any workload can talk to any other workload\n- Micro-segmentation restricts communication to only what each workload needs\n- Even if an attacker compromises one workload, they can't move to others\n\n**AWS Implementation — Security Groups as Micro-Segmentation:**\n```json\n// Web Server Security Group\n{\n  \"Inbound\": [\n    {\"Port\": 443, \"Source\": \"ALB-Security-Group\"},  // Only from ALB\n    {\"Port\": 22, \"Source\": \"SSM-Endpoints\"}       // Only from SSM\n  ],\n  \"Outbound\": [\n    {\"Port\": 8443, \"Dest\": \"API-Service-SG\"},    // Only to API service\n    {\"Port\": 443, \"Dest\": \"0.0.0.0/0\"}           // HTTPS outbound for updates\n  ]\n}\n\n// API Service Security Group\n{\n  \"Inbound\": [\n    {\"Port\": 8443, \"Source\": \"Web-Server-SG\"},   // Only from web servers\n    {\"Port\": 22, \"Source\": \"SSM-Endpoints\"}       // Only from SSM\n  ],\n  \"Outbound\": [\n    {\"Port\": 5432, \"Dest\": \"Database-SG\"},       // Only to database\n    {\"Port\": 6379, \"Dest\": \"Cache-SG\"}            // Only to cache\n  ]\n}\n\n// Database Security Group\n{\n  \"Inbound\": [\n    {\"Port\": 5432, \"Source\": \"API-Service-SG\"},  // Only from API service\n    {\"Port\": 22, \"Source\": \"SSM-Endpoints\"}       // Only from SSM\n  ],\n  \"Outbound\": [\n    // No outbound to internet - databases don't need internet\n  ]\n}\n```\n\n**Micro-Segmentation Best Practices:**\n1. Every workload gets its own security group\n2. Security groups reference other security groups, not IP addresses\n3. Outbound rules are as restrictive as inbound rules\n4. No security group allows 0.0.0.0/0 inbound (except ALB)\n5. Databases have no outbound internet access\n6. Use least-privilege: allow only specific ports, not ranges"
+      },
+      "simplified_explanation": "Micro-segmentation means every workload has its own firewall rules. Instead of 'all app servers can talk to all databases,' it's 'this specific app server can talk to this specific database on this specific port.' Even if one app server is compromised, the attacker can't reach anything else.",
+      "memory_aids": [
+        "Micro-segmentation = Per-workload firewall rules, not per-zone",
+        "Security groups reference other security groups, not IP addresses",
+        "Databases have NO outbound internet. Period."
+      ],
+      "real_world_connection": "Google's BeyondCorp and zero-trust architectures are built on micro-segmentation principles. Every service authenticates and authorizes every other service, with no implicit trust based on network location.",
+      "reflection_prompt": "In your environment, can one compromised application server reach all other application servers? If yes, you need micro-segmentation.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c4b5a6f7-e8d9-0123-abcdef-345678901234",
+      "type": "code_exercise",
+      "title": "Terraform Security Group Configuration",
+      "content": {
+        "text": "Here's a Terraform configuration implementing proper segmentation:\n\n```hcl\n# VPC and Subnets\nresource \"aws_vpc\" \"main\" {\n  cidr_block           = \"10.0.0.0/16\"\n  enable_dns_hostnames = true\n  enable_dns_support   = true\n  \n  tags = { Name = \"segmented-vpc\" }\n}\n\n# DMZ Subnet (public)\nresource \"aws_subnet\" \"dmz\" {\n  vpc_id                  = aws_vpc.main.id\n  cidr_block              = \"10.0.1.0/24\"\n  map_public_ip_on_launch = true\n  availability_zone       = \"us-east-1a\"\n  tags = { Name = \"dmz-subnet\", Tier = \"dmz\" }\n}\n\n# Application Subnet (private)\nresource \"aws_subnet\" \"app\" {\n  vpc_id            = aws_vpc.main.id\n  cidr_block        = \"10.0.2.0/24\"\n  availability_zone = \"us-east-1a\"\n  tags = { Name = \"app-subnet\", Tier = \"application\" }\n}\n\n# Data Subnet (isolated)\nresource \"aws_subnet\" \"data\" {\n  vpc_id            = aws_vpc.main.id\n  cidr_block        = \"10.0.3.0/24\"\n  availability_zone = \"us-east-1a\"\n  tags = { Name = \"data-subnet\", Tier = \"data\" }\n}\n\n# ALB Security Group (DMZ tier)\nresource \"aws_security_group\" \"alb\" {\n  name        = \"alb-sg\"\n  description = \"Application Load Balancer - DMZ tier\"\n  vpc_id      = aws_vpc.main.id\n\n  ingress {\n    description = \"HTTPS from internet\"\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]  # ALB is the only thing exposed\n  }\n\n  egress {\n    description = \"To application tier\"\n    from_port   = 8443\n    to_port     = 8443\n    protocol    = \"tcp\"\n    security_groups = [aws_security_group.app.id]\n  }\n}\n\n# Application Security Group\nresource \"aws_security_group\" \"app\" {\n  name        = \"app-sg\"\n  description = \"Application servers - Application tier\"\n  vpc_id      = aws_vpc.main.id\n\n  ingress {\n    description = \"From ALB only\"\n    from_port   = 8443\n    to_port     = 8443\n    protocol    = \"tcp\"\n    security_groups = [aws_security_group.alb.id]\n  }\n\n  egress {\n    description = \"To database tier\"\n    from_port   = 5432\n    to_port     = 5432\n    protocol    = \"tcp\"\n    security_groups = [aws_security_group.database.id]\n  }\n}\n\n# Database Security Group\nresource \"aws_security_group\" \"database\" {\n  name        = \"database-sg\"\n  description = \"Database servers - Data tier (NO internet)\"\n  vpc_id      = aws_vpc.main.id\n\n  ingress {\n    description = \"From application tier only\"\n    from_port   = 5432\n    to_port     = 5432\n    protocol    = \"tcp\"\n    security_groups = [aws_security_group.app.id]\n  }\n\n  # NO egress to internet\n  # Database servers should never initiate\n  # connections to the internet\n  egress {\n    description = \"DNS resolution only\"\n    from_port   = 53\n    to_port     = 53\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.0.0.0/16\"]  # VPC DNS only\n  }\n}\n```\n\n**Key Security Features:**\n- DMZ tier accepts HTTPS from internet, forwards to app tier\n- App tier only accepts traffic from ALB, only sends to database\n- Database tier only accepts traffic from app tier, has NO internet access\n- All inter-tier communication uses security group references\n- No IP-based rules — only security group references",
+        "language": "hcl",
+        "difficulty": "intermediate"
+      },
+      "simplified_explanation": "This Terraform creates a properly segmented three-tier architecture: DMZ (load balancer), Application, and Data (database). Each tier can only talk to the next tier, and the database has no internet access at all. This is segmentation done right.",
+      "memory_aids": [
+        "Three-tier segmentation: DMZ → App → Data",
+        "Security groups reference other security groups, not IPs",
+        "Database has NO egress to internet — this is critical"
+      ],
+      "real_world_connection": "This is the exact pattern recommended by AWS's Well-Architected Framework. Any deviation from this (like allowing databases to reach the internet) is a security risk that appears on every well-architected review.",
+      "reflection_prompt": "Why is it critical that the database security group has no outbound internet access? What could happen if it did?",
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "b5a6f7e8-d9c0-1234-abcdef-456789012345",
+      "type": "real_world",
+      "title": "Segmentation Failures and Successes",
+      "content": {
+        "text": "**Failure: Equifax (2017) — Flat Network**\nAttackers exploited an Apache Struts vulnerability on a public-facing web server. In a flat network, they moved laterally to the database containing 147 million records. With proper segmentation, the web server would only have been able to reach the application tier, not the database directly.\n\n**Failure: Target (2013) — Insufficient Segmentation**\nAttackers compromised Target's HVAC vendor and moved through a flat network to the POS system, stealing 40 million credit card numbers. The HVAC system should never have been able to reach the POS network.\n\n**Failure: Capital One (2019) — Overly Permissive Security Group**\nA misconfigured security group allowed an EC2 instance in the app tier to assume an IAM role with access to S3 buckets containing 100M+ customer records. The security group should have restricted the instance's permissions.\n\n**Success: A Major Bank — Micro-Segmented**\nA large bank implemented micro-segmentation where every application had its own security group with explicit allow rules. When an attacker compromised a web server, they could only reach the specific API it was configured to communicate with — preventing lateral movement entirely. The breach was contained to a single application tier server.\n\n**Success: A Tech Company — Zero Trust**\nA tech company implemented zero-trust networking where every service authenticated every request. When an attacker compromised an internal service, they couldn't move laterally because every other service required valid authentication tokens they didn't have."
+      },
+      "simplified_explanation": "Equifax, Target, and Capital One all suffered because of insufficient segmentation. In each case, attackers moved laterally through a flat or under-segmented network. The successful cases show that micro-segmentation and zero trust contain breaches to a single compromised workload.",
+      "memory_aids": [
+        "Equifax = Flat network, attackers reached DB from web server",
+        "Target = HVAC vendor accessed POS network — should have been segmented",
+        "Capital One = Overly permissive SG, EC2 reached S3 with 100M records",
+        "Success: Micro-segmentation contains breach to single workload"
+      ],
+      "real_world_connection": "The pattern is clear: every major breach that involved lateral movement could have been contained by proper segmentation. The cost of segmentation is configuration complexity; the cost of NOT segmenting is data breaches affecting millions.",
+      "reflection_prompt": "Could an attacker in your DMZ reach your database directly? If yes, you have a segmentation problem.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a6f7e8d9-c0b1-2345-abcdef-567890123456",
+      "type": "memory_aid",
+      "title": "Cloud Segmentation Cheat Sheet",
+      "content": {
+        "text": "**Segmentation Layers (Defense in Depth):**\n\n| Layer | Cloud Implementation | Purpose |\n|-------|---------------------|----------|\n| VPC | AWS VPC, Azure VNet, GCP VPC | Network isolation |\n| Subnet | Public/Private/Isolated subnets | Zone separation |\n| Security Group | Instance-level firewall | Micro-segmentation |\n| NACL | Subnet-level firewall | Stateless filtering |\n| IAM | Identity and Access Management | Identity-based access |\n\n**5 Security Zones:**\n1. **DMZ** — Internet-facing (load balancers, WAF)\n2. **Application** — Business logic (APIs, services)\n3. **Data** — Storage (databases, caches)\n4. **Management** — Admin (CI/CD, monitoring)\n5. **Restricted** — Highly sensitive (keys, compliance data)\n\n**Micro-Segmentation Rules:**\n☐ Every workload gets its own security group\n☐ SGs reference other SGs, not IP addresses\n☐ Inbound: Deny all, allow by exception\n☐ Outbound: Restrict to specific destinations\n☐ Databases have NO internet access\n☐ Management tier uses SSM, not SSH\n☐ Log all security group changes\n\n**Quick Validation Test:**\nIf a compromised web server can reach the database directly, segmentation is insufficient."
+      },
+      "simplified_explanation": "This cheat sheet gives you the layers, zones, and rules for cloud segmentation. The quick validation test: if a compromised web server can reach your database, you have more segmentation work to do.",
+      "memory_aids": [
+        "Layers: VPC → Subnet → Security Group → NACL → IAM",
+        "Zones: DMZ, App, Data, Management, Restricted",
+        "Quick test: Can a compromised web server reach the database? If yes → more segmentation needed"
+      ],
+      "real_world_connection": "Print this and review it every time you create a new VPC or security group. It takes 5 minutes and prevents 5-month incident responses.",
+      "reflection_prompt": "Can you recite the 5 security zones from memory? What traffic does each zone allow?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "f7e8d9c0-b1a2-3456-abcdef-678901234567",
+      "type": "reflection",
+      "title": "Design a Segmented Cloud Architecture",
+      "content": {
+        "text": "Design network segmentation for a three-tier web application:\n\n**Application Requirements:**\n- Web application with public-facing frontend\n- REST API backend\n- PostgreSQL database\n- Redis cache\n- CI/CD pipeline (Jenkins)\n- Monitoring (Prometheus/Grafana)\n- Admin access via SSM\n\n**Design the following:**\n1. VPC and subnet layout (CIDR blocks, availability zones)\n2. Security groups for each component\n3. Network ACLs for each subnet\n4. Traffic flow rules (what can talk to what, on which ports)\n5. How would you handle the CI/CD and monitoring components?\n\n**Security Requirements:**\n- No component in the data tier can access the internet\n- All admin access goes through SSM\n- The web frontend is the only internet-facing component\n- Lateral movement between tiers is restricted\n- All traffic is logged\n\n**Consider:**\n- What happens if the web server is compromised?\n- What happens if the API server is compromised?\n- What happens if Jenkins is compromised?\n- How do you handle database updates without internet access?"
+      },
+      "simplified_explanation": "This exercise tests whether you can apply segmentation principles to a real application. The key question is always: 'If X is compromised, what can the attacker reach?' Good segmentation limits the answer.",
+      "memory_aids": [
+        "Design rule: Every compromised component should only reach what it's explicitly allowed to",
+        "Data tier = NO internet. Management = SSM only. DMZ = Only HTTPS."
+      ],
+      "real_world_connection": "This is exactly the exercise that cloud security architects work through during design reviews. Getting the segmentation right at design time is far easier than retrofitting it later.",
+      "reflection_prompt": "Draw your architecture. Then test it: what can a compromised web server reach? What can a compromised Jenkins server reach?",
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "c4b5a6f7-e8d9-0123-4abc-def5678901234",
+      "type": "code_exercise",
+      "title": "Security Group Validation Script",
+      "content": {
+        "text": "Here is a Python script to validate your security group configuration against segmentation rules:\n\n```python\nimport boto3\nfrom collections import defaultdict\n\ndef validate_segmentation(vpc_id: str) -> dict:\n    \"\"\"Validate VPC security groups follow segmentation rules.\"\"\"\n    ec2 = boto3.client('ec2')\n    issues = []\n    \n    sgs = ec2.describe_security_groups(\n        Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}]\n    )\n    \n    for sg in sgs['SecurityGroups']:\n        sg_name = sg['GroupName']\n        \n        # Check: No 0.0.0.0/0 inbound (except ALB)\n        for rule in sg.get('IpPermissions', []):\n            for ip_range in rule.get('IpRanges', []):\n                if ip_range['CidrIp'] == '0.0.0.0/0':\n                    if 'alb' not in sg_name.lower():\n                        issues.append({\n                            'type': 'INTERNET_EXPOSURE',\n                            'severity': 'CRITICAL',\n                            'message': f'{sg_name} allows {rule[\"FromPort\"]}/{rule[\"IpProtocol\"]} from 0.0.0.0/0',\n                            'recommendation': 'Restrict to specific IPs'\n                        })\n        \n        # Check: Database SGs should not have internet outbound\n        if 'db' in sg_name.lower() or 'database' in sg_name.lower():\n            for rule in sg.get('IpPermissionsEgress', []):\n                for ip_range in rule.get('IpRanges', []):\n                    if ip_range['CidrIp'] == '0.0.0.0/0':\n                        issues.append({\n                            'type': 'DB_INTERNET_EGRESS',\n                            'severity': 'CRITICAL',\n                            'message': f'{sg_name} has internet egress',\n                            'recommendation': 'Database SGs should not have internet access'\n                        })\n    \n    return {\n        'vpc_id': vpc_id,\n        'issues_found': len(issues),\n        'issues': issues,\n        'status': 'FAIL' if issues else 'PASS'\n    }\n\nresult = validate_segmentation('vpc-1234567890abcdef0')\nprint(f\"Validation: {result['status']}\")\nfor issue in result['issues']:\n    print(f\"  [{issue['severity']}] {issue['message']}\")\n```\n\n**Key Validation Rules:**\n1. No 0.0.0.0/0 inbound on non-ALB security groups\n2. No internet egress on database security groups\n3. Database SGs only allow traffic from app SGs\n4. App SGs only allow traffic from ALB SGs\n5. Management SGs use SSM, not SSH from internet\n\nRun this script regularly as part of your CI/CD pipeline.",
+        "language": "python",
+        "difficulty": "intermediate"
+      },
+      "simplified_explanation": "This script validates your security groups against segmentation rules. It catches common violations: public internet access on non-ALB groups, database internet egress, and unrestricted inbound rules.",
+      "memory_aids": [
+        "Validation: No 0.0.0.0/0 on non-ALB, No DB internet egress, App traffic only from ALB",
+        "Run validation in CI/CD to catch violations before production"
+      ],
+      "real_world_connection": "AWS Config rules and custom Lambda functions like this are standard in well-architected environments. The best teams run these checks on every infrastructure change.",
+      "reflection_prompt": "What other validation rules would you add? What about checking for SGs that allow all ports?",
+      "is_interactive": true,
+      "xp_reward": 25
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1-cloud-78",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of network segmentation in cloud environments?",
+      "options": [
+        "To improve network performance and reduce latency",
+        "To contain the blast radius of a compromise by limiting lateral movement",
+        "To reduce the number of IP addresses needed",
+        "To simplify network configuration"
+      ],
+      "correct_answer": 1,
+      "explanation": "The primary purpose of network segmentation is to contain the blast radius of a compromise. In a flat network, an attacker who compromises one server can move laterally to any other server. In a segmented network, the attacker can only reach resources in the same zone or that have explicit allow rules, dramatically reducing the impact of a breach.",
+      "difficulty": 1,
+      "memory_aid": "Segmentation = Contain the blast radius. Limit lateral movement.",
+      "points": 10
+    },
+    {
+      "question_id": "q2-cloud-78",
+      "type": "multiple_choice",
+      "question": "In a properly segmented cloud architecture, which tier should NEVER have outbound internet access?",
+      "options": [
+        "DMZ / Public tier (load balancers)",
+        "Application tier (API servers)",
+        "Data tier (databases and caches)",
+        "Management tier (CI/CD and monitoring)"
+      ],
+      "correct_answer": 2,
+      "explanation": "The data tier (databases, caches) should never have outbound internet access. Databases don't need to connect to the internet — they only need to accept connections from the application tier. Allowing databases outbound internet access creates a data exfiltration path and a potential channel for command-and-control communication if the database is compromised.",
+      "difficulty": 1,
+      "memory_aid": "Databases = NO internet. They only accept connections from the app tier. Period.",
+      "points": 10
+    },
+    {
+      "question_id": "q3-cloud-78",
+      "type": "multiple_choice",
+      "question": "What is the key difference between traditional network segmentation and micro-segmentation?",
+      "options": [
+        "Micro-segmentation uses physical firewalls instead of software firewalls",
+        "Traditional segmentation divides networks into zones; micro-segmentation applies rules per individual workload",
+        "Micro-segmentation is only available in AWS",
+        "Traditional segmentation is more secure than micro-segmentation"
+      ],
+      "correct_answer": 1,
+      "explanation": "Traditional segmentation divides the network into broad zones (DMZ, App, Data) where all workloads in a zone can communicate. Micro-segmentation applies firewall rules at the individual workload level, so even workloads in the same zone can only communicate if there's an explicit allow rule. This provides much finer-grained containment.",
+      "difficulty": 2,
+      "memory_aid": "Traditional = Zone-level rules. Micro-segmentation = Per-workload rules. Finer granularity = Better containment.",
+      "points": 10
+    },
+    {
+      "question_id": "q4-cloud-78",
+      "type": "multiple_choice",
+      "question": "In the Target breach of 2013, which segmentation failure enabled the attack?",
+      "options": [
+        "The database was exposed to the internet",
+        "The HVAC vendor network was not segmented from the POS network",
+        "The web application had no WAF protection",
+        "MFA was not enabled on admin accounts"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Target breach was enabled by insufficient segmentation between the HVAC vendor network and the POS (Point of Sale) network. Attackers compromised an HVAC vendor's credentials, then moved laterally through a flat network to reach the POS systems that processed credit card transactions. Proper segmentation would have isolated the HVAC network from the POS network entirely.",
+      "difficulty": 2,
+      "memory_aid": "Target = HVAC vendor network connected to POS network. HVAC should never reach POS.",
+      "points": 10
+    },
+    {
+      "question_id": "q5-cloud-78",
+      "type": "multiple_choice",
+      "question": "When configuring cloud security groups for micro-segmentation, what is the best practice for referencing allowed traffic sources?",
+      "options": [
+        "Use CIDR blocks for all internal traffic",
+        "Reference other security groups instead of IP addresses",
+        "Allow all traffic within the VPC CIDR range",
+        "Use 0.0.0.0/0 for internal communication"
+      ],
+      "correct_answer": 1,
+      "explanation": "Best practice is to reference other security groups instead of IP addresses. This provides automatic traffic filtering based on the instance's role rather than its IP, which can change. If an app server's IP changes, the security group reference still works correctly. IP-based rules break when instances are replaced or auto-scaled.",
+      "difficulty": 2,
+      "memory_aid": "SG references > IP addresses. They're role-based and auto-update when instances change.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 60,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "created_at": "2026-06-14T14:30:00+03:00",
+  "updated_at": "2026-06-14T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0.0",
+  "tags": [
+    "cloud-security",
+    "network-segmentation",
+    "micro-segmentation",
+    "vpc",
+    "security-groups",
+    "defense-in-depth",
+    "Course: SANS-SEC502",
+    "Career Path: Cloud Security"
+  ]
+}
