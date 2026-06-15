@@ -1,0 +1,246 @@
+{
+  "lesson_id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
+  "domain": "osint",
+  "title": "Steganography Detection",
+  "subtitle": "Finding Hidden Data in Plain Sight Through Steganalysis Techniques",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 80,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand steganography techniques used to hide data within images, audio, and video files",
+    "Apply statistical analysis methods to detect steganographic content",
+    "Use steganalysis tools to extract hidden data from carrier files",
+    "Identify common steganography tools and their signatures",
+    "Detect covert communication channels using steganographic techniques"
+  ],
+  "concepts": [
+    "LSB (Least Significant Bit) steganography",
+    "Image steganography techniques",
+    "Audio steganography",
+    "Statistical steganalysis",
+    "Chi-square analysis",
+    "Steganography tool signatures",
+    "Visual steganalysis techniques",
+    "Covert communication detection",
+    "Steghide, Steganographer, OpenStego",
+    "Network steganography"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+      "type": "mindset_coach",
+      "title": "Hidden in Plain Sight",
+      "content": {
+        "text": "Cryptography hides the content of a message. Steganography hides the existence of the message entirely. A malicious actor can embed commands, exfiltrated data, or C2 instructions inside a perfectly normal-looking vacation photo. For OSINT analysts and security investigators, steganography detection is a critical skill — because you can't investigate what you can't see."
+      },
+      "simplified_explanation": "Cryptography = Put the message in a safe. Steganography = Write the message on the wall where no one thinks to look. The photo of your lunch could secretly contain a company's entire database, and you'd never notice by looking at it.",
+      "memory_aids": [
+        "Cryptography = Hide the meaning. Steganography = Hide the existence.",
+        "If you can't see it, you can't investigate it."
+      ],
+      "real_world_connection": "Malware families like Turla and OceanLotus have used steganography to hide C2 instructions in images on public websites. The malware downloads what looks like a normal image, extracts the hidden commands, and executes them.",
+      "reflection_prompt": "Why would an attacker choose steganography over encryption to exfiltrate data from an organization?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
+      "type": "explanation",
+      "title": "How Steganography Works: LSB and Beyond",
+      "content": {
+        "text": "**LSB (Least Significant Bit) Steganography** — The most common technique:\n\nDigital images use pixels with color values (0-255 for RGB). The least significant bit (the last binary digit) has minimal visual impact. If you change the LSB of a pixel from 0 to 1, the color changes by 1/256th — invisible to the human eye.\n\n**Example**: An 8-bit pixel value: 1011010**1** (the last bit is the LSB)\n- Changing it to 1011010**0** changes the color value from 181 to 180\n- Invisible to the eye, but you've embedded 1 bit of hidden data\n- A 1000×1000 pixel image has 3 million color channels (RGB) = 3 million potential hidden bits = ~375 KB of hidden data\n\n**Other steganography techniques:**\n\n1. **Palette-based steganography**: Modifies the color palette in GIF/PNG images\n2. **Transform domain**: Hides data in frequency coefficients (DCT, DWT) of JPEG images — harder to detect\n3. **Spread spectrum**: Spreads hidden data across the image using noise-like patterns\n4. **Audio steganography**: LSB in audio samples, echo hiding, phase encoding\n5. **Video steganography**: Embeds data across video frames or in motion vectors\n6. **Network steganography**: Hides data in protocol headers, timing, or packet sizes\n7. **Text steganography**: Uses whitespace, Unicode characters, or linguistic patterns\n\n**Why attackers use steganography:**\n- Bypasses DLP (Data Loss Prevention) — the image looks normal\n- Bypasses network monitoring — no encrypted traffic to flag\n- Hides C2 instructions in publicly accessible images\n- Data exfiltration that doesn't trigger any security alerts"
+      },
+      "simplified_explanation": "LSB steganography is like writing a secret message by slightly changing the shade of every pixel in a photo. Each pixel changes so slightly that nobody can see the difference, but the changes spell out a hidden message. A single photo can hide hundreds of kilobytes of data this way.",
+      "memory_aids": [
+        "LSB = Change the last bit of each pixel. Invisible to eye, readable by tools.",
+        "1 megapixel image = ~375 KB hidden data capacity",
+        "Transform domain = Harder to detect than LSB (hides in frequency, not pixels)"
+      ],
+      "real_world_connection": "The Turla APT group embedded C2 commands in images hosted on public websites. The malware downloaded images that looked completely normal but contained executable instructions hidden in the pixel data.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Hiding Messages in Pictures",
+      "content": {
+        "text": "Imagine you have a huge wall of colored tiles, each one slightly different shade. If you change just a tiny bit of the color of each tile — so tiny nobody can see it — you can spell out a secret message.\n\n**How it works**:\n- Every tile's color is a number (like 157)\n- In binary, that's 10011101\n- The last digit (1) barely matters — changing it to 0 makes it 156\n- Nobody sees the difference between 157 and 156\n- But you just stored one bit of your secret message!\n- Do this for thousands of tiles and you can hide an entire document\n\n**The trick**: You need the RIGHT TOOL to read the hidden message. A person just sees a normal picture. A computer program that knows where to look can extract every changed bit and rebuild the hidden message.\n\n**How investigators catch it**: They look for statistical patterns. Normal photos have random patterns in their least significant bits. Photos with hidden data have patterns that are TOO regular — like they're spelling something out instead of being random noise."
+      },
+      "simplified_explanation": "Steganography hides messages by making tiny, invisible changes to pixels. You need special tools to read the hidden data. Investigators detect it by finding that the tiny changes are too organized/patterned to be natural noise.",
+      "memory_aids": [
+        "Tiny pixel changes = Hidden message. Eye can't see it. Tools can read it.",
+        "Detection: Natural noise is random. Hidden data has patterns. Find the pattern."
+      ],
+      "real_world_connection": "During investigations, forensic analysts compare the LSB patterns of a suspect image against statistical expectations. If the LSBs are too structured, it's a sign of steganographic embedding.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f",
+      "type": "code_exercise",
+      "title": "LSB Steganography Detection with Python",
+      "content": {
+        "text": "Here's a Python script that performs basic LSB steganography detection through statistical analysis:\n\n```python\nfrom PIL import Image\nimport numpy as np\nfrom scipy import stats\n\ndef detect_lsb_steganography(image_path):\n    \"\"\"Analyze LSB patterns for steganography indicators.\"\"\"\n    img = Image.open(image_path).convert('RGB')\n    pixels = np.array(img)\n    \n    results = {}\n    \n    for channel_idx, channel_name in enumerate(['Red', 'Green', 'Blue']):\n        channel = pixels[:, :, channel_idx].flatten()\n        lsb = channel & 1  # Extract least significant bits\n        \n        # Test 1: Chi-square test on LSB distribution\n        # Random LSBs should be ~50% 0s and ~50% 1s\n        zeros = np.sum(lsb == 0)\n        ones = np.sum(lsb == 1)\n        total = len(lsb)\n        expected = total / 2\n        chi2 = ((zeros - expected)**2 / expected + \n                (ones - expected)**2 / expected)\n        p_value = 1 - stats.chi2.cdf(chi2, df=1)\n        \n        # Test 2: RS analysis (pairs analysis)\n        # Compare LSB patterns between adjacent pixel pairs\n        pairs = np.abs(np.diff(channel.astype(int)))\n        lsb_pairs = np.abs(np.diff(lsb.astype(int)))\n        smooth_ratio = np.mean(pairs < 2)\n        \n        results[channel_name] = {\n            'lsb_distribution': {'zeros': zeros, 'ones': ones, 'ratio': zeros/max(ones,1)},\n            'chi2_statistic': round(chi2, 2),\n            'chi2_p_value': round(p_value, 4),\n            'smooth_ratio': round(smooth_ratio, 3),\n            'suspicious': p_value < 0.05 or smooth_ratio > 0.95\n        }\n    \n    overall_suspicious = any(r['suspicious'] for r in results.values())\n    results['overall_suspicious'] = overall_suspicious\n    results['recommendation'] = 'INVESTIGATE' if overall_suspicious else 'LIKELY_CLEAN'\n    \n    return results\n\n# Run detection\nresult = detect_lsb_steganography('suspect_image.png')\nfor channel, data in result.items():\n    if isinstance(data, dict):\n        print(f\"{channel}: chi2={data.get('chi2_statistic','?')}, \"\n              f\"p={data.get('chi2_p_value','?')}, \"\n              f\"suspicious={data.get('suspicious','?')}\")\nprint(f\"Result: {result.get('recommendation', '?')}\")\n```\n\n**Interpreting results:**\n- Chi-square p-value < 0.05 = LSB distribution is too uniform (suspicious)\n- Smooth ratio > 0.95 = Adjacent pixel differences are too small (LSB modification reduces variance)\n- Either indicator warrants deeper investigation with specialized tools",
+        "challenge": "Why would a chi-square test reveal LSB steganography? What does the test measure?",
+        "hint": "Think about what natural image noise looks like compared to embedded data.",
+        "solution": "The chi-square test measures whether the LSB distribution (0s vs 1s) matches the expected ~50/50 random distribution of natural images. Embedded data creates patterns in LSBs — the distribution shifts away from 50/50, and the chi-square test detects this statistical deviation. Embedded structured data has different statistical properties than natural camera noise."
+      },
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "d5e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a",
+      "type": "real_world",
+      "title": "Steganography Tools and Detection Workflow",
+      "content": {
+        "text": "**Common steganography tools (and their signatures):**\n\n1. **Steghide** — Embeds in JPEG, BMP, WAV, AU. Uses passphrase encryption. Detection: specific header patterns and histogram anomalies.\n2. **OpenStego** — Java-based, LSB in images. Detection: uniform LSB patterns.\n3. **Steganographer** — Advanced statistical embedding. Detection: sophisticated chi-square and RS analysis.\n4. **F5** — JPEG steganography using DCT coefficients. Detection: blockiness metrics and histogram characteristic function.\n5. **SilentEye** — Multi-format with AES encryption. Detection: tool-specific header signatures.\n\n**Detection workflow for OSINT investigators:**\n\n**Step 1: Visual inspection**\n- Compare file size to expected size for image dimensions (unusually large file = possible steganography)\n- Look for visual artifacts in color palettes (palette sorting anomalies in GIF/PNG)\n- Check for unusual noise patterns when boosting contrast dramatically\n\n**Step 2: Statistical analysis**\n- Run LSB chi-square tests\n- Perform RS (Regular/Singular) analysis\n- Compare histogram characteristics against known clean images\n\n**Step 3: Tool-specific detection**\n- Check for steganography tool signatures in file headers or metadata\n- Run StegExpose, Stegdetect, or similar automated tools\n- Attempt extraction with known tool passwords (common passwords, context-specific)\n\n**Step 4: Advanced analysis**\n- Compare against known-baseline images (if original exists)\n- Analyze network traffic patterns for steganographic communication\n- Check for steganographic markers in filesystem timestamps or file naming patterns\n\n**Red flag indicators for investigators:**\n- Images on suspect systems with unusually large file sizes\n- Known steganography tools installed on the system\n- Images with steganography tool signatures in metadata\n- Batch of images with identical dimensions but varying file sizes"
+      },
+      "simplified_explanation": "Detection follows four steps: 1) Look at the file (too big for its resolution?), 2) Statistical tests (LSB patterns too regular?), 3) Check for known tools (Steghide signatures?), 4) Advanced analysis. Red flags: unusually large images, stego tools on the system, or metadata showing stego tool usage.",
+      "memory_aids": [
+        "Detection: Visual → Statistical → Tool-specific → Advanced",
+        "Red flags: Big file size, stego tools installed, tool signatures in metadata"
+      ],
+      "real_world_connection": "The OceanLotus APT group used steganography to hide malicious code in images shared via social media. The images appeared completely normal but contained shellcode that the malware extracted and executed. This technique allowed the malware to receive new instructions without any suspicious network traffic.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b",
+      "type": "memory_aid",
+      "title": "Steganography Detection — VSAM",
+      "content": {
+        "text": "Remember the steganalysis workflow with **VSAM**:\n\n👁️ **V**isual inspection — File size, noise patterns, contrast boost\n📊 **S**tatistical analysis — Chi-square, RS analysis, histogram comparison\n🔧 **A**pplication detection — Tool signatures, metadata, known stego markers\n🔬 **M**anual deep analysis — Compare with originals, network patterns, advanced techniques\n\n**Key red flags to remember:**\n- File size ≠ expected size for image dimensions\n- Steganography tools found on the system\n- EXIF Software field shows stego tool name\n- Unusual patterns in LSB distribution\n- Known APT groups that use steganography (Turla, OceanLotus, APT29)",
+        "mnemonic": "VSAM = Visual, Statistical, Application, Manual — From easy to hard, each layer catches what the previous missed"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "f7a8b9c0-d1e2-4f3a-4b5c-6d7e8f9a0b1c",
+      "type": "reflection",
+      "title": "Steganography vs Encryption: When to Use Each",
+      "content": {
+        "text": "Consider the trade-offs between steganography and encryption for data protection:\n\n**Steganography advantages:**\n- Hides the existence of communication (encryption reveals it exists, just not the content)\n- Can bypass DLP and network monitoring entirely\n- Works when encryption is blocked or monitored\n\n**Steganography disadvantages:**\n- Low data capacity (kilobytes, not gigabytes)\n- Vulnerable if detection tools are actively used\n- Carrier file modification can be detected if compared to original\n- Slower to embed and extract\n\n**The attacker's calculation**: Use encryption when you need to move large amounts of data quickly. Use steganography when you need to move small amounts of data undetected. The most sophisticated attackers use both — steganography for C2 commands, encryption for the payload data.\n\n**For defenders**: Monitor for BOTH. Encrypted traffic to unusual destinations is suspicious. Images from known steganography-capable malware are suspicious. The combination of encryption + steganography indicators is the strongest alarm.",
+        "reflection_prompt": "If you were designing a DLP system, how would you detect steganographic data exfiltration alongside encrypted exfiltration?"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "a8b9c0d1-e2f3-4a4b-5c6d-7e8f9a0b1c2d",
+      "type": "mindset_coach",
+      "title": "Seeing the Unseen",
+      "content": {
+        "text": "Steganography detection is about looking where others don't. Most security tools check for known bad patterns — malicious IPs, suspicious attachments, encrypted tunnels. Steganography bypasses all of that by making the carrier file look completely normal. Your advantage as an analyst: you know to look. Apply the VSAM framework, check for the red flags, and remember that the absence of visible threats doesn't mean the absence of threats.",
+        "reflection_prompt": "How would you explain to a non-technical colleague why an image file could be a security threat?"
+      },
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is the fundamental difference between steganography and cryptography?",
+      "options": [
+        "Steganography is more secure than cryptography",
+        "Steganography hides the existence of a message; cryptography hides the content of a message",
+        "Cryptography can only be used for images; steganography works with all file types",
+        "They are the same technique with different names"
+      ],
+      "correct_answer": 1,
+      "explanation": "Cryptography hides the meaning/content of a message (the message exists but is unreadable). Steganography hides the existence of the message entirely — the carrier file looks completely normal and no one even knows there's hidden data to investigate.",
+      "difficulty": 1,
+      "memory_aid": "Cryptography = Hide meaning (encrypted but visible). Steganography = Hide existence (not visible at all).",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "How does LSB steganography hide data in images?",
+      "options": [
+        "By encrypting the image file with a password",
+        "By modifying the least significant bit of pixel color values, which is visually undetectable",
+        "By adding a hidden text layer on top of the image",
+        "By compressing the image and appending data to the end"
+      ],
+      "correct_answer": 1,
+      "explanation": "LSB steganography modifies the least significant bit (the last binary digit) of each pixel's color values. Since this changes the color by only 1/256th, the modification is invisible to the human eye, but stores one bit of hidden data per color channel per pixel.",
+      "difficulty": 2,
+      "memory_aid": "LSB = Last bit of each pixel. Change 1/256th = Invisible. Store 1 bit per channel per pixel.",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What does a chi-square test detect in steganalysis?",
+      "options": [
+        "Whether the image has been compressed",
+        "Whether the LSB distribution deviates from the expected ~50/50 random distribution of natural images",
+        "Whether the image resolution is unusual",
+        "Whether the image contains executable code"
+      ],
+      "correct_answer": 1,
+      "explanation": "The chi-square test compares the actual distribution of LSBs (0s vs 1s) against the expected ~50/50 distribution of natural image noise. Embedded data creates patterns in the LSBs that shift this distribution, and the chi-square test detects this statistical deviation.",
+      "difficulty": 2,
+      "memory_aid": "Chi-square = Does LSB distribution match natural randomness? Too organized = Hidden data detected.",
+      "points": 15
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Which APT group is known for using steganography to hide C2 commands in images?",
+      "options": [
+        "Lazarus Group",
+        "Turla",
+        "Equation Group",
+        "Anonymous"
+      ],
+      "correct_answer": 1,
+      "explanation": "The Turla APT group is well-documented for using steganography to hide command-and-control instructions in images hosted on public websites. The malware downloads normal-looking images, extracts hidden commands from pixel data, and executes them — bypassing network monitoring entirely.",
+      "difficulty": 2,
+      "memory_aid": "Turla = Steganography for C2. Normal image download = No suspicious traffic. Hidden commands inside.",
+      "points": 15
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What is a key red flag indicator that an image may contain steganographic data?",
+      "options": [
+        "The image has very high resolution",
+        "The file size is unusually large for the image dimensions and format",
+        "The image uses the PNG format instead of JPEG",
+        "The image has EXIF metadata"
+      ],
+      "correct_answer": 1,
+      "explanation": "An unusually large file size for the given image dimensions and format is a key red flag. When data is embedded in an image, the file size increases beyond what's expected for that resolution and format. For example, a 640×480 JPEG that's 5MB instead of the expected ~100KB is highly suspicious.",
+      "difficulty": 2,
+      "memory_aid": "File size ≠ Expected size = Red flag. Too big for its dimensions = Possible hidden data.",
+      "points": 15
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "tags": ["steganography", "steganalysis", "lsb", "chi-square", "covert-channels", "apt", "turla", "osint", "Course: SANS-SEC587", "Career Path: OSINT"],
+  "created_at": "2026-06-15T14:30:00+03:00",
+  "updated_at": "2026-06-15T14:30:00+03:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0"
+}

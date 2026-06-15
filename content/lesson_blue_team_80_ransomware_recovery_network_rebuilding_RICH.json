@@ -1,0 +1,247 @@
+{
+  "lesson_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+  "domain": "blue_team",
+  "title": "Ransomware Recovery and Network Rebuilding",
+  "subtitle": "Rebuilding Trust and Infrastructure After Ransomware Devastation",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 80,
+  "prerequisites": ["Ransomware Incident Management and Executive Decision Support"],
+  "learning_objectives": [
+    "Design a systematic network rebuilding process following ransomware incidents",
+    "Implement technical requirements for preventing repeat compromise during recovery",
+    "Document procedural requirements for evidence preservation and regulatory compliance",
+    "Create decision documentation frameworks for recovery prioritization and communication",
+    "Validate rebuilt systems before reconnecting to production networks"
+  ],
+  "concepts": [
+    "Network rebuilding methodology",
+    "Preventing repeat compromise",
+    "Technical recovery requirements",
+    "Procedural recovery requirements",
+    "Records and evidence preservation",
+    "Decision documentation",
+    "Recovery validation and testing",
+    "Clean system rebuilding",
+    "Identity infrastructure recovery",
+    "Network segmentation during rebuild"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "type": "mindset_coach",
+      "title": "Recovery Is Harder Than Prevention",
+      "content": {
+        "text": "Ransomware recovery isn't just about restoring files — it's about rebuilding trust in your entire infrastructure. The attackers were inside your network. They compromised credentials, moved laterally, and established persistence. If you simply restore from backup without understanding how they got in, you're inviting them back. Recovery requires the discipline to rebuild securely, even under enormous pressure to restore operations immediately."
+      },
+      "simplified_explanation": "Imagine your house was robbed because of a broken lock. If you just put your stuff back without fixing the lock, the robber returns tonight. Ransomware recovery means fixing the lock AND cleaning up — not just cleaning up.",
+      "memory_aids": [
+        "Recovery ≠ Restoration. Recovery = Fix the root cause + Restore operations",
+        "If you don't know how they got in, you can't keep them out"
+      ],
+      "real_world_connection": "Multiple organizations have been hit by ransomware twice because they restored from backup without patching the initial entry point. The average time to second infection: 3 weeks.",
+      "reflection_prompt": "If your organization was hit by ransomware right now, what would be the first system you'd rebuild? Why?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "type": "explanation",
+      "title": "The Network Rebuilding Process",
+      "content": {
+        "text": "A structured approach to network rebuilding after ransomware:\n\n**Phase 1: Containment Verification (0-48 hours)**\n- Confirm all attacker access is severed (C2 channels, backdoors, compromised accounts)\n- Reset ALL privileged credentials — not just known compromised ones\n- Verify no dormant persistence mechanisms exist across the network\n- Maintain network isolation during initial assessment\n\n**Phase 2: Root Cause Analysis (Concurrent with Phase 1)**\n- Identify the initial access vector (phishing, VPN vulnerability, supply chain)\n- Map the full attack path: initial access → lateral movement → ransomware deployment\n- Document every compromised system, account, and credential\n- This is NOT optional — you cannot rebuild safely without understanding how they got in\n\n**Phase 3: Secure Rebuild Planning (48-96 hours)**\n- Prioritize systems by business criticality and dependency\n- Design a segmented rebuild order that doesn't recreate the same vulnerability\n- Create clean build standards (hardened baselines, current patches, monitoring)\n- Plan identity infrastructure recovery first (AD, IAM)\n\n**Phase 4: Controlled Restoration (Days 1-2+)**\n- Rebuild identity infrastructure on clean hardware/VMs\n- Restore from verified clean backups (test before production)\n- Deploy enhanced monitoring before connecting to network\n- Connect systems in phases, validating each segment before adding the next\n\n**Phase 5: Validation and Hardening (Ongoing)**\n- Penetration test the rebuilt environment before declaring recovery complete\n- Implement all recommended hardening from root cause analysis\n- Deploy enhanced detection capabilities\n- Conduct purple team exercise to validate new defenses"
+      },
+      "simplified_explanation": "The rebuild has 5 phases: 1) Make sure the attacker is really gone, 2) Figure out how they got in, 3) Plan the rebuild so the same door isn't there, 4) Restore systems in phases starting with identity, 5) Test everything before declaring recovery.",
+      "memory_aids": [
+        "5 phases: Contain → Analyze → Plan → Restore → Validate",
+        "Identity infrastructure first — without AD/IAM, nothing else matters",
+        "Never restore without understanding the initial access vector"
+      ],
+      "real_world_connection": "After the Colonial Pipeline ransomware attack (2021), recovery took 6 days because the organization had to verify system integrity across a massive operational technology environment before safely restoring pipeline operations.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Why You Can't Just Restore from Backup",
+      "content": {
+        "text": "Imagine your treehouse was taken over by bullies. They got in because the ladder was left on the ground overnight.\n\n**Wrong approach**: Climb back up, put your stuff back, and hope they don't come back.\n\n**Right approach**:\n1. First, make sure the bullies aren't still hiding inside\n2. Figure out they got in through the ladder you left out\n3. Put the ladder away and add a proper lock to the door\n4. Move your stuff back in carefully, checking nothing was booby-trapped\n5. Set up a security camera so you see them coming next time\n\nIf you skip step 2, the bullies just come back that night. If you skip step 5, you won't know if they try again. Every step matters."
+      },
+      "simplified_explanation": "Restoring from backup without fixing how the attacker got in is like putting your valuables back in an unlocked safe. The attacker knows the combination now — they'll just take everything again.",
+      "memory_aids": [
+        "Restore without fix = Invite them back",
+        "5 steps: Out? How? Fix? Check? Watch?"
+      ],
+      "real_world_connection": "The city of Baltimore spent $18 million recovering from a ransomware attack in 2019. Much of the cost wasn't the ransom — it was the careful rebuilding process required to prevent reinfection.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "type": "code_exercise",
+      "title": "Credential Reset Verification Script",
+      "content": {
+        "text": "After a ransomware incident, ALL credentials must be reset. Here's a PowerShell script to verify Active Directory password resets across the domain:\n\n```powershell\n# Verify all domain users have changed passwords since the incident date\n$incidentDate = Get-Date \"2026-06-01\"\n$users = Get-ADUser -Filter * -Properties PasswordLastSet, SamAccountName, Enabled\n\n$notReset = $users | Where-Object {\n    $_.Enabled -eq $true -and \n    ($_.PasswordLastSet -lt $incidentDate -or $_.PasswordLastSet -eq $null)\n}\n\nif ($notReset) {\n    Write-Host \"⚠️  Users with passwords NOT reset since incident:\" -ForegroundColor Red\n    $notReset | Select-Object SamAccountName, PasswordLastSet | Format-Table\n    Write-Host \"Total: $($notReset.Count) users need password reset\" -ForegroundColor Red\n} else {\n    Write-Host \"✅ All enabled users have reset passwords since incident\" -ForegroundColor Green\n}\n\n# Check for service accounts (often overlooked)\n$serviceAccounts = Get-ADUser -Filter {ServicePrincipalName -like \"*\"} -Properties PasswordLastSet, SamAccountName\n$serviceNotReset = $serviceAccounts | Where-Object {\n    $_.PasswordLastSet -lt $incidentDate\n}\n\nif ($serviceNotReset) {\n    Write-Host \"⚠️  Service accounts NOT reset (HIGH RISK):\" -ForegroundColor Yellow\n    $serviceNotReset | Select-Object SamAccountName, PasswordLastSet | Format-Table\n}\n```\n\n**Key checks after credential reset:**\n1. All user accounts — Password reset since incident date\n2. Service accounts — Often forgotten, high privilege\n3. KRBTGT account — Reset TWICE with 12+ hour gap (invalidates Golden Tickets)\n4. Local admin accounts — Reset across ALL systems\n5. Network device credentials — Switches, routers, firewalls\n6. Cloud service accounts — AWS access keys, Azure service principals\n7. Third-party integrations — API keys, vendor access",
+        "challenge": "Why must the KRBTGT account password be reset TWICE with a gap of 12+ hours?",
+        "hint": "Think about how Kerberos ticket lifetimes work and what a Golden Ticket attack does.",
+        "solution": "KRBTGT must be reset twice because the first reset invalidates new tickets, but existing Golden Tickets created before the first reset remain valid until they expire (default 10 hours). The second reset after 12+ hours ensures all previously-created Golden Tickets have expired and can no longer be used."
+      },
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
+      "type": "real_world",
+      "title": "Preventing Repeat Compromise: Technical Requirements",
+      "content": {
+        "text": "The most critical requirement for recovery: **Don't let them back in.** Here's the technical checklist:\n\n**Identity & Access:**\n- Reset ALL credentials (domain, local, service, cloud, third-party)\n- KRBTGT double-reset (invalidate Golden Tickets)\n- Deploy MFA on all remote access (VPN, RDP, email, admin interfaces)\n- Implement tiered administration (separate admin accounts for different privilege levels)\n- Disable or remove any accounts the attacker created\n\n**Network Segmentation:**\n- Implement micro-segmentation between critical systems\n- Block lateral movement paths the attacker used\n- Deploy network-level authentication for RDP\n- Isolate critical systems (domain controllers, backup servers) in protected VLANs\n\n**Patching & Hardening:**\n- Patch the initial access vulnerability (and all related CVEs)\n- Update all systems to current security baselines\n- Disable unnecessary services and protocols\n- Remove any tools or backdoors the attacker deployed\n\n**Monitoring & Detection:**\n- Deploy EDR on all endpoints before reconnecting\n- Implement enhanced logging (Sysmon, PowerShell logging, process creation)\n- Set up alerts for indicators from the incident (C2 domains, tools, techniques)\n- Deploy deception technology (honeypots, honeytokens) in the rebuilt environment\n\n**Backup Integrity:**\n- Verify backup integrity before restoring (test restores on isolated systems)\n- Ensure backups are immutable and cannot be encrypted by ransomware\n- Validate offline/air-gapped backup copies exist"
+      },
+      "simplified_explanation": "Technical prevention covers 4 areas: Lock all doors (credentials + MFA), Build walls between rooms (segmentation), Fix the broken lock (patching), Install security cameras (monitoring). And always verify your spare keys (backups) still work.",
+      "memory_aids": [
+        "Identity + Network + Patching + Monitoring + Backups = 5 pillars of repeat prevention",
+        "KRBTGT double reset = Golden Ticket kill switch",
+        "EDR before network connect = Monitor before you expose"
+      ],
+      "real_world_connection": "After the Kaseya VSA ransomware attack, many MSPs rebuilt their environments but forgot to rotate API keys. Attackers used the old keys to regain access within days. Every credential type must be rotated — not just passwords.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
+      "type": "memory_aid",
+      "title": "Recovery Checklist — CLEAN",
+      "content": {
+        "text": "Remember the ransomware recovery phases with **CLEAN**:\n\n🔒 **C**ontain — Verify attacker is out, all access severed\n🔍 **L**ocate root cause — How did they get in? Map the full attack path\n📋 **E**stablish rebuild plan — Prioritize by criticality, design secure architecture\n🔄 **A**ctivate restoration — Rebuild identity first, restore in phases\n🧪 **N**ew validation — Pen test, purple team, confirm defenses work\n\n**Critical success factors:**\n- NEVER skip root cause analysis (Locate)\n- Identity infrastructure rebuilds FIRST\n- EDR deployed BEFORE network connection\n- KRBTGT double reset for Golden Ticket invalidation\n- Test backups on isolated systems before production restore",
+        "mnemonic": "CLEAN = Contain, Locate root cause, Establish plan, Activate restoration, New validation — Clean recovery, not just restoration"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+      "type": "reflection",
+      "title": "Decision Documentation Under Pressure",
+      "content": {
+        "text": "During ransomware recovery, executives demand fast action. You'll face pressure to skip phases. Decision documentation protects your team and organization:\n\n**Document every decision with:**\n- What was decided\n- Who decided it\n- What alternatives were considered\n- What risks were accepted\n- What information was available at the time\n\n**Example**: \"Decision: Restore email server from backup before root cause analysis is complete. Authorized by: CISO. Alternatives considered: Wait for full RCA (estimated 48h delay). Risk accepted: If initial access vector was email, restored server may be vulnerable. Mitigation: Deploy EDR and enhanced logging before connecting to network.\"\n\nThis documentation isn't bureaucracy — it's protection. When (not if) something goes wrong during recovery, you need to show that decisions were made with available information, not recklessly.",
+        "reflection_prompt": "How would you handle a CEO demanding you restore all systems immediately while you're still investigating the root cause? What would you document?"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+      "type": "mindset_coach",
+      "title": "Recovery Discipline",
+      "content": {
+        "text": "The hardest part of ransomware recovery isn't technical — it's maintaining discipline under pressure. Executives want systems back. Users want to work. The business is losing money. But every shortcut you take during recovery is a door you leave open for the attacker. Stay calm, follow the process, document everything, and remember: the speed of recovery matters, but the security of the recovered environment matters more.",
+        "reflection_prompt": "After completing this lesson, what's the single most important thing you'd communicate to your leadership team about ransomware recovery expectations?"
+      },
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why must you complete root cause analysis before rebuilding systems after ransomware?",
+      "options": [
+        "It's required by law in all jurisdictions",
+        "Without understanding how the attacker got in, you can't prevent them from returning through the same vector",
+        "Root cause analysis helps determine the ransom amount",
+        "Insurance companies require it before paying claims"
+      ],
+      "correct_answer": 1,
+      "explanation": "Root cause analysis identifies the initial access vector and full attack path. Without this understanding, you cannot harden the environment against the same attack. Organizations that restore without root cause analysis frequently suffer repeat infections through the same vulnerability.",
+      "difficulty": 2,
+      "memory_aid": "No root cause = No fix = They come back. Simple as that.",
+      "points": 15
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What must be done with the KRBTGT account after a ransomware incident involving Active Directory?",
+      "options": [
+        "Disable the account permanently",
+        "Reset the password once immediately",
+        "Reset the password twice with a gap of 12+ hours to invalidate Golden Tickets",
+        "Move the account to a different OU"
+      ],
+      "correct_answer": 2,
+      "explanation": "KRBTGT password must be reset twice with at least 12 hours between resets. The first reset prevents new Golden Ticket creation, but existing tickets remain valid until they expire (default 10 hours). The second reset after 12+ hours ensures all previously-created Golden Tickets have expired.",
+      "difficulty": 3,
+      "memory_aid": "KRBTGT = Double reset, 12+ hour gap. First = Stop new tickets. Second = Wait for old ones to expire.",
+      "points": 20
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which system category should be rebuilt FIRST during ransomware recovery?",
+      "options": [
+        "Email servers to restore communications",
+        "Identity infrastructure (Active Directory, IAM systems)",
+        "Web servers to restore public-facing services",
+        "Database servers to restore business data"
+      ],
+      "correct_answer": 1,
+      "explanation": "Identity infrastructure must be rebuilt first because all other systems depend on it for authentication and authorization. Without clean, trusted identity services, you can't safely authenticate users or control access to any rebuilt systems. A compromised AD means attacker credentials may exist in any system.",
+      "difficulty": 2,
+      "memory_aid": "Identity first = Everything depends on authentication. No trusted AD = No trusted access to anything.",
+      "points": 15
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "What should you do with backups before restoring from them after a ransomware incident?",
+      "options": [
+        "Immediately restore to production to minimize downtime",
+        "Verify backup integrity and test restores on isolated systems first",
+        "Only restore the most recent backup regardless of its date",
+        "Scan backups with antivirus and then restore to production"
+      ],
+      "correct_answer": 1,
+      "explanation": "Backups must be verified for integrity and tested on isolated systems before production restoration. Compromised backups could reintroduce malware, and some ransomware variants deliberately corrupt backups. Testing on isolated systems ensures the backup is clean and functional before exposing it to the production network.",
+      "difficulty": 2,
+      "memory_aid": "Test before trust. Isolated first, production second. A corrupted backup is worse than no backup.",
+      "points": 15
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "Why is decision documentation critical during ransomware recovery?",
+      "options": [
+        "It satisfies auditors after the incident",
+        "It protects the team by showing decisions were made with available information, not recklessly",
+        "It helps calculate the total cost of recovery",
+        "It is required by ransomware attackers as proof of payment"
+      ],
+      "correct_answer": 1,
+      "explanation": "Decision documentation records what was decided, by whom, what alternatives were considered, and what risks were accepted. This protects the recovery team by demonstrating that decisions were made with the best available information under pressure, not made recklessly. When complications arise (and they will), documentation shows the decision-making process was sound.",
+      "difficulty": 3,
+      "memory_aid": "Document = Protect. Not bureaucracy — accountability shield for your team under pressure.",
+      "points": 20
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 200,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "tags": ["ransomware-recovery", "network-rebuilding", "incident-recovery", "krbtgt", "credential-reset", "backup-verification", "Course: SANS-LDR553", "Career Path: Blue Teamer", "Career Path: Security Engineer"],
+  "created_at": "2026-06-15T14:30:00+03:00",
+  "updated_at": "2026-06-15T14:30:00+03:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0"
+}

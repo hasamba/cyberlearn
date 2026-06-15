@@ -1,0 +1,248 @@
+{
+  "lesson_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "domain": "fundamentals",
+  "title": "Common Vulnerabilities",
+  "subtitle": "Understanding the Weaknesses Attackers Exploit Most",
+  "difficulty": 1,
+  "estimated_time": 35,
+  "order_index": 78,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Identify the most common software vulnerabilities including buffer overflows, injection flaws, and misconfigurations",
+    "Explain how weak authentication and unpatched systems create attack surfaces",
+    "Classify vulnerabilities using CVE databases and severity scoring (CVSS)",
+    "Distinguish between zero-day vulnerabilities and known vulnerabilities",
+    "Describe remediation strategies for common vulnerability categories"
+  ],
+  "concepts": [
+    "Software flaws and bugs",
+    "Misconfigurations",
+    "Weak authentication mechanisms",
+    "Unpatched and outdated systems",
+    "CVE and CVSS scoring",
+    "Zero-day vs known vulnerabilities",
+    "Injection vulnerabilities",
+    "Buffer overflows",
+    "Default credentials",
+    "Vulnerability remediation lifecycle"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "b1a2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "type": "mindset_coach",
+      "title": "Welcome to the World of Vulnerabilities",
+      "content": {
+        "text": "Every system has weaknesses. The difference between a secure organization and a breached one isn't the absence of vulnerabilities — it's how quickly they find and fix them. Understanding common vulnerabilities is your foundation for every security role, from SOC analyst to penetration tester. You're learning to see what others miss."
+      },
+      "simplified_explanation": "Think of vulnerabilities like unlocked doors in a building. Some doors are obviously broken (like default passwords), some have faulty locks (like buffer overflows), and some were never locked in the first place (like misconfigurations). Your job is to find and fix them before attackers walk through.",
+      "memory_aids": [
+        "Vulnerability = A door an attacker can walk through",
+        "Exploit = The key that opens that door"
+      ],
+      "real_world_connection": "In 2021, the Log4Shell vulnerability (CVE-2021-44228) affected millions of systems worldwide because a common logging library had a flaw nobody noticed for years. It proved that even the most trusted software can harbor critical vulnerabilities.",
+      "reflection_prompt": "Think about your own devices — have you ever skipped a software update? That unpatched system is a vulnerability.",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c1a2b3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5e",
+      "type": "explanation",
+      "title": "Software Flaws: The Bugs That Break Security",
+      "content": {
+        "text": "Software flaws are coding errors that create security weaknesses. The most dangerous include:\n\n**Buffer Overflows**: When a program writes more data to a buffer than it can hold, the overflow can overwrite adjacent memory, allowing attackers to execute arbitrary code. Languages like C and C++ are particularly susceptible because they don't automatically check buffer boundaries.\n\n**Injection Flaws**: SQL injection, command injection, and LDAP injection occur when user input is treated as code rather than data. An attacker crafts input that the system executes, potentially gaining full database access or system control.\n\n**Cross-Site Scripting (XSS)**: Malicious scripts injected into web pages execute in other users' browsers, stealing sessions, redirecting traffic, or defacing sites.\n\n**Race Conditions**: When multiple processes access shared data concurrently without proper synchronization, attackers can exploit the timing gap to manipulate outcomes.\n\n**Integer Overflows**: Arithmetic operations that exceed the allocated integer range can cause unexpected behavior, bypassing security checks."
+      },
+      "simplified_explanation": "Software flaws are like typos in a recipe — but instead of a bad cake, you get a system anyone can break into. Buffer overflows stuff too much into a box until it spills into the wrong place. Injection flaws let attackers sneak their own instructions into your system's commands.",
+      "memory_aids": [
+        "Buffer Overflow = Too much data → spills into wrong memory",
+        "Injection = Attacker's code treated as your code",
+        "XSS = Attacker's script runs in someone else's browser"
+      ],
+      "real_world_connection": "The infamous Morris Worm (1988) used a buffer overflow in Unix fingerd to spread across the early internet — infecting roughly 10% of all internet-connected systems within hours.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d1a2b3c4-e5f6-4a7b-8c9d-0e1f2a3b4c5f",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: What Are Misconfigurations?",
+      "content": {
+        "text": "Imagine you bought a new toy robot, and it came with the password \"1234\" printed right on the box. Anyone who has the same robot knows your password! That's a misconfiguration — when something is set up with unsafe default settings.\n\nIn the real world, this happens all the time:\n- Servers left with default admin passwords\n- Cloud storage buckets set to \"public\" instead of \"private\"\n- Firewall rules that allow everything instead of blocking what's dangerous\n- Debug mode left on in production software\n\nMisconfigurations are actually the #1 cause of cloud data breaches. Attackers don't always need fancy hacks — sometimes they just find doors that were never locked."
+      },
+      "simplified_explanation": "A misconfiguration is like leaving the keys in your car's ignition. The car works fine, but anyone can drive it away. In cybersecurity, this means systems that are set up with default settings, open permissions, or features that should have been turned off.",
+      "memory_aids": [
+        "Misconfiguration = Forgot to lock the door",
+        "Default settings = Everyone knows the combination",
+        "Cloud misconfig = Your private stuff is now public"
+      ],
+      "real_world_connection": "In 2019, a misconfigured AWS S3 bucket exposed 750 million email addresses for a marketing firm. No hacking required — the data was simply set to public access.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e1a2b3c4-d5f6-4a7b-8c9d-0e1f2a3b4c5a",
+      "type": "code_exercise",
+      "title": "Spot the Vulnerability",
+      "content": {
+        "text": "Look at this Python code that handles user login. Can you spot the vulnerability?\n\n```python\ndef login(username, password):\n    query = f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\"\n    result = db.execute(query)\n    return result\n\nuser = input(\"Enter username: \")\npassw = input(\"Enter password: \")\nlogin(user, passw)\n```\n\n**The vulnerability**: This code is vulnerable to SQL injection! If an attacker enters `admin' --` as the username, the query becomes:\n\n```sql\nSELECT * FROM users WHERE username='admin' --' AND password='anything'\n```\n\nThe `--` comments out the password check entirely, granting access without knowing the password.\n\n**The fix**: Use parameterized queries:\n```python\ndef login(username, password):\n    query = \"SELECT * FROM users WHERE username=? AND password=?\"\n    result = db.execute(query, (username, password))\n    return result\n```",
+        "challenge": "Identify what input an attacker could use to bypass authentication in the vulnerable code above.",
+        "hint": "Think about how SQL handles single quotes and comments.",
+        "solution": "Entering `admin' --` as the username comments out the password check, allowing authentication bypass."
+      },
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "f1a2b3c4-d5e6-4a7b-8c9d-0e1f2a3b4c5b",
+      "type": "real_world",
+      "title": "CVE and CVSS: The Vulnerability Classification System",
+      "content": {
+        "text": "**CVE (Common Vulnerabilities and Exposures)** is a standardized identifier system for known vulnerabilities. Each vulnerability gets a unique CVE ID (like CVE-2021-44228), making it easy to reference across organizations, tools, and databases.\n\n**CVSS (Common Vulnerability Scoring System)** rates vulnerability severity on a 0.0-10.0 scale:\n\n| Score | Severity |\n|-------|----------|\n| 0.0 | None |\n| 0.1-3.9 | Low |\n| 4.0-6.9 | Medium |\n| 7.0-8.9 | High |\n| 9.0-10.0 | Critical |\n\nCVSS considers three metric groups:\n1. **Base Metrics** — Exploitability (attack vector, complexity, privileges) and impact (confidentiality, integrity, availability)\n2. **Temporal Metrics** — Current exploit status, remediation level, report confidence\n3. **Environmental Metrics** — Organization-specific modifications based on your environment\n\nWhen you see a CVE with a CVSS of 9.8, it means: drop everything and patch now. A 3.2? Add it to the next maintenance window."
+      },
+      "simplified_explanation": "CVE is like a catalog number for every known security flaw — so everyone calls it the same thing. CVSS is a report card: 0-10 where 10 means 'fix this yesterday.'",
+      "memory_aids": [
+        "CVE = Catalog number for vulnerabilities",
+        "CVSS = Score from 0-10 (Critical = 9-10 = Fix NOW)",
+        "Base + Temporal + Environmental = Full CVSS score"
+      ],
+      "real_world_connection": "NVD (National Vulnerability Database) at nvd.nist.gov is the free, public repository of all CVEs with their CVSS scores. Every security professional uses it regularly.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a2b1c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5c",
+      "type": "memory_aid",
+      "title": "Vulnerability Categories — The SWUM Framework",
+      "content": {
+        "text": "Remember the four major vulnerability categories with **SWUM**:\n\n🛡️ **S**oftware Flaws — Buffer overflows, injection, XSS, race conditions\n⚙️ **W**eak Authentication — Default passwords, no MFA, hardcoded credentials  \n🔧 **U**npatched Systems — Missing updates, end-of-life software, known CVEs\n🪛 **M**isconfigurations — Open ports, public cloud storage, unnecessary services\n\n**Key insight**: Attackers follow the path of least resistance. They'll try M before S every time — misconfigurations are easier to exploit than buffer overflows.",
+        "mnemonic": "SWUM = Software flaws, Weak auth, Unpatched, Misconfigurations — Attackers swim through SWUM to reach your data"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b2c1d3e4-f5a6-4a7b-8c9d-0e1f2a3b4c5d",
+      "type": "reflection",
+      "title": "Zero-Day vs Known Vulnerabilities",
+      "content": {
+        "text": "Think about these two scenarios:\n\n**Scenario A**: A vulnerability in Apache was disclosed 6 months ago. A patch exists. Your organization hasn't applied it yet.\n\n**Scenario B**: A researcher just discovered a brand-new vulnerability in Apache. No patch exists yet. The vendor doesn't even know about it.\n\nScenario A is a **known vulnerability** — you have everything you need to fix it. If you get breached through this, it's on you.\n\nScenario B is a **zero-day vulnerability** — the attacker has the advantage. You need defense-in-depth (multiple security layers) to survive zero-days because no single patch will save you.\n\n**The uncomfortable truth**: Most breaches don't use zero-days. They use known vulnerabilities that organizations simply failed to patch. The 2023 Verizon DBIR found that 80% of breaches involved known vulnerabilities with available patches.",
+        "reflection_prompt": "If most breaches use known vulnerabilities, why do organizations still fail to patch? What barriers exist in your organization?"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "c2d1e3f4-a5b6-4a7b-8c9d-0e1f2a3b4c5e",
+      "type": "mindset_coach",
+      "title": "Your Vulnerability Mindset",
+      "content": {
+        "text": "You now understand the four pillars of vulnerabilities: software flaws, weak authentication, unpatched systems, and misconfigurations. The most important lesson? Vulnerabilities are inevitable, but exploitation is preventable. Every security role — from SOC analyst to CISO — needs this knowledge.\n\nYour next step: When you hear about a breach in the news, ask yourself — which SWUM category was it? You'll start seeing patterns everywhere.",
+        "reflection_prompt": "Pick one vulnerability category you find most interesting. How would you explain it to a friend who doesn't work in tech?"
+      },
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Which type of vulnerability occurs when a program writes more data to memory than allocated?",
+      "options": [
+        "SQL injection",
+        "Buffer overflow",
+        "Cross-site scripting",
+        "Race condition"
+      ],
+      "correct_answer": 1,
+      "explanation": "A buffer overflow occurs when a program writes more data to a buffer (memory area) than it can hold, causing the excess data to overflow into adjacent memory locations. This can allow attackers to overwrite return addresses and execute arbitrary code.",
+      "difficulty": 1,
+      "memory_aid": "Buffer = container. Overflow = too much. Spills into wrong places.",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What does a CVSS score of 9.5 indicate?",
+      "options": [
+        "Low severity vulnerability",
+        "Medium severity vulnerability",
+        "High severity vulnerability",
+        "Critical severity vulnerability"
+      ],
+      "correct_answer": 3,
+      "explanation": "CVSS scores of 9.0-10.0 are classified as Critical severity. A score of 9.5 indicates a critical vulnerability that should be patched immediately.",
+      "difficulty": 1,
+      "memory_aid": "9-10 = Critical = Fix NOW. Think of it as a 911 emergency for your systems.",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What is the primary difference between a zero-day and a known vulnerability?",
+      "options": [
+        "Zero-days are less dangerous than known vulnerabilities",
+        "Zero-days have no patch available yet, while known vulnerabilities have patches",
+        "Known vulnerabilities only affect open-source software",
+        "Zero-days can only be exploited by nation-state actors"
+      ],
+      "correct_answer": 1,
+      "explanation": "A zero-day vulnerability has no patch available because the vendor is unaware or hasn't released a fix yet. Known vulnerabilities have been disclosed and patches are typically available. This is why most breaches use known vulnerabilities — attackers exploit the window between disclosure and patching.",
+      "difficulty": 1,
+      "memory_aid": "Zero-day = Zero days to patch (vendor has had zero days to fix it). Known = Patch exists, no excuse.",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Which is the BEST defense against SQL injection?",
+      "options": [
+        "Using HTTPS encryption",
+        "Implementing parameterized queries",
+        "Adding more firewall rules",
+        "Increasing password complexity"
+      ],
+      "correct_answer": 1,
+      "explanation": "Parameterized queries (prepared statements) separate SQL code from user input, preventing attackers from injecting malicious SQL commands. This is the most effective defense against SQL injection at the code level.",
+      "difficulty": 2,
+      "memory_aid": "Parameterized = Input is data, never code. Separation of concerns.",
+      "points": 15
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "According to industry data, most breaches exploit which type of vulnerability?",
+      "options": [
+        "Zero-day vulnerabilities with no patches",
+        "Sophisticated nation-state malware",
+        "Known vulnerabilities with available patches",
+        "Hardware-level vulnerabilities"
+      ],
+      "correct_answer": 2,
+      "explanation": "Industry data consistently shows that most breaches exploit known vulnerabilities where patches already exist. The Verizon DBIR reports approximately 80% of breaches involve known, patchable vulnerabilities. The problem isn't discovery — it's patching speed and coverage.",
+      "difficulty": 1,
+      "memory_aid": "Most breaches = Known vulns, not zero-days. The fix exists — we just don't apply it fast enough.",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 100,
+  "badge_unlock": null,
+  "is_core_concept": true,
+  "tags": ["vulnerabilities", "cve", "cvss", "buffer-overflow", "sql-injection", "misconfigurations", "zero-day", "Course: CompTIA-Security+", "Career Path: SOC Analyst", "Career Path: Security Engineer"],
+  "created_at": "2026-06-15T14:30:00+03:00",
+  "updated_at": "2026-06-15T14:30:00+03:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0"
+}

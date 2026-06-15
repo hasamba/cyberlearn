@@ -1,0 +1,247 @@
+{
+  "lesson_id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "domain": "osint",
+  "title": "Advanced Image and Video Verification",
+  "subtitle": "Detecting Manipulation, Deepfakes, and Forged Visual Evidence",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 79,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Apply metadata analysis techniques to verify image authenticity and provenance",
+    "Use reverse image search and pixel-level analysis to detect manipulation",
+    "Identify deepfake indicators in video content using technical and visual analysis",
+    "Employ OSINT tools for image geolocation and timestamp verification",
+    "Evaluate the credibility of visual evidence using multi-source corroboration"
+  ],
+  "concepts": [
+    "EXIF metadata analysis",
+    "Reverse image search for provenance",
+    "Error Level Analysis (ELA)",
+    "Deepfake detection indicators",
+    "Image geolocation techniques",
+    "Photo response non-uniformity (PRNU)",
+    "AI-generated image detection",
+    "Video integrity verification",
+    "Manipulation artifact analysis",
+    "Multi-source visual corroboration"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e",
+      "type": "mindset_coach",
+      "title": "Seeing Is No Longer Believing",
+      "content": {
+        "text": "In the age of AI-generated images and deepfakes, visual evidence can no longer be taken at face value. As an OSINT analyst, your job is to verify — not assume. A single manipulated image can sway public opinion, ruin reputations, or provide false intelligence. Learning to dissect and verify visual content is one of the most valuable skills in modern OSINT."
+      },
+      "simplified_explanation": "Photos and videos used to be proof — if you saw it, it happened. Now anyone can fake a photo or video with AI. Your job as an OSINT analyst is like being a detective at a crime scene: check the evidence, look for clues that something's been altered, and verify with other sources.",
+      "memory_aids": [
+        "Old rule: Seeing is believing. New rule: Verify before believing.",
+        "Every image has a story — metadata tells you the real one"
+      ],
+      "real_world_connection": "In 2023, AI-generated images of an explosion near the Pentagon went viral on social media, briefly causing stock market fluctuations. The image had telltale signs of AI generation but spread faster than anyone could verify it.",
+      "reflection_prompt": "Have you ever shared an image online without verifying it first? What would make you stop and check?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f",
+      "type": "explanation",
+      "title": "Metadata Analysis: The Hidden Story in Every Image",
+      "content": {
+        "text": "Every digital image carries hidden data about itself — metadata. For OSINT verification, the most critical metadata standard is **EXIF** (Exchangeable Image File Format).\n\n**Key EXIF fields for verification:**\n- **DateTime** — When the photo was taken (can be spoofed, but worth checking)\n- **GPSPosition** — Latitude/longitude where the photo was taken (if GPS was enabled)\n- **Make/Model** — Camera or phone that took the photo\n- **Software** — Editing software that processed the image (Photoshop, GIMP = edited)\n- **Thumbnail** — Sometimes preserves the original before edits\n\n**Analysis workflow:**\n1. Extract EXIF data using `exiftool`, online viewers, or Python libraries\n2. Check for inconsistencies: timestamps that don't match claimed events, GPS locations that don't match visible landmarks\n3. Look for editing software signatures in the Software field\n4. Compare thumbnail with the full image — differences indicate editing\n5. Check if EXIF was stripped entirely (social media platforms often do this)\n\n**Important caveat**: Social media platforms (Twitter, Facebook, Instagram) strip EXIF data on upload. If an image posted on social media still has full EXIF, that's itself suspicious — it may not have been uploaded normally.\n\n**Python example:**\n```python\nfrom PIL import Image\nfrom PIL.ExifTags import TAGS\n\nimg = Image.open('suspicious.jpg')\nexif = img._getexif()\nfor tag_id, value in exif.items():\n    tag_name = TAGS.get(tag_id, tag_id)\n    print(f'{tag_name}: {value}')\n```"
+      },
+      "simplified_explanation": "EXIF metadata is like the receipt that comes with a photo — it tells you when, where, and with what device it was taken. If the receipt says the photo was taken in Paris but the image shows a beach in Hawaii, something's wrong. Editing software also leaves its stamp on the receipt.",
+      "memory_aids": [
+        "EXIF = The photo's birth certificate (when, where, what device)",
+        "Software field with 'Photoshop' = The photo was edited",
+        "Social media strips EXIF — if it's still there, suspicious"
+      ],
+      "real_world_connection": "In 2019, an OSINT analyst used EXIF GPS data from a terrorist's propaganda photo to locate their exact position, leading to a military strike. The terrorist didn't realize their phone was geotagging every photo.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "d3e4f5a6-b7c8-4d9e-0f1a-2b3c4d5e6f7a",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: How to Spot a Fake Photo",
+      "content": {
+        "text": "Imagine someone shows you a photo of a unicorn in their backyard. How do you know it's fake? You look for clues!\n\n**Clue 1: The shadows don't match**\nIf the sun is coming from the left, all shadows should point right. If one shadow points the wrong way, something was added.\n\n**Clue 2: The edges look weird**\nWhen you paste a person into a photo, their edges might look blurry or too sharp compared to everything else. Real objects blend naturally.\n\n**Clue 3: The lighting is different**\nIf someone's face is brightly lit but everyone around them is in shadow, that face was probably pasted in from a different photo.\n\n**Clue 4: The fingers**\nAI image generators are terrible at hands — extra fingers, missing fingers, or weird finger shapes are a dead giveaway.\n\n**Clue 5: Text in the image**\nAI struggles with text. If signs, labels, or writing in the image look like gibberish or have weird letter shapes, it's probably AI-generated."
+      },
+      "simplified_explanation": "Fake photos always have mistakes if you look closely. Check shadows, edges, lighting, hands, and text. AI is getting better, but it still makes these mistakes — you just need to know where to look.",
+      "memory_aids": [
+        "S-E-L-F-T = Shadows, Edges, Lighting, Fingers, Text — Check these for fakes",
+        "AI is bad at hands and text — always check these first"
+      ],
+      "real_world_connection": "The viral AI-generated image of the Pope wearing a Balenciaga puffer jacket fooled millions — but close inspection showed asymmetrical glasses frames and unusual hand proportions.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "e4f5a6b7-c8d9-4e0f-1a2b-3c4d5e6f7a8b",
+      "type": "code_exercise",
+      "title": "Error Level Analysis (ELA) with Python",
+      "content": {
+        "text": "Error Level Analysis (ELA) detects image manipulation by re-saving an image at a known compression level and comparing the error levels. Edited areas show different error levels than the rest of the image.\n\n```python\nfrom PIL import Image\nimport numpy as np\n\ndef ela_analysis(image_path, quality=85):\n    \"\"\"Perform Error Level Analysis on an image.\"\"\"\n    original = Image.open(image_path).convert('RGB')\n    \n    # Re-save at known quality\n    resaved_path = '/tmp/ela_resaved.jpg'\n    original.save(resaved_path, 'JPEG', quality=quality)\n    resaved = Image.open(resaved_path)\n    \n    # Calculate error level\n    original_arr = np.array(original, dtype=float)\n    resaved_arr = np.array(resaved, dtype=float)\n    \n    # Difference shows error levels\n    diff = np.abs(original_arr - resaved_arr)\n    \n    # Scale for visibility\n    scale = 20  # Amplify differences\n    scaled = diff * scale\n    scaled = np.clip(scaled, 0, 255).astype(np.uint8)\n    \n    ela_image = Image.fromarray(scaled)\n    return ela_image\n\nresult = ela_analysis('suspicious_image.jpg')\nresult.save('ela_output.jpg')\n```\n\n**Interpreting results:**\n- **Uniform error levels** = Image is likely unmodified\n- **Bright spots** = Areas with higher error = possibly edited\n- **Very dark areas** = Areas with lower error = possibly drawn/painted over\n- **Sharp contrast between adjacent areas** = Boundary of an edit\n\n**Limitations**: ELA works best on JPEG images and detects resaving artifacts. It can't detect all manipulation types, especially in images saved at very low quality initially.",
+        "challenge": "What would ELA show if someone copied a person from one photo and pasted them into another?",
+        "hint": "Think about how JPEG compression affects the pasted area differently from the surrounding original content.",
+        "solution": "The pasted person would show different error levels than the surrounding image, appearing as a bright or contrasting region in the ELA output. The boundary between the pasted area and the original would be clearly visible."
+      },
+      "is_interactive": true,
+      "xp_reward": 50
+    },
+    {
+      "block_id": "f5a6b7c8-d9e0-4f1a-2b3c-4d5e6f7a8b9c",
+      "type": "real_world",
+      "title": "Deepfake Detection: Technical and Visual Indicators",
+      "content": {
+        "text": "Deepfakes use AI to replace faces or generate synthetic video. Detection requires a multi-layered approach:\n\n**Visual Indicators (What to look for):**\n- **Face-edge blending artifacts**: Blurry or flickering boundaries between the face and surrounding areas\n- **Inconsistent blinking**: Deepfakes often have unnatural blink rates (too frequent or absent)\n- **Teeth and eye details**: AI struggles with realistic teeth, reflections in eyes\n- **Skin texture**: Too smooth or has inconsistent texture compared to lighting\n- **Temporal inconsistencies**: Face shape or skin tone shifts between frames\n- **Audio-visual sync**: Lip movements don't perfectly match speech\n\n**Technical Indicators (What to analyze):**\n- **Frame-by-frame analysis**: Use tools to step through frames looking for flickering or morphing\n- **Frequency domain analysis**: Deepfakes often leave detectable patterns in frequency space\n- **Blood flow detection (rPPG)**: Real faces show subtle color changes from blood flow; deepfakes don't\n- **GAN fingerprint detection**: AI-generated images often contain subtle artifacts from the generator network\n\n**Verification Workflow:**\n1. Reverse image/video search (Google, Yandex, TinEye) for earlier versions\n2. EXIF and metadata extraction\n3. ELA or noise analysis\n4. Facial landmark analysis for inconsistencies\n5. Cross-reference with other sources (was this event documented elsewhere?)\n6. Use specialized deepfake detection tools (Microsoft Video Authenticator, Sensity)"
+      },
+      "simplified_explanation": "Deepfakes are getting better, but they still leave clues. Watch for weird blinking, blurry edges around faces, mismatched audio, and teeth that look wrong. Then use technical tools to analyze frame by frame. The key is combining human observation with automated analysis.",
+      "memory_aids": [
+        "Deepfake checklist: Blinking, Edges, Teeth, Audio sync, Skin texture (BETAS)",
+        "rPPG = Blood flow signal that deepfakes can't fake (yet)",
+        "Always cross-reference: If only one source has the image, be suspicious"
+      ],
+      "real_world_connection": "In 2022, a deepfake video of Ukrainian President Zelenskyy telling soldiers to surrender circulated on social media. The poor quality and mismatched audio gave it away, but it still reached millions before being debunked.",
+      "is_interactive": false,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "a6b7c8d9-e0f1-4a2b-3c4d-5e6f7a8b9c0d",
+      "type": "memory_aid",
+      "title": "Image Verification Checklist — VERIFY",
+      "content": {
+        "text": "Remember the six-step image verification process with **VERIFY**:\n\n🔍 **V**erify Metadata — EXIF data, timestamps, GPS coordinates\n🌍 **E**xamine Provenance — Reverse image search, find the original source\n🔍 **R**eview for Manipulation — ELA, noise analysis, shadow consistency\n🖼️ **I**nspect Details — Hands, text, edges, lighting, reflections\n🔍 **F**act-check Context — Does the content match known events, weather, landmarks?\n📊 **Y**ield Conclusion — Rate confidence: Verified / Unverified / Likely Manipulated\n\n**Confidence levels:**\n- ✅ **Verified** — Multiple independent sources confirm\n- ⚠️ **Unverified** — Cannot confirm or deny with available information\n- ❌ **Likely Manipulated** — Multiple indicators of manipulation found",
+        "mnemonic": "VERIFY = Verifiable metadata, Examine provenance, Review manipulation, Inspect details, Fact-check context, Yield conclusion"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b7c8d9e0-f1a2-4b3c-4d5e-6f7a8b9c0d1e",
+      "type": "reflection",
+      "title": "The Verification Paradox",
+      "content": {
+        "text": "As AI-generated content becomes indistinguishable from real content, we face a paradox: the tools to detect AI fakes are themselves AI-based. If both generation and detection use AI, who wins?\n\nConsider:\n- Detection AI is always one step behind generation AI (detecting yesterday's fakes)\n- Human analysts add value through context understanding that AI lacks\n- The most reliable verification is often multi-source corroboration, not technical analysis alone\n- Social engineering (making people believe without checking) may become the bigger threat than technical deepfake quality\n\n**Your role**: Be the human in the loop. AI tools assist your analysis, but your judgment about context, plausibility, and source credibility makes the final call.",
+        "reflection_prompt": "How would you verify a video that shows a political leader making a controversial statement? What sources and techniques would you use?"
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "c8d9e0f1-a2b3-4c4d-5e6f-7a8b9c0d1e2f",
+      "type": "mindset_coach",
+      "title": "Verification as a Habit",
+      "content": {
+        "text": "Image and video verification isn't a skill you use occasionally — it's a habit you build. Every time you see a striking image online, run through the VERIFY checklist mentally. Start with the quick checks (reverse image search, metadata) and escalate to technical analysis when needed. The more you practice, the faster you'll spot inconsistencies. Your eyes are your most powerful tool — train them well.",
+        "reflection_prompt": "Next time you see a viral image, take 60 seconds to do a reverse image search before sharing. What would change if everyone did this?"
+      },
+      "is_interactive": false,
+      "xp_reward": 10
+    }
+  ],
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What does the EXIF Software field reveal about an image?",
+      "options": [
+        "The operating system used to take the photo",
+        "The editing or processing software applied to the image",
+        "The social media platform where it was shared",
+        "The camera lens focal length"
+      ],
+      "correct_answer": 1,
+      "explanation": "The EXIF Software field records any software that processed the image. If this field contains 'Adobe Photoshop' or 'GIMP', it indicates the image was edited. This is a key verification indicator.",
+      "difficulty": 1,
+      "memory_aid": "Software field = 'Who touched this photo after it was taken?' Photoshop in Software field = Edited.",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What does Error Level Analysis (ELA) detect?",
+      "options": [
+        "The geographic location where an image was taken",
+        "Areas of an image with different compression error levels, indicating possible editing",
+        "The identity of the person who took the photo",
+        "Malware embedded in image files"
+      ],
+      "correct_answer": 1,
+      "explanation": "ELA re-saves an image at a known compression level and compares the error levels. Edited areas show different error levels than the surrounding image because they've been compressed a different number of times or at different quality levels.",
+      "difficulty": 2,
+      "memory_aid": "ELA = Re-save, compare errors. Different error levels = Different edit history = Possible manipulation.",
+      "points": 15
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which visual indicator is MOST commonly associated with deepfake videos?",
+      "options": [
+        "Perfectly realistic hand gestures",
+        "Blurry or flickering boundaries between the face and surrounding areas",
+        "Extremely high resolution and clarity",
+        "Consistent skin texture across all lighting conditions"
+      ],
+      "correct_answer": 1,
+      "explanation": "Deepfakes often show blurry or flickering boundaries between the synthesized face and the surrounding areas. This is because the AI model struggles to seamlessly blend the generated face with the original video's edges, especially during movement.",
+      "difficulty": 2,
+      "memory_aid": "Deepfake edges = Blurry/flickering boundaries. The seam between fake face and real background is the weak point.",
+      "points": 15
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Why is it suspicious if an image on social media still contains full EXIF data?",
+      "options": [
+        "It means the image is too large to display properly",
+        "Most social media platforms strip EXIF data on upload, so its presence suggests non-normal upload",
+        "EXIF data makes images load slower on mobile devices",
+        "It indicates the image was taken with a professional camera"
+      ],
+      "correct_answer": 1,
+      "explanation": "Major social media platforms (Twitter, Facebook, Instagram) automatically strip EXIF data when images are uploaded. If an image on social media still has full EXIF data, it likely wasn't uploaded through normal channels — possibly indicating it was scraped, screenshotted, or uploaded through an API.",
+      "difficulty": 3,
+      "memory_aid": "Social media strips EXIF. Full EXIF on social media = Non-normal upload = Suspicious.",
+      "points": 20
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What is rPPG in the context of deepfake detection?",
+      "options": [
+        "A type of reverse image search algorithm",
+        "Remote photoplethysmography — detecting subtle blood flow color changes in real faces that deepfakes lack",
+        "A file format for storing video evidence",
+        "A social media verification tool"
+      ],
+      "correct_answer": 1,
+      "explanation": "rPPG (remote photoplethysmography) detects subtle color changes in skin caused by blood flow. Real faces show these micro-changes; deepfakes typically don't reproduce them accurately. This is a promising technical indicator for deepfake detection.",
+      "difficulty": 3,
+      "memory_aid": "rPPG = Blood flow signal. Real faces pulse with blood. Deepfakes don't. Hard to fake biology.",
+      "points": 20
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 200,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "tags": ["image-verification", "deepfake-detection", "exif", "ela", "osint", "forensic-analysis", "video-verification", "Course: SANS-SEC587", "Career Path: OSINT"],
+  "created_at": "2026-06-15T14:30:00+03:00",
+  "updated_at": "2026-06-15T14:30:00+03:00",
+  "author": "CyberLearn Advanced Curriculum Team",
+  "version": "2.0"
+}
