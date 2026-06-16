@@ -1,0 +1,263 @@
+{
+  "lesson_id": "1ae7f187-d7d2-43e2-8a13-537f0df5285f",
+  "domain": "blue_team",
+  "title": "Linux Logging and Log Rotation",
+  "subtitle": "Mastering Linux Logging and Log Rotation in Blue Team",
+  "difficulty": 2,
+  "estimated_time": 50,
+  "order_index": 82,
+  "prerequisites": [
+    "Linux Services and Systemd"
+  ],
+  "learning_objectives": [
+    "Understand syslog/rsyslog",
+    "Understand log locations (/var/log)",
+    "Understand logrotate",
+    "Understand log management",
+    "Apply knowledge of log analysis in real-world scenarios",
+    "Apply knowledge of centralized logging in real-world scenarios"
+  ],
+  "concepts": [
+    "syslog/rsyslog",
+    "log locations (/var/log)",
+    "logrotate",
+    "log management",
+    "log analysis",
+    "centralized logging"
+  ],
+  "tags": [
+    "Course: SANS-SEC406",
+    "Career Path: Blue Teamer",
+    "Career Path: DFIR Specialist"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "2ff40254-2c68-4490-a7e2-0e09d944fa73",
+      "type": "mindset_coach",
+      "title": "Welcome to Linux Logging and Log Rotation!",
+      "content": {
+        "text": "You're about to dive into Linux Logging and Log Rotation. This is a crucial topic in cybersecurity that connects theory with hands-on practice. This is a foundational topic that will serve as building blocks for more advanced concepts."
+      },
+      "simplified_explanation": "Think of Linux Logging and Log Rotation as learning the ABCs of a critical security domain. Master the basics first, then connect them to more advanced topics.",
+      "memory_aids": [
+        "Connect Linux Logging and Log Rotation to what you already know about Blue Team",
+        "Teach someone else what you learn - that's the fastest way to master it"
+      ],
+      "real_world_connection": "In real security operations, Linux Logging and Log Rotation is something you'll use almost daily. Understanding this gives you an edge.",
+      "reflection_prompt": "What do you already know about Linux Logging and Log Rotation? What gaps do you want to fill?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "040795a0-e237-4b21-9983-ec1ebc01c042",
+      "type": "explanation",
+      "title": "Understanding Linux Logging and Log Rotation",
+      "content": {
+        "text": "This lesson covers syslog/rsyslog, log locations (/var/log), logrotate, log management, log analysis, centralized logging.\n\nWe will build from fundamentals to practical application.\n\nKey areas covered:\n• syslog/rsyslog\n• log locations (/var/log)\n• logrotate\n• log management\n• log analysis\n• centralized logging\n"
+      },
+      "key_takeaways": [
+        "syslog/rsyslog",
+        "log locations (/var/log)",
+        "logrotate",
+        "log management",
+        "log analysis"
+      ],
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "7d8b2d0d-959c-477a-aece-821757f186f6",
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Linux Logging and Log Rotation",
+      "content": {
+        "text": "Imagine you're explaining Linux Logging and Log Rotation to a 10-year-old:\n\nThink of it like a toolkit with different tools for different jobs. Linux Logging and Log Rotation helps security professionals understand and protect systems.\n\nJust like a house has locks, windows, and doors that need protection, Blue Team security works by combining multiple layers of defense."
+      },
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a1d69342-ed40-424b-b446-d7f1cef57077",
+      "type": "code_exercise",
+      "title": "Hands-On: Linux Logging and Log Rotation Practice",
+      "content": {
+        "text": "Let's practice what we've learned. Try to complete the following exercise related to Linux Logging and Log Rotation.\n\nFollow the steps below to build your understanding.",
+        "exercise": "1. Review the key concepts of Linux Logging and Log Rotation\n2. Identify how each concept applies in a real environment\n3. Document your findings and observations\n4. Note any questions for further investigation",
+        "hint": "Start by reviewing the fundamentals, then work through each topic area systematically."
+      },
+      "is_interactive": true,
+      "xp_reward": 25
+    },
+    {
+      "block_id": "283e5ab7-fc74-4fba-ab48-ac44a3ed7402",
+      "type": "real_world",
+      "title": "Real-World Application: Linux Logging and Log Rotation",
+      "content": {
+        "text": "In production environments, Linux Logging and Log Rotation plays a critical role. SOC analysts and security engineers use these skills daily.\n\nA common scenario: A security alert triggers, and you need to quickly assess whether it represents a genuine threat using these techniques.",
+        "scenario": "You're a security analyst investigating an alert. Your knowledge of Linux Logging and Log Rotation helps you quickly triage and determine next steps.",
+        "impact": "Understanding this topic can mean the difference between catching a threat early vs. dealing with a breach."
+      },
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "d65e89f2-fdf1-49bf-9de8-19e9e5a86ef4",
+      "type": "memory_aid",
+      "title": "Memory Anchors for Linux Logging and Log Rotation",
+      "content": {
+        "text": "Lock in what you've learned with these memory techniques:",
+        "anchors": [
+          "Acronym: Create your own acronym from the key concepts of Linux Logging and Log Rotation",
+          "Visual: Imagine a mind map connecting each concept to real outcomes",
+          "Story: Build a narrative that walks through Blue Team scenarios using these concepts",
+          "Teach: Explain this to a colleague (or rubber duck!) in your own words"
+        ]
+      },
+      "spaced_repetition_topics": [
+        "syslog/rsyslog",
+        "log locations (/var/log)",
+        "logrotate",
+        "log management",
+        "log analysis"
+      ],
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "45b5244f-37c7-4ce4-abc9-36f964eb424d",
+      "type": "reflection",
+      "title": "Reflect and Connect",
+      "content": {
+        "text": "Take a moment to consolidate your learning about Linux Logging and Log Rotation.",
+        "prompts": [
+          "How does Linux Logging and Log Rotation fit into the bigger picture of Blue Team security?",
+          "What was the most surprising thing you learned in this lesson?",
+          "How could you apply this knowledge in your current or future role?",
+          "What questions do you still have? Write them down for later exploration."
+        ]
+      },
+      "is_interactive": true,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "c82d6ebc-0750-4688-af39-794d5112aa0d",
+      "type": "mindset_coach",
+      "title": "You've Got This!",
+      "content": {
+        "text": "Congratulations on completing Linux Logging and Log Rotation! You've added another essential tool to your cybersecurity toolkit.\n\nRemember: learning cybersecurity is a marathon, not a sprint. Each lesson builds on the last. Keep practicing, keep questioning, and keep growing."
+      },
+      "memory_aids": [
+        "Review this lesson in 24 hours for maximum retention",
+        "Try teaching these concepts to someone else",
+        "Connect today's learning to your next lesson"
+      ],
+      "real_world_connection": "Every expert in Blue Team started exactly where you are now. The difference? They kept going.",
+      "reflection_prompt": "What's one thing from this lesson you'll apply this week?",
+      "is_interactive": false,
+      "xp_reward": 0
+    }
+  ],
+  "pre_assessment": {
+    "questions": [
+      {
+        "question_id": "pre_q1",
+        "type": "multiple_choice",
+        "question": "How familiar are you with Linux Logging and Log Rotation?",
+        "options": [
+          "I've never heard of it",
+          "I know the basics of Blue Team",
+          "I've worked with Blue Team concepts professionally",
+          "I'm an expert in Blue Team"
+        ],
+        "correct_answer": null,
+        "difficulty": 1,
+        "points": 0
+      }
+    ]
+  },
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Which of the following best describes syslog/rsyslog in the context of Linux Logging and Log Rotation?",
+      "options": [
+        "A core concept essential for Blue Team security operations",
+        "A technique used primarily for network routing and switching",
+        "A method for physical access control in data centers",
+        "An unrelated concept not applicable to this domain"
+      ],
+      "correct_answer": 0,
+      "explanation": "syslog/rsyslog is a core component of Linux Logging and Log Rotation, directly relevant to Blue Team security practices.",
+      "difficulty": 2,
+      "memory_aid": "Remember: syslog/rsyslog → Blue Team security → Linux Logging and Log Rotation",
+      "points": 10
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which of the following best describes log locations (/var/log) in the context of Linux Logging and Log Rotation?",
+      "options": [
+        "A core concept essential for Blue Team security operations",
+        "A technique used primarily for network routing and switching",
+        "A method for physical access control in data centers",
+        "An unrelated concept not applicable to this domain"
+      ],
+      "correct_answer": 0,
+      "explanation": "log locations (/var/log) is a core component of Linux Logging and Log Rotation, directly relevant to Blue Team security practices.",
+      "difficulty": 2,
+      "memory_aid": "Remember: log locations (/var/log) → Blue Team security → Linux Logging and Log Rotation",
+      "points": 10
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which of the following best describes logrotate in the context of Linux Logging and Log Rotation?",
+      "options": [
+        "A core concept essential for Blue Team security operations",
+        "A technique used primarily for network routing and switching",
+        "A method for physical access control in data centers",
+        "An unrelated concept not applicable to this domain"
+      ],
+      "correct_answer": 0,
+      "explanation": "logrotate is a core component of Linux Logging and Log Rotation, directly relevant to Blue Team security practices.",
+      "difficulty": 2,
+      "memory_aid": "Remember: logrotate → Blue Team security → Linux Logging and Log Rotation",
+      "points": 10
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Which of the following best describes log management in the context of Linux Logging and Log Rotation?",
+      "options": [
+        "A core concept essential for Blue Team security operations",
+        "A technique used primarily for network routing and switching",
+        "A method for physical access control in data centers",
+        "An unrelated concept not applicable to this domain"
+      ],
+      "correct_answer": 0,
+      "explanation": "log management is a core component of Linux Logging and Log Rotation, directly relevant to Blue Team security practices.",
+      "difficulty": 2,
+      "memory_aid": "Remember: log management → Blue Team security → Linux Logging and Log Rotation",
+      "points": 10
+    }
+  ],
+  "mastery_threshold": 80,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "active_learning",
+    "memory_hooks",
+    "minimum_effective_dose",
+    "connect_to_what_i_know",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "meta_learning",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 150,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-16T14:30:00+03:00",
+  "updated_at": "2026-06-16T14:30:00+03:00",
+  "author": "CyberLearn Generator",
+  "version": "1.0.0"
+}
