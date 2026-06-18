@@ -1,0 +1,111 @@
+{
+  "lesson_id": "a3b4c5d6-e7f8-49a0-b1c2-d3e4f5a6b7c8",
+  "domain": "fundamentals",
+  "title": "Risk Management Processes",
+  "difficulty": 1,
+  "order_index": 85,
+  "prerequisites": ["Security Governance Frameworks"],
+  "concepts": ["Risk identification", "Risk analysis", "Risk treatment", "Risk monitoring", "Risk registers", "Qualitative vs. quantitative risk analysis", "Risk appetite", "Business impact analysis"],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Explain the core risk management process: identify, analyze, treat, monitor",
+    "Distinguish between qualitative and quantitative risk analysis methods",
+    "Apply risk treatment strategies: mitigate, transfer, accept, avoid",
+    "Create and maintain a risk register",
+    "Understand risk appetite and tolerance in organizational context"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the formula for calculating Annualized Loss Expectancy (ALE)?",
+      "options": ["ALE = SLE × ARO", "ALE = SLE + ARO", "ALE = SLE / ARO", "ALE = Threat × Vulnerability"],
+      "correct": 0
+    },
+    {
+      "question": "Which risk treatment strategy involves purchasing cybersecurity insurance?",
+      "options": ["Mitigation", "Acceptance", "Transfer", "Avoidance"],
+      "correct": 2
+    },
+    {
+      "question": "What is the primary difference between risk appetite and risk tolerance?",
+      "options": ["They are identical concepts", "Appetite is the broad level of risk an organization accepts; tolerance is the acceptable variation around that level", "Appetite is for financial risk only; tolerance is for all risks", "Appetite is set by the board; tolerance is set by IT"],
+      "correct": 1
+    },
+    {
+      "question": "In qualitative risk analysis, what does a risk matrix typically use as axes?",
+      "options": ["Cost and Time", "Likelihood and Impact", "Threat and Vulnerability", "Revenue and Expense"],
+      "correct": 1
+    },
+    {
+      "question": "What is the purpose of a risk register?",
+      "options": ["To eliminate all risks", "To document, track, and prioritize identified risks and their treatment plans", "To report only critical risks to the board", "To store employee security awareness scores"],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Picture a risk matrix as a dartboard—likelihood on one axis, impact on the other. High-likelihood, high-impact risks are the bullseye that demands action."},
+    {"principle": "Association", "application": "Link risk treatments to everyday analogies: Mitigation = wearing a seatbelt, Transfer = buying insurance, Acceptance = driving without a seatbelt, Avoidance = not driving at all."},
+    {"principle": "Emotion", "application": "Risk isn't abstract. Every unmanaged risk is a potential breach, outage, or data loss. The Equifax breach was a risk management failure—a known vulnerability left untreated."},
+    {"principle": "Chunking", "application": "Break risk management into four chunks: Identify (what could go wrong?), Analyze (how likely and how bad?), Treat (what do we do about it?), Monitor (is our treatment working?)."},
+    {"principle": "Repetition", "application": "Practice calculating ALE for different scenarios. SLE × ARO = ALE becomes automatic with repetition."},
+    {"principle": "Storytelling", "application": "Tell the story of a real risk that materialized because it wasn't managed. The narrative makes the process memorable."},
+    {"principle": "Mnemonics", "application": "Use MAT-A for risk treatments: Mitigate, Accept, Transfer, Avoid. Use LIA-M for the process: Locate, Investigate, Act, Monitor."},
+    {"principle": "Active Recall", "application": "After learning each treatment type, close the lesson and list all four from memory. Then give a real-world example for each."},
+    {"principle": "Teaching", "application": "Explain the difference between qualitative and quantitative risk analysis to someone who's never heard of either. If you can simplify it, you understand it."},
+    {"principle": "Simplification", "application": "Risk management in one sentence: 'Find what could hurt you, figure out how much, decide what to do about it, and check if it worked.'"}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Risk Is Not the Enemy—Ignoring It Is",
+      "content": "Risk management isn't about eliminating risk. That's impossible. Every business takes risks—the question is whether they're taking the right risks, at the right level, with the right awareness. Your job isn't to say 'no' to everything. It's to give decision-makers the information they need to say 'yes' intelligently. Today you learn the process that turns uncertainty into informed decisions."
+    },
+    {
+      "type": "explanation",
+      "title": "The Risk Management Process",
+      "content": "Risk management follows a continuous cycle:\n\n1. **Risk Identification**: Discover and document risks. Sources include threat intelligence, vulnerability assessments, audit findings, incident history, and business changes.\n\n2. **Risk Analysis**: Assess each risk's likelihood and impact.\n   - **Qualitative**: Risk matrix (low/medium/high), expert judgment, descriptive\n   - **Quantitative**: ALE calculations, Monte Carlo simulation, statistical modeling\n\n3. **Risk Treatment**: Choose how to address each risk:\n   - **Mitigate**: Reduce likelihood or impact (e.g., patch vulnerabilities, implement MFA)\n   - **Transfer**: Shift risk to another party (e.g., insurance, outsourcing)\n   - **Accept**: Acknowledge risk is within tolerance, monitor it (e.g., low-impact, high-cost-to-fix)\n   - **Avoid**: Eliminate the activity causing the risk (e.g., decommission a legacy system)\n\n4. **Risk Monitoring**: Continuously track risks, review treatments, and adjust as conditions change."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Ice Cream Shop",
+      "content": "You run an ice cream shop. Here are your risks:\n\n- **Freezer breaks** → Your ice cream melts. You could mitigate this by buying a backup freezer (reduce the impact) or accept it because freezers rarely break. You could transfer it by buying insurance. Or you could avoid selling ice cream—but then you don't have a business.\n\n- **Power outage** → Everything stops. You mitigate by buying a generator. You accept because outages are rare and brief in your area.\n\n- **New ice cream shop opens next door** → Competition risk. You mitigate by improving your recipes. You can't transfer or avoid this one—you compete or close.\n\nRisk management is just asking: what could go wrong, how likely is it, how bad would it be, and what should I do about it?"
+    },
+    {
+      "type": "explanation",
+      "title": "Quantitative Risk Analysis: ALE",
+      "content": "Annualized Loss Expectancy (ALE) is the cornerstone of quantitative risk analysis:\n\n**ALE = SLE × ARO**\n\n- **SLE** (Single Loss Expectancy): The monetary loss from a single occurrence\n  - Example: If a server outage costs $50,000 in lost revenue, SLE = $50,000\n\n- **ARO** (Annualized Rate of Occurrence): How many times per year the event is expected\n  - Example: If the server outage happens twice per year, ARO = 2\n\n- **ALE**: Annualized Loss Expectancy\n  - Example: ALE = $50,000 × 2 = $100,000/year\n\n**Decision point**: If a mitigation costs $30,000/year and reduces ARO from 2 to 0.5, the new ALE is $25,000. Savings = $75,000/year. Mitigation cost ($30,000) is less than savings ($75,000)—it's worth doing.\n\n**Limitation**: Quantitative analysis requires reliable data. When likelihood and impact are uncertain, qualitative analysis is more appropriate."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Building a Risk Register",
+      "content": "A risk register is the central document for tracking all identified risks. Here's a practical implementation:",
+      "code_language": "python",
+      "code": "import csv\nfrom datetime import datetime\n\nclass RiskRegister:\n    def __init__(self):\n        self.risks = []\n    \n    def add_risk(self, id, description, likelihood, impact, treatment, owner):\n        \"\"\"Add a risk to the register\"\"\"\n        # Qualitative scoring: 1-5 scale\n        risk_score = likelihood * impact  # Simple multiplication\n        risk = {\n            'id': id,\n            'description': description,\n            'likelihood': likelihood,  # 1-5\n            'impact': impact,  # 1-5\n            'risk_score': risk_score,\n            'treatment': treatment,  # mitigate/transfer/accept/avoid\n            'owner': owner,\n            'status': 'open',\n            'date': datetime.now().isoformat()\n        }\n        self.risks.append(risk)\n        return risk\n    \n    def get_critical_risks(self, threshold=15):\n        \"\"\"Return risks scoring above threshold\"\"\"\n        return [r for r in self.risks if r['risk_score'] >= threshold]\n    \n    def summary(self):\n        critical = len(self.get_critical_risks())\n        total = len(self.risks)\n        print(f'Risk Register: {total} risks, {critical} critical (score >= 15)')\n        for r in sorted(self.risks, key=lambda x: x['risk_score'], reverse=True):\n            print(f\"  [{r['id']}] Score={r['risk_score']} | {r['description'][:50]} | {r['treatment']}\")\n\n# Example usage\nregister = RiskRegister()\nregister.add_risk('R001', 'Ransomware attack on file servers', 4, 5, 'mitigate', 'CISO')\nregister.add_risk('R002', 'Employee phishing compromise', 5, 4, 'mitigate', 'CISO')\nregister.add_risk('R003', 'Legacy system end-of-life', 3, 3, 'accept', 'CIO')\nregister.summary()"
+    },
+    {
+      "type": "real_world",
+      "title": "Equifax: A Risk Management Failure",
+      "content": "The 2017 Equifax breach exposed 147 million records. The root cause? A known Apache Struts vulnerability (CVE-2017-5639) that wasn't patched despite being identified in the risk register.\n\n**What went wrong in the risk management process**:\n- **Identification**: ✅ The vulnerability was identified and published\n- **Analysis**: ✅ The risk was assessed (high likelihood, critical impact)\n- **Treatment**: ❌ The patch was available but not applied for 76 days\n- **Monitoring**: ❌ Scans failed to detect the unpatched system\n\n**The lesson**: Having a risk register isn't enough. You must execute on the treatments and verify they're effective. A documented risk that's not treated is just an expensive way to say 'we knew this would happen and did nothing.'\n\n**Cost**: $700+ million in settlements, congressional hearings, and reputation damage. The patch would have taken hours."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Risk Management Quick Reference",
+      "content": "📋 **Risk Process**: Identify → Analyze → Treat → Monitor\n\n🎯 **Risk Treatments (MAT-A)**:\n- **M**itigate → Reduce likelihood/impact (patch, MFA, training)\n- **A**ccept → Risk is within tolerance, monitor only\n- **T**ransfer → Shift to another party (insurance, contract)\n- **A**void → Eliminate the risk source\n\n📊 **Quantitative Formula**:\n- ALE = SLE × ARO\n- SLE = Asset Value × Exposure Factor\n- Safeguard Value = ALE(before) - ALE(after) - Control Cost\n\n⚖️ **Appetite vs. Tolerance**:\n- Appetite = How much risk the organization willingly takes\n- Tolerance = How much variation around that appetite is acceptable"
+    },
+    {
+      "type": "reflection",
+      "title": "Risk Appetite in Practice",
+      "content": "Consider how risk appetite varies across organizations:\n\n1. A startup building a new app might accept higher risk to move fast. A bank serving millions can't afford that same appetite. Why?\n2. Your CISO says 'we have zero risk appetite for data breaches.' Is this realistic? What does it actually mean in practice?\n3. How does risk appetite change after a major incident? What are the dangers of overcorrecting?\n4. Should risk appetite be documented quantitatively ('we accept up to $500K ALE in this category') or qualitatively ('we take moderate risk in this area')? When is each appropriate?\n\nUnderstanding risk appetite isn't just theory—it's the foundation of every security decision."
+    },
+    {
+      "type": "explanation",
+      "title": "Qualitative Risk Analysis",
+      "content": "When quantitative data isn't available (which is often), qualitative analysis provides a structured way to assess risk:\n\n**Risk Matrix**: A 5×5 grid with likelihood on one axis and impact on the other. Each cell gets a risk level:\n- Low (1-4): Accept, monitor\n- Medium (5-9): Mitigate within normal operations\n- High (10-15): Mitigate urgently, report to management\n- Critical (16-25): Immediate action required\n\n**Advantages**: Quick, intuitive, easy to communicate to non-technical stakeholders\n**Disadvantages**: Subjective, inconsistent between assessors, doesn't provide cost-benefit data\n\n**Best practice**: Use qualitative analysis for initial triage and prioritization. Use quantitative analysis for high-priority risks where cost-benefit decisions are needed."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Theory to Practice",
+      "content": "Risk management is a process, not a product. You can't buy it, install it, or delegate it entirely. It requires continuous attention, honest assessment, and the willingness to tell leadership uncomfortable truths about what could go wrong. The best risk managers aren't the ones who prevent every breach—they're the ones who ensure that when something happens, the organization has already decided how to respond. That's the power of this process."
+    }
+  ],
+  "tags": ["Course: CompTIA-Security+", "Career Path: GRC Analyst", "risk-management", "ALE", "risk-register", "qualitative-analysis", "quantitative-analysis"]
+}

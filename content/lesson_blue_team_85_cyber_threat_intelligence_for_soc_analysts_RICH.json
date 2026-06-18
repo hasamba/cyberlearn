@@ -1,0 +1,111 @@
+{
+  "lesson_id": "c9d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f",
+  "domain": "blue_team",
+  "title": "Cyber Threat Intelligence for SOC Analysts",
+  "difficulty": 2,
+  "order_index": 85,
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": ["CTI fundamentals", "Threat-informed defense", "Threat Intelligence Platforms", "IOC management", "Strategic vs. tactical intelligence", "MITRE ATT&CK mapping", "Intelligence consumption", "Threat feeds"],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Distinguish between strategic, operational, and tactical threat intelligence",
+    "Consume and apply threat intelligence effectively in SOC workflows",
+    "Evaluate and select Threat Intelligence Platforms (TIPs) for organizational needs",
+    "Manage IOCs with proper lifecycle handling (ingest, enrich, correlate, retire)",
+    "Map threat intelligence to MITRE ATT&CK for threat-informed defense"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which type of threat intelligence focuses on long-term trends, adversary motivations, and strategic planning?",
+      "options": ["Tactical intelligence", "Operational intelligence", "Strategic intelligence", "Technical intelligence"],
+      "correct": 2
+    },
+    {
+      "question": "What is the primary purpose of a Threat Intelligence Platform (TIP)?",
+      "options": ["To replace SIEM entirely", "To aggregate, correlate, and disseminate threat intelligence across tools and teams", "To conduct penetration tests automatically", "To store only internal logs"],
+      "correct": 1
+    },
+    {
+      "question": "An IOC (Indicator of Compromise) is best described as:",
+      "options": ["A strategic threat report", "A forensic artifact or observable that indicates a potential breach", "A vulnerability scan result", "A compliance checklist item"],
+      "correct": 1
+    },
+    {
+      "question": "What is the Pyramid of Pain's key insight about IOCs?",
+      "options": ["All IOCs are equally valuable", "Hashes are the most impactful indicators for adversaries", "Higher-level indicators (TTPs) are harder for adversaries to change but more valuable for defenders", "IP addresses are the best long-term indicators"],
+      "correct": 2
+    },
+    {
+      "question": "How should SOC analysts apply threat intelligence most effectively?",
+      "options": ["Block every IOC from every feed automatically", "Only read threat reports from well-known vendors", "Enrich alerts with CTI context to prioritize and investigate more efficiently", "Ignore external intelligence and focus only on internal logs"],
+      "correct": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Picture the intelligence lifecycle as a funnel: raw data at the top, actionable intelligence at the bottom. Visualize each stage filtering noise into signal."},
+    {"principle": "Association", "application": "Link the three intelligence types to decision-makers: Strategic → CISO, Operational → SOC Manager, Tactical → Analyst on the keyboard."},
+    {"principle": "Emotion", "application": "Remember that behind every threat report is a real victim organization. Intelligence isn't abstract—timely consumption prevents real damage."},
+    {"principle": "Chunking", "application": "Break CTI into three chunks: Collect (feeds, reports), Process (TIP, correlation), Consume (SOC workflows, detection rules)."},
+    {"principle": "Repetition", "application": "Practice mapping IOCs to ATT&CK techniques daily until the mapping becomes instinctive."},
+    {"principle": "Storytelling", "application": "Read a real threat report and tell the story: who is the adversary, what do they want, how do they operate? Narrative makes intelligence memorable."},
+    {"principle": "Mnemonics", "application": "Use 'SOT' for intelligence types: Strategic, Operational, Tactical. Use 'DIR' for the lifecycle: Direction, Integration, Response."},
+    {"principle": "Active Recall", "application": "After reading a threat report, close it and try to list the key TTPs from memory. Then check. This builds retention."},
+    {"principle": "Teaching", "application": "Explain the Pyramid of Pain to a colleague. If you can articulate why TTPs hurt adversaries more than IPs, you've internalized it."},
+    {"principle": "Simplification", "application": "CTI in one sentence: 'The right intelligence, to the right person, at the right time, in the right format.' Everything else is implementation."}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Intelligence Is a Weapon—Learn to Wield It",
+      "content": "A SOC without threat intelligence is a guard patrolling blind. You're reacting to alerts without knowing who's attacking you, why, or what they'll try next. CTI transforms your defense from reactive to proactive. This lesson teaches you to consume, evaluate, and apply intelligence like a professional—not just collect feeds and hope for the best."
+    },
+    {
+      "type": "explanation",
+      "title": "Types of Threat Intelligence",
+      "content": "Threat intelligence exists on three levels:\n\n**Strategic Intelligence** — For executives and decision-makers.\n- Trends, adversary motivations, geopolitical context\n- Format: Reports, briefings, whitepapers\n- Timeframe: Months to years\n- Example: 'Nation-state group APT29 targets cloud infrastructure in Western Europe'\n\n**Operational Intelligence** — For security managers and hunt team leads.\n- Campaign details, attack patterns, specific threats to your sector\n- Format: Threat reports, malware analysis, campaign tracking\n- Timeframe: Weeks to months\n- Example: 'FIN7 is using new PowerShell loaders targeting restaurant POS systems'\n\n**Tactical Intelligence** — For analysts on the front line.\n- IOCs: IPs, domains, hashes, URLs\n- Format: Machine-readable feeds, STIX/TAXII, SIEM rules\n- Timeframe: Hours to days\n- Example: 'Block these 50 IPs associated with Cobalt Strike C2 servers'\n\nThe key insight: each level serves a different audience and decision speed."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Weather Forecasts for Hackers",
+      "content": "Think of threat intelligence like weather forecasting:\n\n- **Strategic** = 'This is hurricane season' → Tells the mayor whether to prepare shelters (long-term planning)\n- **Operational** = 'A Category 3 hurricane is heading toward your coast' → Tells the emergency manager to activate plans (medium-term response)\n- **Tactical** = 'It's raining right now and wind is 80 mph' → Tells the person on the street to take cover NOW (immediate action)\n\nDifferent people need different forecasts. The mayor doesn't need to know the exact wind speed right now. The person outside doesn't need a seasonal forecast. Same with threat intelligence—match the type to the audience."
+    },
+    {
+      "type": "explanation",
+      "title": "The Pyramid of Pain",
+      "content": "Created by David Bianco, the Pyramid of Pain ranks IOC types by how much pain they cause adversaries when defenders detect them:\n\n```\n        /\\          TTPs (highest pain for adversary)\n       /  \\         \n      / TTPs\\       \n     /______\\       \n    / Tools & \\     → Hard for adversary to change\n   /  Malware  \\    → High-value detection\n  /____________\\   \n /   Network &  \\   \n/  Host Artifacts \\  → Moderate adversary pain\n\\________________/  \n     Hashes          → Easy for adversary to change\n                      → Low-value detection\n```\n\n- **Hashes**: Adversary changes one byte and the hash is different. Low pain.\n- **IPs/Domains**: Easy to rotate infrastructure. Moderate pain.\n- **Network/Host Artifacts**: Harder to change tactics quickly. More pain.\n- **Tools**: Significant effort to rewrite. High pain.\n- **TTPs**: Changing fundamental behavior is extremely costly. Maximum pain.\n\n**Your goal**: Build detections that target the top of the pyramid. Blocking an IP is a band-aid. Detecting a technique is a cure."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Working with STIX/TAXII Threat Intelligence",
+      "content": "Parse a STIX bundle to extract IOCs and map them to MITRE ATT&CK techniques.",
+      "code_language": "python",
+      "code": "import json\n\n# Simplified STIX bundle (in reality, fetched via TAXII server)\nstix_bundle = {\n    \"type\": \"bundle\",\n    \"objects\": [\n        {\n            \"type\": \"indicator\",\n            \"pattern\": \"[ipv4-addr:value = '203.0.113.50']\",\n            \"labels\": [\"malicious-activity\"],\n            \"valid_from\": \"2026-01-15T00:00:00Z\"\n        },\n        {\n            \"type\": \"indicator\",\n            \"pattern\": \"[domain-name:value = 'evil-c2.example.com']\",\n            \"labels\": [\"malicious-activity\"]\n        },\n        {\n            \"type\": \"attack-pattern\",\n            \"name\": \"Spear Phishing Attachment\",\n            \"external_references\": [\n                {\"source_name\": \"mitre-attack\", \"external_id\": \"T1566.001\"}\n            ]\n        }\n    ]\n}\n\n# Extract IOCs and ATT&CK mappings\niocs = []\nattack_refs = []\n\nfor obj in stix_bundle[\"objects\"]:\n    if obj[\"type\"] == \"indicator\":\n        iocs.append({\"pattern\": obj[\"pattern\"], \"labels\": obj[\"labels\"]})\n    elif obj[\"type\"] == \"attack-pattern\":\n        for ref in obj.get(\"external_references\", []):\n            if ref[\"source_name\"] == \"mitre-attack\":\n                attack_refs.append({\"name\": obj[\"name\"], \"technique\": ref[\"external_id\"]})\n\nprint(f'Extracted {len(iocs)} IOCs and {len(attack_refs)} ATT&CK mappings')\nfor ioc in iocs:\n    print(f'  IOC: {ioc[\"pattern\"]}')\nfor ref in attack_refs:\n    print(f'  ATT&CK: {ref[\"technique\"]} - {ref[\"name\"]}')"
+    },
+    {
+      "type": "real_world",
+      "title": "How SOC Teams Actually Use CTI",
+      "content": "A financial services SOC implemented threat intelligence in three stages:\n\n**Stage 1 (Auto-block)**: Fed high-confidence IOC feeds into the firewall and proxy. Blocked ~12,000 malicious IPs/domains per month. Reduced phishing click-through by 40%.\n\n**Stage 2 (Enrichment)**: Integrated their TIP with the SIEM. When an alert fired, the TIP automatically enriched it with context: 'This IP belongs to APT28 infrastructure, active in financial sector campaigns since 2024.' Analysts prioritized these alerts immediately.\n\n**Stage 3 (Hunting)**: Used ATT&CK-mapped intelligence to proactively hunt. If a threat report said 'APT28 uses scheduled tasks for persistence,' the hunt team searched for suspicious scheduled task creation across the fleet—finding compromises the IOC-based detections had missed.\n\nKey takeaway: IOCs are just the entry point. The real value is in TTP-level intelligence driving proactive defense."
+    },
+    {
+      "type": "memory_aid",
+      "title": "IOC Lifecycle: IECR",
+      "content": "Remember the IOC lifecycle with **IECR**:\n\n📥 **Ingest** — Collect IOCs from feeds, reports, ISACs\n🔍 **Enrich** — Add context (geolocation, WHOIS, ATT&CK mapping)\n🔗 **Correlate** — Link IOCs to campaigns, actors, and other indicators\n🗑️ **Retire** — Remove stale IOCs that are no longer valid\n\n**Critical mistake**: Never retire IOCs too early. An IP that's quiet today may be reused in 6 months. Use confidence scores and expiration dates, not gut feelings."
+    },
+    {
+      "type": "reflection",
+      "title": "Intelligence Quality Assessment",
+      "content": "Before applying any threat intelligence, evaluate it using the TIMS framework:\n\n- **Timeliness**: Is this intelligence current? Does it have an expiration date?\n- **Accuracy**: Can the source be verified? Is there corroboration from multiple sources?\n- **Relevance**: Does this apply to my organization, industry, and technology stack?\n- **Specificity**: Is this actionable, or is it vague ('be aware of phishing')?\n\nNext time you read a threat report, run it through TIMS. You'll find that many reports score poorly on at least one dimension—and that tells you how much weight to give them."
+    },
+    {
+      "type": "explanation",
+      "title": "Threat Intelligence Platforms",
+      "content": "A TIP is the central hub for managing threat intelligence. Key capabilities:\n\n- **Aggregation**: Collect from multiple sources (commercial feeds, OSINT, ISACs, internal telemetry)\n- **Normalization**: Convert different formats (STIX, CSV, JSON) into a common data model\n- **Correlation**: Link related indicators into campaigns and adversary profiles\n- **Enrichment**: Auto-enrich IOCs with WHOIS, geolocation, passive DNS\n- **Dissemination**: Push intelligence to SIEMs, firewalls, EDRs, and SOAR platforms\n- **Scoring**: Apply confidence levels and expiration dates\n\nPopular TIPs include MISP (open-source), OpenCTI (open-source), ThreatConnect, Anomali ThreatStream, and IBM Threat Intelligence. Choose based on your team size, budget, and integration needs."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Reactive to Proactive",
+      "content": "You've moved from 'collecting IOCs' to 'understanding adversaries.' That's the transformation CTI enables. A SOC that only reacts to alerts is always one step behind. A SOC that consumes intelligence knows what's coming next. Practice mapping every alert to ATT&CK, and you'll start seeing the adversary's playbook—not just their footprints."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Threat Hunter", "CTI", "threat-intelligence", "MITRE-ATT&CK", "IOC", "TIPs"]
+}

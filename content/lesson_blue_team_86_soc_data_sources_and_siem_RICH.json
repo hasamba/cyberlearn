@@ -1,0 +1,111 @@
+{
+  "lesson_id": "b4c5d6e7-f8a9-40b1-c2d3-e4f5a6b7c8d9",
+  "domain": "blue_team",
+  "title": "SOC Data Sources and SIEM",
+  "difficulty": 2,
+  "order_index": 86,
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": ["SOC data sources", "SIEM fundamentals", "Log analysis", "Search queries", "Correlation rules", "SIEM workflow", "Log ingestion", "Event normalization"],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Identify and categorize the primary data sources that feed a SOC",
+    "Explain SIEM architecture: collection, normalization, correlation, and alerting",
+    "Write basic SIEM search queries to find security events",
+    "Design correlation rules that combine multiple data sources for detection",
+    "Describe the complete SIEM workflow from log ingestion to alert triage"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which data source provides the most detailed information about user authentication attempts?",
+      "options": ["Firewall logs", "Authentication/identity logs", "DNS logs", "Network flow data"],
+      "correct": 1
+    },
+    {
+      "question": "What is the primary purpose of log normalization in a SIEM?",
+      "options": ["To reduce storage costs by deleting logs", "To convert logs from different formats into a common schema for correlation", "To encrypt logs for security", "To prevent logs from being modified"],
+      "correct": 1
+    },
+    {
+      "question": "A correlation rule that triggers on '5 failed logins from one source IP within 10 minutes' is an example of:",
+      "options": ["Anomaly detection", "Threshold-based detection", "Behavioral analytics", "Threat intelligence matching"],
+      "correct": 1
+    },
+    {
+      "question": "What is the correct SIEM workflow order?",
+      "options": ["Alert → Ingest → Correlate → Respond", "Ingest → Normalize → Correlate → Alert → Triage", "Collect → Alert → Investigate → Respond", "Normalize → Ingest → Alert → Correlate"],
+      "correct": 1
+    },
+    {
+      "question": "Why is DNS logging critical for SOC operations?",
+      "options": ["DNS logs help reduce storage costs", "DNS queries reveal domain lookups that indicate malicious activity like C2 communication", "DNS logs are required by law", "DNS logs replace the need for firewall logs"],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Picture the SIEM as a funnel: data sources pour in at the top, normalization squeezes them into a common format, correlation filters combine signals, and alerts drip out at the bottom."},
+    {"principle": "Association", "application": "Link each data source to its investigative value: auth logs = who logged in, firewall = what connections were made, DNS = what domains were queried, EDR = what ran on the endpoint."},
+    {"principle": "Emotion", "application": "Every missed alert in a SIEM is a potential breach. The Aurora shooting, the SolarWinds hack—both had signals in the logs that were missed. Data sources matter because lives and organizations depend on them."},
+    {"principle": "Chunking", "application": "Break SIEM into: Collect → Normalize → Correlate → Alert → Triage. Five chunks, each building on the previous."},
+    {"principle": "Repetition", "application": "Practice writing SIEM queries daily. Start simple (failed logins) and add complexity (failed logins from specific sources). Query fluency comes from repetition."},
+    {"principle": "Storytelling", "application": "Tell the story of an attack through logs: first the auth failure (identity log), then the DNS query to a suspicious domain (DNS log), then the data exfiltration (firewall log). Each log is a chapter."},
+    {"principle": "Mnemonics", "application": "Use 'CAFDR' for data sources: Cloud, Authentication, Firewall, DNS, Endpoint. The five pillars of SOC visibility."},
+    {"principle": "Active Recall", "application": "After learning the SIEM workflow, close the lesson and draw it from memory. Ingest → Normalize → Correlate → Alert → Triage. What happens at each stage?"},
+    {"principle": "Teaching", "application": "Explain to someone why a SIEM needs normalization. If you can articulate why different log formats need a common schema, you understand the architecture."},
+    {"principle": "Simplification", "application": "SIEM in one sentence: 'Collect everything, make it speak one language, find the patterns that matter, and tell the humans.'"}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Data Is the Fuel, SIEM Is the Engine",
+      "content": "A SOC without data sources is a detective without evidence. A SOC with data but no SIEM is a detective with a million receipts and no filing system. The SIEM doesn't create intelligence—it reveals it by bringing together signals that would be invisible in isolation. Today you learn what to collect and how to make it useful."
+    },
+    {
+      "type": "explanation",
+      "title": "SOC Data Sources",
+      "content": "A SOC needs visibility across the entire environment. The primary data sources:\n\n**Authentication & Identity Logs**: Login successes/failures, privilege escalation, MFA challenges, account creation/modification. Sources: Active Directory, LDAP, cloud IAM (Azure AD, Okta).\n\n**Network Data**: Firewall logs (allow/deny), network flow data (NetFlow, sFlow), proxy logs, VPN connections. Shows who talked to whom.\n\n**DNS Logs**: Every domain query on the network. Critical for detecting C2 communication, phishing, and data exfiltration. Sources: BIND, Unbound, cloud DNS.\n\n**Endpoint Data**: EDR logs, process creation, file modifications, registry changes. Shows what happened on the device. Sources: CrowdStrike, SentinelOne, Defender for Endpoint.\n\n**Cloud & SaaS Logs**: Cloud audit trails, API calls, data access. Sources: AWS CloudTrail, Azure Activity Logs, GCP Audit Logs, O365 audit logs.\n\n**Application Logs**: Web server access logs, database query logs, custom application logs. Show application-level activity.\n\n**Threat Intelligence**: External feeds, IOCs, TTPs. Enriches other data sources with context."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: The Detective's Evidence Board",
+      "content": "Imagine you're a detective investigating a crime. You need evidence from different places: fingerprints from the door (authentication logs), traffic camera footage showing who drove by (network logs), a list of every phone number called (DNS logs), and what the suspect touched in the house (endpoint logs). Each piece of evidence alone tells you something small. But when you pin them all on your evidence board (that's the SIEM), you see the whole picture: the suspect entered at 9pm (auth), visited a suspicious address (DNS), downloaded something to their laptop (endpoint), and sent data out the back door (firewall). The SIEM is your evidence board—it connects the dots."
+    },
+    {
+      "type": "explanation",
+      "title": "SIEM Architecture and Workflow",
+      "content": "A SIEM follows a pipeline:\n\n1. **Collection/Ingestion**: Agents, syslog, API integrations, and log forwarders send data to the SIEM. Agents run on endpoints; syslog receives from network devices; APIs pull from cloud services.\n\n2. **Normalization/Parsing**: Raw logs come in different formats (JSON, syslog, CEF, key-value). The SIEM parses and maps them to a common schema—unified fields like `src_ip`, `dst_ip`, `user`, `action`, `timestamp`.\n\n3. **Correlation**: The SIEM applies rules that connect events across data sources. Example: '5 failed logins from IP X + successful login from IP X within 10 minutes = brute force detection.'\n\n4. **Alerting/Notification**: When correlation rules fire, the SIEM creates alerts and routes them to the appropriate team via dashboards, email, Slack, or SOAR integrations.\n\n5. **Triage/Investigation**: Analysts review alerts, investigate using search queries, pivot across data sources, and determine if the alert is true positive, false positive, or needs escalation.\n\n6. **Retention/Compliance**: Logs are stored per retention policies (30 days hot, 1 year warm, 7 years cold) for compliance and historical investigation."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Writing SIEM Search Queries",
+      "content": "Practice writing SIEM search queries (Splunk SPL syntax). These patterns translate to most SIEM platforms.",
+      "code_language": "python",
+      "code": "# Common SIEM search patterns (Splunk SPL syntax)\n\n# 1. Find failed logins for a specific user\nquery_1 = 'index=auth action=\"failure\" user=\"jsmith\" | stats count by src_ip'\n\n# 2. Detect brute force: 5+ failed logins from same IP in 10 minutes\nquery_2 = 'index=auth action=\"failure\" | bucket _time span=10m \\\n  | stats count as failures by src_ip, _time \\\n  | where failures >= 5'\n\n# 3. Find connections to suspicious domains (from threat intel)\nquery_3 = 'index=dns [| lookup suspicious_domains.csv domain OUTPUT domain as matched_domain] \\\n  | where isnotnull(matched_domain)'\n\n# 4. Correlate: failed login followed by successful login from same IP\nquery_4 = 'index=auth (action=\"failure\" OR action=\"success\") \\\n  | transaction src_ip maxspan=10m \\\n  | search action=\"failure\" AND action=\"success\"'\n\n# 5. Top talkers: which IPs generate the most firewall traffic\nquery_5 = 'index=firewall | stats count as events, sum(bytes) as total_bytes \\\n  by src_ip | sort -total_bytes | head 20'\n\n# Key SIEM search skills:\n# - Filter by index, sourcetype, and fields\n# - Use stats, chart, timechart for aggregation\n# - Use transaction for multi-event correlation\n# - Use lookup tables for threat intelligence enrichment\n# - Always include time range in your searches"
+    },
+    {
+      "type": "real_world",
+      "title": "Building a Correlation Rule That Caught an Attack",
+      "content": "A SOC analyst created a correlation rule that combined three data sources:\n\n**Rule**: 'Failed VPN login + successful VPN login from new geographic location + EDR detection of unusual process within 30 minutes'\n\n**What it caught**: An attacker had purchased credentials from a stealer log (dark web). They tried multiple passwords (failed VPN login), eventually succeeded (credential stuffing), and then launched Mimikatz on the endpoint (EDR detection). The correlation across all three sources flagged the activity within minutes.\n\n**Why single-source detection would have missed it**:\n- Failed VPN logins: Common, thousands per day\n- Successful VPN from new location: Increasingly common with remote work\n- EDR Mimikatz detection: Moderate volume, some false positives\n\n**Combined**: Extremely low false positive rate. Three independent signals converging is far more reliable than any one alone."
+    },
+    {
+      "type": "explanation",
+      "title": "Correlation Rules: The Heart of SIEM",
+      "content": "Correlation rules combine events from different sources to detect attacks that single-source analysis would miss:\n\n**Single-Event Rules**: Trigger on one event meeting specific criteria\n- Example: 'Malware detection by EDR'\n- High volume, high false positives\n\n**Threshold Rules**: Trigger when an event exceeds a count within a timeframe\n- Example: '10 failed logins in 5 minutes'\n- Good for brute force, DDoS detection\n\n**Correlation Rules**: Trigger when multiple related events occur in sequence\n- Example: 'Failed login + successful login + privilege escalation within 30 min'\n- Lower volume, higher fidelity\n\n**Behavioral/Anomaly Rules**: Trigger when behavior deviates from baseline\n- Example: 'User accesses 50% more files than their 30-day average'\n- Requires baseline, can detect novel attacks\n\n**Best practice**: Start with simple threshold rules, add correlation as you understand your environment, and layer in behavioral analytics once baselines are established."
+    },
+    {
+      "type": "memory_aid",
+      "title": "CAFDR: The Five Data Source Pillars",
+      "content": "📊 **SOC Data Sources: CAFDR**\n\n☁️ **C**loud — CloudTrail, Azure Activity, GCP Audit, O365\n🔑 **A**uthentication — AD, LDAP, Okta, MFA logs\n🔥 **F**irewall — Allow/deny, VPN, proxy logs\n🌐 **D**NS — Domain queries, C2 detection, phishing indicators\n💻 **E**ndpoint — (R for R-EDR) Process, file, registry events\n\n⚙️ **SIEM Pipeline: INCAT**\n📥 **I**ngest — Collect from all sources\n🔄 **N**ormalize — Parse to common schema\n🔗 **C**orrelate — Connect related events\n🚨 **A**lert — Notify analysts\n🔍 **T**riage — Investigate and respond\n\n💡 **Key Insight**: The SIEM is only as good as its data sources. Missing a source means missing visibility."
+    },
+    {
+      "type": "reflection",
+      "title": "Designing Your SIEM Strategy",
+      "content": "Consider these real-world SIEM challenges:\n\n1. Your organization logs 10TB/day. Storage is expensive. How do you decide what to keep hot (searchable instantly) vs. warm (searchable in minutes) vs. cold (archived)?\n2. You have 5,000 alerts per day and a team of 5 analysts. How do you prioritize which alerts to investigate first?\n3. A critical data source (EDR) stops sending logs due to an agent failure. The SIEM doesn't alert because it never sees the data stop. How do you detect gaps in log collection?\n4. Your organization migrates from on-prem AD to cloud identity. Your SIEM rules are written for on-prem event IDs. How do you update detection logic for cloud auth events?\n\nThese are the daily challenges of SOC data management."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Logs to Intelligence",
+      "content": "You've learned what data to collect and how to make it useful. The progression is clear: raw logs → normalized events → correlated alerts → investigated incidents → threat intelligence. Each step adds value. A log that no one searches is wasted storage. A search that no one correlates is a missed pattern. A pattern that no one alerts on is a missed attack. Your job is to close those gaps."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Blue Teamer", "SIEM", "log-analysis", "correlation", "data-sources", "SOC"]
+}

@@ -1,0 +1,111 @@
+{
+  "lesson_id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f",
+  "domain": "cloud",
+  "title": "Cloud Incident Detection and Containment",
+  "difficulty": 3,
+  "order_index": 86,
+  "prerequisites": ["Cloud Logging and Threat Detection"],
+  "concepts": ["Cloud IR", "Tripwires", "Early detection", "Breach containment", "Cloud forensics", "Incident response in AWS/Azure/GCP", "Cloud-specific evidence collection", "Containment strategies"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Design cloud-specific detection mechanisms (tripwires, canaries, anomaly alerts)",
+    "Execute incident response playbooks adapted for cloud environments",
+    "Perform cloud forensic evidence collection without destroying ephemeral resources",
+    "Implement containment strategies that preserve evidence while stopping the breach",
+    "Navigate cloud provider-specific IR tools and capabilities"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is a cloud tripwire (canary) and how is it used?",
+      "options": ["A tool for encrypting cloud resources", "A decoy resource designed to alert when accessed, indicating unauthorized exploration", "A load balancer configuration", "A type of firewall rule"],
+      "correct": 1
+    },
+    {
+      "question": "Why is cloud incident response different from on-premises IR?",
+      "options": ["Cloud incidents are always less severe", "Cloud resources are ephemeral, shared infrastructure requires provider-specific tools, and evidence can be lost instantly", "Cloud providers handle all IR for you", "There are no logs in cloud environments"],
+      "correct": 1
+    },
+    {
+      "question": "What is the first priority when containing a cloud breach?",
+      "options": ["Delete all compromised resources immediately", "Preserve evidence while isolating compromised resources", "Shut down the entire cloud account", "Wait for the cloud provider's response"],
+      "correct": 1
+    },
+    {
+      "question": "Which AWS service provides automated forensic snapshot capabilities?",
+      "options": ["Amazon S3", "AWS CloudTrail", "AWS Inspector", "None built-in—forensic snapshots must be scripted or use third-party tools"],
+      "correct": 3
+    },
+    {
+      "question": "What is the risk of terminating a compromised EC2 instance immediately?",
+      "options": ["It saves money on compute costs", "It destroys volatile memory and ephemeral disk data that could be critical forensic evidence", "It prevents all future attacks", "It has no risks"],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Picture a cloud breach as a fire in a hotel room. You need to contain the fire (isolate the room) without destroying the evidence (don't demolish the room). Cloud IR is about surgical containment."},
+    {"principle": "Association", "application": "Link each cloud IR step to its on-prem equivalent: tripwire = honeypot, AMI snapshot = disk image, VPC isolation = network quarantine. Transfer what you know."},
+    {"principle": "Emotion", "application": "Cloud breaches move fast. The Capital One breach took minutes. The SolarWinds supply chain compromise was discovered months after initial access. Speed matters—detection delays have real consequences."},
+    {"principle": "Chunking", "application": "Cloud IR phases: Detect → Preserve → Contain → Investigate → Remediate. Master each phase before combining."},
+    {"principle": "Repetition", "application": "Practice the forensic snapshot procedure until it's muscle memory. In a real incident, you won't have time to look up commands."},
+    {"principle": "Storytelling", "application": "Walk through a cloud breach scenario from detection to remediation. The narrative makes the sequence stick."},
+    {"principle": "Mnemonics", "application": "Use DPCIR: Detect, Preserve, Contain, Investigate, Remediate. The cloud IR lifecycle."},
+    {"principle": "Active Recall", "application": "Close the lesson and walk through a cloud IR response from memory. What do you do first? What evidence do you preserve? How do you contain?"},
+    {"principle": "Teaching", "application": "Explain why terminating an instance immediately is wrong. If you can articulate the forensic evidence loss, you understand cloud IR."},
+    {"principle": "Simplification", "application": "Cloud IR in one sentence: 'Detect fast, preserve first, contain surgically, investigate thoroughly, and automate it all for next time.'"}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Speed Meets Precision",
+      "content": "Cloud incidents move at cloud speed. An attacker with compromised credentials can exfiltrate data in minutes. But rushing to contain can destroy evidence that lives in volatile memory or ephemeral storage. Cloud IR requires both speed and precision: contain the breach while preserving the evidence. This is the hardest balance in incident response—and the most important."
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud vs. On-Premises Incident Response",
+      "content": "Cloud IR differs from on-premises in critical ways:\n\n**Shared Responsibility**: You don't control the infrastructure. You can't image a physical server—you work with snapshots and logs.\n\n**Ephemeral Resources**: Containers, Lambda functions, and auto-scaled VMs can disappear in seconds. Evidence evaporates if not preserved immediately.\n\n**API-Driven**: Everything is an API call. Detection, containment, and investigation are all done through cloud provider APIs and consoles.\n\n**Multi-Region/Multi-Account**: Attacks can span multiple regions and accounts. Containment requires cross-account coordination.\n\n**Provider Tools**: AWS, Azure, and GCP each have different IR capabilities, logging formats, and forensic approaches. You must know your provider.\n\n**Compliance and Legal**: Cloud forensics may involve provider cooperation, legal holds across jurisdictions, and data residency requirements."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Catching a Thief in a Glass House",
+      "content": "On-premises IR is like catching a thief in your house—you can lock the doors, check the security cameras, and examine everything. Cloud IR is like catching a thief in a glass skyscraper. The building isn't yours (shared infrastructure), the rooms can disappear in seconds (ephemeral resources), and you can only watch through the building's cameras (cloud logs). But the glass is actually helpful—every move the thief makes is recorded in the building's log (cloud audit trail). The challenge is preserving the evidence before the room disappears."
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud Tripwires and Canaries",
+      "content": "Tripwires (canaries) are decoy resources that alert when accessed:\n\n**AWS Canaries**:\n- Honey tokens: AWS access keys embedded in code repositories that trigger alerts when used\n- Canary S3 buckets with alerts on any access\n- Decoy EC2 instances in private subnets\n- CloudWatch alarms on unexpected API calls\n\n**Azure Canaries**:\n- Decoy Azure AD accounts with sign-in alerts\n- Honey storage accounts with monitoring\n- Azure Sentinel analytics rules for suspicious activity\n\n**GCP Canaries**:\n- Decoy service accounts with audit logging\n- Honey GCS buckets with notification triggers\n- Security Command Center findings for anomalous access\n\n**Design principle**: Place canaries in locations that an attacker exploring your environment would naturally discover. A canary in an isolated subnet that no one accesses is useless. A canary in a subnet labeled 'prod-data' is effective."
+    },
+    {
+      "type": "code_exercise",
+      "title": "AWS Cloud Tripwire Setup",
+      "content": "Create a canary S3 bucket that alerts on any access:",
+      "code_language": "python",
+      "code": "import boto3\nimport json\n\n# Create a canary S3 bucket with CloudWatch alerting\ns3 = boto3.client('s3')\nlogs = boto3.client('logs')\nsns = boto3.client('sns')\n\n# Step 1: Create SNS topic for alerts\ntopic = sns.create_topic(Name='canary-alerts')\ntopic_arn = topic['TopicArn']\nprint(f'Created SNS topic: {topic_arn}')\n\n# Step 2: Create canary bucket\nbucket_name = 'canary-honeypot-data-2026-prod'\ns3.create_bucket(\n    Bucket=bucket_name,\n    CreateBucketConfiguration={'LocationConstraint': 'us-east-1'}\n)\nprint(f'Created canary bucket: {bucket_name}')\n\n# Step 3: Enable bucket logging and CloudWatch alarm\n# Any access to this bucket should trigger an alert\n# because legitimate users should NEVER access it\n\n# CloudWatch metric filter for canary bucket access\nlogs.put_metric_filter(\n    logGroupName='/aws/s3/canary-access-logs',\n    filterName='CanaryBucketAccess',\n    filterPattern='... bucket_name = \"canary-honeypot-data-2026-prod\"',\n    metricTransformations=[{\n        'metricName': 'CanaryAccess',\n        'metricNamespace': 'Security/Canary',\n        'metricValue': '1'\n    }]\n)\n\nprint('Tripwire configured!')\nprint('Any access to this bucket = immediate alert')\nprint('Place a fake access key in your code repo to detect credential exposure')"
+    },
+    {
+      "type": "real_world",
+      "title": "Cloud IR Case Study: Rapid Credential Compromise",
+      "content": "A company detected an AWS incident through tripwires:\n\n**Detection (T+0)**: Canary AWS access key (honey token) in a public GitHub repo was used. CloudTrail logged `AssumeRole` with the compromised key.\n\n**Triage (T+5 min)**: SOC confirmed the key was used from an unfamiliar IP. The role had `AmazonS3ReadOnlyAccess`.\n\n**Preserve (T+10 min)**: Before disabling the key, SOC:\n- Captured CloudTrail logs for the past 2 hours\n- Noted all API calls made with the compromised key\n- Identified the source IP and user agent\n\n**Contain (T+15 min)**: \n- Disabled the compromised access key\n- Added explicit deny policy on the source IP\n- Revoked all active sessions for the compromised role\n\n**Investigate (T+30 min)**: \n- Confirmed attacker only accessed 3 S3 buckets (no data exfiltrated)\n- Found the key was scraped from a public repo within 4 hours of commit\n\n**Remediate (T+2 hours)**: \n- Implemented git-secrets pre-commit hooks\n- Added CloudTrail alarm for any key usage from new IPs\n- Rotated all developer access keys\n\n**Key lesson**: The canary key detected the compromise. Without it, the attacker would have had silent read access indefinitely."
+    },
+    {
+      "type": "explanation",
+      "title": "Containment Strategies",
+      "content": "Cloud containment requires balancing speed with evidence preservation:\n\n**Network Isolation**: Modify security groups or NACLs to block attacker IPs. Move compromised instances to an isolated VPC subnet.\n\n**Credential Rotation**: Disable compromised access keys, rotate secrets, revoke active sessions (AWS: `iam:RevokeOldSession`, Azure: `revokeSignInSessions`).\n\n**Resource Quarantine**: Snapshot compromised instances before any action. For containers, capture the running container state before stopping it.\n\n**DNS Sinkholing**: Redirect known malicious domains to a monitoring endpoint. Useful when you see C2 traffic but need time to investigate.\n\n**Account-Level Response**: For severe breaches, consider freezing the entire AWS account (contact AWS Support) or enabling AWS Organizations SCP to block all actions except read-only.\n\n**Critical Rule**: Always preserve evidence BEFORE containment. A snapshot takes minutes. Terminating an instance destroys volatile memory forever."
+    },
+    {
+      "type": "memory_aid",
+      "title": "DPCIR: Cloud IR Lifecycle",
+      "content": "🚨 **Cloud IR Lifecycle: DPCIR**\n\n🔍 **D**etect — Tripwires, CloudTrail alerts, anomaly detection\n📦 **P**reserve — Snapshot instances, export logs, capture volatile data\n🚧 **C**ontain — Isolate resources, rotate credentials, block IPs\n🔎 **I**nvestigate — Analyze logs, trace attack path, determine scope\n🔧 **R**emediate — Patch, harden, automate detection for next time\n\n⚠️ **Critical Rules**:\n1. ALWAYS preserve before you contain\n2. NEVER terminate an instance before snapshotting\n3. CloudTrail is your best friend—enable it EVERYWHERE\n4. Automation beats manual in cloud IR—pre-build playbooks"
+    },
+    {
+      "type": "reflection",
+      "title": "Cloud IR Challenges",
+      "content": "Think through these real-world cloud IR challenges:\n\n1. You detect a compromised EC2 instance currently exfiltrating data. Do you isolate it (preserving evidence but allowing continued exfiltration for a short time) or terminate it (stopping the breach but losing volatile memory)? What factors influence your decision?\n\n2. An attacker used compromised credentials across three AWS regions. How do you contain all three simultaneously? What if one region's CloudTrail was not enabled?\n\n3. Your organization uses a multi-account strategy (100+ AWS accounts). An attack starts in a development account. How do you prevent lateral movement to production accounts?\n\n4. A container in an EKS cluster was compromised. The container is ephemeral—how do you preserve evidence before Kubernetes reschedules it?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Detect Fast, Preserve First",
+      "content": "Cloud IR comes down to two imperatives: detect fast and preserve first. Every minute of detection delay is a minute the attacker has free rein. But every rushed containment action risks destroying evidence you'll never get back. The best cloud IR teams practice their playbooks until the steps are automatic—because in a real incident, there's no time to read documentation. Build your tripwires, automate your forensic snapshots, and rehearse your containment procedures. When the alert fires, muscle memory takes over."
+    }
+  ],
+  "tags": ["Course: SANS-SEC502", "Career Path: Cloud Security", "Career Path: DFIR Specialist", "cloud-IR", "incident-response", "tripwires", "forensics", "containment"]
+}

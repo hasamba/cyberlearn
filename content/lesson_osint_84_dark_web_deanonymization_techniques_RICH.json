@@ -1,0 +1,120 @@
+{
+  "lesson_id": "a7b3c4d5-e6f7-48a1-b2c3-d4e5f6a7b8c9",
+  "domain": "osint",
+  "title": "Dark Web De-Anonymization Techniques",
+  "difficulty": 3,
+  "order_index": 84,
+  "prerequisites": ["Dark Web and Tor Investigation"],
+  "concepts": ["Tor network analysis", "Hidden service discovery", "Traffic correlation attacks", "Dark web forensics", "Attribution techniques", "Opsec failures", "Relay and guard node analysis", "Cryptographic fingerprinting"],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Understand the theoretical and practical limits of Tor anonymity",
+    "Apply traffic correlation and timing analysis techniques to de-anonymize hidden services",
+    "Discover hidden services through operational security failures and metadata leaks",
+    "Conduct dark web forensics to attribute activities to real-world identities",
+    "Evaluate defensive countermeasures against de-anonymization"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which attack leverages the ability to monitor both entry and exit traffic to correlate a user's activity?",
+      "options": ["DNS spoofing", "Traffic correlation attack", "SQL injection on hidden services", "ARP poisoning"],
+      "correct": 1
+    },
+    {
+      "question": "What is a common opsec failure that leads to hidden service deanonymization?",
+      "options": ["Using strong encryption", "Reusing usernames or PGP keys across clearnet and darknet", "Running Tor Browser in Whonix", "Using Monero instead of Bitcoin"],
+      "correct": 1
+    },
+    {
+      "question": "Which technique can reveal the real IP of a hidden service operator?",
+      "options": ["Brute-forcing the .onion address", "Analyzing server headers that leak through misconfigured web servers", "Increasing Tor relay count", "Disabling JavaScript in Tor Browser"],
+      "correct": 1
+    },
+    {
+      "question": "What is the primary purpose of a guard node in Tor?",
+      "options": ["To encrypt traffic between relays", "To provide a stable, long-term entry point to reduce profiling risk", "To cache frequently visited .onion sites", "To block malicious exit nodes"],
+      "correct": 1
+    },
+    {
+      "question": "Which forensic artifact is most valuable for attributing dark web activity to a specific individual?",
+      "options": ["Browser cache timestamps", "PGP key fingerprint linked to a clearnet identity", "Tor circuit path length", "Number of relay hops"],
+      "correct": 1
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Map Tor circuits visually—see each relay, guard, and exit as a link in a chain to understand where anonymity breaks."},
+    {"principle": "Association", "application": "Link each de-anonymization technique to the layer it targets: guard node attacks target entry, traffic correlation targets both ends."},
+    {"principle": "Emotion", "application": "Remember the stakes—real criminals are caught through these techniques. The emotional weight makes the methods stick."},
+    {"principle": "Chunking", "application": "Break de-anonymization into phases: discovery, profiling, correlation, attribution. Master each chunk before combining."},
+    {"principle": "Repetition", "application": "Practice analyzing the same hidden service with different techniques each time until the process becomes automatic."},
+    {"principle": "Storytelling", "application": "Frame each technique as a detective story: the clue, the investigation, the breakthrough. Stories make dry technical steps memorable."},
+    {"principle": "Mnemonics", "application": "Use 'DPTA' for the de-anonymization pipeline: Discover → Profile → Traffic-analyze → Attribute."},
+    {"principle": "Active Recall", "application": "After each technique, close the lesson and try to reconstruct the attack chain from memory before checking."},
+    {"principle": "Teaching", "application": "Explain each technique to a peer (or rubber duck). If you can teach traffic correlation simply, you truly understand it."},
+    {"principle": "Simplification", "application": "Reduce each complex attack to its core insight: 'follow the metadata' or 'watch both ends of the tunnel.' Simplicity anchors understanding."}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Anonymity Paradox",
+      "content": "Every anonymization system has a breaking point. Tor was designed to resist low-resource adversaries, but nation-states and determined investigators have demonstrated that even layered encryption can be peeled. Your job as a security professional is to understand these cracks—not to exploit the innocent, but to trace genuine threats. This lesson is about understanding the limits of anonymity so you can both investigate and defend."
+    },
+    {
+      "type": "explanation",
+      "title": "Why Anonymity Breaks",
+      "content": "Tor anonymizes by routing traffic through three random relays (guard, middle, exit). The system is strong against passive observers who see only one relay. However, an adversary who can monitor both the user's entry point and the destination's exit point can correlate timing, packet sizes, and traffic patterns to link them. This is the fundamental insight behind most de-anonymization research. Additionally, hidden services (.onion) introduce more relay hops—introduction points and rendezvous points—creating additional surfaces for attack.",
+      "code_language": null,
+      "code": null
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Following Footprints in the Snow",
+      "content": "Imagine you're walking through fresh snow wearing boots. Tor is like putting on three pairs of socks—you walk through the snow, and someone tracking you sees footprints, but can't easily tell which pair of socks is yours. But what if someone watches both where you started walking AND where you end up? They see footprints appearing at the same time in both places. The timing matches. That's a traffic correlation attack. Also, if your boot has a unique mark on one sock (like a PGP key), someone can match it to shoes you wear at home. That's an opsec failure."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Analyzing Tor Circuit Metadata",
+      "content": "Use stem (Tor controller library) to inspect circuit paths and identify guard nodes. This helps you understand what an adversary sees when profiling a target.",
+      "code_language": "python",
+      "code": "from stem import Signal\nfrom stem.control import Controller\n\n# Connect to a local Tor control port\nwith Controller.from_port(port=9051) as controller:\n    controller.authenticate()\n    \n    # List active circuits\n    for circuit in controller.get_circuits():\n        print(f\"Circuit {circuit.id}:\")\n        for i, (fingerprint, nickname) in enumerate(circuit.path):\n            print(f\"  Hop {i+1}: {nickname} ({fingerprint})\")\n        \n        # Identify guard nodes (first hop in path)\n        if len(circuit.path) >= 1:\n            guard = circuit.path[0]\n            print(f\"  ** Guard node: {guard[1]}\")\n        print()"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Carnegie Mellon's De-Anonymization",
+      "content": "In 2014, researchers from Carnegie Mellon University demonstrated a practical de-anonymization attack against Tor hidden services. By running malicious relays (specifically, modifying Tor's path selection to force circuits through their nodes), they were able to correlate traffic at both ends of the circuit. This research was later alleged to have been used by the FBI to de-anonymize users of hidden services. The attack cost approximately $3,000/month in relay hosting—demonstrating that resource requirements are well within reach of motivated adversaries. This case underscores that Tor's security model assumes a specific threat model, and adversaries who can observe network traffic at multiple points can break anonymity."
+    },
+    {
+      "type": "explanation",
+      "title": "Hidden Service Discovery Techniques",
+      "content": "Hidden services are advertised through hidden service directories (HSDirs). Several techniques expose them:\n\n1. **HSDir monitoring**: Run a relay that becomes an HSDir, observe which .onion descriptors get published. This passively discovers hidden services.\n2. **Content scanning**: Once a hidden service is found, index its content. Metadata in documents (PDF author fields, image EXIF data, server headers) frequently leaks real identities.\n3. **Introduction point analysis**: The hidden service selects introduction points. By becoming one, you learn the service's identity before it's fully anonymized.\n4. **Crawling and fingerprinting**: Service software versions, error pages, and default configurations create unique fingerprints that can be matched against clearnet sites."
+    },
+    {
+      "type": "memory_aid",
+      "title": "The DEAN Mnemonic",
+      "content": "Remember the four pillars of de-anonymization:\n\n🔍 **D**iscover — Find the hidden service (HSDir monitoring, crawling)\n👤 **E**xpose — Look for metadata leaks (server headers, EXIF, PGP keys)\n🔗 **A**nalyze — Correlate traffic patterns (timing attacks, packet sizes)\n🎯 **N**ame — Attribute to real identity (PGP cross-referencing, username reuse)\n\nEach step builds on the previous one. Skip discovery and you have nothing to analyze. Skip attribution and you have data without a name."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Metadata Extraction from Dark Web Content",
+      "content": "A hidden service serves a PDF. Extract metadata to identify the author.",
+      "code_language": "python",
+      "code": "import subprocess\nimport json\n\ndef extract_metadata(filepath):\n    \"\"\"Extract metadata from a file using exiftool\"\"\"\n    result = subprocess.run(\n        ['exiftool', '-json', filepath],\n        capture_output=True, text=True\n    )\n    metadata = json.loads(result.stdout)[0]\n    \n    # Key fields that leak identity\n    identity_fields = [\n        'Author', 'Creator', 'Producer',\n        'LastModifiedBy', 'Company'\n    ]\n    \n    leaks = {}\n    for field in identity_fields:\n        if field in metadata:\n            leaks[field] = metadata[field]\n            print(f'⚠️  LEAK: {field} = {metadata[field]}')\n    \n    return leaks\n\n# In practice, you'd download from .onion via Tor\n# then run metadata extraction on the local file"
+    },
+    {
+      "type": "real_world",
+      "title": "Real Opsec Failures That Led to Arrests",
+      "content": "High-profile arrests demonstrate consistent patterns of opsec failure:\n\n- **Silk Road**: Ross Ulbricht used the same username 'altoid' on both Stack Overflow and the darknet forum, and posted a clearnet email address.\n- **Playpen**: The FBI exploited a Firefox vulnerability in Tor Browser to deliver an NIT (Network Investigative Technique) that revealed real IPs.\n- **AlphaBay**: Alexandre Cazes reused the email 'Pimp_Alex@daemail' across clearnet and darknet, and used the same PGP key.\n\nThe common thread: identity crossover between clearnet and darknet. PGP keys, usernames, email addresses, and writing style are all bridges that investigators follow."
+    },
+    {
+      "type": "reflection",
+      "title": "The Ethics of De-Anonymization",
+      "content": "Before moving on, reflect on these questions:\n\n1. When is de-anonymization justified? Law enforcement tracking criminals? Intelligence agencies monitoring dissidents?\n2. Should security researchers disclose Tor vulnerabilities to the Tor Project, or can they ethically sell them to governments?\n3. If you discover a vulnerability in Tor, what's your responsible disclosure timeline?\n4. How do you balance the legitimate need for anonymity (whistleblowers, journalists) with law enforcement's need to investigate crimes?\n\nThere are no universally right answers—but as a professional, you need a considered position."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "You Now See Both Sides",
+      "content": "Understanding de-anonymization makes you a better defender. You know where anonymity breaks, so you can reinforce those points. You know what investigators look for, so you can advise organizations on opsec. The best security professionals understand attack and defense as two sides of the same coin. Take this knowledge and use it to protect those who genuinely need anonymity—and to trace those who abuse it."
+    }
+  ],
+  "tags": ["Course: SANS-SEC587", "Career Path: OSINT", "dark-web", "deanonymization", "tor", "forensics", "attribution"]
+}

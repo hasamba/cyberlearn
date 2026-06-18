@@ -1,0 +1,113 @@
+{
+  "lesson_id": "d0e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a",
+  "domain": "cloud",
+  "title": "Cloud Penetration Testing",
+  "difficulty": 3,
+  "order_index": 85,
+  "prerequisites": [],
+  "concepts": ["Cloud pentest methodology", "Rules of engagement for cloud", "AWS/Azure/GCP attack surfaces", "IAM exploitation", "Container and serverless attacks", "Cloud-specific tooling", "Legal and compliance constraints", "Post-exploitation in cloud"],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Design a cloud penetration testing engagement with proper scope and rules of engagement",
+    "Identify and exploit cloud-specific attack surfaces (IAM, storage, compute, networking)",
+    "Use cloud-specific tools (Pacu, CloudSploit, ScoutSuite) for enumeration and exploitation",
+    "Navigate legal and compliance constraints unique to cloud pentesting",
+    "Perform post-exploitation activities in cloud environments (lateral movement, persistence)"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the first document you must obtain before conducting a cloud penetration test?",
+      "options": ["Vulnerability scan report", "Written authorization/Rules of Engagement", "SSL certificate", "Network diagram"],
+      "correct": 1
+    },
+    {
+      "question": "Which tool is specifically designed for AWS penetration testing?",
+      "options": ["Burp Suite", "Pacu", "Nmap", "Metasploit"],
+      "correct": 1
+    },
+    {
+      "question": "Why is IAM exploitation particularly impactful in cloud environments?",
+      "options": ["IAM is impossible to secure", "Cloud permissions are often overly permissive and can be chained for privilege escalation", "IAM doesn't support MFA", "IAM logs cannot be monitored"],
+      "correct": 1
+    },
+    {
+      "question": "What cloud-specific risk makes S3 bucket testing different from traditional file server testing?",
+      "options": ["S3 doesn't support encryption", "Misconfigured buckets can expose data globally without authentication", "S3 only works inside VPCs", "S3 buckets can't be enumerated"],
+      "correct": 1
+    },
+    {
+      "question": "Which statement about cloud provider pentest policies is correct?",
+      "options": ["All cloud providers prohibit penetration testing entirely", "AWS and Azure allow testing your own resources without prior approval", "You need explicit permission to test even your own cloud resources on some platforms", "Cloud providers handle all security testing for you"],
+      "correct": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    {"principle": "Visualization", "application": "Draw a cloud architecture diagram with IAM at the center—every service connects through identity. See how compromising one role cascades to many services."},
+    {"principle": "Association", "application": "Link each cloud attack to its on-premises equivalent: IAM = Active Directory, S3 = file share, Lambda = cron job. Prior knowledge transfers."},
+    {"principle": "Emotion", "application": "Remember the Capital One breach—SSRF on an EC2 instance led to 100M records exposed. Real stakes, real impact. This is why cloud pentesting matters."},
+    {"principle": "Chunking", "application": "Break cloud pentesting into: Recon → IAM exploitation → Service exploitation → Post-exploitation → Reporting. Master each chunk."},
+    {"principle": "Repetition", "application": "Practice IAM policy analysis daily. Reading policies quickly is a core cloud pentesting skill that only comes with repetition."},
+    {"principle": "Storytelling", "application": "Tell the story of a cloud breach from initial access to data exfiltration. Narrative makes attack paths memorable."},
+    {"principle": "Mnemonics", "application": "Use 'CRISP' for cloud pentest phases: Contracts/ROE → Recon → IAM exploitation → Service exploitation → Persistence/Post-exploitation."},
+    {"principle": "Active Recall", "application": "After each section, close the lesson and mentally walk through an AWS pentest from start to finish. Where are the pivot points?"},
+    {"principle": "Teaching", "application": "Explain to a colleague why cloud pentesting is fundamentally different from on-prem. If you can articulate the 'why,' the 'how' follows."},
+    {"principle": "Simplification", "application": "Cloud pentesting in one sentence: 'Find the over-permissioned identity, chain it to sensitive data.' Everything else is details."}
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Cloud Changes Everything—and Nothing",
+      "content": "The fundamentals of penetration testing haven't changed: find weaknesses, exploit them, document everything. But the cloud changes the attack surface, the tools, and the rules. You're no longer scanning a flat network—you're navigating a complex web of identity policies, API endpoints, and managed services. The most powerful attack in the cloud isn't a buffer overflow—it's an IAM policy with `s3:*` on `*`. Welcome to cloud pentesting, where identity is the new perimeter."
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud Pentest Methodology",
+      "content": "Cloud penetration testing follows a modified methodology:\n\n1. **Scope & Legal**: Define which cloud resources are in scope. Obtain written authorization. Review cloud provider pentest policies (AWS: generally allowed for your own resources, Azure: requires notification, GCP: allowed for your own projects).\n\n2. **Reconnaissance**: Enumerate cloud resources, APIs, and services. Cloud-specific: enumerate S3 buckets, Azure Blob containers, GCP storage buckets, API endpoints, IAM policies.\n\n3. **IAM Exploitation**: This is the cloud kill chain's center. Enumerate roles and policies, find over-permissioned identities, exploit role chaining, assume compromised credentials.\n\n4. **Service Exploitation**: Attack specific cloud services—SSRF on metadata endpoints, container escapes, serverless injection, storage misconfigurations.\n\n5. **Post-Exploitation**: Lateral movement through role assumption, persistence via backdoored roles or Lambda functions, data exfiltration through cloud-native services.\n\n6. **Reporting**: Document with cloud-specific context—ARNs, resource IDs, policy statements."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Breaking Into a Cloud House",
+      "content": "Imagine a house where every room has a different lock system. The front door uses a badge (that's IAM). The garage has a code pad (that's an API). The windows automatically open if you know the right phrase (that's a misconfigured service). In a regular house, a burglar walks around looking for weak doors and windows. In a cloud house, the burglar first figures out who has which badge, then steals a badge that opens every room. The most powerful badge isn't a lockpick—it's a master key someone left lying around because they wanted convenience."
+    },
+    {
+      "type": "code_exercise",
+      "title": "AWS Enumeration with Pacu",
+      "content": "Pacu is the go-to AWS exploitation framework. Here's how to start enumerating:",
+      "code_language": "python",
+      "code": "# Pacu is an interactive tool, but here's the enumeration workflow\n# Install: pip install pacu\n# Start: pacu\n\n# In Pacu console:\n# 1. Set credentials:\n#    set_keys --access-key-id AKIA... --secret-access-key wJal...\n\n# 2. Run enumeration modules:\n#    run iam__enum_users\n#    run iam__enum_roles\n#    run iam__privesc_scan    # Privilege escalation paths!\n#    run s3__bucket_finder\n#    run ec2__enum\n\n# Key finding: over-permissioned IAM policies\n# Example dangerous policy:\nimport json\n\ndangerous_policy = {\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [{\n        \"Effect\": \"Allow\",\n        \"Action\": \"*\",       # ⚠️ Everything allowed!\n        \"Resource\": \"*\"      # ⚠️ On everything!\n    }]\n}\n\n# This is the cloud equivalent of root with no password\nprint(json.dumps(dangerous_policy, indent=2))\nprint(\"\\n⚠️  AdministratorAccess policy - found in many compromised accounts\")"
+    },
+    {
+      "type": "real_world",
+      "title": "The Capital One Breach: A Cloud Pentest Case Study",
+      "content": "In 2019, a former AWS employee exploited a misconfigured WAF (ModSecurity) on an EC2 instance:\n\n1. **Initial Access**: SSRF vulnerability in the WAF allowed requests to the EC2 metadata endpoint\n2. **Credential Theft**: Retrieved temporary IAM role credentials from `http://169.254.169.254/latest/meta-data/iam/security-credentials/`\n3. **Privilege Escalation**: The IAM role had `s3:GetObject` on a wide range of S3 buckets\n4. **Data Exfiltration**: Downloaded over 100 million customer records\n\n**Key lessons for pentesters**:\n- SSRF to metadata is the #1 cloud attack vector—always test for it\n- IMDSv2 (instance metadata v2) adds a token requirement that prevents simple SSRF\n- Overly broad S3 permissions turned a single SSRF into a catastrophic breach\n- This is why cloud pentesting focuses on identity first, infrastructure second"
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud-Specific Attack Vectors",
+      "content": "Cloud environments introduce attack vectors that don't exist on-premises:\n\n**SSRF to Metadata**: Access `169.254.169.254` (AWS), `metadata.azure.com` (Azure), or `metadata.google.internal` (GCP) to steal instance credentials.\n\n**IAM Privilege Escalation Paths**:\n- `iam:PassRole` + service creation = assume any role\n- `iam:CreateAccessKey` on another user = credential theft\n- `lambda:CreateFunction` + `iam:PassRole` = backdoor via Lambda\n- `sts:AssumeRole` to a more privileged role\n\n**Storage Misconfigurations**: Public S3 buckets, anonymous Azure Blob access, GCP storage with `allUsers` access.\n\n**Container Escapes**: Break from container to host, then use host's IAM role. EKS, AKS, GKE container escapes are high-impact.\n\n**Serverless Injection**: Inject code through Lambda/Azure Functions event triggers. Not SQL injection—command injection through event payloads."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Cloud Pentest Attack Path Mnemonic: RISPP",
+      "content": "Remember the cloud pentest attack path:\n\n🔍 **R**ules of Engagement — Get authorization, scope, and cloud provider approval\n🔍 **I**AM Exploitation — Enumerate identities, find over-permissioned roles, escalate\n🔍 **S**ervice Attacks — SSRF, storage misconfigs, container escapes\n🔍 **P**ersistence — Backdoor roles, Lambda functions, API keys\n🔍 **P**roof & Report — Document with cloud-specific evidence (ARNs, policies, logs)\n\nThe cloud isn't harder—it's different. Identity is the perimeter."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Detecting Cloud Misconfigurations with ScoutSuite",
+      "content": "ScoutSuite audits cloud environments for misconfigurations. Here's how to run it:",
+      "code_language": "python",
+      "code": "# ScoutSuite: Multi-cloud security auditing tool\n# Install: pip install scoutsuite\n\n# Run AWS audit:\n# scout aws --profile my-profile\n\n# Key findings ScoutSuite detects:\nmisconfig_patterns = {\n    \"s3_public_access\": {\n        \"description\": \"S3 bucket allows public read access\",\n        \"severity\": \"HIGH\",\n        \"check\": \"Bucket Policy grants public read\"\n    },\n    \"iam_admin_policy\": {\n        \"description\": \"IAM user/role has AdministratorAccess\",\n        \"severity\": \"HIGH\",\n        \"check\": \"Policy allows action:* on resource:*\"\n    },\n    \"security_group_open\": {\n        \"description\": \"Security group allows 0.0.0.0/0 ingress\",\n        \"severity\": \"MEDIUM\",\n        \"check\": \"Ingress rule with source 0.0.0.0/0\"\n    },\n    \"unencrypted_ebs\": {\n        \"description\": \"EBS volume not encrypted\",\n        \"severity\": \"MEDIUM\",\n        \"check\": \"Encrypted flag is False\"\n    },\n    \"cloudtrail_not_multi_region\": {\n        \"description\": \"CloudTrail not enabled in all regions\",\n        \"severity\": \"LOW\",\n        \"check\": \"IsMultiRegionTrail is False\"\n    }\n}\n\nfor name, config in misconfig_patterns.items():\n    print(f'⚠️  {name}: {config[\"description\"]} [{config[\"severity\"]}]')"
+    },
+    {
+      "type": "reflection",
+      "title": "Legal and Ethical Boundaries",
+      "content": "Cloud pentesting has unique legal considerations:\n\n1. **Shared responsibility**: You can test your own resources, but not the cloud provider's infrastructure. An AWS pentest that scans `amazonaws.com` is illegal.\n2. **Provider policies**: AWS permits testing your own resources without prior approval (with exceptions like DNS Zone Walking). Azure requires notification. Always check current policies.\n3. **Third-party resources**: Can you test an S3 bucket owned by another account? No—unless you have written authorization from the owner.\n4. **Data exposure**: If your pentest reveals someone else's misconfigured resource exposing your data, reporting it properly is critical. Don't access data beyond what's needed to demonstrate the vulnerability.\n\nQuestion: What would you do if during an authorized pentest you discover an unrelated third party's data exposed? What's the ethical and legal response?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "You Now Think in Cloud",
+      "content": "Cloud pentesting isn't about replacing your skills—it's about redirecting them. The methodology is the same: recon, exploit, escalate, persist, report. But the targets have shifted from IP addresses and ports to IAM policies and API endpoints. Master identity, and you've mastered the cloud attack surface. Every over-permissioned role is a potential foothold. Every metadata endpoint is a potential key vault. Now go find them."
+    }
+  ],
+  "tags": ["Course: SANS-SEC502", "Career Path: Cloud Security", "Career Path: Pentester", "cloud-pentesting", "AWS", "IAM", "SSRF", "Pacu"]
+}
