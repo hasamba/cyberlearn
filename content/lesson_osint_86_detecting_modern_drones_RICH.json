@@ -1,0 +1,129 @@
+{
+  "lesson_id": "794988e8-8172-4311-a4e6-229a2644be48",
+  "domain": "osint",
+  "title": "Detecting Modern Drones",
+  "difficulty": 2,
+  "order_index": 86,
+  "module": "SEC587 Section 4",
+  "prerequisites": [],
+  "concepts": [
+    "Drone identification and classification",
+    "UAV signal detection and analysis",
+    "Wireless protocol reconnaissance for drones",
+    "ADS-B and RF-based tracking",
+    "Drone OSINT techniques and counter-UAS",
+    "Regulatory frameworks for drone monitoring",
+    "Aerial surveillance detection methods",
+    "Open-source drone tracking databases"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Identify commercial and hobbyist drone models through OSINT techniques",
+    "Analyze wireless signals to detect and classify UAV activity",
+    "Use ADS-B data and RF monitoring for drone tracking",
+    "Apply regulatory knowledge to legal drone surveillance detection",
+    "Correlate drone detection data with open-source intelligence sources"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which wireless frequency is most commonly used by consumer drones for control signals?",
+      "options": ["2.4 GHz and 5.8 GHz", "900 MHz only", "1.2 GHz only", "3.5 GHz only"],
+      "correct": 0,
+      "explanation": "Consumer drones predominantly use 2.4 GHz for control and 5.8 GHz for video transmission, making these the primary frequencies to monitor."
+    },
+    {
+      "question": "What is ADS-B and how is it relevant to drone OSINT?",
+      "options": [
+        "A proprietary drone tracking protocol",
+        "Automatic Dependent Surveillance–Broadcast, used by some drones to broadcast position data",
+        "An encryption standard for drone communications",
+        "A military-only drone identification system"
+      ],
+      "correct": 1,
+      "explanation": "ADS-B (Automatic Dependent Surveillance–Broadcast) is a surveillance technology where aircraft broadcast their position. Some drones, especially those above 250g in regulated airspace, may emit ADS-B signals."
+    },
+    {
+      "question": "Which tool can be used to track drones via RF signal analysis?",
+      "options": ["Nmap", "Wireshark with a compatible SDR", "Shodan only", "Google Earth"],
+      "correct": 1,
+      "explanation": "Wireshark combined with a Software-Defined Radio (SDR) can capture and analyze RF signals transmitted by drones for identification and tracking."
+    },
+    {
+      "question": "What is the primary legal concern when conducting drone detection OSINT?",
+      "options": [
+        "Copyright violations",
+        "Intercepting communications may violate wiretapping laws depending on jurisdiction",
+        "Trademark infringement",
+        "Domain squatting"
+      ],
+      "correct": 1,
+      "explanation": "Intercepting drone communications could violate wiretapping or telecommunications laws. Understanding local regulations is critical before conducting drone signal analysis."
+    },
+    {
+      "question": "Which open-source platform provides real-time flight tracking data useful for drone OSINT?",
+      "options": ["Have I Been Pwned", "Flightradar24 and OpenSky Network", "Shodan", "Censys"],
+      "correct": 1,
+      "explanation": "Flightradar24 and OpenSky Network aggregate ADS-B data for real-time flight tracking, which can reveal drone activity in monitored airspace."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link drone RF frequencies to everyday Wi-Fi bands you already know",
+    "Visualization: Picture the drone detection workflow as a radar screen sweeping for signals",
+    "Storytelling: Imagine tracking a mystery drone hovering over a restricted area to find its operator",
+    "Chunking: Break drone detection into signal capture → analysis → identification → correlation",
+    "Repetition: Practice identifying drone protocols by reviewing captured signal samples regularly",
+    "Senses: Engage multiple senses—visualize RF spectrums, listen to audio representations of signals",
+    "Teaching: Explain drone detection steps to a colleague to cement your understanding",
+    "Mnemonics: Use 'RADAR'—Receive, Analyze, Decode, Associate, Report",
+    "Emotion: Connect drone detection to protecting critical infrastructure from aerial threats",
+    "Movement: Walk through the detection workflow physically—point where signal comes from, trace it on a map"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Drone Detection Matters",
+      "content": "Drones are everywhere—from delivery services to hobbyists to military reconnaissance. As an OSINT practitioner, detecting and tracking drones isn't just about cool technology; it's about understanding a growing surveillance and security landscape. Whether you're protecting a facility, investigating unauthorized surveillance, or tracking supply chain movements, drone OSINT gives you eyes in the sky—literally. This lesson equips you with practical techniques to detect, identify, and track drones using open sources and signal analysis."
+    },
+    {
+      "type": "explanation",
+      "title": "Drone Technology and Identification",
+      "content": "Modern drones span a wide range—from sub-$50 toy quadcopters to enterprise-grade platforms like DJI Matrice. Key identification factors include:\n\n**Physical characteristics:** Size, shape, rotor count (quad, hex, octo), camera payloads, LED patterns.\n\n**Signal signatures:** Control frequencies (2.4 GHz, 5.8 GHz), telemetry protocols (DJI OcuSync, MAVLink), video transmission bands.\n\n**Digital fingerprints:** Remote ID broadcasts (required in US/EU for drones >250g), ADS-B transponders, Wi-Fi beacons from controller apps.\n\n**Behavioral patterns:** Flight paths, hovering behavior, return-to-home patterns, battery-limited endurance.\n\nUnderstanding these factors lets you identify what you're looking at from signal data alone, without ever seeing the physical drone."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Detecting Drones",
+      "content": "Imagine you're a detective and invisible robots are flying around your neighborhood. How do you find them?\n\nDrones talk to their controllers using radio waves—like how your phone talks to Wi-Fi. But these radio waves are like secret whispers that travel through the air. If you have a special radio listener (called an SDR), you can hear those whispers!\n\nSome drones also shout out their name and location—like a nametag—because the government makes them. This is called 'Remote ID.' You can pick up these nametags with apps.\n\nOnce you hear the whispers or read the nametags, you can figure out: What kind of drone is it? Where is it? Who's flying it? That's drone detection—being a detective for flying robots!"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Drone Remote ID Monitoring Script",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Drone Remote ID Monitor - Basic scanner for WiFi-based Remote ID broadcasts\n\nThis script monitors WiFi probe requests for drone Remote ID signals.\nRemote ID is mandatory for drones >250g in the US (FCC) and EU (EASA).\n\"\"\"\n\nimport subprocess\nimport re\nimport json\nfrom datetime import datetime\n\ndef scan_wifi_interfaces():\n    \"\"\"List available WiFi interfaces for monitoring.\"\"\"\n    result = subprocess.run(['iwconfig'], capture_output=True, text=True)\n    interfaces = []\n    for line in result.stdout.split('\\n'):\n        if 'IEEE 802.11' in line:\n            iface = line.split()[0]\n            interfaces.append(iface)\n    return interfaces\n\ndef parse_remote_id(packet_data):\n    \"\"\"Parse drone Remote ID from captured packet.\n    \n    Remote ID broadcasts contain:\n    - Drone serial number or registration\n    - Latitude/longitude\n    - Altitude\n    - Operator location\n    - Timestamp\n    \"\"\"\n    drone_info = {\n        'timestamp': datetime.utcnow().isoformat(),\n        'raw': packet_data,\n        'drone_id': None,\n        'lat': None,\n        'lon': None,\n        'altitude': None\n    }\n    \n    # Look for Remote ID patterns\n    # DJI drones broadcast in specific WiFi probe formats\n    id_match = re.search(r'Drone-[A-Z0-9]{4,}', packet_data)\n    if id_match:\n        drone_info['drone_id'] = id_match.group()\n    \n    coord_match = re.search(\n        r'lat[=:]+([\\-\\d.]+).*lon[=:]+([\\-\\d.]+)',\n        packet_data, re.IGNORECASE\n    )\n    if coord_match:\n        drone_info['lat'] = float(coord_match.group(1))\n        drone_info['lon'] = float(coord_match.group(2))\n    \n    return drone_info\n\ndef monitor_drones(interface='wlan0', duration=60):\n    \"\"\"Monitor for drone Remote ID signals.\n    \n    Args:\n        interface: WiFi interface in monitor mode\n        duration: Scan duration in seconds\n    \"\"\"\n    print(f\"[*] Starting drone monitor on {interface}\")\n    print(f\"[*] Scanning for {duration} seconds...\")\n    \n    detected = []\n    \n    # In practice, use tcpdump or scapy with monitor mode\n    # This is a demonstration framework\n    print(\"[+] Monitoring WiFi probe requests for Remote ID...\")\n    print(\"[+] Tip: Use 'sudo airmon-ng start wlan0' first\")\n    \n    return detected\n\nif __name__ == '__main__':\n    interfaces = scan_wifi_interfaces()\n    print(f\"Available interfaces: {interfaces}\")\n    drones = monitor_drones()\n    print(f\"Detected {len(drones)} drone(s)\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Drone Detection: Airport Incidents",
+      "content": "In December 2018, Gatwick Airport was shut down for 33 hours after drone sightings near the runway. Over 1,000 flights were cancelled, affecting 140,000 passengers. The incident highlighted critical gaps in drone detection capability.\n\n**OSINT lessons from Gatwick:**\n- Multiple witness reports were cross-referenced on social media\n- Open-source flight tracking showed the disruption radius\n- Drone detection systems were later deployed using RF monitoring + ADS-B\n\n**Modern counter-UAS systems combine:**\n- RF detection (identify drone and controller signals)\n- Radar (detect small, low-flying objects)\n- Electro-optical/IR cameras (visual confirmation)\n- Remote ID receivers (mandatory broadcast decoding)\n\nAs an OSINT analyst, you can leverage publicly available ADS-B data (Flightradar24, OpenSky Network) and Remote ID monitoring apps to build a picture of drone activity in any area without deploying expensive hardware."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Drone Detection Mnemonic: SKYLINE",
+      "content": "**S** — Signals: Monitor 2.4 GHz, 5.8 GHz, and 900 MHz bands for drone control signals\n**K** — Knowledge: Know the Remote ID regulations in your jurisdiction (US FCC Part 89, EU EASA)\n**Y** — Yield: Use SDR to yield RF data; decode with tools like dump1090 or GNU Radio\n**L** — Look: Check ADS-B aggregators (OpenSky Network, Flightradar24) for transponding drones\n**I** — Identify: Match signal patterns to known drone models (DJI OcuSync, MAVLink, etc.)\n**N** — Network: Correlate drone sightings with social media posts and flight databases\n**E** — Evidence: Document all findings with timestamps, frequencies, and location data"
+    },
+    {
+      "type": "explanation",
+      "title": "Wireless Signal Analysis for Drone Detection",
+      "content": "Drone RF analysis is the core technical skill in drone detection OSINT:\n\n**1. Frequency bands to monitor:**\n- 2.4 GHz ISM band: Most common control link\n- 5.8 GHz: Video transmission (DJI Lightbridge/OcuSync)\n- 900 MHz: Long-range control (some enterprise drones)\n- 1.2/1.3 GHz: FPV racing drones\n\n**2. Signal identification:**\n- DJI drones: OcuSync protocol on 2.4/5.8 GHz with frequency hopping\n- MAVLink: Open telemetry protocol, 433/915 MHz or 2.4 GHz\n- FrSky/TBS: Common RC protocols with identifiable patterns\n\n**3. SDR tools:**\n- `dump1090`: ADS-B decoder for aircraft transponders\n- `gr-gsm`/`gr-lte`: GSM analysis (for drones using cellular)\n- GNU Radio: Custom signal processing flows\n- SDR#: GUI-based SDR receiver for quick scanning\n\n**4. Remote ID decoding:**\n- WiFi-based (ASTM F3411): Drone broadcasts on 2.4/5 GHz WiFi\n- Bluetooth-based (EU): BLE advertisements with drone data\n- Network-based: Drone sends position via LTE/WiFi to internet servers"
+    },
+    {
+      "type": "reflection",
+      "title": "Ethical and Legal Boundaries",
+      "content": "Consider these questions before conducting drone detection:\n\n1. **Legality of interception:** In many jurisdictions, intercepting radio communications violates wiretapping laws. Monitoring ADS-B (intentionally broadcast) is legal; capturing private drone-control signals may not be.\n\n2. **Remote ID exception:** Since Remote ID data is intentionally broadcast for identification, receiving and logging it is generally legal—similar to receiving WiFi SSID beacons.\n\n3. **Counter-drone actions:** Jamming, spoofing, or shooting down drones is illegal in most countries. Detection ≠ interdiction.\n\n4. **Privacy:** Tracking drone operators via their Remote ID or signal triangulation raises privacy concerns. Always have a legitimate purpose.\n\n5. **Jurisdiction matters:** US FCC Part 89 mandates Remote ID. EU EASA has similar rules. Many countries have no such requirement, making detection harder and potentially regulated differently.\n\n**Your task:** Research the drone detection laws in your jurisdiction before engaging in any monitoring activity."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Detection to Understanding",
+      "content": "You've learned the fundamentals of drone detection—RF signals, Remote ID, ADS-B, and legal considerations. This is a rapidly evolving field. As drone regulations tighten and Remote ID becomes universal, the OSINT opportunities grow. But so do the countermeasures—some operators will spoof IDs or fly without broadcasting.\n\nThe key takeaway: drone detection is multi-source intelligence. No single method works reliably. Combine RF analysis, public flight data, social media, and regulatory databases to build a complete picture. Stay current with regulations and technology—this space changes monthly.\n\nNext up: You'll apply these concepts in real scenarios, tracking drone activity over sensitive locations and correlating signal data with open sources."
+    }
+  ],
+  "tags": ["Course: SANS-SEC587", "Career Path: OSINT", "drone-detection", "SDR", "RF-analysis", "Remote-ID", "UAV", "ADS-B"]
+}

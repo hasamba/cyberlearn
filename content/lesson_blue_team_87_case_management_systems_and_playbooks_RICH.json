@@ -1,0 +1,133 @@
+{
+  "lesson_id": "f4fbee18-f635-4f94-8436-98f0172b84f0",
+  "domain": "blue_team",
+  "title": "Case Management Systems and Playbooks",
+  "difficulty": 2,
+  "order_index": 87,
+  "module": "SEC450 Section 1",
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": [
+    "Case management lifecycle",
+    "SOAR platform architecture",
+    "Playbook design and automation",
+    "Incident tracking and workflow",
+    "Evidence chain of custody in case systems",
+    "Integration between SIEM, SOAR, and case management",
+    "Ticketing vs. case management",
+    "Metrics and reporting from case data"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Distinguish between ticketing systems and purpose-built security case management platforms",
+    "Design a playbook for a common incident type (phishing, malware, unauthorized access)",
+    "Configure a case management workflow from detection to closure",
+    "Implement SOAR automation for repetitive investigation tasks",
+    "Generate meaningful metrics from case data to improve SOC operations"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the key difference between a ticketing system and a security case management system?",
+      "options": [
+        "Ticketing systems are free; case management systems are paid",
+        "Ticketing systems track individual requests; case management tracks complex investigations with evidence chains",
+        "There is no difference; they are synonymous",
+        "Ticketing systems are only for IT support"
+      ],
+      "correct": 1,
+      "explanation": "While ticketing systems handle individual requests, security case management systems track complex, multi-step investigations, maintain evidence chains, support collaboration, and integrate with detection/response tools."
+    },
+    {
+      "question": "Which metric best measures SOC efficiency in handling incidents?",
+      "options": [
+        "Total number of alerts per day",
+        "Mean Time to Detect (MTTD) and Mean Time to Respond (MTTR)",
+        "Number of open tickets at end of month",
+        "Total disk space used by logs"
+      ],
+      "correct": 1,
+      "explanation": "MTTD and MTTR are the gold-standard metrics for SOC efficiency. MTTD measures how quickly threats are detected; MTTR measures how quickly they are contained and remediated."
+    },
+    {
+      "question": "What is a SOAR playbook?",
+      "options": [
+        "A document describing incident response policies",
+        "An automated workflow that orchestrates actions across multiple security tools",
+        "A training manual for new SOC analysts",
+        "A compliance checklist"
+      ],
+      "correct": 1,
+      "explanation": "A SOAR playbook is an automated, sequenced workflow that orchestrates actions across security tools—enriching alerts, making decisions, and executing responses without manual intervention for each step."
+    },
+    {
+      "question": "Why is evidence chain of custody important in case management?",
+      "options": [
+        "It makes the case load faster",
+        "It ensures evidence integrity and admissibility in legal proceedings",
+        "It is only needed for malware analysis",
+        "It reduces storage requirements"
+      ],
+      "correct": 1,
+      "explanation": "Chain of custody tracks who handled evidence, when, and how. This preserves evidence integrity and is critical for legal admissibility in court or regulatory proceedings."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link case management to police investigation files—every action documented, every piece of evidence tracked",
+    "Visualization: Picture a Kanban board where each card is an incident flowing through Triage → Investigation → Containment → Recovery → Closure",
+    "Storytelling: Imagine a phishing incident where the playbook automatically enriches the URL, checks reputation, quarantines the email, and notifies the user—all before you finish your coffee",
+    "Chunking: Break case management into Create → Enrich → Investigate → Respond → Document → Close",
+    "Repetition: Practice creating mock cases to build muscle memory for the workflow",
+    "Senses: Visualize the SOC dashboard—red alerts flowing in, playbooks executing green automated actions",
+    "Teaching: Walk a colleague through a phishing playbook step by step",
+    "Mnemonics: Use 'CASES'—Create, Assess, Sequence, Execute, Summarize",
+    "Emotion: Think about missing a critical indicator because it was buried in email—case management prevents that",
+    "Movement: Physically map the incident lifecycle on a whiteboard, then digitize it"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "From Chaos to Control",
+      "content": "Every SOC has been there: alerts flooding in, analysts copy-pasting IOCs into spreadsheets, important details buried in email threads, and no one sure whether that critical phishing email was actually remediated. Case management systems and playbooks transform this chaos into structured, repeatable, measurable processes. This lesson teaches you how to build the operational backbone of a SOC—the systems that ensure nothing falls through the cracks and every response follows a proven path."
+    },
+    {
+      "type": "explanation",
+      "title": "Case Management Fundamentals",
+      "content": "Security case management goes far beyond ticketing:\n\n**Case lifecycle stages:**\n1. **Creation:** Alert triggers or analyst manually opens a case\n2. **Triage:** Initial assessment—real threat or false positive?\n3. **Investigation:** Deep analysis—enrichment, correlation, scoping\n4. **Containment:** Stop the bleeding—isolate hosts, block domains\n5. **Eradication:** Remove threat—malware removal, credential resets\n6. **Recovery:** Restore operations—monitor for re-infection\n7. **Documentation:** Capture lessons learned, update detection rules\n8. **Closure:** Final review and case archival\n\n**Key features of case management platforms:**\n- Evidence attachment with chain of custody tracking\n- Timeline view of all actions and observations\n- Role-based access for different analyst tiers\n- Integration with SIEM, EDR, threat intel platforms\n- Playbook automation for repeatable response steps\n- Metrics dashboards (MTTD, MTTR, escalation rates)\n\n**Popular platforms:** TheHive (open-source), Splunk SOAR, Palo Alto XSOAR, Microsoft Sentinel SOAR, Swimlane, ServiceNow SecOps."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Case Management and Playbooks",
+      "content": "Imagine you're running a detective agency. When a case comes in, you need a folder for it. Inside the folder, you put all the clues, notes, and evidence. That's case management!\n\nNow, some cases are really common—like 'someone clicked a bad link.' For these, you write a recipe: 'Step 1: Check the link. Step 2: Block it. Step 3: Tell the person who clicked it. Step 4: Clean their computer.' That recipe is a playbook!\n\nThe cool part? Some of those steps can happen automatically, like a robot following the recipe. The robot checks the link in a database, blocks it in the firewall, and sends the notification—all in seconds. You only get involved when the robot isn't sure.\n\nCase management = organized detective folders. Playbooks = recipes for common cases. SOAR = robots that follow the recipes."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Phishing Playbook Logic (Pseudo-SOAR)",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Phishing Incident Playbook - Pseudo-SOAR Logic\n\nThis represents the automated decision tree a SOAR platform\nexecutes when a phishing alert is triggered.\n\"\"\"\n\nfrom datetime import datetime\n\nclass PhishingPlaybook:\n    \"\"\"Automated phishing response playbook.\"\"\"\n    \n    def __init__(self, alert_data):\n        self.alert = alert_data\n        self.case_id = f\"PHISH-{datetime.now().strftime('%Y%m%d-%H%M%S')}\"\n        self.actions = []\n        self.severity = 'medium'\n    \n    def execute(self):\n        \"\"\"Run the full playbook.\"\"\"\n        print(f\"[{self.case_id}] Phishing playbook triggered\")\n        \n        # Step 1: Enrich the indicator\n        self._enrich_indicator()\n        \n        # Step 2: Check threat intel\n        self._check_threat_intel()\n        \n        # Step 3: Determine scope\n        self._determine_scope()\n        \n        # Step 4: Contain\n        self._contain()\n        \n        # Step 5: Notify\n        self._notify()\n        \n        # Step 6: Document\n        self._document()\n        \n        return {\n            'case_id': self.case_id,\n            'severity': self.severity,\n            'actions_taken': self.actions\n        }\n    \n    def _enrich_indicator(self):\n        \"\"\"Enrich URL/IP/email with reputation data.\"\"\"\n        url = self.alert.get('url', 'unknown')\n        self.actions.append(f\"Enriched: {url} → checked VirusTotal, URLhaus\")\n    \n    def _check_threat_intel(self):\n        \"\"\"Query threat intelligence for matches.\"\"\"\n        self.actions.append(\"Queried threat intel feeds\")\n        # If known malicious, escalate severity\n        if self.alert.get('known_malicious'):\n            self.severity = 'high'\n    \n    def _determine_scope(self):\n        \"\"\"Find all users who received the phishing email.\"\"\"\n        self.actions.append(\"Searched email gateway for all recipients\")\n    \n    def _contain(self):\n        \"\"\"Block the indicator and quarantine emails.\"\"\"\n        self.actions.append(\"Blocked URL/domain on proxy\")\n        self.actions.append(\"Quarantined phishing emails\")\n    \n    def _notify(self):\n        \"\"\"Notify affected users and SOC.\"\"\"\n        self.actions.append(\"Sent notification to affected users\")\n        self.actions.append(\"Updated SOC case with enrichment data\")\n    \n    def _document(self):\n        \"\"\"Record all actions in the case timeline.\"\"\"\n        self.actions.append(\"Documented all actions in case timeline\")\n\n# Execute playbook\nalert = {\n    'url': 'http://malicious-site.example/login',\n    'known_malicious': True,\n    'sender': 'attacker@evil.com'\n}\nresult = PhishingPlaybook(alert).execute()\nprint(f\"Case: {result['case_id']}\")\nprint(f\"Severity: {result['severity']}\")\nfor action in result['actions_taken']:\n    print(f\"  ✅ {action}\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World SOC: From Manual to Automated",
+      "content": "A mid-size SOC was processing 200+ phishing alerts per day manually. Analysts were:\n- Copy-pasting URLs into VirusTotal\n- Manually checking threat intel feeds\n- Individually notifying each affected user\n- Creating case notes by hand\n\n**After SOAR playbook implementation:**\n- 80% of phishing alerts handled automatically (enrichment, containment, user notification)\n- MTTD dropped from 45 minutes to 3 minutes\n- MTTR dropped from 2 hours to 15 minutes for common phishing\n- Analysts focused on the 20% requiring human judgment\n\n**Key lesson:** Automation doesn't replace analysts—it frees them for the work that actually requires human judgment. The playbook handles the repetitive parts; analysts handle the complex investigations.\n\n**Metrics that mattered:**\n- False positive rate: Dropped 60% (playbooks enriched before analyst review)\n- Escalation rate: Increased 40% (better triage meant the right cases reached Tier 2)\n- Analyst satisfaction: Improved significantly (less copy-paste drudgery)"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Playbook Design Mnemonic: CASER",
+      "content": "**C** — Create: Define the trigger (alert type, threshold, severity)\n**A** — Assess: Enrich the indicator, check threat intel, determine scope\n**S** — Select: Choose the response action (block, quarantine, isolate, notify)\n**E** — Execute: Run the response action automatically via SOAR\n**R** — Record: Document everything in the case, update detection rules\n\n**Playbook must-haves:**\n✓ Clear trigger conditions\n✓ Decision branches (if/then logic)\n✓ Timeout and escalation rules\n✓ Human approval gates for high-impact actions\n✓ Rollback procedures\n✓ Post-action documentation requirements"
+    },
+    {
+      "type": "explanation",
+      "title": "SOAR vs. SIEM: Understanding the Difference",
+      "content": "A common confusion: SIEM and SOAR are complementary, not competing.\n\n**SIEM (Security Information and Event Management):**\n- Collects and correlates log data\n- Detects threats through rules and analytics\n- Generates alerts\n- Examples: Splunk Enterprise Security, Microsoft Sentinel, QRadar\n\n**SOAR (Security Orchestration, Automation, and Response):**\n- Takes SIEM alerts and orchestrates response\n- Automates enrichment, investigation, and containment\n- Manages case workflows and playbooks\n- Examples: Splunk SOAR, XSOAR, Swimlane, TheHive + Cortex\n\n**How they work together:**\n1. SIEM detects suspicious login → generates alert\n2. SOAR picks up alert → creates case → runs playbook\n3. Playbook enriches IP in VirusTotal, checks threat intel\n4. Playbook conditionally blocks IP, disables account\n5. Case updated with all actions, analyst reviews\n\n**Case management sits on top of both**, providing the investigation framework that ties detection (SIEM) to response (SOAR)."
+    },
+    {
+      "type": "reflection",
+      "title": "Build Your Own Playbook",
+      "content": "Design a playbook for a common scenario: **Unauthorized login detected from an unusual location.**\n\n1. **Trigger:** SIEM alert—user account authenticates from a country never seen before\n2. **Enrichment:** What data would you automatically gather? (Geo-IP, user's recent activity, threat intel for the source IP)\n3. **Decision points:** What determines whether this is benign (business travel) or malicious?\n4. **Actions:** What automated responses are appropriate? (Require MFA re-authentication? Disable account? Notify user?)\n5. **Escalation:** When does this escalate from Tier 1 to Tier 2?\n6. **Documentation:** What must be recorded in the case?\n\nSketch this out. Even if you don't have a SOAR platform, the logic is the same—having it written down means consistent, measurable response."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Systems Beat Heroes",
+      "content": "The best SOC analyst in the world can't scale alone. Case management and playbooks are about building systems that make every analyst—not just the best one—effective. When playbooks handle the routine, analysts can focus on the novel threats that actually require human creativity.\n\nYour takeaway: start small. Pick the most common alert type in your environment and write a playbook for it. Test it manually first, then automate one step at a time. Before you know it, you'll have a library of playbooks and a case management system that makes your entire team sharper."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Blue Teamer", "case-management", "SOAR", "playbooks", "incident-tracking", "workflow-automation"]
+}

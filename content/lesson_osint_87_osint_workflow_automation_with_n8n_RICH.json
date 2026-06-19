@@ -1,0 +1,128 @@
+{
+  "lesson_id": "256a5930-761b-44be-b8fd-7a7645f147f9",
+  "domain": "osint",
+  "title": "OSINT Workflow Automation with N8n",
+  "difficulty": 3,
+  "order_index": 87,
+  "module": "SEC587 Section 5",
+  "prerequisites": [],
+  "concepts": [
+    "N8n workflow automation platform",
+    "OSINT pipeline design",
+    "API integration for intelligence collection",
+    "Data enrichment automation",
+    "Webhook triggers and scheduled tasks",
+    "Error handling in automated workflows",
+    "Conditional logic and branching in OSINT",
+    "Output routing and report generation"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Design and build automated OSINT collection pipelines using N8n",
+    "Integrate multiple data sources (Shodan, VirusTotal, social media APIs) into a single workflow",
+    "Implement conditional logic for filtering and prioritizing intelligence",
+    "Set up scheduled and webhook-triggered collection tasks",
+    "Create automated reporting outputs from OSINT workflows"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is N8n's key advantage over manual OSINT collection?",
+      "options": [
+        "It's free while all other tools are paid",
+        "It automates repetitive collection, enrichment, and analysis tasks across multiple sources",
+        "It replaces the need for human analysts entirely",
+        "It can only connect to open-source databases"
+      ],
+      "correct": 1,
+      "explanation": "N8n automates the repetitive parts of OSINT—collecting from multiple APIs, filtering results, enriching data, and generating reports—freeing analysts for interpretation and decision-making."
+    },
+    {
+      "question": "Which N8n node type is used to execute custom JavaScript code within a workflow?",
+      "options": ["HTTP Request node", "Function node (Code node)", "Webhook node", "Cron node"],
+      "correct": 1,
+      "explanation": "The Function (now Code) node allows you to write custom JavaScript to transform data, apply complex filtering logic, or implement calculations that standard nodes can't handle."
+    },
+    {
+      "question": "What is the best approach when an API rate limit is hit during an N8n OSINT workflow?",
+      "options": [
+        "Ignore it and retry immediately",
+        "Use the Wait node to pause before retrying, and implement error handling with the Error Trigger node",
+        "Disable rate limiting on the API server",
+        "Remove the API from the workflow entirely"
+      ],
+      "correct": 1,
+      "explanation": "N8n's Wait node can pause execution for a specified duration, and the Error Trigger node catches failures. Together they enable graceful rate limit handling—pause, then retry—rather than losing the data."
+    },
+    {
+      "question": "How should an OSINT workflow handle potentially sensitive collected data?",
+      "options": [
+        "Store everything in clear text for easy access",
+        "Apply data minimization, encrypt stored results, and restrict output channels",
+        "Delete all data after each workflow run",
+        "Email results to the entire team"
+      ],
+      "correct": 1,
+      "explanation": "OSINT workflows should practice data minimization (collect only what's needed), encrypt stored results, and restrict output channels to authorized personnel only—even open-source data can have sensitivity implications."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link N8n workflows to plumbing pipes—data flows in, gets filtered, enriched, and routed to the right output",
+    "Visualization: Picture data flowing through a factory assembly line—each station adds something, each filter removes noise",
+    "Storytelling: Imagine waking up to a finished intelligence report that was collected, enriched, and formatted while you slept—that's N8n automation",
+    "Chunking: Break workflow design into Trigger → Collect → Filter → Enrich → Route → Report",
+    "Repetition: Build small workflows first, then combine them into complex pipelines",
+    "Senses: Visualize the N8n canvas with colored nodes connecting data flows like a circuit board",
+    "Teaching: Explain a workflow to someone by drawing it on paper before building it in N8n",
+    "Mnemonics: Use 'FLOW'—Filter, Link, Output, Watch",
+    "Emotion: Feel the satisfaction of automating a task that used to take 2 hours down to 2 minutes",
+    "Movement: Physically map nodes on sticky notes, then transfer to the N8n canvas"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "From Manual to Automated Intelligence",
+      "content": "OSINT analysts spend 70% of their time on collection and processing—surfing between tools, copying URLs, running API queries, formatting results. N8n eliminates that drudgery by connecting data sources, applying logic, and delivering finished intelligence automatically. This lesson isn't just about learning a tool; it's about redesigning how you work. When your collection runs itself, you spend your time on what matters: analysis, judgment, and decision-making. Let's build pipelines that work while you sleep."
+    },
+    {
+      "type": "explanation",
+      "title": "N8n Architecture for OSINT",
+      "content": "N8n (nodenode) is a workflow automation platform that excels at OSINT pipelines:\n\n**Core concepts:**\n- **Nodes:** Individual operations (HTTP request, data transform, condition, output)\n- **Workflows:** Connected sequences of nodes forming a complete pipeline\n- **Triggers:** Events that start workflows (schedule, webhook, manual)\n- **Connections:** Data flow paths between nodes\n\n**N8n advantages for OSINT:**\n- Self-hosted (your data stays local)\n- Visual canvas (see the entire pipeline at a glance)\n- 400+ built-in integrations (Shodan, Slack, email, databases)\n- Custom code nodes for complex logic\n- Branching and merging for parallel processing\n- Error handling and retry logic\n\n**Common OSINT workflow patterns:**\n1. **Scheduled collection:** Cron trigger → API queries → filter → store → alert\n2. **Webhook-driven:** External alert → enrich → correlate → notify\n3. **Enrichment pipeline:** Input indicator → query multiple APIs → aggregate results → report\n4. **Monitoring pipeline:** Periodic check → compare to baseline → alert on changes\n\n**N8n vs. other automation tools:**\n- vs. Zapier: N8n is self-hosted, free tier is generous, better for security use cases\n- vs. Apache Airflow: N8n is simpler, visual, better for quick automations\n- vs. custom scripts: N8n is maintainable, visual, and has built-in error handling"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Workflow Automation",
+      "content": "Imagine you have a morning routine: check the weather, check the news, check if school is open, then decide what to wear and whether to bring an umbrella.\n\nWhat if you had a robot that did all the checking for you every morning and sent you a text saying 'Rain today, bring umbrella. No school delays. News: nothing urgent'?\n\nThat's what N8n does for OSINT. Instead of checking 10 different websites and tools one by one, you build a robot (workflow) that:\n1. Wakes up on a schedule (trigger)\n2. Checks Shodan for new devices on your target\n3. Checks if any IPs are on threat lists (enrich)\n4. Sends you a Slack message if something's new (output)\n\nThe 'nodes' are like stations on an assembly line. Each one does one thing. Connect them together, and data flows through like a river, getting filtered and enriched at each bend."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Domain Intelligence Collection Workflow (N8n JSON)",
+      "content": "```json\n{\n  \"name\": \"OSINT Domain Intelligence Pipeline\",\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"rule\": {\n          \"interval\": [\"0 8 * * *\"]\n        }\n      },\n      \"name\": \"Daily 8AM Trigger\",\n      \"type\": \"n8n-nodes-base.scheduleTrigger\",\n      \"position\": [0, 0]\n    },\n    {\n      \"parameters\": {\n        \"url\": \"https://api.shodan.io/dns/domain/{{ $json.domain }}\",\n        \"queryParameters\": {\n          \"parameters\": [\n            {\"name\": \"key\", \"value\": \"{{ $env.SHODAN_API_KEY }}\"}\n          ]\n        }\n      },\n      \"name\": \"Shodan DNS Lookup\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"position\": [250, 0]\n    },\n    {\n      \"parameters\": {\n        \"url\": \"https://www.virustotal.com/api/v3/domains/{{ $json.domain }}\",\n        \"headerParameters\": {\n          \"parameters\": [\n            {\"name\": \"x-apikey\", \"value\": \"{{ $env.VT_API_KEY }}\"}\n          ]\n        }\n      },\n      \"name\": \"VirusTotal Enrichment\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"position\": [500, 0]\n    },\n    {\n      \"parameters\": {\n        \"conditions\": {\n          \"number\": [{\n            \"value1\": \"={{ $json.data.attributes.last_analysis_stats.malicious }}\",\n            \"operation\": \"larger\",\n            \"value2\": 0\n          }]\n        }\n      },\n      \"name\": \"Is Malicious?\",\n      \"type\": \"n8n-nodes-base.if\",\n      \"position\": [750, 0]\n    },\n    {\n      \"parameters\": {\n        \"channel\": \"osint-alerts\",\n        \"text\": \"🔴 Malicious domain detected: {{ $json.domain }}\\nMalicious hits: {{ $json.data.attributes.last_analysis_stats.malicious }}\"\n      },\n      \"name\": \"Alert Slack\",\n      \"type\": \"n8n-nodes-base.slack\",\n      \"position\": [1000, -100]\n    },\n    {\n      \"parameters\": {\n        \"operation\": \"insert\",\n        \"collection\": \"domain_intel\",\n        \"fields\": {\n          \"domain\": \"={{ $json.domain }}\",\n          \"vt_score\": \"={{ $json.data.attributes.last_analysis_stats.malicious }}\",\n          \"timestamp\": \"={{ $now }}\"\n        }\n      },\n      \"name\": \"Store Results\",\n      \"type\": \"n8n-nodes-base.mongoDb\",\n      \"position\": [1000, 100]\n    }\n  ],\n  \"connections\": {\n    \"Daily 8AM Trigger\": {\"main\": [[{\"node\": \"Shodan DNS Lookup\"}]]},\n    \"Shodan DNS Lookup\": {\"main\": [[{\"node\": \"VirusTotal Enrichment\"}]]},\n    \"VirusTotal Enrichment\": {\"main\": [[{\"node\": \"Is Malicious?\"}]]},\n    \"Is Malicious?\": {\n      \"main\": [\n        [{\"node\": \"Alert Slack\"}],\n        [{\"node\": \"Store Results\"}]\n      ]\n    }\n  }\n}\n```\nThis workflow triggers daily, queries Shodan and VirusTotal, checks if domains are flagged as malicious, alerts via Slack, and stores all results."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Automated Brand Monitoring Pipeline",
+      "content": "A security team built an N8n pipeline to monitor for brand impersonation:\n\n**Workflow:**\n1. **Daily trigger** → Query Certificate Transparency logs for new SSL certs matching brand keywords\n2. **Filter** → Remove known legitimate domains\n3. **Enrich** → Check each new domain against VirusTotal, URLhaus, and WHOIS\n4. **Score** → Custom JavaScript node assigns a risk score based on: domain age, registrar reputation, SSL issuer, DNS patterns\n5. **Route** → High-risk (>80 score) → Immediate Slack alert + Jira ticket. Medium (50-80) → Daily digest email. Low (<50) → Log only.\n6. **Store** → All results in Elasticsearch for trend analysis\n\n**Results:**\n- Caught 12 phishing domains in the first week that manual monitoring missed\n- Average detection time: 4 hours vs. 24+ hours manual\n- Analyst time saved: ~3 hours/day on brand monitoring\n- False positive rate: <5% after tuning the scoring model\n\n**Key insight:** The analyst didn't become less important—the automation handled collection and filtering, freeing the analyst to focus on takedown requests and legal coordination."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Workflow Design Pattern: FLOW",
+      "content": "**F** — Filter: Remove noise early. Don't enrich garbage data.\n**L** — Link: Connect multiple data sources for correlation (Shodan + VT + WHOIS)\n**O** — Output: Route results to appropriate channels (Slack for urgent, email for digest, DB for archive)\n**W** — Watch: Set up monitoring for failures (Error Trigger node) and schedule regular runs\n\n**N8n Node Cheat Sheet for OSINT:**\n- **Schedule Trigger:** Cron-based collection\n- **Webhook Trigger:** Event-driven (e.g., Shodan alert → enrich)\n- **HTTP Request:** API calls to any service\n- **IF/Switch:** Conditional routing\n- **Code (Function):** Custom JavaScript logic\n- **Set:** Transform and rename fields\n- **Merge:** Combine data from multiple sources\n- **Wait:** Pause execution (rate limiting)\n- **Error Trigger:** Catch and handle failures"
+    },
+    {
+      "type": "explanation",
+      "title": "Error Handling and Rate Limiting",
+      "content": "OSINT APIs have rate limits. Your workflows must handle them gracefully:\n\n**Rate limiting strategies:**\n1. **Wait node:** Insert pauses between API calls (e.g., 1 second between VT queries)\n2. **Split In Batches node:** Process items in chunks with delays\n3. **Exponential backoff:** Custom Code node that increases wait time on 429 errors\n\n**Error handling patterns:**\n1. **Error Trigger node:** Catches workflow failures globally\n2. **Continue On Fail:** Set on individual nodes to prevent one failure from stopping the pipeline\n3. **Retry configuration:** Built-in retry for HTTP Request nodes\n4. **Fallback paths:** If primary API fails, route to backup source\n\n**Data quality gates:**\n1. **Null checks:** Filter out empty results before enrichment\n2. **Schema validation:** Verify API responses match expected format\n3. **Deduplication:** Remove duplicate data before storage\n4. **Timestamp validation:** Ensure data freshness (don't enrich month-old results)\n\n**Pro tip:** Always add a 'Catch All' error handler that logs failures to a dedicated channel. Silent failures in automated OSINT mean blind spots."
+    },
+    {
+      "type": "reflection",
+      "title": "Design Your Own OSINT Pipeline",
+      "content": "Pick one repetitive OSINT task you do regularly and design a workflow for it:\n\n1. **Trigger:** What starts this workflow? (Schedule? Webhook? Manual?)\n2. **Collection:** What data sources do you query? (Shodan, VT, WHOIS, social media, CT logs?)\n3. **Filtering:** What criteria separate signal from noise?\n4. **Enrichment:** What additional context would make the data actionable?\n5. **Routing:** Where do different priority levels go? (Immediate alert? Daily report? Archive?)\n6. **Error handling:** What happens when an API is down or rate-limited?\n7. **Storage:** Where do results live for future reference and trend analysis?\n\n**Start small:** Build a single-source pipeline first (e.g., Shodan → Slack alert). Get it working. Then add enrichment, filtering, and routing one node at a time."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Automate the Boring, Analyze the Interesting",
+      "content": "N8n isn't about replacing analysts—it's about making them 10x more effective. When collection, filtering, and formatting run automatically, you arrive at your desk with clean, enriched intelligence ready for judgment calls. The manual OSINT workflow is a relic. The future is automated collection with human-in-the-loop analysis. Build your first pipeline this week. Start simple. Iterate. Before long, you'll have a personal intelligence factory that works 24/7."
+    }
+  ],
+  "tags": ["Course: SANS-SEC587", "Career Path: OSINT", "N8n", "workflow-automation", "OSINT-pipeline", "API-integration", "automation"]
+}

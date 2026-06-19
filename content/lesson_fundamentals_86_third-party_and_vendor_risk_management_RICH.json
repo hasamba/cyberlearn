@@ -1,0 +1,128 @@
+{
+  "lesson_id": "b4996614-a574-4f91-9e1d-37d902879a72",
+  "domain": "fundamentals",
+  "title": "Third-Party and Vendor Risk Management",
+  "difficulty": 1,
+  "order_index": 86,
+  "module": "Sec+ D5",
+  "prerequisites": ["Risk Management Processes"],
+  "concepts": [
+    "Third-party risk assessment frameworks",
+    "Vendor due diligence processes",
+    "Supply chain security risks",
+    "Service Level Agreements (SLAs)",
+    "Contract security requirements",
+    "Vendor continuous monitoring",
+    "Fourth-party risk (subcontractors)",
+    "Incident response obligations in vendor contracts"
+  ],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Identify key risk factors when engaging third-party vendors",
+    "Design a vendor due diligence questionnaire for security assessment",
+    "Evaluate SLA terms for security relevance and enforceability",
+    "Implement continuous monitoring strategies for vendor risk",
+    "Apply supply chain security principles to vendor management"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of vendor due diligence?",
+      "options": [
+        "To negotiate the lowest possible price",
+        "To identify and assess security risks before engaging a vendor",
+        "To verify the vendor's marketing claims about their product",
+        "To ensure the vendor has a social media presence"
+      ],
+      "correct": 1,
+      "explanation": "Vendor due diligence focuses on identifying security, compliance, and operational risks before entering a business relationship, ensuring the vendor meets your organization's security standards."
+    },
+    {
+      "question": "Which clause in a vendor contract ensures you are notified of security incidents affecting your data?",
+      "options": [
+        "Force majeure clause",
+        "Indemnification clause",
+        "Security incident notification clause",
+        "Non-compete clause"
+      ],
+      "correct": 2,
+      "explanation": "A security incident notification clause defines the vendor's obligation to notify you within a specified timeframe when a security incident affects your data or services."
+    },
+    {
+      "question": "What is 'fourth-party risk'?",
+      "options": [
+        "Risk from government regulators",
+        "Risk from a vendor's subcontractors or downstream dependencies",
+        "Risk from your own employees",
+        "Risk from competitors"
+      ],
+      "correct": 1,
+      "explanation": "Fourth-party risk comes from your vendor's own third parties (subcontractors). If your cloud provider uses a subprocessor that gets breached, your data is still at risk."
+    },
+    {
+      "question": "Which framework specifically addresses supply chain risk management?",
+      "options": ["NIST SP 800-53 only", "NIST SP 800-161 (C-SCRM)", "ISO 27001 only", "COBIT 5 only"],
+      "correct": 1,
+      "explanation": "NIST SP 800-161 provides guidance on Cybersecurity Supply Chain Risk Management (C-SCRM), specifically addressing supply chain risks that other frameworks cover only broadly."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link vendor risk to choosing a babysitter—you wouldn't hand your kids to a stranger without checking references",
+    "Visualization: Imagine your organization as a castle—every vendor is a door; which doors are locked?",
+    "Storytelling: SolarWinds was breached through their supply chain, affecting 18,000+ organizations. One vendor compromise = cascading damage",
+    "Chunking: Break vendor management into Select → Assess → Contract → Monitor → Review",
+    "Repetition: Review vendor risk questionnaires regularly to build assessment intuition",
+    "Senses: Visualize a red-yellow-green risk dashboard for each vendor",
+    "Teaching: Explain fourth-party risk to someone using the 'your vendor's vendor' framing",
+    "Mnemonics: Use 'VENDOR'—Verify, Evaluate, Negotiate, Document, Observe, Review",
+    "Emotion: Connect vendor failures to real breaches—Target, Equifax, SolarWinds",
+    "Movement: Walk through a vendor onboarding checklist step by step physically"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Vendor Risk Is Everyone's Problem",
+      "content": "Here's a hard truth: your security is only as strong as your weakest vendor. SolarWinds, Target, Equifax—some of the worst breaches came through third parties, not direct attacks. When you give a vendor access to your data, your network, or your customers, you inherit their risk. This lesson teaches you how to identify, assess, and manage that risk systematically. Think of yourself as the gatekeeper who ensures that every door into your organization is properly locked and monitored."
+    },
+    {
+      "type": "explanation",
+      "title": "Understanding Third-Party Risk",
+      "content": "Third-party risk arises whenever an external entity has access to your data, systems, or processes. Key categories:\n\n**Data risk:** Vendors processing, storing, or transmitting your data create exposure points.\n\n**Access risk:** VPN access, API keys, SSH credentials given to vendors expand your attack surface.\n\n**Operational risk:** If a vendor goes down, your business operations may halt.\n\n**Compliance risk:** Vendors must comply with the same regulations affecting your industry (GDPR, HIPAA, PCI DSS).\n\n**Supply chain risk:** The vendor's own dependencies (fourth parties) create hidden risk paths.\n\n**Reputation risk:** A vendor breach reflects on your organization in the eyes of customers and regulators.\n\nThe fundamental principle: **You can outsource the work, but you cannot outsource the accountability.**"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Vendor Risk",
+      "content": "Imagine you're throwing a big party and you hire a catering company. They're going to come into your house, use your kitchen, and serve food to your guests.\n\nBut wait—did you check if they have food safety certificates? What if they leave your back door open while carrying food in? What if their own food supplier uses bad ingredients?\n\nThat's vendor risk! When a company lets another company help with their work, they have to make sure:\n- The helper is trustworthy (due diligence)\n- They follow the rules (compliance)\n- They tell you quickly if something goes wrong (incident notification)\n- You can check on them anytime (audit rights)\n- If they mess up, they fix it (SLA guarantees)\n\nIf you don't check all this, a bad helper can ruin the whole party—even though you did everything right yourself!"
+    },
+    {
+      "type": "code_exercise",
+      "title": "Vendor Risk Assessment Scorecard",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Vendor Risk Assessment Scorecard\n\nCalculates a composite risk score for a vendor based on\nsecurity, compliance, and operational factors.\n\"\"\"\n\ndef assess_vendor(vendor_name, assessment_data):\n    \"\"\"Calculate vendor risk score from assessment responses.\"\"\"\n    \n    weights = {\n        'data_handling': 0.25,\n        'access_controls': 0.20,\n        'compliance': 0.20,\n        'incident_history': 0.15,\n        'subprocessor_mgmt': 0.10,\n        'business_continuity': 0.10\n    }\n    \n    total_score = 0\n    findings = []\n    \n    for category, weight in weights.items():\n        score = assessment_data.get(category, 0)  # 0-10 scale\n        weighted = score * weight\n        total_score += weighted\n        \n        if score < 5:\n            findings.append(f\"⚠️  {category}: LOW ({score}/10)\")\n        elif score < 7:\n            findings.append(f\"🟡 {category}: MEDIUM ({score}/10)\")\n        else:\n            findings.append(f\"✅ {category}: GOOD ({score}/10)\")\n    \n    risk_level = (\n        'CRITICAL' if total_score < 3 else\n        'HIGH' if total_score < 5 else\n        'MEDIUM' if total_score < 7 else\n        'LOW'\n    )\n    \n    return {\n        'vendor': vendor_name,\n        'score': round(total_score, 2),\n        'risk_level': risk_level,\n        'findings': findings,\n        'recommendation': (\n            'Do not engage' if risk_level == 'CRITICAL' else\n            'Require remediation before engagement' if risk_level == 'HIGH' else\n            'Engage with conditions' if risk_level == 'MEDIUM' else\n            'Approve for engagement'\n        )\n    }\n\n# Example assessment\nexample_vendor = {\n    'data_handling': 8,\n    'access_controls': 6,\n    'compliance': 7,\n    'incident_history': 4,\n    'subprocessor_mgmt': 5,\n    'business_continuity': 8\n}\n\nresult = assess_vendor('CloudHost Inc.', example_vendor)\nprint(f\"Vendor: {result['vendor']}\")\nprint(f\"Score: {result['score']}/10 — Risk: {result['risk_level']}\")\nfor f in result['findings']:\n    print(f)\nprint(f\"Recommendation: {result['recommendation']}\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: SolarWinds Supply Chain Attack",
+      "content": "The SolarWinds breach (2020) is the definitive case study in third-party risk:\n\n**What happened:** Russian APT29 (Cozy Bear) compromised SolarWinds' build environment and inserted malicious code into Orion software updates. ~18,000 organizations downloaded the tainted update, including US government agencies.\n\n**Key failures:**\n- SolarWinds' build environment had weak access controls (password: 'solarwinds123')\n- No code-signing integrity verification caught the tampering\n- Customers trusted the vendor without validating updates\n- Fourth-party risk: SolarWinds used contractors who were also compromised\n\n**Lessons for vendor risk management:**\n1. **Verify, don't trust:** Validate vendor code integrity independently\n2. **Build environment security matters:** Ask vendors about their SDLC security\n3. **Least privilege for vendors:** Restrict vendor access to minimum necessary\n4. **Continuous monitoring:** Don't just assess at onboarding—monitor continuously\n5. **Fourth-party awareness:** Map your vendor's critical dependencies"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Vendor Risk Mnemonic: VENDOR",
+      "content": "**V** — Verify: Conduct thorough due diligence before engagement\n**E** — Evaluate: Score vendors on security, compliance, and operational criteria\n**N** — Negotiate: Include security clauses, SLAs, audit rights, and breach notification in contracts\n**D** — Document: Maintain a vendor inventory with risk classifications\n**O** — Observe: Continuously monitor vendor security posture (not just at onboarding)\n**R** — Review: Schedule periodic reassessments and update risk ratings\n\n**Contract essentials checklist:**\n✓ Right to audit\n✓ Breach notification ≤72 hours\n✓ Data handling and retention requirements\n✓ Subprocessor disclosure and approval\n✓ Incident response coordination\n✓ Business continuity SLAs\n✓ Data destruction on termination"
+    },
+    {
+      "type": "explanation",
+      "title": "SLA Security Requirements That Actually Matter",
+      "content": "Most SLAs focus on uptime. Security-focused SLAs need specific, measurable terms:\n\n**Breach notification:** 'Vendor shall notify Customer within 72 hours of discovering any security incident involving Customer data.' Not 'promptly'—specify hours.\n\n**Uptime during incident:** 'Security incident response SLA: Critical=4h, High=24h, Medium=72h.'\n\n**Patch management:** 'Critical vulnerabilities patched within 14 days, high within 30 days.'\n\n**Encryption standards:** 'All data at rest encrypted with AES-256, in transit with TLS 1.2+.'\n\n**Audit rights:** 'Customer may conduct or commission a security audit with 30 days' notice, no more than once per year.'\n\n**Subprocessor changes:** 'Vendor shall notify Customer 30 days before adding or changing subprocessors; Customer may object.'\n\n**Data destruction:** 'Within 30 days of contract termination, Vendor shall certify destruction of all Customer data.'\n\n**Penalty clauses:** Tie SLA violations to financial penalties—otherwise they're aspirational, not contractual."
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your Organization's Vendor Risk",
+      "content": "Consider your current organization (or a hypothetical one):\n\n1. **Inventory:** Do you know every vendor with access to your data? Most organizations underestimate by 3-5x.\n\n2. **Classification:** Do you categorize vendors by risk level (critical, high, medium, low)? What criteria do you use?\n\n3. **Continuous monitoring:** Are you assessing vendors only at onboarding, or do you have ongoing monitoring?\n\n4. **Fourth-party visibility:** Do you know who your vendors' critical subprocessors are?\n\n5. **Incident readiness:** If a vendor was breached tonight, do you have a response plan that includes vendor coordination?\n\n**Action item:** Start a vendor inventory spreadsheet today. List every vendor, what data they access, their risk tier, and their last assessment date. You'll be surprised how many 'forgotten vendors' you find."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "You're the Gatekeeper",
+      "content": "Third-party risk management isn't about saying 'no' to every vendor. It's about saying 'yes, and here's how we do it safely.' Every vendor relationship is a risk decision. Your job is to make that decision informed, measurable, and enforceable.\n\nRemember the SolarWinds lesson: trust is not a security control. Verify independently, monitor continuously, and never assume a vendor's security matches your own standards.\n\nIn your next vendor review, bring a checklist. Ask the uncomfortable questions. If a vendor can't answer them, that's your answer—regardless of how good their product demo looked."
+    }
+  ],
+  "tags": ["Course: CompTIA-Security+", "Career Path: GRC Analyst", "vendor-risk", "supply-chain", "SLA", "due-diligence", "third-party"]
+}

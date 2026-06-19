@@ -1,0 +1,133 @@
+{
+  "lesson_id": "c7bd2995-2a7d-41a6-aa38-9ce9e241d96c",
+  "domain": "cloud",
+  "title": "Microsoft 365 Authentication Attacks",
+  "difficulty": 2,
+  "order_index": 88,
+  "module": "SEC504 Section 3",
+  "prerequisites": ["Password Attack Methodologies"],
+  "concepts": [
+    "M365 authentication architecture",
+    "MFA bypass techniques",
+    "Conditional Access policy abuse",
+    "Azure AD token manipulation",
+    "OAuth application consent attacks",
+    "Legacy authentication exploitation",
+    "Password spray and credential stuffing for cloud",
+    "Token theft and replay attacks"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify common authentication attack vectors targeting Microsoft 365 environments",
+    "Analyze how attackers bypass MFA through conditional access misconfigurations",
+    "Understand OAuth consent phishing and token theft techniques",
+    "Implement defensive measures for M365 authentication security",
+    "Detect and respond to authentication anomalies in Azure AD logs"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which authentication protocol is commonly abused because it doesn't support MFA?",
+      "options": [
+        "Modern Authentication (OAuth 2.0)",
+        "Legacy authentication protocols (IMAP, POP3, SMTP Auth)",
+        "SAML-based federation",
+        "Certificate-based authentication"
+      ],
+      "correct": 1,
+      "explanation": "Legacy protocols like IMAP, POP3, and SMTP Auth don't support modern MFA challenges, making them prime targets for credential stuffing and password spray attacks that bypass MFA requirements."
+    },
+    {
+      "question": "What is an OAuth consent phishing attack?",
+      "options": [
+        "Stealing passwords from OAuth servers",
+        "Tricking users into granting a malicious app permissions to their M365 data",
+        "Brute-forcing OAuth tokens",
+        "DDoSing the OAuth endpoint"
+      ],
+      "correct": 1,
+      "explanation": "In OAuth consent phishing, attackers register a malicious application and trick users into clicking 'Accept' on a consent prompt, granting the app access to their data—bypassing MFA entirely because the user authenticated legitimately."
+    },
+    {
+      "question": "Which Azure AD log event indicates a potential password spray attack?",
+      "options": [
+        "A single failed login from one IP",
+        "Multiple failed logins across many accounts from few IP addresses (error codes 50126, 50053)",
+        "A successful login from a new device",
+        "A user changing their password"
+      ],
+      "correct": 1,
+      "explanation": "Password spray attacks show as many failed logins (error 50126 - invalid credentials) across different accounts from a small number of IPs, often with intermittent lockouts (error 50053)."
+    },
+    {
+      "question": "What is the most effective defense against legacy authentication bypass?",
+      "options": [
+        "Stronger password policies",
+        "Disable legacy authentication protocols entirely in Azure AD",
+        "Increase MFA token length",
+        "Deploy additional firewalls"
+      ],
+      "correct": 1,
+      "explanation": "Disabling legacy authentication entirely in Azure AD (via Conditional Access policy blocking legacy protocols) is the most effective defense, as it eliminates the authentication path that bypasses MFA."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link M365 auth attacks to a house with a modern front door lock but an old unlocked back door (legacy auth)",
+    "Visualization: Picture authentication as a chain—each link (password, MFA, conditional access) must be strong; one weak link breaks the chain",
+    "Storytelling: Imagine an attacker who can't break the front door (MFA) but finds a window that doesn't have a lock (legacy auth protocol)",
+    "Chunking: Break M365 auth attacks into Credential theft → MFA bypass → Token manipulation → Persistence",
+    "Repetition: Review Azure AD sign-in log patterns for common attacks until they're recognizable at a glance",
+    "Senses: Visualize the Azure AD sign-in log dashboard with red spikes indicating password spray attempts",
+    "Teaching: Explain OAuth consent phishing to a colleague using the 'malicious app approval' scenario",
+    "Mnemonics: Use 'ACTS'—Attackers exploit Credentials, Tokens, and Sessions (not just passwords)",
+    "Emotion: Feel the urgency—M365 is the #1 target for business email compromise, the costliest attack type",
+    "Movement: Walk through the authentication flow physically: user → password → MFA → token → access"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "M365: The Biggest Target in the Cloud",
+      "content": "Microsoft 365 is the world's most popular business productivity suite, which makes it the world's most popular attack target. Business email compromise (BEC) through M365 costs organizations billions annually. The attack surface isn't just passwords—it's authentication architectures, token systems, consent frameworks, and conditional access policies. This lesson maps the attack paths into M365 and, critically, how to close them. If you secure M365 auth, you eliminate the #1 initial access vector for most organizations."
+    },
+    {
+      "type": "explanation",
+      "title": "M365 Authentication Attack Vectors",
+      "content": "**1. Password Spray & Credential Stuffing:**\n- Attackers try common passwords across many accounts\n- Azure AD error codes: 50126 (invalid credentials), 50053 (account locked)\n- Detection: Many accounts, few IPs, same password attempts\n\n**2. Legacy Authentication Bypass:**\n- Protocols: IMAP, POP3, SMTP Auth, ActiveSync\n- These don't support modern MFA challenges\n- Attackers use them to bypass conditional access policies\n- Detection: Sign-ins with 'Legacy Authentication' client app type\n\n**3. MFA Fatigue (MFA Bombing):**\n- Attackers trigger repeated MFA push notifications\n- Users eventually approve out of frustration\n- Detection: Multiple MFA challenges in short time periods\n\n**4. OAuth Consent Phishing:**\n- Attacker registers malicious app with enticing name\n- User clicks 'Accept' on consent prompt (legitimate auth!)\n- App receives persistent access token—no MFA bypass needed\n- Detection: Application consent grants for unknown applications\n\n**5. Token Theft & Replay:**\n- Stealing access/refresh tokens from compromised endpoints\n- Tokens are valid regardless of subsequent password changes\n- PRT (Primary Refresh Token) theft via pass-the-cookie\n- Detection: Impossible travel, token use from unexpected locations\n\n**6. Conditional Access Misconfiguration:**\n- Excluded groups, bypass policies, incomplete coverage\n- Common gap: excluding emergency access accounts that become permanent exceptions\n- Detection: Sign-ins that should have been blocked by CA but weren't"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: M365 Auth Attacks",
+      "content": "Imagine your school has a front door with a really good lock that needs your key AND your fingerprint (that's MFA). Pretty secure, right?\n\nBut there's a back door for delivery people that only needs a regular key (that's legacy auth). A bad guy finds out about this back door and uses it instead!\n\nOr imagine someone keeps knocking on your door 50 times saying 'please let me in!' until you finally say 'FINE, come in!' just to make them stop (that's MFA fatigue).\n\nThe sneakiest attack: someone shows you a form that says 'Click Allow to get free homework help.' You click Allow, but it actually gives them access to your entire locker permanently! (That's OAuth consent phishing.)\n\nThe lesson: even the best lock doesn't help if there are other doors, you get annoyed into opening it, or you accidentally give someone a permanent key."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Azure AD Sign-In Log Analysis for Auth Attacks",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Azure AD Sign-In Log Analyzer\n\nDetects common authentication attack patterns\nfrom Azure AD sign-in logs.\n\"\"\"\n\nfrom collections import defaultdict\nfrom datetime import datetime\n\ndef analyze_signin_logs(logs):\n    \"\"\"Analyze Azure AD sign-in logs for attack patterns.\"\"\"\n    \n    findings = {\n        'password_spray': [],\n        'legacy_auth': [],\n        'mfa_fatigue': [],\n        'impossible_travel': [],\n        'suspicious_consents': []\n    }\n    \n    # Track patterns\n    failed_by_ip = defaultdict(list)\n    failed_by_account = defaultdict(list)\n    mfa_attempts = defaultdict(list)\n    app_consents = []\n    \n    for log in logs:\n        ip = log.get('ipAddress', 'unknown')\n        user = log.get('userPrincipalName', 'unknown')\n        status = log.get('status', {})\n        error = status.get('errorCode', 0)\n        client_app = log.get('clientAppUsed', '')\n        location = log.get('location', {}).get('countryOrRegion', '')\n        app_display = log.get('appDisplayName', '')\n        \n        # Password spray: many accounts, few IPs\n        if error == 50126:  # Invalid credentials\n            failed_by_ip[ip].append(user)\n            failed_by_account[user].append(ip)\n        \n        # Legacy auth detection\n        if client_app in ['IMAP', 'POP3', 'SMTP', 'Exchange ActiveSync']:\n            if error == 0:  # Successful auth via legacy protocol\n                findings['legacy_auth'].append({\n                    'user': user, 'ip': ip,\n                    'protocol': client_app,\n                    'timestamp': log.get('createdDateTime', '')\n                })\n        \n        # MFA fatigue: many MFA challenges per user\n        if 'MFA' in log.get('authenticationProcessingDetails', [{}]):\n            mfa_attempts[user].append(log.get('createdDateTime', ''))\n    \n    # Detect password spray pattern\n    for ip, users in failed_by_ip.items():\n        unique_users = len(set(users))\n        if unique_users >= 10:  # 10+ accounts from one IP\n            findings['password_spray'].append({\n                'source_ip': ip,\n                'targeted_accounts': unique_users,\n                'total_attempts': len(users)\n            })\n    \n    # Detect MFA fatigue\n    for user, times in mfa_attempts.items():\n        if len(times) >= 5:  # 5+ MFA challenges\n            findings['mfa_fatigue'].append({\n                'user': user,\n                'mfa_count': len(times)\n            })\n    \n    return findings\n\n# Example detection queries for Azure AD:\nLEGACY_AUTH_KQL = \"\"\"\nSigninLogs\n| where ClientAppUsed in (\"IMAP\", \"POP3\", \"SMTP\", \"Exchange ActiveSync\")\n| where ResultType == 0  // Successful legacy auth\n| project TimeGenerated, UserPrincipalName, IPAddress,\n          ClientAppUsed, Location\n| order by TimeGenerated desc\n\"\"\"\n\nPASSWORD_SPRAY_KQL = \"\"\"\nSigninLogs\n| where ResultType in (\"50126\", \"50053\")\n| summarize attempt_count=count(),\n    unique_accounts=dcount(UserPrincipalName)\n    by IPAddress, bin(TimeGenerated, 5m)\n| where unique_accounts > 10\n| project TimeGenerated, IPAddress, attempt_count, unique_accounts\n\"\"\"\n\nprint(\"Use these KQL queries in Microsoft Sentinel\")\nprint(\"to detect M365 authentication attacks.\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real Attack: MFA Bypass via OAuth Consent",
+      "content": "**The attack (simplified):**\n\n1. Attacker registers an Azure AD application called 'ShareFile Viewer' with permissions to read email, files, and contacts\n2. Attacker sends phishing email: 'Your manager shared a document. Click to view.'\n3. User clicks link → redirected to legitimate Microsoft login page → authenticates with MFA\n4. User sees consent prompt: 'ShareFile Viewer needs permission to read your email and files'\n5. User clicks 'Accept' → app receives a refresh token valid for 90 days\n6. Attacker uses the token to access email, files, and contacts—no password or MFA needed for 90 days\n\n**Why it works:**\n- The authentication was legitimate (user really did log in)\n- MFA was satisfied (user really did approve the MFA challenge)\n- The user authorized the app voluntarily (social engineering, not technical bypass)\n- The token persists regardless of subsequent password changes\n\n**Defenses:**\n- Configure 'Consent and permissions' in Azure AD to require admin approval for high-privileged apps\n- Monitor application consent grants in audit logs\n- Educate users about consent phishing\n- Deploy Conditional Access requiring compliant devices for app consent\n- Use the 'User consent for applications' setting to restrict to verified publishers only"
+    },
+    {
+      "type": "memory_aid",
+      "title": "M365 Auth Attack Defense: ACTS",
+      "content": "**A** — Authenticate properly: Enforce MFA everywhere, block legacy auth\n**C** — Conditional Access: Comprehensive CA policies, no excluded groups without review\n**T** — Tokens: Monitor token usage, detect impossible travel, set token lifetimes appropriately\n**S** — Sessions: Monitor for session anomalies, implement CAE (Continuous Access Evaluation)\n\n**M365 Auth Hardening Checklist:**\n✅ Disable legacy authentication (IMAP/POP/SMTP Auth)\n✅ Enforce MFA for all users, no exceptions\n✅ Configure Conditional Access policies (device compliance, location, risk)\n✅ Require admin consent for application registrations\n✅ Set user consent to 'verified publishers only'\n✅ Enable Azure AD Identity Protection risk-based policies\n✅ Monitor sign-in logs for password spray, MFA fatigue, impossible travel\n✅ Configure token lifetime policies appropriately\n✅ Implement CAE for real-time session revocation\n✅ Regular audit of application consent grants"
+    },
+    {
+      "type": "explanation",
+      "title": "Conditional Access: Your Most Powerful M365 Defense",
+      "content": "Conditional Access (CA) is Azure AD's policy engine that makes real-time access decisions:\n\n**How CA works:**\n1. User attempts sign-in\n2. Azure AD evaluates signals: identity, device, location, risk level, client app\n3. CA policies are evaluated in order\n4. Access is granted, blocked, or requires additional verification\n\n**Essential CA policies:**\n1. **Block legacy authentication:** Block all sign-ins using legacy protocols\n2. **Require MFA for all users:** No exceptions—every user, every app\n3. **Require compliant device:** Device must meet Intune compliance standards\n4. **Block sign-in from risky locations:** Use Identity Protection risk-based policies\n5. **Require MFA for risky sign-ins:** Automatic MFA challenge when risk is detected\n\n**Common CA mistakes:**\n- **Excluding groups:** 'Emergency access' exclusion becomes permanent bypass\n- **Incomplete app coverage:** Policy applies to 'all cloud apps' except that one... which attackers find\n- **Report-only mode:** Policies that never get promoted from report-only to enforce\n- **No guest policy:** Guest accounts have no CA restrictions\n\n**Testing CA policies:** Always use 'report-only' mode first, review the impact log, then promote to 'on'."
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your M365 Auth Security",
+      "content": "Evaluate your organization's M365 authentication posture:\n\n1. **Legacy auth:** Is legacy authentication disabled? Check: Azure AD > Sign-ins > filter by 'Legacy Authentication'\n\n2. **MFA enrollment:** Are all users enrolled in MFA? Are there excluded accounts?\n\n3. **Conditional Access:** Do you have CA policies covering all users and all cloud apps? Any exclusions?\n\n4. **App consent:** What's your user consent setting? Can users consent to any app, or only verified publishers?\n\n5. **Token lifetime:** What are your refresh token lifetimes? (Default: 90 days—consider reducing)\n\n6. **Monitoring:** Are you alerting on password spray, MFA fatigue, impossible travel, and suspicious app consents?\n\n**Action item:** Run `Get-MgPolicyConditionalAccessPolicy` in your tenant. Review every policy for exclusions and gaps. You'll likely find at least one."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Secure the Front Door and Close the Back Doors",
+      "content": "M365 authentication attacks succeed because organizations focus on the front door (password + MFA) while leaving back doors open (legacy auth, permissive app consent, excluded CA groups). The attacker doesn't need to break through MFA when they can bypass it entirely through legacy protocols, trick users into granting OAuth consent, or exploit a conditional access exclusion. Your job: identify every authentication path into M365 and ensure each one is properly secured. No exceptions, no back doors."
+    }
+  ],
+  "tags": ["Course: SANS-SEC504", "Career Path: Pentester", "Career Path: Cloud Security", "M365", "Azure-AD", "authentication", "MFA-bypass", "conditional-access", "OAuth"]
+}

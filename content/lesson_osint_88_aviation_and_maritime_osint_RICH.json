@@ -1,0 +1,128 @@
+{
+  "lesson_id": "de310636-2feb-465d-93ac-71479019f748",
+  "domain": "osint",
+  "title": "Aviation and Maritime OSINT",
+  "difficulty": 2,
+  "order_index": 88,
+  "module": "SEC587 Section 5",
+  "prerequisites": [],
+  "concepts": [
+    "ADS-B aircraft tracking",
+    "Flight data analysis",
+    "AIS vessel tracking",
+    "Maritime intelligence gathering",
+    "Aviation databases and registration lookups",
+    "Geospatial correlation of transport data",
+    "Privacy considerations in transport OSINT",
+    "Open-source aviation and maritime platforms"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Track aircraft in real-time using ADS-B data and open-source platforms",
+    "Analyze vessel movements using AIS data and maritime tracking services",
+    "Correlate aviation and maritime data for intelligence purposes",
+    "Identify ownership, registration, and operational patterns from transport data",
+    "Apply legal and ethical considerations to transport tracking activities"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is ADS-B and why is it important for aviation OSINT?",
+      "options": [
+        "A military encryption system for aircraft",
+        "Automatic Dependent Surveillance–Broadcast, a system where aircraft broadcast their position, altitude, and velocity",
+        "An airline booking system",
+        "A satellite communication protocol"
+      ],
+      "correct": 1,
+      "explanation": "ADS-B (Automatic Dependent Surveillance–Broadcast) is a surveillance technology where aircraft determine their position via satellite and broadcast it, along with altitude, velocity, and callsign. This broadcast is unencrypted and receivable by anyone with the right equipment."
+    },
+    {
+      "question": "What is AIS and what information does it provide?",
+      "options": [
+        "Aviation Intelligence System providing flight plans",
+        "Automatic Identification System providing vessel identity, position, course, and speed",
+        "A social media platform for sailors",
+        "An encryption standard for maritime communications"
+      ],
+      "correct": 1,
+      "explanation": "AIS (Automatic Identification System) is an automatic tracking system for vessels. It broadcasts vessel identity (MMSI, name, callsign), position, course, speed, and destination. Vessels over 300GT on international voyages are required to carry AIS."
+    },
+    {
+      "question": "Which platform provides open-source flight tracking data by aggregating ADS-B feeds?",
+      "options": ["MarineTraffic", "Flightradar24 and OpenSky Network", "OSINT Framework", "Shodan"],
+      "correct": 1,
+      "explanation": "Flightradar24 and OpenSky Network aggregate ADS-B data from volunteer receivers worldwide. Flightradar24 is commercial with a free tier; OpenSky Network is academic and provides raw data access for research."
+    },
+    {
+      "question": "What is a key privacy concern when tracking private aircraft or yachts?",
+      "options": [
+        "No privacy concerns exist for public tracking data",
+        "Tracking can reveal the movements and location of individuals, potentially enabling stalking or targeted attacks",
+        "Only military aircraft have privacy concerns",
+        "Privacy concerns only apply to data sold for profit"
+      ],
+      "correct": 1,
+      "explanation": "Tracking private aircraft or yachts can reveal patterns of life, vacation locations, business meetings, and home addresses of individuals. This enables stalking, targeted attacks, and surveillance. Always consider the ethical implications."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link ADS-B to a car's GPS broadcasting its location—it's intentional, public, and trackable",
+    "Visualization: Picture a world map with thousands of planes and ships moving in real-time—that's what ADS-B/AIS data looks like",
+    "Storytelling: Imagine tracking a suspicious cargo ship that turned off its AIS near a sanctions zone—then finding it reappeared at a different port",
+    "Chunking: Break transport OSINT into Identify → Track → Correlate → Analyze → Report",
+    "Repetition: Practice looking up flights and vessels until the platforms feel familiar",
+    "Senses: Visualize the live map displays—colored dots moving across oceans and continents",
+    "Teaching: Explain to someone how flight tracking data makes private jet movements visible to anyone",
+    "Mnemonics: Use 'TRACK'—Transponders, Registration, AIS, Correlation, Knowledge",
+    "Emotion: Consider the power of knowing where someone's private jet is—then the responsibility that comes with it",
+    "Movement: Walk through a tracking workflow: open platform → search identifier → follow route → note anomalies"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Eyes on Everything That Moves",
+      "content": "Every day, over 100,000 flights and 50,000 ships broadcast their positions publicly. This data is a goldmine for intelligence—tracking sanctions evasion, monitoring cargo movements, verifying claims, and investigating individuals. Aviation and maritime OSINT gives you visibility into global transportation that was impossible 20 years ago. But with that power comes responsibility: tracking a private jet can reveal where someone sleeps at night. This lesson teaches you the tools, techniques, and ethics of transport OSINT."
+    },
+    {
+      "type": "explanation",
+      "title": "Aviation OSINT: ADS-B and Flight Tracking",
+      "content": "**ADS-B (Automatic Dependent Surveillance–Broadcast):**\n- Aircraft determine position via GPS and broadcast it on 1090 MHz\n- Broadcast includes: callsign, altitude, velocity, heading, squawk code\n- Unencrypted and receivable by anyone with an SDR or online platform\n- Mandatory in many airspace regions (US, EU, others)\n\n**Key tracking platforms:**\n- **Flightradar24:** Commercial, free tier, excellent UI, historical data\n- **OpenSky Network:** Academic, raw data access, API for researchers\n- **ADS-B Exchange:** Uncensored (doesn't block military/VIP), community-driven\n- **FlightAware:** US-centric, good alerting, API access\n\n**Aircraft identification:**\n- **ICAO 24-bit address:** Unique hex identifier for each aircraft (e.g., A12345)\n- **Callsign:** Flight identifier (e.g., UAL123, RCH3547 for military)\n- **Registration:** National registration (e.g., N12345, G-ABCD)\n- **Aircraft type:** ICAO type designator (e.g., B738 = Boeing 737-800)\n\n**Aviation databases:**\n- FAA Registry (US aircraft ownership)\n- CAA G-INFO (UK)\n- Eurocontrol Aircraft Operator database\n- Airportia (airport and route data)\n- Airfleets (fleet composition and history)\n\n**Military/special interest tracking:**\n- Military aircraft use MODE-S transponders (not always ADS-B)\n- Some platforms (ADS-B Exchange) show military aircraft\n- Government/VIP flights sometimes use generic callsigns\n- Be aware: tracking military aircraft has significant ethical and legal considerations"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Tracking Planes and Ships",
+      "content": "Every big airplane and ship has a special radio that shouts out 'Here I am! Here's my name! Here's where I'm going!' all the time.\n\nFor airplanes, this shout is called ADS-B. It's like the plane has a GPS and a megaphone, broadcasting its position to anyone listening.\n\nFor ships, it's called AIS. Ships broadcast their name, speed, and direction so other ships don't crash into them.\n\nYou can listen to these shouts using websites like Flightradar24 (for planes) or MarineTraffic (for ships). It's like looking at a giant map with thousands of moving dots!\n\nCool things you can find out:\n- Where a politician's private jet flew\n- Whether a cargo ship is really going where it says\n- Which mysterious ship turned off its tracker near a country under sanctions\n- If a ship changed its name or flag to hide where it's from\n\nBut remember: just because you CAN track someone's private plane doesn't mean you SHOULD share where they live."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Aviation OSINT: Aircraft Registration Lookup",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Aviation OSINT - Aircraft Registration and Tracking\n\nFramework for looking up aircraft by registration\nand correlating with flight tracking data.\n\"\"\"\n\n# Key OSINT resources for aviation research\nAVIATION_RESOURCES = {\n    'flight_tracking': {\n        'flightradar24': 'https://www.flightradar24.com',\n        'adsb_exchange': 'https://www.adsbexchange.com',\n        'opensky_network': 'https://opensky-network.org',\n        'flightaware': 'https://flightaware.com'\n    },\n    'registration': {\n        'faa_registry': 'https://registry.faa.gov/aircarinquiry/',\n        'uk_caa': 'https://www.caa.co.uk/aircraft/',\n        'airliners_net': 'https://www.airliners.net'\n    },\n    'route_analysis': {\n        'flightera': 'https://www.flightera.net',\n        'routes_online': 'https://www.routesonline.com'\n    },\n    'ownership': {\n        'faa_registry': 'FAA N-number registry (US)',\n        'icao_aircraft': 'ICAO aircraft type designators'\n    }\n}\n\ndef analyze_aircraft(registration):\n    \"\"\"Template for aircraft research workflow.\n    \n    Steps for investigating an aircraft:\n    1. Look up registration in FAA/CAA database\n    2. Identify owner/operator\n    3. Track historical flights\n    4. Correlate with events of interest\n    \"\"\"\n    workflow = [\n        f'1. Look up {registration} in FAA Registry',\n        f'2. Note aircraft type, owner, and operator',\n        f'3. Search {registration} on Flightradar24 for history',\n        f'4. Check ADS-B Exchange for uncensored data',\n        f'5. Correlate flight patterns with events',\n        f'6. Document findings with timestamps and sources'\n    ]\n    return workflow\n\ndef analyze_vessel(imo_number):\n    \"\"\"Template for vessel research workflow.\n    \n    Steps for investigating a vessel:\n    1. Look up IMO in maritime databases\n    2. Identify owner, flag, and history\n    3. Track AIS movements\n    4. Check for AIS gaps (turned off tracker)\n    5. Correlate with port call data\n    \"\"\"\n    workflow = [\n        f'1. Look up IMO {imo_number} on MarineTraffic/VesselFinder',\n        f'2. Note vessel name, flag, owner, and type',\n        f'3. Check Equasis for safety and inspection history',\n        f'4. Track AIS history for route deviations or gaps',\n        f'5. Search for name/IMO changes (flag hopping)',\n        f'6. Correlate movements with cargo/port records'\n    ]\n    return workflow\n\n# Common investigation patterns\nprint('=== Aircraft Investigation Workflow ===')\nfor step in analyze_aircraft('N12345'):\n    print(step)\n\nprint('\\n=== Vessel Investigation Workflow ===')\nfor step in analyze_vessel(1234567):\n    print(step)\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World: Tracking Sanctions Evasion at Sea",
+      "content": "Maritime OSINT has been critical for tracking sanctions evasion:\n\n**The AIS Gap Pattern:**\n- A tanker departs from a Russian Baltic port, AIS active\n- Mid-voyage, AIS turns off for 3-5 days (AIS gap)\n- AIS reactivates near the Mediterranean—vessel now shows different destination\n- The 'dark period' was a ship-to-ship transfer of oil to a second vessel\n\n**OSINT techniques used:**\n1. **AIS gap detection:** Monitor vessels that disable transponders near sanctions zones\n2. **Satellite imagery:** Correlate AIS gaps with commercial satellite images showing ship-to-ship transfers\n3. **Flag changes:** Track vessels that change their flag state (flags of convenience)\n4. **Name changes:** Same IMO number with different vessel names = likely ownership changes to evade sanctions\n5. **Port call analysis:** Cross-reference with port records showing unexpected destinations\n\n**Tools used:**\n- MarineTraffic / VesselFinder for AIS tracking\n- Equasis for vessel ownership and safety records\n- Sentinel Hub / Planet for satellite imagery correlation\n- UN sanctions lists for vessel screening\n\n**Impact:** These techniques have identified dozens of sanctions-evading vessels and led to enforcement actions by OFAC and EU authorities."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Transport OSINT: TRACK",
+      "content": "**T** — Transponders: ADS-B for aircraft, AIS for vessels—both broadcast position data\n**R** — Registration: Look up ownership via FAA, IMO, flag state registries\n**A** — AIS (and gaps): Track vessel movements; AIS gaps = red flags\n**C** — Correlate: Cross-reference transport data with events, locations, ownership changes\n**K** — Knowledge: Build a database of observed patterns and anomalies\n\n**Aviation OSINT platforms:**\n- Flightradar24 (commercial, good UI)\n- ADS-B Exchange (uncensored, military/VIP visible)\n- OpenSky Network (academic, API access)\n- FAA Registry (US aircraft ownership)\n\n**Maritime OSINT platforms:**\n- MarineTraffic (real-time AIS)\n- VesselFinder (vessel details)\n- Equasis (safety/inspection records)\n- UN/OFAC sanctions lists\n- Windward (commercial maritime intelligence)"
+    },
+    {
+      "type": "explanation",
+      "title": "Maritime OSINT: AIS and Vessel Tracking",
+      "content": "**AIS (Automatic Identification System):**\n- Vessels broadcast: MMSI, name, callsign, position, course, speed, destination\n- Required for vessels >300GT on international voyages\n- Transmitted on VHF frequencies (161.975 MHz, 162.025 MHz)\n- Received by coastal stations and satellites\n\n**Key tracking platforms:**\n- **MarineTraffic:** Largest AIS aggregator, free tier with 5-day history\n- **VesselFinder:** Detailed vessel information and tracking\n- **Equasis:** Safety, inspection, and ownership data\n- **Windward:** Commercial maritime intelligence platform\n\n**Vessel identification:**\n- **IMO number:** Permanent identifier assigned to each vessel (7 digits)\n- **MMSI:** Maritime Mobile Service Identity (9 digits, can change)\n- **Flag state:** Country of registration (flags of convenience: Panama, Liberia, Marshall Islands)\n- **Call sign:** Radio identifier\n\n**Maritime investigation techniques:**\n1. **AIS gap analysis:** Periods where AIS is disabled—potential illicit activity\n2. **Flag hopping:** Vessels changing flag state to evade sanctions\n3. **Name changes:** Same IMO, different name = attempt to obscure identity\n4. **Ship-to-ship transfers:** Two vessels meeting at sea to transfer cargo\n5. **Port call patterns:** Unusual destinations or frequency\n6. **Ownership chains:** Shell companies in multiple jurisdictions\n\n**Limitations:**\n- AIS can be spoofed (falsified position data)\n- Coastal coverage gaps (no receivers = no data)\n- Small vessels (<300GT) may not transmit\n- Satellite AIS has lower update frequency"
+    },
+    {
+      "type": "reflection",
+      "title": "Ethics in Transport Tracking",
+      "content": "Aviation and maritime OSINT raise significant ethical questions:\n\n1. **Private individuals:** Tracking a CEO's private jet reveals their home, business meetings, and vacation locations. Is this legitimate intelligence or stalking?\n\n2. **Military aircraft:** Some platforms suppress military aircraft data. Tracking military flights can reveal operational patterns that endanger personnel.\n\n3. **Data persistence:** Flight data is often historical and permanent. Someone's travel patterns from 5 years ago are still searchable.\n\n4. **Journalistic use:** Tracking a politician's flights to question their transparency is different from tracking a private individual for personal reasons.\n\n5. **Sanctions vs. privacy:** Tracking sanctions-evading vessels serves international law. Tracking a refugee boat serves... what?\n\n**Your ethical framework:**\n- Legitimate purpose: Sanctions enforcement, corporate due diligence, journalism\n- Illegitimate purpose: Stalking, harassment, targeting individuals\n- Proportionality: Use the least intrusive method that achieves your goal\n- Data minimization: Don't collect more data than needed\n- Non-publication: Don't publish individual tracking data without compelling public interest\n\n**Rule of thumb:** If your investigation would make the cover of a newspaper, it's probably legitimate. If it would make you uncomfortable explaining, reconsider."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "With Great Visibility Comes Great Responsibility",
+      "content": "Aviation and maritime OSINT give you unprecedented visibility into global transportation. You can track sanctions-evading tankers, verify corporate flight claims, and investigate shipping fraud. You can also stalk individuals, endanger military operations, and violate privacy. The technology is neutral—your purpose makes the difference. Use these tools for legitimate intelligence: due diligence, accountability, and public interest. Never for personal tracking, harassment, or targeting. The data is public; what you do with it defines who you are."
+    }
+  ],
+  "tags": ["Course: SANS-SEC587", "Career Path: OSINT", "ADS-B", "AIS", "aviation-OSINT", "maritime-OSINT", "flight-tracking", "vessel-tracking"]
+}

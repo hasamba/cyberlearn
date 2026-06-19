@@ -1,0 +1,123 @@
+{
+  "lesson_id": "14e55775-6904-43f9-aed9-a08aac450e10",
+  "domain": "fundamentals",
+  "title": "Compliance and Regulatory Requirements",
+  "difficulty": 1,
+  "order_index": 87,
+  "module": "Sec+ D5",
+  "prerequisites": [],
+  "concepts": [
+    "Regulatory compliance frameworks",
+    "PCI DSS requirements",
+    "HIPAA security rules",
+    "GDPR data protection principles",
+    "SOX financial controls",
+    "Compliance audits and assessments",
+    "Industry-specific regulations",
+    "Compliance vs. security relationship"
+  ],
+  "estimated_time": 35,
+  "learning_objectives": [
+    "Identify major compliance frameworks and their requirements (PCI DSS, HIPAA, GDPR, SOX)",
+    "Explain the relationship between compliance and security",
+    "Navigate a compliance audit process",
+    "Apply regulatory requirements to real security controls",
+    "Distinguish between legal compliance and actual security posture"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which regulation specifically governs the protection of health information?",
+      "options": ["PCI DSS", "HIPAA", "GDPR", "SOX"],
+      "correct": 1,
+      "explanation": "HIPAA (Health Insurance Portability and Accountability Act) governs the protection of Protected Health Information (PHI) in the United States."
+    },
+    {
+      "question": "What is the key difference between compliance and security?",
+      "options": [
+        "They are the same thing",
+        "Compliance meets legal/regulatory requirements; security protects against actual threats",
+        "Compliance is optional; security is mandatory",
+        "Security is cheaper than compliance"
+      ],
+      "correct": 1,
+      "explanation": "Compliance means meeting specific legal or regulatory requirements—a checkbox exercise. Security means protecting against real threats. You can be compliant but insecure, and secure but non-compliant. The goal is both."
+    },
+    {
+      "question": "Under GDPR, what is the maximum fine for serious violations?",
+      "options": ["€1 million", "€10 million or 2% of global annual revenue", "€20 million or 4% of global annual revenue", "No financial penalties"],
+      "correct": 2,
+      "explanation": "GDPR's maximum penalty for serious violations is €20 million or 4% of global annual revenue, whichever is higher. This is the most severe GDPR penalty tier."
+    },
+    {
+      "question": "PCI DSS applies to which type of organization?",
+      "options": [
+        "Only banks",
+        "Any organization that stores, processes, or transmits cardholder data",
+        "Only online retailers",
+        "Only US-based companies"
+      ],
+      "correct": 1,
+      "explanation": "PCI DSS applies to any organization—regardless of size or location—that stores, processes, or transmits payment card data. This includes merchants, service providers, and financial institutions."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Association: Link each regulation to a headline breach—Target (PCI), Anthem (HIPAA), Facebook (GDPR)",
+    "Visualization: Picture compliance as the legal shield and security as the actual armor—both needed, both different",
+    "Storytelling: Imagine a company that passed its PCI audit but got breached because compliance ≠ security",
+    "Chunking: Group regulations by industry: Healthcare=HIPAA, Finance=SOX/PCI, Everyone=GDPR",
+    "Repetition: Review the key requirements of each framework regularly until they stick",
+    "Senses: Visualize a compliance dashboard with green checkmarks and red flags",
+    "Teaching: Explain to a colleague why being 'HIPAA compliant' doesn't mean you're secure",
+    "Mnemonics: Use 'RISC'—Regulations, Industry, Scope, Controls",
+    "Emotion: Feel the weight of a €20M GDPR fine—that's why compliance matters",
+    "Movement: Walk through each regulation's requirements physically—privacy notice here, encryption there, audit trail there"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Compliance: Not Sexy, But Essential",
+      "content": "Compliance isn't glamorous. Nobody became a security professional because they love filling out audit questionnaires. But here's the reality: compliance failures can shut down your business, cost millions in fines, and destroy customer trust. Understanding regulations isn't optional—it's the legal framework within which all your security work operates. This lesson gives you the essential knowledge of major frameworks without the jargon overload. Let's make compliance click."
+    },
+    {
+      "type": "explanation",
+      "title": "The Big Four: Major Regulatory Frameworks",
+      "content": "**PCI DSS (Payment Card Industry Data Security Standard):**\n- Applies to: Any organization handling payment card data\n- 12 requirements across 6 goals: network security, data protection, vulnerability management, access control, monitoring, policy\n- Key requirements: Encrypt cardholder data, maintain firewall, restrict access, test security systems regularly\n- Penalties: $5,000–$100,000/month per non-compliant month\n\n**HIPAA (Health Insurance Portability and Accountability Act):**\n- Applies to: Healthcare providers, insurers, and their business associates\n- Privacy Rule: Protects PHI (Protected Health Information)\n- Security Rule: Administrative, physical, and technical safeguards\n- Key requirements: Access controls, audit logs, encryption, breach notification\n- Penalties: $100–$50,000 per violation, up to $1.5M/year per category\n\n**GDPR (General Data Protection Regulation):**\n- Applies to: Any organization processing EU residents' data\n- Key principles: Lawful basis, data minimization, purpose limitation, accuracy, storage limitation, integrity, accountability\n- Individual rights: Access, rectification, erasure, portability, objection\n- Penalties: Up to €20M or 4% of global annual revenue\n\n**SOX (Sarbanes-Oxley Act):**\n- Applies to: Publicly traded companies in the US\n- Section 302: Corporate responsibility for financial reports\n- Section 404: Internal controls assessment\n- Key IT requirements: Access controls, change management, audit trails, data backup\n- Penalties: Up to 20 years imprisonment for willful violations"
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Why Rules Exist",
+      "content": "Imagine you're playing a game and some players keep cheating—stealing other players' stuff, not following the rules, and hurting people.\n\nThe government says, 'OK, we need rules to make this fair.' So they make different rules for different games:\n\n🏥 **HIPAA** is the rule for hospitals: 'Keep people's health info secret. Don't share it without permission.'\n\n💳 **PCI DSS** is the rule for credit cards: 'When someone pays with a card, lock up their card number. Don't let bad guys steal it.'\n\n🌍 **GDPR** is the rule for Europe: 'If you collect someone's personal info, tell them what you're doing with it, keep it safe, and delete it when they ask.'\n\n📊 **SOX** is the rule for big companies: 'Show proof your financial numbers are real. Don't cheat on your reports.'\n\nIf you break these rules, you can get fined a LOT of money or even go to jail. The rules exist because without them, companies would cut corners on keeping our information safe."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Compliance Requirements Checker",
+      "content": "```python\n#!/usr/bin/env python3\n\"\"\"Compliance Requirements Checker\n\nMaps security controls to regulatory requirements,\nhelping organizations identify compliance gaps.\n\"\"\"\n\nCOMPLIANCE_CONTROLS = {\n    'PCI_DSS': {\n        'network_security': {\n            'firewall_config': 'Install and maintain a firewall configuration to protect cardholder data',\n            'default_passwords': 'Change vendor-supplied defaults',\n            'restrict_access': 'Restrict access to cardholder data by business need-to-know'\n        },\n        'data_protection': {\n            'encrypt_transmission': 'Encrypt transmission of cardholder data across open networks',\n            'encrypt_storage': 'Protect stored cardholder data',\n            'key_management': 'Document and distribute encryption keys'\n        },\n        'vulnerability_management': {\n            'antivirus': 'Maintain anti-virus software',\n            'secure_systems': 'Develop and maintain secure systems',\n            'vuln_scanning': 'Test security systems regularly'\n        }\n    },\n    'HIPAA': {\n        'administrative': {\n            'risk_assessment': 'Conduct risk analysis',\n            'training': 'Implement security awareness training',\n            'incident_response': 'Establish incident response procedures'\n        },\n        'physical': {\n            'access_control': 'Implement physical access controls',\n            'workstation_security': 'Implement workstation security measures'\n        },\n        'technical': {\n            'access_controls': 'Implement technical access controls',\n            'audit_logs': 'Implement audit controls',\n            'encryption': 'Implement encryption for PHI'\n        }\n    },\n    'GDPR': {\n        'data_principles': {\n            'lawful_basis': 'Process data only with lawful basis',\n            'data_minimization': 'Collect only necessary data',\n            'purpose_limitation': 'Use data only for stated purposes'\n        },\n        'individual_rights': {\n            'access': 'Enable data subject access requests',\n            'erasure': 'Enable right to be forgotten',\n            'portability': 'Enable data portability'\n        },\n        'security': {\n            'breach_notification': 'Notify authorities within 72 hours',\n            'pia': 'Conduct privacy impact assessments',\n            'dpo': 'Appoint a Data Protection Officer if required'\n        }\n    }\n}\n\ndef check_compliance(org_data, framework):\n    \"\"\"Check an organization's controls against a framework.\"\"\"\n    controls = COMPLIANCE_CONTROLS.get(framework, {})\n    gaps = []\n    compliant = []\n    \n    for category, requirements in controls.items():\n        for control_id, requirement in requirements.items():\n            if org_data.get(control_id, False):\n                compliant.append((category, control_id, requirement))\n            else:\n                gaps.append((category, control_id, requirement))\n    \n    return {\n        'framework': framework,\n        'compliant_count': len(compliant),\n        'gap_count': len(gaps),\n        'compliance_pct': round(\n            len(compliant) / (len(compliant) + len(gaps)) * 100, 1\n        ) if (compliant or gaps) else 0,\n        'gaps': gaps,\n        'compliant': compliant\n    }\n\n# Example\norg = {'firewall_config': True, 'encrypt_transmission': True,\n       'risk_assessment': True, 'breach_notification': False}\nresult = check_compliance(org, 'PCI_DSS')\nprint(f\"PCI DSS Compliance: {result['compliance_pct']}%\")\nprint(f\"Gaps: {result['gap_count']}\")\nfor gap in result['gaps']:\n    print(f\"  ⚠️ {gap[0]}/{gap[1]}: {gap[2]}\")\n```"
+    },
+    {
+      "type": "real_world",
+      "title": "Case Studies: When Compliance Fails",
+      "content": "**Equifax Breach (2017) — $700M settlement:**\n- 147M records exposed\n- Failed to patch a known Apache Struts vulnerability (2 months after patch available)\n- Had compliance certifications but inadequate actual security\n- Lesson: Compliance without real security controls is theater\n\n**British Airways — £20M fine (GDPR):**\n- 429,612 customer records stolen via Magecart skimming\n- ICO found inadequate security measures despite GDPR obligations\n- Lesson: Data minimization and encryption aren't optional under GDPR\n\n**Anthem Breach (2015) — $16M HIPAA settlement:**\n- 78.8M records exposed\n- Failed to implement adequate access controls and audit mechanisms\n- Lesson: HIPAA's Security Rule requirements (access controls, audit logs) exist for a reason\n\n**Target Breach (2013) — $18.5M settlement:**\n- 40M card numbers stolen\n- PCI DSS compliant on paper but failed in practice\n- Lesson: Annual PCI assessments don't guarantee continuous compliance"
+    },
+    {
+      "type": "memory_aid",
+      "title": "Compliance Quick Reference: RISC",
+      "content": "**R** — Regulations by industry:\n- Healthcare → HIPAA\n- Finance (public) → SOX\n- Payment cards → PCI DSS\n- EU personal data → GDPR\n- Government → FISMA/NIST\n\n**I** — Identify which apply to YOU:\n- What data do you process?\n- Where are your customers?\n- What industry are you in?\n- Are you a public company?\n\n**S** — Scope your compliance:\n- Which systems handle regulated data?\n- Who has access?\n- What's your data flow?\n\n**C** — Controls mapping:\n- Many controls overlap across frameworks\n- Encryption → PCI (req 3&4), HIPAA (technical), GDPR (security)\n- Access controls → ALL frameworks require them\n- Audit logs → ALL frameworks require them\n\n**Compliance ≠ Security:** You can check every box and still be breached. Compliance is the floor, not the ceiling."
+    },
+    {
+      "type": "explanation",
+      "title": "The Compliance Audit Process",
+      "content": "Understanding how audits work helps you prepare effectively:\n\n**Types of assessments:**\n- **Self-assessment:** Internal review (PCI DSS SAQ for low-level merchants)\n- **Internal audit:** Organization's own audit team reviews controls\n- **External audit:** Third-party assessor validates compliance (PCI QSA, HIPAA audit)\n- **Regulatory examination:** Government agency inspects (OCR for HIPAA, FTC for GDPR)\n\n**The audit process:**\n1. **Scoping:** Define what systems and data are in scope\n2. **Evidence collection:** Policies, procedures, logs, configurations\n3. **Testing:** Verify controls are implemented and effective\n4. **Findings:** Document gaps and remediation recommendations\n5. **Report:** Attestation of compliance or statement of findings\n\n**How to survive an audit:**\n- Maintain documentation year-round, not just before audits\n- Implement continuous compliance monitoring (not point-in-time)\n- Map controls across frameworks (one control may satisfy multiple requirements)\n- Keep evidence organized and accessible\n- Treat audits as opportunities to improve, not just pass\n\n**Continuous compliance:** The best organizations maintain compliance continuously, not just during audit season. Automated monitoring, regular internal reviews, and integrated GRC tools make this achievable."
+    },
+    {
+      "type": "reflection",
+      "title": "Which Regulations Apply to You?",
+      "content": "Map your organization's compliance landscape:\n\n1. **Data inventory:** What types of data do you process? (Payment cards? Health records? EU personal data? Financial records?)\n\n2. **Geographic scope:** Where are your customers? Where is data stored? (EU presence triggers GDPR regardless of HQ location)\n\n3. **Industry:** Are you in healthcare? Financial services? Government contractor? E-commerce?\n\n4. **Current state:** Which frameworks are you currently compliant with? When was your last assessment?\n\n5. **Gaps:** For each applicable framework, what are your top 3 compliance gaps?\n\n6. **Overlap:** Where do requirements overlap? Can one control satisfy multiple frameworks?\n\n**Action:** Create a compliance matrix spreadsheet: rows = controls, columns = frameworks. Mark which controls satisfy which requirements. You'll find 40-60% overlap, which means less work than you think."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Compliance Is the Floor, Not the Ceiling",
+      "content": "Compliance sets minimum standards. Real security exceeds them. The organizations that get breached despite being 'compliant' treated compliance as the goal rather than the baseline. Use compliance as a framework for essential controls, then build real security on top. When you understand why each requirement exists—not just what it says—you implement controls that actually protect, not just check boxes. Now go map your compliance landscape. The audit is coming whether you're ready or not."
+    }
+  ],
+  "tags": ["Course: CompTIA-Security+", "Career Path: GRC Analyst", "compliance", "PCI-DSS", "HIPAA", "GDPR", "SOX", "regulatory", "audit"]
+}
