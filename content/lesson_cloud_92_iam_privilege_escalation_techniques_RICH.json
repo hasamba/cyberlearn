@@ -1,0 +1,135 @@
+{
+  "lesson_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "domain": "cloud",
+  "title": "IAM Privilege Escalation Techniques",
+  "difficulty": 3,
+  "order_index": 92,
+  "prerequisites": ["Broken Access Control and IAM Policy Analysis"],
+  "concepts": [
+    "IAM privilege escalation paths and vectors",
+    "iam:PassRole exploitation",
+    "Role assumption chaining",
+    "Admin-level permission abuse",
+    "Cross-account privilege escalation",
+    "Cloud-specific misconfigurations enabling escalation",
+    "Escalation detection and monitoring",
+    "Privilege escalation prevention strategies"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify common IAM privilege escalation paths in AWS, Azure, and GCP",
+    "Exploit iam:PassRole and role assumption chains to escalate privileges",
+    "Detect privilege escalation attempts through CloudTrail and monitoring",
+    "Implement least-privilege IAM policies that prevent escalation paths",
+    "Design IAM architectures that eliminate escalation vectors"
+  ],
+  "post_assessment": [
+    {
+      "question": "An IAM user with only iam:PassRole and ec2:RunInstances permissions can escalate privileges by:",
+      "options": [
+        "Deleting the IAM role and creating a new one",
+        "Launching an EC2 instance with an existing role that has higher privileges, then accessing it",
+        "Modifying their own permissions directly",
+        "Accessing the AWS management console as root"
+      ],
+      "correct": 1,
+      "explanation": "With iam:PassRole and ec2:RunInstances, a user can launch an instance with an existing role that has higher privileges (like Admin), then SSH into that instance and assume the role's elevated permissions via instance metadata."
+    },
+    {
+      "question": "Which AWS CloudTrail event most reliably indicates a privilege escalation attempt?",
+      "options": [
+        "ConsoleLogin events",
+        "AssumeRole events where the principal escalates to a higher-privilege role",
+        "DescribeInstances API calls",
+        "S3 GetObject events"
+      ],
+      "correct": 1,
+      "explanation": "AssumeRole events that show a principal assuming a role with higher privileges than their original permissions indicate escalation. Correlating the source identity with the target role's permissions reveals the escalation path."
+    },
+    {
+      "question": "What is role chaining in the context of IAM privilege escalation?",
+      "options": [
+        "Creating multiple IAM roles with the same permissions",
+        "Using one role to assume another role, which assumes yet another, progressively gaining privileges",
+        "Assigning multiple roles to a single user simultaneously",
+        "Deleting and recreating roles in a chain"
+      ],
+      "correct": 1,
+      "explanation": "Role chaining involves assuming Role A, then from Role A assuming Role B, then from Role B assuming Role C. Each step may grant additional permissions, and the combined effect can reach privileges far beyond the original identity."
+    },
+    {
+      "question": "Which IAM policy configuration is most effective at preventing privilege escalation?",
+      "options": [
+        "Denying all iam:* actions",
+        "Using explicit denies on iam:PassRole for high-privilege roles combined with permission boundaries",
+        "Requiring MFA for all API calls",
+        "Using only managed policies"
+      ],
+      "correct": 1,
+      "explanation": "Explicit denies on iam:PassRole for critical roles prevents the most common escalation vector, while permission boundaries cap the maximum permissions an identity can ever obtain, even if they assume a more powerful role."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link privilege escalation to climbing a ladder: each role is a rung, and chaining roles lets you climb higher than any single role allows" },
+    { "principle": "Visualization", "application": "Draw IAM escalation paths as attack trees: start from low-privilege identity, branch through each escalation vector, reach admin" },
+    { "principle": "Imagination", "application": "Imagine PassRole as a hotel keycard: you cannot open the penthouse yourself, but you can pass the keycard to someone who can, then ride with them" },
+    { "principle": "Repetition", "application": "Practice finding escalation paths in sample IAM policies weekly. Each time you spot one faster, your intuition improves" },
+    { "principle": "Senses", "application": "Color-code escalation paths: red for direct escalation, orange for chaining, yellow for cross-account. Visual severity mapping" },
+    { "principle": "Emotion", "application": "Feel the gravity: a single misconfigured PassRole permission can escalate from read-only to full admin. One small mistake, massive impact" },
+    { "principle": "Storytelling", "application": "Frame escalation as a heist movie: the low-level employee finds the key (PassRole), opens the vault (assumes admin role), and walks out with everything" },
+    { "principle": "Simplification", "application": "Privilege escalation = using what you have to get what you should not. Find the path, block the path" },
+    { "principle": "Chunking", "application": "Learn in order: PassRole exploitation, then role chaining, then cross-account, then detection. Each builds on the previous" },
+    { "principle": "Teaching", "application": "Explain a PassRole escalation to someone who is not technical. If they understand why it is dangerous, you understand it deeply" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Weakest Link in Your Cloud",
+      "content": "IAM privilege escalation is the cloud equivalent of finding an unlocked door that leads to the executive suite. The attacker does not need to break anything: they use the permissions they already have to get permissions they should not. Every IAM misconfiguration is an escalation path waiting to be exploited.",
+      "action": "Before starting, audit your own cloud IAM: can any user in your environment escalate to admin through PassRole, role assumption, or policy manipulation?"
+    },
+    {
+      "type": "explanation",
+      "title": "Common IAM Privilege Escalation Paths",
+      "content": "**AWS Privilege Escalation Vectors:**\n\n**1. iam:PassRole + Service Actions**\nThe most common escalation path:\n- User has `iam:PassRole` and `ec2:RunInstances`\n- Pass an admin role to a new EC2 instance\n- SSH into the instance, retrieve credentials from metadata\n- Full admin access achieved\n\n**2. iam:CreatePolicyVersion**\n- Create a new version of an existing policy with broader permissions\n- Set it as the default version\n- Original policy now grants elevated permissions\n\n**3. iam:SetDefaultPolicyVersion**\n- If a policy has older versions with more permissions\n- Roll back to a previous version that grants admin\n\n**4. iam:CreateAccessKey**\n- Create access keys for any user, including admins\n- Use those keys to act as the admin user\n\n**5. iam:CreateLoginProfile**\n- Set a password for any user who does not have console access\n- Log in as that user\n\n**6. iam:UpdateLoginProfile**\n- Change any user's password\n- Log in as that user\n\n**7. iam:AttachUserPolicy / iam:AttachGroupPolicy / iam:AttachRolePolicy**\n- Attach an admin policy to yourself, your group, or a role you can assume\n\n**8. iam:PutRolePolicy**\n- Write inline policies to roles you can assume\n- Add admin permissions inline\n\n**9. sts:AssumeRole Chaining**\n- Assume Role A, then from Role A assume Role B\n- Each role may grant additional assumption permissions\n- Chain 3-4 roles to reach admin-level access\n\n**10. Lambda Execution Role Abuse**\n- If you can update Lambda code for a function with an elevated role\n- Modify the code to perform actions using that role's permissions\n- Retrieve the results via CloudWatch logs or S3\n\n**Azure Privilege Escalation Vectors:**\n- **Role Assignment Abuse**: Assign yourself a higher-privilege role (Owner, Contributor)\n- **Managed Identity Abuse**: Use a VM's managed identity to escalate\n- **Service Principal Key Creation**: Create new credentials for service principals with higher privileges\n- **App Registration Abuse**: Create app registrations with admin consent\n\n**GCP Privilege Escalation Vectors:**\n- **serviceAccountKeys.create**: Create keys for service accounts with higher privileges\n- **iam.serviceAccounts.actAs**: Impersonate service accounts\n- **cloudfunctions.functions.create**: Deploy a Cloud Function with a privileged service account\n- **compute.instances.create**: Launch VMs with privileged service accounts\n- **iam.serviceAccounts.setIamPolicy**: Modify service account policies to grant yourself access",
+      "key_takeaway": "Every IAM permission that lets you modify identities, policies, or roles is a potential escalation vector. Map them, block them, monitor them."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cloud Privilege Escalation",
+      "content": "Imagine you are in a hotel with different keycards for different floors:\n\n**Your keycard** lets you into the lobby and your room (floor 2). That is your IAM role.\n\n**Privilege escalation** is finding clever ways to get to floors you should not access:\n\n**PassRole** = You cannot open the penthouse door yourself, but the hotel lets you give a keycard to a delivery robot. You program the robot with a penthouse keycard, ride the elevator with it, and walk into the penthouse.\n\n**CreatePolicyVersion** = The hotel has a rulebook that says what each keycard can do. You find out you can write new pages in the rulebook. You add a page that says your keycard now opens every door.\n\n**AssumeRole Chaining** = You have a keycard for floor 2. Floor 2 has a special elevator that goes to floor 5. Floor 5 has a special elevator to floor 10. Floor 10 has a special elevator to the penthouse. You ride all four elevators in sequence.\n\n**Lambda Abuse** = There is a robot on floor 8 that does cleaning. You reprogram it to press the penthouse button for you and report back what it finds.\n\n**The fix**: Make sure no single keycard can reach the penthouse through any combination of elevators, robots, or rulebook changes.",
+      "analogy": "Privilege escalation = using legitimate keys and elevators to reach floors you should not access. PassRole = giving keys to a robot you control. Chaining = riding elevators between floors."
+    },
+    {
+      "type": "code_exercise",
+      "title": "IAM Escalation Path Finder",
+      "content": "Map privilege escalation paths in AWS IAM:\n\n```python\n# AWS IAM Privilege Escalation Path Finder\nimport boto3\nimport json\nfrom collections import defaultdict\n\nclass IAMEscalationFinder:\n    # Known escalation vectors and required permissions\n    ESCALATION_VECTORS = {\n        'PassRole+EC2': ['iam:PassRole', 'ec2:RunInstances'],\n        'PassRole+Lambda': ['iam:PassRole', 'lambda:CreateFunction'],\n        'CreateAccessKey': ['iam:CreateAccessKey'],\n        'CreateLoginProfile': ['iam:CreateLoginProfile'],\n        'UpdateLoginProfile': ['iam:UpdateLoginProfile'],\n        'AttachUserPolicy': ['iam:AttachUserPolicy'],\n        'AttachRolePolicy': ['iam:AttachRolePolicy'],\n        'PutRolePolicy': ['iam:PutRolePolicy'],\n        'CreatePolicyVersion': ['iam:CreatePolicyVersion'],\n        'SetDefaultPolicyVersion': ['iam:SetDefaultPolicyVersion'],\n        'AssumeRole': ['sts:AssumeRole'],\n        'UpdateFunctionCode': ['lambda:UpdateFunctionCode'],\n    }\n    \n    def __init__(self):\n        self.iam = boto3.client('iam')\n        self.findings = []\n    \n    def get_user_permissions(self, user_name):\n        \"\"\"Get all permissions for a user (direct + group policies)\"\"\"\n        permissions = set()\n        \n        # Get user attached policies\n        user_policies = self.iam.list_attached_user_policies(\n            UserName=user_name\n        )\n        for policy in user_policies['AttachedPolicies']:\n            permissions.update(self._get_policy_permissions(policy['Arn']))\n        \n        # Get user group policies\n        groups = self.iam.list_groups_for_user(UserName=user_name)\n        for group in groups['Groups']:\n            group_policies = self.iam.list_attached_group_policies(\n                GroupName=group['GroupName']\n            )\n            for policy in group_policies['AttachedPolicies']:\n                permissions.update(self._get_policy_permissions(policy['Arn']))\n        \n        # Get inline policies\n        inline = self.iam.list_user_policies(UserName=user_name)\n        for policy_name in inline['PolicyNames']:\n            doc = self.iam.get_user_policy(\n                UserName=user_name, PolicyName=policy_name\n            )\n            permissions.update(self._extract_actions(doc['PolicyDocument']))\n        \n        return permissions\n    \n    def _get_policy_permissions(self, policy_arn):\n        \"\"\"Extract allowed actions from a policy\"\"\"\n        permissions = set()\n        version = self.iam.get_policy(PolicyArn=policy_arn)\n        doc = self.iam.get_policy_version(\n            PolicyArn=policy_arn,\n            VersionId=version['Policy']['DefaultVersionId']\n        )\n        return self._extract_actions(doc['PolicyVersion']['Document'])\n    \n    def _extract_actions(self, policy_doc):\n        \"\"\"Extract actions from a policy document\"\"\"\n        actions = set()\n        statements = policy_doc.get('Statement', [])\n        if isinstance(statements, dict):\n            statements = [statements]\n        for stmt in statements:\n            if stmt.get('Effect') == 'Allow':\n                stmt_actions = stmt.get('Action', [])\n                if isinstance(stmt_actions, str):\n                    stmt_actions = [stmt_actions]\n                for action in stmt_actions:\n                    actions.add(action.lower())\n        return actions\n    \n    def find_escalation_paths(self, user_name):\n        \"\"\"Find all privilege escalation paths for a user\"\"\"\n        permissions = self.get_user_permissions(user_name)\n        paths = []\n        \n        for vector_name, required in self.ESCALATION_VECTORS.items():\n            if all(self._permission_grants(perm, permissions) for perm in required):\n                paths.append({\n                    'vector': vector_name,\n                    'required': required,\n                    'severity': 'CRITICAL' if 'Admin' in vector_name or 'Policy' in vector_name else 'HIGH'\n                })\n        \n        # Check for wildcard permissions (effectively admin)\n        if '*' in permissions or 'iam:*' in permissions:\n            paths.append({\n                'vector': 'Wildcard/Admin',\n                'required': ['*'],\n                'severity': 'CRITICAL'\n            })\n        \n        return paths\n    \n    def _permission_grants(self, required, permissions):\n        \"\"\"Check if permissions grant the required action\"\"\"\n        required_service = required.split(':')[0]\n        required_action = required.split(':')[1]\n        \n        for perm in permissions:\n            if perm == '*':\n                return True\n            if perm == f'{required_service}:*':\n                return True\n            if perm == required.lower():\n                return True\n        return False\n\n# Usage\nfinder = IAMEscalationFinder()\nfor user in ['dev-user', 'intern-user', 'contractor-user']:\n    paths = finder.find_escalation_paths(user)\n    if paths:\n        print(f\"\\n⚠️  {user}: {len(paths)} escalation paths found\")\n        for path in paths:\n            print(f\"  [{path['severity']}] {path['vector']}: {path['required']}\")\n    else:\n        print(f\"\\n✅ {user}: No direct escalation paths\")\n```\n\n**Challenge**: Run this against your AWS development account. How many users have at least one escalation path? Document each path and rank by severity.",
+      "hint": "Start with users who have any iam:* permissions. Those are the most dangerous escalation vectors."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: The PassRole Escalation That Compromised a Startup",
+      "content": "A 200-person SaaS startup had a common AWS IAM pattern:\n\n**The Setup:**\n- Developers had an IAM policy granting `iam:PassRole` on `*` (all roles)\n- They also had `ec2:RunInstances` and `ec2:AssociateIAMInstanceProfile`\n- The intent: developers could launch EC2 instances for testing\n- The roles: `EC2-ReadOnly`, `EC2-Dev`, `EC2-Admin`, and `EC2-Deploy`\n\n**The Exploitation:**\n1. Attacker compromised a developer's AWS credentials (phishing)\n2. Credentials only granted read access to S3 and EC2 launch permissions\n3. Attacker ran: `aws ec2 run-instances --iam-instance-profile Name=EC2-Admin ...`\n4. SSHed into the new instance\n5. Retrieved admin credentials from instance metadata: `http://169.254.169.254/latest/meta-data/iam/security-credentials/EC2-Admin`\n6. Used admin credentials to access all S3 buckets, including customer data\n7. Exfiltrated 2.3 million customer records\n\n**The Timeline:**\n- Day 0: Developer credentials phished\n- Day 0 + 4 hours: EC2 instance launched with admin role\n- Day 0 + 4.5 hours: Full admin access obtained\n- Day 0 + 6 hours: Data exfiltration complete\n- Day 3: Breach discovered via CloudTrail alerts\n\n**The Fix:**\n- Restricted `iam:PassRole` to only approved roles: `EC2-ReadOnly`, `EC2-Dev`\n- Added permission boundaries to all developer roles (max permissions cap)\n- Implemented CloudTrail alerts for role assumption anomalies\n- Added SCP (Service Control Policy) denying admin role assumption from developer accounts\n\n**Key Lesson:** The developer credentials alone were not dangerous. The `iam:PassRole` permission on `*` transformed them into full admin access.",
+      "lesson": "PassRole is the single most abused IAM permission for escalation. Restrict it to specific roles only."
+    },
+    {
+      "type": "memory_aid",
+      "title": "ESCALATE Acronym for IAM Escalation Vectors",
+      "content": "**E** - **Execute role assumption**: sts:AssumeRole chains to higher privileges\n**S** - **Set/Create policy versions**: iam:CreatePolicyVersion, iam:SetDefaultPolicyVersion\n**C** - **Create access keys/credentials**: iam:CreateAccessKey, iam:CreateLoginProfile\n**A** - **Attach policies**: iam:AttachUserPolicy, iam:AttachRolePolicy, iam:PutRolePolicy\n**L** - **Launch with elevated roles**: iam:PassRole + ec2:RunInstances or lambda:CreateFunction\n**A** - **Act as service accounts**: iam:serviceAccounts.actAs (GCP), managed identity abuse (Azure)\n**T** - **Trust relationship abuse**: Modifying trust policies on roles\n**E** - **Elevate via managed policies**: Attaching existing admin managed policies\n\n**Quick Reference: Most Dangerous Permissions:**\n| Permission | Risk | Severity |\n|-----------|------|----------|\n| iam:PassRole (on *) | Full admin via role | CRITICAL |\n| iam:CreatePolicyVersion | Policy manipulation | CRITICAL |\n| iam:AttachUserPolicy | Self-grant admin | CRITICAL |\n| iam:CreateAccessKey | Credential theft | HIGH |\n| sts:AssumeRole | Role chaining | HIGH |\n| lambda:UpdateFunctionCode | Code injection | HIGH |\n| iam:PutRolePolicy | Inline policy abuse | MEDIUM |\n\n**Prevention Checklist:**\n- [ ] Restrict iam:PassRole to specific approved roles only\n- [ ] Use permission boundaries to cap maximum permissions\n- [ ] Implement SCPs denying admin role assumption from non-admin accounts\n- [ ] Monitor AssumeRole events for unusual escalation patterns\n- [ ] Require MFA for all iam:* actions\n- [ ] Deny iam:CreatePolicyVersion, iam:SetDefaultPolicyVersion unless explicitly needed",
+      "mnemonic": "ESCALATE: Execute role assumption, Set/Create policy versions, Create access keys, Attach policies, Launch with elevated roles, Act as service accounts, Trust relationship abuse, Elevate via managed policies"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your IAM for Escalation Paths",
+      "content": "Map your cloud IAM escalation paths:\n\n1. **Who has iam:PassRole on *?** This is your most critical question. List every user, group, and role.\n2. **Can any identity attach policies to itself?** Check for iam:AttachUserPolicy, iam:AttachGroupPolicy.\n3. **Are there role chains?** Can Role A assume Role B, which can assume Role C with admin privileges?\n4. **Who can create access keys for other users?** iam:CreateAccessKey on any user = credential theft vector.\n5. **Do you have permission boundaries?** If not, any escalation path can reach full admin.\n6. **Are service control policies (SCPs) in place?** SCPs provide an organizational-level guardrail that prevents escalation even if individual policies allow it.\n7. **Is CloudTrail monitoring for escalation events?** Alert on AssumeRole to admin roles, policy changes, and new access keys.\n\n**Action item**: Run the escalation path finder script against your development account this week. Document every path found and create a remediation plan.",
+      "action": "Start with iam:PassRole. Audit every identity that has this permission. If the Resource field is *, that is a critical escalation path."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Map the Paths, Block the Paths",
+      "content": "Privilege escalation is not a theoretical risk: it is the most common path from compromised developer credentials to full cloud takeover. Every organization with cloud infrastructure has escalation paths. The question is whether you have found them before the attacker does.\n\nThe defenders who win are the ones who systematically map every escalation path, then block them with permission boundaries, SCPs, and monitoring. It is not glamorous work, but it is the work that prevents headlines.\n\nNext lesson: Cloud Virtual Network Security, where we will see how network controls add defense-in-depth against escalation.",
+      "action": "This week: run an IAM escalation audit. Next week: implement permission boundaries for all developer roles. The gap between finding and fixing is where breaches happen."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "aws", "iam", "privilege-escalation", "passrole", "permission-boundaries", "cloud-security"]
+}

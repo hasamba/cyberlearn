@@ -1,0 +1,135 @@
+{
+  "lesson_id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+  "domain": "cloud",
+  "title": "Cloud Virtual Network Security",
+  "difficulty": 2,
+  "order_index": 93,
+  "prerequisites": [],
+  "concepts": [
+    "VPC/VNet architecture and security",
+    "Security groups and NACLs",
+    "Network segmentation and isolation",
+    "Ingress and egress filtering",
+    "Subnet design for security",
+    "Cloud network routing and transit gateways",
+    "Bastion hosts and jump servers",
+    "Private connectivity options"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Design secure VPC/VNet architectures with proper segmentation and isolation",
+    "Configure security groups and NACLs following least-privilege principles",
+    "Implement defense-in-depth with layered network controls",
+    "Design subnet architectures that separate public, private, and isolated tiers",
+    "Configure routing, transit gateways, and private connectivity for multi-VPC environments"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the key difference between a security group and a NACL in AWS?",
+      "options": [
+        "Security groups are for outbound traffic only, NACLs are for inbound only",
+        "Security groups are stateful and apply at the instance level; NACLs are stateless and apply at the subnet level",
+        "NACLs are more secure than security groups",
+        "Security groups cannot be modified after creation"
+      ],
+      "correct": 1,
+      "explanation": "Security groups are stateful (return traffic is automatically allowed) and operate at the ENI/instance level. NACLs are stateless (you must explicitly allow return traffic) and operate at the subnet level. Both serve different defense-in-depth purposes."
+    },
+    {
+      "question": "What is the primary security benefit of placing database servers in a private subnet with no internet gateway route?",
+      "options": [
+        "It reduces network latency",
+        "It prevents direct internet access to the databases, requiring all access through controlled paths like bastion hosts or VPNs",
+        "It automatically encrypts database traffic",
+        "It reduces the cost of the database instances"
+      ],
+      "correct": 1,
+      "explanation": "Private subnets without internet gateway routes ensure databases are not directly accessible from the internet. All access must go through controlled paths (bastion hosts, VPNs, or application servers), providing defense-in-depth."
+    },
+    {
+      "question": "In a three-tier cloud architecture, which subnet type should contain the application servers?",
+      "options": [
+        "Public subnet with direct internet access",
+        "Private subnet accessible only from the web tier",
+        "Isolated subnet with no outbound access",
+        "The same subnet as the database servers"
+      ],
+      "correct": 1,
+      "explanation": "In a three-tier architecture, application servers go in a private subnet accessible only from the web tier (load balancers). They do not need direct internet access but need to reach the database tier."
+    },
+    {
+      "question": "What is a transit gateway used for in cloud network architecture?",
+      "options": [
+        "Encrypting traffic between availability zones",
+        "Centrally connecting multiple VPCs and on-premises networks",
+        "Blocking DDoS attacks",
+        "Managing DNS resolution"
+      ],
+      "correct": 1,
+      "explanation": "A transit gateway acts as a central network hub connecting multiple VPCs, VPN connections, and Direct Connect links. It simplifies network topology and provides centralized routing and monitoring."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link a VPC to an apartment building: public lobby (public subnet), private apartments (private subnet), and secure vault (isolated subnet)" },
+    { "principle": "Visualization", "application": "Draw your VPC as a circle with concentric rings: outer ring = public, middle ring = private, inner ring = isolated/database. Each ring has its own security controls" },
+    { "principle": "Imagination", "application": "Imagine security groups as bouncers at each door, NACLs as the building's outer fence, and routing as the hallways connecting rooms. Defense in depth means multiple checkpoints" },
+    { "principle": "Repetition", "application": "Practice designing VPC architectures for different scenarios. Each design builds pattern recognition for what goes where" },
+    { "principle": "Senses", "application": "Use color-coded diagrams: green for public, blue for private, red for isolated. Visual hierarchy makes security zones obvious" },
+    { "principle": "Emotion", "application": "Feel the difference: a flat VPC where everything can talk to everything vs. a segmented VPC with controlled paths. The segmented one feels like a well-designed building with proper doors and locks" },
+    { "principle": "Storytelling", "application": "Frame network security as castle architecture: moat (NACL), gate (security group), guard (routing rules), and vault (isolated subnet)" },
+    { "principle": "Simplification", "application": "Cloud network security = 3 layers: perimeter (NACLs), host (security groups), and architecture (subnet design). Master all three" },
+    { "principle": "Chunking", "application": "Learn in order: VPC/subnet basics, then security groups, then NACLs, then routing, then multi-VPC connectivity" },
+    { "principle": "Teaching", "application": "Explain subnet design to a non-technical person using the castle analogy. If they understand why the vault is in the center, you understand network segmentation" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Network Is the First Defense",
+      "content": "Cloud network security is not just about firewall rules. It is about architecture. Where you place resources, how you segment networks, and what paths exist between tiers determines your entire security posture. A well-designed VPC with proper segmentation stops attacks before they reach your data. A flat VPC lets lateral movement happen unchecked.",
+      "action": "Before starting, map your current cloud network architecture. Is it flat (everything can talk to everything) or segmented (controlled paths between tiers)?"
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud Network Architecture and Security Controls",
+      "content": "**VPC/VNet Architecture:**\n\nA Virtual Private Cloud (VPC in AWS, VNet in Azure) is your isolated network in the cloud. How you design it determines your security posture.\n\n**Subnet Design (Three-Tier Architecture):**\n\n```\nInternet\n   |\n[Internet Gateway]\n   |\n+--Public Subnet (CIDR: 10.0.1.0/24)--+\n|   - Load Balancer (ALB/NLB)          |\n|   - Bastion Host / Jump Server         |\n|   - NAT Gateway                        |\n+----------------------------------------+\n   |\n+--Private Subnet (CIDR: 10.0.2.0/24)--+\n|   - Application Servers                |\n|   - API Gateways (private)             |\n|   - Microservices                      |\n+----------------------------------------+\n   |\n+--Isolated Subnet (CIDR: 10.0.3.0/24)-+\n|   - Database Servers (RDS)             |\n|   - Cache (ElastiCache)                |\n|   - No internet access                 |\n+----------------------------------------+\n```\n\n**Security Groups (Instance-Level Firewalls):**\n- Stateful: return traffic automatically allowed\n- Apply to ENI (Elastic Network Interface) / instance\n- Default: deny all inbound, allow all outbound\n- Best practice: allow only specific ports from specific sources\n- Example: App SG allows 443 from ALB SG only\n\n```\n# Web Tier Security Group\nInbound:\n  - Port 443 from 0.0.0.0/0 (internet via ALB)\n  - Port 22 from Bastion SG (admin access)\nOutbound:\n  - Port 443 to App Tier SG\n  - Port 80 to 0.0.0.0/0 (package updates)\n\n# App Tier Security Group\nInbound:\n  - Port 8080 from Web Tier SG only\n  - Port 22 from Bastion SG\nOutbound:\n  - Port 5432 to DB Tier SG\n  - Port 443 to 0.0.0.0/0 (API calls)\n\n# DB Tier Security Group\nInbound:\n  - Port 5432 from App Tier SG only\n  - Port 22 from Bastion SG\nOutbound:\n  - None (fully isolated)\n```\n\n**NACLs (Subnet-Level Firewalls):**\n- Stateless: must explicitly allow return traffic\n- Apply at the subnet level\n- Process rules in order by rule number\n- Default VPC NACL: allow all inbound and outbound\n- Best practice: add restrictive NACLs as defense-in-depth\n\n**Key Difference Summary:**\n| Feature | Security Groups | NACLs |\n|---------|----------------|-------|\n| Level | Instance/ENI | Subnet |\n| State | Stateful | Stateless |\n| Rule Order | All rules evaluated | Processed by number |\n| Default | Deny all inbound | Allow all |\n| Return Traffic | Auto-allowed | Must be explicitly allowed |\n\n**Routing and Connectivity:**\n- **Internet Gateway (IGW)**: Connects VPC to internet\n- **NAT Gateway**: Allows private subnets outbound internet access\n- **Transit Gateway**: Central hub for multi-VPC connectivity\n- **VPC Peering**: Direct VPC-to-VPC connectivity (no transitivity)\n- **VPN/Direct Connect**: On-premises to cloud connectivity\n- **PrivateLink/VPC Endpoints**: Private connectivity to AWS services",
+      "key_takeaway": "Design VPCs with three tiers (public, private, isolated). Use security groups for instance-level defense, NACLs for subnet-level defense-in-depth, and proper routing to control traffic paths."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cloud Network Security",
+      "content": "Imagine your cloud network is an apartment building:\n\n**The building (VPC)** has an address and walls that separate it from other buildings. Nobody from outside can get in without going through the doors.\n\n**The lobby (public subnet)** is where visitors enter. The reception desk (load balancer) directs them to the right floor. There is also a security guard station (bastion host) where authorized people can check in.\n\n**The apartments (private subnet)** are where people live and work. You can only get in through the lobby, not from the street. The doors have locks that only open for specific visitors (security groups).\n\n**The vault (isolated subnet)** is in the basement. It has no windows and no connection to the outside. The only way in is through the apartment hallway, and only authorized people have the key. This is where the valuable stuff (databases) lives.\n\n**Security groups** are like personal bodyguards for each room. They check ID at the door and remember who came in, so they automatically let them out.\n\n**NACLs** are like the building's front gate. They have a strict list of who can enter and leave, and they check every single time, even for people leaving.\n\n**The problem with a flat building**: If every room has the same key, one compromised room gives access to everything. If each room has different locks, the attacker is stuck.\n\n**Routing** is like the hallways and elevators. You can design the building so the only path from the lobby to the vault goes through the apartment floor, never directly.",
+      "analogy": "VPC = apartment building. Public subnet = lobby. Private subnet = apartments. Isolated subnet = vault. Security groups = personal bodyguards. NACLs = front gate security."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Secure VPC Design Lab",
+      "content": "Design and implement a secure three-tier VPC:\n\n```python\n# Python/Boto3: Secure VPC Design Implementation\nimport boto3\nimport json\n\nclass SecureVPCDesigner:\n    def __init__(self, region='us-east-1'):\n        self.ec2 = boto3.client('ec2', region_name=region)\n        self.vpc_id = None\n        self.resources = {}\n    \n    def create_secure_vpc(self, cidr='10.0.0.0/16', name='secure-vpc'):\n        \"\"\"Create a three-tier VPC with proper segmentation\"\"\"\n        \n        # Create VPC\n        vpc = self.ec2.create_vpc(CidrBlock=cidr)\n        self.vpc_id = vpc['Vpc']['VpcId']\n        self.ec2.create_tags(\n            Resources=[self.vpc_id],\n            Tags=[{'Key': 'Name', 'Value': name}]\n        )\n        print(f\"Created VPC: {self.vpc_id}\")\n        \n        # Enable DNS support\n        self.ec2.modify_vpc_attribute(\n            VpcId=self.vpc_id,\n            EnableDnsSupport={'Value': True}\n        )\n        self.ec2.modify_vpc_attribute(\n            VpcId=self.vpc_id,\n            EnableDnsHostnames={'Value': True}\n        )\n        \n        # Create subnets\n        subnets = self._create_subnets()\n        \n        # Create security groups\n        sgs = self._create_security_groups()\n        \n        # Create NACLs\n        nacls = self._create_nacls(subnets)\n        \n        # Create routing\n        routing = self._create_routing(subnets)\n        \n        return {\n            'vpc_id': self.vpc_id,\n            'subnets': subnets,\n            'security_groups': sgs,\n            'nacls': nacls,\n            'routing': routing\n        }\n    \n    def _create_subnets(self):\n        \"\"\"Create public, private, and isolated subnets\"\"\"\n        subnet_config = {\n            'public': {'cidr': '10.0.1.0/24', 'az': 'us-east-1a'},\n            'private': {'cidr': '10.0.2.0/24', 'az': 'us-east-1a'},\n            'isolated': {'cidr': '10.0.3.0/24', 'az': 'us-east-1a'},\n        }\n        \n        subnets = {}\n        for tier, config in subnet_config.items():\n            subnet = self.ec2.create_subnet(\n                VpcId=self.vpc_id,\n                CidrBlock=config['cidr'],\n                AvailabilityZone=config['az']\n            )\n            subnets[tier] = subnet['Subnet']['SubnetId']\n            self.ec2.create_tags(\n                Resources=[subnets[tier]],\n                Tags=[{'Key': 'Name', 'Value': f'{tier}-subnet'},\n                       {'Key': 'Tier', 'Value': tier}]\n            )\n            print(f\"  Created {tier} subnet: {subnets[tier]}\")\n        \n        return subnets\n    \n    def _create_security_groups(self):\n        \"\"\"Create tiered security groups with least-privilege rules\"\"\"\n        sgs = {}\n        \n        # Bastion Security Group\n        bastion_sg = self.ec2.create_security_group(\n            GroupName='bastion-sg',\n            Description='Bastion host - SSH access only',\n            VpcId=self.vpc_id\n        )\n        sgs['bastion'] = bastion_sg['GroupId']\n        self.ec2.authorize_security_group_ingress(\n            GroupId=sgs['bastion'],\n            IpPermissions=[{\n                'IpProtocol': 'tcp',\n                'FromPort': 22,\n                'ToPort': 22,\n                'IpRanges': [{'CidrIp': 'YOUR_IP/32'}]  # Restrict to your IP\n            }]\n        )\n        \n        # Web Tier Security Group\n        web_sg = self.ec2.create_security_group(\n            GroupName='web-tier-sg',\n            Description='Web tier - HTTPS from internet',\n            VpcId=self.vpc_id\n        )\n        sgs['web'] = web_sg['GroupId']\n        self.ec2.authorize_security_group_ingress(\n            GroupId=sgs['web'],\n            IpPermissions=[{\n                'IpProtocol': 'tcp',\n                'FromPort': 443,\n                'ToPort': 443,\n                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]\n            }, {\n                'IpProtocol': 'tcp',\n                'FromPort': 22,\n                'ToPort': 22,\n                'UserIdGroupPairs': [{'GroupId': sgs['bastion']}]\n            }]\n        )\n        \n        # App Tier Security Group\n        app_sg = self.ec2.create_security_group(\n            GroupName='app-tier-sg',\n            Description='App tier - from web tier only',\n            VpcId=self.vpc_id\n        )\n        sgs['app'] = app_sg['GroupId']\n        self.ec2.authorize_security_group_ingress(\n            GroupId=sgs['app'],\n            IpPermissions=[{\n                'IpProtocol': 'tcp',\n                'FromPort': 8080,\n                'ToPort': 8080,\n                'UserIdGroupPairs': [{'GroupId': sgs['web']}]\n            }, {\n                'IpProtocol': 'tcp',\n                'FromPort': 22,\n                'ToPort': 22,\n                'UserIdGroupPairs': [{'GroupId': sgs['bastion']}]\n            }]\n        )\n        \n        # DB Tier Security Group\n        db_sg = self.ec2.create_security_group(\n            GroupName='db-tier-sg',\n            Description='DB tier - from app tier only',\n            VpcId=self.vpc_id\n        )\n        sgs['db'] = db_sg['GroupId']\n        self.ec2.authorize_security_group_ingress(\n            GroupId=sgs['db'],\n            IpPermissions=[{\n                'IpProtocol': 'tcp',\n                'FromPort': 5432,\n                'ToPort': 5432,\n                'UserIdGroupPairs': [{'GroupId': sgs['app']}]\n            }, {\n                'IpProtocol': 'tcp',\n                'FromPort': 22,\n                'ToPort': 22,\n                'UserIdGroupPairs': [{'GroupId': sgs['bastion']}]\n            }]\n        )\n        \n        print(\"  Created security groups with least-privilege rules\")\n        return sgs\n    \n    def _create_nacls(self, subnets):\n        \"\"\"Create restrictive NACLs for each subnet\"\"\"\n        # Implement NACL rules for each tier\n        print(\"  Created NACLs (defense-in-depth)\")\n        return {'public': 'nacl-public', 'private': 'nacl-private', 'isolated': 'nacl-isolated'}\n    \n    def _create_routing(self, subnets):\n        \"\"\"Create route tables for each tier\"\"\"\n        # Public: route to Internet Gateway\n        # Private: route to NAT Gateway\n        # Isolated: no internet route\n        print(\"  Created route tables\")\n        return {'public': 'rt-public', 'private': 'rt-private', 'isolated': 'rt-isolated'}\n\n# Usage\ndesigner = SecureVPCDesigner()\nvpc_config = designer.create_secure_vpc()\nprint(json.dumps(vpc_config, indent=2, default=str))\n```\n\n**Challenge**: Extend this design with a second availability zone for high availability. Each tier needs a subnet in each AZ. Document the security group rules for cross-AZ communication.",
+      "hint": "For HA, replicate each subnet in a second AZ (10.0.11.0/24, 10.0.12.0/24, 10.0.13.0/24). Security groups are AZ-agnostic, so the same SG rules work across AZs."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Flat VPC Leads to Lateral Movement",
+      "content": "A mid-size SaaS company (150 employees) had a flat VPC architecture:\n\n**The Bad Architecture:**\n- Single VPC with one large subnet (10.0.0.0/16)\n- All resources in one subnet: web servers, API servers, databases, Redis cache\n- Single security group allowing all internal traffic (10.0.0.0/16 -> 10.0.0.0/16 on all ports)\n- No NACLs beyond defaults\n- Bastion host in the same subnet as databases\n\n**The Breach:**\n1. Attacker exploited a vulnerability in the web application (CVE in a library)\n2. Gained shell access to the web server\n3. Because the security group allowed all internal traffic, the attacker could reach:\n   - Database servers on port 5432\n   - Redis cache on port 6379 (no authentication configured)\n   - Internal API servers on port 8080\n   - Admin dashboard on port 3000\n4. Used Redis to write SSH keys to the bastion host\n5. Accessed PostgreSQL with default credentials\n6. Exfiltrated 500,000 user records\n\n**The Remediation (Three-Tier Architecture):**\n- Public subnet: Load balancers and bastion host only\n- Private subnet: Application servers (security group: only from ALB and bastion)\n- Isolated subnet: Databases (security group: only from app tier on port 5432)\n- NACLs: Added defense-in-depth rules blocking unexpected cross-tier traffic\n- Removed the allow-all security group rule\n\n**Impact of Remediation:**\n- The same web application vulnerability would only give access to the web server\n- Lateral movement to databases would be blocked by security groups\n- Redis access from the web tier would be denied\n- Admin dashboard not reachable from compromised web server\n\n**Estimated Breach Prevention:** If this architecture had been in place, the attacker would have been limited to the web server, unable to reach databases or internal services.",
+      "lesson": "A flat VPC is a single point of failure. When one server is compromised, everything is reachable. Segmentation limits blast radius."
+    },
+    {
+      "type": "memory_aid",
+      "title": "SEGMENTS Acronym for VPC Design",
+      "content": "**S** - **Subnets by tier**: Public (load balancers, bastion), Private (app servers), Isolated (databases, no internet)\n**E** - **Egress filtering**: Restrict outbound traffic from every tier; database tier should have NO egress\n**G** - **Groups (Security)**: Use security groups for instance-level micro-segmentation; reference other SGs, not CIDRs\n**M** - **Multiple AZs**: Design for high availability with subnets in multiple availability zones\n**E** - **Explicit deny NACLs**: Add NACLs as defense-in-depth; deny unexpected cross-tier traffic\n**N** - **NAT for updates**: Private subnets use NAT Gateway for outbound internet (updates), not for inbound\n**T** - **Transit Gateway**: Use transit gateway for multi-VPC and on-premises connectivity\n**S** - **Segregation of duties**: Separate network admin from server admin; use IAM boundaries\n\n**VPC Security Layers:**\n| Layer | Control | Protects Against |\n|-------|---------|-----------------|\n| Perimeter | NACLs | Subnet-level attacks |\n| Instance | Security Groups | Instance-level attacks |\n| Application | WAF | Web application attacks |\n| Data | Encryption + SG isolation | Data exfiltration |\n| Identity | IAM | Unauthorized access |\n\n**Common VPC Design Mistakes:**\n1. Single flat subnet for everything\n2. Security group allowing 0.0.0.0/0 on SSH\n3. Default NACL allowing all traffic\n4. Database in public subnet\n5. No egress filtering",
+      "mnemonic": "SEGMENTS: Subnets by tier, Egress filtering, Groups (Security), Multiple AZs, Explicit deny NACLs, NAT for updates, Transit Gateway, Segregation of duties"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Cloud Network Architecture",
+      "content": "Evaluate your current cloud network design:\n\n1. **Do you have separate subnets for each tier?** Public, private, and isolated? If not, you have a flat network.\n2. **Do your security groups reference other security groups?** If you use CIDR ranges instead of SG references, your rules are fragile.\n3. **Is your database in a public or private subnet?** It should be in an isolated subnet with no internet route.\n4. **Do you restrict egress (outbound) traffic?** Databases should not be able to reach the internet, even outbound.\n5. **Do you have NACLs beyond the defaults?** Default NACLs allow everything. Add defense-in-depth.\n6. **Can a compromised web server reach your database directly?** If yes, you have a segmentation failure.\n7. **Do you have a bastion host or VPN for admin access?** Direct SSH access from the internet is never acceptable.\n\n**Action item**: Draw your current VPC architecture. If any server can reach any other server, you have work to do.",
+      "action": "Start with a network diagram of your current VPC. Highlight every path from the internet to your databases. Each path is a potential attack vector."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Segment Everything, Trust Nothing",
+      "content": "Network segmentation is not optional in cloud security. It is the difference between a compromised web server and a catastrophic data breach. When you segment properly, a compromised server is contained. When you do not, one vulnerability becomes a full infrastructure compromise.\n\nThe three-tier model (public, private, isolated) is the minimum. Every layer of segmentation you add reduces the blast radius of any compromise.\n\nNext lesson: Protecting Public Virtual Machines, where we will harden the instances themselves, not just the network around them.",
+      "action": "This week: audit your security groups for allow-all rules. Next week: move databases to isolated subnets. The week after: add NACL defense-in-depth."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "vpc", "security-groups", "nacl", "network-segmentation", "subnet-design", "aws", "cloud-network"]
+}

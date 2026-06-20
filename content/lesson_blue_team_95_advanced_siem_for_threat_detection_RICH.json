@@ -1,0 +1,135 @@
+{
+  "lesson_id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
+  "domain": "blue_team",
+  "title": "Advanced SIEM for Threat Detection",
+  "difficulty": 2,
+  "order_index": 95,
+  "prerequisites": ["SOC Data Sources and SIEM"],
+  "concepts": [
+    "Advanced SIEM query languages and techniques",
+    "Correlation rules and multi-source detection",
+    "Threat hunting with SIEM analytics",
+    "Dashboard and visualization design",
+    "Alert tuning and false positive reduction",
+    "UEBA (User and Entity Behavior Analytics)",
+    "MITRE ATT&CK mapping in SIEM",
+    "SIEM performance optimization"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Write advanced SIEM queries using KQL, SPL, or Lucene to detect complex attack patterns",
+    "Design correlation rules that combine multiple data sources for high-fidelity detection",
+    "Build threat hunting hypotheses using MITRE ATT&CK mapping in SIEM",
+    "Create effective dashboards and visualizations for security monitoring",
+    "Tune detection rules to reduce false positives while maintaining high detection rates"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary benefit of correlation rules in a SIEM?",
+      "options": [
+        "They reduce storage requirements by deduplicating logs",
+        "They combine events from multiple sources to detect attacks that would be invisible in any single source",
+        "They automatically block attacks without analyst intervention",
+        "They replace the need for threat intelligence feeds"
+      ],
+      "correct": 1,
+      "explanation": "Correlation rules combine events from multiple sources (e.g., firewall logs + authentication logs + endpoint data) to detect attack patterns that span multiple systems. A single failed login is noise; 50 failed logins from one IP followed by a successful login from a different country is an attack."
+    },
+    {
+      "question": "How should you handle a detection rule that generates 100 alerts per day, 95 of which are false positives?",
+      "options": [
+        "Delete the rule entirely",
+        "Tune the rule by adding context (user risk, asset value, time of day) to reduce false positives while keeping true positives",
+        "Increase the severity of the rule so analysts pay more attention",
+        "Leave it as-is and let analysts triage"
+      ],
+      "correct": 1,
+      "explanation": "A rule with 95% false positive rate causes alert fatigue and wastes analyst time. Tuning involves adding contextual filters (user risk score, asset criticality, business hours) to reduce noise while preserving the true positive detections."
+    },
+    {
+      "question": "What MITRE ATT&CK technique would you map to a SIEM rule detecting multiple failed logins from one IP?",
+      "options": [
+        "T1078 - Valid Accounts",
+        "T1110 - Brute Force",
+        "T1071 - Application Layer Protocol",
+        "T1059 - Command and Scripting Interpreter"
+      ],
+      "correct": 1,
+      "explanation": "Multiple failed logins from one IP followed by a success maps to T1110 (Brute Force). The ATT&CK mapping helps categorize the detection and link it to known adversary behavior."
+    },
+    {
+      "question": "What is UEBA and how does it enhance SIEM detection?",
+      "options": [
+        "A rule-based firewall system that blocks known bad IPs",
+        "User and Entity Behavior Analytics that establishes baseline behavior for users and alerts on anomalies, such as a user accessing resources at unusual times or from unusual locations",
+        "A log aggregation service that collects data from multiple sources",
+        "A vulnerability scanner that identifies unpatched systems"
+      ],
+      "correct": 1,
+      "explanation": "UEBA establishes behavioral baselines for users (normal login times, typical resources, usual locations) and alerts when behavior deviates from the baseline. This catches insider threats and compromised accounts that rule-based detection would miss."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link SIEM correlation to connecting dots: a single dot tells you nothing, but connect the login failure dot to the privilege escalation dot to the data access dot, and you see an attack" },
+    { "principle": "Visualization", "application": "Build dashboards that tell a story at a glance: red = investigate, yellow = monitor, green = normal. Your eyes should find problems before your brain processes the data" },
+    { "principle": "Imagination", "application": "Imagine the SIEM as a detective's corkboard with red string connecting clues. Each correlation rule is a string connecting two events that, together, reveal the attack" },
+    { "principle": "Repetition", "application": "Write one new detection rule per week. Within 6 months, you will have 26 rules covering the most common attack patterns" },
+    { "principle": "Senses", "application": "Use color and position in dashboards: hot colors for critical events, cool for normal. Anomalous data should visually jump out" },
+    { "principle": "Emotion", "application": "Feel the frustration of alert fatigue: 100 alerts, 95 false positives. The real attack is hiding in the noise. Tuning saves sanity and catches real threats" },
+    { "principle": "Storytelling", "application": "Each alert should tell a story: who did what, from where, when, and why it matters. If an alert cannot tell its story, it needs tuning" },
+    { "principle": "Simplification", "application": "SIEM detection = 3 types: single-event (brute force), multi-source correlation (failed login + privilege change), and behavioral anomaly (UEBA). Master all three" },
+    { "principle": "Chunking", "application": "Learn in order: basic queries first, then correlation rules, then dashboards, then UEBA. Each builds on the previous" },
+    { "principle": "Teaching", "application": "Explain a correlation rule to someone using the detective corkboard analogy. If they see how the string connects the clues, you understand correlation" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "From Logs to Insights",
+      "content": "A SIEM without well-written detection rules is just an expensive log storage system. The value of a SIEM is not in collecting data — it is in turning data into insights. Every query you write, every correlation rule you create, and every dashboard you build transforms raw logs into actionable intelligence.\n\nThe best analysts do not just react to alerts. They hunt proactively, write rules that catch what others miss, and tune the noise away so the signal shines through.",
+      "action": "Before starting, review your SIEM alert volume for the past week. How many alerts were true positives? If the ratio is below 10%, your rules need tuning."
+    },
+    {
+      "type": "explanation",
+      "title": "Advanced SIEM Queries and Correlation",
+      "content": "**Query Languages by SIEM:**\n\n| SIEM | Query Language | Example |\n|------|---------------|----------|\n| Splunk | SPL | `index=auth action=failed | stats count by src_ip | where count > 50` |\n| Microsoft Sentinel | KQL | `SecurityEvent | where EventID == 4625 | summarize count() by IpAddress | where count_ > 50` |\n| Elastic SIEM | KQL/EQL | `event.action: \"authentication_failed\" GROUP BY source.ip HAVING count() > 50` |\n| QRadar | AQL | `SELECT sourceip, COUNT(*) FROM events WHERE category = 'Authentication' AND devicetime > NOW - 1 HOUR GROUP BY sourceip HAVING COUNT(*) > 50` |\n\n**Correlation Rule Types:**\n\n**1. Single-Source Threshold Rules**\nTrigger when a single event type exceeds a threshold.\n```\nRule: Brute Force Detection\nIF authentication_failure_count FROM same_source_ip IN 5_minutes > 20\nTHEN alert severity=HIGH\n```\n\n**2. Multi-Source Correlation Rules**\nTrigger when events from different sources occur in sequence.\n```\nRule: Impossible Travel\nIF (\n    successful_login FROM user IN location_A\n    AND successful_login FROM same_user IN location_B\n    WITHIN 30_minutes\n    AND distance(A, B) > 500_km\n)\nTHEN alert severity=CRITICAL\n```\n\n**3. Behavioral Anomaly Rules**\nTrigger when behavior deviates from established baseline.\n```\nRule: Unusual Admin Activity\nIF (\n    user IN admin_group\n    AND user.activity NOT IN user.historical_activities\n    AND user.activity IN high_risk_actions\n)\nTHEN alert severity=HIGH\n```\n\n**4. Threat Intelligence Match Rules**\nTrigger when events match known IOCs.\n```\nRule: Known Malicious IP\nIF (\n    connection.destination_ip IN threat_intel.malicious_ips\n    OR dns.query IN threat_intel.malicious_domains\n)\nTHEN alert severity=CRITICAL\n```\n\n**5. MITRE ATT&CK Mapped Rules**\n```\nRule: Potential Lateral Movement (T1021)\nIF (\n    authentication_success TO destination IN internal_servers\n    FROM source NOT IN admin_workstations\n    AND protocol IN [RDP, SMB, WinRM]\n    AND time NOT IN business_hours\n)\nTHEN alert severity=HIGH, mitre_attack=T1021\n```\n\n**Advanced KQL Examples (Microsoft Sentinel):**\n\n```kql\n// Detect credential stuffing: multiple failed logins followed by success\nlet timeframe = 1h;\nlet failedLogins = SecurityEvent\n| where TimeGenerated > ago(timeframe)\n| where EventID == 4625\n| summarize failedCount = count() by TargetUserName, IpAddress;\nlet successLogins = SecurityEvent\n| where TimeGenerated > ago(timeframe)\n| where EventID == 4625\n| summarize successCount = count() by TargetUserName, IpAddress;\nfailedLogins\n| join kind=inner successLogins on TargetUserName, IpAddress\n| where failedCount > 10 and successCount > 0\n| project TargetUserName, IpAddress, failedCount, successCount\n```\n\n```kql\n// Detect privilege escalation: user added to admin group\nSecurityEvent\n| where EventID in (4728, 4732, 4756)  // Member added to group\n| where TargetGroupName contains \"Admin\" or TargetGroupName contains \"Domain Admins\"\n| project TimeGenerated, SubjectUserName, TargetUserName, TargetGroupName\n```\n\n**False Positive Reduction Techniques:**\n1. **Context enrichment**: Add user risk score, asset value, and business context\n2. **Whitelist known good**: Exclude service accounts, known scanners, approved admin activities\n3. **Time-based filtering**: Only alert on off-hours admin activity\n4. **Threshold tuning**: Increase threshold for noisy sources, decrease for critical assets\n5. **Suppression windows**: Suppress duplicate alerts within a time window",
+      "key_takeaway": "Effective SIEM detection combines single-event thresholds, multi-source correlation, behavioral baselines, and threat intelligence. Tune aggressively to reduce noise while maintaining signal."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: SIEM Detection",
+      "content": "Imagine your school has cameras everywhere: at the front door, in the hallways, in the cafeteria, at the parking lot. Each camera records everything, but nobody can watch all the videos all the time.\n\n**The SIEM** is like a smart security guard who watches all the cameras at once.\n\n**Simple rules** are like telling the guard: If someone tries the front door and fails 5 times, tell me. This catches someone trying to break in.\n\n**But simple rules have problems.** The school principal forgets their keys all the time and fails 5 times every Monday. The guard keeps reporting the principal, which is annoying (false positive).\n\n**Correlation rules** are smarter. They say: If someone fails the front door 5 times AND then enters through a window AND goes to the principal's office AND it is 2 AM, THEN tell me. Now the guard only reports real break-ins, not the forgetful principal.\n\n**Behavioral rules** are even smarter. They learn what is normal for each person. The principal always arrives at 8 AM and leaves at 5 PM. If the principal's badge is used at 3 AM, that is not normal. The guard alerts.\n\n**Dashboards** are like the guard's desk. Instead of reading every camera log, you look at the desk: green lights mean everything is fine, yellow means something needs attention, red means something is wrong.\n\n**Tuning** is teaching the guard which alerts are real and which are noise. Over time, the guard gets smarter and only bothers you when it truly matters.",
+      "analogy": "SIEM = smart security guard. Simple rules = door alarm. Correlation = connecting multiple events. Behavioral = knowing what is normal. Dashboards = guard's desk with colored lights. Tuning = teaching the guard what matters."
+    },
+    {
+      "type": "code_exercise",
+      "title": "SIEM Detection Rules Lab",
+      "content": "Write advanced detection rules across multiple scenarios:\n\n```kql\n// Microsoft Sentinel (KQL) Detection Rules\n\n// 1. Brute Force Detection with Context\nlet failedLogins = SecurityEvent\n| where TimeGenerated > ago(1h)\n| where EventID == 4625\n| summarize FailedCount = count(), \n          DistinctUsers = dcount(TargetUserName),\n          FirstAttempt = min(TimeGenerated),\n          LastAttempt = max(TimeGenerated)\n    by IpAddress;\nfailedLogins\n| where FailedCount > 20\n| join kind=leftouter (SecurityEvent\n    | where TimeGenerated > ago(1h)\n    | where EventID == 4624\n    | summarize SuccessCount = count() by IpAddress)\n    on IpAddress\n| project IpAddress, FailedCount, DistinctUsers, \n          SuccessCount=isnull(SuccessCount) ? 0 : SuccessCount,\n          FirstAttempt, LastAttempt,\n          RiskScore = FailedCount * 2 + (DistinctUsers * 5) + \n                      (isnull(SuccessCount) ? 0 : 50)\n| where RiskScore > 40\n| order by RiskScore desc\n```\n\n```kql\n// 2. Impossible Travel Detection\nlet loginEvents = SecurityEvent\n| where TimeGenerated > ago(24h)\n| where EventID == 4624\n| project TimeGenerated, TargetUserName, IpAddress, \n          Location=geo_info_from_ip_address(IpAddress);\nloginEvents\n| serialize\n| extend PrevTime = prev(TimeGenerated, 1),\n          PrevIp = prev(IpAddress, 1),\n          PrevLocation = prev(Location, 1)\n| where PrevTime != datetime(null)\n| extend TimeDiffMinutes = datetime_diff('minute', TimeGenerated, PrevTime)\n| where TimeDiffMinutes < 120  // Less than 2 hours between logins\n| extend DistanceKm = geo_distance(Location, PrevLocation)  // Simplified\n| where DistanceKm > 500  // More than 500km apart\n| project TimeGenerated, TargetUserName, IpAddress, Location, \n          PrevIp, PrevLocation, TimeDiffMinutes, DistanceKm\n```\n\n```kql\n// 3. Privilege Escalation Detection\nlet adminGroupChanges = SecurityEvent\n| where TimeGenerated > ago(24h)\n| where EventID in (4728, 4732, 4756)  // Member added to group\n| where TargetGroupName contains \"Admin\" \n    or TargetGroupName contains \"Domain Admins\"\n    or TargetGroupName contains \"Enterprise Admins\";\nadminGroupChanges\n| project TimeGenerated, SubjectUserName, TargetUserName, \n          TargetGroupName, EventID\n```\n\n```kql\n// 4. Data Exfiltration Detection\nlet outboundTraffic = NetworkEvents\n| where TimeGenerated > ago(24h)\n| where direction == \"outbound\"\n| summarize TotalBytes = sum(BytesSent),\n          ConnectionCount = count(),\n          Destinations = dcount(DestinationIp)\n    by SourceIp\n| where TotalBytes > 1000000000  // > 1GB outbound\n    or Destinations > 50  // > 50 unique destinations\n| join kind=leftouter (SecurityEvent\n    | where EventID == 4624\n    | summarize by SourceIp, TargetUserName)\n    on SourceIp\n| project SourceIp, TargetUserName, TotalBytes, \n          ConnectionCount, Destinations\n| order by TotalBytes desc\n```\n\n```kql\n// 5. Living off the Land Detection\nlet suspiciousProcesses = dynamic([\"powershell.exe\", \"cmd.exe\", \n    \"certutil.exe\", \"mshta.exe\", \"wmic.exe\", \"rundll32.exe\",\n    \"bitsadmin.exe\", \"regsvr32.exe\"]);\nSecurityEvent\n| where TimeGenerated > ago(1h)\n| where ProcessName in (suspiciousProcesses)\n| where EventID == 4688  // Process creation\n| summarize Count = count(), \n          ProcessNames = make_set(ProcessName),\n          CommandLines = make_set(CommandLine)\n    by Computer, SubjectUserName\n| where Count > 5  // More than 5 suspicious processes in 1 hour\n| project Computer, SubjectUserName, Count, ProcessNames, CommandLines\n```\n\n**Challenge**: Write a correlation rule that detects the full attack chain: brute force (many failed logins) followed by successful login followed by privilege escalation (admin group change) within 4 hours. This is a credential compromise to privilege escalation attack chain.",
+      "hint": "Use the join operator to link failed logins, successful logins, and group changes by the same user/IP within a time window. Start with failed logins, join to success, then join to group changes."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: SIEM Correlation Catches Insider Threat",
+      "content": "A financial services company detected an insider threat through SIEM correlation:\n\n**The Scenario:**\n- An employee in the finance department (User: jsmit) was preparing to leave the company\n- Over 3 weeks, they exfiltrated customer financial data\n- No single rule would have caught the activity\n\n**The Detection Chain:**\n\n**Week 1: Behavioral Anomaly**\n- UEBA flagged: jsmit accessing customer records at unusual hours (11 PM - 2 AM)\n- Historical baseline: jsmit only accessed records during business hours\n- Alert severity: LOW (could be overtime)\n\n**Week 2: Escalation**\n- DLP flagged: jsmit downloaded 50,000 customer records (10x normal volume)\n- SIEM flagged: jsmit connected from personal device (not corporate laptop)\n- VPN log: connection from a new IP address\n- Correlation rule: unusual access + high volume + new device = MEDIUM\n\n**Week 3: Exfiltration**\n- SIEM flagged: jsmit uploaded 2GB to personal cloud storage (Google Drive)\n- Correlation rule: MEDIUM alert + data upload + off-hours = HIGH\n- UEBA flagged: jsmit accessed systems they had never touched before (HR system)\n- Final correlation: unusual hours + high volume + new device + cloud upload + HR system access = CRITICAL\n\n**The Correlation Rule That Caught It:**\n```kql\nlet unusualAccess = SecurityEvent\n| where TimeGenerated > ago(7d)\n| where TargetUserName == \"jsmit\"\n| where TimeGenerated !between (datetime(08:00) .. datetime(18:00))\n| summarize UnusualAccessCount = count() by bin(TimeGenerated, 1d);\nlet highVolume = DataAccessEvents\n| where TimeGenerated > ago(7d)\n| where UserName == \"jsmit\"\n| summarize RecordsAccessed = count() by bin(TimeGenerated, 1d)\n| where RecordsAccessed > 5000;\nlet cloudUpload = NetworkEvents\n| where TimeGenerated > ago(7d)\n| where SourceIp in (jsmit_ips)\n| where DestinationDomain has_any (\"drive.google.com\", \"dropbox.com\", \"onedrive.com\")\n| summarize UploadBytes = sum(BytesSent) by bin(TimeGenerated, 1d);\nunusualAccess\n| join kind=inner highVolume on TimeGenerated\n| join kind=inner cloudUpload on TimeGenerated\n| where UnusualAccessCount > 0 and RecordsAccessed > 5000\n```\n\n**Result:** The employee was terminated and the data was tracked. 95% of the data was recovered before it could be used.\n\n**Key Lesson:** No single alert was suspicious enough to act on. The correlation of behavioral anomalies + volume increase + cloud upload created the full picture.",
+      "lesson": "Single events are noise. Correlation of multiple events over time reveals the attack story. The best detections combine behavioral baselines with event correlation."
+    },
+    {
+      "type": "memory_aid",
+      "title": "DETECT Acronym for SIEM Detection Design",
+      "content": "**D** - **Define the threat**: What attack are you detecting? Map it to MITRE ATT&CK\n**E** - **Enrich the data**: Add user risk scores, asset values, and threat intelligence\n**T** - **Tune the threshold**: Start broad, then narrow based on false positive rates\n**E** - **Evaluate false positives**: Track FP rate and tune until at least 50% of alerts are true positives\n**C** - **Correlate sources**: Single-source rules miss context. Combine auth logs + network + endpoint\n**T** - **Test with simulations**: Use red team exercises to validate detection rules\n\n**Detection Rule Quality Metrics:**\n| Metric | Good | Needs Work |\n|--------|------|------------|\n| True Positive Rate | > 50% | < 20% |\n| False Positive Rate | < 50% | > 80% |\n| Mean Time to Detect | < 1 hour | > 4 hours |\n| Alert Volume | < 100/day | > 500/day |\n| Coverage (ATT&CK) | > 30% | < 10% |\n\n**Rule Tuning Workflow:**\n1. Write initial rule with broad threshold\n2. Run for 1 week, analyze all alerts\n3. Categorize: true positive, false positive, unknown\n4. Add context to reduce false positives (user risk, asset value, time)\n5. Re-run for 1 week, compare metrics\n6. Repeat until true positive rate > 50%\n7. Document the rule, add MITRE ATT&CK mapping\n8. Add to monitoring dashboard",
+      "mnemonic": "DETECT: Define threat, Enrich data, Tune threshold, Evaluate FP, Correlate sources, Test with simulations"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your SIEM Detection Coverage",
+      "content": "Evaluate your SIEM detection maturity:\n\n1. **What percentage of MITRE ATT&CK techniques do you detect?** Map your current rules to ATT&CK. Aim for 30%+ coverage.\n2. **What is your true positive rate?** If less than 50% of alerts are true positives, you need to tune.\n3. **Do you have correlation rules?** Single-source rules miss context. Can you correlate auth + network + endpoint?\n4. **Is UEBA enabled?** Behavioral baselines catch insider threats and compromised accounts that rules miss.\n5. **What is your mean time to detect (MTTD)?** If it is over 1 hour, you have visibility gaps.\n6. **How many alerts does your team triage per day?** Over 200 per analyst means you need tuning.\n7. **Do your dashboards tell a story?** Can an analyst understand the security posture in 30 seconds?\n\n**Detection Maturity Model:**\n- **Level 1**: Basic rules (brute force, malware hash matches)\n- **Level 2**: Correlation rules (multi-source detection)\n- **Level 3**: Behavioral analytics (UEBA, anomaly detection)\n- **Level 4**: Threat hunting (proactive hypothesis-driven)\n- **Level 5**: Automated response (SOAR, playbooks)\n\nWhere are you? Where do you want to be?",
+      "action": "This week: map your current SIEM rules to MITRE ATT&CK. Identify the top 5 techniques you are not detecting and write rules for them."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "From Noise to Signal",
+      "content": "A SIEM that generates 1000 alerts a day with 90% false positives is worse than no SIEM at all. Alert fatigue causes analysts to miss real threats buried in the noise. The best SIEM operators are not the ones who write the most rules — they are the ones who write the best rules.\n\nQuality over quantity. One well-tuned correlation rule that catches real attacks is worth more than 100 noisy single-source rules. Tune aggressively, enrich constantly, and correlate when you can.\n\nThis completes the blue team detection module. You now understand how to turn raw logs into actionable detection through queries, correlation, behavioral analytics, and dashboards.",
+      "action": "Pick your noisiest SIEM rule. Spend 1 hour tuning it. If you can reduce its false positive rate by 50%, you have made your SOC more effective than adding 10 new rules."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Threat Hunter", "siem", "detection", "correlation", "kql", "spl", "mitre-attack", "ueba"]
+}

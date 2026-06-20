@@ -1,0 +1,135 @@
+{
+  "lesson_id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
+  "domain": "cloud",
+  "title": "Protecting Public Virtual Machines",
+  "difficulty": 2,
+  "order_index": 94,
+  "prerequisites": ["Cloud Virtual Network Security"],
+  "concepts": [
+    "Public VM attack surface and risks",
+    "VM hardening and baseline configuration",
+    "SSH key management and secure access",
+    "Bastion host architecture and design",
+    "Network security groups for VM protection",
+    "Cloud-native VM security features",
+    "Patch management and vulnerability reduction",
+    "Monitoring and incident response for VMs"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Harden public-facing virtual machines following CIS benchmarks and cloud-native security features",
+    "Design bastion host architectures for secure administrative access",
+    "Configure SSH key-based authentication and disable password-based access",
+    "Implement defense-in-depth for VMs using NSGs, application security groups, and just-in-time access",
+    "Apply cloud-native security controls including disk encryption, boot diagnostics, and serial console restrictions"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary purpose of a bastion host (jump server)?",
+      "options": [
+        "To serve as a public web server",
+        "To provide a single, hardened entry point for administrative access to private network resources",
+        "To store encryption keys for the cloud environment",
+        "To load balance traffic between availability zones"
+      ],
+      "correct": 1,
+      "explanation": "A bastion host is a specially hardened server that serves as the single entry point for administrative access to private resources. It reduces the attack surface by eliminating direct internet access to internal servers."
+    },
+    {
+      "question": "Which SSH configuration provides the strongest authentication security?",
+      "options": [
+        "Password authentication with 12-character passwords",
+        "SSH key-based authentication with Ed25519 keys and password authentication disabled",
+        "Two-factor authentication with TOTP and password",
+        "SSH key-based authentication with RSA 2048-bit keys"
+      ],
+      "correct": 1,
+      "explanation": "Ed25519 SSH keys are cryptographically stronger and more efficient than RSA 2048. Combined with disabled password authentication, this eliminates brute force attacks as a vector entirely."
+    },
+    {
+      "question": "What cloud security feature allows you to open SSH access to a VM only when you need it and automatically close it after a set time?",
+      "options": [
+        "VPN Gateway",
+        "Just-In-Time (JIT) VM Access",
+        "Network Security Groups with dynamic rules",
+        "Azure AD Conditional Access"
+      ],
+      "correct": 1,
+      "explanation": "Just-In-Time (JIT) VM Access opens NSG rules for SSH/RDP only when needed and automatically closes them after a specified time window. This dramatically reduces the exposure window for brute force attacks."
+    },
+    {
+      "question": "Why should you never expose a database server directly to the internet?",
+      "options": [
+        "It increases network latency",
+        "Database servers are high-value targets with known vulnerabilities, and direct exposure allows automated scanning and brute force attacks",
+        "Database servers cannot handle internet traffic",
+        "Cloud providers block database ports by default"
+      ],
+      "correct": 1,
+      "explanation": "Database servers are prime targets for automated scanning, brute force attacks, and vulnerability exploitation. They should only be accessible from application servers or through VPNs/bastion hosts, never directly from the internet."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link a bastion host to a security checkpoint at a building entrance: all visitors must pass through this single controlled point before reaching the interior" },
+    { "principle": "Visualization", "application": "Draw VM security as concentric circles: outer ring = NSGs and firewalls, middle ring = OS hardening, inner ring = application security" },
+    { "principle": "Imagination", "application": "Imagine each public VM as a house on a busy street: the more doors and windows facing the street (open ports), the more ways an intruder can get in" },
+    { "principle": "Repetition", "application": "Practice the VM hardening checklist on every new deployment. Within 5 deployments, it becomes automatic" },
+    { "principle": "Senses", "application": "Use a vulnerability scanner on a hardened vs. unhardened VM. The contrast in findings makes the value of hardening immediately visible" },
+    { "principle": "Emotion", "application": "Feel the exposure: every open port on a public VM is a door facing the internet. An attacker scans 4 billion IP addresses; they will find your doors" },
+    { "principle": "Storytelling", "application": "Frame VM hardening as fortifying a castle: close unnecessary doors (ports), add guards (NSGs), and require identification (SSH keys) at the main gate (bastion)" },
+    { "principle": "Simplification", "application": "VM security = 3 rules: close unnecessary ports, use key-based auth, access through bastion only. Everything else builds on these" },
+    { "principle": "Chunking", "application": "Learn in order: close ports and NSGs first, then SSH hardening, then bastion architecture, then monitoring. Each layer adds protection" },
+    { "principle": "Teaching", "application": "Explain to a colleague why password SSH is dangerous using the brute force analogy: an attacker tries 1000 passwords per second until one works. Keys make this impossible" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Every Open Port Is a Door",
+      "content": "A virtual machine exposed to the internet is a house on the busiest street in the world. Every open port is a door, and automated scanners check every door on every house, 24/7, 365 days a year. The question is not whether someone will knock on your doors — they already are. The question is whether your doors are locked, reinforced, and monitored.\n\nVM hardening is not optional. It is the minimum standard for any server facing the internet.",
+      "action": "Before starting, run a port scan on one of your public VMs. Every open port that you did not intentionally expose is a vulnerability."
+    },
+    {
+      "type": "explanation",
+      "title": "Public VM Hardening Blueprint",
+      "content": "**Layer 1: Network Security Groups (Perimeter Defense)**\n\n```\n# NSG Rules for Public VM (Bastion)\nPriority | Direction | Port  | Source        | Action\n---------|-----------|-------|--------------|--------\n100      | Inbound   | 22    | Your_IP/32    | Allow\n110      | Inbound   | 22    | Corp_IP_Range | Allow  (optional)\n200      | Inbound   | *     | Internet      | Deny\n300      | Outbound  | 443   | Internet      | Allow  (updates)\n310      | Outbound  | *     | VNet          | Allow  (internal access)\n400      | Outbound  | *     | Internet      | Deny\n```\n\n**Layer 2: OS Hardening (Host Defense)**\n\nSSH Configuration (`/etc/ssh/sshd_config`):\n```\n# Disable password authentication\nPasswordAuthentication no\nPubkeyAuthentication yes\n\n# Disable root login\nPermitRootLogin no\n\n# Use Ed25519 keys only\nPubkeyAcceptedAlgorithms ssh-ed25519\n\n# Limit access to specific users\nAllowUsers admin deploy-user\n\n# Set idle timeout\nClientAliveInterval 300\nClientAliveCountMax 2\n\n# Disable unused authentication methods\nChallengeResponseAuthentication no\nKbdInteractiveAuthentication no\n\n# Set strong ciphers\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com\n\n# Change default port (obfuscation, not security)\nPort 2222\n\n# Limit authentication attempts\nMaxAuthTries 3\n```\n\n**Layer 3: Application Security (Inner Defense)**\n- Run services as non-root users\n- Use AppArmor or SELinux for mandatory access control\n- Enable audit logging\n- Configure fail2ban for brute force protection\n\n**Layer 4: Cloud-Native Security Features**\n\n| Feature | AWS | Azure | GCP |\n|---------|-----|-------|-----|\n| Disk Encryption | EBS Encryption | Azure Disk Encryption | Compute Engine Encryption |\n| JIT Access | - | JIT VM Access | - |\n| Serial Console | - | Disable or restrict | - |\n| Boot Diagnostics | - | Enable with secure storage | - |\n| Managed Identities | IAM Roles | Managed Identity | Service Account |\n| Auto-Shutdown | - | Auto-shutdown schedule | - |\n\n**Bastion Host Architecture:**\n\n```\nInternet\n   |\n[Bastion Host / Jump Server]\n- Hardened OS\n- SSH key-only auth\n- MFA required\n- Audit logging enabled\n- Just-In-Time access (Azure)\n   |\n+--Private Subnet--+\n|  App Server 1    |\n|  App Server 2    |\n|  DB Server       |\n+------------------+\n```\n\n**Bastion Host Hardening:**\n1. Minimal OS installation (no GUI, no unnecessary packages)\n2. SSH key-only authentication (Ed25519)\n3. MFA for SSH (Google Authenticator or cloud MFA)\n4. Fail2ban with aggressive settings\n5. Audit logging (send to SIEM)\n6. No data stored on bastion (jump box only)\n7. Auto-updates enabled\n8. Daily security scans\n9. Network restricted to specific source IPs\n10. Just-In-Time access when available",
+      "key_takeaway": "Public VM security is defense-in-depth: NSGs at the perimeter, OS hardening on the host, SSH keys for access, bastion architecture for administration, and cloud-native features for additional protection."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Protecting Public VMs",
+      "content": "Imagine your virtual machine is a house on a street where millions of people walk by every day. Some of those people are nice, but some are thieves who try every door handle they can find.\n\n**Open ports are open doors**. If you leave port 22 (SSH) open to the whole internet, that is like leaving your front door unlocked on the busiest street in the city. Thieves will try 1000 keys per second until one fits.\n\n**Security groups are bouncers** at the door. They check IDs (IP addresses) and only let in people on the list. If only your IP is on the list, the thieves cannot even knock.\n\n**SSH keys are special keys that cannot be copied**. Instead of a password (which can be guessed), you use a key that is mathematically impossible to fake. The thief cannot guess it because there are more possible keys than atoms in the universe.\n\n**A bastion host is a security checkpoint**. Instead of letting people walk straight to your house, they must go through a security guard first. The guard checks their ID, makes them sign in, and then walks them to the house. Even if a thief gets past the guard, the guard logs everything.\n\n**Hardening is reinforcing the house**: locking windows (closing unnecessary ports), installing a safe (encryption), and removing the hidden key under the doormat (disabling default accounts).\n\n**Just-In-Time access is a smart lock**: it only opens the door when you need it and automatically locks it after 30 minutes. The rest of the time, the door is completely invisible to thieves.",
+      "analogy": "Public VM = house on a busy street. Open ports = open doors. Security groups = bouncers. SSH keys = unbreakable keys. Bastion host = security checkpoint. JIT access = smart lock that only opens when needed."
+    },
+    {
+      "type": "code_exercise",
+      "title": "VM Hardening Automation Lab",
+      "content": "Automate VM hardening with a configuration script:\n\n```bash\n#!/bin/bash\n# VM Hardening Script\n# Run as root on a fresh Linux VM\n\nset -euo pipefail\n\necho \"=== VM Hardening Started ===\"\n\n# 1. System Updates\necho \"[1/10] Updating system...\"\napt update && apt upgrade -y\napt autoremove -y\n\n# 2. Remove Unnecessary Packages\necho \"[2/10] Removing unnecessary packages...\"\napt remove -y telnetd rshd rlogind tftpd xinetd\napt autoremove -y\n\n# 3. Configure SSH\necho \"[3/10] Hardening SSH...\"\ncp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak\ncat > /etc/ssh/sshd_config << 'EOF'\n# SSH Hardened Configuration\nPort 2222\nPermitRootLogin no\nPasswordAuthentication no\nPubkeyAuthentication yes\nPubkeyAcceptedAlgorithms ssh-ed25519\nChallengeResponseAuthentication no\nKbdInteractiveAuthentication no\nMaxAuthTries 3\nClientAliveInterval 300\nClientAliveCountMax 2\nAllowUsers admin\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com\nEOF\n\n# 4. Configure Firewall (UFW)\necho \"[4/10] Configuring firewall...\"\nufw default deny incoming\nufw default allow outgoing\nufw allow 2222/tcp from any  # SSH on custom port\nufw allow 443/tcp            # HTTPS\nufw --force enable\n\n# 5. Install Fail2Ban\necho \"[5/10] Installing fail2ban...\"\napt install -y fail2ban\ncat > /etc/fail2ban/jail.local << 'EOF'\n[sshd]\nenabled = true\nport = 2222\nfilter = sshd\nlogpath = /var/log/auth.log\nmaxretry = 3\nbantime = 3600\nfindtime = 600\nEOF\nsystemctl enable fail2ban\nsystemctl start fail2ban\n\n# 6. Set File Permissions\necho \"[6/10] Setting file permissions...\"\nchmod 700 /home/admin/.ssh\nchmod 600 /home/admin/.ssh/authorized_keys\nchown -R admin:admin /home/admin/.ssh\n\n# 7. Enable Audit Logging\necho \"[7/10] Enabling audit logging...\"\napt install -y auditd\nsystemctl enable auditd\nsystemctl start auditd\n\n# 8. Configure Auto-Updates\necho \"[8/10] Configuring auto-updates...\"\napt install -y unattended-upgrades\ndpkg-reconfigure -plow unattended-upgrades\n\n# 9. Disable Unused Services\necho \"[9/10] Disabling unused services...\"\nsystemctl disable --now avahi-daemon 2>/dev/null || true\nsystemctl disable --now cups 2>/dev/null || true\nsystemctl disable --now nfs-server 2>/dev/null || true\n\n# 10. Final Security Checks\necho \"[10/10] Running security checks...\"\n\n# Check for empty passwords\nEMPTY_PASSWORDS=$(awk -F: '($2 == \"\" ) {print $1}' /etc/shadow)\nif [ -n \"$EMPTY_PASSWORDS\" ]; then\n    echo \"WARNING: Users with empty passwords: $EMPTY_PASSWORDS\"\nfi\n\n# Check listening ports\necho \"Open ports:\"\nss -tlnp\n\necho \"=== VM Hardening Complete ===\"\necho \"IMPORTANT: Add your SSH public key to /home/admin/.ssh/authorized_keys\"\necho \"IMPORTANT: Restart SSH: systemctl restart sshd\"\necho \"IMPORTANT: Test SSH access before closing current session!\"\n```\n\n**Challenge**: Run this script on a fresh VM in your lab. After hardening, run a vulnerability scan (using Lynis or similar) and document the improvement in the security score.",
+      "hint": "After running the hardening script, always test SSH access from another terminal before closing your current session. A misconfigured SSH lockout requires console access to fix."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: The Unhardened VM That Cost $250,000",
+      "content": "A startup deployed a web application on a public AWS EC2 instance with minimal hardening:\n\n**The Configuration (Before Hardening):**\n- SSH port 22 open to 0.0.0.0/0 (entire internet)\n- Password authentication enabled with a 10-character password\n- Root login enabled via SSH\n- No fail2ban\n- Default SSH configuration (all ciphers, no key requirements)\n- Application running as root\n- No disk encryption\n- Security group allowing all inbound traffic on all ports\n\n**The Attack:**\n- Day 0: Attacker scanned the internet and found SSH port 22 open\n- Day 1: Attacker began brute-force password attempts (500 attempts/minute)\n- Day 3: Brute-force succeeded (password was in a common password list)\n- Day 3+4: Attacker gained root access, installed cryptomining malware\n- Day 4-30: Malware ran undetected, consuming $50,000 in compute costs\n- Day 30: Attacker exfiltrated database containing 100,000 user records\n- Day 45: Data breach discovered via customer complaints about spam\n\n**The Cost:**\n- $50,000 in unauthorized compute costs\n- $150,000 in breach notification and credit monitoring\n- $50,000 in incident response and remediation\n- Reputation damage (unquantified)\n- **Total: $250,000+**\n\n**The Hardened Configuration (After):**\n```\nSecurity Group:\n  - Inbound: Port 2222 (SSH) from corporate IP only\n  - Inbound: Port 443 (HTTPS) from anywhere\n  - Inbound: All other ports: DENY\n  - Outbound: Port 443 (updates) and port 5432 (database): ALLOW\n\nSSH Configuration:\n  - Password authentication: DISABLED\n  - Root login: DISABLED\n  - Key type: Ed25519 only\n  - Port: 2222\n  - MaxAuthTries: 3\n  - Fail2ban: 3 failures = 1-hour ban\n\nApplication:\n  - Running as non-root user\n  - AppArmor profile enabled\n  - Disk encrypted\n\nMonitoring:\n  - CloudWatch alerts for SSH failures > 5 in 5 minutes\n  - Process monitoring for unexpected processes\n  - Network flow logging enabled\n```\n\n**Result**: The same attack would fail at every step. SSH brute force blocked by key-only auth. Root access impossible. Even if compromised, lateral movement blocked by NSGs.",
+      "lesson": "An unhardened VM on the internet will be compromised. It is not a question of if, but when. The cost of hardening is hours; the cost of not hardening can be hundreds of thousands of dollars."
+    },
+    {
+      "type": "memory_aid",
+      "title": "HARDEN Acronym for VM Security",
+      "content": "**H** - **Hide attack surface**: Close unnecessary ports, remove unnecessary packages, disable unused services\n**A** - **Authenticate with keys**: Ed25519 SSH keys only, no passwords, no root login\n**R** - **Restrict access**: NSGs allowing only specific IPs, JIT access, bastion host architecture\n**D** - **Deploy defense-in-depth**: NSGs + OS firewall + fail2ban + audit logging\n**E** - **Encrypt everything**: Disk encryption, encrypted SSH, encrypted data at rest\n**N** - **Never stop monitoring**: CloudWatch alerts, flow logs, process monitoring, SSH failure alerts\n\n**VM Hardening Checklist:**\n- [ ] OS updates applied and auto-updates enabled\n- [ ] Unnecessary packages removed\n- [ ] SSH: password auth disabled, key-only, root login disabled\n- [ ] SSH: custom port, max auth tries = 3, strong ciphers\n- [ ] Firewall: deny all incoming, allow only needed ports\n- [ ] NSG: restrict source IPs, deny 0.0.0.0/0 on SSH\n- [ ] Fail2ban: 3 failures = 1-hour ban\n- [ ] Application running as non-root user\n- [ ] Disk encryption enabled\n- [ ] Audit logging enabled and sent to SIEM\n- [ ] Cloud-native security features enabled\n- [ ] Auto-shutdown for non-production VMs\n- [ ] Bastion host for admin access\n\n**Critical Ports That Should NEVER Be Public:**\n| Port | Service | Risk |\n|------|---------|------|\n| 22 | SSH | Brute force |\n| 3389 | RDP | Brute force, BlueKeep |\n| 3306 | MySQL | Database compromise |\n| 5432 | PostgreSQL | Database compromise |\n| 6379 | Redis | Unauthorized access |\n| 27017 | MongoDB | Database compromise |\n| 9200 | Elasticsearch | Data exposure |\n| 2375 | Docker API | Container compromise |",
+      "mnemonic": "HARDEN: Hide attack surface, Authenticate with keys, Restrict access, Deploy defense-in-depth, Encrypt everything, Never stop monitoring"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Public VMs",
+      "content": "Audit every public-facing VM in your environment:\n\n1. **Is SSH open to 0.0.0.0/0?** This is the most common critical finding. Restrict to specific IPs or use bastion/JIT.\n2. **Is password authentication enabled?** Disable it immediately. SSH key-only.\n3. **Is root login enabled over SSH?** Disable it. Use sudo for administrative tasks.\n4. **Are there unnecessary open ports?** Run `ss -tlnp` and justify every listening port.\n5. **Is the VM running the latest patches?** Check for unpatched vulnerabilities.\n6. **Is disk encryption enabled?** If someone gains access to the disk, encryption prevents data theft.\n7. **Is audit logging enabled and sent to SIEM?** You cannot detect what you cannot see.\n8. **Is fail2ban or equivalent running?** Automated brute force is constant on the internet.\n9. **Can you use a bastion host instead of direct SSH?** Reduce the attack surface.\n10. **Are cloud-native security features enabled?** JIT access, managed identities, boot diagnostics.\n\n**Priority Actions:**\n- **Today**: Restrict SSH NSGs to specific IPs (not 0.0.0.0/0)\n- **This week**: Disable password authentication, enforce SSH keys\n- **This month**: Deploy bastion host architecture",
+      "action": "Start with the most critical finding: SSH open to the internet. Restrict it to specific IPs or implement bastion host access today."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Hardening Is Hygiene, Not Heroism",
+      "content": "VM hardening is not exciting. It is hygiene. Just like washing your hands prevents disease, closing unnecessary ports prevents breaches. The best security work is invisible: it prevents incidents that never happen.\n\nThe VMs you hardened today will not generate alerts tomorrow. That is the point. The VMs you did not harden will eventually generate incident reports.\n\nNext lesson: Private Endpoint Security and Abuse, where we will explore how cloud private connectivity features can be both a security improvement and an attack vector.",
+      "action": "Run the hardening script on one VM today. Document the before and after. The difference in your vulnerability scan results will speak for itself."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "vm-hardening", "bastion-host", "ssh", "nsg", "cloud-security", "defense-in-depth", "aws", "azure"]
+}
