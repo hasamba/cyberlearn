@@ -1,0 +1,135 @@
+{
+  "lesson_id": "f2a6b0c3-d4e8-4c1a-9b5f-7d9e1a3c5e7b",
+  "domain": "blue_team",
+  "title": "Modern HTTP (HTTP/2 and HTTP/3) Analysis",
+  "difficulty": 2,
+  "order_index": 92,
+  "prerequisites": ["HTTP Traffic Dissection and Analysis"],
+  "concepts": [
+    "HTTP/2 binary framing and multiplexing",
+    "HTTP/2 HPACK header compression",
+    "HTTP/2 server push and stream priorities",
+    "HTTP/3 and QUIC protocol fundamentals",
+    "TLS 1.3 and encrypted protocol analysis",
+    "HTTP/2 specific attack surfaces",
+    "Protocol downgrade attacks",
+    "Analyzing encrypted HTTP traffic"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain the key differences between HTTP/1.1, HTTP/2, and HTTP/3 protocols",
+    "Analyze HTTP/2 multiplexed streams and HPACK-compressed headers",
+    "Identify HTTP/2-specific vulnerabilities including stream multiplexing abuse and HPACK attacks",
+    "Understand QUIC protocol fundamentals and their impact on network analysis",
+    "Apply techniques for analyzing encrypted HTTP traffic when TLS keys are unavailable"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary advantage of HTTP/2 multiplexing over HTTP/1.1?",
+      "options": [
+        "It encrypts all traffic by default",
+        "It allows multiple requests and responses on a single TCP connection simultaneously",
+        "It reduces server resource usage",
+        "It compresses response bodies"
+      ],
+      "correct": 1,
+      "explanation": "HTTP/2 multiplexing allows multiple concurrent requests and responses on a single TCP connection using streams, eliminating HTTP/1.1 head-of-line blocking and connection overhead."
+    },
+    {
+      "question": "How does HTTP/3 (QUIC) solve the TCP-level head-of-line blocking problem?",
+      "options": [
+        "By using larger TCP window sizes",
+        "By replacing TCP with UDP and implementing independent stream handling at the transport layer",
+        "By disabling multiplexing",
+        "By requiring TLS 1.2"
+      ],
+      "correct": 1,
+      "explanation": "QUIC uses UDP and implements its own stream multiplexing, so a lost packet only blocks the specific stream it belongs to, not all streams sharing the connection."
+    },
+    {
+      "question": "What security challenge does HPACK header compression pose for defenders?",
+      "options": [
+        "It makes headers impossible to read",
+        "It creates a stateful compression context that can be exploited for information leakage across requests",
+        "It increases bandwidth usage",
+        "It prevents TLS from working correctly"
+      ],
+      "correct": 1,
+      "explanation": "HPACK maintains a dynamic compression table across requests. This stateful context can be exploited (e.g., CRIME/BREACH-style attacks) to leak information about headers across different requests."
+    },
+    {
+      "question": "What technique allows analysis of encrypted HTTP/2 traffic when TLS keys are available?",
+      "options": [
+        "Packet filtering by IP address only",
+        "TLS decryption using SSLKEYLOGFILE or session keys to decrypt the traffic before analysis",
+        "Downgrading to HTTP/1.1 at the firewall",
+        "Inspecting only the TLS handshake metadata"
+      ],
+      "correct": 1,
+      "explanation": "With TLS session keys (via SSLKEYLOGFILE or key log), tools like Wireshark can decrypt and analyze HTTP/2 frames, streams, and headers inside the encrypted tunnel."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link HTTP/2 multiplexing to a highway with multiple lanes: one road, many cars, no waiting for the truck ahead" },
+    { "principle": "Visualization", "application": "Picture HTTP/1.1 as a single-lane road (one request at a time) vs HTTP/2 as a multi-lane highway (many streams in parallel)" },
+    { "principle": "Imagination", "application": "Imagine QUIC as sending packages via courier (UDP) instead of registered mail (TCP): faster, and one lost package does not hold up the rest" },
+    { "principle": "Repetition", "application": "Practice reading HTTP/2 frame captures in Wireshark: each session builds pattern recognition for stream analysis" },
+    { "principle": "Senses", "application": "Use Wireshark HTTP/2 stream coloring: visual stream identification makes multiplexed traffic comprehensible" },
+    { "principle": "Emotion", "application": "Feel the shift: encryption is making our job harder, not easier. We need new techniques to see through the veil" },
+    { "principle": "Storytelling", "application": "Frame the HTTP evolution as a story: HTTP/1.1 = single-lane road, HTTP/2 = highway, HTTP/3 = express drone delivery" },
+    { "principle": "Simplification", "application": "HTTP/2 = multiplexed binary protocol. HTTP/3 = QUIC over UDP. Both encrypted. Analysis requires decryption keys or metadata-only approaches" },
+    { "principle": "Chunking", "application": "Learn in order: HTTP/2 frames, then streams, then HPACK, then attacks. Then: QUIC concepts, HTTP/3, analysis challenges" },
+    { "principle": "Teaching", "application": "Explain multiplexing to a colleague using the highway analogy: if they get it, you understand the core concept" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "The Encryption Challenge",
+      "content": "Modern HTTP is encrypted by default. HTTP/2 and HTTP/3 make our analysis job harder, not because the protocols are more complex, but because we cannot see inside without the right keys. The analysts who thrive in this new world are those who learn to read metadata, use JA3/JA4 fingerprints, and leverage TLS key logging. The traffic has not disappeared; it just requires new tools.",
+      "action": "Before starting, check: does your monitoring infrastructure support HTTP/2 and QUIC dissection? If not, you have a visibility gap."
+    },
+    {
+      "type": "explanation",
+      "title": "HTTP/2 and HTTP/3 Protocol Fundamentals",
+      "content": "**HTTP/2 Key Features:**\n\n1. **Binary Framing Layer**: Instead of text-based requests, HTTP/2 uses binary frames with defined types (DATA, HEADERS, SETTINGS, etc.). This makes parsing faster but harder to read without tools.\n\n2. **Multiplexed Streams**: Multiple requests and responses share a single TCP connection. Each stream has a unique ID. No more head-of-line blocking at the application layer.\n\n3. **HPACK Header Compression**: Headers are compressed using a dynamic table. Repeated headers (like User-Agent, Cookie) are sent as indices rather than full strings.\n\n4. **Server Push**: Servers can proactively send resources the client will likely need. (Being removed in most implementations due to security concerns.)\n\n5. **Stream Priorities**: Clients can assign weight and dependency to streams, telling the server which resources to prioritize.\n\n**HTTP/3 (QUIC) Key Features:**\n\n1. **UDP-based Transport**: QUIC replaces TCP with UDP, implementing reliability in user space. This eliminates TCP-level head-of-line blocking.\n\n2. **Built-in TLS 1.3**: Encryption is mandatory, not optional. The TLS handshake is integrated into the QUIC handshake for faster connection setup.\n\n3. **Connection IDs**: QUIC uses connection IDs that survive IP address changes, enabling seamless connection migration (e.g., WiFi to cellular).\n\n4. **0-RTT Connection Resumption**: Previously connected clients can send data immediately on reconnection, reducing latency.\n\n**Analysis Implications:**\n- HTTP/2 traffic looks different in Wireshark: you see frames, not plain text\n- HPACK compression means you need the full stream context to decompress headers\n- HTTP/3 over QUIC uses UDP, which many monitoring tools do not handle well\n- TLS 1.3 with 0-RTT complicates decryption and replay analysis",
+      "key_takeaway": "HTTP/2 multiplexes requests over one connection. HTTP/3 moves to UDP with QUIC. Both encrypt by default. Analysis requires either TLS keys or metadata-only techniques."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Modern HTTP",
+      "content": "HTTP/1.1 is like ordering food at a drive-through: you have to wait for each car to finish ordering before you can order. One lane, one order at a time.\n\n**HTTP/2** adds more lanes to the same drive-through. Now 10 cars can order at the same time on the same road! The server handles all the orders together. But there is a catch: if one order is really complicated (like a custom burger), it can still slow down the whole lane.\n\n**HTTP/3 (QUIC)** is like switching from drive-through to delivery drones. Instead of waiting in a line (TCP), each order gets its own drone (UDP). If one drone gets stuck in traffic, the other drones keep flying. No waiting!\n\n**HPACK** is like the drive-through having a shortcut menu. Instead of saying I want a Quarter Pounder with Cheese, Large Fries, and a Large Coke every time, you say I want combo number 5 and the restaurant knows what you mean because they remember your past orders.\n\n**The security challenge**: All these new lanes and drones are invisible to the security camera if it cannot see inside the cars. We need special X-ray glasses (TLS decryption keys) to see what is being ordered.",
+      "analogy": "HTTP/1.1 = single-lane drive-through. HTTP/2 = multi-lane drive-through. HTTP/3 = delivery drones (no waiting). HPACK = shortcut menu."
+    },
+    {
+      "type": "code_exercise",
+      "title": "HTTP/2 and QUIC Traffic Analysis Lab",
+      "content": "Analyze modern HTTP traffic with Wireshark and tshark:\n\n```bash\n# Filter for HTTP/2 frames\ntshark -r capture.pcap -Y 'http2'\n\n# Show HTTP/2 stream IDs and headers\ntshark -r capture.pcap -Y 'http2' -T fields \\\n  -e http2.stream -e http2.type -e http2.flags\n\n# Show HPACK-compressed headers (after decryption)\ntshark -r capture.pcap -Y 'http2.headers' -T fields \\\n  -e http2.headers.name -e http2.headers.value\n\n# Identify HTTP/2-specific attacks\n# Stream multiplexing abuse (too many concurrent streams)\ntshark -r capture.pcap -Y 'http2.stream > 1000'\n\n# SETTINGS frame flood detection\ntshark -r capture.pcap -Y 'http2.type == 0x04' -c 100\n\n# QUIC traffic (HTTP/3)\ntshark -r capture.pcap -Y 'quic'\n\n# Show QUIC connection IDs\ntshark -r capture.pcap -Y 'quic' -T fields \\\n  -e quic.scid -e quic.dcid\n\n# JA3 fingerprinting (even without decryption)\ntshark -r capture.pcap -Y 'tls.handshake.type == 1' -T fields \\\n  -e ip.src -e tls.handshake.extensions.server_name -e ja3.hash\n```\n\n```python\n# Python: JA3 fingerprint analysis for client identification\nimport hashlib\n\ndef calculate_ja3(tls_version, cipher_suites, extensions, \n                   elliptic_curves, ec_point_formats):\n    \"\"\"Calculate JA3 fingerprint from TLS Client Hello parameters\"\"\"\n    ja3_data = \",\".join(map(str, cipher_suites)) + \",\" + \\\n               \",\".join(map(str, extensions)) + \",\" + \\\n               \",\".join(map(str, elliptic_curves)) + \",\" + \\\n               \",\".join(map(str, ec_point_formats))\n    full_ja3 = f\"{tls_version},{ja3_data}\"\n    ja3_hash = hashlib.md5(full_ja3.encode()).hexdigest()\n    return ja3_hash, full_ja3\n\n# Known JA3 fingerprints\nknown_ja3 = {\n    \"e7d705a3286e19ea42f587b344ee6865\": \"Chrome 120+\",\n    \"51c64c77e60f3980eea90869b68c58a8\": \"Firefox 120+\",\n    \"b3238a4516b669c0df8a4b60494de3b8\": \"curl/Python\",\n    \"6734f37431670b3ab4292b8f60f29984\": \"Malware - Cobalt Strike\",\n}\n\ndef identify_client(ja3_hash):\n    return known_ja3.get(ja3_hash, \"Unknown client\")\n```\n\n**Challenge**: Capture HTTP/2 traffic from your browser using SSLKEYLOGFILE. Decrypt in Wireshark and identify all HTTP/2 streams in a single connection.",
+      "hint": "Set export SSLKEYLOGFILE=/tmp/sslkeys.log before launching Chrome, then configure Wireshark TLS preferences to use this file."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: HTTP/2 Rapid Reset Attack (2023)",
+      "content": "In October 2023, a critical vulnerability (CVE-2023-44487) exploited HTTP/2 stream lifecycle:\n\n**The Attack:**\n- HTTP/2 allows clients to create and cancel streams rapidly\n- The attacker sends many requests (HEADERS frame) and immediately cancels them (RST_STREAM frame)\n- The server must process the request setup before processing the cancel\n- This creates asymmetry: cheap for client, expensive for server\n- By repeating this at massive scale, the attacker overwhelms the server\n\n**Impact:**\n- Affected virtually every HTTP/2 implementation (nginx, Apache, Go, Node.js, etc.)\n- DDoS amplification factor of up to 100x\n- Major cloud providers (Google, AWS, Cloudflare) experienced significant disruptions\n\n**Technical Details:**\n- Normal HTTP/2 flow: Client sends HEADERS (stream 1), server processes, server responds\n- Rapid Reset attack: Client sends HEADERS (stream 1) then RST_STREAM (stream 1) immediately\n- Client repeats this thousands of times per second\n- Server processes request setup for each, even though they are cancelled\n\n**Detection:**\n- Monitor for high rate of RST_STREAM frames relative to completed streams\n- Alert when RST_STREAM/HEADERS ratio exceeds normal baseline (more than 50% cancellation rate)\n- Track stream lifecycle duration: legitimate streams last milliseconds to seconds; attack streams are microseconds\n\n**Mitigation:**\n- Rate limit stream creation per connection\n- Implement stream concurrency limits\n- Patch HTTP/2 implementations to limit processing of cancelled streams",
+      "lesson": "Protocol features designed for efficiency (stream cancellation) can be weaponized. Monitor protocol behavior, not just content."
+    },
+    {
+      "type": "memory_aid",
+      "title": "MODERN Acronym for HTTP/2+ Analysis",
+      "content": "**M** - **Multiplexed streams**: HTTP/2 sends multiple requests on one connection; track by stream ID\n**O** - **Observe metadata**: When you cannot decrypt, analyze TLS fingerprints (JA3/JA4), connection patterns, and timing\n**D** - **Decrypt when possible**: Use SSLKEYLOGFILE or TLS key log for full analysis\n**E** - **Examine HPACK**: Compressed headers require full stream context; capture from connection start\n**R** - **RST_STREAM attacks**: Monitor for rapid stream cancellation patterns (CVE-2023-44487)\n**N** - **New protocol, new attacks**: HTTP/2 has unique attack surfaces (stream abuse, header compression)\n\n**HTTP/2 vs HTTP/3 Quick Comparison:**\n| Feature | HTTP/2 | HTTP/3 |\n|---------|--------|--------|\n| Transport | TCP | UDP (QUIC) |\n| Encryption | Optional (usually TLS) | Mandatory (TLS 1.3) |\n| Head-of-line blocking | TCP level | None (per-stream) |\n| Connection setup | 1-2 RTTs | 0-1 RTTs |\n| Connection migration | No (breaks on IP change) | Yes (connection IDs) |\n| Analysis tools | Wireshark, tshark | Limited support |\n| Fingerprinting | JA3 (TLS) | JA4 (QUIC) |",
+      "mnemonic": "MODERN: Multiplexed, Observe metadata, Decrypt, Examine HPACK, RST_STREAM, New attacks"
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your Modern Protocol Visibility",
+      "content": "Answer these questions about your environment:\n\n1. **Can you decrypt HTTPS traffic?** Do you have SSLKEYLOGFILE, TLS key escrow, or inline decryption?\n2. **Do your monitoring tools support HTTP/2?** Can your IDS/IPS parse HTTP/2 frames?\n3. **Can you detect QUIC/HTTP/3?** Many tools silently drop UDP port 443.\n4. **Do you monitor JA3/JA4 fingerprints?** This is your primary identification method without decryption.\n5. **What is your RST_STREAM baseline?** Do you know normal cancellation rates for HTTP/2?\n6. **Can you differentiate between HTTP/2 and HTTP/3?** Your firewalls may need separate rules.\n\n**Visibility Gap Assessment:**\n- What percentage of your web traffic uses HTTP/2?\n- What percentage uses HTTP/3/QUIC?\n- What percentage of encrypted traffic can you currently decrypt?\n- What is your blind spot percentage?",
+      "action": "Check your proxy/firewall: does it support HTTP/2 inspection? Does it handle QUIC? Document the gaps."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Adapt or Go Blind",
+      "content": "The web is moving to encrypted, multiplexed protocols faster than our monitoring tools can adapt. HTTP/2 is now the majority of web traffic, and HTTP/3 adoption is growing. The analysts who learn to work with metadata, TLS fingerprints, and protocol behavior, not just payload inspection, will be the ones who can still see.\n\nThe tools will catch up, but the mindset shift needs to happen now: you cannot rely on deep packet inspection alone. Build your metadata analysis skills today.",
+      "action": "Set up SSLKEYLOGFILE in your browser and capture one HTTP/2 session in Wireshark. Seeing the decrypted multiplexed streams will change how you think about modern traffic."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "http2", "http3", "quic", "tls", "hpack", "wireshark", "protocol-analysis", "ja3"]
+}

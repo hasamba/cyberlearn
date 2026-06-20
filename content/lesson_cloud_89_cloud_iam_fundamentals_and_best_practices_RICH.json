@@ -1,0 +1,135 @@
+{
+  "lesson_id": "b4d8e2f9-a6c3-4e1b-9d7f-2a4c6e8f0b1d",
+  "domain": "cloud",
+  "title": "Cloud IAM Fundamentals and Best Practices",
+  "difficulty": 2,
+  "order_index": 89,
+  "prerequisites": [],
+  "concepts": [
+    "Identity and Access Management (IAM) basics",
+    "Cloud IAM vs on-premises IAM",
+    "Principle of least privilege",
+    "IAM policies and permissions",
+    "Role-based access control (RBAC)",
+    "Service accounts and machine identities",
+    "Multi-factor authentication (MFA)",
+    "Identity federation and SSO"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain the core components of cloud IAM and how they differ from on-premises identity management",
+    "Create and manage IAM policies following the principle of least privilege across AWS, Azure, and GCP",
+    "Identify common IAM misconfigurations that lead to cloud breaches",
+    "Configure multi-factor authentication and identity federation for cloud environments",
+    "Audit existing IAM configurations to find over-permissioned users and service accounts"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which IAM principle states that users should only have the minimum permissions needed to perform their job?",
+      "options": [
+        "Defense in depth",
+        "Principle of least privilege",
+        "Zero trust",
+        "Separation of duties"
+      ],
+      "correct": 1,
+      "explanation": "The principle of least privilege ensures users and services have only the minimum permissions required, reducing the blast radius of compromised credentials."
+    },
+    {
+      "question": "What is the primary risk of using root/owner accounts for daily cloud operations?",
+      "options": [
+        "They cost more than standard accounts",
+        "They cannot use MFA",
+        "If compromised, the attacker gains unrestricted access to the entire cloud environment",
+        "They are slower than standard accounts"
+      ],
+      "correct": 2,
+      "explanation": "Root/owner accounts have unrestricted access. A compromise gives the attacker full control over every resource in the cloud environment."
+    },
+    {
+      "question": "In AWS IAM, what is a trust policy?",
+      "options": [
+        "A policy that trusts all AWS services by default",
+        "A policy attached to a role that defines which principals can assume it",
+        "A policy that replaces the need for MFA",
+        "A policy that automatically grants admin access"
+      ],
+      "correct": 1,
+      "explanation": "A trust policy (assume role policy) defines which entities (users, services, or other accounts) are allowed to assume an IAM role."
+    },
+    {
+      "question": "Which practice is most effective for securing service accounts in the cloud?",
+      "options": [
+        "Using long, complex passwords and never rotating them",
+        "Granting service accounts admin access to simplify operations",
+        "Using short-lived credentials and workload identity federation instead of long-lived keys",
+        "Disabling logging for service account activities"
+      ],
+      "correct": 2,
+      "explanation": "Short-lived credentials and workload identity federation eliminate the risk of long-lived access keys being compromised, which is one of the most common cloud breach vectors."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link IAM policies to building keycards — different doors need different keys, and the front desk (admin) shouldn't have every key" },
+    { "principle": "Visualization", "application": "Draw a permission map: who can access what, colored by risk level. Overlaps are danger zones" },
+    { "principle": "Imagination", "application": "Imagine a service account as a robot employee that never sleeps — if it has too many keys, it can unlock every door at 3am" },
+    { "principle": "Repetition", "application": "Practice writing least-privilege policies daily. The syntax becomes second nature only through repetition" },
+    { "principle": "Senses", "application": "Use IAM visualization tools (like AWS IAM Access Analyzer) — seeing permission paths visually is more memorable than reading JSON" },
+    { "principle": "Emotion", "application": "Feel the weight of a misconfigured IAM policy — a single wildcard (*) can expose an entire cloud environment" },
+    { "principle": "Storytelling", "application": "Frame IAM as a security guard story: who gets past the checkpoint, what badge they carry, and what rooms they can enter" },
+    { "principle": "Simplification", "application": "IAM = Who + What + Where + When. Who is asking, What they want, Where they are, and When they're asking" },
+    { "principle": "Chunking", "application": "Master in order: Users → Groups → Roles → Policies → Federation. Each builds on the previous" },
+    { "principle": "Teaching", "application": "Explain the difference between a user, group, and role to someone new — if you can clarify the distinction, you've mastered the fundamentals" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Identity Is the New Perimeter",
+      "content": "In the cloud, there are no walls to guard — only identities to verify. IAM isn't just an administrative checkbox; it's your primary defense line. Misconfigured IAM is the #1 cause of cloud breaches. Master this, and you've mastered cloud security's foundation.",
+      "action": "Before starting, write down: What's one IAM mistake you've seen or can imagine that would give an attacker full cloud access?"
+    },
+    {
+      "type": "explanation",
+      "title": "Cloud IAM Fundamentals",
+      "content": "Cloud IAM controls **who** can do **what** on **which** resources. Unlike on-premises IAM, cloud IAM is:\n\n- **API-driven**: Every action is an API call that must be authorized\n- **Granular**: Permissions can be scoped to individual resources\n- **Dynamic**: Identities can be temporary (roles, federated access)\n- **Programmable**: Policies are code that can be versioned and audited\n\n**AWS IAM Components:**\n- **Users**: Identities for people or applications\n- **Groups**: Collections of users with shared permissions\n- **Roles**: Temporary identities with assume-role trust policies\n- **Policies**: JSON documents defining permissions (Identity-based and Resource-based)\n- **Service-linked roles**: Pre-defined roles for AWS services\n\n**Azure IAM Components:**\n- **Users and Groups**: Managed via Entra ID (formerly Azure AD)\n- **App registrations**: Service principals for applications\n- **Managed Identities**: Auto-managed identities for Azure services\n- **RBAC**: Role-Based Access Control with built-in and custom roles\n- **Conditional Access**: Policy-based access control (MFA, location, device)\n\n**GCP IAM Components:**\n- **Members**: Users, service accounts, groups, domains\n- **Roles**: Primitive (Owner/Editor/Viewer), Predefined, Custom\n- **Policies**: Bindings of members to roles on resources\n- **Service Accounts**: Identities for GCP services and workloads\n- **Workload Identity**: Federation for Kubernetes workloads",
+      "key_takeaway": "Every cloud provider has equivalent IAM primitives: identities, roles, policies, and service accounts. Learn the pattern once, apply everywhere."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Cloud IAM",
+      "content": "Imagine a huge hotel with thousands of rooms (cloud resources). IAM is the system that decides:\n\n- **Who** gets a keycard (identity)\n- **Which rooms** they can open (permissions)\n- **When** the keycard expires (temporary access)\n- **How** they prove who they are (authentication)\n\nA **policy** is like a list on the keycard that says: \"Room 301, pool only, expires Friday.\"\n\nA **role** is like a job title — \"Housekeeper\" gets access to all guest rooms but not the safe. \"Manager\" gets different access.\n\n**Least privilege** means the housekeeper shouldn't have a key to the vault, even if it would make cleaning faster.\n\n**Service accounts** are like robot workers — they need their own keycards, but those keycards should only open the doors the robot actually needs.\n\n**MFA** is like requiring both a keycard AND a fingerprint — even if someone steals your keycard, they can't get in.",
+      "analogy": "IAM = hotel keycard system. Least privilege = only the rooms you need. MFA = keycard + fingerprint."
+    },
+    {
+      "type": "code_exercise",
+      "title": "IAM Policy Analysis Lab",
+      "content": "Analyze and fix misconfigured IAM policies:\n\n```bash\n# AWS: List all users and their last activity\naws iam list-users --query 'Users[*].[UserName, PasswordLastUsed]' --output table\n\n# Find users with console access but no MFA\naws iam list-mfa-devices --all\naws iam list-users --query 'Users[*].UserName' --output text | \\\n  while read user; do\n    devices=$(aws iam list-mfa-devices --user-name $user --query 'MFADevices[*]' --output text)\n    if [ -z \"$devices\" ]; then\n      echo \"NO MFA: $user\"\n    fi\n  done\n\n# Check for overly permissive policies (wildcard actions)\naws iam list-policies --scope Local --query 'Policies[*].[PolicyName,Arn]' --output table\n\n# Review a specific policy\naws iam get-policy-version \\\n  --policy-arn arn:aws:iam::123456789012:policy/MyPolicy \\\n  --version-id v1\n\n# Find inline policies attached to users\naws iam list-users --query 'Users[*].UserName' --output text |\n  while read user; do\n    aws iam list-user-policies --user-name $user --output text\n  done\n```\n\n**Challenge**: Find the most dangerous policy in your AWS account (hint: look for `Action: *` with `Resource: *`).",
+      "hint": "Use `aws iam get-policy-version` on each policy and search for 'Effect: Allow' combined with 'Action: *' and 'Resource: *'."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Capital One Breach (2019)",
+      "content": "The Capital One breach exposed 100M+ customer records through an IAM misconfiguration:\n\n1. **The vulnerability**: An IAM role with excessive permissions (`s3:*` on all buckets) was attached to an EC2 instance.\n2. **The exploit**: An attacker exploited a Server-Side Request Forgery (SSRF) vulnerability in a WAF configuration to access the EC2 metadata service.\n3. **The pivot**: The metadata service provided temporary IAM credentials for the overly-permissive role.\n4. **The exfiltration**: Using those credentials, the attacker accessed S3 buckets containing sensitive customer data.\n\n**Root causes:**\n- IAM role had `s3:*` on `*` (all S3 buckets) — violating least privilege\n- No resource-level permissions scoping the role to specific buckets\n- SSRF protection was insufficient on the WAF\n- No monitoring for unusual S3 access patterns\n\n**Remediation lessons:**\n- Scope IAM roles to specific resources (not `Resource: *`)\n- Use IAM Access Analyzer to identify overly-permissive policies\n- Implement instance metadata service v2 (IMDSv2) to prevent SSRF\n- Monitor for anomalous S3 access with CloudTrail + GuardDuty",
+      "lesson": "Over-permissioned service roles are the #1 cloud IAM risk. Every `*` in a policy is an attack surface."
+    },
+    {
+      "type": "memory_aid",
+      "title": "LEAST Acronym for IAM",
+      "content": "**L** — **Limit** permissions to only what's needed (principle of least privilege)\n**E** — **Expire** credentials — use temporary roles instead of long-lived keys\n**A** — **Audit** regularly — review who has access to what, and revoke what's unused\n**S** — **Scope** policies to specific resources — never use `Resource: *` for production\n**T** — **Test** policies with IAM Access Analyzer before deployment\n\n**Bonus — The 5 Deadly Sins of Cloud IAM:**\n1. Root account usage for daily operations\n2. `AdministratorAccess` attached to users instead of roles\n3. Long-lived access keys stored in code repositories\n4. No MFA on human accounts\n5. Service accounts with `Action: *` on `Resource: *`",
+      "mnemonic": "LEAST privilege — Limit, Expire, Audit, Scope, Test"
+    },
+    {
+      "type": "reflection",
+      "title": "IAM Audit Your Environment",
+      "content": "Answer these questions about your current (or imagined) cloud environment:\n\n1. **Who has admin access?** Can you list every user with `*:*` permissions?\n2. **How many service accounts have long-lived keys?** When were they last rotated?\n3. **Which users lack MFA?** Is there a policy enforcing MFA for all human users?\n4. **Are there unused permissions?** When did each IAM user last authenticate?\n5. **Cross-account access**: Which external accounts can assume roles in your environment?\n\nDocument your findings. These gaps form your IAM hardening roadmap.",
+      "action": "Run `aws iam list-users` and check each user for MFA, last activity, and attached policies. Note every violation of least privilege."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "IAM Is Your Foundation",
+      "content": "You've just built the mental model for cloud IAM — and it's the single most important security layer in any cloud environment. Every subsequent lesson (VM credential exposure, access control, privilege escalation) builds on these fundamentals.\n\nThe best cloud security engineers don't memorize every policy syntax — they internalize the principle: **verify identity, authorize minimally, audit relentlessly.**\n\nNext lesson: Virtual Machine Credential Exposure — where we'll see exactly how IAM misconfigurations get exploited in practice.",
+      "action": "Set one IAM hardening goal for this week: enable MFA on all accounts, remove one wildcard permission, or rotate all access keys."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "iam", "least-privilege", "aws-iam", "azure-rbac", "gcp-iam", "mfa", "service-accounts", "identity-federation"]
+}

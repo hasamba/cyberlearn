@@ -1,0 +1,135 @@
+{
+  "lesson_id": "e1a5b3c9-d2f6-4e7a-8b0c-1d3e5f7a9b2d",
+  "domain": "blue_team",
+  "title": "HTTP Traffic Dissection and Analysis",
+  "difficulty": 2,
+  "order_index": 91,
+  "prerequisites": ["Network Visibility and Traffic Analysis"],
+  "concepts": [
+    "HTTP request and response structure",
+    "HTTP methods and status codes",
+    "User-Agent analysis",
+    "Cookie and session tracking",
+    "Content-Type and encoding",
+    "HTTP header forensics",
+    "Web attack patterns in HTTP",
+    "Proxy log analysis"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Dissect HTTP requests and responses to identify attack patterns",
+    "Analyze User-Agent strings to detect malicious or unusual clients",
+    "Interpret common HTTP status codes in the context of security events",
+    "Identify web attack signatures (SQLi, XSS, path traversal) in HTTP logs",
+    "Use proxy logs and packet captures to reconstruct web attack timelines"
+  ],
+  "post_assessment": [
+    {
+      "question": "Which HTTP status code indicates a successful server response?",
+      "options": [
+        "301",
+        "200",
+        "403",
+        "500"
+      ],
+      "correct": 1,
+      "explanation": "200 OK indicates the server successfully processed the request. 301 is redirect, 403 is forbidden, and 500 is server error."
+    },
+    {
+      "question": "A request with '../' sequences in the URL path most likely indicates which attack?",
+      "options": [
+        "SQL injection",
+        "Cross-site scripting (XSS)",
+        "Path traversal",
+        "Command injection"
+      ],
+      "correct": 2,
+      "explanation": "Path traversal (directory traversal) uses '../' sequences to navigate outside the intended directory structure and access restricted files."
+    },
+    {
+      "question": "What does a sudden spike in HTTP 404 responses from a server typically indicate?",
+      "options": [
+        "The server is misconfigured",
+        "An attacker or scanner is probing for vulnerabilities or hidden resources",
+        "The application has a bug",
+        "Legitimate users have outdated bookmarks"
+      ],
+      "correct": 1,
+      "explanation": "While some 404s are normal, a spike typically indicates vulnerability scanning, directory enumeration, or content discovery attempts."
+    },
+    {
+      "question": "Why is User-Agent analysis important in security monitoring?",
+      "options": [
+        "It identifies the server's operating system",
+        "It helps identify automated tools, scanners, and malware making HTTP requests",
+        "It determines the encryption strength of the connection",
+        "It shows the geographic location of the client"
+      ],
+      "correct": 1,
+      "explanation": "User-Agent strings reveal the client software making requests. Security tools, scanners, and malware often have distinctive or missing User-Agent strings that distinguish them from legitimate browsers."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link HTTP to postal mail: the envelope is headers, the letter is the body, the stamp is the method (GET/POST)" },
+    { "principle": "Visualization", "application": "Draw HTTP as a conversation: client asks (request), server answers (response). Each has a header card and a body letter" },
+    { "principle": "Imagination", "application": "Imagine HTTP headers as airport luggage tags: they tell you where data came from, where it is going, and what is inside" },
+    { "principle": "Repetition", "application": "Practice reading raw HTTP headers daily. Within a week, suspicious patterns jump out immediately" },
+    { "principle": "Senses", "application": "Color-code HTTP logs: green for 2xx, yellow for 3xx, orange for 4xx, red for 5xx. Anomalies become visually obvious" },
+    { "principle": "Emotion", "application": "Feel the attacker's intent behind every malicious request: each one is a probe looking for weakness" },
+    { "principle": "Storytelling", "application": "Reconstruct attacks as narratives: the attacker knocked on 47 doors (404s), found one open (200), and walked in with a SQL injection" },
+    { "principle": "Simplification", "application": "HTTP analysis = 3 questions: Who is asking (UA/IP)? What do they want (URL/method)? Did they get it (status code)?" },
+    { "principle": "Chunking", "application": "Master in order: status codes, then request methods, then headers, then body analysis, then attack pattern recognition" },
+    { "principle": "Teaching", "application": "Explain a web attack to someone using HTTP as the story. If they get the flow, you have mastered it" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "HTTP: The Language of the Web",
+      "content": "Every web attack leaves traces in HTTP traffic. Every click, every form submission, every API call is HTTP. Learning to read HTTP fluently is like learning to read a foreign language: once you can, you see threats everywhere that were invisible before.",
+      "action": "Open your browser developer tools Network tab. Visit any website. How many HTTP requests does it make? Each one is a potential forensic clue."
+    },
+    {
+      "type": "explanation",
+      "title": "HTTP Request and Response Anatomy",
+      "content": "**HTTP Request Structure:**\n\n```\nGET /api/users/42 HTTP/1.1          <- Method, Path, Version\nHost: example.com                    <- Target server\nUser-Agent: Mozilla/5.0 ...          <- Client identification\nAccept: application/json             <- Expected response format\nCookie: session=abc123               <- Session state\nAuthorization: Bearer eyJhb...       <- Authentication token\nReferer: https://example.com/dashboard <- Where the user came from\nContent-Type: application/json        <- Body format (for POST/PUT)\n```\n\n**HTTP Response Structure:**\n\n```\nHTTP/1.1 200 OK                      <- Version, Status Code, Reason\nContent-Type: application/json        <- Response format\nSet-Cookie: session=xyz789; HttpOnly  <- Server setting cookies\nX-Frame-Options: DENY                 <- Security headers\nContent-Length: 1234                  <- Body size\n\n{\"user\": {\"id\": 42, \"name\": \"Alice\"}}  <- Response body\n```\n\n**Key Security Status Codes:**\n- **2xx Success**: 200 OK, 201 Created, 204 No Content\n- **3xx Redirection**: 301 Moved Permanently, 302 Found, 304 Not Modified\n- **4xx Client Error**: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests\n- **5xx Server Error**: 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable\n\n**Attack Signatures in Status Codes:**\n- Spike in 404s = scanning/directory enumeration\n- 401/403 spikes = brute force or authorization attacks\n- 500 errors = potential SQL injection or application errors being exploited\n- 429 responses = rate limiting triggered (possible DoS or brute force)",
+      "key_takeaway": "HTTP is a conversation. The request asks a question, the response answers it. Security analysis reads both sides of the conversation."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: HTTP Traffic",
+      "content": "HTTP is like ordering food at a restaurant:\n\n**The request** is you telling the waiter what you want:\n- **Method** (GET/POST/PUT/DELETE) = I want to read / add / change / remove\n- **URL** = from the menu section called /api/pizza\n- **Headers** = I speak English, I am allergic to peanuts, here is my loyalty card\n- **Body** = (for POST) Here are the toppings I want: extra cheese, no olives\n\n**The response** is the waiter bringing your food:\n- **Status code** = how it went: 200 = Here is your food! 404 = We do not have that. 403 = You cannot order that\n- **Headers** = This is pizza (content-type), eat within 30 minutes (cache)\n- **Body** = the actual food (data)\n\n**An attack** is like:\n- **SQL Injection**: Ordering a pizza but also giving me all the credit card numbers from the register\n- **Path Traversal**: Asking for ../../../../etc/passwd instead of a menu item\n- **Brute force**: Trying 1000 different loyalty cards until one works\n- **Scanner**: Asking Do you have item 1? Item 2? Item 3? 10,000 times",
+      "analogy": "HTTP = restaurant ordering. Request = your order. Response = the waiter answer. Attack = abusing the ordering system."
+    },
+    {
+      "type": "code_exercise",
+      "title": "HTTP Log Analysis Lab",
+      "content": "Analyze proxy/web server logs for attack patterns:\n\n```bash\n# Common log format analysis\n# Extract all 4xx and 5xx responses\ngrep -E '\" [45][0-9]{2} ' access.log | head -20\n\n# Top IPs generating errors\ngrep -E '\" [45][0-9]{2} ' access.log | \n  awk '{print $1}' | sort | uniq -c | sort -rn | head -10\n\n# Find SQL injection attempts\ngrep -iE '(union|select|insert|drop|delete|update).*from|1.*=.*1|or.*true' access.log\n\n# Find path traversal attempts\ngrep -E '\\.\\.[\\\\/]' access.log\n\n# Find XSS attempts\ngrep -iE '<script|javascript:|onerror|onload|alert\\(' access.log\n\n# User-Agent analysis - find scanners\nawk '{print $6}' access.log | sort | uniq -c | sort -rn | head -20\n\n# Find unusual HTTP methods\ngrep -vE '\" (GET|POST|HEAD) ' access.log | awk '{print $6}' | sort | uniq -c | sort -rn\n```\n\n```python\nimport re\nfrom collections import Counter\n\nattack_patterns = {\n    'sql_injection': re.compile(r'(?i)(union|select|insert|drop|delete|update).*(from|table|where)|1=1|or\\s+true'),\n    'path_traversal': re.compile(r'\\.\\.[\\\\/]'),\n    'xss': re.compile(r'(?i)(<script|javascript:|onerror=|onload=|alert\\()'),\n    'command_injection': re.compile(r'(?i)(;|\\|).*(ls|cat|whoami|id|pwd|wget|curl)'),\n    'scanner': re.compile(r'(?i)(nikto|sqlmap|nmap|dirbuster|gobuster|wfuzz|masscan)'),\n}\n\ndef analyze_log_line(line):\n    findings = {}\n    for attack_name, pattern in attack_patterns.items():\n        if pattern.search(line):\n            findings[attack_name] = True\n    return findings\n\n# Count attacks per IP\nip_attacks = Counter()\nwith open('access.log') as f:\n    for line in f:\n        ip = line.split()[0]\n        attacks = analyze_log_line(line)\n        if attacks:\n            ip_attacks[ip] += 1\n\nprint('Top attacking IPs:')\nfor ip, count in ip_attacks.most_common(10):\n    print(f'  {ip}: {count} malicious requests')\n```\n\n**Challenge**: Download a sample access log and run the analysis. Which IP address has the most diverse attack types?",
+      "hint": "Focus on the URL path for attack detection. SQLi often contains UNION SELECT, path traversal has ../, and XSS has script tags."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Detecting a Web Application Attack",
+      "content": "Analysis of a real web server log revealed a sophisticated attack sequence:\n\n**Phase 1: Reconnaissance (2 hours)**\n- 5,000+ 404/403 responses from a single IP (192.168.1.100)\n- Requested /admin, /administrator, /wp-admin, /phpmyadmin, and many more\n- Indicator: 404 spike from one IP = directory enumeration\n\n**Phase 2: SQL Injection (30 minutes)**\n- First attempt: /search?q=test'+OR+1=1-- returned 500 error\n- Second attempt: /search?q=test'+UNION+SELECT+1,2,3-- returned 200 with 1234 bytes\n- Third attempt: /search?q=test'+UNION+SELECT+username,password+FROM+users-- returned 200 with 5678 bytes\n- Indicator: 500 error followed by 200 with UNION SELECT = successful SQL injection\n\n**Phase 3: Data Exfiltration (15 minutes)**\n- /search?q=test'+UNION+SELECT+email,credit_card+FROM+customers-- returned 200 with 45,678 bytes\n- /search?q=test'+UNION+SELECT+SSN,dob+FROM+employees-- returned 200 with 78,901 bytes\n- Indicator: Increasing response sizes = more data extracted per query\n\n**The detection pattern:**\n1. 404 spike = early warning (reconnaissance)\n2. 500 error with SQL syntax = attack attempt\n3. 200 response with unusually large payload = successful breach\n4. Escalating response sizes = active data exfiltration",
+      "lesson": "Every attack has phases. The 404 spike is the early warning. The 500 error is the attempt. The 200 with unusual response size is the successful breach."
+    },
+    {
+      "type": "memory_aid",
+      "title": "DISSECT Acronym for HTTP Analysis",
+      "content": "**D** - **Decode** URL-encoded payloads (%27 = apostrophe, %3C = <, %2F = /)\n**I** - **Inspect** User-Agent strings for known scanners or empty/missing UAs\n**S** - **Status codes**: 404 spikes = scanning, 401/403 = brute force, 500 = potential exploit\n**S** - **Size matters**: Unusually large responses may indicate data exfiltration\n**E** - **Examine** headers for authentication tokens, cookies, and session IDs\n**C** - **Correlate** requests across time: one 404 is noise, 5,000 is a scan\n**T** - **Timeline** reconstruction: map requests chronologically to see the attack progression\n\n**HTTP Attack Signature Quick Reference:**\n| Attack | URL Pattern | Status Code Clue |\n|--------|------------|------------------|\n| SQLi | UNION, SELECT, OR 1=1, -- | 500 (error) then 200 (success) |\n| XSS | script tag, onerror=, alert( | 200 (reflected in response) |\n| Path Traversal | ../, ..\\, %2e%2e%2f | 200 (if file read) or 403 |\n| Brute Force | /login, /api/auth | Many 401/403 from same IP |\n| Scanning | /admin, /backup, /.git | Many 404s from same IP |\n| Command Inj | ;ls, pipe cat, backtick whoami | 200 with command output |",
+      "mnemonic": "DISSECT: Decode, Inspect, Status, Size, Examine, Correlate, Timeline"
+    },
+    {
+      "type": "reflection",
+      "title": "Build Your HTTP Monitoring",
+      "content": "Answer these questions about your environment:\n\n1. **Do you log HTTP traffic?** Full request/response or just access logs?\n2. **Can you detect a scanning campaign?** How would you identify 5,000+ 404s from one IP?\n3. **Do you alert on SQL injection attempts?** What about successful SQLi (200 response with UNION)?\n4. **How do you monitor User-Agent strings?** Do you block known scanner UAs?\n5. **Can you correlate HTTP attacks across multiple servers?** Is there a centralized log?\n\n**Build your detection checklist:**\n- Alert on more than 100 404s from single IP in 5 minutes\n- Alert on SQL injection patterns in URL parameters\n- Alert on path traversal patterns in requests\n- Monitor for known scanner User-Agent strings\n- Alert on 500 errors following 401/403 spikes\n- Track response size anomalies (more than 2x normal for same endpoint)",
+      "action": "Implement one detection rule this week. Start with the 404 spike alert: it catches scanning early."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Read the Traffic, See the Story",
+      "content": "HTTP analysis is forensic storytelling. Every request is a sentence. Every status code is punctuation. Together they tell the story of an attack, from reconnaissance to exploitation.\n\nThe analysts who catch breaches early are the ones who read HTTP traffic like a book, not like individual words. Patterns emerge when you look at the full conversation.\n\nNext lesson: Modern HTTP (HTTP/2 and HTTP/3), where we will see how encryption and multiplexing change the analysis landscape.",
+      "action": "Next time you see an alert, pull the full HTTP conversation, not just the single request. The context around an attack tells you more than the attack itself."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: DFIR Specialist", "http", "web-analysis", "log-analysis", "sql-injection", "xss", "path-traversal", "user-agent"]
+}

@@ -1,0 +1,135 @@
+{
+  "lesson_id": "c5e9f3a0-b7d4-4f2c-8e1a-3b5d7f9a1c2e",
+  "domain": "blue_team",
+  "title": "DNS Monitoring and Threat Detection",
+  "difficulty": 2,
+  "order_index": 90,
+  "prerequisites": ["Network Visibility and Traffic Analysis"],
+  "concepts": [
+    "DNS protocol fundamentals",
+    "DNS query types and response codes",
+    "DNS tunneling detection",
+    "DGA domain identification",
+    "DNS-based exfiltration techniques",
+    "Passive DNS analysis",
+    "DNS sinkholing and blacklisting",
+    "Zeek DNS logging"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Explain how attackers abuse DNS for C2 communication, data exfiltration, and phishing",
+    "Configure Zeek to log and analyze DNS traffic for suspicious patterns",
+    "Identify DGA-generated domains using entropy analysis and pattern recognition",
+    "Detect DNS tunneling by analyzing query length, frequency, and TXT record abuse",
+    "Implement DNS monitoring workflows using open-source tools"
+  ],
+  "post_assessment": [
+    {
+      "question": "What makes DNS tunneling detectable in network traffic?",
+      "options": [
+        "It uses encrypted DNS queries exclusively",
+        "Unusually long subdomain labels and high-frequency queries to the same domain",
+        "It only works with IPv6",
+        "DNS tunneling is undetectable by design"
+      ],
+      "correct": 1,
+      "explanation": "DNS tunneling encodes data in long subdomain labels (e.g., a1b2c3d4e5f6g7h8.tunnel.example.com) and often shows high-frequency queries to a single resolver domain, both of which are statistical anomalies."
+    },
+    {
+      "question": "Which DNS record type is most commonly abused for data exfiltration via DNS?",
+      "options": [
+        "A records",
+        "MX records",
+        "TXT records",
+        "SOA records"
+      ],
+      "correct": 2,
+      "explanation": "TXT records can carry large amounts of arbitrary data and are commonly used in DNS tunneling tools like dnscat2 and iodine for data exfiltration."
+    },
+    {
+      "question": "What is a DGA (Domain Generation Algorithm)?",
+      "options": [
+        "A DNS security extension",
+        "An algorithm that generates thousands of random domains used by malware for C2",
+        "A DNS load balancing technique",
+        "A method for creating memorable domain names"
+      ],
+      "correct": 1,
+      "explanation": "DGAs generate large numbers of pseudo-random domains daily. Malware attempts to connect to each one, and only the attacker knows which domain is actually registered, making C2 resilient to takedowns."
+    },
+    {
+      "question": "Passive DNS replication is useful because it:",
+      "options": [
+        "Blocks malicious domains in real-time",
+        "Stores historical DNS resolution data for forensic analysis",
+        "Encrypts DNS queries",
+        "Replaces the need for DNS logging"
+      ],
+      "correct": 1,
+      "explanation": "Passive DNS collects and stores DNS responses over time, allowing analysts to see what IP a domain resolved to in the past — crucial for tracking infrastructure changes and connecting malicious campaigns."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link DNS to a phone book — attackers use fake entries in the phone book to redirect your calls" },
+    { "principle": "Visualization", "application": "Visualize DNS tunneling as a secret message hidden inside a very long name tag at a conference" },
+    { "principle": "Imagination", "application": "Imagine DGA as malware rolling dice every day — thousands of possibilities, but only the attacker knows which one landed" },
+    { "principle": "Repetition", "application": "Practice reading Zeek DNS logs daily. Pattern recognition for anomalous queries improves with every session" },
+    { "principle": "Senses", "application": "Use entropy heatmaps — high-entropy domains 'glow' differently than normal ones, making DGAs visually obvious" },
+    { "principle": "Emotion", "application": "DNS is the most abused protocol because it's trusted and always allowed — feel the urgency of monitoring what others ignore" },
+    { "principle": "Storytelling", "application": "Frame DNS exfiltration as a prison escape: the inmate encodes messages in letters home, and only the warden who reads carefully catches it" },
+    { "principle": "Simplification", "application": "DNS monitoring = 3 patterns: too long (tunneling), too random (DGA), too frequent (beaconing)" },
+    { "principle": "Chunking", "application": "Master DNS monitoring in steps: first understand normal queries, then spot anomalies, then detect tunnels, then hunt DGAs" },
+    { "principle": "Teaching", "application": "Explain to a colleague how DNS tunneling works — if they get the 'long subdomain' concept, you've mastered the detection logic" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "DNS: The Protocol Everyone Trusts",
+      "content": "DNS is the most universally allowed protocol in every network. Firewalls block suspicious ports, proxies inspect HTTP, but DNS? DNS always gets through. That's exactly why attackers love it. Today you'll learn to see what's hiding in plain sight.",
+      "action": "Quick thought: How many DNS queries does your computer make in a normal hour? That's your baseline. Anything beyond it is suspicious."
+    },
+    {
+      "type": "explanation",
+      "title": "DNS Threat Landscape",
+      "content": "DNS is abused in four primary attack patterns:\n\n**1. Command and Control (C2)**\nMalware uses DNS to find its command server. The domain can be:\n- **Hardcoded**: Static C2 domain in malware binary (easy to block, easy to find)\n- **DGA-generated**: Thousands of rotating domains (hard to block, hard to predict)\n- **Fast-flux**: Single domain resolving to many IPs rotating rapidly (resilient C2)\n\n**2. Data Exfiltration (DNS Tunneling)**\nData is encoded into DNS queries. Example:\n```\nsOMeDaTAENcodeDINtheLABEL.tunnel.attacker.com\n```\n- Uses long subdomain labels to carry data outbound\n- TXT record responses carry data inbound\n- Tools: dnscat2, iodine, DNS2TCP\n\n**3. Phishing and Brand Abuse**\n- Typosquatting: `g00gle.com`, `paypa1.com`\n- Homoglyph attacks: Using Unicode lookalikes\n- DKIM/SPF/DMARC misconfigurations\n\n**4. DNS Infrastructure Attacks**\n- DNS hijacking: Changing NS records to point to attacker-controlled servers\n- DNS cache poisoning: Injecting false records into resolver caches\n- DNS amplification: Using open resolvers for DDoS attacks",
+      "key_takeaway": "DNS attacks fall into 4 categories: C2 communication, data exfiltration, phishing/brand abuse, and infrastructure attacks. Each requires different detection strategies."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: DNS Monitoring",
+      "content": "DNS is like the phone book of the internet. When you type 'google.com,' your computer asks DNS: 'What's the number for google.com?' and DNS gives you the IP address.\n\nNow imagine if someone started writing secret messages inside the names they look up. Like looking up:\n'send-500-dollars-to-account-12345.evil.com'\n\nThe DNS system doesn't care about the long name — it just tries to find an address for it. But the bad guy's DNS server reads the name, extracts the message ('send 500 dollars to account 12345'), and the data has been stolen right through the phone book!\n\n**DGA** is like a bad guy rolling dice every day to create a new phone book entry. They register only one of the 10,000 random names the dice produce, and the malware tries all 10,000 until it finds the real one. You can't block what you can't predict.\n\nBut here's the trick: those random dice-roll names look weird. They have too many consonants, they're too long, and they don't make sense as words. That's how we catch them!",
+      "analogy": "DNS tunneling = sending secret messages inside phone book lookups. DGA = rolling dice to create random phone book entries."
+    },
+    {
+      "type": "code_exercise",
+      "title": "DNS Analysis with Zeek and Python",
+      "content": "Set up DNS monitoring and analysis:\n\n```bash\n# Zeek DNS log - key fields\n# ts, uid, id.orig_h, id.orig_p, id.resp_h, id.resp_p, proto, trans_id, rtt, query, qclass, qclass_name, qtype, qtype_name, rcode, rcode_name, AA, TC, RD, RA, Z, answers, TTLs, rejected\n\n# Extract all DNS queries from Zeek logs\ncat dns.log | zeek-cut query | sort | uniq -c | sort -rn | head -20\n\n# Find long subdomain labels (potential tunneling)\ncat dns.log | zeek-cut query | awk -F. '{print length($1), $0}' | sort -rn | head -20\n\n# Find high-frequency domains (potential C2 beaconing)\ncat dns.log | zeek-cut query | awk -F. '{print $(NF-1)\".\"$NF}' | sort | uniq -c | sort -rn | head -20\n```\n\n```python\n# Python: Calculate domain entropy (DGA detection)\nimport math\nfrom collections import Counter\n\ndef shannon_entropy(domain):\n    \"\"\"Calculate Shannon entropy of a domain string\"\"\"\n    if not domain:\n        return 0\n    counts = Counter(domain)\n    length = len(domain)\n    entropy = -sum((count/length) * math.log2(count/length)\n                   for count in counts.values())\n    return entropy\n\ndef is_suspicious_domain(domain, entropy_threshold=3.5, length_threshold=12):\n    \"\"\"Flag domains with high entropy or excessive length\"\"\"\n    labels = domain.split('.')\n    for label in labels:\n        if len(label) > length_threshold and shannon_entropy(label) > entropy_threshold:\n            return True\n    return False\n\n# Test\ndomains = [\n    'www.google.com',\n    'a3f8d7b2c9e1m4k7p2x9.evil-domain.com',\n    'api.github.com',\n    'xk7m3p9q2w5n8r1t4v6y.evil.com'\n]\n\nfor d in domains:\n    print(f\"{d}: entropy={shannon_entropy(d.split('.')[0]):.2f}, \"\n          f\"suspicious={is_suspicious_domain(d)}\")\n```\n\n**Challenge**: Capture DNS traffic for 1 hour. Calculate entropy for all queried domains. How many exceed the 3.5 threshold?",
+      "hint": "Use `zeek-cut query` to extract domain names, then pipe through the Python entropy script. Real domains typically have entropy < 3.0 for their subdomains."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: DNS Tunneling in the Wild",
+      "content": "A financial services company noticed unusual DNS patterns during a routine review:\n\n**The Detection:**\n- DNS queries averaging 180 characters (normal: 15-30)\n- A single domain receiving 50,000+ queries per day from one workstation\n- TXT record responses averaging 200+ characters\n- Queries occurring at regular intervals (every 30 seconds)\n\n**The Investigation:**\n- The domain `data.x8k2m.example.com` was being used as a DNS tunneling channel\n- An employee had installed an unauthorized VPN tool that used DNS tunneling\n- The tool was exfiltrating internal documents via encoded DNS queries\n- Data was being decoded by an external DNS server controlled by the VPN provider\n\n**Key Indicators:**\n1. **Label length**: Normal DNS labels are 5-15 characters; tunneling labels were 60-180 characters\n2. **Query frequency**: 30-second intervals indicate automated C2 beaconing\n3. **TXT record usage**: Large TXT responses indicate data being pushed inbound\n4. **Single destination**: All queries went to the same authoritative domain\n\n**Remediation:**\n- Blocked the tunneling domain at the DNS resolver\n- Implemented DNS query length limits (max 255 bytes total)\n- Deployed Zeek DNS monitoring with custom tunneling detection script\n- Added DNS query length alerting to SIEM",
+      "lesson": "DNS tunneling leaves clear statistical fingerprints: long labels, high frequency, TXT records, and regular intervals. The challenge is setting up detection before the attack, not after."
+    },
+    {
+      "type": "memory_aid",
+      "title": "TUNNEL Acronym for DNS Threats",
+      "content": "**T** — **Tunneling**: Data encoded in long DNS queries (label > 30 chars is suspicious)\n**U** — **Unusual frequency**: C2 beaconing shows regular intervals (every 30s, 60s, 300s)\n**N** — **Newly registered domains**: DGA domains are freshly created; check registration age\n**N** — **NXDOMAIN storms**: DGA malware generates many failed queries before finding the C2 domain\n**E** — **Entropy analysis**: High Shannon entropy (>3.5) in subdomain labels = likely DGA\n**L** — **Length anomalies**: Normal queries are short; tunneling queries are very long\n\n**Detection Quick Reference:**\n| Indicator | Normal | Suspicious | Malicious |\n|-----------|--------|------------|-----------|\n| Query length | 15-30 chars | 50-100 chars | 100+ chars |\n| Subdomain entropy | <2.5 | 2.5-3.5 | >3.5 |\n| Queries/day to one domain | <100 | 100-1000 | 1000+ |\n| TXT record size | <100 chars | 100-200 chars | 200+ chars |\n| NXDOMAIN ratio | <5% | 5-20% | >20% |",
+      "mnemonic": "TUNNEL — the 6 signs of DNS abuse"
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your DNS Monitoring",
+      "content": "Answer these questions about your environment:\n\n1. **Do you log all DNS queries?** Where are they stored and for how long?\n2. **Can you detect a DNS tunnel** exfiltrating 1MB/day? (That's only ~4,000 queries)\n3. **Do you block newly registered domains?** Most DGA domains are < 7 days old.\n4. **What's your NXDOMAIN rate?** A sudden spike often indicates DGA activity.\n5. **Do you monitor for DNS over HTTPS (DoH)?** Attackers use DoH to bypass monitoring.\n\nRate your DNS monitoring maturity:\n- Level 1: We log DNS but don't analyze it\n- Level 2: We have basic alerts for known malicious domains\n- Level 3: We detect tunneling and DGA through statistical analysis\n- Level 4: We have automated DNS threat hunting with passive DNS correlation",
+      "action": "Pick one gap from your assessment and create a plan to address it within 2 weeks."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "See Through the Noise",
+      "content": "DNS monitoring is one of the highest-value activities in security operations. Every device uses DNS, most malware uses DNS, and DNS is almost never blocked. By mastering DNS analysis, you've gained visibility into the most universally abused protocol.\n\nThe patterns you learned today — length, frequency, entropy — apply to every DNS-based attack. The indicators will evolve, but the statistical fingerprints remain.\n\nNext lesson: HTTP Traffic Dissection — where we'll apply the same analytical mindset to the most widely used application protocol.",
+      "action": "Deploy one DNS monitoring rule today: either alert on queries with labels longer than 50 characters, or alert on NXDOMAIN rates exceeding 20%."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Threat Hunter", "dns", "dns-tunneling", "dga", "zeek", "network-monitoring", "threat-detection", "exfiltration"]
+}

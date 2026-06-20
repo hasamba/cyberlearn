@@ -1,0 +1,135 @@
+{
+  "lesson_id": "a3c7d1e8-f5b2-4d9a-8e6f-1b3c5d7e9f0a",
+  "domain": "blue_team",
+  "title": "Network Visibility and Traffic Analysis",
+  "difficulty": 2,
+  "order_index": 89,
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": [
+    "Network visibility architecture",
+    "Traffic capture methods (SPAN, TAP, inline)",
+    "Protocol analysis fundamentals",
+    "NetFlow and packet analysis",
+    "Network segmentation monitoring",
+    "Baseline traffic profiling",
+    "East-west vs north-south traffic",
+    "Full packet capture vs metadata"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Explain the difference between full packet capture and flow-based monitoring and when to use each",
+    "Configure SPAN ports and network TAPs for traffic acquisition",
+    "Identify normal vs anomalous network traffic patterns using baseline profiling",
+    "Distinguish between east-west and north-south traffic and their security implications",
+    "Deploy and configure Zeek for network visibility in a lab environment"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary advantage of a network TAP over a SPAN port for traffic capture?",
+      "options": [
+        "TAPs are less expensive to deploy",
+        "TAPs provide a bit-for-bit copy without dropping packets under load",
+        "TAPs can filter traffic before capturing it",
+        "TAPs work only on wireless networks"
+      ],
+      "correct": 1,
+      "explanation": "Network TAPs provide a faithful, bit-for-bit copy of network traffic without the risk of dropped packets that can occur with SPAN ports under heavy load."
+    },
+    {
+      "question": "East-west traffic refers to communication between:",
+      "options": [
+        "Internal devices and the internet",
+        "Devices within the same network segment or data center",
+        "DNS servers and external resolvers",
+        "VPN clients and corporate gateways"
+      ],
+      "correct": 1,
+      "explanation": "East-west traffic is lateral movement between devices within the same network, as opposed to north-south traffic which flows in and out of the network perimeter."
+    },
+    {
+      "question": "Which monitoring approach provides the most granular visibility into network activity?",
+      "options": [
+        "NetFlow collection",
+        "Syslog aggregation",
+        "Full packet capture",
+        "SNMP monitoring"
+      ],
+      "correct": 2,
+      "explanation": "Full packet capture provides the most detailed view, including payload content, while NetFlow provides metadata about connections without payload."
+    },
+    {
+      "question": "What is the first step in establishing effective network monitoring?",
+      "options": [
+        "Deploy an IDS/IPS system",
+        "Create a baseline of normal network traffic",
+        "Block all outbound traffic",
+        "Install a SIEM platform"
+      ],
+      "correct": 1,
+      "explanation": "Before you can detect anomalies, you need to understand what normal looks like. Baseline profiling is the foundation of effective network monitoring."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link SPAN ports to mirrors — they mirror traffic like a hallway mirror lets you see around corners" },
+    { "principle": "Visualization", "application": "Picture east-west traffic as conversations between cubicles and north-south as the front door" },
+    { "principle": "Imagination", "application": "Imagine a TAP as a wiretap that copies every whisper perfectly without anyone noticing" },
+    { "principle": "Repetition", "application": "Practice reading packet headers daily — each session builds pattern recognition for anomalies" },
+    { "principle": "Senses", "application": "Use color-coded protocol visualizations in Wireshark — visual patterns stick faster than hex dumps" },
+    { "principle": "Emotion", "application": "Feel the urgency: missed lateral movement is how breaches escalate from small to catastrophic" },
+    { "principle": "Storytelling", "application": "Frame traffic analysis as detective work — every packet tells a story about who talked to whom" },
+    { "principle": "Simplification", "application": "Break visibility into three layers: where you capture (TAP/SPAN), what you see (metadata vs full), how you analyze (Zeek/SIEM)" },
+    { "principle": "Chunking", "application": "Group protocols: first master DNS and HTTP, then tackle TLS and SMB, finally handle custom protocols" },
+    { "principle": "Teaching", "application": "Explain network visibility architecture to a colleague — if you can teach it, you truly understand it" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Why Network Visibility Matters",
+      "content": "You can't protect what you can't see. Network visibility is the foundation of every detection, investigation, and response action you'll ever take. Today you're learning to see — and that sight will make you the analyst who catches what others miss.",
+      "action": "Before diving in, write down: what's one network attack you've heard of that would be invisible without proper traffic analysis?"
+    },
+    {
+      "type": "explanation",
+      "title": "Network Visibility Architecture",
+      "content": "Network visibility is the ability to monitor, inspect, and analyze traffic flowing across your infrastructure. It's built on three pillars:\n\n**1. Capture** — How you get the data:\n- **SPAN ports** (Switched Port ANalyzer): Mirror traffic from one or more switch ports to a monitoring port. Easy to deploy but can drop packets under heavy load.\n- **Network TAPs** (Test Access Points): Hardware devices inserted inline that copy traffic bit-for-bit. More reliable but cost more.\n- **Inline devices**: Firewalls, proxies, and IPS that sit in the traffic path.\n\n**2. Processing** — What you extract:\n- **Full packet capture**: Every byte, including payloads. Storage-intensive but most detailed.\n- **Flow data** (NetFlow, sFlow, IPFIX): Metadata about connections — who, what, when, how much. Efficient and scalable.\n- **Log data**: Events from network devices (firewall logs, proxy logs, DNS logs).\n\n**3. Analysis** — How you make sense of it:\n- Zeek (formerly Bro) for protocol analysis\n- Wireshark for deep packet inspection\n- SIEM platforms for correlation\n- Custom scripts for hunting",
+      "key_takeaway": "Visibility architecture = Capture + Processing + Analysis. Weakness in any pillar creates blind spots."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Network Visibility",
+      "content": "Imagine your school hallways. There are cameras at the doors (north-south traffic — people coming in and out). But what about inside the classrooms? If you only watch the doors, you miss what happens between rooms (east-west traffic).\n\nA **SPAN port** is like pointing one camera at a hallway — it works, but if too many kids run by at once, some get missed.\n\nA **TAP** is like having an invisible clone of every student — you see exactly what they do, every step, every whisper.\n\n**Flow data** tells you \"Alice walked to the library at 2pm.\" **Full packet capture** tells you exactly what she said when she got there.\n\nThe best security teams watch both the doors AND the hallways, because the sneakiest stuff happens inside the building.",
+      "analogy": "North-south = watching the front door. East-west = watching the hallways inside."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Capture Analysis with tcpdump",
+      "content": "Practice basic traffic capture and analysis using tcpdump:\n\n```bash\n# List available interfaces\nsudo tcpdump -D\n\n# Capture traffic on an interface (first 20 packets)\nsudo tcpdump -i eth0 -c 20\n\n# Capture only DNS traffic\nsudo tcpdump -i eth0 -c 50 port 53\n\n# Capture HTTP traffic with full payload\nsudo tcpdump -i eth0 -A -c 20 port 80\n\n# Write captures to a file for later analysis\nsudo tcpdump -i eth0 -w /tmp/capture.pcap -c 100\n\n# Read back the capture\ntcpdump -r /tmp/capture.pcap -nn\n\n# Filter for specific source IP\ntcpdump -r /tmp/capture.pcap src 192.168.1.100\n\n# Count connections by protocol\ntcpdump -r /tmp/capture.pcap -nn 2>/dev/null | \n  awk '{print $3}' | sort | uniq -c | sort -rn | head\n```\n\n**Challenge**: Capture 100 packets on your lab interface. How many are DNS? How many are HTTP? What percentage is encrypted (HTTPS/TLS)?",
+      "hint": "Use `tcpdump -r file.pcap port 53 | wc -l` to count DNS packets. Compare with total packet count."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: The Blind Spot That Cost $40M",
+      "content": "In 2019, a major healthcare organization had full visibility of their perimeter (north-south) but zero monitoring of internal east-west traffic. Attackers exploited this blind spot:\n\n1. **Initial compromise**: Phishing email delivered credential stealer — caught by perimeter IDS but alert was buried in noise.\n2. **Lateral movement**: Attackers moved from workstation to workstation via SMB and RDP — **completely invisible** because no internal traffic monitoring existed.\n3. **Data staging**: 4TB of patient records exfiltrated over 6 months to an internal staging server.\n4. **Exfiltration**: Small encrypted DNS tunnels pushed data out slowly — below the threshold of perimeter alerts.\n\n**The fix**: After the breach, the organization deployed:\n- Internal TAPs at every VLAN boundary\n- Zeek monitors for east-west traffic\n- NetFlow collectors with baseline anomaly detection\n- DNS monitoring specifically for tunnel detection\n\n**Lesson**: Perimeter visibility alone is insufficient. Modern attacks live and move inside the network.",
+      "lesson": "If you can't see east-west traffic, you're flying blind through 70% of the kill chain."
+    },
+    {
+      "type": "memory_aid",
+      "title": "VISIBILITY Acronym",
+      "content": "**V** — **Verify** capture points cover all critical network segments\n**I** — **Inspect** both full packets and flow metadata\n**S** — **SPAN** ports for quick wins, **TAPs** for reliability\n**I** — **Internal** (east-west) traffic matters as much as perimeter\n**B** — **Baseline** normal traffic before hunting anomalies\n**I** — **Invest** in storage — packet captures eat disk space fast\n**L** — **Log** everything — you'll need it for correlation\n**I** — **Integrate** network data with endpoint and log sources\n**T** — **Test** your visibility regularly — gaps appear over time\n**Y** — **You** can't defend what you can't see",
+      "mnemonic": "VISIBILITY — each letter is a checkpoint for your monitoring strategy"
+    },
+    {
+      "type": "reflection",
+      "title": "Assess Your Visibility",
+      "content": "Think about your current (or imagined) environment:\n\n1. **Where are your blind spots?** List 3 network segments that lack monitoring.\n2. **Capture method**: Are you using SPAN or TAP? What are the failure scenarios for each?\n3. **East-west coverage**: Can you see lateral movement between workstations? Between VLANs?\n4. **Storage capacity**: How long do you retain full packet captures? Flow data? Is it enough?\n5. **DNS visibility**: Can you detect DNS tunneling in your current setup?\n\nWrite down your answers — they form the basis of your visibility improvement plan.",
+      "action": "Create a simple network diagram marking your current monitoring points and blind spots."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Seeing Is Believing",
+      "content": "Network visibility is a superpower that most organizations underinvest in. You're learning to build the eyes and ears of your security operations. Every packet you can see is a potential detection. Every blind spot is an invitation to an attacker.\n\nThe analysts who catch advanced threats are the ones who invested in seeing everything — not just the easy stuff at the perimeter. You're building that foundation now.\n\nTomorrow's lesson on DNS monitoring builds directly on today's visibility concepts. DNS is where some of the most sophisticated attacks hide.",
+      "action": "Before you close this lesson, make one change to your lab: enable a SPAN port or deploy Zeek on one interface. Even small visibility wins compound over time."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Blue Teamer", "network-visibility", "traffic-analysis", "span", "network-tap", "zeek", "netflow", "packet-capture"]
+}

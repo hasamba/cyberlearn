@@ -1,0 +1,135 @@
+{
+  "lesson_id": "b0d4e8f2-a3c6-4b1a-9d5f-7e9c1b3a5d7f",
+  "domain": "cloud",
+  "title": "Broken Access Control and IAM Policy Analysis",
+  "difficulty": 2,
+  "order_index": 91,
+  "prerequisites": ["Cloud IAM Fundamentals and Best Practices"],
+  "concepts": [
+    "Broken access control in cloud environments",
+    "IAM policy evaluation logic",
+    "Explicit deny vs allow precedence",
+    "Resource-based vs identity-based policies",
+    "Privilege escalation through policy misconfiguration",
+    "Cross-account access vulnerabilities",
+    "Policy simulation and testing",
+    "Cloud-specific access control failures"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Analyze IAM policies to identify over-permissioned access and privilege escalation paths",
+    "Explain the policy evaluation logic in AWS, Azure, and GCP IAM systems",
+    "Identify common broken access control patterns in cloud environments",
+    "Use policy simulation tools to test permission boundaries before deployment",
+    "Implement least-privilege IAM policies that follow security best practices"
+  ],
+  "post_assessment": [
+    {
+      "question": "In AWS IAM policy evaluation, which statement is true about conflicting allow and deny statements?",
+      "options": [
+        "Allow always takes precedence over deny",
+        "Deny always takes precedence over allow",
+        "The most specific statement takes precedence",
+        "The most recent statement takes precedence"
+      ],
+      "correct": 1,
+      "explanation": "In AWS IAM, an explicit deny always overrides any allow. This is a core principle: explicit deny > explicit allow > default deny."
+    },
+    {
+      "question": "Which AWS IAM policy type is attached directly to an S3 bucket rather than to a user or role?",
+      "options": [
+        "Identity-based policy",
+        "Resource-based policy",
+        "Service control policy",
+        "Permissions boundary"
+      ],
+      "correct": 1,
+      "explanation": "Resource-based policies are attached to resources (like S3 buckets) and define who can access that resource, as opposed to identity-based policies attached to users/roles."
+    },
+    {
+      "question": "What is the principle of 'privilege escalation via IAM'?",
+      "options": [
+        "Gaining physical access to a server room",
+        "Using existing permissions to grant yourself additional permissions",
+        "Exploiting a network vulnerability for remote access",
+        "Brute-forcing administrator passwords"
+      ],
+      "correct": 1,
+      "explanation": "IAM privilege escalation occurs when a user with limited permissions can use those permissions to grant themselves higher permissions, such as iam:PassRole with ec2:RunInstances to assume a more privileged role."
+    },
+    {
+      "question": "What is the most effective way to prevent IAM privilege escalation in cloud environments?",
+      "options": [
+        "Use only root accounts for all operations",
+        "Apply permissions boundaries and regularly audit for escalation paths",
+        "Disable all IAM roles",
+        "Remove all access keys and use only console access"
+      ],
+      "correct": 1,
+      "explanation": "Permissions boundaries set the maximum permissions a user or role can ever have, preventing any escalation beyond that boundary. Combined with regular auditing, this is the most effective prevention."
+    }
+  ],
+  "jim_kwik_principles": [
+    { "principle": "Association", "application": "Link IAM policy evaluation to a bouncer at a club: multiple lists (policies), but if ANY list says 'no' (deny), you're out" },
+    { "principle": "Visualization", "application": "Draw permission diagrams: user → policies → resource. Arrows show allow, X's show deny. Overlaps reveal escalation paths" },
+    { "principle": "Imagination", "application": "Imagine IAM policies as a set of keys. Some keys open every door (admin), some open only one. Privilege escalation is finding a key that opens the key cabinet" },
+    { "principle": "Repetition", "application": "Practice reading IAM policies daily. Start with simple ones, add complexity. Pattern recognition develops through volume" },
+    { "principle": "Senses", "application": "Use IAM Access Analyzer's visual findings — color-coded risks jump out faster than reading JSON" },
+    { "principle": "Emotion", "application": "Feel the weight of `Resource: *` — this single policy grants access to everything. Treat it with the gravity it deserves" },
+    { "principle": "Storytelling", "application": "Frame privilege escalation as a heist: the burglar has one key, but that key opens the room where ALL the keys are stored" },
+    { "principle": "Simplification", "application": "Access control = 3 questions: Who are you? What do you want? Are you allowed? Everything else is implementation details" },
+    { "principle": "Chunking", "application": "Learn policy evaluation in order: identity policies → resource policies → permissions boundaries → service control policies → session policies" },
+    { "principle": "Teaching", "application": "Explain explicit deny precedence to a colleague using a real-world analogy — if they get it, you've mastered the logic" }
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Access Control: Where Most Cloud Breaches Begin",
+      "content": "Broken access control is the #1 vulnerability in OWASP Top 10 and the root cause of most cloud breaches. Understanding how policies are evaluated — and where they break — is the most impactful skill you can develop in cloud security. Every `*` in a policy is a door left unlocked.",
+      "action": "Open your cloud console and look at your most permissive IAM policy. How many `*` wildcards does it contain? Each one is a risk vector."
+    },
+    {
+      "type": "explanation",
+      "title": "IAM Policy Evaluation Logic",
+      "content": "Understanding how cloud providers evaluate access decisions is critical for finding broken access control.\n\n**AWS Policy Evaluation (simplified):**\n1. **Default deny**: Everything is denied unless explicitly allowed\n2. **Evaluate all policies**: Identity-based, resource-based, permissions boundaries, service control policies, session policies\n3. **Explicit deny wins**: If ANY policy has an explicit deny, access is denied\n4. **Explicit allow required**: At least one policy must explicitly allow the action\n5. **No allow = deny**: If no policy allows the action, it's implicitly denied\n\n**Policy Types by Scope:**\n- **Identity-based**: Attached to IAM users, groups, or roles (defines what they CAN do)\n- **Resource-based**: Attached to resources like S3 buckets (defines WHO can access them)\n- **Permissions boundaries**: Maximum permissions a role/user can ever have (ceiling)\n- **Service Control Policies (SCPs)**: Organization-level boundaries (another ceiling)\n- **Session policies**: Temporary restrictions for assumed roles\n\n**Common Broken Access Control Patterns:**\n\n1. **Over-permissioned roles**: `Action: *` on `Resource: *`\n2. **Missing resource constraints**: `Action: s3:GetObject` on `Resource: *` (all buckets instead of specific)\n3. **Privilege escalation paths**: `iam:PassRole` + `ec2:RunInstances` = assume any role\n4. **Cross-account trust misconfiguration**: Trusting all accounts or using `Principal: *`\n5. **Resource-based policies overriding identity policies**: S3 bucket policy allowing public access despite IAM denial\n6. **Stale permissions**: Permissions from old roles no longer needed but never removed\n\n**Azure RBAC Evaluation:**\n1. All applicable role assignments are collected\n2. Deny assignments always take precedence\n3. All allow assignments are combined (additive)\n4. Result: deny wins over allow\n\n**GCP IAM Evaluation:**\n1. IAM policies are evaluated as a flat list of bindings\n2. No explicit deny mechanism (use Organization Policies for restrictions)\n3. Most permissive binding wins — if any binding allows, access is granted",
+      "key_takeaway": "AWS: explicit deny > all. Azure: deny > allow. GCP: most permissive wins. Know your cloud's evaluation logic."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Access Control Policies",
+      "content": "Imagine a building with lots of doors, and each person has a list saying which doors they can open.\n\n**AWS rules** are like this:\n- If ANY list says 'NO, you can't open this door,' you can't open it. No exceptions.\n- If at least one list says 'YES, you can,' and NO list says 'NO,' then you can.\n- If no list mentions the door at all, you can't open it.\n\n**Privilege escalation** is like this:\n- You have a key to the supply closet (your normal permission)\n- Inside the supply closet is the key cabinet (you have `iam:PassRole`)\n- You use the key cabinet to get a master key (you create an EC2 instance with an admin role)\n- Now you have the master key and can open every door\n\n**Over-permissioned policies** are like giving someone a key that opens every door in the building 'just in case they need to check on something.' That's convenient, but if someone steals their key ring, the thief gets everything.\n\n**Permissions boundaries** are like saying: 'Even if someone gives you more keys, you can never open doors beyond the second floor.' It's a ceiling that can't be exceeded.\n\n**Resource-based policies** are like a door having its own guest list — the door itself decides who can enter, regardless of what your personal key list says.",
+      "analogy": "IAM policies = key lists. Explicit deny = bouncer's NO. Privilege escalation = finding the key cabinet. Boundary = ceiling on keys you can ever hold."
+    },
+    {
+      "type": "code_exercise",
+      "title": "IAM Policy Analysis and Privilege Escalation Detection",
+      "content": "Analyze IAM policies for security issues:\n\n```python\n# Python: IAM Policy Analyzer\nimport json\n\ndef analyze_policy(policy_document):\n    \"\"\"Analyze an IAM policy for security issues\"\"\"\n    issues = []\n    \n    for statement in policy_document.get('Statement', []):\n        effect = statement.get('Effect', '')\n        actions = statement.get('Action', [])\n        resources = statement.get('Resource', [])\n        \n        # Convert to lists for uniform handling\n        if isinstance(actions, str): actions = [actions]\n        if isinstance(resources, str): resources = [resources]\n        \n        # Check for overly permissive actions\n        if '*' in actions:\n            issues.append(f\"CRITICAL: Wildcard action in {effect} statement\")\n        \n        # Check for overly permissive resources\n        if '*' in resources:\n            issues.append(f\"HIGH: Wildcard resource in {effect} statement\")\n        \n        # Check for privilege escalation paths\n        escalation_actions = {\n            'iam:PassRole': 'Can pass any role to EC2/other services',\n            'iam:CreateAccessKey': 'Can create access keys for any user',\n            'iam:CreateLoginProfile': 'Can create login profiles for any user',\n            'iam:UpdateLoginProfile': 'Can update any user password',\n            'iam:AttachUserPolicy': 'Can attach any policy to any user',\n            'iam:PutRolePolicy': 'Can put inline policies on any role',\n            'sts:AssumeRole': 'Can assume any role they can specify',\n            'lambda:CreateFunction': 'Can create Lambda with any role',\n            'lambda:InvokeFunction': 'Can invoke any Lambda',\n            'ec2:RunInstances': 'Can launch EC2 with any role via iam:PassRole',\n        }\n        \n        for action in actions:\n            if action in escalation_actions:\n                issues.append(f\"ESCALATION: {action} - {escalation_actions[action]}\")\n            elif action == '*' and effect == 'Allow':\n                issues.append(f\"CRITICAL: Full admin access - includes all escalation paths\")\n    \n    return issues\n\n# Example: Analyze a suspicious policy\npolicy = {\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\"s3:*\", \"ec2:Describe*\", \"iam:PassRole\"],\n            \"Resource\": \"*\"\n        }\n    ]\n}\n\nfor issue in analyze_policy(policy):\n    print(issue)\n```\n\n```bash\n# AWS: Find all policies with admin access\naws iam list-policies --scope Local --query 'Policies[*].[PolicyName,Arn]' --output table\n\n# Check a specific policy\naws iam get-policy-version \\\n  --policy-arn arn:aws:iam::123456789012:policy/MyPolicy \\\n  --version-id v1\n\n# Find users with AdminAccess\naws iam list-attached-user-policies --user-name admin-user\n\n# Simulate policy (test what a user can actually do)\naws iam simulate-principal-policy \\\n  --policy-source-arn arn:aws:iam::123456789012:user/test-user \\\n  --action-names s3:GetObject s3:PutObject iam:CreateUser \\\n  --resource-arns arn:aws:s3:::my-bucket/*\n```\n\n**Challenge**: Run `aws iam simulate-principal-policy` for a user in your environment. What actions can they perform that they shouldn't?",
+      "hint": "Use `aws iam simulate-principal-policy` with `--action-names iam:*` to test all IAM actions. Any 'allowed' result is a potential escalation path."
+    },
+    {
+      "type": "real_world",
+      "title": "Case Study: Cloud Escalation Pathways",
+      "content": "Multiple real-world breaches exploited IAM privilege escalation:\n\n**Bridgewater Associates (2021)**\n- An attacker obtained credentials for a low-privilege IAM user\n- The user had `iam:PassRole` permission (for legitimate EC2 deployment)\n- Attacker launched an EC2 instance with an admin IAM role attached\n- The instance assumed the role, granting full admin access\n- **Root cause**: `iam:PassRole` was not scoped to specific roles\n\n**CloudGoat Escalation Path (common CTF pattern)**\n- Low-privilege user has `lambda:CreateFunction` and `iam:PassRole`\n- Creates a Lambda function with an admin role\n- Invokes the Lambda → admin access\n- **Key lesson**: Any service that can assume a role is an escalation path\n\n**Common Escalation Chains:**\n1. `iam:CreateAccessKey` → create keys for any user\n2. `iam:CreateLoginProfile` → set password for any user\n3. `iam:AttachUserPolicy` → attach admin policy to yourself\n4. `iam:PassRole` + `ec2:RunInstances` → launch instance with admin role\n5. `iam:PassRole` + `lambda:CreateFunction` → create Lambda with admin role\n6. `sts:AssumeRole` → assume any role you can specify\n7. `ec2:RunInstances` + `iam:PassRole` + `ec2:AssociateIamInstanceProfile` → attach role to existing instance\n\n**Detection Patterns:**\n- CloudTrail logs showing `iam:PassRole` for roles the user shouldn't access\n- EC2 instances launched with unusual IAM roles\n- Lambda functions created with admin roles\n- Access keys created for other users\n- Login profiles created or updated for other users",
+      "lesson": "Every IAM permission is an escalation path if it allows modifying permissions, passing roles, or creating resources with roles. Map these paths and close them."
+    },
+    {
+      "type": "memory_aid",
+      "title": "ESCALATE Acronym for IAM Escalation",
+      "content": "**E** — **Explicit Deny**: Always wins. Use it to set hard boundaries\n**S** — **Scope Resources**: Never use `Resource: *` in production policies\n**C** — **Create Access Keys**: `iam:CreateAccessKey` is an escalation path\n**A** — **Attach Policies**: `iam:AttachUserPolicy` lets users grant themselves permissions\n**L** — **Lambda/EC2 PassRole**: Can create services with privileged roles\n**A** — **Assume Role**: `sts:AssumeRole` across accounts is powerful and dangerous\n**T** — **Test with Simulation**: Always use `iam simulate-principal-policy` before deployment\n**E** — **Evaluate Regularly**: Audit all policies quarterly for privilege creep\n\n**Quick Privilege Escalation Detection Checklist:**\n- [ ] Users with `iam:*` or `AdministratorAccess`\n- [ ] Roles with `iam:PassRole` not scoped to specific roles\n- [ ] Lambda functions with admin roles\n- [ ] EC2 instance profiles with broad permissions\n- [ ] Cross-account trust policies with `Principal: *`\n- [ ] S3 bucket policies allowing public access\n- [ ] Unused permissions (compare assigned vs used via Access Analyzer)",
+      "mnemonic": "ESCALATE — the 8 steps to audit for privilege escalation paths"
+    },
+    {
+      "type": "reflection",
+      "title": "Audit Your Cloud IAM",
+      "content": "Run these checks in your environment:\n\n1. **Admin access**: How many users/roles have `AdministratorAccess` or `Action: *`?\n2. **PassRole paths**: Who has `iam:PassRole`? Is it scoped to specific roles?\n3. **Resource wildcards**: How many policies have `Resource: *`?\n4. **Cross-account access**: Which roles trust external accounts?\n5. **Public resources**: Are any S3 buckets, EBS snapshots, or AMIs public?\n6. **Unused permissions**: When was the last time each access key was used?\n7. **Stale credentials**: Are there access keys older than 90 days?\n\nRate your IAM maturity:\n- Level 1: We have IAM but haven't audited it\n- Level 2: We've removed wildcard policies from most resources\n- Level 3: We use Access Analyzer and simulate policies before deployment\n- Level 4: We have automated detection for escalation paths and regular audits\n- Level 5: We use permissions boundaries and JIT access for all roles",
+      "action": "Run `aws iam list-attached-user-policies` for your own user. Are there any policies with broader access than you need?"
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Close the Paths, Not Just the Doors",
+      "content": "Access control isn't just about who can open which door — it's about whether any door can be used to reach the key cabinet. Privilege escalation paths are the most dangerous vulnerabilities because they turn limited access into unlimited access.\n\nThe best IAM engineers don't just remove over-permissioned policies — they map every escalation path and close each one. It's detective work: find the chain, break a link.\n\nNext lesson: IAM Privilege Escalation Techniques — where we'll go deeper into specific attack paths and their countermeasures.",
+      "action": "Pick one escalation path from this lesson and verify it's blocked in your environment. One path closed is real progress."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "iam", "access-control", "privilege-escalation", "aws-iam", "azure-rbac", "policy-analysis", "least-privilege", "owasp"]
+}
