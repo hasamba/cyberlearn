@@ -1,0 +1,306 @@
+{
+  "lesson_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c05",
+  "domain": "cloud",
+  "title": "Cloud Cryptographic Key Management",
+  "subtitle": "Securing Encryption Keys in AWS KMS, Azure Key Vault, and GCP Cloud KMS",
+  "difficulty": 2,
+  "estimated_time": 45,
+  "order_index": 97,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand cloud KMS architecture and key lifecycle management",
+    "Configure AWS KMS, Azure Key Vault, and GCP Cloud KMS for secure key management",
+    "Implement key rotation, versioning, and deletion policies",
+    "Design envelope encryption strategies for data protection",
+    "Detect and respond to key management misconfigurations and abuse"
+  ],
+  "concepts": [
+    "Key Management Service",
+    "Envelope Encryption",
+    "Key Rotation",
+    "Customer Managed Keys",
+    "Hardware Security Module",
+    "Key Policies",
+    "CMK",
+    "CSE",
+    "Key Lifecycle",
+    "Cloud KMS"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-d5e6-7890-abcd-ef0123456780",
+      "type": "mindset_coach",
+      "title": "Keys Are the Crown Jewels",
+      "content": {
+        "text": "In cloud security, cryptographic keys are the crown jewels. They encrypt your databases, protect your secrets, sign your code, and secure your communications. If someone gets your encryption key, your encryption becomes useless. Key management isn't glamorous, but it's the foundation everything else is built on. A single misconfigured key policy can expose years of encrypted data. This lesson teaches you how to manage keys properly across AWS, Azure, and GCP."
+      },
+      "simplified_explanation": "Encryption keys are like the master keys to all your locked rooms. If someone steals the master key, all the locks are useless. Key management is about keeping those master keys safe, rotating them regularly, and making sure only the right people can use them.",
+      "memory_aids": [
+        "Keys = Crown jewels = If stolen, encryption is useless",
+        "Key management = Foundation of cloud security"
+      ],
+      "real_world_connection": "The 2019 Capital One breach wasn't just about data access — the attacker gained access to IAM roles that could use KMS keys to decrypt sensitive data. Key policies are as critical as data access policies.",
+      "reflection_prompt": "Do you know where your organization's encryption keys are managed and who has access to them?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-e6f7-8901-bcde-f12345678902",
+      "type": "explanation",
+      "title": "Cloud KMS Architecture Across Providers",
+      "content": {
+        "text": "Each cloud provider offers a managed key management service, but they differ in important ways:\n\n**AWS KMS (Key Management Service)**\n- Customer Managed Keys (CMK): You control policy, rotation, and deletion\n- AWS Managed Keys: AWS manages for service integration\n- Key types: Symmetric (AES-256), Asymmetric (RSA, ECC)\n- Envelope encryption: KMS encrypts data keys, data keys encrypt data\n- Automatic key rotation: Annual (for symmetric CMKs)\n- HSM-backed: Keys never leave HSMs in plaintext\n\n**Azure Key Vault**\n- Key types: RSA, EC (elliptic curve)\n- Managed HSM: Dedicated HSM pool (single-tenant)\n- Key vault types: Standard (soft delete) vs Premium (HSM-backed)\n- Automatic rotation: Configurable with Azure Policy\n- Secrets, certificates, and keys in one vault\n- Access via Azure RBAC or vault access policies\n\n**GCP Cloud KMS**\n- Key rings organize keys by location\n- Key versions: Automatic versioning on every operation\n- Import existing keys or generate in Cloud KMS\n- Cloud HSM: HSM-backed keys\n- Automatic rotation: Configurable (90 days default recommended)\n- IAM-based access control\n\n**Comparison:**\n\n| Feature | AWS KMS | Azure Key Vault | GCP Cloud KMS |\n|---------|---------|---------------|---------------|\n| HSM-backed | Yes (shared) | Yes (Premium) | Yes (Cloud HSM) |\n| Envelope encryption | Yes | Yes | Yes |\n| Automatic rotation | Annual | Configurable | Configurable |\n| Key import | No* | Yes | Yes |\n| Managed HSM | No (shared) | Yes (dedicated) | Yes (Cloud HSM) |\n| Key policies | Resource-based | Access policies/RBAC | IAM |\n\n*AWS KMS now supports key import for certain key types",
+        "format": "markdown"
+      },
+      "simplified_explanation": "All three cloud providers offer key management services that use Hardware Security Modules (HSMs) to protect your keys. AWS KMS is the most integrated with other AWS services, Azure Key Vault also stores secrets and certificates, and GCP Cloud KMS organizes keys into rings with automatic versioning.",
+      "memory_aids": [
+        "AWS KMS = CMK (Customer Managed Key) + Envelope Encryption",
+        "Azure Key Vault = Keys + Secrets + Certificates in one place",
+        "GCP Cloud KMS = Key Rings + Automatic Versioning",
+        "All use HSMs = Keys never leave hardware in plaintext"
+      ],
+      "real_world_connection": "The choice of KMS affects your entire security architecture. Organizations running multi-cloud need to understand all three to maintain consistent key management practices across environments.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b3c4d5e6-f7a8-9012-cdef-123456789012",
+      "type": "explanation",
+      "title": "Envelope Encryption Deep Dive",
+      "content": {
+        "text": "Envelope encryption is the core pattern used by all cloud KMS providers. Understanding it is critical:\n\n**How Envelope Encryption Works:**\n\n```\nStep 1: Application requests data encryption\nStep 2: KMS generates a Data Encryption Key (DEK)\nStep 3: KMS encrypts the DEK with the Customer Master Key (CMK)\nStep 4: Application receives BOTH:\n  - Plaintext DEK (for encrypting data)\n  - Encrypted DEK (for storage)\nStep 5: Application encrypts data with plaintext DEK\nStep 6: Application stores: Encrypted Data + Encrypted DEK\nStep 7: Plaintext DEK is discarded from memory\n\nDecryption:\nStep 1: Application sends Encrypted DEK to KMS\nStep 2: KMS decrypts DEK using the CMK\nStep 3: Application receives plaintext DEK\nStep 4: Application decrypts data with plaintext DEK\n```\n\n**Why Envelope Encryption?**\n1. **Performance**: KMS doesn't see your data — only encrypts/decrypts the DEK\n2. **Scalability**: One CMK can protect millions of DEKs\n3. **Key rotation**: Rotate CMK without re-encrypting all data\n4. **Audit**: Every DEK generation is logged\n5. **Access control**: CMK policy controls who can use the key\n\n**AWS KMS Envelope Encryption Example:**\n\n```python\nimport boto3\n\nkms = boto3.client('kms')\n\n# Generate a data key\nresponse = kms.generate_data_key(\n    KeyId='alias/my-cmk',\n    KeySpec='AES_256'\n)\n\n# Response contains:\n# - PlaintextKey: Use to encrypt your data (discard after!)\n# - CiphertextBlob: Encrypted DEK (store with your data)\n\nplaintext_key = response['Plaintext']\nencrypted_dek = response['CiphertextBlob']\n\n# Encrypt your data with plaintext_key\n# Store: encrypted_data + encrypted_dek\n\n# Decrypt later:\ndecrypt_response = kms.decrypt(\n    CiphertextBlob=encrypted_dek\n)\n# Returns plaintext DEK to decrypt data\n```\n\n**Key Rotation:**\nWhen you rotate a CMK, new DEKs are generated with the new version. Old data encrypted with previous DEKs can still be decrypted — KMS tracks all key versions. You never need to re-encrypt existing data.",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Envelope encryption is like a safe within a safe. The master key (CMK) opens the inner safe to get the data key (DEK), and the data key opens the box with your actual data. The master key never directly touches your data — it only protects the data key. This way, you can rotate the master key without re-encrypting everything.",
+      "memory_aids": [
+        "Envelope = CMK encrypts DEK, DEK encrypts data",
+        "Master key = Safe key | Data key = Box key | Data = Contents",
+        "Rotate CMK = New DEKs use new version, old data still decrypts"
+      ],
+      "real_world_connection": "Every time you use S3 server-side encryption, EBS encryption, or any AWS encryption service, envelope encryption is happening behind the scenes. Understanding this helps you design proper key hierarchies for your own applications.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c4d5e6f7-a8b9-0123-def0-234567890123",
+      "type": "explanation",
+      "title": "Key Policies and Access Control",
+      "content": {
+        "text": "Key policies are the most critical — and most often misconfigured — part of cloud KMS:\n\n**AWS KMS Key Policies:**\n\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"Enable IAM User Policies\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::123456789012:root\"\n      },\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\"\n    },\n    {\n      \"Sid\": \"Allow encryption and decryption\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::123456789012:role/ApplicationRole\"\n      },\n      \"Action\": [\n        \"kms:Encrypt\",\n        \"kms:Decrypt\",\n        \"kms:GenerateDataKey\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"kms:EncryptionContext:application\": \"my-app\"\n        }\n      }\n    },\n    {\n      \"Sid\": \"Allow key administrators\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::123456789012:role/KeyAdminRole\"\n      },\n      \"Action\": [\n        \"kms:Create*\",\n        \"kms:Describe*\",\n        \"kms:Enable*\",\n        \"kms:List*\",\n        \"kms:PutKeyPolicy\",\n        \"kms:ScheduleKeyDeletion\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}\n```\n\n**Common Key Policy Misconfigurations:**\n\n1. **Overly Permissive Principals:** Using `*` as principal allows anyone in the account to use the key\n2. **Missing Encryption Context:** Without encryption context conditions, any role with kms:Decrypt can decrypt any data encrypted with that key\n3. **Admin and User Separation:** Administrators who can change policies should not be able to encrypt/decrypt data\n4. **Cross-Account Access Without Conditions:** Allowing external accounts without restrictions\n\n**Azure Key Vault Access Control:**\n\n```json\n// Azure Key Vault access policy\n{\n  \"tenantId\": \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\",\n  \"objectId\": \"yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy\",\n  \"permissions\": {\n    \"keys\": [\"encrypt\", \"decrypt\", \"wrapKey\", \"unwrapKey\"],\n    \"secrets\": [\"get\", \"list\"],\n    \"certificates\": [\"get\", \"list\"]\n  }\n}\n```\n\n**Best Practices:**\n- Separate key administrators from key users\n- Use encryption context to scope key usage\n- Enable key rotation (automatic)\n- Monitor key usage with CloudTrail/Activity Log\n- Implement least-privilege policies\n- Use separate keys for different data classifications\n- Never use AWS managed keys for sensitive data (you can't control the policy)",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Key policies control who can use encryption keys. The most common mistake is giving too many people access. Best practice: separate administrators (who manage the key) from users (who encrypt/decrypt data), and use encryption context to limit what each key can encrypt.",
+      "memory_aids": [
+        "Key policy = Who can use this key and for what",
+        "Admin ≠ User: Key admins manage, key users encrypt/decrypt",
+        "Encryption context = Limits what data each key can protect"
+      ],
+      "real_world_connection": "A misconfigured KMS key policy that allowed all authenticated users to decrypt led to a data breach where an attacker with a compromised IAM role could decrypt sensitive data across multiple S3 buckets.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "d5e6f7a8-b9c0-1234-ef01-345678901234",
+      "type": "code_exercise",
+      "title": "Auditing KMS Key Security",
+      "content": {
+        "text": "Here's a script to audit AWS KMS key configurations for security issues:\n\n```python\nimport boto3\nimport json\n\ndef audit_kms_keys():\n    \"\"\"Audit all KMS keys for security misconfigurations.\"\"\"\n    kms = boto3.client('kms')\n    findings = []\n    \n    # List all keys\n    paginator = kms.get_paginator('list_keys')\n    \n    for page in paginator.paginate():\n        for key in page['Keys']:\n            key_id = key['KeyId']\n            \n            # Get key metadata\n            metadata = kms.describe_key(KeyId=key_id)\n            key_data = metadata['KeyMetadata']\n            policy = kms.get_key_policy(KeyId=key_id, PolicyName='default')\n            policy_doc = json.loads(policy['Policy'])\n            \n            # Check 1: Key rotation enabled\n            if key_data['Origin'] == 'AWS_KMS' and key_data['KeyManager'] == 'CUSTOMER':\n                try:\n                    rotation = kms.get_key_rotation_status(KeyId=key_id)\n                    if not rotation['KeyRotationEnabled']:\n                        findings.append({\n                            'key_id': key_id,\n                            'severity': 'MEDIUM',\n                            'issue': 'KEY_ROTATION_DISABLED',\n                            'detail': 'Automatic key rotation is not enabled'\n                        })\n                except:\n                    pass  # AWS managed keys can't be checked\n            \n            # Check 2: Overly permissive key policy\n            for statement in policy_doc.get('Statement', []):\n                if (statement.get('Effect') == 'Allow' and\n                    statement.get('Principal', {}).get('AWS') == '*'):\n                    findings.append({\n                        'key_id': key_id,\n                        'severity': 'HIGH',\n                        'issue': 'OVERLY_PERMISSIVE_KEY_POLICY',\n                        'detail': f\"Key policy allows access to all principals\"\n                    })\n            \n            # Check 3: Key deletion protection\n            if key_data['KeyState'] == 'PendingDeletion':\n                findings.append({\n                    'key_id': key_id,\n                    'severity': 'CRITICAL',\n                    'issue': 'KEY_PENDING_DELETION',\n                    'detail': f\"Key is scheduled for deletion on {key_data['DeletionDate']}\"\n                })\n            \n            # Check 4: Key not used recently\n            if key_data.get('Enabled') and key_data['KeyManager'] == 'CUSTOMER':\n                # Check last usage (requires CloudTrail analysis)\n                pass  # Would require CloudTrail log analysis\n    \n    return findings\n\n# Run the audit\nresults = audit_kms_keys()\nfor f in results:\n    print(f\"[{f['severity']}] {f['key_id'][:12]}...: {f['issue']}\")\n    print(f\"  Detail: {f['detail']}\")\n```",
+        "format": "python"
+      },
+      "simplified_explanation": "This script checks every KMS key for common security issues: disabled rotation, overly permissive policies, and pending deletions. It's like checking that every lock in your building has the right keys assigned and no locks are about to be removed.",
+      "memory_aids": [
+        "Audit: Rotation enabled? Policy permissive? Key pending deletion?",
+        "Key without rotation = Key compromise = All data decrypted",
+        "Wildcard principal in key policy = Anyone can decrypt"
+      ],
+      "real_world_connection": "Regular KMS key audits are essential. Many organizations have keys created years ago with permissive policies that were never reviewed. These orphaned keys can be a significant security risk.",
+      "reflection_prompt": null,
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e6f7a8b9-c0d1-2345-f012-456789012345",
+      "type": "real_world",
+      "title": "Case Study: Key Policy Misconfiguration Leads to Data Exposure",
+      "content": {
+        "text": "**Incident:** A financial services company discovered that an attacker could decrypt sensitive customer data across 47 S3 buckets.\n\n**Root Cause:**\n- A KMS CMK was created with a default key policy that allowed `kms:Decrypt` for all authenticated users in the account\n- The key was used for server-side encryption of 47 S3 buckets\n- An attacker compromised a low-privilege IAM role through a vulnerable web application\n- The compromised role had `kms:Decrypt` permission through the default key policy\n- The attacker could decrypt all data in all 47 buckets\n\n**Attack Chain:**\n1. Web application vulnerability → IAM role compromise\n2. IAM role had kms:Decrypt through default key policy\n3. Attacker used S3 API to download encrypted objects\n4. Attacker used the same IAM role to call KMS Decrypt\n5. KMS returned plaintext data keys\n6. Attacker decrypted all 47 buckets' data\n\n**Why the Default Key Policy Was Dangerous:**\n```json\n// Dangerous default policy\n{\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:root\"},\n    \"Action\": \"kms:*\",\n    \"Resource\": \"*\"\n  }]\n}\n// This allows any IAM policy in the account to grant access to the key\n```\n\n**Remediation:**\n1. Updated key policies to restrict `kms:Decrypt` to specific roles\n2. Added encryption context conditions to scope key usage\n3. Enabled CloudTrail data events logging for KMS\n4. Implemented key usage monitoring and alerting\n5. Separated keys by data classification\n6. Rotated all compromised keys",
+        "format": "markdown"
+      },
+      "simplified_explanation": "A default key policy allowed any role in the account to decrypt. An attacker compromised one low-privilege role through a web app vulnerability, then used that role's KMS access to decrypt 47 buckets of sensitive data. The fix: restrict key policies to specific roles with encryption context conditions.",
+      "memory_aids": [
+        "Default key policy + compromised role = All data decrypted",
+        "Always restrict kms:Decrypt to specific roles",
+        "Encryption context = Scope key usage to specific data types"
+      ],
+      "real_world_connection": "This is one of the most common KMS misconfigurations. Default key policies that allow broad access are convenient during development but dangerous in production.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "f7a8b9c0-d1e2-3456-0123-567890123456",
+      "type": "explanation",
+      "title": "Key Lifecycle Management Best Practices",
+      "content": {
+        "text": "Managing keys throughout their lifecycle requires discipline and automation:\n\n**Key Lifecycle Stages:**\n\n```\nCreation → Activation → Rotation → Deactivation → Deletion\n   ↑                                                      |\n   └────────────── Re-encrypt if needed ←──────────────────┘\n```\n\n**1. Key Creation**\n- Use customer-managed keys for sensitive data\n- Define key policies at creation time\n- Tag keys with purpose, owner, and data classification\n- Use CloudHSM / Managed HSM for highest security\n\n**AWS Key Creation:**\n```bash\naws kms create-key \\\n  --description \"Production database encryption key\" \\\n  --key-usage ENCRYPT_DECRYPT \\\n  --origin AWS_KMS \\\n  --tags TagKey=DataClassification,TagValue=Restricted \\\n  --policy file://key-policy.json\n\naws kms create-alias \\\n  --alias-name alias/prod-db-encryption \\\n  --target-key-id <key-id>\n```\n\n**2. Key Rotation**\n- AWS: Automatic annual rotation for symmetric CMKs\n- Azure: Configure rotation policy (90 days recommended)\n- GCP: Configure rotation period (90 days recommended)\n- Manual rotation: Create new key, update alias, schedule old key for deletion after transition period\n\n**3. Key Monitoring**\n```bash\n# CloudTrail logs every KMS API call\n# Key usage monitoring queries:\n\n# Find keys not used in 90 days\naws cloudtrail lookup-events \\\n  --lookup-attributes AttributeKey=ResourceName,AttributeValue=<key-arn> \\\n  --start-time $(date -d '90 days ago' +%Y-%m-%dT%H:%M:%S)\n```\n\n**4. Key Deletion**\n- Always schedule deletion, never immediate\n- AWS: 7-30 day waiting period (recommended: 30 days)\n- Azure: Soft delete enabled by default (90-day purge protection)\n- GCP: 24-hour destruction schedule\n- Before deletion: Verify no data is still using the key\n\n**Key Hierarchy Best Practices:**\n```\nMaster Key (KMS) → Data Encryption Key → Data\n         ↑                                         ↑\n   Rotate annually                       Rotate per operation\n```\n\n- One master key per data classification level\n- Separate keys for different environments (dev/staging/prod)\n- Separate keys for different applications\n- Document key purpose and ownership",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Key lifecycle management is about controlling keys from creation to deletion. Create keys with proper policies, rotate them regularly, monitor usage, and delete safely with a waiting period. Never delete a key immediately — always schedule deletion and verify nothing still uses it.",
+      "memory_aids": [
+        "Key lifecycle: Create → Activate → Rotate → Deactivate → Delete",
+        "Rotate annually, monitor always, delete with 30-day waiting period",
+        "One key per classification, one key per environment"
+      ],
+      "real_world_connection": "Key deletion without a waiting period has caused permanent data loss. AWS's mandatory 7-day minimum waiting period was introduced specifically because organizations were accidentally deleting keys they still needed.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "a8b9c0d1-e2f3-4567-1234-678901234567",
+      "type": "memory_aid",
+      "title": "Cloud Key Management Cheat Sheet",
+      "content": {
+        "text": "**🔑 AWS KMS:**\n- CMK = Customer Managed Key (you control policy)\n- Envelope encryption: CMK → DEK → Data\n- Key rotation: Annual (automatic)\n- Key policy: Resource-based, not IAM\n- CloudTrail: Logs every KMS API call\n\n**🔐 Azure Key Vault:**\n- Keys + Secrets + Certificates in one vault\n- Access policies or RBAC\n- Soft delete: 90-day recovery\n- Managed HSM: Single-tenant HSM pool\n- Key rotation: Azure Policy configurable\n\n**🛡️ GCP Cloud KMS:**\n- Key Rings organize keys by location\n- Automatic versioning on every operation\n- Cloud HSM: HSM-backed keys\n- IAM-based access control\n- Import existing keys supported\n\n**⚠️ Critical Rules:**\n1. Never use default/managed keys for sensitive data\n2. Always restrict key policies to specific roles\n3. Enable key rotation (annual minimum)\n4. Monitor key usage with CloudTrail/Activity Log\n5. Schedule deletion with 30-day waiting period\n6. Use encryption context to scope key usage\n7. Separate keys by data classification",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "AWS KMS: CMK → DEK → Data (envelope encryption)",
+        "Azure Key Vault: Keys + Secrets + Certificates",
+        "GCP Cloud KMS: Key Rings + Automatic versioning",
+        "Never: Default keys for sensitive data, wildcard principals, immediate deletion"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "b9c0d1e2-f3a4-5678-2345-789012345678",
+      "type": "reflection",
+      "title": "Key Management Mastery Check",
+      "content": {
+        "text": "**Review Questions:**\n\n1. **What is envelope encryption and why is it used?**\n   — A master key (CMK) encrypts a data key (DEK), which encrypts the actual data. This allows key rotation without re-encrypting all data and ensures the master key never directly touches data.\n\n2. **Why should you never use AWS managed keys for sensitive data?**\n   — You can't control the key policy for AWS managed keys, meaning you can't restrict who can use them or add encryption context conditions.\n\n3. **What's the recommended minimum deletion waiting period for KMS keys?**\n   — 30 days, to ensure no data still depends on the key.\n\n4. **How does encryption context improve key security?**\n   — Encryption context is additional authenticated data that must be provided to decrypt. It scopes key usage so a key can only decrypt data with matching context, preventing misuse.\n\n5. **What's the key hierarchy best practice?**\n   — One master key per data classification, separate keys per environment, separate keys per application.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [],
+      "real_world_connection": null,
+      "reflection_prompt": "How does your organization currently manage encryption keys? Are there any gaps in key policies or rotation?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "c0d1e2f3-a4b5-6789-3456-890123456789",
+      "type": "mindset_coach",
+      "title": "Key Management is Data Protection",
+      "content": {
+        "text": "Key management isn't exciting, but it's the bedrock of data protection in the cloud. Every encrypted database, every secret, every signed certificate depends on keys being properly managed.\n\n**Key Takeaways:**\n1. **Envelope encryption** is the foundation — understand it deeply\n2. **Key policies** are as important as IAM policies — restrict who can decrypt\n3. **Key rotation** is non-negotiable — enable automatic annual rotation at minimum\n4. **Monitor key usage** — CloudTrail/Activity Log should alert on unusual decrypt patterns\n5. **Separate keys** by classification, environment, and application\n\nThe best encryption in the world is useless if the key management is weak. Treat your keys like the crown jewels they are.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "Key management = Data protection foundation",
+        "Restrict key policies, rotate annually, monitor always",
+        "Separate keys: one per classification, environment, application"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What is envelope encryption?",
+      "options": [
+        "Encrypting data twice with two different keys",
+        "A master key encrypts a data key, which then encrypts the actual data",
+        "Storing encryption keys inside envelopes of additional security layers",
+        "Using the same key for encryption and decryption"
+      ],
+      "correct_answer": 1,
+      "explanation": "In envelope encryption, the Customer Master Key (CMK) encrypts the Data Encryption Key (DEK), and the DEK encrypts the actual data. This allows key rotation without re-encrypting data and ensures the master key never directly processes data."
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Why should you avoid using AWS managed keys (aws/*) for sensitive data?",
+      "options": [
+        "AWS managed keys use weaker encryption algorithms",
+        "You cannot control the key policy, meaning you can't restrict access or add encryption context",
+        "AWS managed keys don't support encryption",
+        "AWS managed keys expire after 30 days"
+      ],
+      "correct_answer": 1,
+      "explanation": "AWS managed keys have default policies that allow any IAM user/role in the account to use them. You can't customize these policies to restrict access or add encryption context conditions. For sensitive data, customer-managed keys give you full control over who can use the key."
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What is the recommended minimum waiting period before deleting a KMS key?",
+      "options": [
+        "24 hours",
+        "7 days",
+        "30 days",
+        "90 days"
+      ],
+      "correct_answer": 2,
+      "explanation": "30 days is the recommended minimum waiting period for key deletion. AWS enforces a minimum of 7 days, but 30 days provides more safety margin to ensure no data still depends on the key. Once a key is deleted, all data encrypted with it becomes permanently unrecoverable."
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "How does encryption context enhance KMS key security?",
+      "options": [
+        "It encrypts the data key twice for extra security",
+        "It adds additional authenticated data that must match for decryption, scoping key usage to specific data types",
+        "It hides the encryption key from unauthorized users",
+        "It stores the encryption context in a separate database"
+      ],
+      "correct_answer": 1,
+      "explanation": "Encryption context is additional data (key-value pairs) that is cryptographically bound to the encryption. When you encrypt with context {\"application\": \"payroll\"}, the same context must be provided to decrypt. This means the key can only be used to decrypt data with matching context, preventing misuse."
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What happens to existing data when you rotate a Customer Master Key in AWS KMS?",
+      "options": [
+        "All existing data must be re-encrypted with the new key version",
+        "Existing data remains encrypted with the old key version and can still be decrypted; new data uses the new version",
+        "The old key version is immediately deleted",
+        "All encrypted data becomes inaccessible"
+      ],
+      "correct_answer": 1,
+      "explanation": "When you rotate a CMK, AWS KMS creates a new key version. New encryption operations use the new version, but the old version is still available for decryption. KMS tracks which version encrypted which data, so all existing data remains accessible without re-encryption."
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 115,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-21T14:30:00+03:00",
+  "updated_at": "2026-06-21T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0",
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "KMS", "Key Management", "Envelope Encryption", "HSM", "Cloud Security", "Built-In"]
+}

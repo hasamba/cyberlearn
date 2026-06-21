@@ -1,0 +1,315 @@
+{
+  "lesson_id": "e0f1a2b3-d4c5-4e6f-a7b8-5c6d7e8f9a01",
+  "domain": "blue_team",
+  "title": "Key Log Events for Threat Detection",
+  "subtitle": "Critical Event IDs and Log Sources That Reveal Attacks",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 97,
+  "prerequisites": [
+    "Windows and Linux Logging for Detection"
+  ],
+  "learning_objectives": [
+    "Identify the most critical Windows Event IDs for threat detection",
+    "Recognize key Linux log events that indicate compromise",
+    "Map log events to the MITRE ATT&CK framework",
+    "Build detection rules around critical event IDs",
+    "Prioritize log collection based on detection value"
+  ],
+  "concepts": [
+    "Event ID 4624",
+    "Event ID 4625",
+    "Event ID 4648",
+    "Sysmon Event IDs",
+    "Authentication Logs",
+    "Process Creation",
+    "Lateral Movement Logs",
+    "MITRE ATT&CK Mapping",
+    "Log Priority",
+    "Detection Rules"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-d5e6-7890-abcd-ef0123456780",
+      "type": "mindset_coach",
+      "title": "Not All Logs Are Created Equal",
+      "content": {
+        "text": "You could collect every log from every system, but you'd drown in noise. The key to effective detection is knowing which events actually matter. A single Event ID 4624 (successful logon) is routine — but 4624 with Logon Type 3 from an unusual source IP at 3 AM is a red flag. This lesson teaches you which events to prioritize and how to interpret them in context."
+      },
+      "simplified_explanation": "Most logs are noise. This lesson focuses on the 20% of events that reveal 80% of attacks. Think of it as knowing which security camera to watch, instead of staring at 100 screens.",
+      "memory_aids": [
+        "20% of events reveal 80% of attacks",
+        "Context turns routine events into red flags"
+      ],
+      "real_world_connection": "Sophisticated attackers don't use exotic techniques — they use legitimate Windows features like PsExec, WMI, and PowerShell. Detection relies on catching the log events these tools generate, not looking for malware signatures.",
+      "reflection_prompt": "How many of the critical event IDs in this lesson are you currently monitoring?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-e6f7-8901-bcde-f12345678902",
+      "type": "explanation",
+      "title": "Critical Windows Authentication Events",
+      "content": {
+        "text": "Authentication events are the backbone of detection. Here are the events you must know:\n\n**Event ID 4624 — Successful Logon**\nKey fields to monitor:\n- `Logon Type`: 2 (Interactive), 3 (Network), 4 (Batch), 5 (Service), 7 (Unlock), 8 (NetworkCleartext), 9 (NewCredentials), 10 (RemoteInteractive), 11 (CachedInteractive)\n- `Authentication Package`: Kerberos vs NTLM\n- `Source Network Address`: Where the logon came from\n- `TargetUserName`: Who logged on\n\n**Detection Use Cases:**\n- Logon Type 3 + unusual source = Lateral movement\n- Logon Type 10 = RDP session\n- Logon Type 9 = Pass-the-hash (runas /netonly)\n- NTLM authentication in Kerberos environment = Possible credential attack\n\n**Event ID 4625 — Failed Logon**\n- Multiple 4625 events from same source = Brute force\n- 4625 with special privilege accounts = Targeted attack\n\n**Event ID 4648 — Explicit Credential Logon**\n- Someone using explicit credentials (runas, scheduled task with stored creds)\n- Common during lateral movement with PsExec\n\n**Event ID 4672 — Special Privileges Assigned**\n- Logon with admin-level privileges\n- Correlate with 4624 for privileged account tracking\n\n**Event ID 4768/4769 — Kerberos TGT/TGS Request**\n- 4768: TGT requested (initial authentication)\n- 4769: TGS requested (service access)\n- Encryption type 0x17 (RC4) = Potential Kerberoasting target\n\n```spl\n# Splunk detection: Brute force detection\nindex=wineventlog EventCode=4625\n| stats count as failures, dc(TargetUserName) as unique_accounts by SourceNetworkAddress\n| where failures > 10 AND unique_accounts > 3\n| sort -failures\n```",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Event 4624 = Someone logged in successfully. Event 4625 = Someone failed to log in. The magic is in the details — what type of logon, from where, using what credentials. A successful logon from an unusual IP at 3 AM is suspicious even though 4624 is routine.",
+      "memory_aids": [
+        "4624 = Success | 4625 = Failure | 4648 = Explicit creds | 4672 = Admin",
+        "Logon Type 3 = Network | 10 = RDP | 9 = Pass-the-hash indicator",
+        "Multiple 4625 = Brute force | NTLM in Kerberos env = Suspicious"
+      ],
+      "real_world_connection": "The lateral movement phase of almost every Windows attack generates Event 4624 with Logon Type 3. The SolarWinds attackers generated thousands of these events across victim networks.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b3c4d5e6-f7a8-9012-cdef-123456789012",
+      "type": "explanation",
+      "title": "Critical Sysmon Events for Detection",
+      "content": {
+        "text": "Sysmon provides the granular event data that Windows Event Logs lack:\n\n**Sysmon EID 1 — Process Creation**\n```\nKey fields:\n- Image: Full path to executable\n- CommandLine: Full command line including arguments\n- ParentImage: What process launched this\n- CurrentDirectory: Working directory\n- User: Security context\n- Hashes: SHA256, MD5, SHA1, IMPHASH\n\nSuspicious patterns:\n- powershell.exe with -enc or -bypass flags\n- cmd.exe launched by unusual parent (Word, Excel)\n- certutil.exe with -urlcache or -f flags (download)\n- mshta.exe executing remote HTA files\n- wscript.exe/cscript.exe executing unusual scripts\n- rundll32.exe loading from temp/appdata directories\n```\n\n**Sysmon EID 3 — Network Connection**\n```\nKey fields:\n- Image: Process making connection\n- Source/Destination IP and Port\n- Initiated: true/false\n\nSuspicious patterns:\n- PowerShell making outbound connections\n- cmd.exe connecting to external IPs\n- Unusual processes on port 443 (not browsers)\n- Connections to known C2 infrastructure\n- Rare processes making external connections\n```\n\n**Sysmon EID 7 — Image Loaded (DLL)**\n```\nSuspicious patterns:\n- DLL loaded from temp/appdata directories\n- DLL loaded by unusual process\n- Known malicious DLL hashes\n- Side-loaded DLL (different directory than the EXE)\n```\n\n**Sysmon EID 8 — CreateRemoteThread**\n```\nSuspicious patterns:\n- Process injection detection\n- Source and target process differ\n- Injecting into lsass.exe = credential theft\n- Injecting into explorer.exe = persistence\n```\n\n**Sysmon EID 10 — Process Access**\n```\nSuspicious patterns:\n- Accessing lsass.exe with PROCESS_VM_READ = Credential dumping\n- Source: powershell.exe, mimikatz.exe, taskmgr.exe\n- DesiredAccess: 0x1410 (Read Memory) = Mimikatz pattern\n```\n\n**Sysmon EID 22 — DNS Query**\n```\nSuspicious patterns:\n- Queries to newly registered domains\n- DGA (Domain Generation Algorithm) patterns\n- DNS TXT queries (potential data exfiltration)\n- Long subdomain labels (DNS tunneling)\n- Queries matching known C2 indicators\n```",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Sysmon is your best friend for detection. EID 1 (process creation) tells you what ran and how. EID 3 (network connections) tells you what's calling home. EID 10 (process access) catches credential theft. EID 22 (DNS) catches C2 communication.",
+      "memory_aids": [
+        "Sysmon 1 = What ran | 3 = What connected | 7 = What DLL loaded",
+        "Sysmon 8 = Injection | 10 = Access to lsass = Cred theft | 22 = DNS query",
+        "PowerShell + -enc = Red flag | certutil + -urlcache = Download tool"
+      ],
+      "real_world_connection": "Sigma rules (the detection rule standard) heavily rely on Sysmon events. Of the top 100 detection rules, ~65% use Sysmon EID 1 (process creation) because command-line visibility is the most powerful detection signal on Windows.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c4d5e6f7-a8b9-0123-def0-234567890123",
+      "type": "explanation",
+      "title": "Linux Key Events and ATT&CK Mapping",
+      "content": {
+        "text": "Linux detection relies on different log sources but follows the same principles:\n\n**Critical Linux Log Events:**\n\n**Authentication Events (auth.log / secure):**\n```bash\n# Successful SSH login\ngrep \"Accepted\" /var/log/auth.log\n# Failed SSH login\ngrep \"Failed password\" /var/log/auth.log\n# Sudo usage\ngrep \"sudo:\" /var/log/auth.log\n# User added/modified\ngrep \"useradd\\|usermod\\|passwd\" /var/log/auth.log\n```\n\n**Process Execution (auditd):**\n```bash\n# Track all process execution\nausearch -m execve -ts recent\n\n# Specific suspicious commands\ngrep \"execve\" /var/log/audit/audit.log | grep -E \"curl|wget|nc|ncat|bash.*-i\"\n```\n\n**Key auditd Rules for Detection:**\n```bash\n# Process execution\n-a exit,always -F arch=b64 -S execve\n\n# File modification in sensitive directories\n-w /etc/passwd -p wa -k identity\n-w /etc/shadow -p wa -k identity\n-w /etc/sudoers -p wa -k sudo_changes\n\n# SSH key access\n-w /root/.ssh/ -p wa -k ssh_keys\n-w /home/ -p wa -k home_changes\n\n# Cron modification\n-w /etc/cron* -p wa -k cron_changes\n\n# Network connections\n-a exit,always -F arch=b64 -S connect\n```\n\n**MITRE ATT&CK Mapping — Key Events:**\n\n| Tactic | Technique | Windows Event | Linux Source |\n|--------|-----------|---------------|------------- |\n| Initial Access | T1078 Valid Accounts | 4624, 4625 | auth.log (Accepted/Failed) |\n| Execution | T1059 Command Line | Sysmon 1 | auditd execve |\n| Persistence | T1053 Scheduled Task | 4698, 4702 | crontab entries |\n| Persistence | T1136 Create Account | 4720 | useradd in auth.log |\n| Priv Esc | T1068 Exploitation | 4672, 4673 | sudo logs |\n| Defense Evasion | T1070 Indicator Removal | 1102 | auditd log clear |\n| Credential Access | T1003 OS Cred Dump | Sysmon 10 | /etc/shadow access |\n| Lateral Movement | T1021 Remote Services | 4624 Type 3 | SSH logs |\n| Exfiltration | T1048 Exfiltration | Sysmon 3 | Network connections |",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Linux detection uses auth.log for logins and sudo, auditd for process execution and file changes, and journald for service logs. The same MITRE ATT&CK techniques apply — just different log sources.",
+      "memory_aids": [
+        "Linux: auth.log = Logins/sudo | auditd = Processes/files | journalctl = Services",
+        "ATT&CK mapping: 4624→auth.log Accepted | Sysmon 1→auditd execve | 4720→useradd",
+        "auditd -S execve = Process tracking gold mine"
+      ],
+      "real_world_connection": "Cloud servers run Linux. If your organization has cloud infrastructure (AWS EC2, Azure VMs, GCP instances), Linux logging is essential. The same attacks that happen on Windows (credential theft, lateral movement, persistence) happen on Linux with different tools.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "d5e6f7a8-b9c0-1234-ef01-345678901234",
+      "type": "code_exercise",
+      "title": "Building Detection Rules from Key Events",
+      "content": {
+        "text": "Here are Sigma-format detection rules for key event patterns:\n\n**Sigma Rule: Suspicious PowerShell Execution**\n```yaml\ntitle: Suspicious PowerShell Execution\ndescription: Detects PowerShell execution with suspicious parameters\nstatus: production\nlogsource:\n    category: process_creation\n    product: windows\ndetection:\n    selection:\n        Image|endswith: '\\\\powershell.exe'\n        CommandLine|contains:\n            - '-enc'\n            - '-EncodedCommand'\n            - '-bypass'\n            - '-noprofile'\n            - '-hidden'\n            - '-windowstyle hidden'\n            - 'Invoke-Expression'\n            - 'IEX'\n            - 'DownloadString'\n            - 'FromBase64String'\n    condition: selection\nlevel: high\ntags:\n    - attack.execution\n    - attack.t1059.001\n```\n\n**Sigma Rule: Lateral Movement via PsExec**\n```yaml\ntitle: PsExec Lateral Movement\ndescription: Detects PsExec usage for lateral movement\ndescription: Detects PsExec service installation\nstatus: production\nlogsource:\n    product: windows\n    service: security\ndetection:\n    selection:\n        EventID: 4624\n        LogonType: 3\n        TargetImage|endswith: '\\\\PSEXESVC.exe'\n    condition: selection\nlevel: medium\ntags:\n    - attack.lateral_movement\n    - attack.t1021.002\n```\n\n**Sigma Rule: Credential Dumping via LSASS Access**\n```yaml\ntitle: LSASS Memory Access\ndescription: Detects processes accessing LSASS memory\ndescription: Detects processes accessing LSASS memory\nstatus: production\nlogsource:\n    product: windows\n    service: sysmon\ndetection:\n    selection:\n        EventID: 10\n        TargetImage|endswith: '\\\\lsass.exe'\n        GrantedAccess|contains:\n            - '0x1410'  # Read memory\n            - '0x1010'  # Read memory\n    filter:\n        SourceImage|endswith:\n            - '\\\\taskmgr.exe'\n            - '\\\\procexp64.exe'\n            - '\\\\procexp.exe'\n            - '\\\\svchost.exe'\n    condition: selection and not filter\nlevel: critical\ntags:\n    - attack.credential_access\n    - attack.t1003.001\n```",
+        "format": "yaml"
+      },
+      "simplified_explanation": "Sigma rules are detection recipes. They say: 'If you see THIS event with THESE characteristics, it's suspicious.' The PowerShell rule catches encoded commands. The LSASS rule catches credential theft. The PsExec rule catches lateral movement.",
+      "memory_aids": [
+        "Sigma = Detection recipe = If THIS event with THESE characteristics = Alert",
+        "PowerShell + -enc/-bypass = High priority alert",
+        "Process accessing lsass.exe = Critical alert (credential theft)"
+      ],
+      "real_world_connection": "Sigma is the standard format for detection rules. It's vendor-agnostic — write once, convert to Splunk SPL, Microsoft Sentinel KQL, Elasticsearch KQL, or any other SIEM query language using the Sigma toolchain.",
+      "reflection_prompt": null,
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e6f7a8b9-c0d1-2345-f012-456789012345",
+      "type": "real_world",
+      "title": "Real Attack Event Sequences",
+      "content": {
+        "text": "Let's trace real attack patterns through log events:\n\n**Attack Pattern: Lateral Movement via Pass-the-Hash**\n\n```\nStep 1: Attacker obtains hash (Mimikatz on compromised host)\n  → Sysmon EID 10: Process accessing lsass.exe\n  → Sysmon EID 1: mimikatz.exe or similar process created\n\nStep 2: Attacker uses hash to authenticate to next host\n  → EID 4624: Logon Type 3 (Network)\n  → EID 4624: Authentication Package = NTLM (not Kerberos)\n  → EID 4648: Explicit credentials logon\n\nStep 3: Attacker creates remote session\n  → Sysmon EID 1: psexec.exe or wmic.exe process created\n  → Sysmon EID 3: Network connection to target host\n  → Sysmon EID 1: Remote service installed\n\nStep 4: Attacker establishes persistence\n  → EID 4698: Scheduled task created\n  → Sysmon EID 13: Registry persistence key set\n```\n\n**Attack Pattern: PowerShell Download Cradle**\n\n```\nStep 1: User opens weaponized document\n  → Sysmon EID 1: WINWORD.EXE or EXCEL.EXE spawns powershell.exe\n  → Sysmon EID 1: CommandLine contains IEX or DownloadString\n\nStep 2: PowerShell downloads payload\n  → Sysmon EID 3: powershell.exe makes outbound connection\n  → Sysmon EID 22: DNS query for payload domain\n\nStep 3: Payload executes\n  → Sysmon EID 1: New process created from temp directory\n  → Sysmon EID 7: Suspicious DLL loaded\n  → Sysmon EID 3: C2 beaconing connection established\n```\n\n**Key Detection Principle:**\nEach attack step generates events. Detecting any single step is useful. Detecting the *sequence* (kill chain) is powerful. Correlating EID 10 → EID 4624 → EID 1 creates a high-fidelity alert for pass-the-hash.",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Attacks leave a trail of events. Pass-the-hash generates: access to lsass → network logon → remote execution. PowerShell attacks generate: Office spawns PowerShell → network download → new process. Each step is an event you can detect.",
+      "memory_aids": [
+        "PtH sequence: EID 10 (lsass access) → 4624 (network logon) → EID 1 (remote process)",
+        "PowerShell sequence: Office spawns PS → Download → Execute → C2",
+        "Correlated events = Higher fidelity alerts = Fewer false positives"
+      ],
+      "real_world_connection": "Sophisticated detection platforms like Microsoft Sentinel and Splunk UEBA correlate these event sequences automatically. Understanding the event chains helps you write better detection rules and investigate alerts more effectively.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "f7a8b9c0-d1e2-3456-0123-567890123456",
+      "type": "memory_aid",
+      "title": "Critical Event IDs Quick Reference",
+      "content": {
+        "text": "**🔴 CRITICAL — Investigate Immediately:**\n\n| ID | Source | Meaning |\n|-----|--------|---------|\n| 10 | Sysmon | Process accessing LSASS (cred dump) |\n| 8 | Sysmon | CreateRemoteThread (injection) |\n| 25 | Sysmon | Process tampering (hollowing) |\n| 1102 | Security | Audit log cleared (anti-forensics) |\n| 4648 | Security | Explicit credential logon |\n\n**🟡 HIGH — Correlate and Analyze:**\n\n| ID | Source | Meaning |\n|-----|--------|---------|\n| 4624 | Security | Successful logon (check Logon Type) |\n| 4625 | Security | Failed logon (brute force) |\n| 4672 | Security | Special privileges assigned |\n| 1 | Sysmon | Process creation (suspicious commands) |\n| 3 | Sysmon | Network connection (unusual) |\n| 22 | Sysmon | DNS query (C2 indicators) |\n| 7 | Sysmon | DLL loaded (suspicious location) |\n\n**🟢 MEDIUM — Baseline and Monitor:**\n\n| ID | Source | Meaning |\n|-----|--------|---------|\n| 13 | Sysmon | Registry value set (persistence) |\n| 11 | Sysmon | File creation (dropper) |\n| 4720 | Security | User created |\n| 4732 | Security | Member added to group |\n| 7045 | System | Service installed |\n| 4698 | Security | Scheduled task created |",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "CRITICAL: LSASS access (10), Injection (8), Log cleared (1102)",
+        "HIGH: Logon events (4624/25), Process creation (1), Network (3), DNS (22)",
+        "MEDIUM: Registry (13), File (11), User/group changes (4720/32)"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a8b9c0d1-e2f3-4567-1234-678901234567",
+      "type": "explanation",
+      "title": "Prioritizing Log Collection",
+      "content": {
+        "text": "Not all logs provide equal detection value. Prioritize collection based on ATT&CK coverage:\n\n**Tier 1 — Must Have (Deploy Immediately):**\n- Windows Security Event Log (4624, 4625, 4648, 4672, 4720, 4732, 4698, 1102)\n- Sysmon (EID 1, 3, 7, 8, 10, 11, 13, 22, 25)\n- PowerShell Script Block Logging (4104)\n- Linux auth.log / secure\n- Linux auditd (execve, file modifications)\n\n**Tier 2 — Should Have (Deploy Within 30 Days):**\n- Windows System Log (7045 — Service installation)\n- Windows Application Log (Application errors/crashes)\n- DNS query logs\n- Firewall/NGFW logs\n- DHCP logs\n- VPN authentication logs\n\n**Tier 3 — Nice to Have (Deploy Within 90 Days):**\n- Web server access logs\n- Database audit logs\n- Application-specific logs\n- Network device logs\n- Cloud provider logs (CloudTrail, Activity Log)\n\n**Log Volume vs Detection Value:**\n\n```\nHigh Volume, High Value:     Sysmon EID 1, 3, 22\nLow Volume, High Value:      Sysmon EID 8, 10, 25; EID 1102\nHigh Volume, Medium Value:  DNS queries, firewall logs\nLow Volume, Medium Value:   Service installs, account changes\n```\n\n**Cost Optimization Tips:**\n1. Use Sysmon filtering to reduce noise (exclude legitimate processes)\n2. Set appropriate log sizes (Security log: 4GB minimum)\n3. Forward only what you need to SIEM\n4. Use S3/Storage for long-term retention, SIEM for hot search",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Start with the high-value, must-have logs (Windows Security + Sysmon + PowerShell + Linux auth/auditd). These cover the most attack techniques. Add more as your detection program matures.",
+      "memory_aids": [
+        "Tier 1 = Windows Security + Sysmon + PowerShell + Linux auth + auditd",
+        "High value + Low volume = Investigate immediately (LSASS, injection, log clear)",
+        "High value + High volume = Correlate and analyze (process creation, network)"
+      ],
+      "real_world_connection": "Many organizations try to collect everything at once and fail. Starting with Tier 1 logs gives you coverage for ~80% of ATT&CK techniques. You can add more as your detection capabilities mature.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b9c0d1e2-f3a4-5678-2345-789012345678",
+      "type": "reflection",
+      "title": "Key Event IDs Mastery Check",
+      "content": {
+        "text": "**Test Your Knowledge:**\n\n1. **What does Event ID 4624 Logon Type 3 indicate?**\n   — Network logon, commonly seen during lateral movement (SMB, PsExec, WMI).\n\n2. **What Sysmon Event ID detects credential dumping?**\n   — EID 10 (Process Access) — specifically a process accessing lsass.exe with read memory permissions.\n\n3. **What's the significance of Event ID 1102?**\n   — Audit log was cleared. This is an anti-forensics technique — attackers clear logs to cover their tracks.\n\n4. **Which Linux log tracks sudo commands?**\n   — /var/log/auth.log (Debian) or /var/log/secure (RHEL).\n\n5. **What does Sysmon EID 22 capture?**\n   — DNS queries, which are crucial for detecting C2 communication and DGA domains.\n\n6. **What's the detection value of correlating events?**\n   — Correlated events (event chains) dramatically reduce false positives and increase alert fidelity.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [],
+      "real_world_connection": null,
+      "reflection_prompt": "Which of these events are you currently alerting on? Which gaps need to be filled?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "c0d1e2f3-a4b5-6789-3456-890123456789",
+      "type": "mindset_coach",
+      "title": "From Events to Detections",
+      "content": {
+        "text": "You've now learned the key events that reveal attacks. But events alone don't make detections — context does. A single 4624 is routine. A 4624 with Logon Type 3 from an unusual IP, followed by a Sysmon EID 1 spawning cmd.exe, followed by EID 3 connecting to a suspicious domain — that's a detection.\n\n**The Progression:**\n1. **Events** → Raw data points (4624, EID 1, EID 3)\n2. **Correlations** → Event sequences (4624 → EID 1 → EID 3)\n3. **Detections** → Correlations with context (unusual source, off-hours, known bad domain)\n4. **Alerts** → Detections filtered for relevance and priority\n\n**Key Takeaway:**\nDon't try to alert on every event. Focus on high-value events, add context through correlation, and prioritize detections based on the attack patterns that matter most to your organization.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "Events → Correlations → Detections → Alerts",
+        "Single event = Noise | Correlated events = Signal",
+        "Prioritize: Tier 1 logs first, then add context"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "What does Windows Event ID 4624 with Logon Type 3 typically indicate?",
+      "options": [
+        "Interactive console logon",
+        "Network logon, commonly associated with lateral movement",
+        "Service account logon",
+        "Cached domain credential logon"
+      ],
+      "correct_answer": 1,
+      "explanation": "Logon Type 3 indicates a network logon, which occurs when a user authenticates to a remote system using SMB, PsExec, WMI, or similar tools. This is the most common logon type during lateral movement attacks."
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "Which Sysmon Event ID detects credential dumping by monitoring access to LSASS?",
+      "options": [
+        "Sysmon EID 1 (Process Creation)",
+        "Sysmon EID 3 (Network Connection)",
+        "Sysmon EID 10 (Process Access)",
+        "Sysmon EID 22 (DNS Query)"
+      ],
+      "correct_answer": 2,
+      "explanation": "Sysmon EID 10 (Process Access) monitors when one process accesses another process's memory. When a process accesses lsass.exe with PROCESS_VM_READ permission, it indicates credential dumping activity, commonly performed by tools like Mimikatz."
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "What makes Windows Event ID 1102 particularly alarming?",
+      "options": [
+        "It indicates a successful remote desktop connection",
+        "It means the audit log was cleared, which is a common anti-forensics technique",
+        "It shows a new user account was created",
+        "It records a change to firewall rules"
+      ],
+      "correct_answer": 1,
+      "explanation": "Event ID 1102 indicates that the Security audit log was cleared. Legitimate administrators rarely clear audit logs, so this event is a strong indicator of anti-forensics activity — an attacker trying to cover their tracks by removing evidence."
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "On Linux, which auditd rule tracks all process execution for detection purposes?",
+      "options": [
+        "-a exit,always -F arch=b64 -S open",
+        "-a exit,always -F arch=b64 -S execve",
+        "-a exit,always -F arch=b64 -S write",
+        "-a exit,always -F arch=b64 -S connect"
+      ],
+      "correct_answer": 1,
+      "explanation": "The execve system call is used when a new process is executed. Tracking -S execve in auditd provides Linux process creation logging equivalent to Sysmon EID 1 on Windows, which is the most valuable detection data source."
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "Why is correlating multiple events more valuable than alerting on individual events?",
+      "options": [
+        "It reduces the number of logs you need to store",
+        "Correlated events dramatically reduce false positives and increase alert fidelity by adding attack context",
+        "Individual events are always false positives",
+        "It makes the SIEM run faster"
+      ],
+      "correct_answer": 1,
+      "explanation": "A single Event ID 4624 (successful logon) is routine and generates massive noise. But a 4624 from an unusual source IP, followed by a process creation spawning cmd.exe, followed by a network connection to a suspicious domain — that correlated sequence has very high fidelity and low false positive rate."
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 110,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-21T14:30:00+03:00",
+  "updated_at": "2026-06-21T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0",
+  "tags": [
+    "Course: SANS-SEC450",
+    "Career Path: SOC Analyst",
+    "Career Path: Threat Hunter",
+    "Event IDs",
+    "MITRE ATT&CK",
+    "Detection Rules",
+    "Sigma",
+    "Built-In"
+  ]
+}

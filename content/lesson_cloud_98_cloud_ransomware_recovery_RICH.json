@@ -1,0 +1,309 @@
+{
+  "lesson_id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f08",
+  "domain": "cloud",
+  "title": "Cloud Ransomware Recovery",
+  "subtitle": "Preparing for and Recovering from Ransomware Attacks in Cloud Environments",
+  "difficulty": 3,
+  "estimated_time": 50,
+  "order_index": 98,
+  "prerequisites": [],
+  "learning_objectives": [
+    "Understand how ransomware operates in cloud environments",
+    "Design cloud-specific backup and recovery strategies",
+    "Implement cloud ransomware prevention controls",
+    "Execute incident response procedures for cloud ransomware",
+    "Plan and test cloud disaster recovery for ransomware scenarios"
+  ],
+  "concepts": [
+    "Cloud Ransomware",
+    "Immutable Backups",
+    "Cross-Region Recovery",
+    "Cloud DR",
+    "Ransomware Prevention",
+    "Backup Strategy",
+    "Incident Response",
+    "Cloud Storage Encryption",
+    "Versioning",
+    "Ransomware Negotiation"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "a1b2c3d4-e5f6-7890-abcd-ef0123456780",
+      "type": "mindset_coach",
+      "title": "The Cloud Doesn't Make You Immune",
+      "content": {
+        "text": "Many organizations assume cloud means safety — that AWS, Azure, or GCP will protect them from ransomware. That's dangerously wrong. Cloud ransomware is real, growing, and often more devastating than on-premises attacks. Why? Because cloud environments have massive data stores, automated access through IAM roles, and shared responsibility gaps that attackers exploit. A single compromised IAM role can encrypt terabytes of S3 data across multiple buckets. This lesson teaches you how to prepare for, prevent, and recover from ransomware in the cloud."
+      },
+      "simplified_explanation": "Cloud doesn't protect you from ransomware — it can make it worse. A single compromised IAM role can encrypt terabytes across multiple buckets. But cloud also gives you powerful recovery tools: immutable backups, cross-region replication, and versioning. The key is using them before you need them.",
+      "memory_aids": [
+        "Cloud ransomware = Same threat, bigger scale, faster encryption",
+        "Single IAM role compromise = Terabytes encrypted across regions",
+        "Cloud recovery tools: Immutable backups, versioning, cross-region replication"
+      ],
+      "real_world_connection": "In 2023, a cloud-native company lost 2TB of S3 data when attackers compromised an IAM role with s3:PutObject and s3:DeleteObject permissions across 47 buckets. The company had backups — but they were in the same AWS account, and the attackers deleted those too.",
+      "reflection_prompt": "If your cloud account was compromised right now, how long would it take to recover your data? Do you have immutable backups in a separate account?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "b2c3d4e5-f6a7-8901-bcde-f12345678902",
+      "type": "explanation",
+      "title": "How Ransomware Works in the Cloud",
+      "content": {
+        "text": "Cloud ransomware differs from traditional ransomware in critical ways:\n\n**Traditional Ransomware (On-Premises):**\n- Encrypts files on local drives\n- Requires local execution (malware on endpoint)\n- Limited to accessible file shares\n- Recovery from local or network backups\n\n**Cloud Ransomware (New Model):**\n- Encrypts or deletes objects in cloud storage (S3, Blob, GCS)\n- Uses cloud APIs (no local malware needed)\n- Can affect all buckets/containers in an account\n- Can delete backups in the same account\n- Can spread across regions instantly\n\n**Cloud Ransomware Attack Vectors:**\n\n**1. IAM Role Compromise**\n```\nAttack flow:\n1. Compromise IAM role (phishing, exposed credentials, SSRF)\n2. Enumerate accessible S3 buckets\n3. Download original objects\n4. Upload encrypted copies\n5. Delete original objects\n6. Leave ransom note (README_DECRYPT.txt)\n\nRequired permissions:\n- s3:ListBucket (find targets)\n- s3:GetObject (download originals)\n- s3:PutObject (upload encrypted copies)\n- s3:DeleteObject (delete originals)\n```\n\n**2. Cloud Crypto Mining + Data Encryption**\n- Compromise compute instance for crypto mining\n- Use instance metadata to assume IAM role\n- Enumerate and encrypt accessible data stores\n- Dual threat: resource abuse + data encryption\n\n**3. Serverless Ransomware**\n- Deploy Lambda/Cloud Functions that iterate through buckets\n- Each function invocation processes a batch of objects\n- Scales automatically (pay-per-use becomes pay-per-encryption)\n- Delete the function when complete — no persistent malware\n\n**4. Snapshot Encryption**\n- Encrypt EBS volumes via snapshot copy\n- Delete original snapshots\n- Ransom the decryption key\n\n**5. Database Ransomware**\n- RDS/Aurora snapshot encryption\n- Cloud SQL backup encryption\n- DynamoDB table export encryption\n- Delete original data, ransom the encrypted export",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Cloud ransomware uses cloud APIs instead of local malware. A compromised IAM role can encrypt everything across all regions. Attackers can even use serverless functions (Lambda) to encrypt at scale, then delete the evidence. The attack is faster, affects more data, and can destroy backups in the same account.",
+      "memory_aids": [
+        "Cloud ransomware = API-based, not malware-based",
+        "Single IAM role = s3:ListBucket + GetObject + PutObject + DeleteObject = Full encryption",
+        "Serverless ransomware: Lambda encrypts, deletes itself, no persistent malware"
+      ],
+      "real_world_connection": "The TeamTNT group has been targeting cloud environments specifically, using compromised IAM credentials to enumerate and encrypt S3 buckets. They also deploy crypto miners on compromised EC2 instances — a dual threat that costs money both in ransom and compute resources.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "type": "explanation",
+      "title": "Cloud Backup and Recovery Strategies",
+      "content": {
+        "text": "The key to ransomware recovery is having backups that the ransomware can't reach:\n\n**Principle 1: Immutable Backups (WORM)**\n\n```bash\n# AWS S3 Object Lock (WORM - Write Once Read Many)\naws s3api put-object-lock-configuration \\\n  --bucket my-backup-bucket \\\n  --object-lock-configuration '{\n    \"ObjectLockEnabled\": \"Enabled\",\n    \"Rule\": {\n      \"DefaultRetention\": {\n        \"Mode\": \"COMPLIANCE\",\n        \"Days\": 365\n      }\n    }\n  }'\n\n# Compliance mode = Cannot be deleted by ANYONE, even root user\n# Governance mode = Can be deleted by privileged users (with explicit bypass)\n\n# Azure Immutable Storage\naz storage container immutability-policy create \\\n  --account-name mystorageaccount \\\n  --container-name mycontainer \\\n  --period 365\n\n# GCP Bucket Lock\ngcloud storage buckets update gs://my-backup-bucket \\\n  --default-event-based-hold\n```\n\n**Principle 2: Cross-Account Backups**\n\n```\nProduction Account (Account A)\n  → Replicate to Backup Account (Account B)\n  → Backup Account has NO cross-account delete permissions\n  → Even if Account A is fully compromised, backups in Account B are safe\n```\n\n**AWS Cross-Account Backup Architecture:**\n```yaml\n# Backup Account (Account B) Bucket Policy\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::ACCOUNT_A_ID:root\"\n      },\n      \"Action\": [\n        \"s3:PutObject\",\n        \"s3:GetObject\"\n      ],\n      \"Resource\": \"arn:aws:s3:::backup-bucket/*\"\n    },\n    {\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"s3:DeleteObject\",\n      \"Resource\": \"arn:aws:s3:::backup-bucket/*\",\n      \"Condition\": {\n        \"StringNotEquals\": {\n          \"aws:PrincipalAccount\": \"ACCOUNT_B_ID\"\n        }\n      }\n    }\n  ]\n}\n```\n\n**Principle 3: Versioning + Lifecycle**\n\n```bash\n# Enable versioning on all buckets\naws s3api put-bucket-versioning \\\n  --bucket my-data-bucket \\\n  --versioning-configuration Status=Enabled\n\n# With versioning, 'deleting' an object just adds a delete marker\n# Previous versions are still accessible\n# To recover: remove delete marker\naws s3api delete-object \\\n  --bucket my-data-bucket \\\n  --key \"encrypted-file.txt\" \\\n  --version-id \"delete-marker-version-id\"\n```\n\n**Principle 4: Cross-Region Replication**\n\n```bash\n# Replicate to different region for disaster recovery\naws s3api put-bucket-replication \\\n  --bucket my-data-bucket \\\n  --replication-configuration '{\n    \"Role\": \"arn:aws:iam::ACCOUNT_ID:role/s3-replication-role\",\n    \"Rules\": [{\n      \"ID\": \"ReplicateToBackupRegion\",\n      \"Status\": \"Enabled\",\n      \"Destination\": {\n        \"Bucket\": \"arn:aws:s3:::my-backup-bucket\",\n        \"StorageClass\": \"STANDARD_IA\"\n      }\n    }]\n  }'\n```\n\n**Recovery Architecture Summary:**\n\n| Layer | Purpose | Ransomware Resistant |\n|-------|---------|----------------------|\n| S3 Versioning | Recover from overwrite/delete | Yes (delete markers) |\n| Cross-Region Replication | Geographic redundancy | Yes (separate region) |\n| Cross-Account Backup | Account isolation | Yes (separate account) |\n| Object Lock (WORM) | Immutable retention | Yes (cannot delete) |\n| AWS Backup Vault Lock | Backup immutability | Yes (cannot delete) |",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Four layers of cloud backup protection: 1) Object Lock (WORM - can't delete even by root), 2) Cross-account replication (different AWS account, different permissions), 3) Versioning (delete just adds marker, old version still there), 4) Cross-region (different geographic location). Use all four for maximum ransomware resistance.",
+      "memory_aids": [
+        "4 Backup layers: Object Lock + Cross-Account + Versioning + Cross-Region",
+        "WORM = Write Once Read Many = Even root can't delete",
+        "Cross-account = Compromised account A can't delete backups in account B",
+        "Versioning = Delete adds marker, previous versions still accessible"
+      ],
+      "real_world_connection": "Organizations that only had same-account backups lost everything when ransomware encrypted the backups too. Cross-account, immutable backups are the gold standard for ransomware recovery.",
+      "reflection_prompt": null,
+      "is_interive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "type": "explanation",
+      "title": "Cloud Ransomware Prevention Controls",
+      "content": {
+        "text": "Preventing cloud ransomware requires controls at multiple layers:\n\n**1. IAM Hardening (Most Critical)**\n\n```json\n// Least privilege S3 policy — prevent mass deletion\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:GetObject\",\n        \"s3:PutObject\"\n      ],\n      \"Resource\": \"arn:aws:s3:::my-bucket/*\"\n    },\n    {\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"s3:DeleteObject\",\n        \"s3:DeleteObjectVersion\"\n      ],\n      \"Resource\": \"arn:aws:s3:::my-bucket/*\",\n      \"Condition\": {\n        \"StringNotEquals\": {\n          \"aws:PrincipalAccount\": \"BACKUP_ACCOUNT_ID\"\n        }\n      }\n    },\n    {\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"s3:PutObject\"\n      ],\n      \"Resource\": \"arn:aws:s3:::my-bucket/*\",\n      \"Condition\": {\n        \"StringNotEquals\": {\n          \"s3:x-amz-server-side-encryption\": \"aws:kms\"\n        }\n      }\n    }\n  ]\n}\n```\n\n**2. S3 Bucket Protection**\n\n```bash\n# Enable MFA delete (requires MFA to delete objects or version history)\naws s3api put-bucket-versioning \\\n  --bucket my-bucket \\\n  --versioning-configuration Status=Enabled \\\n  --mfa \"arn:aws:iam::123456789012:mfa/admin 123456\"\n\n# Block public access\naws s3api put-public-access-block \\\n  --bucket my-bucket \\\n  --public-access-block-configuration \\\n    BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true\n\n# Enable server-side encryption by default\naws s3api put-bucket-encryption \\\n  --bucket my-bucket \\\n  --server-side-encryption-configuration '{\n    \"Rules\": [{\n      \"ApplyServerSideEncryptionByDefault\": {\n        \"SSEAlgorithm\": \"aws:kms\",\n        \"KMSMasterKeyID\": \"arn:aws:kms:region:account:key/key-id\"\n      }\n    }]\n  }'\n```\n\n**3. Monitoring and Detection**\n\n```yaml\n# CloudWatch alarm: Mass deletion detection\nResources:\n  MassDeletionAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: mass-s3-deletion\n      AlarmDescription: Alert on mass S3 object deletion\n      MetricName: DeleteRequests\n      Namespace: AWS/S3\n      Statistic: Sum\n      Period: 300  # 5 minutes\n      EvaluationPeriods: 1\n      Threshold: 100  # More than 100 deletes in 5 min\n      ComparisonOperator: GreaterThanThreshold\n      AlarmActions:\n        - !Ref SNSAlertTopic\n```\n\n**4. Compute Protection**\n\n```bash\n# Prevent IMDS access from compromised instances\n# Use IMDSv2 (requires session token)\naws ec2 modify-instance-metadata-options \\\n  --instance-id i-1234567890abcdef0 \\\n  --http-tokens required \\\n  --http-endpoint enabled\n\n# This prevents SSRF attacks from stealing IAM role credentials\n```\n\n**5. Network Protection**\n- VPC endpoints for S3 (no internet access needed)\n- S3 bucket policies restricting access to specific VPCs\n- PrivateLink for AWS services\n- Deny direct internet access to data stores",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Prevention = IAM hardening (least privilege, deny mass delete) + S3 protection (MFA delete, versioning, encryption) + Monitoring (alert on mass deletion) + Compute protection (IMDSv2 prevents SSRF) + Network protection (VPC endpoints, no internet access to data). The most critical: deny s3:DeleteObject from application roles.",
+      "memory_aids": [
+        "Prevention: IAM hardening + S3 protection + Monitoring + Compute + Network",
+        "Most critical: Deny s3:DeleteObject from application roles",
+        "IMDSv2 = Prevents SSRF from stealing IAM credentials",
+        "Mass deletion alarm = 100+ deletes in 5 minutes"
+      ],
+      "real_world_connection": "The Capital One breach started with SSRF on an EC2 instance that used IMDSv1. The attacker could retrieve IAM role credentials and access S3 data. IMDSv2 requires a session token, preventing this attack vector.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
+      "type": "code_exercise",
+      "title": "Ransomware Recovery Runbook",
+      "content": {
+        "text": "This runbook covers the step-by-step recovery process for cloud ransomware:\n\n```bash\n#!/bin/bash\n# Cloud Ransomware Recovery Runbook\n# Execute these steps in order\n\n# ============================================\n# PHASE 1: CONTAINMENT (0-30 minutes)\n# ============================================\n\n# Step 1: Disable compromised IAM credentials\necho \"[1] Disabling compromised IAM credentials...\"\naws iam delete-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --user-name compromised-user\naws iam remove-user-from-group --user-name compromised-user --group-name data-access\n\n# Step 2: Revoke active sessions\necho \"[2] Revoking active sessions...\"\naws iam create-policy \\\n  --policy-name deny-all \\\n  --policy-document '{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [{\n      \"Effect\": \"Deny\",\n      \"Action\": \"*\",\n      \"Resource\": \"*\"\n    }]\n  }'\naws iam attach-user-policy --user-name compromised-user --policy-arn arn:aws:iam::account:policy/deny-all\n\n# Step 3: Isolate affected resources\necho \"[3] Isolating affected resources...\"\n# Deny all S3 access from the compromised role\naws s3api put-bucket-policy --bucket my-data-bucket --policy file://deny-all-policy.json\n\n# ============================================\n# PHASE 2: ASSESSMENT (30-60 minutes)\n# ============================================\n\n# Step 4: Determine scope of encryption\necho \"[4] Assessing scope of encryption...\"\naws s3api list-object-versions --bucket my-data-bucket \\\n  --query 'Versions[?IsLatest==`true`].[Key,VersionId,LastModified]' \\\n  --output json > current-versions.json\n\n# Step 5: Identify encrypted objects (look for ransom notes)\naws s3api list-objects-v2 --bucket my-data-bucket \\\n  --query 'Contents[?contains(Key, `README_DECRYPT`)].Key' \\\n  --output json > ransom-notes.json\n\n# Step 6: Check backup integrity\necho \"[6] Verifying backup integrity...\"\naws s3api list-object-versions --bucket my-backup-bucket \\\n  --query 'Versions[?IsLatest==`true`].[Key,VersionId,LastModified]' \\\n  --output json > backup-versions.json\n\n# ============================================\n# PHASE 3: RECOVERY (1-4 hours)\n# ============================================\n\n# Step 7: Remove delete markers (if versioning enabled)\necho \"[7] Removing delete markers...\"\nfor key in $(cat affected-keys.txt); do\n  # Get the delete marker version ID\n  marker=$(aws s3api list-object-versions --bucket my-data-bucket \\\n    --prefix \"$key\" \\\n    --query 'DeleteMarkers[0].VersionId' \\\n    --output text)\n  \n  # Remove the delete marker to restore previous version\n  aws s3api delete-object \\\n    --bucket my-data-bucket \\\n    --key \"$key\" \\\n    --version-id \"$marker\"\ndone\n\n# Step 8: Restore from immutable backup (if versioning not available)\necho \"[8] Restoring from backup account...\"\nfor key in $(cat affected-keys.txt); do\n  aws s3 copy-object \\\n    --copy-source my-backup-bucket/$key \\\n    --bucket my-data-bucket \\\n    --key \"$key\"\ndone\n\n# Step 9: Verify data integrity\necho \"[9] Verifying data integrity...\"\n# Compare checksums of restored objects\nfor key in $(cat affected-keys.txt); do\n  backup_hash=$(aws s3api head-object --bucket my-backup-bucket --key \"$key\" \\\n    --query 'ETag' --output text)\n  restored_hash=$(aws s3api head-object --bucket my-data-bucket --key \"$key\" \\\n    --query 'ETag' --output text)\n  if [ \"$backup_hash\" != \"$restored_hash\" ]; then\n    echo \"INTEGRITY CHECK FAILED: $key\"\n  fi\ndone\n\n# ============================================\n# PHASE 4: POST-RECOVERY\n# ============================================\n\necho \"[10] Post-recovery steps:\"\necho \"1. Review and rotate all credentials\"\necho \"2. Enable enhanced monitoring\"\necho \"3. Conduct root cause analysis\"\necho \"4. Update prevention controls\"\necho \"5. Document lessons learned\"\necho \"6. Test recovery procedures\"\n```",
+        "format": "bash"
+      },
+      "simplified_explanation": "Recovery runbook: 1) Containment (disable compromised credentials, revoke sessions, isolate resources) → 2) Assessment (determine scope, find encrypted objects, verify backups) → 3) Recovery (remove delete markers, restore from backups, verify integrity) → 4) Post-recovery (rotate credentials, monitor, analyze, document).",
+      "memory_aids": [
+        "Recovery phases: Contain → Assess → Restore → Post-recovery",
+        "Containment: Disable credentials, revoke sessions, isolate resources",
+        "Assessment: Find encrypted objects, check backup integrity",
+        "Recovery: Remove delete markers or restore from cross-account backup"
+      ],
+      "real_world_connection": "Organizations with tested recovery runbooks recover in hours. Those without can take days or weeks. The difference is preparation — having immutable backups, documented procedures, and practiced recovery.",
+      "reflection_prompt": null,
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "f6a7b8c9-d0e1-2345-f012-456789012345",
+      "type": "real_world",
+      "title": "Cloud Ransomware Attack Simulation",
+      "content": {
+        "text": "**Scenario:** A cloud-native SaaS company is hit by ransomware through a compromised IAM role.\n\n**Attack Timeline:**\n\n```\nDay 0, 23:15 — Attacker gains IAM credentials via phishing\nDay 0, 23:20 — Attacker enumerates 47 S3 buckets\nDay 0, 23:25 — Attacker deploys Lambda function to encrypt objects\nDay 0, 23:30 — Lambda processes 500,000 objects across 47 buckets\nDay 0, 23:45 — Original objects deleted, encrypted copies uploaded\nDay 0, 23:50 — Ransom notes uploaded to each bucket\nDay 0, 23:55 — Lambda function deleted (no persistent malware)\nDay 1, 00:10 — Total time: 55 minutes, 500,000 objects affected\n```\n\n**What Went Wrong:**\n1. **Overly permissive IAM role** — Application role had s3:* on all buckets\n2. **No deletion protection** — No MFA delete, no Object Lock\n3. **Same-account backups** — Backups in same account, deleted by attacker\n4. **No anomaly detection** — No alerting on mass deletion\n5. **No versioning** — No way to recover previous versions\n\n**Recovery (With Proper Controls):**\n\n| Control | Recovery Time | Data Loss |\n|---------|--------------|------------|\n| No controls (baseline) | Days-Weeks | Complete |\n| Versioning only | 2-4 hours | 0% (remove delete markers) |\n| Cross-account backup | 4-8 hours | 0% (restore from backup) |\n| Object Lock (WORM) | 30 min | 0% (cannot encrypt/delete) |\n| All controls combined | 30 min | 0% |\n\n**Recovery Steps (With All Controls):**\n1. Alert triggered on mass deletion (automated)\n2. Compromised IAM role disabled (automated via Lambda)\n3. Object Lock prevented deletion — ransomware couldn't encrypt data\n4. Ransom notes deleted (they could upload, not delete originals)\n5. Full recovery in under 30 minutes\n\n**Key Insight:** The difference between complete data loss and 30-minute recovery is preparation. Immutable backups, cross-account isolation, and anomaly detection turn a catastrophic event into a minor incident.",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Attack scenario: Compromised IAM role → 47 buckets encrypted in 55 minutes. Without controls: complete data loss. With Object Lock: 30-minute recovery, 0% data loss. The difference between catastrophe and minor incident is preparation — immutable backups, cross-account isolation, and anomaly detection.",
+      "memory_aids": [
+        "47 buckets encrypted in 55 minutes via Lambda",
+        "No controls = Complete data loss | Object Lock = 30 min recovery, 0% loss",
+        "The difference between catastrophe and minor incident = Preparation"
+      ],
+      "real_world_connection": "This scenario is based on real cloud ransomware attacks. The Lambda-based attack pattern is particularly dangerous because it scales automatically, leaves no persistent malware, and completes in minutes.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "a7b8c9d0-e1f2-3456-1234-567890123456",
+      "type": "explanation",
+      "title": "Ransomware Negotiation and Response Decisions",
+      "content": {
+        "text": "If ransomware does succeed, you face critical decisions:\n\n**Should You Pay the Ransom?**\n\n**Reasons NOT to pay:**\n- No guarantee of decryption (average 80% recovery rate)\n- Funding criminal organizations\n- You may be targeted again (proven payer)\n- Legal and regulatory issues\n- Insurance may not cover ransom payments\n- Decryption tools may introduce new malware\n\n**Reasons to consider payment:**\n- No viable backup exists\n- Data is irreplaceable (life-safety, unique IP)\n- Business continuity is critical and can't be restored otherwise\n- Regulatory deadline for data recovery\n\n**Industry Recommendations:**\n- FBI: Do not pay ransoms\n- CISA: Focus on prevention and backup\n- Most cybersecurity insurers: Pay only as last resort\n\n**If You Decide to Engage:**\n\n```\n1. Never pay the initial demand — negotiate down\n2. Use a ransomware negotiation specialist\n3. Verify decryption capability before full payment\n4. Use cryptocurrency mixer (if legally permitted)\n5. Pay only after partial decryption proof\n6. Assume the decryptor contains additional malware\n7. Run decryptor in isolated environment only\n8. Document everything for legal/regulatory purposes\n```\n\n**Legal Considerations:**\n- OFAC (US Treasury) sanctions prohibit payments to certain threat actors\n- Some jurisdictions require reporting ransom payments\n- Cyber insurance policies may have specific requirements\n- Law enforcement may provide decryption tools for free\n\n**Communication During Incident:**\n\n| Audience | Message | Timing |\n|----------|---------|--------|\n| Internal teams | Technical details, containment status | Immediate |\n| Leadership | Business impact, recovery options, decisions | Within 1 hour |\n| Customers | General statement, no technical details | Within 24 hours |\n| Regulators | Required disclosures per regulation | Per regulatory timeline |\n| Law enforcement | Full technical details | As soon as possible |\n| Public | Minimal, coordinated with legal | Only if necessary |",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Don't pay ransoms if you have backups. If you must engage, use a specialist, negotiate down, verify decryption capability, and run the decryptor in an isolated environment. The FBI and CISA recommend against payment. Check OFAC sanctions before any payment.",
+      "memory_aids": [
+        "Don't pay: 80% recovery rate, funds criminals, you may be targeted again",
+        "If you must: Specialist → Negotiate → Verify → Isolated decryptor → Document",
+        "OFAC sanctions = Some payments are illegal (paying sanctioned actors)"
+      ],
+      "real_world_connection": "Several high-profile ransomware payments resulted in only partial data recovery, and some organizations were re-encrypted within weeks because they were marked as 'proven payers.'",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b8c9d0e1-f2a3-4567-2345-678901234567",
+      "type": "memory_aid",
+      "title": "Cloud Ransomware Recovery Cheat Sheet",
+      "content": {
+        "text": "**🛡️ Prevention:**\n- IAM least privilege (deny s3:DeleteObject from app roles)\n- IMDSv2 on all EC2 instances (prevent SSRF)\n- MFA delete on critical buckets\n- Object Lock (WORM) on backups\n- Cross-account backup isolation\n- Mass deletion monitoring (CloudWatch alarm)\n- Versioning on all data buckets\n\n**🚨 Detection:**\n- Mass S3 object deletion (>100 in 5 min)\n- Unusual IAM role activity\n- Ransom note files (README_DECRYPT.txt)\n- Lambda functions created by unusual roles\n- S3 bucket policy changes\n- Cross-region data access anomalies\n\n**🔄 Recovery Runbook:**\n1. Contain: Disable credentials, isolate resources\n2. Assess: Determine scope, verify backups\n3. Restore: Remove delete markers or restore from backup\n4. Verify: Check data integrity\n5. Post-recovery: Rotate credentials, analyze, document\n\n**💾 Backup Architecture:**\n```\nProduction → Versioning (delete markers)\n         → Cross-Region Replication\n         → Cross-Account Backup\n         → Object Lock (WORM)\n```",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "Prevention: IAM least privilege + IMDSv2 + MFA delete + Object Lock + Cross-account + Monitoring",
+        "Detection: Mass deletion + unusual IAM + ransom notes + suspicious Lambda",
+        "Recovery: Contain → Assess → Restore → Verify → Post-recovery",
+        "Backup: Versioning + Cross-region + Cross-account + Object Lock"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "c9d0e1f2-a3b4-5678-3456-789012345678",
+      "type": "reflection",
+      "title": "Cloud Ransomware Recovery Check",
+      "content": {
+        "text": "**Review Questions:**\n\n1. **Why are same-account backups vulnerable to ransomware?**\n   — Because the same compromised IAM role that encrypted the production data can also delete the backups in the same account.\n\n2. **What is Object Lock in Compliance mode?**\n   — WORM (Write Once Read Many) protection where objects cannot be deleted by anyone, including the root user, for the specified retention period.\n\n3. **How does S3 versioning help with ransomware recovery?**\n   — When versioning is enabled, deleting an object only adds a delete marker. The previous version is still accessible and can be restored by removing the delete marker.\n\n4. **What's the first step in ransomware recovery?**\n   — Containment: Disable compromised IAM credentials, revoke active sessions, and isolate affected resources to prevent further encryption.\n\n5. **Why is IMDSv2 important for ransomware prevention?**\n   — IMDSv2 prevents SSRF attacks from stealing IAM role credentials from EC2 instances, which is a common initial access vector for cloud ransomware.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [],
+      "real_world_connection": null,
+      "reflection_prompt": "Does your organization have immutable, cross-account backups? How long would recovery take?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "d0e1f2a3-b4c5-6789-4567-890123456789",
+      "type": "mindset_coach",
+      "title": "Preparation Beats Recovery",
+      "content": {
+        "text": "Cloud ransomware recovery is 90% preparation and 10% execution. The organizations that recover in minutes are the ones that invested in immutable backups, cross-account isolation, and anomaly detection before the attack. The ones that take weeks or never recover are the ones that assumed 'it won't happen to us.'\n\n**Key Takeaways:**\n1. **Cloud ransomware is real and growing** — API-based attacks are faster and broader than on-premises\n2. **Immutable backups are non-negotiable** — Object Lock + cross-account isolation\n3. **Versioning is your safety net** — Enable it on every data bucket\n4. **IAM least privilege prevents most attacks** — Deny s3:DeleteObject from application roles\n5. **Detection accelerates response** — Alert on mass deletion patterns\n\n**Test your recovery before you need it.** Run a tabletop exercise: simulate a ransomware attack and walk through your recovery procedures. Find the gaps when it's an exercise, not an emergency.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "Recovery = 90% preparation + 10% execution",
+        "Test recovery BEFORE you need it — tabletop exercises reveal gaps",
+        "Immutable backups + Versioning + Cross-account = Ransomware resistance"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Why are same-account backups vulnerable to ransomware?",
+      "options": [
+        "Cloud backups are encrypted by default and can't be restored quickly",
+        "The same compromised IAM role that encrypted production data can also delete backups in the same account",
+        "Same-account backups don't support versioning",
+        "Cloud providers don't allow same-account backup policies"
+      ],
+      "correct_answer": 1,
+      "explanation": "When backups are in the same AWS account, the compromised IAM role can use s3:DeleteObject or s3:DeleteObjectVersion to delete the backup data. Cross-account backups with separate permissions prevent this because the compromised role in the production account has no delete permissions in the backup account."
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is S3 Object Lock in Compliance mode?",
+      "options": [
+        "A feature that encrypts objects with customer-managed keys",
+        "WORM (Write Once Read Many) protection where objects cannot be deleted by anyone, including the root user, for a specified retention period",
+        "A feature that prevents objects from being modified but allows deletion",
+        "A compliance reporting tool that generates audit logs for S3 access"
+      ],
+      "correct_answer": 1,
+      "explanation": "S3 Object Lock in Compliance mode provides true WORM protection. Objects cannot be deleted or overwritten by anyone — not even the AWS account root user — for the duration of the retention period. This makes backups immune to ransomware encryption and deletion."
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "How does S3 versioning help with ransomware recovery?",
+      "options": [
+        "It automatically encrypts all objects with the latest encryption standard",
+        "It creates a separate bucket for each version of an object",
+        "Deleting an object only adds a delete marker; previous versions are still accessible and can be restored",
+        "It prevents new objects from being uploaded during a ransomware attack"
+      ],
+      "correct_answer": 2,
+      "explanation": "When versioning is enabled, deleting an object doesn't actually remove it — it adds a delete marker. The previous version remains accessible and can be restored by removing the delete marker. This provides a built-in recovery mechanism even if the attacker deletes original objects."
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "What is the first step in cloud ransomware incident response?",
+      "options": [
+        "Immediately pay the ransom to minimize data loss",
+        "Contain the incident by disabling compromised credentials and isolating affected resources",
+        "Restore all data from backups immediately",
+        "Contact law enforcement before taking any other action"
+      ],
+      "correct_answer": 1,
+      "explanation": "Containment is the first priority. Disabling compromised IAM credentials and isolating affected resources prevents further encryption. If you skip containment and go straight to recovery, the attacker may still have access and can encrypt data again during recovery."
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "How does IMDSv2 help prevent cloud ransomware?",
+      "options": [
+        "It encrypts data stored on EC2 instances",
+        "It requires a session token to access instance metadata, preventing SSRF attacks from stealing IAM role credentials",
+        "It automatically backs up EC2 instance data to S3",
+        "It monitors EC2 instances for ransomware activity"
+      ],
+      "correct_answer": 1,
+      "explanation": "IMDSv2 (Instance Metadata Service v2) requires a session token to access instance metadata, which prevents SSRF (Server-Side Request Forgery) attacks from retrieving IAM role credentials. This is critical because SSRF was the initial access vector in the Capital One breach and many other cloud attacks."
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 120,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-21T14:30:00+03:00",
+  "updated_at": "2026-06-21T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0",
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "Ransomware", "Cloud DR", "Immutable Backups", "S3 Object Lock", "Incident Response", "Built-In"]
+}

@@ -1,0 +1,315 @@
+{
+  "lesson_id": "b8d4f6a2-9c3e-4f0b-a7d5-2e3d4f5a6b17",
+  "domain": "blue_team",
+  "title": "Windows and Linux Logging for Detection",
+  "subtitle": "Configuring and Analyzing OS Logs for Threat Detection",
+  "difficulty": 2,
+  "estimated_time": 40,
+  "order_index": 96,
+  "prerequisites": [
+    "SOC Data Sources and SIEM"
+  ],
+  "learning_objectives": [
+    "Configure Windows Event Logs and Sysmon for comprehensive visibility",
+    "Set up Linux logging with syslog, auditd, and journald",
+    "Identify key log sources and event IDs critical for threat detection",
+    "Implement log enrichment strategies to improve detection quality",
+    "Troubleshoot common logging gaps and misconfigurations"
+  ],
+  "concepts": [
+    "Windows Event Logs",
+    "Sysmon",
+    "Linux syslog",
+    "auditd",
+    "journald",
+    "Log Enrichment",
+    "Event ID",
+    "Log Collection",
+    "Detection Pipeline",
+    "Log Forwarding"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "f1a2b3c4-d5e6-7890-abcd-ef0123456789",
+      "type": "mindset_coach",
+      "title": "Logging: Your Eyes on the Battlefield",
+      "content": {
+        "text": "Logging is the foundation of every detection program. You can't detect what you can't see. The most sophisticated detection logic is useless if the logs it needs don't exist. This lesson is about building that foundation — making sure you have the right logs, from the right places, with the right detail. Think of it as installing cameras before you start watching for intruders."
+      },
+      "simplified_explanation": "Logs are like security cameras. Before you can catch a thief, you need cameras in the right places pointing at the right things. This lesson teaches you where to put the cameras and how to make sure they're recording.",
+      "memory_aids": [
+        "No logs = No detection = You're blind",
+        "Logs before logic — always"
+      ],
+      "real_world_connection": "In every major breach investigation, one of the first findings is insufficient logging. SolarWinds, MOVEit, the Uber breach — all had logging gaps that delayed detection by weeks or months.",
+      "reflection_prompt": "How confident are you that your organization's logging covers the key detection scenarios?",
+      "is_interactive": false,
+      "xp_reward": 0
+    },
+    {
+      "block_id": "a2b3c4d5-e6f7-8901-bcde-f12345678901",
+      "type": "explanation",
+      "title": "Windows Event Log Architecture",
+      "content": {
+        "text": "Windows provides several log channels, each serving different purposes:\n\n**Core Security Log — Security.evtx**\n- Authentication events (4624, 4625)\n- Authorization changes (4670, 4713)\n- Account management (4720, 4726, 4728, 4732)\n- Policy changes (4670, 4719)\n- Log clear events (1102)\n\n**System Log — System.evtx**\n- Service installations (7045)\n- Driver loads (7036)\n- System time changes (1)\n\n**Application Log — Application.evtx**\n- Application errors and crashes\n- Custom application events\n\n**PowerShell Logs**\n- Script block logging (4104)\n- Module logging (4103)\n- Transcription logging\n\n**Key Configuration Steps:**\n```powershell\n# Enable PowerShell Script Block Logging\nreg add HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging \\\n  /v EnableScriptBlockLogging /t REG_DWORD /d 1 /f\n\n# Enable PowerShell Transcription\nreg add HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription \\\n  /v EnableTranscripting /t REG_DWORD /d 1 /f\n\n# Increase Security log size to 4GB\nwevtutil sl Security /ms:4294967296\n```",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Windows has multiple log 'books.' The Security log is your most important book — it records who logged in, who changed permissions, who created accounts. PowerShell logs are crucial because attackers love PowerShell.",
+      "memory_aids": [
+        "Security.evtx = The main security camera",
+        "4624 = Successful login | 4625 = Failed login",
+        "PowerShell 4104 = Script block logging = See what scripts actually do"
+      ],
+      "real_world_connection": "PowerShell is the #1 tool for post-exploitation. Without script block logging (Event ID 4104), you'll only see that PowerShell ran — not what it actually executed. This is the single most important logging configuration for Windows detection.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b3c4d5e6-f7a8-9012-cdef-123456789012",
+      "type": "explanation",
+      "title": "Sysmon: The Detection Engineer's Best Friend",
+      "content": {
+        "text": "Sysmon (System Monitor) is a Windows system service and device driver that provides detailed process creation, network connections, and file creation tracking. It's the single most important tool for Windows detection.\n\n**Essential Sysmon Event IDs:**\n\n| Event ID | What It Captures | Detection Value |\n|----------|-----------------|-----------------|\n| 1 | Process Creation | Command-line logging, parent-child relationships |\n| 3 | Network Connection | C2 beaconing, lateral movement |\n| 7 | Image Loaded (DLL) | DLL sideloading, injection |\n| 8 | CreateRemoteThread | Process injection |\n| 10 | Process Access | Credential theft (LSASS access) |\n| 11 | File Create | Dropper detection |\n| 13 | Registry Value Set | Persistence mechanisms |\n| 22 | DNS Query | C2 domain resolution |\n| 25 | Process Tampering | Process hollowing |\n\n**Installing and Configuring Sysmon:**\n```powershell\n# Download Sysmon from Sysinternals\n# Install with SwiftOnSecurity's config (excellent starting point)\nSysmon64.exe -accepteula -i sysmonconfig.xml\n\n# Or install with Microsoft's recommended config\nSysmon64.exe -accepteula -i\n\n# Verify installation\nGet-WinEvent -LogName \"Microsoft-Windows-Sysmon/Operational\" -MaxEvents 5\n```\n\n**SwiftOnSecurity Config Highlights:**\n- Logs process creation with full command lines\n- Logs all network connections\n- Logs DNS queries\n- Filters out noise (legitimate system processes)\n- Logs DLL loads for suspicious locations\n- Logs raw access reads (for credential access detection)",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Sysmon is like a super-powered security camera that records every program startup, every network connection, every file creation, and every DNS lookup. Without it, you're flying blind on Windows.",
+      "memory_aids": [
+        "Sysmon EID 1 = Process Creation (who ran what)",
+        "Sysmon EID 3 = Network Connection (who called home)",
+        "Sysmon EID 22 = DNS Query (what domain was looked up)",
+        "SwiftOnSecurity config = Best starting point"
+      ],
+      "real_world_connection": "Every major Windows detection rule in Sigma relies on Sysmon data. MITRE ATT&CK mapping for Windows techniques heavily depends on Sysmon events. Without Sysmon, you lose visibility into ~60% of ATT&CK techniques.",
+      "reflection_prompt": "Is Sysmon deployed in your environment? If not, what's the first event ID you'd want to enable?",
+      "is_interactive": false,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "c4d5e6f7-a8b9-0123-def0-234567890123",
+      "type": "explanation",
+      "title": "Linux Logging: syslog, auditd, and journald",
+      "content": {
+        "text": "Linux provides three primary logging systems, each with different strengths:\n\n**1. syslog / rsyslog**\nThe traditional Linux logging daemon. Captures system messages, kernel logs, and application output.\n\nKey log files:\n- `/var/log/auth.log` (Debian) or `/var/log/secure` (RHEL) — Authentication events\n- `/var/log/syslog` (Debian) or `/var/log/messages` (RHEL) — General system logs\n- `/var/log/kern.log` — Kernel messages\n- `/var/log/cron` — Cron job execution\n\n**2. auditd — The Linux Audit Framework**\nFor security-focused logging. auditd provides detailed tracking of system calls, file access, and security events.\n\n```bash\n# Key audit rules for security monitoring\n# Track execve calls (process creation)\n-a exit,always -F arch=b64 -S execve\n\n# Track /etc/passwd modifications\n-w /etc/passwd -p wa -k identity\n\n# Track sudo usage\n-w /etc/sudoers -p wa -k sudo_changes\n\n# Track SSH key modifications\n-w /root/.ssh/ -p wa -k ssh_keys\n\n# Track cron modifications\n-w /etc/cron* -p wa -k cron_changes\n```\n\n**3. journald (systemd)**\nModern logging system that stores logs in a binary format and provides powerful querying.\n\n```bash\n# Key journal commands\njournalctl -u sshd                    # SSH daemon logs\njournalctl -u auditd                  # Audit daemon logs\njournalctl --since \"1 hour ago\"       # Recent logs\njournalctl -p err                     # Error priority and above\njournalctl -f                         # Follow (like tail -f)\n```\n\n**Recommended Configuration:**\n- Enable auditd with process creation logging\n- Forward all logs to a centralized SIEM\n- Set appropriate log rotation and retention\n- Use journald for ad-hoc investigation\n- Configure rsyslog to forward to remote syslog server",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Linux has three main logging tools: syslog (general system logs), auditd (security-focused tracking), and journald (modern, searchable logs). You need all three for complete visibility.",
+      "memory_aids": [
+        "syslog = General logs (who, what, when)",
+        "auditd = Security camera (process creation, file changes, system calls)",
+        "journald = Modern search engine for logs",
+        "auth.log = Login attempts on Linux"
+      ],
+      "real_world_connection": "Linux servers are often overlooked in logging programs focused on Windows. But cloud infrastructure runs primarily on Linux, and Linux logging gaps are routinely exploited by attackers who know most organizations have weaker Linux visibility.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "d5e6f7a8-b9c0-1234-ef01-345678901234",
+      "type": "code_exercise",
+      "title": "Log Enrichment with GeoIP and Threat Intelligence",
+      "content": {
+        "text": "Raw logs are useful, but enriched logs are powerful. Here's how to enrich authentication logs with GeoIP and threat intel data:\n\n```python\nimport geoip2.database\nimport json\nfrom datetime import datetime\n\ndef enrich_auth_event(event, geoip_db, threat_intel):\n    \"\"\"Enrich an authentication event with geo and threat intel.\"\"\"\n    enriched = event.copy()\n    \n    # GeoIP enrichment\n    try:\n        response = geoip_db.city(event.get('source_ip', ''))\n        enriched['geo'] = {\n            'country': response.country.iso_code,\n            'city': response.city.name,\n            'latitude': response.location.latitude,\n            'longitude': response.location.longitude,\n            'isp': response.traits.isp\n        }\n    except:\n        enriched['geo'] = {'country': 'Unknown', 'city': 'Unknown'}\n    \n    # Threat intel enrichment\n    source_ip = event.get('source_ip', '')\n    if source_ip in threat_intel.get('malicious_ips', set()):\n        enriched['threat_intel'] = {\n            'malicious': True,\n            'source': 'threat_feed',\n            'tags': threat_intel['malicious_ips'][source_ip]\n        }\n    \n    # Risk scoring\n    risk_score = 0\n    if enriched.get('event_id') == '4625':  # Failed login\n        risk_score += 10\n    if enriched.get('logon_type') == 3:  # Network logon\n        risk_score += 5\n    if enriched.get('geo', {}).get('country') not in ['US', 'IL']:\n        risk_score += 20\n    if enriched.get('threat_intel', {}).get('malicious'):\n        risk_score += 50\n    \n    enriched['risk_score'] = risk_score\n    return enriched\n\n# Example usage\nevent = {\n    'event_id': '4625',\n    'source_ip': '185.220.101.45',\n    'username': 'admin',\n    'logon_type': 3,\n    'timestamp': '2026-06-21T14:30:00Z'\n}\n\n# In practice, load these from actual databases\n# geoip_db = geoip2.database.Reader('GeoIP2-City.mmdb')\n# threat_intel = load_threat_feed()\nprint(json.dumps(enrich_auth_event(event, None, {'malicious_ips': {}}), indent=2))\n```",
+        "format": "python"
+      },
+      "simplified_explanation": "Raw logs tell you WHAT happened. Enriched logs tell you WHY it matters. Adding country, threat intel, and risk scores turns 'failed login from IP X' into 'failed login from known malicious Russian IP with high risk score.'",
+      "memory_aids": [
+        "Raw log = WHAT | Enriched log = WHY IT MATTERS",
+        "GeoIP + Threat Intel + Risk Score = Detection gold"
+      ],
+      "real_world_connection": "SIEM platforms like Splunk and Microsoft Sentinel perform this enrichment automatically, but understanding the process helps you design better detection rules and validate enrichment quality.",
+      "reflection_prompt": null,
+      "is_interactive": true,
+      "xp_reward": 20
+    },
+    {
+      "block_id": "e6f7a8b9-c0d1-2345-f012-456789012345",
+      "type": "real_world",
+      "title": "Logging Gaps That Cost Months of Detection Time",
+      "content": {
+        "text": "**Case Study: The Missing PowerShell Logs**\n\nAn organization was compromised for 87 days before detection. The attacker used PowerShell extensively for lateral movement and data collection. Investigation revealed:\n\n**What Was Missing:**\n1. PowerShell Script Block Logging was not enabled — only saw `powershell.exe` in process logs, not the actual commands\n2. Sysmon was not deployed on 40% of endpoints — no process creation or network connection data\n3. Linux auth.log was only retained for 7 days — attacker's initial SSH brute force was already overwritten\n4. auditd was not configured for process creation — no visibility into commands executed via SSH\n\n**What This Cost:**\n- 87 days of dwell time\n- $2.3M in incident response costs\n- Regulatory fines for insufficient logging\n- Lost customer trust\n\n**Remediation:**\n1. Deployed Sysmon with SwiftOnSecurity config to all endpoints\n2. Enabled PowerShell Script Block Logging via GPO\n3. Extended Linux log retention to 90 days\n4. Configured auditd with comprehensive process creation rules\n5. Forwarded all logs to SIEM with 1-year hot storage\n\n**Detection Gap Cost Formula:**\n`Detection_Time = Time_Without_Logs + Investigation_Time`\n`Cost = Detection_Time × Data_Exfiltration_Rate + IR_Cost + Regulatory_Fines`",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Missing logs = blind spots = longer breach detection time. The organization couldn't see PowerShell commands, couldn't see process creation on 40% of machines, and overwrote Linux logs too quickly. Each gap added weeks to detection time.",
+      "memory_aids": [
+        "87 days dwell time because of 4 logging gaps",
+        "PowerShell without script block logging = seeing a gun, not seeing the bullet"
+      ],
+      "real_world_connection": "This pattern repeats across breach reports. The most common gaps: no Sysmon, no PowerShell logging, insufficient retention, no Linux auditd. Fix these four and you'll cover ~80% of common detection needs.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "f7a8b9c0-d1e2-3456-0123-567890123456",
+      "type": "memory_aid",
+      "title": "OS Logging Essentials Cheat Sheet",
+      "content": {
+        "text": "**Windows Logging Essentials:**\n\n📋 **Must-Have Windows Event IDs:**\n| ID | Description | Detection Use |\n|-----|------------|-------------- |\n| 4624 | Successful logon | Login tracking |\n| 4625 | Failed logon | Brute force detection |\n| 4648 | Explicit credential logon | Lateral movement |\n| 4672 | Special privileges | Privilege escalation |\n| 4720 | User created | Persistence |\n| 4732 | Member added to group | Privilege escalation |\n| 7045 | Service installed | Persistence |\n| 1102 | Audit log cleared | Anti-forensics |\n\n🔧 **Sysmon Critical Event IDs:**\n| ID | Description |\n|-----|------------|\n| 1 | Process Creation |\n| 3 | Network Connection |\n| 7 | Image Loaded (DLL) |\n| 8 | CreateRemoteThread |\n| 10 | Process Access |\n| 22 | DNS Query |\n\n🐧 **Linux Logging Commands:**\n- `auditd`: Process execution, file changes, SSH key mods\n- `auth.log/secure`: Authentication events\n- `journalctl -u <service>`: Service-specific logs\n- `/var/log/syslog`: General system logs",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "4624 = Good login | 4625 = Bad login | 4648 = Using someone's creds",
+        "Sysmon 1=Process 3=Network 22=DNS",
+        "Linux: auditd for security, auth.log for logins, journald for ad-hoc"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 10
+    },
+    {
+      "block_id": "a8b9c0d1-e2f3-4567-1234-678901234567",
+      "type": "explanation",
+      "title": "Log Collection and Forwarding Architecture",
+      "content": {
+        "text": "Getting logs from endpoints to your SIEM requires a robust collection architecture:\n\n**Windows Log Collection:**\n- **WinLogBeat** (Elastic): Lightweight, configurable, good for Elastic Stack\n- **Splunk Universal Forwarder**: For Splunk environments\n- **Azure Monitor Agent**: For Microsoft Sentinel\n- **NXLog**: Flexible, supports multiple outputs\n\n**Linux Log Collection:**\n- **Filebeat/Auditbeat** (Elastic): Syslog + auditd + journald\n- **Splunk Universal Forwarder**: For Splunk environments\n- **rsyslog remote forwarding**: Simple, built-in\n- **Fluentd/Fluent Bit**: Lightweight, cloud-native\n\n**Architecture Best Practices:**\n\n```\n[Endpoints] → [Log Forwarders] → [Log Aggregator] → [SIEM]\n     ↓                                    ↓\n[Local Buffer]                    [Log Rotation]\n```\n\n**Key Design Decisions:**\n1. **Local buffering**: Always buffer logs locally before forwarding to prevent data loss\n2. **TLS encryption**: All log forwarding must use TLS\n3. **Load balancing**: Use multiple aggregators behind a load balancer\n4. **Log format normalization**: Normalize before or during ingestion\n5. **Retention policy**: Hot storage (searchable) 90+ days, cold storage 1+ year\n6. **Compression**: Enable on forwarders to reduce bandwidth",
+        "format": "markdown"
+      },
+      "simplified_explanation": "Log collection is like a plumbing system. Every endpoint is a faucet, the log forwarders are pipes, the aggregator is a water tank, and the SIEM is the treatment plant. If any pipe is clogged or missing, you lose visibility.",
+      "memory_aids": [
+        "Endpoints → Forwarders → Aggregator → SIEM",
+        "Always encrypt (TLS), always buffer locally, always plan for scale"
+      ],
+      "real_world_connection": "A common failure mode is log forwarders going down silently. Without local buffering, logs are lost. Without monitoring the forwarders themselves, you have a gap you don't even know about.",
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 15
+    },
+    {
+      "block_id": "b9c0d1e2-f3a4-5678-2345-789012345678",
+      "type": "reflection",
+      "title": "Key Takeaways and Self-Assessment",
+      "content": {
+        "text": "**Quick self-check — can you answer these?**\n\n1. **Why is Sysmon critical for Windows detection?**\n   — It provides process creation (EID 1), network connections (EID 3), DNS queries (EID 22), and other events not available in standard Windows logs.\n\n2. **What's the most important PowerShell logging to enable?**\n   — Script Block Logging (EID 4104) — it captures the actual PowerShell code executed, not just `powershell.exe`.\n\n3. **What's the Linux equivalent of Sysmon for process creation?**\n   — auditd with an execve system call rule (`-a exit,always -F arch=b64 -S execve`).\n\n4. **What are the three pillars of log enrichment?**\n   — GeoIP enrichment, threat intelligence enrichment, and risk scoring.\n\n5. **Why must log forwarders use local buffering?**\n   — To prevent log loss when the network or aggregator is unavailable.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [],
+      "real_world_connection": null,
+      "reflection_prompt": "Which of these logging gaps exist in your current environment? What would you fix first?",
+      "is_interactive": false,
+      "xp_reward": 5
+    },
+    {
+      "block_id": "c0d1e2f3-a4b5-6789-3456-890123456789",
+      "type": "mindset_coach",
+      "title": "Logging is the Foundation",
+      "content": {
+        "text": "You've now learned how to configure and collect the logs that feed every detection, investigation, and response action. Remember: the best detection rules in the world are useless without the right logs to feed them.\n\n**Key Principles:**\n1. **Deploy before you need it** — Logging after an incident is too late\n2. **Sysmon + PowerShell logging is non-negotiable for Windows**\n3. **auditd + auth.log is non-negotiable for Linux**\n4. **Enrichment turns raw logs into detection fuel**\n5. **Buffer locally, forward securely, retain wisely**\n\nEvery minute without proper logging is a minute an attacker can operate invisibly. Build the foundation first, then the detection logic will have fuel to run on.",
+        "format": "markdown"
+      },
+      "simplified_explanation": null,
+      "memory_aids": [
+        "Logs before logic — always",
+        "Sysmon + PowerShell on Windows, auditd + auth.log on Linux",
+        "Deploy logging BEFORE the incident, not after"
+      ],
+      "real_world_connection": null,
+      "reflection_prompt": null,
+      "is_interactive": false,
+      "xp_reward": 5
+    }
+  ],
+  "pre_assessment": null,
+  "post_assessment": [
+    {
+      "question_id": "q1",
+      "type": "multiple_choice",
+      "question": "Which Windows logging feature is most critical for detecting PowerShell-based attacks?",
+      "options": [
+        "Windows Firewall logs",
+        "PowerShell Script Block Logging (Event ID 4104)",
+        "Windows Update logs",
+        "DNS Client event logs"
+      ],
+      "correct_answer": 1,
+      "explanation": "Script Block Logging (EID 4104) captures the actual PowerShell code being executed, not just the process name. This is essential because attackers heavily use PowerShell, and without script block logging you only see `powershell.exe` ran, not what it actually did."
+    },
+    {
+      "question_id": "q2",
+      "type": "multiple_choice",
+      "question": "What is the primary purpose of Sysmon Event ID 1 (Process Creation)?",
+      "options": [
+        "To log when a system service starts",
+        "To record detailed information about new processes including full command lines and parent process relationships",
+        "To track file system changes",
+        "To monitor network interface status"
+      ],
+      "correct_answer": 1,
+      "explanation": "Sysmon EID 1 logs process creation with full command lines, parent process information, hashes of the executable, and the user context. This is the foundation of endpoint detection — seeing exactly what ran, how it was invoked, and by which parent process."
+    },
+    {
+      "question_id": "q3",
+      "type": "multiple_choice",
+      "question": "Which Linux logging tool is specifically designed for security event tracking, including system calls like execve?",
+      "options": [
+        "journald",
+        "rsyslog",
+        "auditd",
+        "dmesg"
+      ],
+      "correct_answer": 2,
+      "explanation": "auditd is the Linux Audit Daemon, specifically designed for security-focused logging. It can track system calls (like execve for process creation), file modifications, and security events. rsyslog and journald capture general system messages, but auditd provides the granular security tracking equivalent to Sysmon on Windows."
+    },
+    {
+      "question_id": "q4",
+      "type": "multiple_choice",
+      "question": "Why is local buffering important for log forwarders?",
+      "options": [
+        "It speeds up log processing",
+        "It prevents log loss when the network or centralized aggregator is unavailable",
+        "It compresses logs to save disk space",
+        "It filters out unimportant log entries"
+      ],
+      "correct_answer": 1,
+      "explanation": "Local buffering ensures that if the log aggregator or network connection goes down, logs are stored locally and can be forwarded once connectivity is restored. Without buffering, any logs generated during an outage are permanently lost — creating detection gaps."
+    },
+    {
+      "question_id": "q5",
+      "type": "multiple_choice",
+      "question": "What are the three main pillars of log enrichment for threat detection?",
+      "options": [
+        "Compression, encryption, and deduplication",
+        "GeoIP enrichment, threat intelligence enrichment, and risk scoring",
+        "Log rotation, retention, and archival",
+        "Normalization, parsing, and indexing"
+      ],
+      "correct_answer": 1,
+      "explanation": "GeoIP enrichment adds location context (where is this IP?), threat intelligence adds threat context (is this IP malicious?), and risk scoring adds priority context (how suspicious is this event?). Together, they transform raw logs into actionable detection data."
+    }
+  ],
+  "mastery_threshold": 70,
+  "jim_kwik_principles": [
+    "teach_like_im_10",
+    "memory_hooks",
+    "connect_to_what_i_know",
+    "active_learning",
+    "meta_learning",
+    "minimum_effective_dose",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint",
+    "multiple_memory_pathways"
+  ],
+  "base_xp_reward": 110,
+  "badge_unlock": null,
+  "is_core_concept": false,
+  "created_at": "2026-06-21T14:30:00+03:00",
+  "updated_at": "2026-06-21T14:30:00+03:00",
+  "author": "CyberLearn",
+  "version": "1.0",
+  "tags": [
+    "Course: SANS-SEC450",
+    "Career Path: SOC Analyst",
+    "Career Path: Blue Teamer",
+    "Windows Event Logs",
+    "Sysmon",
+    "auditd",
+    "Log Collection",
+    "Detection",
+    "Built-In"
+  ]
+}
