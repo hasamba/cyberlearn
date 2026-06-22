@@ -1,0 +1,156 @@
+{
+  "lesson_id": "e7f8a9b0-1c23-4d56-ef78-9a0b1c2d3e4f",
+  "domain": "dfir",
+  "title": "Wireshark for SOC Analysts",
+  "difficulty": 2,
+  "order_index": 268,
+  "prerequisites": ["Network Visibility and Traffic Analysis"],
+  "concepts": [
+    "Wireshark interface and navigation",
+    "Capture filters vs. display filters",
+    "Protocol dissection and analysis",
+    "Following TCP streams and conversations",
+    "Common network protocols deep dive (DNS, HTTP, TLS)",
+    "Packet colorization and expert info",
+    "pcap analysis workflow for incident investigation",
+    "Wireshark command-line tools (tshark, editcap, mergecap)"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Navigate the Wireshark interface efficiently and customize the packet list view for SOC workflows",
+    "Write display filters and capture filters to isolate relevant traffic from large pcap files",
+    "Analyze common protocols (DNS, HTTP, TLS) to identify suspicious activity patterns",
+    "Follow TCP streams and reconstruct conversations to extract indicators of compromise",
+    "Apply a structured pcap analysis workflow for incident investigation and threat hunting"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the key difference between a capture filter and a display filter in Wireshark?",
+      "options": [
+        "Capture filters and display filters use the same syntax but apply at different stages",
+        "Capture filters use BPF syntax and reduce the data collected; display filters use Wireshark's own syntax and filter already-captured data",
+        "Display filters are more efficient because they reduce the pcap file size",
+        "Capture filters can only filter by IP address, while display filters can filter by any field"
+      ],
+      "correct": 1,
+      "explanation": "Capture filters use Berkeley Packet Filter (BPF) syntax (e.g., 'host 10.0.0.1 and port 80') and limit what packets are collected from the network interface. Display filters use Wireshark's rich protocol-aware syntax (e.g., 'http.request and dns.qry.name contains evil.com') and filter what's shown from already-captured data. Capture filters reduce file size; display filters don't."
+    },
+    {
+      "question": "A SOC analyst needs to find all DNS queries for a specific domain in a large pcap. Which display filter is most efficient?",
+      "options": [
+        "dns contains \"example.com\"",
+        "dns.qry.name contains \"example.com\"",
+        "dns.flags.response == 0 and dns contains example",
+        "udp.port == 53 and example.com"
+      ],
+      "correct": 1,
+      "explanation": "dns.qry.name contains \"example.com\" targets the specific DNS query name field directly, making it the most precise and efficient filter. 'dns contains' searches the entire DNS payload (slower, more false positives), and the other options either use incorrect syntax or are too broad."
+    },
+    {
+      "question": "What does the Wireshark 'Expert Info' feature help analysts identify?",
+      "options": [
+        "It provides expert commentary on network architecture",
+        "It flags protocol-level anomalies such as retransmissions, checksum errors, and unusual header values",
+        "It automatically generates incident reports from pcap files",
+        "It replaces the need for manual packet analysis"
+      ],
+      "correct": 1,
+      "explanation": "Expert Info flags protocol anomalies and issues: TCP retransmissions, duplicate ACKs, zero window probes, checksum errors, and protocol violations. It's a starting point for investigation, not a replacement for manual analysis — the analyst must still interpret findings in context."
+    },
+    {
+      "question": "When following a TCP stream in Wireshark, what are you actually seeing?",
+      "options": [
+        "Only the packets sent by the server",
+        "The complete two-way conversation between two endpoints, reassembled in order, with the payload displayed",
+        "Just the TCP headers without application data",
+        "All packets on the network segment between the two IPs"
+      ],
+      "correct": 1,
+      "explanation": "Follow TCP Stream reassembles the full two-way conversation between two endpoints, showing client data in one color and server data in another. It displays the application-layer payload in order, making it easy to read HTTP requests/responses, FTP commands, or malicious payloads."
+    },
+    {
+      "question": "A pcap contains 500MB of traffic. What is the most efficient analysis workflow?",
+      "options": [
+        "Open the pcap and manually scroll through every packet",
+        "Apply broad filters first to narrow the dataset, then progressively refine using display filters and protocol statistics",
+        "Export all packets to CSV and analyze in a spreadsheet",
+        "Only look at the first and last 100 packets"
+      ],
+      "correct": 1,
+      "explanation": "The efficient workflow: start with broad filters and statistics (Protocol Hierarchy, Conversations, Endpoints) to understand the traffic profile, then progressively narrow with targeted display filters. This reduces 500MB to relevant subsets rather than examining every packet manually."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall — After each section, list the key Wireshark filters and tools from memory",
+    "Spaced Repetition — Review display filter syntax at increasing intervals",
+    "Visualization — Map the pcap analysis workflow: Statistics → Filter → Stream → IOC extraction",
+    "Association — Link each filter type to a specific SOC scenario (dns.qry.name → beaconing, http.request → web attacks)",
+    "Emotion — Feel the satisfaction of finding a C2 beacon in a sea of noise — that's the analyst's reward",
+    "Storytelling — Frame pcap analysis as detective work: the evidence is in the packets, you just need to find it",
+    "Mnemonics — Use 'PCAP' for analysis workflow: Profile traffic, Capture filters, Analyze protocols, Pull IOCs",
+    "Chunking — Learn one protocol at a time: DNS first, then HTTP, then TLS",
+    "Simplification — Before writing a complex filter, ask: 'What field contains exactly what I'm looking for?'",
+    "Teaching — Walk a colleague through your filter logic to reveal gaps and solidify understanding"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Packets Don't Lie",
+      "content": "Logs can be deleted. Processes can be hidden. But packets on the wire tell the truth. Wireshark is your microscope — it shows you exactly what happened, when, and between whom. The skill isn't memorizing filters; it's knowing what to look for and having the patience to find it."
+    },
+    {
+      "type": "explanation",
+      "title": "Wireshark Interface and Navigation",
+      "content": "The Wireshark interface has three main panes that work together:\n\n**1. Packet List Pane (Top)**\n- Shows one packet per line with key columns: No., Time, Source, Destination, Protocol, Length, Info\n- Click any packet to select it and view details below\n- Right-click columns to add/remove (add: TTL, tcp.stream, http.host for SOC work)\n- Sort by any column by clicking the header\n\n**2. Packet Details Pane (Middle)**\n- Expanding tree view of the selected packet's protocol layers\n- Click the arrow next to each protocol to expand\n- Key fields for SOC: Ethernet → IP → TCP/UDP → Application layer\n- Right-click any field → 'Apply as Filter' to quickly filter on that value\n\n**3. Packet Bytes Pane (Bottom)**\n- Hex dump and ASCII view of the raw packet data\n- Selecting a field in Details highlights the corresponding bytes below\n- Useful for spotting obfuscated payloads, encoded strings, and anomalies\n\n**Essential Interface Customization for SOC:**\n- **Time Display:** View → Time Display Format → Seconds Since Beginning of Capture (for timeline analysis)\n- **Name Resolution:** Disable 'Resolve network addresses' (can slow analysis and hide IPs)\n- **Colorization:** View → Coloring Rules — customize for SOC priorities\n- **Columns:** Add tcp.stream, http.request.uri, dns.qry.name as permanent columns\n\n**Keyboard Shortcuts That Save Hours:**\n- Ctrl+F — Find packet\n- Ctrl+E — Apply filter\n- Ctrl+/ — Add display filter from selected packet field\n- Ctrl+Shift+F — Follow TCP stream\n- Ctrl+G — Go to specific packet number",
+      "key_takeaway": "Three panes: Packet List (overview), Packet Details (protocol layers), Packet Bytes (raw data). Customize columns and time format for SOC workflows."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Wireshark Like a Security Camera",
+      "content": "Imagine your computer network is a building, and Wireshark is the security camera system that records everything.\n\n**Normal people see:** A bunch of people walking around. 'Looks fine.'\n\n**Wireshark shows you:**\n- Who went where (source and destination IPs)\n- What they were doing (protocols — browsing, email, file transfer)\n- How long they stayed (packet timing)\n- What they were carrying (the packet payload)\n\n**Capture filters** are like telling the security guard: 'Only record people entering through the front door.' You save disk space by not recording what you don't need.\n\n**Display filters** are like searching the recordings: 'Show me everyone wearing a red hat who visited Room 42.' You're not deleting footage — you're just focusing on what matters.\n\n**Follow TCP Stream** is like watching a complete conversation between two people, instead of hearing random words scattered across different recordings.\n\n**Expert Info** is like the guard flagging suspicious behavior: 'Hey, someone knocked on this door 500 times' or 'That person went in but never came out.'\n\nThe power of Wireshark isn't in seeing everything — it's in finding the one suspicious thing in a sea of normal traffic.",
+      "key_takeaway": "Wireshark = security camera for your network. Capture filters record what you want. Display filters search the footage. Follow TCP Stream shows full conversations. Expert Info flags suspicious behavior."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Display Filters and Capture Filters for SOC Analysis",
+      "content": "Essential filters for SOC analysts — organized by investigation type:\n\n**Capture Filters (BPF syntax — applied during capture):**\n```bash\n# Capture only traffic to/from a specific host\nhost 10.0.0.5\n\n# Capture only HTTP traffic\ntcp port 80\n\n# Capture traffic on a specific subnet\tnet 192.168.1.0/24\n\n# Capture DNS queries only\nudp port 53\n\n# Combine: traffic from subnet to specific host on port 443\nsrc net 192.168.1.0/24 and dst host 10.0.0.5 and tcp port 443\n```\n\n**Display Filters (Wireshark syntax — applied to captured data):**\n```bash\n# DNS Investigation\ndns.qry.name contains \"evil.com\"       # DNS queries for specific domain\ndns.qry.name endswith \".ru\"             # DNS queries for .ru domains\ndns.flags.response == 0                 # DNS queries only (not responses)\ndns.count.answers > 5                   # DNS responses with many answers (potential DNS tunnel)\n\n# HTTP Investigation\nhttp.request                              # All HTTP requests\nhttp.request.method == \"POST\"             # HTTP POST requests\nhttp.host contains \"suspicious-site\"      # Requests to specific hosts\nhttp.response.code == 200                 # Successful HTTP responses\nhttp.file_extension in (\"exe\" \"dll\" \"ps1\") # Downloads of executables\n\n# TLS/SSL Investigation\ntls.handshake.type == 1                   # TLS Client Hello\ntls.handshake.extensions_server_name contains \"evil\"  # SNI for specific domains\ntls.record.content_type == 23             # Application data\n\n# TCP Analysis\ntcp.analysis.retransmission               # Retransmissions (potential issues)\ntcp.flags.syn == 1 and tcp.flags.ack == 0 # SYN packets (connection attempts)\ntcp.flags.rst == 1                        # RST packets (connection resets)\ntcp.stream eq 42                          # Specific TCP stream\n\n# Beaconing Detection\ndns.qry.name and frame.time_delta > 300   # DNS queries with time gaps\n\n# Suspicious Patterns\nip.ttl < 10                               # Unusual TTL values\ndns.qry.name.len > 50                    # Unusually long DNS queries\nhttp.request.uri.len > 200               # Unusually long HTTP URIs\n```\n\n**Combination Filters for Common SOC Scenarios:**\n```bash\n# Find all connections to a known bad IP\nip.addr == 192.168.1.100 and tcp.flags.syn == 1\n\n# Find DNS exfiltration attempts\ndns.qry.name.len > 50 or dns.count.labels > 10\n\n# Find file downloads over HTTP from suspicious hosts\nhttp.response and http.content_type contains \"application\" and ip.src == 10.0.0.5\n\n# Find TLS connections to suspicious domains\ntls.handshake.extensions_server_name and (tls.handshake.extensions_server_name contains \"xyz\" or tls.handshake.extensions_server_name contains \"onion\")\n```\n\n**Pro Tip:** Right-click any field in Packet Details → 'Apply as Filter' → 'Selected' to instantly create a filter for that specific value.",
+      "key_takeaway": "Capture filters use BPF syntax (before capture). Display filters use Wireshark syntax (after capture). Right-click → Apply as Filter is your best friend."
+    },
+    {
+      "type": "real_world",
+      "title": "Finding C2 Beaconing in a 2GB pcap",
+      "content": "A SOC analyst received a 2GB pcap from a compromised endpoint. The EDR flagged suspicious PowerShell activity, but the C2 channel was unknown.\n\n**Step 1: Traffic Profiling (30 seconds)**\n- Statistics → Protocol Hierarchy: 78% TLS, 15% DNS, 5% HTTP, 2% other\n- Statistics → Conversations: 4,000+ unique conversation pairs\n- Statistics → Endpoints: 1 internal IP communicating with 200+ external IPs\n\n**Step 2: DNS Analysis (2 minutes)**\n- Filter: `dns.flags.response == 0` (queries only)\n- Statistics → DNS → looked for domains with high query frequency\n- Found: `api.update-service[.]xyz` queried every 60 seconds with slight domain rotation\n- Filter: `dns.qry.name contains \"update-service\"` — confirmed 60-second beaconing pattern\n\n**Step 3: TLS Investigation (3 minutes)**\n- Filter: `tls.handshake.extensions_server_name contains \"update-service\"`\n- Found: Client Hello to `api.update-service[.]xyz` every 60 seconds\n- Corresponding server IP: 198.51.100[.]42\n- Followed the TLS stream — encrypted application data, consistent 256-byte payloads\n\n**Step 4: Connection Analysis (1 minute)**\n- Filter: `ip.addr == 198.51.100.42`\n- Pattern: SYN → SYN-ACK → ACK → encrypted data → FIN, repeating every 60 seconds\n- Total connections over 6 hours: 360 (exactly one per minute)\n\n**Step 5: IOC Extraction**\n- Domain: `api.update-service[.]xyz` and variants\n- IP: 198.51.100[.]42\n- JA3 hash of the TLS client: matched known Cobalt Strike fingerprint\n- Beacon interval: 60 seconds\n- Payload size: 256 bytes (Cobalt Strike default)\n\n**Time to detection:** Under 10 minutes from pcap open to full C2 identification.\n\n**Key lesson:** Start with statistics (Protocol Hierarchy, Conversations), then narrow with targeted filters. The beaconing pattern became obvious once we filtered for the suspicious domain.",
+      "key_takeaway": "2GB pcap → 10 minutes to find C2. Workflow: Protocol Hierarchy → DNS queries → TLS SNI → connection pattern → IOC extraction. Statistics first, filters second."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Wireshark SOC Analysis Quick Reference",
+      "content": "**PCAP — Analysis Workflow:**\n- **P**rofile traffic — Protocol Hierarchy, Conversations, Endpoints\n- **C**apture filters — BPF syntax for targeted collection\n- **A**nalyze protocols — DNS, HTTP, TLS display filters\n- **P**ull IOCs — Extract domains, IPs, hashes, patterns\n\n**Essential Display Filters by Scenario:**\n| Scenario | Filter |\n|----------|--------|\n| DNS queries | `dns.flags.response == 0` |\n| DNS for domain | `dns.qry.name contains \"evil.com\"` |\n| HTTP requests | `http.request` |\n| HTTP POST | `http.request.method == \"POST\"` |\n| TLS SNI | `tls.handshake.extensions_server_name contains \"x\"` |\n| TCP SYN | `tcp.flags.syn == 1 && tcp.flags.ack == 0` |\n| RST floods | `tcp.flags.rst == 1` |\n| Retransmissions | `tcp.analysis.retransmission` |\n| Specific stream | `tcp.stream eq N` |\n| Large DNS names | `dns.qry.name.len > 50` |\n| EXE downloads | `http.file_extension in (\"exe\" \"dll\" \"ps1\")` |\n\n**tshark Commands for Automation:**\n```bash\n# Extract DNS queries\ntshark -r file.pcap -Y \"dns.flags.response == 0\" -T fields -e dns.qry.name\n\n# Extract HTTP URIs\ntshark -r file.pcap -Y \"http.request\" -T fields -e http.host -e http.request.uri\n\n# Extract TLS SNI\ntshark -r file.pcap -Y \"tls.handshake.type == 1\" -T fields -e tls.handshake.extensions_server_name\n\n# Extract unique IPs\ntshark -r file.pcap -T fields -e ip.src -e ip.dst | sort -u\n\n# Count packets per IP\ntshark -r file.pcap -T fields -e ip.src | sort | uniq -c | sort -rn | head -20\n```",
+      "key_takeaway": "PCAP workflow: Profile → Capture filters → Analyze protocols → Pull IOCs. tshark for automation. Right-click fields to build filters."
+    },
+    {
+      "type": "explanation",
+      "title": "Protocol Analysis: DNS, HTTP, and TLS",
+      "content": "SOC analysts must deeply understand the three most common protocols in incident investigation:\n\n**DNS Analysis for SOC:**\n- **Normal DNS:** Client queries for domain → server responds with IP\n- **Suspicious patterns:**\n  - High-frequency queries to same domain (beaconing)\n  - Unusually long subdomain labels (DNS tunneling)\n  - Queries to newly registered domains\n  - TXT record queries with large responses (data exfiltration)\n  - High entropy domain names (DGA — Domain Generation Algorithm)\n\n**Key DNS display filters:**\n```\ndns.qry.name contains \"suspicious.com\"     # Domain filter\ndns.qry.name.len > 50                        # Long queries (tunneling)\ndns.count.answers > 5                         # Many answers\ndns.txt                                      # TXT record queries\ndns.flags.response == 0                      # Queries only\n```\n\n**HTTP Analysis for SOC:**\n- **Normal HTTP:** GET/POST requests with standard headers\n- **Suspicious patterns:**\n  - Unusual User-Agent strings\n  - POST requests with large payloads to unknown endpoints\n  - Unusual HTTP methods (PUT, DELETE on production servers)\n  - HTTP responses with executable content types\n  - Long URIs (potential command injection or data exfiltration)\n\n**Key HTTP display filters:**\n```\nhttp.request                                 # All requests\nhttp.request.method == \"POST\"                # POST requests\nhttp.user_agent contains \"curl\"               # Specific user agents\nhttp.content_type contains \"application\"       # Binary downloads\nhttp.response.code == 200                     # Successful responses\n```\n\n**TLS Analysis for SOC:**\n- TLS encrypts application data, but metadata is visible:\n  - SNI (Server Name Indication) shows the domain being connected to\n  - TLS version and cipher suites reveal client capabilities\n  - JA3/JA3S hashes fingerprint the client/server TLS implementation\n  - Certificate details (issuer, subject, validity) reveal proxy/attack infrastructure\n\n**Key TLS display filters:**\n```\ntls.handshake.type == 1                                # Client Hello\ntls.handshake.extensions_server_name contains \"evil\"    # SNI filter\ntls.handshake.type == 11                               # Certificate\ntls.record.content_type == 23                           # Application data\n```",
+      "key_takeaway": "Three key protocols: DNS (beaconing/tunneling), HTTP (exfiltration/malware delivery), TLS (SNI/JA3 fingerprints). Each has specific suspicious patterns to hunt for."
+    },
+    {
+      "type": "explanation",
+      "title": "Following Streams and Reconstructing Conversations",
+      "content": "Following TCP streams is one of the most powerful analysis techniques:\n\n**Follow TCP Stream (Right-click → Follow → TCP Stream):**\n- Reassembles the complete two-way conversation\n- Client data in one color (red), server data in another (blue)\n- Shows application-layer payload in order\n- Can filter to show only one direction\n- Use 'Show data as' to switch between ASCII, hex, UTF-8, and raw\n\n**When to Follow Streams:**\n- HTTP conversations: see full request/response including headers and body\n- FTP sessions: see commands and file transfers\n- SMTP conversations: see email delivery including headers\n- Clear-text credential entry: passwords in telnet, FTP, HTTP basic auth\n- Malware C2: see the actual commands and responses\n\n**Follow UDP Stream:**\n- Similar to TCP but for UDP protocols (DNS, SNMP, RTP)\n- Less common but useful for DNS tunneling analysis\n\n**HTTP Object Export (File → Export Objects → HTTP):**\n- Extracts all files transferred over HTTP from the pcap\n- Shows filename, content type, size, and URL\n- Can save individual files or all at once\n- Essential for extracting malware samples, stolen documents, and web artifacts\n\n**Practical Workflow:**\n1. Find suspicious packet with display filter\n2. Right-click → Follow → TCP Stream to see full conversation\n3. If HTTP, use Export Objects to extract transferred files\n4. Save streams and extracted files as evidence\n5. Extract IOCs from the conversation (URLs, IPs, commands)\n\n**Pro Tip:** After following a stream, note the stream number (e.g., 'TCP Stream 42'). You can then filter with `tcp.stream eq 42` to see all packets in that stream with full packet details.",
+      "key_takeaway": "Follow TCP Stream = full conversation view. Use for HTTP, FTP, SMTP, and C2 analysis. Export HTTP Objects to extract transferred files. Note stream numbers for re-filtering."
+    },
+    {
+      "type": "reflection",
+      "title": "Wireshark SOC Skills Self-Assessment",
+      "content": "Evaluate your Wireshark proficiency:\n\n**Level 1 — Basic**\n- [ ] Can open a pcap and navigate the three panes\n- [ ] Can apply basic display filters (ip.addr, tcp.port)\n- [ ] Can follow a TCP stream\n\n**Level 2 — Intermediate**\n- [ ] Can write display filters for specific protocol fields\n- [ ] Can use Statistics (Protocol Hierarchy, Conversations, DNS)\n- [ ] Can identify suspicious patterns in DNS, HTTP, and TLS\n- [ ] Can extract files via Export Objects\n- [ ] Can use tshark for basic extraction\n\n**Level 3 — Advanced**\n- [ ] Can profile traffic patterns to identify beaconing and C2\n- [ ] Can correlate multiple protocols to build attack timelines\n- [ ] Can write complex multi-field display filters\n- [ ] Can automate pcap analysis with tshark scripts\n- [ ] Can identify DNS tunneling, C2 patterns, and data exfiltration\n\n**Level 4 — Expert**\n- [ ] Can build automated pcap analysis pipelines\n- [ ] Can write custom Wireshark dissectors for unknown protocols\n- [ ] Can perform full attack chain reconstruction from pcap alone\n- [ ] Can train other analysts on efficient pcap analysis workflows\n\n**Practice exercise:** Download a malware traffic analysis exercise from Malware Traffic Analysis (blog.malware-traffic-analysis.net) and apply the PCAP workflow. Time yourself — can you find the IOCs in under 15 minutes?",
+      "key_takeaway": "Start with basic filters and navigation. Progress to protocol analysis, pattern recognition, and finally automation. Practice with real malware pcaps."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "The Analyst's Microscope",
+      "content": "Wireshark is your microscope. The packets are your evidence. No other tool shows you exactly what happened on the wire with this level of detail.\n\n**This week's challenge:**\n1. Download a sample pcap from Malware Traffic Analysis blog\n2. Apply the PCAP workflow: Profile → Filter → Analyze → Extract\n3. Time yourself — aim for under 15 minutes to find all IOCs\n\nThe difference between a junior analyst and a senior analyst isn't intelligence — it's methodology and practice. The senior analyst has seen thousands of pcaps and knows immediately what 'normal' looks like, making the abnormal stand out instantly.\n\nBuild that intuition by analyzing real traffic regularly. The PCAP workflow will become second nature, and you'll spot anomalies in minutes that would take others hours.\n\nPackets don't lie. Learn to read them."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: DFIR Specialist", "Wireshark", "pcap analysis", "network forensics", "display filters", "protocol analysis", "DNS analysis", "beaconing detection"]
+}

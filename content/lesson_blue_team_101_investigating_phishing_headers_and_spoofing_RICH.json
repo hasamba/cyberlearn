@@ -1,0 +1,150 @@
+{
+  "lesson_id": "a1b2c3d4-6e78-4f90-a123-b4c5d6e7f890",
+  "domain": "blue_team",
+  "title": "Investigating Phishing: Headers and Spoofing",
+  "difficulty": 2,
+  "order_index": 101,
+  "prerequisites": ["Phishing Prevention and Detection"],
+  "concepts": [
+    "Email header structure and analysis",
+    "SMTP protocol and message routing",
+    "SPF, DKIM, and DMARC authentication verification",
+    "Email spoofing techniques and detection",
+    "Header forgery identification methods",
+    "IP address and domain reputation analysis",
+    "Email authentication failure analysis",
+    "Phishing investigation workflow"
+  ],
+  "estimated_time": 45,
+  "learning_objectives": [
+    "Parse and interpret email headers to trace message origin and routing path",
+    "Verify SPF, DKIM, and DMARC authentication results in received headers",
+    "Identify common spoofing techniques including domain lookalikes and header manipulation",
+    "Investigate phishing emails using header analysis to attribute attacks",
+    "Create detection rules based on header patterns for SOC alerting"
+  ],
+  "post_assessment": [
+    {
+      "question": "In an email header, what does the 'Received' field tell you?",
+      "options": [
+        "The content of the email message",
+        "The mail servers that handled the message, in reverse chronological order (last hop first)",
+        "The SPF and DKIM verification results only",
+        "The recipient's email client configuration"
+      ],
+      "correct": 1,
+      "explanation": "Received headers trace the message path through mail servers. They appear in reverse order — the topmost Received header is the last server that handled the message, and reading down reveals the full path back to the origin."
+    },
+    {
+      "question": "An email claims to be from ceo@company.com but the DKIM result shows 'dkim=fail'. What does this indicate?",
+      "options": [
+        "The email was sent from the CEO's personal device",
+        "The email's content or headers were modified after signing, or the signature doesn't match the claimed domain",
+        "DKIM verification is optional and the failure can be ignored",
+        "The email was sent through the company's backup mail server"
+      ],
+      "correct": 1,
+      "explanation": "DKIM failure means the digital signature doesn't validate — either the message was modified after signing, the signature was forged, or the email wasn't signed by the claimed domain. This is a strong indicator of spoofing."
+    },
+    {
+      "question": "What is the primary difference between a phishing email with a lookalike domain and one with a forged sender address?",
+      "options": [
+        "Lookalike domains are always more dangerous",
+        "A lookalike domain (e.g., c0mpany.com) is a different registered domain, while forged sender addresses manipulate the display name or envelope to appear as a legitimate domain",
+        "Forged sender addresses cannot be detected",
+        "There is no practical difference for the investigator"
+      ],
+      "correct": 1,
+      "explanation": "Lookalike domains are actually registered domains designed to visually mimic legitimate ones (homograph attacks). Forged senders manipulate the envelope or display name to impersonate a legitimate domain without actually controlling it. The detection methods differ for each."
+    },
+    {
+      "question": "When analyzing a suspicious email's headers, which field reveals the IP address of the system that originally sent the message?",
+      "options": [
+        "The From field in the header",
+        "The bottommost Received field (first hop) in the header chain",
+        "The Message-ID field",
+        "The X-Mailer field"
+      ],
+      "correct": 1,
+      "explanation": "The bottommost Received header (chronologically first) contains the IP address of the originating system. Each subsequent Received header was added by mail servers as the message was relayed to its destination."
+    },
+    {
+      "question": "What does an SPF result of 'softfail' (~all) indicate about an email?",
+      "options": [
+        "The email is definitely legitimate and should be delivered",
+        "The sending IP is not authorized but the domain owner requests marking rather than rejecting",
+        "The email has been verified as malicious",
+        "The SPF record is invalid and should be ignored"
+      ],
+      "correct": 1,
+      "explanation": "SPF softfail (~all) means the sending IP isn't in the authorized list, but the domain owner instructs receivers to mark it as suspicious rather than reject it outright. It's a middle ground between pass and hard fail."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall — After analyzing headers, reconstruct the message path from memory",
+    "Spaced Repetition — Review SPF/DKIM/DMARC verification steps at increasing intervals",
+    "Visualization — Map email headers as a relay race: sender → relay → relay → recipient",
+    "Association — Link each authentication result (pass/fail/softfail) to its specific meaning",
+    "Emotion — Think of spoofing as identity theft — headers are the forensic evidence",
+    "Storytelling — Frame header analysis as tracing a letter's postmarks back to its origin",
+    "Mnemonics — Use 'RABIT' for header analysis: Received headers, Authentication results, Bounces/relay, IP tracing, Timestamps",
+    "Chunking — Learn header analysis in order: trace path → verify auth → identify spoofing → attribute",
+    "Simplification — If you can't explain the difference between SPF fail and DKIM fail, review the section",
+    "Teaching — Walk someone through a real phishing header to solidify your analysis workflow"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Headers Are the Paper Trail",
+      "content": "Every email carries its own forensic evidence in the headers. Attackers can forge the 'From' address, but they can't fully control the entire header chain. The Received headers, authentication results, and routing information tell the real story. Learn to read headers, and no phishing email can hide from you."
+    },
+    {
+      "type": "explanation",
+      "title": "Email Header Structure Deep Dive",
+      "content": "Email headers are metadata attached to every message, revealing its journey from sender to recipient:\n\n**Key Header Fields:**\n\n**Received** (the most important for investigation)\n- Added by each mail server that handles the message\n- Appears in reverse chronological order (newest on top)\n- Contains: sending IP, receiving server, timestamp, protocol\n- Read from bottom to top to trace the origin\n\n**Authentication-Results**\n- SPF, DKIM, and DMARC verification results\n- Added by the receiving mail server\n- Critical for determining if the email is authenticated\n\n**From / Reply-To / Sender**\n- From: Display address (can be forged)\n- Reply-To: Where replies go (may differ from From)\n- Sender: Actual sender (if different from From)\n- Mismatch between these = suspicious\n\n**Message-ID**\n- Unique identifier assigned by the originating server\n- Format typically: `<uniquestring@sendingdomain>`\n- Can reveal the true sending infrastructure\n\n**X-headers** (custom headers)\n- X-Spam-Status, X-Spam-Score: Spam filter results\n- X-Mailer: Email client used to send\n- X-Originating-IP: Original sender IP (if preserved)\n\n**Date and Subject**\n- Date: When the message was sent (can be manipulated)\n- Subject: Often crafted for urgency/social engineering\n\n**Reading headers is like reading postmarks on an envelope — each stamp tells you where the letter has been.**",
+      "key_takeaway": "Received headers (bottom-to-top) trace the path. Authentication-Results verify the sender. Mismatches between From/Reply-To/Sender are red flags."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Email Headers Like Postmarks",
+      "content": "Imagine you receive a letter that says it's from your friend Alex, but something feels off. How do you check if it's really from Alex?\n\nLook at the envelope! Every post office that handled the letter stamped it. You can read the stamps:\n\n1. **Last stamp** (on top): Your local post office received it\n2. **Middle stamp**: A sorting facility processed it\n3. **First stamp** (at the bottom): The post office where it entered the mail system\n\nIf the first stamp says 'Scamville' but the letter claims to be from Alex in Hometown, something's wrong.\n\nEmail works the same way. The 'Received' headers are like postmarks. Read them from bottom to top, and you can see exactly where the email really came from — even if the 'From' address says otherwise.\n\nThe authentication checks (SPF, DKIM, DMARC) are like the post office verifying that the return address is real. If they all say 'pass,' the letter is genuinely from where it claims. If any say 'fail,' it's suspicious.",
+      "key_takeaway": "Read Received headers bottom-to-top like postmarks. Authentication results verify the sender. Failures = suspicious."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Parsing and Analyzing Email Headers",
+      "content": "Here's a Python script to extract and analyze key header information:\n\n```python\nimport email\nimport re\nfrom datetime import datetime\nfrom email.policy import default\n\ndef parse_email_headers(raw_email):\n    \"\"\"Parse email headers for phishing investigation.\"\"\"\n    msg = email.message_from_string(raw_email, policy=default)\n    analysis = {\n        'from': msg.get('From', ''),\n        'reply_to': msg.get('Reply-To', ''),\n        'sender': msg.get('Sender', ''),\n        'subject': msg.get('Subject', ''),\n        'date': msg.get('Date', ''),\n        'message_id': msg.get('Message-ID', ''),\n        'received_chain': [],\n        'auth_results': {},\n        'red_flags': []\n    }\n    \n    # Parse Received headers (bottom = origin)\n    received_headers = msg.get_all('Received', [])\n    for i, header in enumerate(reversed(received_headers)):\n        hop_num = len(received_headers) - i\n        # Extract IP addresses\n        ips = re.findall(r'\\[(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\]', header)\n        if not ips:\n            ips = re.findall(r'(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})', header)\n        analysis['received_chain'].append({\n            'hop': hop_num,\n            'ip': ips[0] if ips else 'unknown',\n            'raw': header[:200]\n        })\n    \n    # Parse Authentication-Results\n    auth_header = msg.get('Authentication-Results', '')\n    if auth_header:\n        spf_match = re.search(r'spf=(\\w+)', auth_header)\n        dkim_match = re.search(r'dkim=(\\w+)', auth_header)\n        dmarc_match = re.search(r'dmarc=(\\w+)', auth_header)\n        analysis['auth_results'] = {\n            'spf': spf_match.group(1) if spf_match else 'not found',\n            'dkim': dkim_match.group(1) if dkim_match else 'not found',\n            'dmarc': dmarc_match.group(1) if dmarc_match else 'not found'\n        }\n    \n    # Check for red flags\n    if analysis['reply_to'] and analysis['reply_to'] != analysis['from']:\n        analysis['red_flags'].append(f\"Reply-To ({analysis['reply_to']}) differs from From ({analysis['from']})\")\n    \n    if analysis['auth_results'].get('spf') == 'fail':\n        analysis['red_flags'].append('SPF authentication FAILED')\n    if analysis['auth_results'].get('dkim') == 'fail':\n        analysis['red_flags'].append('DKIM authentication FAILED')\n    if analysis['auth_results'].get('dmarc') == 'fail':\n        analysis['red_flags'].append('DMARC authentication FAILED')\n    \n    originating_ip = analysis['received_chain'][0]['ip'] if analysis['received_chain'] else 'unknown'\n    analysis['originating_ip'] = originating_ip\n    \n    return analysis\n\n# Example usage\nresults = parse_email_headers(raw_email_content)\nprint(f\"Originating IP: {results['originating_ip']}\")\nprint(f\"Auth Results: {results['auth_results']}\")\nprint(f\"Red Flags: {results['red_flags']}\")\n```",
+      "key_takeaway": "Parse Received headers bottom-to-top for origin. Check SPF/DKIM/DMARC results. Flag From/Reply-To mismatches."
+    },
+    {
+      "type": "real_world",
+      "title": "Real-World Investigation: BEC Email Header Analysis",
+      "content": "A finance team member reported a suspicious email claiming to be from the CEO requesting an urgent wire transfer. Here's the header investigation:\n\n**What the email claimed:**\n- From: CEO <ceo@company.com>\n- Subject: Urgent: Wire Transfer Needed Today\n\n**Header Analysis:**\n\n```\nAuthentication-Results: mx.company.com;\n    dkim=pass (1024-bit key) header.d=external-domain.xyz;\n    spf=pass smtp.mailfrom=bounce@external-domain.xyz;\n    dmarc=fail (p=reject) header.from=company.com\n```\n\n**What the headers revealed:**\n1. **SPF passed** — but for `external-domain.xyz`, not `company.com`\n2. **DKIM passed** — but signed by `external-domain.xyz`, not `company.com`\n3. **DMARC failed** — the From domain (`company.com`) didn't match the DKIM domain\n4. **Originating IP**: 185.234.xx.xx (registered to a hosting provider in Eastern Europe)\n5. **X-Mailer**: Microsoft Outlook 16.0 (legitimate), but **Message-ID** domain was `external-domain.xyz`\n6. **Reply-To**: personal-email@protonmail.com (different from From address)\n\n**Conclusion:** Classic BEC spoof. The attacker registered `external-domain.xyz` and configured it to send emails that look like they came from `company.com`. SPF/DKIM pass for the attacker's domain, but DMARC catches the domain mismatch.\n\n**Detection rule based on this pattern:**\n```yaml\n# Sigma rule for similar BEC patterns\ndetection:\n  selection:\n    authentication_results|contains: 'dmarc=fail'\n  condition: selection AND reply_to_exists AND subject|contains: ['urgent', 'wire', 'transfer']\n```",
+      "key_takeaway": "SPF/DKIM can pass for attacker domains while DMARC catches the domain mismatch. Always check Reply-To and originating IP."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Email Header Analysis Cheat Sheet",
+      "content": "**RABIT — Header Investigation Workflow:**\n- **R**eceived headers — Trace path bottom-to-top for origin IP\n- **A**uthentication results — Check SPF, DKIM, DMARC (all three!)\n- **B**ounces/relay — Identify legitimate vs. suspicious relay servers\n- **I**P tracing — Lookup originating IP reputation (VirusTotal, AbuseIPDB)\n- **T**imestamps — Check for impossible or inconsistent time zones\n\n**Authentication Results Quick Reference:**\n| Result | SPF | DKIM | DMARC | Meaning |\n|--------|-----|------|-------|---------|\n| All pass | pass | pass | pass | Legitimate |\n| SPF pass, DKIM fail | pass | fail | fail | Likely spoofed |\n| SPF softfail | softfail | pass | none | Suspicious, domain uses ~all |\n| All fail | fail | fail | fail | Almost certainly spoofed |\n| DKIM pass for different domain | pass* | pass* | fail | Domain impersonation |\n\n*Passed for attacker's domain, not the claimed domain\n\n**Common Spoofing Indicators:**\n- From ≠ Reply-To (different domains)\n- Originating IP from suspicious hosting/VPS providers\n- Message-ID domain doesn't match From domain\n- X-Mailer reveals unusual email client\n- Received header chain has suspicious relay servers\n- Time zone in Date header doesn't match sender's claimed location",
+      "key_takeaway": "RABIT workflow: Received, Authentication, Bounces, IP, Timestamps. Check all three auth results. From ≠ Reply-To = red flag."
+    },
+    {
+      "type": "explanation",
+      "title": "Common Spoofing Techniques and Detection",
+      "content": "Attackers use several techniques to make phishing emails appear legitimate:\n\n**1. Display Name Spoofing**\n- From: \"CEO Name\" <attacker@evil.com>\n- Works because many email clients only show the display name\n- **Detection:** Always check the actual email address, not just the display name\n\n**2. Domain Lookalikes (Homograph Attack)**\n- company.com → c0mpany.com (zero for o)\n- company.com → cornpany.com (rn for m)\n- company.com → соmраnу.com (Cyrillic characters)\n- **Detection:** Compare character-by-character with legitimate domain; use IDN homograph detection\n\n**3. Compromised Legitimate Account**\n- From: genuinely compromised @company.com account\n- SPF/DKIM/DMARC all pass because it's a real account\n- **Detection:** Behavioral analysis — unusual sending patterns, time of day, content\n\n**4. Subdomain Spoofing**\n- From: ceo@company.com.evil.com\n- The actual domain is evil.com, not company.com\n- **Detection:** Check the rightmost domain in the email address\n\n**5. Reply-To Manipulation**\n- From: ceo@company.com (legitimate-looking)\n- Reply-To: attacker@protonmail.com (goes to attacker)\n- **Detection:** Always compare From and Reply-To fields\n\n**6. BCC Abuse**\n- Legitimate email with BCC to attacker\n- Replies go to legitimate sender but attacker receives copies\n- **Detection:** Monitor for BCC fields in sensitive email threads",
+      "key_takeaway": "Six spoofing techniques: display name, domain lookalike, compromised account, subdomain, Reply-To, BCC. Each has specific detection methods."
+    },
+    {
+      "type": "reflection",
+      "title": "Phishing Investigation Checklist",
+      "content": "When you receive a suspicious email, follow this investigation checklist:\n\n**Step 1: Get Full Headers**\n- [ ] Extract complete email headers (not just From/Subject/Date)\n- [ ] Save raw headers for analysis and evidence\n\n**Step 2: Trace the Origin**\n- [ ] Read Received headers from bottom to top\n- [ ] Identify the originating IP address\n- [ ] Check IP reputation (VirusTotal, AbuseIPDB, Shodan)\n- [ ] Verify IP geolocation matches expected sender location\n\n**Step 3: Verify Authentication**\n- [ ] Check SPF result (pass/fail/softfail/none)\n- [ ] Check DKIM result (pass/fail/none)\n- [ ] Check DMARC result (pass/fail/none)\n- [ ] Note which domain each authentication result applies to\n\n**Step 4: Compare Addresses**\n- [ ] From address vs. Reply-To (different = suspicious)\n- [ ] From address domain vs. DKIM signing domain (different = suspicious)\n- [ ] Message-ID domain vs. From domain (different = suspicious)\n\n**Step 5: Content Analysis**\n- [ ] Subject line urgency indicators\n- [ ] Links (hover, don't click) — check actual URL vs. display text\n- [ ] Attachments — hash and check against VT\n- [ ] Grammar and formatting anomalies\n\n**Step 6: Document and Report**\n- [ ] Record all findings with timestamps\n- [ ] Create detection rule based on indicators\n- [ ] Report to security team per playbook\n- [ ] Block sender/domain/IP if warranted",
+      "key_takeaway": "Six-step investigation: Get headers → Trace origin → Verify auth → Compare addresses → Analyze content → Document and report."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Headers Never Lie (But Attackers Try)",
+      "content": "The From address is what the attacker wants you to see. The headers are what actually happened. Your job is to read past the deception.\n\nEvery phishing investigation follows the same pattern: get the headers, trace the path, verify authentication, compare addresses. If you do these four things consistently, you'll catch the vast majority of phishing attacks.\n\n**Practice challenge:** Take any legitimate marketing email and analyze its headers. Then find a phishing email and compare. The differences will become obvious once you know what to look for.\n\nThe best analysts don't have magic intuition — they have systematic processes. Build yours."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: DFIR Specialist", "email forensics", "phishing investigation", "email headers", "SPF", "DKIM", "DMARC", "spoofing", "header analysis"]
+}

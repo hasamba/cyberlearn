@@ -1,0 +1,150 @@
+{
+  "lesson_id": "c3d4e5f6-8a90-4b12-cd34-e5f6a7b8c901",
+  "domain": "cloud",
+  "title": "Cloud Serverless Function Security",
+  "difficulty": 2,
+  "order_index": 101,
+  "prerequisites": [],
+  "concepts": [
+    "Serverless architecture fundamentals and security model",
+    "AWS Lambda, Azure Functions, and GCP Cloud Functions security",
+    "Function execution role and least privilege IAM",
+    "Input validation and injection prevention",
+    "Secrets management in serverless environments",
+    "Cold start security implications",
+    "Event source security and trigger validation",
+    "Serverless monitoring and logging"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Identify and mitigate the unique security risks of serverless function architectures across AWS, Azure, and GCP",
+    "Configure least-privilege IAM execution roles for Lambda functions, Azure Functions, and Cloud Functions",
+    "Implement secure input validation to prevent injection attacks in serverless functions",
+    "Design secrets management strategies appropriate for serverless environments",
+    "Configure security monitoring and logging for serverless workloads"
+  ],
+  "post_assessment": [
+    {
+      "question": "What is the primary security advantage of serverless architecture compared to traditional servers?",
+      "options": [
+        "Serverless functions are inherently immune to all attacks",
+        "The cloud provider manages the OS and runtime, reducing the attack surface you're responsible for",
+        "Serverless functions cannot be accessed from the internet",
+        "Serverless eliminates the need for any security configuration"
+      ],
+      "correct": 1,
+      "explanation": "Serverless shifts infrastructure responsibility to the cloud provider. You're no longer responsible for OS patching, runtime updates, or server hardening. However, you're still responsible for application security, IAM, input validation, and secrets management."
+    },
+    {
+      "question": "A Lambda function needs to read from an S3 bucket and write to DynamoDB. What is the most secure IAM policy?",
+      "options": [
+        "Assign the function the AWS managed AdministratorAccess policy for convenience",
+        "Create a policy that allows s3:GetObject on the specific bucket and dynamodb:PutItem on the specific table only",
+        "Grant s3:* and dynamodb:* permissions on all resources",
+        "Use the same IAM role as other functions in the account for consistency"
+      ],
+      "correct": 1,
+      "explanation": "Least privilege means granting only the specific actions (s3:GetObject, dynamodb:PutItem) on specific resources (the exact bucket and table). Wildcard permissions or shared roles violate least privilege and increase blast radius."
+    },
+    {
+      "question": "What is the recommended approach for storing secrets (API keys, database passwords) in a serverless function?",
+      "options": [
+        "Hardcode secrets in the function source code for easy access",
+        "Store secrets in environment variables without encryption",
+        "Use the cloud provider's secrets manager (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) with runtime retrieval",
+        "Store secrets in a public S3 bucket and retrieve them at startup"
+      ],
+      "correct": 2,
+      "explanation": "Cloud secrets managers (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) provide encryption, access control, rotation, and audit logging. Functions retrieve secrets at runtime with least-privilege IAM, ensuring secrets never appear in code or environment variables."
+    },
+    {
+      "question": "Which attack is particularly concerning for serverless functions that process user input?",
+      "options": [
+        "SQL injection only affects traditional web servers",
+        "Event injection, where malicious data in event triggers exploits the function's processing logic",
+        "Serverless functions are immune to injection attacks because they run in containers",
+        "Buffer overflow attacks are the primary concern"
+      ],
+      "correct": 1,
+      "explanation": "Serverless functions often process event data (API requests, S3 events, SQS messages) that can contain malicious payloads. Event injection can exploit command execution, SSRF, or data manipulation within the function, even without a traditional server."
+    },
+    {
+      "question": "What security concern is unique to serverless cold starts?",
+      "options": [
+        "Cold starts make functions run faster and more securely",
+        "Cold starts can leak environment variables in error messages if initialization fails before security controls are applied",
+        "Cold starts eliminate the need for input validation",
+        "Cold starts only affect performance, not security"
+      ],
+      "correct": 1,
+      "explanation": "During cold starts, functions initialize their runtime environment. If initialization fails before security controls (input validation, authentication middleware) are fully loaded, error messages may expose environment variables, internal paths, or other sensitive information."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall — After each section, list the serverless security controls from memory",
+    "Spaced Repetition — Review IAM least-privilege patterns at increasing intervals",
+    "Visualization — Map the serverless attack surface: event sources → function → downstream services",
+    "Association — Link each serverless risk to its traditional server equivalent (event injection = SQL injection)",
+    "Emotion — Feel the stakes: an over-privileged Lambda can access every S3 bucket in your account",
+    "Storytelling — Frame serverless security as protecting a house where you don't own the walls but you own the doors",
+    "Mnemonics — Use 'LESS' for serverless security: Least privilege, Environment variables secured, Secrets managed, Scanning enabled",
+    "Chunking — Learn one cloud provider's serverless security first, then map to others",
+    "Simplification — Before learning cloud-specific configs, explain the security principle in one sentence",
+    "Teaching — Explain to a colleague why a Lambda with s3:* is dangerous to cement least-privilege understanding"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Serverless Doesn't Mean Security-Less",
+      "content": "The cloud provider manages the servers, but you still own the code, the configuration, and the permissions. Serverless removes infrastructure attacks but shifts responsibility to application-level security. The blast radius of an over-privileged function is just as large as an over-privileged server — sometimes larger."
+    },
+    {
+      "type": "explanation",
+      "title": "Serverless Security Model: Shared Responsibility Shift",
+      "content": "Serverless fundamentally changes the shared responsibility model:\n\n**You manage (your responsibility):**\n- Application code and dependencies\n- IAM execution roles and permissions\n- Input validation and injection prevention\n- Secrets and configuration management\n- Event source authorization\n- Logging, monitoring, and alerting\n- Dependency vulnerabilities (library scanning)\n\n**Cloud provider manages (their responsibility):**\n- Operating system and runtime\n- Server hardware and networking\n- Container isolation and provisioning\n- Scaling and availability\n- Infrastructure-level patching\n\n**Key Security Differences from Traditional Servers:**\n\n| Aspect | Traditional | Serverless |\n|--------|-------------|------------|\n| OS patching | Your responsibility | Provider responsibility |\n| Attack surface | Full OS + app | App + config only |\n| IAM scope | Server-level roles | Function-level roles |\n| Secrets storage | Config files, vaults | Secrets manager + env vars |\n| Monitoring | Agent-based | Cloud-native logging |\n| Network | Full control | Limited (VPC config) |\n| Execution time | Persistent | Ephemeral (milliseconds to minutes) |\n\n**The Critical Insight:** Function-level IAM means each function should have its own role with minimal permissions. A compromised function can only access what its role allows — make that as little as possible.",
+      "key_takeaway": "Serverless shifts security from infrastructure to application and configuration. Each function needs its own least-privilege IAM role."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Serverless Security Like a Hotel Room",
+      "content": "Imagine you're staying in a hotel (that's your serverless function).\n\n**The hotel manages:** The building, the plumbing, the electricity, the walls. You can't change them. (That's the cloud provider managing the server.)\n\n**You manage:** What's inside your room. You decide who gets a key card (IAM permissions). You decide what valuables to keep in the safe (secrets management). You decide who to let in through the door (input validation).\n\nNow imagine your key card opens every door in the hotel. That's like a Lambda function with too many permissions. If someone steals your key card (function compromised), they can access every room.\n\nBut if your key card only opens your room and the gym (least privilege), even if stolen, the damage is limited.\n\n**Serverless security = giving each function a key card that only opens the specific doors it needs.**",
+      "key_takeaway": "Each serverless function should have a key card (IAM role) that only opens the specific doors (services) it needs. Nothing more."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Least-Privilege IAM for Serverless Functions",
+      "content": "AWS Lambda least-privilege IAM policy example:\n\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:GetObject\"\n      ],\n      \"Resource\": \"arn:aws:s3:::my-app-data-bucket/input/*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"s3:x-amz-server-side-encryption\": \"aws:kms\"\n        }\n      }\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"dynamodb:PutItem\"\n      ],\n      \"Resource\": \"arn:aws:dynamodb:us-east-1:123456789012:table/ProcessResults\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"logs:CreateLogGroup\",\n        \"logs:CreateLogStream\",\n        \"logs:PutLogEvents\"\n      ],\n      \"Resource\": \"arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/my-process-function\"\n    },\n    {\n      \"Effect\": \"Deny\",\n      \"Action\": [\"s3:*\", \"dynamodb:*\"],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"Bool\": {\"aws:SecureTransport\": \"false\"}\n      }\n    }\n  ]\n}\n```\n\n**Security principles applied:**\n- Specific actions only (GetObject, PutItem — not s3:* or dynamodb:*)\n- Specific resources only (exact bucket path, exact table — not *)\n- Encryption condition (require KMS for S3 reads)\n- Deny non-SSL transport\n- Minimal logging permissions\n\n**Azure Functions equivalent:**\n```json\n{\n  \"properties\": {\n    \"roleName\": \"Process Function Role\",\n    \"description\": \"Least-privilege role for process function\",\n    \"permissions\": [{\n      \"actions\": [\n        \"Microsoft.Storage/storageAccounts/blobServices/containers/read\",\n        \"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/create\"\n      ],\n      \"notActions\": [\"*\"],\n      \"dataActions\": [\n        \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\",\n        \"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/create\"\n      ]\n    }]\n  }\n}\n```",
+      "key_takeaway": "Each function = own IAM role. Specific actions, specific resources, deny non-SSL. Never use wildcards."
+    },
+    {
+      "type": "real_world",
+      "title": "The Over-Privileged Lambda That Exposed 3 Million Records",
+      "content": "A financial services company deployed a Lambda function to process customer data uploads. The development team, under deadline pressure, assigned the function a permissive IAM role:\n\n**The Vulnerable Configuration:**\n```json\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\"s3:*\", \"dynamodb:*\", \"ssm:*\", \"secretsmanager:*\"],\n  \"Resource\": \"*\"\n}\n```\n\n**The Attack:**\n1. Attacker found an input injection vulnerability in the function's image processing library\n2. The function's overly permissive role allowed S3 ListAllMyBuckets and GetObject on all buckets\n3. From the compromised function, the attacker accessed:\n   - Customer PII bucket (3.2M records)\n   - Internal documents bucket\n   - Secrets Manager values (database credentials)\n4. Using the database credentials from Secrets Manager, the attacker queried the production database directly\n\n**Impact:**\n- 3.2M customer records exposed\n- $2.1M in breach notification and remediation costs\n- Regulatory fine under GDPR\n\n**The Fix (least-privilege IAM):**\n```json\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\"s3:GetObject\"],\n  \"Resource\": \"arn:aws:s3:::customer-uploads/input/*\"\n}\n```\n\nWith this policy, the compromised function could only read from the specific input bucket. No listing, no access to other buckets, no Secrets Manager access.\n\n**Cost of least-privilege IAM: 15 minutes of policy writing. Cost of the breach: $2.1M+**",
+      "key_takeaway": "An over-privileged Lambda with s3:* exposed 3.2M records. Least privilege limits blast radius to specific resources. 15 minutes of policy vs. $2.1M breach."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Serverless Security Quick Reference",
+      "content": "**LESS — Serverless Security Principles:**\n- **L**east privilege — One role per function, minimal permissions\n- **E**nvironment secured — No secrets in env vars, use secrets manager\n- **S**ecrets managed — Runtime retrieval from encrypted stores\n- **S**canning enabled — Dependency scanning, input validation\n\n**Function-Level Security Checklist:**\n| Control | AWS Lambda | Azure Functions | GCP Cloud Functions |\n|---------|------------|-----------------|---------------------|\n| IAM role | Per-function role | Managed Identity | Per-function SA |\n| Secrets | Secrets Manager | Key Vault | Secret Manager |\n| Logging | CloudWatch | App Insights | Cloud Logging |\n| VPC | VPC attachment | VNet integration | VPC connector |\n| Timeout | Set explicitly | Set explicitly | Set explicitly |\n| Memory | Right-size | Right-size | Right-size |\n\n**Input Validation for Serverless:**\n- Validate all event data (API requests, S3 events, SQS messages)\n- Sanitize before processing (prevent command injection)\n- Set explicit timeouts and memory limits\n- Use parameterized queries for database access\n- Validate event source (confirm the event came from expected source)\n\n**Common Serverless Vulnerabilities:**\n1. Over-privileged IAM roles (s3:*, dynamodb:*)\n2. Secrets in environment variables\n3. Unvalidated event input → injection\n4. Missing authentication on function URLs\n5. Dependency vulnerabilities in function packages\n6. Cold start information leakage\n7. Unrestricted function timeout/memory",
+      "key_takeaway": "LESS principles: Least privilege, Environment secured, Secrets managed, Scanning enabled. One role per function, no wildcards."
+    },
+    {
+      "type": "explanation",
+      "title": "Input Validation and Injection Prevention in Serverless",
+      "content": "Serverless functions often process untrusted input from event sources. Input validation is critical:\n\n**Event Injection Attack Vectors:**\n\n**1. Command Injection**\n```python\n# VULNERABLE — never pass input to shell commands\nimport os\ndef lambda_handler(event, context):\n    filename = event['filename']  # Attacker: '; rm -rf /'\n    os.system(f'process_file {filename}')  # Command injection!\n\n# SECURE — use libraries instead of shell commands\nimport subprocess\ndef lambda_handler(event, context):\n    filename = event['filename']\n    # Validate input\n    if not re.match(r'^[a-zA-Z0-9._-]+$', filename):\n        raise ValueError('Invalid filename')\n    subprocess.run(['process_file', filename], check=True)\n```\n\n**2. SSRF via Event Data**\n```python\n# VULNERABLE — event URL could point to internal resources\nimport requests\ndef lambda_handler(event, context):\n    url = event['callback_url']  # Attacker: 'http://169.254.169.254/latest/meta-data/'\n    requests.post(url, data='...')  # SSRF to metadata service!\n\n# SECURE — validate URL against allowlist\nfrom urllib.parse import urlparse\nALLOWED_HOSTS = ['api.trusted-service.com']\n\ndef lambda_handler(event, context):\n    url = event.get('callback_url', '')\n    parsed = urlparse(url)\n    if parsed.hostname not in ALLOWED_HOSTS:\n        raise ValueError('Unauthorized callback URL')\n```\n\n**3. Path Traversal**\n```python\n# VULNERABLE — event key could contain path traversal\nkey = event['file_key']  # Attacker: '../../../etc/passwd'\n\n# SECURE — validate and sanitize\nimport re\ndef validate_s3_key(key):\n    if '..' in key or key.startswith('/'):\n        raise ValueError('Invalid S3 key')\n    if not re.match(r'^[a-zA-Z0-9._/-]+$', key):\n        raise ValueError('Invalid S3 key')\n    return key\n```\n\n**General Validation Rules:**\n1. Validate all input against strict schemas\n2. Use parameterized queries for database access\n3. Never pass input to shell commands\n4. Validate URLs against allowlists\n5. Set explicit function timeouts\n6. Limit function memory to minimum needed",
+      "key_takeaway": "Validate all event input. Never pass input to shell commands. Use allowlists for URLs. Parameterized queries for databases."
+    },
+    {
+      "type": "reflection",
+      "title": "Serverless Security Maturity Assessment",
+      "content": "Evaluate your serverless security maturity:\n\n**Level 1 — Basic**\n- [ ] Each function has its own IAM role\n- [ ] No secrets hardcoded in function code\n- [ ] Functions have explicit timeouts set\n\n**Level 2 — Intermediate**\n- [ ] IAM roles follow least-privilege (specific actions, specific resources)\n- [ ] Secrets stored in secrets manager, retrieved at runtime\n- [ ] Input validation on all event data\n- [ ] Dependency scanning in CI/CD pipeline\n- [ ] Cloud-native logging enabled (CloudWatch/Application Insights)\n\n**Level 3 — Advanced**\n- [ ] VPC/VNet integration for functions accessing private resources\n- [ ] Dead-letter queues for failed executions\n- [ ] Function-level monitoring and alerting\n- [ ] Automated least-privilege IAM policy generation\n- [ ] Runtime security monitoring\n\n**Level 4 — Expert**\n- [ ] Automated dependency vulnerability scanning and patching\n- [ ] Function behavior anomaly detection\n- [ ] Serverless-specific security testing in CI/CD\n- [ ] Cross-function dependency mapping and blast radius analysis\n\nWhat's the single most impactful improvement you can make this week? For most teams, it's creating proper least-privilege IAM roles for each function.",
+      "key_takeaway": "Start with per-function IAM roles and least privilege. Add secrets management, input validation, and monitoring in layers."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Serverless Security Is Configuration Security",
+      "content": "In traditional servers, you harden the OS, configure the firewall, and install agents. In serverless, you configure IAM roles, set timeouts, and manage dependencies. The attack surface is smaller, but the blast radius of a misconfiguration can be enormous.\n\n**This week's action item:** Pick one serverless function and review its IAM role. Remove any wildcards (*). Replace them with specific actions and resources. Test that the function still works. You've just reduced the blast radius of a potential compromise.\n\nServerless security isn't harder than traditional security — it's different. Master the configuration, and you've mastered the security."
+    }
+  ],
+  "tags": ["Course: SANS-SEC510", "Career Path: Cloud Security", "serverless", "Lambda", "Azure Functions", "Cloud Functions", "IAM least privilege", "input validation", "secrets management", "cloud security"]
+}

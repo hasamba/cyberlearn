@@ -1,0 +1,150 @@
+{
+  "lesson_id": "d4e6f8a0-3b25-4c79-8e1f-2a3b4c5d6e78",
+  "domain": "blue_team",
+  "title": "Phishing Prevention and Detection",
+  "difficulty": 2,
+  "order_index": 100,
+  "prerequisites": ["Foundations of Security Operations"],
+  "concepts": [
+    "Phishing attack lifecycle and categories",
+    "Email authentication protocols (SPF, DKIM, DMARC)",
+    "Technical phishing detection mechanisms",
+    "User awareness training strategies",
+    "Phishing simulation and measurement",
+    "Email header analysis for phishing identification",
+    "URL and domain analysis techniques",
+    "Phishing response playbook"
+  ],
+  "estimated_time": 50,
+  "learning_objectives": [
+    "Explain the phishing attack lifecycle and distinguish between phishing, spear phishing, whaling, and business email compromise",
+    "Configure and validate SPF, DKIM, and DMARC records for email authentication",
+    "Implement technical controls for phishing detection including URL filtering, sandboxing, and content analysis",
+    "Design an effective phishing awareness training program with measurable outcomes",
+    "Create a phishing response playbook with escalation procedures"
+  ],
+  "post_assessment": [
+    {
+      "question": "What does DMARC do when set to 'p=reject' and an email fails both SPF and DKIM authentication?",
+      "options": [
+        "It allows the email through but logs the failure",
+        "It rejects the email and prevents delivery to the recipient",
+        "It quarantines the email and sends it to the spam folder",
+        "It forwards the email to the security team for review"
+      ],
+      "correct": 1,
+      "explanation": "DMARC policy 'p=reject' instructs receiving mail servers to reject emails that fail authentication checks (SPF and/or DKIM). This is the strictest policy and provides the strongest protection against domain spoofing."
+    },
+    {
+      "question": "Which phishing category specifically targets high-level executives with personalized content?",
+      "options": [
+        "Mass phishing",
+        "Spear phishing",
+        "Whaling",
+        "Vishing"
+      ],
+      "correct": 2,
+      "explanation": "Whaling is a subset of spear phishing that specifically targets C-suite executives and other high-value individuals with highly personalized, context-aware messages."
+    },
+    {
+      "question": "What is the most effective first technical control to implement against phishing?",
+      "options": [
+        "Deploy an expensive email gateway appliance",
+        "Implement SPF, DKIM, and DMARC for email authentication",
+        "Block all external email entirely",
+        "Require PGP encryption for all emails"
+      ],
+      "correct": 1,
+      "explanation": "SPF, DKIM, and DMARC are the foundational email authentication protocols that prevent domain spoofing and email forgery. They're free to implement and form the baseline for all other anti-phishing controls."
+    },
+    {
+      "question": "In a phishing simulation program, what metric indicates improvement in user awareness?",
+      "options": [
+        "Decreasing number of phishing emails sent by the organization",
+        "Increasing report rate and decreasing click rate over time",
+        "Increasing click rate showing users are engaging with content",
+        "Decreasing number of simulated phishing campaigns"
+      ],
+      "correct": 1,
+      "explanation": "A successful awareness program shows two trends: more users reporting suspicious emails (higher report rate) and fewer users clicking (lower click rate). Both indicate improved awareness and behavior change."
+    },
+    {
+      "question": "What should be the FIRST action in a phishing response playbook when a phishing email is reported?",
+      "options": [
+        "Immediately disconnect the affected user from the network",
+        "Preserve the email as evidence and begin containment by blocking the sender/domain",
+        "Reformat the affected user's workstation",
+        "Send a company-wide email about the phishing attempt"
+      ],
+      "correct": 1,
+      "explanation": "The first priority is preserving evidence (for investigation) and containing the threat (blocking the sender/domain to prevent more clicks). Disconnecting users or reformatting workstations may destroy evidence and is disproportionate for initial response."
+    }
+  ],
+  "jim_kwik_principles": [
+    "Active Recall — After each section, list the key phishing prevention controls from memory",
+    "Spaced Repetition — Review SPF/DKIM/DMARC mechanisms at increasing intervals",
+    "Visualization — Map the phishing attack lifecycle as a timeline from reconnaissance to data exfiltration",
+    "Association — Link each technical control to a specific phishing technique it prevents",
+    "Emotion — Recall a real phishing incident you've seen and the impact it had — that urgency drives retention",
+    "Storytelling — Frame email authentication as a passport system: SPF verifies the sender, DKIM verifies the letter, DMARC enforces the rules",
+    "Mnemonics — Use 'SDR' for phishing response: Save evidence, Detect scope, Respond with containment",
+    "Chunking — Learn one email auth protocol at a time before combining them",
+    "Simplification — Explain DMARC to someone who thinks email is just 'from: someone@somewhere'",
+    "Teaching — Run a mini phishing awareness session for a colleague to cement your understanding"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "title": "Phishing Is Everyone's Problem",
+      "content": "Phishing accounts for over 80% of reported security incidents. It's not a 'user education problem' — it's a systems problem that requires technical controls, user awareness, and response playbooks working together. Your job is to build layers of defense, not blame people for clicking."
+    },
+    {
+      "type": "explanation",
+      "title": "The Phishing Attack Landscape",
+      "content": "Phishing attacks come in several categories, each requiring different detection strategies:\n\n**Mass Phishing**\n- Cast a wide net to thousands of recipients\n- Generic content: 'Your account has been compromised'\n- Low personalization, high volume\n- Example: Fake Netflix password reset sent to millions\n\n**Spear Phishing**\n- Targeted at specific individuals or organizations\n- Personalized content using OSINT data\n- Higher success rate (6x more effective than mass phishing)\n- Example: Email mimicking CEO to finance team with urgent wire transfer request\n\n**Whaling**\n- Spear phishing targeting C-suite executives\n- Highly personalized with deep research\n- Often involves business email compromise (BEC)\n- Example: CFO receives email from 'CEO' requesting confidential data\n\n**Business Email Compromise (BEC)**\n- Compromises or spoofs business email accounts\n- Targets financial transactions and data\n- Highest financial loss per incident of any phishing type\n- Example: Supplier impersonation diverting payment to attacker account\n\n**Vishing (Voice Phishing)**\n- Phone calls impersonating legitimate entities\n- Often combines with email (hybrid attack)\n- Example: IT help desk call requesting password reset\n\n**Smishing (SMS Phishing)**\n- Phishing via SMS or messaging apps\n- Growing rapidly with mobile usage\n- Example: 'Your delivery is waiting, click here to reschedule'",
+      "key_takeaway": "Phishing categories: Mass, Spear, Whaling, BEC, Vishing, Smishing. Each needs different detection — know the landscape."
+    },
+    {
+      "type": "explanation",
+      "title": "Teach Me Like I'm 10: Email Authentication Like a Passport",
+      "content": "Imagine sending a letter. How does the receiver know it's really from you?\n\n**SPF** is like a return address check. The post office has a list of addresses you send mail from. If the letter says it's from you but comes from an address not on the list, it's suspicious.\n\n**DKIM** is like a wax seal. You put a special seal on your letter that only you can make. If the seal matches, nobody tampered with the letter.\n\n**DMARC** is the mail room rulebook. It says: 'If the return address AND the seal don't match, do this.' You can tell the mail room to:\n- **none** — Just watch and learn (monitor mode)\n- **quarantine** — Send it to the junk folder\n- **reject** — Don't deliver it at all\n\nAll three work together. SPF checks who sent it. DKIM checks it wasn't changed. DMARC decides what to do if either check fails.",
+      "key_takeaway": "SPF = sender verification, DKIM = message integrity, DMARC = enforcement policy. Together they prevent email spoofing."
+    },
+    {
+      "type": "code_exercise",
+      "title": "Configuring Email Authentication: SPF, DKIM, DMARC",
+      "content": "Properly configured email authentication is your first line of defense against phishing using your domain:\n\n```dns\n; SPF Record - Authorize which servers can send email for your domain\nyourdomain.com. IN TXT \"v=spf1 include:_spf.google.com include:spf.mailgun.org ~all\"\n; ~all = softfail (mark as suspicious)\n; -all = hardfail (reject unauthorized senders)\n; +all = allow all (NEVER use this!)\n\n; DKIM Record - Verify message integrity\n; Generated by your email provider, looks like:\nsel1._domainkey.yourdomain.com. IN TXT \"v=DKIM1; k=rsa; p=MIIBIjANBg...\"\n\n; DMARC Record - Enforcement policy for authentication failures\n_dmarc.yourdomain.com. IN TXT \"v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com; pct=100; adkim=s; aspf=s\"\n```\n\n**DMARC Rollout Plan:**\n```bash\n# Step 1: Monitor (p=none) - Collect data without affecting delivery\n\"v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com\"\n\n# Step 2: Quarantine (p=quarantine) - Send failures to spam\n# Start with percentage:\n\"v=DMARC1; p=quarantine; pct=10; rua=mailto:dmarc@yourdomain.com\"\n# Gradually increase: 10% → 25% → 50% → 100%\n\n# Step 3: Reject (p=reject) - Block failures entirely\n\"v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com\"\n```\n\n**Verify your configuration:**\n```bash\n# Check SPF\ndig TXT yourdomain.com\n\n# Check DKIM\ndig TXT sel1._domainkey.yourdomain.com\n\n# Check DMARC\ndig TXT _dmarc.yourdomain.com\n\n# Use online tools: mxtoolbox.com, dmarcian.com\n```",
+      "key_takeaway": "DMARC rollout: Monitor → Quarantine (gradual %) → Reject. Never skip to reject — start with p=none to collect data."
+    },
+    {
+      "type": "real_world",
+      "title": "How a BEC Attack Bypassed Technical Controls",
+      "content": "A mid-sized company lost $2.3M to a BEC attack despite having email authentication configured. Here's what happened:\n\n**The Attack:**\n1. Attacker compromised a supplier's email account (credential stuffing on a reused password)\n2. Monitored email threads for 3 weeks, learning communication patterns and invoice details\n3. Sent a legitimate-looking email from the actual supplier email — SPF, DKIM, DMARC all passed because the email was genuinely from the supplier's account\n4. Email requested payment to a 'new bank account' with urgent timing pressure\n5. Finance team processed the wire transfer because:\n   - Email came from a known, authenticated supplier\n   - The conversation thread was legitimate (attacker replied to existing thread)\n   - The request matched expected payment patterns\n\n**Why Technical Controls Failed:**\n- Email authentication verified the sender — but the sender was compromised\n- URL filtering saw nothing suspicious — no malicious links\n- Sandbox analysis found no malware — there was no attachment\n\n**What Would Have Prevented It:**\n- **Secondary verification**: Call the supplier using a known phone number (not from the email)\n- **Process controls**: Require dual approval for wire transfers above $10K\n- **Behavioral analysis**: Flag emails requesting payment to new accounts\n- **DMARC reporting**: Aggregate reports showed the supplier domain had recent authentication anomalies\n\n**Lesson:** Email authentication prevents spoofing, not account compromise. Layer your defenses.",
+      "key_takeaway": "Email authentication prevents spoofing, not compromised accounts. Always verify payment changes through a secondary channel."
+    },
+    {
+      "type": "memory_aid",
+      "title": "Phishing Defense Layers Cheat Sheet",
+      "content": "**SDR — Phishing Response:**\n- **S**ave evidence (preserve email, headers, attachments)\n- **D**etect scope (who else received it, who clicked)\n- **R**espond with containment (block sender, reset credentials)\n\n**Technical Controls Stack:**\n| Layer | Control | What It Catches |\n|-------|---------|-----------------|\n| Domain Auth | SPF/DKIM/DMARC | Domain spoofing |\n| Email Gateway | Spam filters, reputation | Known malicious senders |\n| URL Filtering | Block known bad URLs | Malicious links |\n| Sandboxing | Detonate attachments | Malware, exploits |\n| Content Analysis | NLP/ML classification | Social engineering patterns |\n| BEC Detection | Communication pattern analysis | Business email compromise |\n\n**User Awareness:**\n- Monthly simulated phishing campaigns\n- Report button in email client\n- Quarterly training refreshers\n- Positive reinforcement for reporters (not punishment for clickers)\n\n**DMARC Rollout Phases:**\n1. p=none (monitor) → Collect data\n2. p=quarantine (10%→100%) → Quarantine failures\n3. p=reject → Block failures entirely",
+      "key_takeaway": "SDR for response. Defense in depth: domain auth → gateway → URL filter → sandbox → content analysis → BEC detection."
+    },
+    {
+      "type": "explanation",
+      "title": "Building a Phishing Awareness Program",
+      "content": "An effective phishing awareness program combines simulated attacks with education:\n\n**Program Structure:**\n\n**1. Baseline Measurement**\n- Run initial phishing simulation (no warning)\n- Record click rate, credential submission rate, report rate\n- This is your starting point\n\n**2. Training Modules**\n- Short, focused training (5-10 minutes max)\n- Triggered immediately after clicking a simulation\n- Cover: URL hovering, sender verification, urgency detection, reporting procedures\n\n**3. Ongoing Simulations**\n- Monthly simulations with varying difficulty\n- Easy: Obvious typos, unknown senders\n- Medium: Slight modifications of known brands\n- Hard: Highly targeted spear phishing with OSINT data\n\n**4. Positive Reinforcement**\n- Celebrate reporters publicly (anonymized)\n- 'Phishing champion' recognition for teams with highest report rates\n- Never shame clickers — they're your detection sensors\n\n**5. Metrics Tracking**\n- Click rate trend (should decrease)\n- Report rate trend (should increase)\n- Time-to-first-report (should decrease)\n- Credential harvest rate (should decrease)\n\n**Common mistakes to avoid:**\n- Don't make simulations too easy or too hard — realistic difficulty\n- Don't punish clickers — they're learning\n- Don't ignore reporters — always acknowledge reports\n- Don't run the same template twice in a quarter",
+      "key_takeaway": "Measure baseline, train on-click, simulate monthly, celebrate reporters, track trends. Never shame clickers."
+    },
+    {
+      "type": "reflection",
+      "title": "Evaluate Your Phishing Defense Maturity",
+      "content": "Rate your organization's phishing defense maturity:\n\n**Level 1 — Reactive**\n- [ ] Basic spam filtering only\n- [ ] No email authentication (SPF/DKIM/DMARC)\n- [ ] No phishing awareness training\n- [ ] Incident response is ad-hoc\n\n**Level 2 — Foundational**\n- [ ] SPF, DKIM, and DMARC configured (at least p=quarantine)\n- [ ] Email gateway with URL filtering\n- [ ] Annual phishing awareness training\n- [ ] Basic phishing response playbook\n\n**Level 3 — Proactive**\n- [ ] DMARC p=reject with reporting\n- [ ] Sandbox detonation for attachments\n- [ ] Monthly phishing simulations with on-click training\n- [ ] Formal phishing response playbook with defined SLAs\n\n**Level 4 — Advanced**\n- [ ] BEC detection with communication pattern analysis\n- [ ] AI-augmented phishing detection\n- [ ] Continuous simulation program with adaptive difficulty\n- [ ] Integrated response with SOAR automation\n\nWhere are you now? Where do you want to be in 6 months? What's the single highest-impact improvement you can make this week?",
+      "key_takeaway": "Assess your maturity level, set a 6-month target, and identify the one highest-impact action you can take this week."
+    },
+    {
+      "type": "mindset_coach",
+      "title": "Defense in Depth, Not Blame in Depth",
+      "content": "The goal of phishing defense isn't zero clicks — that's impossible. The goal is:\n\n1. **Reduce** the number of people who click (technical controls + awareness)\n2. **Detect** quickly when someone does click (reporting + monitoring)\n3. **Respond** fast to contain damage (playbook + automation)\n\nEvery layer you add reduces risk. No single layer is perfect, but together they make successful phishing exponentially harder.\n\n**Your action item:** This week, pick the one thing from this lesson that your organization doesn't have yet, and start implementing it. Even one layer is infinitely better than none."
+    }
+  ],
+  "tags": ["Course: SANS-SEC450", "Career Path: SOC Analyst", "Career Path: Blue Teamer", "phishing", "email security", "SPF", "DKIM", "DMARC", "awareness training", "BEC", "spear phishing"]
+}
