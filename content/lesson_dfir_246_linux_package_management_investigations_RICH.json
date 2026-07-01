@@ -1,0 +1,174 @@
+{
+  "lesson_id": "b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e",
+  "domain": "dfir",
+  "title": "Linux Package Management Investigations",
+  "difficulty": 2,
+  "order_index": 246,
+  "prerequisites": [
+    "Linux Command Line for DFIR"
+  ],
+  "concepts": [
+    "Debian package management (dpkg, apt)",
+    "Red Hat package management (rpm, yum, dnf)",
+    "Package integrity verification",
+    "Investigating software installation timelines",
+    "Package-based indicators of compromise",
+    "Third-party repository analysis",
+    "Dependency trees and attack surface",
+    "Log analysis for package operations"
+  ],
+  "estimated_time": 40,
+  "learning_objectives": [
+    "Identify which package manager a Linux system uses and locate its artifacts",
+    "Verify package integrity against known-good checksums to detect tampering",
+    "Trace software installation timelines from package logs",
+    "Identify suspicious packages and repositories as indicators of compromise",
+    "Correlate package management evidence with other forensic artifacts"
+  ],
+  "post_assessment": [
+    {
+      "question_id": "linux-pkg-001",
+      "question": "On a Debian-based system, which file contains the complete history of package installations, removals, and upgrades?",
+      "options": [
+        "/var/log/dpkg.log",
+        "/var/log/apt/history.log",
+        "/var/log/syslog",
+        "/root/.bash_history"
+      ],
+      "correct_answer": 0,
+      "explanation": "/var/log/dpkg.log records all dpkg operations with timestamps, including install, remove, and upgrade actions. While /var/log/apt/history.log also logs package changes, it only captures operations performed through apt, not direct dpkg commands. For forensic completeness, examine both, but dpkg.log is the authoritative source.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-pkg-002",
+      "question": "You find a package called 'net-tools-extra' installed on a compromised RHEL server. How would you verify its authenticity?",
+      "options": [
+        "Check if it appears in rpm -qa output",
+        "Run rpm -V net-tools-extra to verify file integrity against package metadata",
+        "Check the package size with rpm -qi net-tools-extra",
+        "Search for the package name on Google"
+      ],
+      "correct_answer": 1,
+      "explanation": "rpm -V (verify) compares installed files against the original package metadata (checksums, permissions, ownership, timestamps). If any files have been modified since installation, rpm -V flags the discrepancy. This is the primary integrity verification mechanism for RPM-based systems.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-pkg-003",
+      "question": "Which command shows the timestamp of when a package was installed on a Debian system?",
+      "options": [
+        "dpkg -l packagename",
+        "dpkg -s packagename | grep Status",
+        "zcat /var/log/dpkg.log.*.gz | grep packagename",
+        "apt show packagename"
+      ],
+      "correct_answer": 2,
+      "explanation": "dpkg.log files (including rotated .gz archives) contain timestamped records of all package operations. The command 'zcat /var/log/dpkg.log.*.gz | grep packagename' reveals the exact date and time of installation. The dpkg -l and dpkg -s commands show status but not installation timestamps.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-pkg-004",
+      "question": "During an investigation, you discover a package installed from an unknown third-party repository. What is the MOST significant security concern?",
+      "options": [
+        "The package might have a different icon theme",
+        "The package could contain malicious code not vetted by the distribution's security team",
+        "The package will be slower to update",
+        "The package uses more disk space"
+      ],
+      "correct_answer": 1,
+      "explanation": "Third-party repositories bypass the distribution's security review process. An attacker can create a malicious package that installs backdoors, keyloggers, or rootkits. This is a common supply chain attack vector — the package may look legitimate but contain trojanized binaries or post-install scripts.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-pkg-005",
+      "question": "You run 'rpm -V bash' on a compromised system and see output including 'S.5....T.' What does this indicate?",
+      "options": [
+        "The package is properly verified",
+        "The file size (S), MD5 checksum (5), and modification time (T) differ from the original package",
+        "The package has 5 security vulnerabilities",
+        "The package needs to be updated to version 5"
+      ],
+      "correct_answer": 1,
+      "explanation": "rpm -V flags use specific codes: S=size mismatch, 5=MD5 checksum mismatch, T=timestamp mismatch. 'S.5....T.' means the file's size, checksum, and modification time all differ from what the original package recorded. This is a strong indicator that /bin/bash has been tampered with — potentially replaced with a rootkit version.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": [
+    "active_learning",
+    "minimum_effective_dose",
+    "teach_like_im_10",
+    "memory_hooks",
+    "meta_learning",
+    "connect_to_what_i_know",
+    "multiple_memory_pathways",
+    "reframe_limiting_beliefs",
+    "gamify_it",
+    "learning_sprint"
+  ],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Package Management: The Unsung Hero of Linux IR 📦\n\nPackage managers don't sound exciting. But here's the truth: **they're one of the richest forensic evidence sources on a Linux system.**\n\nEvery package that was installed, upgraded, or removed leaves a timestamped record. Attackers who install tools leave traces in package logs. Rootkits that modify binaries break package checksums. Suspicious repositories reveal supply chain attacks.\n\n**Key insight:** Windows has Prefetch and AmCache to track program execution. Linux has package logs to track software lifecycle. Different operating systems, same forensic principle: **software changes leave evidence.**\n\nThis lesson teaches you to read that evidence like a detective reads a crime scene. Let's go! 🔍"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Debian Package Management (dpkg/apt)\n\n## Key Forensic Artifacts\n\n### /var/log/dpkg.log — The Installation Timeline\n```\n2024-03-15 08:14:22 install libssl1.1:amd64 <none> 1.1.1n-0+deb11u4\n2024-03-15 08:14:23 install openssl:amd64 <none> 1.1.1n-0+deb11u4\n2024-03-15 10:22:01 remove nmap:amd64 <none> 7.80+dfsg1-1\n```\nEvery install, remove, upgrade, and configure action with a timestamp.\n\n### /var/log/apt/history.log — Human-Readable History\n```\nStart-Date: 2024-03-15 08:14:00\nCommandline: apt install openssl\nInstall: libssl1.1:amd64 (1.1.1n-0+deb11u4), openssl:amd64 (1.1.1n-0+deb11u4)\nEnd-Date: 2024-03-15 08:14:25\n```\nShows the exact command used, including who ran it (if run via sudo).\n\n### /var/lib/dpkg/status — Package Database\nContains every installed package's metadata, including version, dependencies, and status.\n\n## Key Investigation Commands\n```bash\n# List all installed packages\ndpkg -l\n\n# Show package details (version, architecture, description)\ndpkg -s openssl\n\n# List files installed by a package\ndpkg -L openssl\n\n# Verify package integrity (check for modifications)\ndebsums -c openssl\n\n# Find which package owns a file\ndpkg -S /usr/bin/openssl\n\n# Show package installation timeline\nzcat /var/log/dpkg.log*.gz | grep install\ncat /var/log/dpkg.log | grep install\n```"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Red Hat Package Management (rpm/yum/dnf)\n\n## Key Forensic Artifacts\n\n### /var/log/yum.log or /var/log/dnf.log\n```\nMar 15 08:14:22 Installed: openssl-1.1.1k-7.el9.x86_64\nMar 15 10:22:01 Erased: nmap-7.92-1.el9.x86_64\n```\n\n### RPM Database — /var/lib/rpm/\nThe RPM database is the authoritative source for package information:\n\n```bash\n# List all installed packages with timestamps\nrpm -qa --last\n\n# Verify all packages (integrity check)\nrpm -Va 2>&1 | head -50\n\n# Verify specific package\nrpm -V openssl\n\n# Show package details\nrpm -qi openssl\n\n# List files in a package\nrpm -ql openssl\n\n# Show package changelog\nrpm -q --changelog openssl\n\n# Show scripts that run during install\nrpm -q --scripts openssl\n```\n\n## RPM Verification Codes Decoded\n\n```\nS.5....T.  /bin/bash\n```\n\n| Code | Meaning | Forensic Significance |\n|------|---------|---------------------|\n| S | File size changed | Binary possibly replaced |\n| M | Mode (permissions) changed | Unauthorized chmod |\n| 5 | MD5 checksum changed | **File content modified** |\n| D | Device mismatch | |\n| L | Readlink mismatch | Symlink tampering |\n| U | User owner changed | Privilege escalation |\n| G | Group owner changed | |\n| T | Modification time changed | Timestamp manipulation |\n\n**Red flag:** `5` (checksum mismatch) on security-critical binaries like bash, sshd, sudo → likely rootkit or trojan.\n\n## Checking Repositories\n```bash\n# List enabled repositories (RHEL/CentOS)\nyum repolist\n\n# List ALL repositories including disabled\nyum repolist all\n\n# Show repository files\nls /etc/yum.repos.d/\ncat /etc/yum.repos.d/*.repo\n\n# Check for suspicious repos\ngrep -r 'gpgcheck=0' /etc/yum.repos.d/\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Package Forensics Investigation Workflow\n\nYou're investigating a compromised RHEL server. Follow this structured approach:\n\n## Step 1: Verify Package Integrity\n```bash\n# Check ALL packages for modifications\nrpm -Va > /tmp/package_verify.txt 2>&1\n\n# Focus on security-critical binaries\ngrep -E '5.*(/bin/|/sbin/|/usr/bin/|/usr/sbin/)' /tmp/package_verify.txt\n\n# Specifically check bash, sshd, sudo, passwd\nrpm -V bash openssh-server sudo passwd\n```\n\n## Step 2: Timeline Package Changes\n```bash\n# Show packages installed in the last 7 days\nrpm -qa --last | head -30\n\n# Check yum history for detailed operations\nyum history list all\n\n# Show details of a specific transaction\nyum history info <transaction_id>\n```\n\n## Step 3: Identify Suspicious Packages\n```bash\n# List all packages NOT from official repos\nrpm -qa --qf '%{NAME} %{VENDOR}\\n' | grep -v -e 'Red Hat' -e 'CentOS'\n\n# Check for packages with no GPG signature verification\nrpm -qa --qf '%{NAME} %{SIGPGP:pgpsig}\\n' | grep -i 'not signed\\|(none)'\n\n# Find recently added repository files\nfind /etc/yum.repos.d/ -mtime -30 -ls\n```\n\n## Step 4: Correlate with System Logs\n```bash\n# Cross-reference package installs with auth log\ngrep -E 'apt-get|yum|dnf|pip|npm' /var/log/auth.log\n\n# Check for manual package operations not in package logs\n# (indicating someone installed from source)\nfind /usr/local/bin/ -mtime -30 -ls\nfind /opt/ -mtime -30 -ls\n```\n\n## Challenge:\nYou find that `rpm -V bash` returns `S.5....T.` and `yum history` shows an unknown transaction that installed a package called `system-monitor` from a repo with `gpgcheck=0`. What's your assessment?",
+        "language": "bash",
+        "solution": "This is a strong indicator of compromise: (1) bash binary has been modified (size, checksum, and timestamp mismatch = likely trojanized shell), (2) 'system-monitor' from an unsigned repository is a classic backdoor naming pattern, (3) gpgcheck=0 means no signature verification was performed. Recommended actions: isolate the system, capture a forensic image, and analyze the 'system-monitor' package contents."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: Supply Chain Attack via Malicious Repository\n\n## The Incident\nA financial services company discovered unusual network traffic originating from their Red Hat web servers. Investigation revealed a sophisticated supply chain attack.\n\n## Package Management Evidence\n\n### Finding 1: Modified Binary\n```bash\n$ rpm -V bash\nS.5....T.  /bin/bash\n```\nThe bash binary had been replaced with a trojanized version that logged all commands and exfiltrated them via DNS.\n\n### Finding 2: Suspicious Repository\n```bash\n$ cat /etc/yum.repos.d/system-updates.repo\n[system-updates]\nname=System Updates\nbaseurl=https://evil-cdn.example.com/rhel9/\nenabled=1\ngpgcheck=0    # ← NO SIGNATURE VERIFICATION!\npriority=1    # ← HIGHEST PRIORITY!\n```\n\nThe attacker added a malicious repository with higher priority than official Red Hat repos and disabled GPG signature checking.\n\n### Finding 3: Package History\n```bash\n$ yum history info 47\nTransaction ID: 47\nCommand: yum install system-monitor\nInstalled: system-monitor-1.2.3-1.el9.x86_64\n```\n\nThe `system-monitor` package contained:\n- A modified `/bin/bash` that logged commands to `/tmp/.cmd_log`\n- A DNS exfiltration script disguised as a health check\n- A cron job to exfiltrate logs every 5 minutes\n\n## Indicators of Compromise (IOCs)\n- Repository file: `/etc/yum.repos.d/system-updates.repo`\n- Package: `system-monitor-1.2.3-1.el9.x86_64`\n- Modified binary: `/bin/bash` (checksum mismatch)\n- Exfil mechanism: DNS queries to `*.evil-cdn.example.com`\n\n## Prevention Recommendations\n1. Enforce `gpgcheck=1` on ALL repositories\n2. Monitor `rpm -Va` output for critical binaries\n3. Alert on new repository files in `/etc/yum.repos.d/`\n4. Centralize package management via Ansible/Puppet\n5. Use AIDE or similar for file integrity monitoring"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: Package Forensics 📦\n\nImagine every program on your computer came in a **labeled box** 📦\n\nEach box has:\n- A **name tag** (package name)\n- A **receipt** (when it was delivered/installed)\n- A **seal** (checksum to prove nobody tampered with it)\n- A **list of what's inside** (files the package installed)\n\n**Package forensics** is like being a detective who checks:\n\n1. **\"Does the seal match?\"** → `rpm -V` or `debsums -c`\n   - If the seal is broken, someone opened the box and changed what's inside! 🚨\n\n2. **\"When was this delivered?\"** → `dpkg.log` or `yum history`\n   - If a package arrived at 3 AM on a Sunday, that's suspicious! 🕐\n\n3. **\"Where did this come from?\"** → Check repositories\n   - If a package came from an unknown store instead of the official one, it might be fake! 🏪\n\n4. **\"What else came with it?\"** → Check dependencies\n   - Sometimes the box you ordered contains a surprise gift... from a hacker! 🎁\n\n**The golden rule:** Every change to your computer's software leaves a receipt. Your job is to read those receipts and spot the forgeries! 🔍"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Hooks for Package Forensics 🔗\n\n## Debian vs RHEL: **DAR**\n- **D**ebian → **dpkg** / **apt** (dpkg.log)\n- **A**pt → history.log (human-readable)\n- **R**HEL → **rpm** / **yum/dnf** (yum.log)\n\n## Integrity Verification: **VCS**\n- **V**erify packages → `rpm -Va` / `debsums -c`\n- **C**hecksum mismatch → **File was modified!**\n- **S**ource verification → Check repos for `gpgcheck=0`\n\n## Red Flags: **RGPS**\n- **R**epo with gpgcheck=0 (no signature verification)\n- **G**PG signature missing on installed package\n- **P**ackage from unknown vendor (not Red Hat/Debian)\n- **S**ize/checksum/time mismatch on security binaries\n\n## Investigation Order: **VCTC**\n1. **V**erify integrity (rpm -V / debsums)\n2. **C**heck package history (dpkg.log / yum history)\n3. **T**race repositories (source of packages)\n4. **C**orrelate with other artifacts (auth logs, timestamps)"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\n1. **Why is `rpm -V bash` returning `S.5....T.` a critical finding?** What does each character mean?\n\n2. **You find a Debian system where `debsums -c openssh-server` reports checksum mismatches.** What are your next steps?\n\n3. **A package was installed at 2:37 AM on a Sunday.** Is this suspicious? What additional evidence would you check?\n\n4. **How would you detect if an attacker replaced `/bin/ps` with a version that hides their processes?** Give the specific commands.\n\n5. **Why does `gpgcheck=0` in a repository file represent a security risk?** What attack does it enable?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Package Management: Your Hidden Evidence Goldmine ✨\n\nYou've just learned to read one of the most overlooked forensic evidence sources on Linux. Most attackers know to clear bash_history and syslog. Far fewer think to clean up dpkg.log or yum.log.\n\n**Key takeaways:**\n- Package logs provide **timestamps** for every software change\n- Integrity verification (`rpm -V`, `debsums`) detects **binary tampering**\n- Repository analysis reveals **supply chain attacks**\n- Cross-distro knowledge (Debian AND RHEL) makes you versatile\n\n**Practice challenge:** On a clean Linux VM, install a package, modify one of its files, then run `rpm -V` or `debsums -c`. See the detection in action.\n\nIn the next lesson, we'll look at how attackers use the Linux kill chain and how to trace their steps. Package evidence + kill chain analysis = powerful correlation. 🎯"
+      }
+    }
+  ],
+  "tags": [
+    "Course: SANS-FOR577",
+    "Career Path: DFIR Specialist"
+  ]
+}

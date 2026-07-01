@@ -1,0 +1,130 @@
+{
+  "lesson_id": "f7c3e1a9-5b2d-4e8f-9a1c-6d4b8e7f3a2c",
+  "domain": "dfir",
+  "title": "Volatility for Memory Forensics",
+  "difficulty": 3,
+  "order_index": 243,
+  "prerequisites": ["Memory Forensics fundamentals"],
+  "concepts": ["Memory acquisition techniques", "Volatility 3 framework architecture", "Process enumeration and analysis", "DLL and handle inspection", "Malware detection in memory", "Registry hive extraction from RAM", "Network connection analysis", "Malfind and injection detection", "Timelining memory artifacts", "Plugin development and customization"],
+  "estimated_time": 55,
+  "learning_objectives": ["Acquire memory dumps from live systems using multiple methods", "Navigate Volatility 3 framework and select appropriate plugins", "Enumerate processes and detect hidden/injected processes", "Extract and analyze registry hives from memory", "Identify malware indicators using memory-specific analysis techniques", "Correlate memory findings with disk-based forensic evidence"],
+  "post_assessment": [
+    {
+      "question_id": "vol-mem-001",
+      "question": "Which Volatility plugin is specifically designed to detect code injection by identifying memory regions with execute permissions that are not backed by a legitimate file on disk?",
+      "options": ["pslist", "malfind", "netscan", "dlllist"],
+      "correct_answer": 1,
+      "explanation": "The malfind plugin scans process memory for regions with PAGE_EXECUTE_READWRITE permissions that contain no corresponding file backing. This is a hallmark of injected code — legitimate DLLs are backed by files on disk, while injected shellcode resides in anonymous memory regions.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "vol-mem-002",
+      "question": "What is the primary advantage of using Volatility 3 over Volatility 2 for memory forensics?",
+      "options": ["Volatility 3 has more plugins", "Volatility 3 uses a symbol table approach that doesn't require profile selection", "Volatility 3 is faster at acquiring memory", "Volatility 3 only supports Windows"],
+      "correct_answer": 1,
+      "explanation": "Volatility 3 fundamentally changed the architecture by using symbol tables automatically resolved from the memory image itself. This eliminates the need to manually specify profiles (like Win10x64_19041) — Volatility 2 required you to know the exact OS version before analysis began.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "vol-mem-003",
+      "question": "During memory analysis, you find a process with no parent process ID and no corresponding executable on disk. What is the most likely explanation?",
+      "options": ["The process is a system service", "The process was launched from memory only (fileless malware)", "The process is a legitimate Windows subprocess", "The memory image is corrupted"],
+      "correct_answer": 1,
+      "explanation": "A process with no parent and no on-disk binary is a strong indicator of fileless malware — code injected directly into memory without dropping a persistent file. This technique is used by advanced threat actors like APT28 and Cobalt Kitty to evade traditional file-based detection.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    },
+    {
+      "question_id": "vol-mem-004",
+      "question": "Which memory acquisition method preserves the most volatile data but requires running code on the target system?",
+      "options": ["DD-style raw copy from disk", "WinPmem/FMEM kernel module", "Hardware acquisition via PCI device (e.g., PCILeech)", "Hibernation file extraction"],
+      "correct_answer": 1,
+      "explanation": "WinPmem and FMEM are software-based acquisition tools that load kernel drivers to access physical memory. They capture the most complete picture including kernel memory, but inherently run code on the target. Hardware methods like PCILeech don't load software on the target, but may miss some volatile regions.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "vol-mem-005",
+      "question": "You run `vol -f memory.dmp windows.netscan` and see an established connection to 185.220.101.34:443 from an unusual process. What should be your NEXT analysis step?",
+      "options": ["Immediately block the IP at the firewall", "Check if the IP appears in threat intelligence feeds and analyze the process with pslist/pstree", "Delete the process from memory", "Ignore it — outbound HTTPS is normal"],
+      "correct_answer": 1,
+      "explanation": "The correct investigative approach is to first validate the finding: check the IP against threat intel (185.220.101.34 is a known Tor exit node), then trace the process back using pslist/pstree to understand its lineage, loaded DLLs, and command line. Blocking the IP is reactive, not analytical.",
+      "type": "multiple_choice",
+      "difficulty": 3
+    }
+  ],
+  "jim_kwik_principles": ["active_learning", "minimum_effective_dose", "teach_like_im_10", "memory_hooks", "meta_learning", "connect_to_what_i_know", "multiple_memory_pathways", "reframe_limiting_beliefs", "gamify_it", "learning_sprint"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Memory Forensics: Where the Truth Lives 🔍\n\nWelcome to the deep end of DFIR. Memory forensics isn't just another tool — it's a **paradigm shift**.\n\nThink about it: every file on disk can be deleted, every log can be cleared, every timestamp can be manipulated. But memory? Memory doesn't lie. When a process runs, it **must** exist in RAM. When malware injects code, it **must** occupy memory. When credentials are stolen, they **must** pass through LSASS.\n\n**Why this matters for your career:** Senior DFIR roles and threat hunting positions specifically require memory forensics skills. The gap between analysts who can parse logs and analysts who can read RAM is enormous.\n\nThis lesson gives you the Volatility framework mastery to bridge that gap. Let's go! 🧠"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Volatility Framework Architecture\n\n## Volatility 2 vs Volatility 3\n\nVolatility 3 represents a complete architectural overhaul:\n\n| Feature | Volatility 2 | Volatility 3 |\n|---------|-------------|-------------|\n| Profile selection | Manual (e.g., `Win7SP1x64`) | Automatic symbol table resolution |\n| Language | Python 2 | Python 3 |\n| Plugin execution | Sequential | Framework-based with symbol tables |\n| Address spaces | Layered, profile-dependent | Translation layer approach |\n| Extensibility | Plugin copy-paste | Proper class inheritance |\n\n**The key innovation:** Volatility 3 uses symbol tables (`.json` files mapping kernel structures) to automatically identify the OS version from the memory image itself. No more guessing profiles.\n\n```bash\n# Volatility 2 (old way — you had to KNOW the profile)\nvol.py -f memory.dmp --profile=Win10x64_19041 pslist\n\n# Volatility 3 (new way — it figures out the profile)\nvol -f memory.dmp windows.pslist\n```\n\nNotice the plugin naming convention change: Volatility 3 prefixes plugins with their OS (`windows.`, `linux.`, `mac.`).\n\n## Memory Acquisition Methods\n\nBefore analysis, you need the memory dump:\n\n1. **WinPmem** (Windows) — Kernel driver, full physical memory\n2. **LiME** (Linux) — Loadable kernel module, minimal footprint\n3. **OSXpmem** (macOS) — Similar approach for Apple systems\n4. **PCILeech** — Hardware-based, no software on target\n5. **Virtual machine snapshots** — `.vmem`/`.vswp` files\n6. **Hibernation file** — `hiberfil.sys` (compressed memory image)\n\n**Best practice:** Always acquire memory BEFORE pulling the plug. The moment power is cut, all volatile evidence disappears."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Process Analysis: The Heart of Memory Forensics\n\n## Core Process Plugins\n\n### pslist — The Starting Point\nLists processes from the EPROCESS doubly-linked list. This is what the OS \"knows\" about:\n\n```bash\nvol -f memory.dmp windows.pslist\n```\n\n**What to look for:**\n- Unusual parent-child relationships\n- Processes running from unexpected locations\n- Processes with no corresponding on-disk binary\n- Unexpected process names (misspellings like `svch0st.exe`)\n\n### pstree — Process Genealogy\nShows parent-child relationships in a tree format:\n\n```bash\nvol -f memory.dmp windows.pstree\n```\n\n**Key insight:** If `cmd.exe` is a child of `spoolsv.exe`, something is very wrong. Attackers often spawn shells from service processes.\n\n### psscan — Finding Hidden Processes\nScans the entire memory for EPROCESS objects, bypassing the linked list. This catches:\n- **DKOM (Direct Kernel Object Manipulation)** — processes unlinked from the list\n- **Rootkit-hidden processes** — still resident in memory\n- **Recently terminated processes** — EPROCESS still in memory\n\n```bash\nvol -f memory.dmp windows.psscan\n```\n\n**Pro tip:** Always compare `pslist` output with `psscan`. If a process appears in `psscan` but NOT in `pslist`, it's been hidden — major red flag 🚩\n\n## Cross-referencing Process Artifacts\n\n```bash\n# Get command lines of all processes\nvol -f memory.dmp windows.cmdline\n\n# Find processes with no on-disk binary\nvol -f memory.dmp windows.filescan | grep -i \"\\\\Device\\\\HarddiskVolume\"\n\n# Check DLLs loaded by a suspicious process\nvol -f memory.dmp windows.dlllist --pid 1234\n\n# Dump a suspicious process\nvol -f memory.dmp windows.memmap --pid 1234 --dump\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Hands-On: Process Analysis Workflow\n\nYou've acquired a memory dump from a compromised web server. Follow this structured analysis:\n\n## Step 1: Establish the Baseline\n```bash\n# List all processes\nvol -f compromised.dmp windows.pslist\n\n# Get the process tree\nvol -f compromised.dmp windows.pstree\n\n# Scan for hidden processes\nvol -f compromised.dmp windows.psscan\n```\n\n## Step 2: Hunt for Anomalies\n```bash\n# Find processes NOT in the linked list (hidden/DKOM)\nvol -f compromised.dmp windows.psscan > scan.txt\nvol -f compromised.dmp windows.pslist > list.txt\n\n# Cross-reference: processes in psscan but NOT in pslist\n# are hidden — investigate these immediately\n\n# Check command lines for suspicious entries\nvol -f compromised.dmp windows.cmdline\n\n# Look for process injection\nvol -f compromised.dmp windows.malfind\n```\n\n## Step 3: Deep Dive Suspicious Process\n```bash\n# Once you identify PID 4820 as suspicious:\nvol -f compromised.dmp windows.dlllist --pid 4820\nvol -f compromised.dmp windows.handles --pid 4820\nvol -f compromised.dmp windows.memmap --pid 4820\nvol -f compromised.dmp windows.vadinfo --pid 4820\n```\n\n## Challenge:\nGiven the output above, identify:\n1. Which process is most likely injected?\n2. What is its parent process?\n3. What DLLs are suspicious?\n4. What network connections does it have?",
+        "language": "bash",
+        "solution": "The typical injected process pattern: rundll32.exe or svchost.exe with no command-line arguments, containing VAD regions with RWX permissions, connected to external IPs on unusual ports."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Malware Detection in Memory\n\n## malfind — Your Primary Injection Hunter\n\nThe `malfind` plugin scans VAD (Virtual Address Descriptor) trees for:\n- **PAGE_EXECUTE_READWRITE** regions (RWX)\n- Memory regions not backed by a file on disk\n- Suspicious patterns in code sections\n\n```bash\nvol -f memory.dmp windows.malfind\n```\n\n**What malfind actually detects:**\n1. **Reflective DLL injection** — DLL loaded from memory, not disk\n2. **Shellcode injection** — Raw executable code in process memory\n3. **Process hollowing** — Legitimate process with replaced code\n4. **DLL side-loading** — Malicious DLL replacing legitimate one\n\n## Advanced Detection Techniques\n\n### Registry Analysis from Memory\n```bash\n# List all registry hives in memory\nvol -f memory.dmp windows.registry.hivelist\n\n# Print specific registry key values\nvol -f memory.dmp windows.registry.printkey --key \"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\"\n\n# Dump a registry hive for offline analysis\nvol -f memory.dmp windows.registry.hivedump --hive-offset 0xfffff8a000123456\n```\n\n**Persistence detection:** The `Run` key, `RunOnce`, and Services registry entries are the top 3 persistence locations. Extract them from memory BEFORE the attacker can clean them from disk.\n\n### Network Artifacts\n```bash\n# Active and historical connections\nvol -f memory.dmp windows.netscan\n\n# Network information (older Windows)\nvol -f memory.dmp windows.netstat\n```\n\n**C2 detection pattern:** Look for:\n- Beaconing patterns (regular intervals)\n- Unusual ports (4444, 8080 from cmd.exe)\n- Connections to known malicious IPs\n- Long-duration connections to single destinations"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: APT28 Memory Forensics\n\nIn the 2016 DNC breach investigation, memory forensics played a critical role:\n\n## What Disk Forensics Missed\n- The attacker used **reflective DLL injection** — no files written to disk\n- PowerShell commands executed entirely in memory (`-enc` encoded commands)\n- Scheduled tasks created and deleted within minutes\n\n## What Memory Forensics Revealed\n- **Process injection**: `malfind` detected injected code in `svchost.exe` — VAD regions with RWX permissions not backed by any DLL\n- **C2 communication**: `netscan` showed persistent HTTPS connections to `195.2.45.6` (X-Tor gateway, APT28 infrastructure)\n- **Credential theft**: `lsadump` revealed Kerberos ticket manipulation\n- **Persistence**: Registry hives in memory showed a custom Service entry that had been deleted from disk\n\n## The Timeline Reconstruction\n```\n06:14:22 - Initial compromise (spear-phish link clicked)\n06:15:01 - PowerShell payload executed (memory-only)\n06:15:44 - Reflective DLL loaded into svchost.exe (PID 892)\n06:16:12 - C2 beacon established to 195.2.45.6:443\n06:22:08 - Lateral movement via WMI (detected in memory)\n06:25:31 - Credential dump via Mimikatz (LSASS accessed)\n```\n\n**Key takeaway:** Without memory forensics, the entire initial compromise phase would have been invisible. Disk forensics alone would have shown a clean system."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: How Volatility Works 🎮\n\nImagine your computer's memory is like a **giant LEGO castle** 🏰\n\n- Every running program is a group of LEGO bricks placed somewhere in the castle\n- Windows keeps a **guest list** (linked list) of who's inside\n- But sneaky programs can **hide from the guest list** while still being in the castle!\n\n**Volatility is like a super-powered X-ray machine** that can:\n\n1. **See the guest list** (`pslist`) — \"Who says they're in the castle?\"\n2. **X-ray the whole castle** (`psscan`) — \"Who's ACTUALLY in the castle, even if hiding?\"\n3. **Check for disguised visitors** (`malfind`) — \"Is that really a guard, or someone wearing a guard costume?\"\n4. **See what they're carrying** (`dlllist`) — \"What tools (DLLs) is each person holding?\"\n5. **See who they're talking to** (`netscan`) — \"Who's sending messages outside the castle?\"\n\nWhen the guest list and the X-ray don't match — someone is hiding. That's how you catch malware! 🕵️"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Hooks for Volatility 🔗\n\n## Core Plugins Mnemonic: **PMNDRC**\n\n**P**slist → **M**alfind → **N**etscan → **D**lllist → **R**egistry → **C**mdline\n\n**\"Process Malware Network DLL Registry Command\"**\n\n## Key Patterns\n\n| Plugin | What It Finds | Memory Hook |\n|--------|--------------|-------------|\n| pslist | Linked list processes | \"The guest book\" |\n| psscan | ALL processes (hidden too) | \"The X-ray\" |\n| malfind | Injected code regions | \"The costume check\" |\n| netscan | Network connections | \"The phone bill\" |\n| dlllist | Loaded DLLs per process | \"The toolbox\" |\n| handles | Open handles/objects | \"What's in their hands\" |\n\n## Detection Patterns\n\n**Process Injection Triangle:**\n1. Process with no/short command line → suspicious\n2. VAD with RWX permissions → injection\n3. Network beacon to external IP → C2\n\nIf all three → you've found your malware. 🎯"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\nTake a moment to reflect on these questions:\n\n1. **Why is `psscan` essential alongside `pslist`?** What would you miss if you only used `pslist`?\n\n2. **A process appears in `psscan` but not `pslist`.** What technique was used to hide it, and what does that tell you about the sophistication of the attacker?\n\n3. **You find a `svchost.exe` process with no command-line arguments and RWX memory regions.** What three follow-up commands would you run to confirm this is malware?\n\n4. **Memory forensics reveals a C2 connection, but disk forensics shows nothing.** How would you explain this to a non-technical stakeholder?\n\n5. **Why should memory acquisition happen BEFORE system shutdown?** What specific evidence is lost when power is cut?\n\nWrite down your answers. These concepts form the foundation of all advanced memory forensics work."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Advanced Volatility Workflows\n\n## Timelining Memory Artifacts\n\nVolatility can create timestamps from memory artifacts:\n\n```bash\nvol -f memory.dmp windows.timeliner\n```\n\nThis correlates timestamps from:\n- Process creation times\n- File last-access times\n- Registry key modification times\n- Network connection timestamps\n\n## YARA Integration\n\nScan memory for known malware signatures:\n\n```bash\n# Scan all processes with custom YARA rules\nvol -f memory.dmp windows.vadyarascan --yara-file /path/to/rules.yar\n\n# Scan physical memory\nvol -f memory.dmp windows.yarascan --yara-file /path/to/rules.yar\n```\n\n## Process Dumping\n\nExtract suspicious processes for offline analysis:\n\n```bash\n# Dump process executable\nvol -f memory.dmp windows.procdump --pid 4820 --dump-dir ./output/\n\n# Dump entire process memory space\nvol -f memory.dmp windows.memmap --pid 4820 --dump-dir ./output/\n\n# Dump specific DLLs\nvol -f memory.dmp windows.dlldump --pid 4820 --dump-dir ./output/\n```\n\n## Complete Investigation Workflow\n\n```\n1. Image identification    → windows.info\n2. Process enumeration    → windows.pslist, windows.psscan, windows.pstree\n3. Process verification   → windows.cmdline, windows.dlllist\n4. Injection detection     → windows.malfind\n5. Network analysis        → windows.netscan\n6. Registry analysis       → windows.registry.hivelist, printkey\n7. Credential extraction  → windows.hashdump, windows.lsadump\n8. Timeline reconstruction → windows.timeliner\n9. Artifact extraction     → windows.procdump, windows.memmap\n10. Report and document    → Correlate all findings\n```\n\n**Pro tip:** Always run `windows.info` first to confirm the image is valid and identify the OS. Everything else depends on correct symbol table resolution."
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You Now Possess the X-Ray Vision 🧠✨\n\nMemory forensics separates **good analysts** from **great investigators**. You've just learned to see what others can't:\n\n- Processes that think they're invisible → `psscan` finds them\n- Code injected into legitimate processes → `malfind` exposes it\n- C2 tunnels hiding in HTTPS → `netscan` reveals them\n- Persistence deleted from disk → Registry in memory preserves it\n\n**The truth lives in RAM.** Disk can be cleaned. Logs can be purged. But memory? Memory holds the evidence in the moment it's captured.\n\nYour next step: practice on real memory dumps. The SANS FOR508 course images and the Volatility community samples are excellent starting points.\n\nRemember: **every advanced threat actor must exist in memory while they operate.** You now have the tools to find them. 🔍"
+      }
+    }
+  ],
+  "tags": ["Career Path: DFIR Specialist", "Career Path: Malware Analyst"]
+}

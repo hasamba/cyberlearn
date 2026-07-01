@@ -1,0 +1,118 @@
+{
+  "lesson_id": "d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
+  "domain": "dfir",
+  "title": "The Sleuth Kit for Linux Forensics",
+  "difficulty": 2,
+  "order_index": 248,
+  "prerequisites": ["Linux Command Line for DFIR"],
+  "concepts": ["TSK layers model", "Filesystem layer tools", "Filename layer tools", "Metadata layer tools", "Data units layer tools", "Application layer tools", "Body file format", "Super timeline creation", "Autopsy as TSK frontend"],
+  "estimated_time": 50,
+  "learning_objectives": ["Understand The Sleuth Kit's layered approach to filesystem analysis", "Use filesystem layer tools (fsstat, fls, icat) to examine disk structures", "Apply metadata layer tools (istat, ils) to analyze inode information", "Create body files and super timelines using mactime", "Distinguish between the five TSK layers and when to use each tool"],
+  "post_assessment": [
+    {
+      "question_id": "tsk-linux-001",
+      "question": "In The Sleuth Kit's layered model, which layer deals with the organization of files and directories as a hierarchy?",
+      "options": ["Data units layer", "Metadata layer", "Filename layer", "Filesystem layer"],
+      "correct_answer": 2,
+      "explanation": "The filename layer organizes files and directories into a hierarchical structure (the directory tree). This is where directory entries map human-readable names to inode numbers. The filesystem layer deals with the overall disk structure, metadata layer deals with inode attributes, and data units layer deals with block/clusters.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "tsk-linux-002",
+      "question": "Which TSK command lists all files and directories in a filesystem, including deleted entries?",
+      "options": ["fsstat", "fls", "icat", "ils"],
+      "correct_answer": 1,
+      "explanation": "fls (file list) enumerates all file and directory entries in a filesystem, including deleted ones. It operates at the filename layer and can recursively list directory contents. fsstat shows filesystem statistics, icat extracts file content by inode, and ils lists inode structures.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    },
+    {
+      "question_id": "tsk-linux-003",
+      "question": "You need to extract the contents of a deleted file using its inode number. Which TSK tool do you use?",
+      "options": ["fls", "istat", "icat", "mmls"],
+      "correct_answer": 2,
+      "explanation": "icat (inode cat) extracts the data contents of a file given its inode address. It reads the data blocks referenced by the inode and outputs the file's content. This is essential for recovering deleted files when you know the inode number but the directory entry has been removed.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "tsk-linux-004",
+      "question": "What is the purpose of a 'body file' in TSK timeline creation?",
+      "options": ["It stores the filesystem metadata", "It contains MACB timestamps in a standardized format that mactime processes into a timeline", "It is the raw disk image format", "It contains the file hashes for integrity verification"],
+      "correct_answer": 1,
+      "explanation": "A body file is an intermediate file containing MACB (Modified, Accessed, Changed, Born) timestamps in the mactime format. It's created by fls and ils, then processed by mactime to produce a chronological super timeline. This separation allows combining multiple data sources into a single timeline.",
+      "type": "multiple_choice",
+      "difficulty": 2
+    },
+    {
+      "question_id": "tsk-linux-005",
+      "question": "Which TSK tool displays filesystem statistics including volume size, block size, and filesystem type?",
+      "options": ["fls", "fsstat", "istat", "mmls"],
+      "correct_answer": 1,
+      "explanation": "fsstat displays filesystem statistics and metadata including filesystem type, volume label, block size, total blocks, free blocks, and inode count. It operates at the filesystem layer, providing the 'big picture' view of the filesystem structure before diving into specific files or inodes.",
+      "type": "multiple_choice",
+      "difficulty": 1
+    }
+  ],
+  "jim_kwik_principles": ["active_learning", "minimum_effective_dose", "teach_like_im_10", "memory_hooks", "meta_learning", "connect_to_what_i_know", "multiple_memory_pathways", "reframe_limiting_beliefs", "gamify_it", "learning_sprint"],
+  "content_blocks": [
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# The Sleuth Kit: Your Forensic Swiss Army Knife 🔪\n\nIf you've done Windows forensics, you know tools like FTK and EnCase. On Linux, **The Sleuth Kit (TSK)** is the foundational forensic framework — open source, battle-tested, and incredibly powerful.\n\nHere's what makes TSK special: it doesn't just show you files. It lets you examine every **layer** of a filesystem, from the overall structure down to individual data blocks.\n\n**Why this matters:** When a suspect deletes a file, the directory entry may be gone, but the inode and data blocks often survive. TSK lets you examine each layer independently — finding evidence that GUI tools miss.\n\nThis lesson gives you the TSK toolkit from the ground up. By the end, you'll be able to dissect a Linux filesystem layer by layer. 🧅"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# The Sleuth Kit Layered Model\n\n## Understanding the Five Layers\n\nTSK organizes filesystem analysis into five layers, each with dedicated tools:\n\n```\n┌─────────────────────────────────┐\n│    Application Layer             │  Words, images, metadata inside files\n│    (keyword search, hash)        │  Tools: sigfind, hfind\n├─────────────────────────────────┤\n│    Filename Layer                │  File names → Inode mapping\n│    (directory structure)         │  Tools: fls, ffind\n├─────────────────────────────────┤\n│    Metadata Layer                │  Inodes (file attributes)\n│    (timestamps, permissions)     │  Tools: istat, ils\n├─────────────────────────────────┤\n│    Data Units Layer              │  Blocks/Clusters (file content)\n│    (disk blocks)                 │  Tools: blkls, blkcat, blkstat\n├─────────────────────────────────┤\n│    Filesystem Layer              │  Overall structure\n│    (superblocks, bitmaps)       │  Tools: fsstat\n└─────────────────────────────────┘\n```\n\n## Why Layers Matter for Forensics\n\nWhen a file is deleted:\n1. **Filename layer** → Directory entry removed (file name gone)\n2. **Metadata layer** → Inode marked as free (but data still there)\n3. **Data units layer** → Blocks marked as free (but content still there)\n\n**Critical insight:** Each layer can be examined independently. Even if the filename is gone, the inode and data may still be recoverable.\n\n## Quick Reference: TSK Tools by Layer\n\n| Layer | Tool | Purpose |\n|-------|------|---------|\n| Filesystem | `fsstat` | Filesystem statistics and structure |\n| Filesystem | `mmls` | Partition table layout |\n| Filename | `fls` | List files and directories |\n| Filename | `ffind` | Find file name for an inode |\n| Metadata | `istat` | Display inode details |\n| Metadata | `ils` | List inode structures |\n| Data Units | `blkls` | List data units (blocks/clusters) |\n| Data Units | `blkcat` | Display data unit contents |\n| Data Units | `icat` | Extract file data by inode |"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Filesystem Layer: The Big Picture\n\n## fsstat — Understanding the Filesystem\n\n```bash\n# Display filesystem statistics\nfsstat -f ext4 /images/suspicious.dd\n\n# Key output sections:\n# FILE SYSTEM INFORMATION\n# --------------------------------------------\n# File System Type: Ext4\n# Volume Name: \n# Volume ID: 5e3b8c7a2f1d4a6b\n# \n# METADATA INFORMATION\n# --------------------------------------------\n# Inode Range: 1 - 1310720\n# Root Directory: 2\n# \n# CONTENT INFORMATION\n# --------------------------------------------\n# Block Size: 4096\n# Block Range: 0 - 2621440\n```\n\n**What to look for:**\n- **Filesystem type** — Confirms what you're analyzing\n- **Block size** — Essential for data unit calculations\n- **Inode count** — How many files can exist\n- **Last mounted** — When was the filesystem last used?\n- **Free blocks/inodes** — Can indicate recent mass deletion\n\n## mmls — Partition Table Analysis\n\n```bash\n# Show partition layout of a disk image\nmmls /images/disk.dd\n\n# Output:\n# DOS Partition Table\n# Offset Sector\n# 0: 0000:0000 | 00:00:00.000 | Partition Table\n# 1: 0000:0001 | 00:00:00.001 | NTFS (0x07)\n# 2: 0000:2048 | 00:00:00.204 | Linux (0x83)\n# 3: 0000:1024000 | 00:00:00.000 | Linux Swap (0x82)\n```\n\n**Why this matters:** Before analyzing filesystems, you need to know WHERE they are on disk. `mmls` gives you the offset for each partition.\n\n```bash\n# Use the offset to analyze a specific partition\nfsstat -o 2048 /images/disk.dd\nfls -o 2048 /images/disk.dd\n```"
+      }
+    },
+    {
+      "type": "code_exercise",
+      "content": {
+        "text": "# Hands-On: TSK Investigation Workflow\n\nYou've received a disk image of a compromised Linux server. Follow this complete analysis workflow:\n\n## Step 1: Identify the Filesystem Structure\n```bash\n# Examine partition table\nmmls /evidence/server.dd\n\n# Get filesystem statistics (use offset from mmls)\nfsstat -o 2048 /evidence/server.dd\n\n# Note: block size, inode range, filesystem type\n```\n\n## Step 2: Examine the Filename Layer\n```bash\n# List root directory contents (including deleted files)\nfls -o 2048 /evidence/server.dd\n\n# Recursive directory listing\nfls -o 2048 -r /evidence/server.dd\n\n# List a specific directory by inode\nfls -o 2048 /evidence/server.dd 2    # inode 2 = root\n\n# Find deleted files specifically\nfls -o 2048 -r /evidence/server.dd | grep \"*\"\n```\n\n## Step 3: Examine the Metadata Layer\n```bash\n# View inode details for a specific file\nistat -o 2048 /evidence/server.dd 12345\n\n# List all inodes (including deleted)\nils -o 2048 /evidence/server.dd\n\n# Create a body file for timeline creation\nfls -o 2048 -m / /evidence/server.dd > body.txt\nils -o 2048 -m /evidence/server.dd >> body.txt\n```\n\n## Step 4: Extract File Content\n```bash\n# Extract file content by inode\nicat -o 2048 /evidence/server.dd 12345 > /tmp/recovered_file\n\n# Extract data from specific data units\nblkcat -o 2048 /evidence/server.dd 1024 > /tmp/block_data\n\n# Search for data in unallocated space\nblkls -o 2048 /evidence/server.dd > /tmp/unallocated.raw\nstrings /tmp/unallocated.raw | grep -i password\n```\n\n## Step 5: Create a Timeline\n```bash\n# Generate the super timeline\nmactime -b body.txt > timeline.csv\n\n# Analyze the timeline\ngrep '2024-03-15' timeline.csv | less\n```\n\n## Challenge:\nYou find a deleted file at inode 54321 with the name `.hidden_passwords.txt`. How would you:\n1. Confirm the file metadata (timestamps, size)?\n2. Recover the file contents?\n3. Determine if any other files reference this inode?",
+        "language": "bash",
+        "solution": "1. `istat -o 2048 /evidence/server.dd 54321` — shows timestamps, size, and data block pointers\n2. `icat -o 2048 /evidence/server.dd 54321 > /tmp/hidden_passwords.txt` — recovers the content\n3. `ffind -o 2048 /evidence/server.dd 54321` — finds any directory entries pointing to this inode, and `fls -o 2048 -r /evidence/server.dd | grep 54321` checks if other paths reference it"
+      }
+    },
+    {
+      "type": "real_world",
+      "content": {
+        "text": "# Case Study: TSK Recovers Deleted Evidence\n\n## The Scenario\nA former employee was suspected of stealing proprietary data before leaving. The employee's laptop had been wiped and reinstalled, but the original disk image was preserved.\n\n## Investigation Using TSK\n\n### Step 1: Identify the Filesystem\n```bash\n$ mmls /evidence/laptop.dd\nDOS Partition Table\nOffset Sector\n001: 0000:0000 | Partition Table\n002: 0000:2048 | Linux (0x83)\n```\n\n### Step 2: List All Files (Including Deleted)\n```bash\n$ fls -o 2048 -r /evidence/laptop.dd | head -20\nr/r 2: d/my-documents\nr/r * 3: d/my-documents/proprietary_data.xlsx  (DELETED)\nr/r 4: d/my-documents/notes.txt\nr/r * 5: d/my-documents/.hidden_contacts.txt  (DELETED)\n```\n\nThe `*` indicates deleted files. Two critical deleted files found!\n\n### Step 3: Examine Deleted File Metadata\n```bash\n$ istat -o 2048 /evidence/laptop.dd 3\ninode: 3\nNot Allocated\nGroup: 0\nGeneration Id: 2983742\nuid / gid: 1000 / 1000\nmode: rrw-r--r--\nsize: 2458624\ntime:\nAccessed: 2024-02-28 14:22:33 (UTC)\nFile Modified: 2024-02-28 14:22:01 (UTC)\nInode Modified: 2024-02-28 14:22:01 (UTC)\nFile Created: 2024-02-28 14:22:01 (UTC)\n\nDirect Blocks:\n6048 6049 6050 6051\n```\n\n**Key finding:** The file was accessed on Feb 28 — the day before the employee left!\n\n### Step 4: Recover the File\n```bash\n$ icat -o 2048 /evidence/laptop.dd 3 > /tmp/proprietary_data.xlsx\n$ file /tmp/proprietary_data.xlsx\n/tmp/proprietary_data.xlsx: Microsoft Excel 2007+\n```\n\n**Result:** Full recovery of the deleted spreadsheet containing proprietary data. The timestamps proved the employee accessed the data the day before resignation.\n\n## Lessons\n1. **Deletion doesn't mean gone** — Inode and data blocks persist\n2. **Metadata survives** — Timestamps tell the story even for deleted files\n3. **Layer-by-layer analysis** — Each TSK layer reveals different evidence\n4. **Document everything** — Every command and output must be preserved for chain of custody"
+      }
+    },
+    {
+      "type": "explanation",
+      "content": {
+        "text": "# Teach Me Like I'm 10: TSK Layers 🧅\n\nImagine a library 📚\n\n- **The building itself** (walls, floors, shelves) → **Filesystem Layer**\n  - `fsstat` tells you: \"This is a 3-story library with 10,000 shelves\"\n\n- **The catalog system** (card catalog mapping names to shelf locations) → **Filename Layer**\n  - `fls` tells you: \"Here's every book title and where it's supposed to be\"\n  - Even books that were removed from the catalog (deleted files)!\n\n- **Each book's information card** (author, date, ISBN) → **Metadata Layer**\n  - `istat` tells you: \"This book was written on Feb 28, is 245 pages, by user 1000\"\n\n- **The actual pages** (the content stored on shelves) → **Data Units Layer**\n  - `icat` lets you: \"Show me the actual content of page 3\"\n  - `blkls` tells you: \"Here are empty shelves where books used to be\"\n\n- **The words on the pages** → **Application Layer**\n  - `srch_strings` lets you: \"Find every page that mentions 'password'\"\n\n**When someone 'deletes' a book:**\n1. They remove the catalog card (filename gone) 🗑️\n2. The info card gets marked 'available' (but data still there) ✏️\n3. The shelf space gets marked 'free' (but book pages still there) 📖\n\n**TSK lets you look at each layer separately!** Even without the catalog card, you can find the info card and the actual pages. 🧅"
+      }
+    },
+    {
+      "type": "memory_aid",
+      "content": {
+        "text": "# TSK Tools Memory Hooks 🔗\n\n## Layer Order: **F-F-M-D-A**\n**F**ilesystem → **F**ilename → **M**etadata → **D**ata → **A**pplication\n(\"**F**ind **F**iles, **M**ine **D**ata, **A**nalyze\")\n\n## Tools by Layer: **MM-FL-II-BB-IC**\n- **M**mls + **M**kstat → Filesystem layer\n- **F**ls + **F**ind → Filename layer\n- **I**stat + **I**ls → Metadata (Inode) layer\n- **B**lkls + **B**lkcat → Data units (Block) layer\n- **I**cat → Extract file content (Inode → Content)\n\n(Think: \"**M**ary **M**ade **F**ive **L**ittle **I**ce **I**slands, **B**ut **B**ob **I**ced **C**ake\")\n\n## Most Used Commands: **FIST**\n- **F**ls → List files (deleted + active)\n- **I**stat → Inode details (timestamps!)\n- **S**tat (fsstat) → Filesystem overview\n- **T**imeline (mactime) → Super timeline\n\n## Timeline Creation: **FIB**\n- **F**ls creates filename body data\n- **I**ls creates inode body data\n- **B**oth feed into **mactime** for the timeline\n\n## Key Insight: Deleted ≠ Gone\nFilename removed → Inode still exists → Data still exists\n(Use each layer to recover what the layer above lost)"
+      }
+    },
+    {
+      "type": "reflection",
+      "content": {
+        "text": "# Check Your Understanding\n\n1. **Explain the five TSK layers in your own words.** What forensic value does each layer provide?\n\n2. **A file has been deleted.** The directory entry is gone. Which TSK tool can you use to find the file's metadata, and how?\n\n3. **You need to create a super timeline of all file activity.** What three TSK commands do you need, and in what order?\n\n4. **Why is `fls -r` more useful than simply listing the directory tree?** What does it show that a normal `ls` would miss?\n\n5. **You find an inode with timestamps showing modification 2 weeks ago but creation yesterday.** What forensic hypothesis could explain this?"
+      }
+    },
+    {
+      "type": "mindset_coach",
+      "content": {
+        "text": "# TSK: Layers Are Your Superpower 🧅✨\n\nYou've just learned to think about filesystems in layers — and that's the key insight that separates surface-level analysis from deep forensic investigation.\n\n**The layer model means you never have to say \"the file is gone.\"** Instead, you say:\n- \"The filename is gone, but let me check the inode layer.\"\n- \"The inode is marked free, but let me check the data blocks.\"\n- \"The blocks are marked free, but let me check unallocated space.\"\n\n**Every layer you can examine is another chance to find evidence.** That's the power of TSK.\n\nNext lesson: Linux File Systems Forensics dives deeper into ext4, XFS, and Btrfs — the filesystems that organize all this data. Understanding them makes TSK even more powerful.\n\nPractice tip: Download a sample disk image from the NIST CFReDS site and work through the FIST workflow. Muscle memory matters! 💪"
+      }
+    }
+  ],
+  "tags": ["Course: SANS-FOR577", "Career Path: DFIR Specialist"]
+}
